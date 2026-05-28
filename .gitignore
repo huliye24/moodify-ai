@@ -1,1 +1,10 @@
 node_modules
+dist
+release
+__pycache__
+*.pyc
+.env
+.venv
+.playwright-mcp
+.DS_Store
+Thumbs.db

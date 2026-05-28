@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/moodify.iml" filepath="$PROJECT_DIR$/.idea/moodify.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/moodify-pulse.iml" filepath="$PROJECT_DIR$/.idea/moodify-pulse.iml" />
     </modules>
   </component>
 </project>
