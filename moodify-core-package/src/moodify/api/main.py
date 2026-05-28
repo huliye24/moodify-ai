@@ -36,6 +36,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Register session-based API router
+from moodify.api.sessions import router as sessions_router
+app.include_router(sessions_router)
+
 # 延迟加载 (避免启动时的重导入)
 _engine = None
 _orchestrator = None

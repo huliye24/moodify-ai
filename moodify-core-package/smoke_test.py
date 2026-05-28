@@ -22,7 +22,7 @@ print(f"4. pedalboard {pedalboard.__version__} OK")
 
 # Test pyloudnorm
 import pyloudnorm
-print(f"5. pyloudnorm {pyloudnorm.__version__} OK")
+print("5. pyloudnorm OK")
 
 # Test diagnosis engine (lightweight import check)
 from moodify.diagnosis.engine import DiagnosisEngine

@@ -633,3 +633,63 @@ def get_ideal_process_vector(name: str) -> np.ndarray:
 def list_all_emotions() -> list[str]:
     """列出所有已定义情绪"""
     return list(EMOTION_TARGETS_V2.keys())
+
+
+def resolve_emotion_from_nl(nl_text: str) -> dict:
+    """自然语言情绪描述 → 结构化情绪目标.
+
+    优先级:
+      1. 查预设 alias 表 (EMOTION_ALIASES)
+      2. 调 DeepSeek 做语义映射
+      3. 回退到默认值 (GA, intensity=0.6, zero bias)
+
+    Returns:
+        {
+            "emotion_key": str,      # EMOTION_TARGETS_V2 中的 key
+            "emotion_code": str,     # "GA"
+            "intensity": float,
+            "vector_bias": dict,     # {"E": 0.0, "D": 0.0, "S": 0.0, "T": 0.0, "H": 0.0}
+            "source": "preset" | "deepseek" | "fallback",
+        }
+    """
+    # Step 1: 尝试预设匹配
+    try:
+        key = resolve_emotion(nl_text)
+        code = KEY_TO_CODE.get(key, "GA")
+        return {
+            "emotion_key": key,
+            "emotion_code": code,
+            "intensity": 0.6,
+            "vector_bias": {"E": 0.0, "D": 0.0, "S": 0.0, "T": 0.0, "H": 0.0},
+            "source": "preset",
+        }
+    except KeyError:
+        pass
+
+    # Step 2: 调 DeepSeek
+    try:
+        from moodify.llm.client import DeepSeekClient
+        client = DeepSeekClient()
+        if client.available:
+            result = client.interpret_emotion(nl_text)
+            if result:
+                code = result["emotion_code"]
+                key = CODE_TO_KEY.get(code, "gentle_awakening")
+                return {
+                    "emotion_key": key,
+                    "emotion_code": code,
+                    "intensity": result["intensity"],
+                    "vector_bias": result["vector_bias"],
+                    "source": "deepseek",
+                }
+    except Exception:
+        pass
+
+    # Step 3: 回退
+    return {
+        "emotion_key": "gentle_awakening",
+        "emotion_code": "GA",
+        "intensity": 0.6,
+        "vector_bias": {"E": 0.0, "D": 0.0, "S": 0.0, "T": 0.0, "H": 0.0},
+        "source": "fallback",
+    }

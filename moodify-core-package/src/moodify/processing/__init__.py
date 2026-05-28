@@ -9,3 +9,4 @@ from moodify.processing.operators import (
 from moodify.processing.pedalboard_chain import (
     MoodifyDSPChain, create_chain_from_code,
 )
+from moodify.processing.spectral_chain import SpectralDSPChain

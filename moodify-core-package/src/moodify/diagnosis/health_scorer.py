@@ -104,7 +104,8 @@ class HealthScorer:
     def compute_eds(self,
                     ws_raw: WaveStateDiagnosis,
                     ws_processed: WaveStateDiagnosis,
-                    emotion_target: str) -> float:
+                    emotion_target: str,
+                    target_vec: np.ndarray | None = None) -> float:
         """
         计算情绪显影分 (EDS)
 
@@ -116,7 +117,8 @@ class HealthScorer:
         Returns:
             float [0, 100]
         """
-        target_vec = self._get_ideal_vector(emotion_target)
+        if target_vec is None:
+            target_vec = self._get_ideal_vector(emotion_target)
 
         raw_vec = self._diagnosis_to_process_vector(ws_raw)
         processed_vec = self._diagnosis_to_process_vector(ws_processed)
