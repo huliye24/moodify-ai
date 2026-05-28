@@ -88,7 +88,7 @@ def cmd_analyze(args):
                          "description": d.description_zh} for d in defects],
         }
         print("\n--- JSON ---")
-        print(json.dumps(report, ensure_ascii=False, indent=2))
+        print(json.dumps(report, ensure_ascii=False, indent=2, default=str))
 
     return 0
 
@@ -130,6 +130,30 @@ def cmd_process(args):
     print(f"WHS: {result.whs_before:.0f} -> {result.whs_after:.0f}  "
           f"EDS: {result.eds:.0f}  Risk: {result.total_risk:.2f} [{result.risk_level}]")
     print(f"Output: {result.output_path}")
+
+    if getattr(args, 'json', False):
+        import json as _json
+        report = {
+            "process_id": result.process_id,
+            "success": result.success,
+            "input": path,
+            "emotion": emotion,
+            "output": result.output_path,
+            "whs_before": result.whs_before,
+            "whs_after": result.whs_after,
+            "eds": result.eds,
+            "total_risk": result.total_risk,
+            "risk_level": result.risk_level,
+            "total_elapsed_ms": result.total_elapsed_ms,
+            "phases": [
+                {"phase": p.phase, "name": p.name, "status": p.status.value,
+                 "elapsed_ms": p.elapsed_ms, "warnings": p.warnings}
+                for p in result.phases
+            ],
+        }
+        print("\n--- JSON ---")
+        print(_json.dumps(report, ensure_ascii=False, indent=2, default=str))
+
     return 0 if result.success else 1
 
 

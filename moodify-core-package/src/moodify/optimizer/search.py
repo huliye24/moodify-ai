@@ -247,7 +247,14 @@ def _proxy_te_base(
     sigma_inv = get_static_sigma_inv()
     dist_after = float(_mahalanobis_distance(ws_te, target, sigma_inv))
     eds = 100.0 * (1.0 - dist_after / max(dist_before, 1e-8))
-    return float(np.clip(eds, -100.0, 100.0))
+    eds = float(np.clip(eds, -100.0, 100.0))
+    # 在线校准修正
+    try:
+        from moodify.calibration.online import correct_proxy_score
+        eds = correct_proxy_score(eds, emotion_code)
+    except Exception:
+        pass
+    return eds
 
 
 # ── 2.1.5 strength_to_params ─────────────────────────────
@@ -300,6 +307,7 @@ def search_optimal_strengths(
     vector_bias: dict | None = None,
     audio: np.ndarray | None = None,
     sr: int = 44100,
+    n_probes_cal: int = 0,  # 0=不校准, 3=快速验证, 5=完整岭回归
 ) -> list[tuple[dict[str, float], dict[str, float], float]]:
     """5D 强度空间搜索主入口. 可选探针校准增强代理评估."""
     t0 = time.perf_counter()
@@ -332,10 +340,10 @@ def search_optimal_strengths(
     target_arr = None
     dist_before = None
 
-    if audio is not None:
+    if audio is not None and n_probes_cal > 0:
         try:
             from moodify.optimizer.calibrate import calibrate
-            cal = calibrate(diagnosis, audio, sr, emotion_code, n_probes=5, ridge_lambda=1.0)
+            cal = calibrate(diagnosis, audio, sr, emotion_code, n_probes=n_probes_cal, ridge_lambda=1.0)
             J = cal["J"]
             cond_num = cal["condition_number"]
             ws_raw_arr = cal["ws_raw"]
