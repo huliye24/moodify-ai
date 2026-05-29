@@ -56,13 +56,13 @@ def preflight_check() -> dict:
     except Exception:
         raise PreFlightError("Output directory not writable")
 
-    # 3. 核心模块可导入
+    # 3. 核心模块可导入 (仅验证包存在, 不做深度导入)
     required_modules = [
         "moodify.diagnosis.engine",
         "moodify.processing.spectral_chain",
         "moodify.optimizer.search",
-        "moodify.calibration.online",
-        "moodify.orchestration.state_transfer",
+        "moodify.knowledge.emotion_targets",
+        "moodify.knowledge.craft_chains",
     ]
     for mod in required_modules:
         try:
