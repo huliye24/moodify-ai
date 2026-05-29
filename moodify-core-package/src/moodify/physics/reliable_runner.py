@@ -266,13 +266,7 @@ def run_with_guard(
             kwargs["resume_from"] = resume_step
             kwargs["resume_data"] = resume_data
 
-        # 注入检查点回调到 kwargs
-        kwargs["checkpoint_callback"] = lambda step, total, data, meta: checkpoint.save(step, total, data, meta)
-        kwargs["heartbeat"] = heartbeat
-        kwargs["checkpoint_every"] = checkpoint_every
-        kwargs["max_failure_rate"] = max_failure_rate
-
-        # 执行
+        # 执行 (guard 不注入额外 kwargs, 避免实验函数签名不匹配)
         result = func(**kwargs)
 
         elapsed = time.perf_counter() - t_start
