@@ -1,41 +1,24 @@
 #!/bin/bash
-# Moodify 异步实验启动器
-# 用法: ssh tencent './run_suite.sh quick'
-#       ssh tencent './run_suite.sh full'
-#       ssh tencent './run_suite.sh engineering'
+# Moodify 异步实验启动器 — 放到云端 /home/ubuntu/run_suite.sh
+# 用法: ./run_suite.sh quick    (5 min)
+#       ./run_suite.sh full     (2-4 hours)
+#       ./run_suite.sh engineering (25 min)
 
 SUITE=${1:-quick}
-LOG_DIR=/home/ubuntu/moodify/outputs/reports
-mkdir -p $LOG_DIR
-
-RUN_ID=$(date +%Y-%m-%d_%H-%M-%S)
-LOG_FILE=$LOG_DIR/${RUN_ID}_run.log
-
-echo "=== Moodify Experiment Suite: $SUITE ===" | tee -a $LOG_FILE
-echo "Start: $(date)" | tee -a $LOG_FILE
-echo "Log: $LOG_FILE" | tee -a $LOG_FILE
-
 cd /home/ubuntu/moodify
+export PYTHONPATH=moodify-core-package/src:$PYTHONPATH
+mkdir -p outputs/reports
 
-# Kill any previous experiments
-pkill -f batch_runner 2>/dev/null || true
-sleep 1
+LOG_FILE=outputs/reports/$(date +%Y-%m-%d_%H-%M-%S)_${SUITE}.log
 
-# Launch batch runner
-PYTHONUNBUFFERED=1 nohup python3 -u -m moodify.physics.batch_runner \
-    --suite $SUITE \
-    >> $LOG_FILE 2>&1 &
+echo "=== Moodify Suite: $SUITE ===" | tee -a $LOG_FILE
+echo "Start: $(date)" | tee -a $LOG_FILE
+echo "PID: $$" | tee -a $LOG_FILE
 
-PID=$!
-echo "PID: $PID" | tee -a $LOG_FILE
+python3 -u -m moodify.physics.batch_runner --suite $SUITE >> $LOG_FILE 2>&1
+
 echo "" | tee -a $LOG_FILE
-echo "Experiment launched. Monitor with:"
-echo "  tail -f $LOG_FILE"
-echo ""
-echo "Check results after completion:"
-echo "  cat outputs/reports/$(date +%Y-%m-%d)*_report.md"
-echo ""
-echo "Auto-stop: process will exit automatically when all experiments complete."
-
-# Save PID for monitoring
-echo $PID > /tmp/moodify_experiment.pid
+echo "Done: $(date)" | tee -a $LOG_FILE
+echo "" | tee -a $LOG_FILE
+echo "Latest reports:"
+ls -lt outputs/reports/*_report.md 2>/dev/null | head -3
