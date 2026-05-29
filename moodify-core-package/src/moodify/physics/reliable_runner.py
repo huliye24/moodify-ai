@@ -19,6 +19,12 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 
+# 确保 moodify 包在路径中 (云端和本地都可能需要)
+_SELF_DIR = Path(__file__).resolve().parent  # physics/
+_SRC_DIR = _SELF_DIR.parent.parent  # src/
+if str(_SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(_SRC_DIR))
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 OUTPUT_ROOT = PROJECT_ROOT / "outputs"
 STATUS_DIR = OUTPUT_ROOT / "status"
