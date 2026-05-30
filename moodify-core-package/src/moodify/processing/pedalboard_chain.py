@@ -88,8 +88,8 @@ class MoodifyDSPChain:
                 cutoff_frequency_hz=_p(params, "P14_high_shelf_freq", 10000),
                 gain_db=g))
 
-        board.append(pedalboard.Gain())     # output gain staging
-        board.append(pedalboard.Limiter())  # safety ceiling
+        board.append(pedalboard.Gain())  # output gain staging
+        board.append(pedalboard.Limiter(threshold_db=-1.0))  # safety ceiling at -1 dBFS
         return board
 
     def _run_board(self, audio: np.ndarray, sr: int,

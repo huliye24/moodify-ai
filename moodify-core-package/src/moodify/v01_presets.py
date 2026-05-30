@@ -1,4 +1,4 @@
-"""v01_presets.py — Three v0.1.0 processing presets.
+"""v01_presets.py -- Three v0.1.0 processing presets.
 
 Each preset maps to a pedalboard DSP parameter dict consumed by MoodifyDSPChain.
 """
@@ -12,16 +12,16 @@ WARM_VOCAL_PARAMS: dict[str, float] = {
     "P03_vocal_presence_q":        0.7,
     "P04_proximity_low_freq":      200.0,
     "P05_proximity_low_gain":      2.5,
-    "P06_compression_ratio":       2.0,
-    "P07_compression_attack":      15.0,
-    "P08_compression_release":     150.0,
-    "P09_compression_threshold":   -24.0,
+    "P06_compression_ratio":       1.45,
+    "P07_compression_attack":      25.0,
+    "P08_compression_release":     220.0,
+    "P09_compression_threshold":   -16.0,
     "P10_reverb_t60":              1.2,
     "P11_reverb_dry_wet":          0.20,
     "P12_reverb_width":            0.8,
-    "P13_harmonic_drive":          0.15,
+    "P13_harmonic_drive":          0.08,
     "P14_high_shelf_freq":         10000.0,
-    "P15_high_shelf_gain":         2.0,
+    "P15_high_shelf_gain":         1.5,
 }
 
 # ── Clean Master ────────────────────────────────────────
@@ -33,16 +33,16 @@ CLEAN_MASTER_PARAMS: dict[str, float] = {
     "P03_vocal_presence_q":        0.5,
     "P04_proximity_low_freq":      200.0,
     "P05_proximity_low_gain":      0.0,
-    "P06_compression_ratio":       1.5,
-    "P07_compression_attack":      25.0,
-    "P08_compression_release":     200.0,
-    "P09_compression_threshold":   -20.0,
+    "P06_compression_ratio":       1.20,
+    "P07_compression_attack":      35.0,
+    "P08_compression_release":     250.0,
+    "P09_compression_threshold":   -12.0,
     "P10_reverb_t60":              0.0,
     "P11_reverb_dry_wet":          0.0,
     "P12_reverb_width":            1.0,
     "P13_harmonic_drive":          0.0,
     "P14_high_shelf_freq":         12000.0,
-    "P15_high_shelf_gain":         1.5,
+    "P15_high_shelf_gain":         1.0,
 }
 
 # ── Wide Space ──────────────────────────────────────────
@@ -54,16 +54,16 @@ WIDE_SPACE_PARAMS: dict[str, float] = {
     "P03_vocal_presence_q":        0.5,
     "P04_proximity_low_freq":      150.0,
     "P05_proximity_low_gain":      0.0,
-    "P06_compression_ratio":       1.5,
-    "P07_compression_attack":      25.0,
-    "P08_compression_release":     300.0,
-    "P09_compression_threshold":   -26.0,
+    "P06_compression_ratio":       1.25,
+    "P07_compression_attack":      35.0,
+    "P08_compression_release":     320.0,
+    "P09_compression_threshold":   -14.0,
     "P10_reverb_t60":              2.5,
-    "P11_reverb_dry_wet":          0.35,
+    "P11_reverb_dry_wet":          0.28,
     "P12_reverb_width":            1.0,
     "P13_harmonic_drive":          0.05,
     "P14_high_shelf_freq":         12000.0,
-    "P15_high_shelf_gain":         2.0,
+    "P15_high_shelf_gain":         1.5,
 }
 
 PRESETS = {
