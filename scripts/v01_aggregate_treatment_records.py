@@ -70,6 +70,16 @@ def extract_flat_record(rec: dict) -> dict:
         "air_delta_db": delta.get("air_delta_db"),
         "feedback_status": fb.get("status", "unknown"),
         "better_than_before": fb.get("better_than_before"),
+        # Feedback scores
+        "clarity": fb.get("clarity"),
+        "warmth": fb.get("warmth"),
+        "space": fb.get("space"),
+        "harshness_control": fb.get("harshness_control"),
+        "plastic_feel_control": fb.get("plastic_feel_control"),
+        "artifact_control": fb.get("artifact_control"),
+        "target_fit": fb.get("target_fit"),
+        "volume_matched": fb.get("volume_matched"),
+        "feedback_notes": fb.get("notes", ""),
     }
 
 
@@ -110,8 +120,26 @@ def compute_preset_stats(flat_records: list[dict]) -> dict:
         ]:
             avg_delta[key] = safe_mean([r[key] for r in items])
 
+        # Feedback scores (completed only)
+        completed = [r for r in items if r["feedback_status"] == "completed"]
+        score_keys = [
+            "clarity", "warmth", "space", "harshness_control",
+            "plastic_feel_control", "artifact_control", "target_fit",
+        ]
+        feedback_scores = {}
+        for sk in score_keys:
+            values = [r[sk] for r in completed if r.get(sk) is not None]
+            feedback_scores[f"avg_{sk}"] = round(mean(values), 1) if values else None
+
+        completed_count = len(completed)
+        total_count = len(items)
+        better_yes_count = sum(
+            1 for r in completed
+            if r.get("better_than_before") in (True, "yes")
+        )
+
         result[preset] = {
-            "count": len(items),
+            "count": total_count,
             "avg_delta": avg_delta,
             "human_feedback": {
                 "pending": fb_statuses.count("pending"),
@@ -119,6 +147,22 @@ def compute_preset_stats(flat_records: list[dict]) -> dict:
                 "better_yes": better_vals.count(True) + better_vals.count("yes"),
                 "better_no": better_vals.count(False) + better_vals.count("no"),
                 "better_uncertain": better_vals.count("uncertain"),
+            },
+            "feedback_scores": feedback_scores,
+            "feedback_quality": {
+                "feedback_coverage": round(completed_count / total_count, 2) if total_count else 0.0,
+                "better_rate": round(better_yes_count / completed_count, 2) if completed_count else None,
+                "completed_count": completed_count,
+                "pending_count": total_count - completed_count,
+                "better_yes_count": better_yes_count,
+                "better_no_count": sum(
+                    1 for r in completed
+                    if r.get("better_than_before") in (False, "no")
+                ),
+                "better_uncertain_count": sum(
+                    1 for r in completed
+                    if r.get("better_than_before") == "uncertain"
+                ),
             },
         }
 
@@ -144,12 +188,49 @@ def build_summary(flat_records: list[dict], errors: list[dict]) -> dict:
             "air_delta_db": r["air_delta_db"],
             "feedback_status": r["feedback_status"],
             "better_than_before": r["better_than_before"],
+            "clarity": r["clarity"],
+            "warmth": r["warmth"],
+            "space": r["space"],
+            "harshness_control": r["harshness_control"],
+            "plastic_feel_control": r["plastic_feel_control"],
+            "artifact_control": r["artifact_control"],
+            "target_fit": r["target_fit"],
+            "volume_matched": r["volume_matched"],
         })
+
+    # Feedback overview
+    total = len(flat_records)
+    completed = [r for r in flat_records if r["feedback_status"] == "completed"]
+    cc = len(completed)
+    better_yes = sum(
+        1 for r in completed
+        if r.get("better_than_before") in (True, "yes")
+    )
+    better_no = sum(
+        1 for r in completed
+        if r.get("better_than_before") in (False, "no")
+    )
+    better_uncertain = sum(
+        1 for r in completed
+        if r.get("better_than_before") == "uncertain"
+    )
+
+    feedback_overview = {
+        "total_records": total,
+        "completed_records": cc,
+        "pending_records": total - cc,
+        "feedback_coverage": round(cc / total, 2) if total else 0.0,
+        "better_yes": better_yes,
+        "better_no": better_no,
+        "better_uncertain": better_uncertain,
+        "global_better_rate": round(better_yes / cc, 2) if cc else None,
+    }
 
     return {
         "schema_version": SCHEMA_VERSION,
         "summary_type": SUMMARY_TYPE,
-        "record_count": len(flat_records),
+        "record_count": total,
+        "feedback_overview": feedback_overview,
         "presets": preset_stats,
         "records": summary_records,
         "errors": errors,
@@ -162,11 +243,29 @@ def _fmt(val, prec=2) -> str:
     return f"{val:+.{prec}f}"
 
 
+def _fb_score(val, prec=1) -> str:
+    if val is None:
+        return "—"
+    return f"{val:.{prec}f}"
+
+
+def _pct(val) -> str:
+    if val is None:
+        return "—"
+    return f"{val * 100:.0f}%"
+
+
 def write_summary_md(summary: dict, out_path: str):
     presets_data = summary.get("presets", {})
     records_list = summary.get("records", [])
-    fb_pending = sum(1 for r in records_list if r["feedback_status"] == "pending")
-    fb_done = sum(1 for r in records_list if r["feedback_status"] == "completed")
+    fb_overview = summary.get("feedback_overview", {})
+    fb_pending = fb_overview.get("pending_records",
+        sum(1 for r in records_list if r["feedback_status"] == "pending"))
+    fb_done = fb_overview.get("completed_records",
+        sum(1 for r in records_list if r["feedback_status"] == "completed"))
+    fb_coverage = fb_overview.get("feedback_coverage")
+    fb_better = fb_overview.get("better_yes", 0)
+    fb_global_rate = fb_overview.get("global_better_rate")
 
     lines = [
         "# Moodify Treatment Record Summary",
@@ -177,6 +276,8 @@ def write_summary_md(summary: dict, out_path: str):
         f"- **Presets**: {', '.join(presets_data.keys()) or 'none'}",
         f"- **Pending feedback**: {fb_pending}",
         f"- **Completed feedback**: {fb_done}",
+        f"- **Feedback coverage**: {fb_done}/{summary['record_count']} ({_pct(fb_coverage)})",
+        f"- **Global better rate**: {fb_better}/{fb_done} yes ({_pct(fb_global_rate)})",
         "",
         "## Preset Summary",
         "",
@@ -199,14 +300,45 @@ def write_summary_md(summary: dict, out_path: str):
             f"{_fmt(ad.get('air_delta_db'))} | {fd['pending']} | {fd['completed']} |"
         )
 
+    # Feedback Score Summary
+    lines += [
+        "",
+        "## Feedback Score Summary",
+        "",
+        "| Preset | Completed | Coverage | Better Rate | Clarity | Warmth | Space | "
+        "Harsh Ctrl | Plastic Ctrl | Artifact Ctrl | Target Fit |",
+        "|--------|----------:|---------:|------------:|--------:|-------:|------:|"
+        "----------:|------------:|-------------:|----------:|",
+    ]
+
+    for preset in PRESET_NAMES:
+        if preset not in presets_data:
+            continue
+        s = presets_data[preset]
+        fq = s.get("feedback_quality", {})
+        fs_ = s.get("feedback_scores", {})
+        lines.append(
+            f"| {preset} | {fq.get('completed_count', 0)} | "
+            f"{_pct(fq.get('feedback_coverage'))} | "
+            f"{_pct(fq.get('better_rate'))} | "
+            f"{_fb_score(fs_.get('avg_clarity'))} | "
+            f"{_fb_score(fs_.get('avg_warmth'))} | "
+            f"{_fb_score(fs_.get('avg_space'))} | "
+            f"{_fb_score(fs_.get('avg_harshness_control'))} | "
+            f"{_fb_score(fs_.get('avg_plastic_feel_control'))} | "
+            f"{_fb_score(fs_.get('avg_artifact_control'))} | "
+            f"{_fb_score(fs_.get('avg_target_fit'))} |"
+        )
+
+    # Records table
     lines += [
         "",
         "## Records",
         "",
         "| Record | Song ID | Preset | RMS Δ | Match Gain | Warning | "
-        "Crest Δ | DynRange Δ | Corr Δ | Presence Δ | Air Δ | Feedback | Better? |",
+        "Crest Δ | DynRange Δ | Corr Δ | Feedback | Better? | Target Fit |",
         "|--------|---------|--------|------:|-----------:|--------:|"
-        "--------:|-----------:|-------:|-----------:|------:|---------:|--------:|",
+        "--------:|-----------:|-------:|---------:|--------:|----------:|",
     ]
 
     for r in records_list:
@@ -214,15 +346,57 @@ def write_summary_md(summary: dict, out_path: str):
         btb = r["better_than_before"]
         btb_str = {True: "yes", False: "no", "yes": "yes", "no": "no",
                    "uncertain": "uncertain"}.get(btb, str(btb) if btb else "—")
+        tf = _fb_score(r.get("target_fit"), 0) if r.get("target_fit") is not None else "—"
         lines.append(
             f"| {r['record_file']} | {r['song_id']} | {r['preset']} | "
             f"{_fmt(r['rms_delta_db'])} | {_fmt(r['after_gain_match_db'])} | "
             f"{r['warning_level']} | {_fmt(r['crest_delta'])} | "
             f"{_fmt(r['dynamic_range_delta_db'])} | {_fmt(r['correlation_delta'])} | "
-            f"{_fmt(r['presence_delta_db'])} | {_fmt(r['air_delta_db'])} | "
-            f"{fb} | {btb_str} |"
+            f"{fb} | {btb_str} | {tf} |"
         )
 
+    # Positive Feedback
+    positive = [r for r in records_list
+                if r["feedback_status"] == "completed"
+                and r.get("better_than_before") in (True, "yes")]
+    lines += [
+        "",
+        "## Positive Feedback",
+        "",
+    ]
+    if positive:
+        lines += [
+            "| Record | Song ID | Preset | Target Fit | Notes |",
+            "|--------|---------|--------|----------:|-------|",
+        ]
+        for r in positive:
+            notes = (r.get("feedback_notes", "") or "")[:60]
+            tf = _fb_score(r.get("target_fit"), 0) if r.get("target_fit") is not None else "—"
+            lines.append(
+                f"| {r['record_file']} | {r['song_id']} | {r['preset']} | "
+                f"{tf} | {notes} |"
+            )
+    else:
+        lines.append("No positive feedback yet.")
+
+    # Pending Feedback
+    pending = [r for r in records_list if r["feedback_status"] == "pending"]
+    lines += [
+        "",
+        "## Pending Feedback",
+        "",
+    ]
+    if pending:
+        lines += [
+            "| Record | Song ID | Preset |",
+            "|--------|---------|--------|",
+        ]
+        for r in pending:
+            lines.append(f"| {r['record_file']} | {r['song_id']} | {r['preset']} |")
+    else:
+        lines.append("No pending feedback.")
+
+    # Human Feedback Status
     lines += [
         "",
         "## Human Feedback Status",
@@ -244,9 +418,8 @@ def write_summary_md(summary: dict, out_path: str):
         "",
         "## Notes",
         "",
-        "This file is generated from local Treatment Records.",
-        "It is not a database, not a cloud data layer, and not a trained model.",
-        "It is the first aggregation layer for future adaptive preset logic.",
+        "Generated from local Treatment Records via Feedback-aware Aggregator.",
+        "Not a database, not a cloud data layer, not a trained model.",
     ]
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)

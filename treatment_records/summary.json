@@ -2,6 +2,16 @@
   "schema_version": "0.1.0",
   "summary_type": "moodify_treatment_record_summary",
   "record_count": 3,
+  "feedback_overview": {
+    "total_records": 3,
+    "completed_records": 1,
+    "pending_records": 2,
+    "feedback_coverage": 0.33,
+    "better_yes": 1,
+    "better_no": 0,
+    "better_uncertain": 0,
+    "global_better_rate": 1.0
+  },
   "presets": {
     "warm_vocal": {
       "count": 1,
@@ -19,6 +29,24 @@
         "better_yes": 1,
         "better_no": 0,
         "better_uncertain": 0
+      },
+      "feedback_scores": {
+        "avg_clarity": 4,
+        "avg_warmth": 5,
+        "avg_space": 3,
+        "avg_harshness_control": 4,
+        "avg_plastic_feel_control": 4,
+        "avg_artifact_control": 5,
+        "avg_target_fit": 5
+      },
+      "feedback_quality": {
+        "feedback_coverage": 1.0,
+        "better_rate": 1.0,
+        "completed_count": 1,
+        "pending_count": 0,
+        "better_yes_count": 1,
+        "better_no_count": 0,
+        "better_uncertain_count": 0
       }
     },
     "clean_master": {
@@ -37,6 +65,24 @@
         "better_yes": 0,
         "better_no": 0,
         "better_uncertain": 0
+      },
+      "feedback_scores": {
+        "avg_clarity": null,
+        "avg_warmth": null,
+        "avg_space": null,
+        "avg_harshness_control": null,
+        "avg_plastic_feel_control": null,
+        "avg_artifact_control": null,
+        "avg_target_fit": null
+      },
+      "feedback_quality": {
+        "feedback_coverage": 0.0,
+        "better_rate": null,
+        "completed_count": 0,
+        "pending_count": 1,
+        "better_yes_count": 0,
+        "better_no_count": 0,
+        "better_uncertain_count": 0
       }
     },
     "wide_space": {
@@ -55,6 +101,24 @@
         "better_yes": 0,
         "better_no": 0,
         "better_uncertain": 0
+      },
+      "feedback_scores": {
+        "avg_clarity": null,
+        "avg_warmth": null,
+        "avg_space": null,
+        "avg_harshness_control": null,
+        "avg_plastic_feel_control": null,
+        "avg_artifact_control": null,
+        "avg_target_fit": null
+      },
+      "feedback_quality": {
+        "feedback_coverage": 0.0,
+        "better_rate": null,
+        "completed_count": 0,
+        "pending_count": 1,
+        "better_yes_count": 0,
+        "better_no_count": 0,
+        "better_uncertain_count": 0
       }
     }
   },
@@ -72,7 +136,15 @@
       "presence_delta_db": 1.7,
       "air_delta_db": 1.3,
       "feedback_status": "pending",
-      "better_than_before": null
+      "better_than_before": null,
+      "clarity": null,
+      "warmth": null,
+      "space": null,
+      "harshness_control": null,
+      "plastic_feel_control": null,
+      "artifact_control": null,
+      "target_fit": null,
+      "volume_matched": null
     },
     {
       "record_file": "piano_clean_master.json",
@@ -87,7 +159,15 @@
       "presence_delta_db": 0.2,
       "air_delta_db": 0.6,
       "feedback_status": "pending",
-      "better_than_before": null
+      "better_than_before": null,
+      "clarity": null,
+      "warmth": null,
+      "space": null,
+      "harshness_control": null,
+      "plastic_feel_control": null,
+      "artifact_control": null,
+      "target_fit": null,
+      "volume_matched": null
     },
     {
       "record_file": "vocal_folk_warm_vocal.json",
@@ -102,7 +182,15 @@
       "presence_delta_db": 1.3,
       "air_delta_db": 0.8,
       "feedback_status": "completed",
-      "better_than_before": true
+      "better_than_before": true,
+      "clarity": 4,
+      "warmth": 5,
+      "space": 3,
+      "harshness_control": 4,
+      "plastic_feel_control": 4,
+      "artifact_control": 5,
+      "target_fit": 5,
+      "volume_matched": true
     }
   ],
   "errors": []
