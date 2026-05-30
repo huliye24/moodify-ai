@@ -11,7 +11,28 @@ backend/moodify-server.exe
 backend/moodify-server.exe~
 .DS_Store
 Thumbs.db
+
+# Moodify generated heavy assets
 calibration_reports/
 inspector_reports/
 listening_test/
-/treatment_records/
+
+# Generated audio / visual files
+*.wav
+*.flac
+*.mp3
+*.aiff
+*.aif
+*.png
+*.jpg
+*.jpeg
+*.html
+*.bak
+
+# Keep baseline test audio (used by tests and calibration)
+!moodify-core-package/tests/baseline/test_audio/*.wav
+
+# Keep lightweight treatment records (JSON/MD only)
+!treatment_records/
+!treatment_records/*.json
+!treatment_records/*.md

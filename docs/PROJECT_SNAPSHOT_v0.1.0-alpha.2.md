@@ -65,7 +65,22 @@ pytest -m v01  → 20 passed
 pytest         → 104 passed
 ```
 
-## 8. Architecture Rules
+## 8. Data Commit Policy
+
+**Commit** (lightweight, permanent):
+- source code (`src/moodify/`)
+- docs, scripts
+- treatment record JSON / Markdown summaries
+
+**Do not commit** (heavy, regenerable):
+- generated WAV files, matched-after WAVs
+- PNG visualizations, HTML reports
+- `.bak` backups
+- `inspector_reports/`, `calibration_reports/`, `listening_test/`
+
+**Exception**: `tests/baseline/test_audio/*.wav` is baseline test audio — allowed.
+
+## 9. Architecture Rules
 
 - Do not delete legacy system
 - Do not reconnect WorkflowOrchestrator to v0.1.0 /process
@@ -73,7 +88,7 @@ pytest         → 104 passed
 - Do not start cloud / database / model training in v0.1.x
 - Do not build Adaptive Preset on only 3 records
 
-## 9. Current Feedback State
+## 10. Current Feedback State
 
 ```
 warm_vocal:    completed=1, better_yes=1
@@ -81,13 +96,13 @@ clean_master:  pending
 wide_space:    pending
 ```
 
-## 10. Known Issues
+## 11. Known Issues
 
 - `tests/baseline/run_baseline.py` references nonexistent `moodify.llm.offline_fallback`
 - `v01_analyzer.py:166` emits tight_layout UserWarning (cosmetic)
 - CLI/API smoke tests are manual, not in pytest
 
-## 11. Next Steps
+## 12. Next Steps
 
 ```
 MHP-019  Feedback-aware Aggregator Enhancement

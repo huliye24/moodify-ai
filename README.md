@@ -140,6 +140,36 @@ memory/        — SQLite + JSONL history
 - 不要在 v0.1.0 阶段做 GUI
 - `pytest` 始终跑全量，`pytest -m v01` 用于快速检查主线
 
+## Data and Git Policy
+
+Moodify generates two classes of data:
+
+### Lightweight experience records (commit to Git)
+
+Small files that preserve project experience:
+
+```text
+treatment_records/*.json       # individual treatment records
+treatment_records/summary.json  # aggregated summary
+treatment_records/summary.md    # human-readable summary
+docs/
+scripts/
+```
+
+### Heavy generated assets (keep local, do not commit)
+
+Large files that can be regenerated:
+
+```text
+calibration_reports/           # calibration audio + reports
+inspector_reports/             # per-case visualizations
+listening_test/                # A/B comparison WAVs
+*.wav  *.flac  *.mp3           # audio files
+*.png  *.html  *.bak           # generated images/reports/backups
+```
+
+Before committing, always run `git status` and verify no generated assets are staged.
+
 ## Local Experience Loop
 
 Moodify v0.1.0-alpha.2 includes a local experience loop:
