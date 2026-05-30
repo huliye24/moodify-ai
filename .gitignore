@@ -12,3 +12,4 @@ backend/moodify-server.exe~
 .DS_Store
 Thumbs.db
 calibration_reports/
+inspector_reports/
