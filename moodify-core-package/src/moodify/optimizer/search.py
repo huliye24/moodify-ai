@@ -1,8 +1,13 @@
-"""5D 强度空间搜索 — LHS 采样 + 代理评估 + 强度↔参数映射"""
+"""5D/3D 强度空间搜索 — LHS 采样 + 代理评估 (T_EFFECTS 或 B矩阵) + 强度↔参数映射
+
+B 矩阵模式: 用实验测量的 B ∈ R^(5×15) 预测 Δx = B @ Δu, 替代 T_EFFECTS 查找表.
+3D 搜索: 仅探索 E/H/S 三个可控维度, dynamic 和 master 使用推荐值.
+"""
 
 from __future__ import annotations
 
-import time
+import time, os, json
+from pathlib import Path
 import numpy as np
 from scipy.stats import qmc
 
@@ -29,6 +34,14 @@ STRENGTH_TO_PARAMS: dict[str, list[str]] = {
 
 CHAIN_ORDER = ["spectrum", "dynamic", "space", "layer", "master"]
 
+# 3D 搜索: 只探索 E/S/H 三个有正向 R² 的维度, dynamic 用推荐值, master 废弃
+SEARCH_DIMS_3D = ["spectrum", "space", "layer"]  # → E, S, H
+FIXED_DIMS = {"dynamic": 0.5, "master": 0.5}
+
+# B 矩阵缓存
+_B_MATRICES: dict[str, np.ndarray] | None = None
+_B_LOADED = False
+
 DEFAULT_RANGE = (0.3, 0.7)
 
 PARAM_INT_KEYS = {"P01_vocal_presence_freq", "P04_proximity_low_freq", "P14_high_shelf_freq"}
@@ -54,7 +67,7 @@ def define_strength_space(
     for dim in CHAIN_ORDER:
         params_in_dim = set(STRENGTH_TO_PARAMS.get(dim, []))
         if defect_params & params_in_dim:
-            space[dim] = (0.15, 0.85)
+            space[dim] = (0.25, 0.75)  # narrowed from (0.15,0.85): M Factor ρ=-0.237
         else:
             lo, hi = DEFAULT_RANGE
             lo = max(0.1, lo)
@@ -168,6 +181,85 @@ def get_static_sigma_inv() -> np.ndarray:
     return _STATIC_SIGMA_INV
 
 
+# ── B 矩阵代理 (替代 T_EFFECTS) ──────────────────────────
+
+def _load_b_matrices() -> dict[str, np.ndarray]:
+    """加载实验测量的 B 矩阵 (5×15). 缓存于模块级变量."""
+    global _B_MATRICES, _B_LOADED
+    if _B_LOADED:
+        return _B_MATRICES or {}
+
+    _B_LOADED = True
+    project_root = Path(__file__).resolve().parent.parent.parent.parent.parent  # 5 levels up
+    search_paths = [
+        project_root / "data" / "b_matrix",
+        Path(os.getcwd()) / "data" / "b_matrix",
+    ]
+    for base in search_paths:
+        npz_path = base / "all_B_matrices.npz"
+        if npz_path.exists():
+            _B_MATRICES = dict(np.load(npz_path))
+            return _B_MATRICES
+        # Fallback: individual .npy files
+        if (base / "GA_B.npy").exists():
+            _B_MATRICES = {}
+            for emo in ["GA", "DR", "WL", "SE", "HL", "LW", "UD", "CN"]:
+                npy = base / f"{emo}_B.npy"
+                if npy.exists():
+                    _B_MATRICES[emo] = np.load(npy)
+            return _B_MATRICES
+
+    return {}
+
+
+def _get_b_matrix(emotion_code: str) -> np.ndarray | None:
+    """获取指定情绪的 B 矩阵, 不存在则返回 None."""
+    matrices = _load_b_matrices()
+    return matrices.get(emotion_code)
+
+
+def proxy_evaluate_B(
+    strength_vector: dict[str, float],
+    ws_raw: np.ndarray,
+    target: np.ndarray,
+    dist_before: float,
+    emotion_code: str = "GA",
+) -> float:
+    """用 B 矩阵替代 T_EFFECTS 做代理评分.
+
+    Δx_pred = B @ Δu
+    其中 Δu = params(s) - params(s=0.5), 即强度向量偏离推荐值的参数变化.
+
+    仅在有 B 矩阵的情绪上使用, 否则回退到 T_EFFECTS.
+    """
+    B = _get_b_matrix(emotion_code)
+    if B is None:
+        return _proxy_te_base(strength_vector, ws_raw, target, dist_before, emotion_code)
+
+    from moodify.knowledge.craft_chains import PARAM_KEYS
+
+    # 当前强度下的参数
+    params_curr = strength_to_params(strength_vector, emotion_code)
+    # 推荐值 (strength=0.5)
+    base_strength = {d: 0.5 for d in CHAIN_ORDER}
+    params_base = strength_to_params(base_strength, emotion_code)
+
+    # Δu: 15D 参数变化
+    du = np.array([params_curr.get(pk, 0) - params_base.get(pk, 0) for pk in PARAM_KEYS])
+
+    # Δx_pred = B @ Δu
+    dx_pred = B @ du  # (5,)
+
+    # 预测处理后状态
+    ws_pred = ws_raw + dx_pred
+    ws_pred = np.clip(ws_pred, 0.0, 1.0)
+
+    sigma_inv = get_static_sigma_inv()
+    dist_after = float(_mahalanobis_distance(ws_pred, target, sigma_inv))
+    eds = 100.0 * (1.0 - dist_after / max(dist_before, 1e-8))
+    return float(np.clip(eds, -100.0, 100.0))
+
+
 # ── 2.1.4 proxy_evaluate ─────────────────────────────────
 
 def proxy_evaluate(
@@ -242,19 +334,25 @@ def _proxy_te_base(
     dist_before: float,
     emotion_code: str,
 ) -> float:
-    """纯 T_EFFECTS 评分 (马氏距离, 无 J 校正, 无惩罚项)。"""
+    """T_EFFECTS 评分 + 5D 校准修正. 修正应用在波场向量层面而非标量 EDS."""
     ws_te = _get_te_wave_state(strength_vector, ws_raw, emotion_code)
+
+    # 5D 校准修正: ws_corrected = ws_te - confidence * error_5d
+    try:
+        from moodify.calibration.online import get_state
+        state = get_state()
+        confidence = state.get_confidence(emotion_code)
+        if confidence > 0:
+            error_5d = state.get_error_5d(emotion_code)
+            ws_te = ws_te - confidence * error_5d
+            ws_te = np.clip(ws_te, 0.0, 1.0)
+    except Exception:
+        pass
+
     sigma_inv = get_static_sigma_inv()
     dist_after = float(_mahalanobis_distance(ws_te, target, sigma_inv))
     eds = 100.0 * (1.0 - dist_after / max(dist_before, 1e-8))
-    eds = float(np.clip(eds, -100.0, 100.0))
-    # 在线校准修正
-    try:
-        from moodify.calibration.online import correct_proxy_score
-        eds = correct_proxy_score(eds, emotion_code)
-    except Exception:
-        pass
-    return eds
+    return float(np.clip(eds, -100.0, 100.0))
 
 
 # ── 2.1.5 strength_to_params ─────────────────────────────
@@ -296,7 +394,84 @@ def strength_to_params(
     return params
 
 
-# ── 2.1.6 search_optimal_strengths ───────────────────────
+# ── 2.1.6 3D 搜索 (B矩阵模式) ────────────────────────────
+
+def search_3d(
+    diagnosis,
+    emotion_target: str,
+    top_k: int = 3,
+    n_samples: int = 2000,
+    use_b_matrix: bool = True,
+) -> list[tuple[dict[str, float], dict[str, float], float]]:
+    """3D 强度空间搜索 — 用 B 矩阵做代理, 仅探索 E/S/H 三维.
+
+    废弃的维度: dynamic 固定 0.5, master 固定 0.5.
+    若无 B 矩阵则回退到 T_EFFECTS.
+    """
+    t0 = time.perf_counter()
+
+    from moodify.knowledge.emotion_targets import resolve_emotion, KEY_TO_CODE
+    from moodify.diagnosis.defect_classifier import DefectClassifier
+    from moodify.knowledge.emotion_targets import get_ideal_process_vector
+    from moodify.orchestration.state_transfer import StateTransferEngine
+
+    try:
+        emotion_key = resolve_emotion(emotion_target)
+        emotion_code = KEY_TO_CODE.get(emotion_key, "GA")
+    except Exception:
+        emotion_code = "GA"
+
+    classifier = DefectClassifier()
+    defects = classifier.classify(diagnosis, emotion_code)
+
+    # 3D 搜索空间
+    space_3d = {}
+    for dim in SEARCH_DIMS_3D:
+        params_in_dim = set(STRENGTH_TO_PARAMS.get(dim, []))
+        defect_params = {getattr(d, "parameter", "") for d in defects}
+        if defect_params & params_in_dim:
+            space_3d[dim] = (0.25, 0.75)
+        else:
+            space_3d[dim] = (0.2, 0.8)
+
+    # LHS 采样 (3D)
+    sampler = qmc.LatinHypercube(d=3, seed=42)
+    samples = sampler.random(n=n_samples)
+
+    # 构建完整 5D 向量: 3D 搜索 + 2D 固定
+    ws_proc = StateTransferEngine.diagnostic_to_process(diagnosis)
+    ws_raw_arr = ws_proc.to_array()
+    target_arr = get_ideal_process_vector(emotion_code)
+    sigma_inv = get_static_sigma_inv()
+    dist_before = float(_mahalanobis_distance(ws_raw_arr, target_arr, sigma_inv))
+
+    B = _get_b_matrix(emotion_code) if use_b_matrix else None
+    proxy_func = proxy_evaluate_B if B is not None else (
+        lambda sv, ws, tgt, db, ec: _proxy_te_base(sv, ws, tgt, db, ec)
+    )
+
+    scored = []
+    for i in range(n_samples):
+        vec = {dim: float(space_3d[dim][0] + samples[i, j] * (space_3d[dim][1] - space_3d[dim][0]))
+               for j, dim in enumerate(SEARCH_DIMS_3D)}
+        # 补齐 5D
+        for dim, val in FIXED_DIMS.items():
+            vec[dim] = val
+        score = proxy_func(vec, ws_raw_arr, target_arr, dist_before, emotion_code)
+        scored.append((vec, score))
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+
+    result = []
+    for vec, score in scored[:top_k]:
+        params = strength_to_params(vec, emotion_code)
+        result.append((vec, params, score))
+
+    elapsed = (time.perf_counter() - t0) * 1000
+    return result
+
+
+# ── 2.1.7 search_optimal_strengths (legacy 5D) ────────────
 
 def search_optimal_strengths(
     diagnosis,
@@ -391,3 +566,68 @@ def search_optimal_strengths(
         warnings.warn(f"search_optimal_strengths took {elapsed:.0f}ms (target < 3000ms)")
 
     return result
+
+
+# ── B 矩阵非线性检验 (SPEC-011 T8) ───────────────────────
+
+def check_b_matrix_linearity(
+    emotion_code: str,
+    actual_dx: np.ndarray,       # (n_samples, 5) — 实际测量 Δx
+    predicted_dx: np.ndarray,    # (n_samples, 5) — B @ Δu 预测 Δx
+) -> dict:
+    """检验 B 矩阵线性假设的有效性 (PHYS-007 §4).
+
+    B 矩阵假设 Δx = B @ Δu (线性), 但处理链包含非线性操作.
+    此函数计算非线性残差统计量, 判断线性假设是否成立.
+
+    Args:
+        emotion_code: 情绪代码 (用于报告)
+        actual_dx: 实际测量的 5D 波场变化 [n_samples × 5]
+        predicted_dx: B 矩阵预测的 5D 波场变化 [n_samples × 5]
+
+    Returns:
+        {"emotion": str, "residual_mean": float, "residual_std": float,
+         "linearity_warning": bool, "max_residual": float,
+         "dim_residuals": [5 floats]}
+    """
+    residuals = actual_dx - predicted_dx  # (n_samples, 5)
+    residual_norms = np.linalg.norm(residuals, axis=1)  # L2 norm per sample
+
+    mean_residual = float(np.mean(residual_norms))
+    std_residual = float(np.std(residual_norms))
+    max_residual = float(np.max(residual_norms))
+    dim_residuals = [float(np.mean(np.abs(residuals[:, i]))) for i in range(5)]
+
+    # 警告条件: σ_residual > 0.1 且 max_residual > 0.2
+    linearity_warning = (std_residual > 0.1) or (max_residual > 0.2)
+
+    return {
+        "emotion": emotion_code,
+        "residual_mean": mean_residual,
+        "residual_std": std_residual,
+        "max_residual": max_residual,
+        "dim_residuals": dim_residuals,
+        "linearity_warning": linearity_warning,
+    }
+
+
+def validate_b_matrix_health(
+    emotion_code: str,
+    actual_dx: np.ndarray,
+    predicted_dx: np.ndarray,
+) -> str:
+    """返回 B 矩阵健康状态的人类可读报告 (PHYS-007 §4 审计)."""
+    check = check_b_matrix_linearity(emotion_code, actual_dx, predicted_dx)
+
+    if check["linearity_warning"]:
+        return (
+            f"B-matrix linearity WARNING for {emotion_code}: "
+            f"σ_residual = {check['residual_std']:.3f}, "
+            f"max_residual = {check['max_residual']:.3f}. "
+            f"Dim residuals: {[f'{r:.3f}' for r in check['dim_residuals']]}. "
+            f"建议: 对 {emotion_code} 不使用 B 矩阵预测, 回退到 T_EFFECTS."
+        )
+    return (
+        f"B-matrix linearity OK for {emotion_code}: "
+        f"σ_residual = {check['residual_std']:.4f} < 0.1"
+    )

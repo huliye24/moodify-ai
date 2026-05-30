@@ -18,37 +18,41 @@ from scipy.signal import convolve
 #  EQ — 参数均衡器 (FFT-based, correct shelf/peak)
 # ============================================================
 
+def _resolve_eq_params(bands: dict[str, float] | None,
+                       low_shelf_gain_db, low_shelf_freq,
+                       high_shelf_gain_db, high_shelf_freq,
+                       peak_freq, peak_gain_db, peak_q):
+    """Convert semantic band names → EQ parameters. Returns (ls_gain, ls_freq, hs_gain, hs_freq, pf, pg, pq)."""
+    if not bands:
+        return low_shelf_gain_db, low_shelf_freq, high_shelf_gain_db, high_shelf_freq, peak_freq, peak_gain_db, peak_q
+    for name, g in bands.items():
+        if name in ("Sub", "Bass"):
+            low_shelf_gain_db += g * 0.5
+        elif name == "Air":
+            high_shelf_gain_db += g * 0.5
+        elif name == "Presence":
+            peak_freq, peak_gain_db = 3500.0, peak_gain_db + g * 0.5
+        elif name == "Mid":
+            peak_freq, peak_gain_db = 1000.0, peak_gain_db + g * 0.5
+        elif name == "Low-Mid":
+            peak_freq, peak_gain_db = 350.0, peak_gain_db + g * 0.3
+    return low_shelf_gain_db, low_shelf_freq, high_shelf_gain_db, high_shelf_freq, peak_freq, peak_gain_db, peak_q
+
+
 def apply_eq(audio: np.ndarray, sr: int,
              bands: dict[str, float] | None = None,
-             low_shelf_gain_db: float = 0.0,
-             low_shelf_freq: float = 200.0,
-             high_shelf_gain_db: float = 0.0,
-             high_shelf_freq: float = 6000.0,
-             peak_freq: float = 1000.0,
-             peak_gain_db: float = 0.0,
+             low_shelf_gain_db: float = 0.0, low_shelf_freq: float = 200.0,
+             high_shelf_gain_db: float = 0.0, high_shelf_freq: float = 6000.0,
+             peak_freq: float = 1000.0, peak_gain_db: float = 0.0,
              peak_q: float = 1.0) -> np.ndarray:
-    """
-    频域 EQ：low shelf + peaking + high shelf。
+    """频域 EQ：low shelf + peaking + high shelf. FFT-based, block-wise overlap-add."""
+    low_shelf_gain_db, low_shelf_freq, high_shelf_gain_db, high_shelf_freq, \
+        peak_freq, peak_gain_db, peak_q = _resolve_eq_params(
+        bands, low_shelf_gain_db, low_shelf_freq,
+        high_shelf_gain_db, high_shelf_freq, peak_freq, peak_gain_db, peak_q)
 
-    使用 FFT 在频域直接构造幅频响应曲线，避免 IIR 滤波器设计误差。
-    """
     result = audio.copy()
     is_stereo = result.ndim > 1
-
-    if bands:
-        for band_name, gain_db in bands.items():
-            if band_name in ("Sub", "Bass"):
-                low_shelf_gain_db += gain_db * 0.5
-            elif band_name == "Air":
-                high_shelf_gain_db += gain_db * 0.5
-            elif band_name == "Presence":
-                peak_freq, peak_gain_db = 3500.0, peak_gain_db + gain_db * 0.5
-            elif band_name == "Mid":
-                peak_freq, peak_gain_db = 1000.0, peak_gain_db + gain_db * 0.5
-            elif band_name == "Low-Mid":
-                peak_freq, peak_gain_db = 350.0, peak_gain_db + gain_db * 0.3
-
-    # 如果没有任何调整，直接返回
     if (abs(low_shelf_gain_db) < 0.1 and abs(high_shelf_gain_db) < 0.1
             and abs(peak_gain_db) < 0.1):
         return result

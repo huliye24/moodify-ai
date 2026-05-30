@@ -36,3 +36,16 @@ from moodify.data_types import (
     AudioRecord,
     Experiment,
 )
+
+# ── MATH/PHYS Foundation 基础设施 (SPEC-011 批次 0) ──
+
+from moodify.uncertainty import UncertaintyResult, ConfidenceLevel
+from moodify.protocol import (
+    MeasurementRecord,
+    PROTOCOL_VERSION,
+    STFT_CONFIG_STANDARD,
+    STFT_CONFIG_QUICK,
+)
+from moodify.fingerprint import ProcessorFingerprint, compute_thd, estimate_cr_eff
+from moodify.conservation import ConservationReport, audit_conservation
+from moodify.icc import compute_icc

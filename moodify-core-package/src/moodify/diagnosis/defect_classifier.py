@@ -272,19 +272,28 @@ class DefectClassifier:
         return self.classify(ws, emotion_target)
 
     def _get_param_value(self, ws: WaveStateDiagnosis, param: str) -> float | None:
-        """从 WaveStateDiagnosis 中提取参数值"""
-        dim = param[0:2]
+        """从 WaveStateDiagnosis 中提取参数值.
+
+        自动从 ParameterWithUncertainty 中解包 .value,
+        SP4_WidthHealth (bool) 特殊处理.
+        """
         try:
             if param.startswith("S"):
-                return getattr(ws.Spectrum, param, None)
+                raw = getattr(ws.Spectrum, param, None)
             elif param.startswith("D"):
-                return getattr(ws.Dynamics, param, None)
+                raw = getattr(ws.Dynamics, param, None)
             elif param.startswith("SP"):
-                return getattr(ws.Space, param, None)
+                raw = getattr(ws.Space, param, None)
             elif param.startswith("L"):
-                return getattr(ws.Layers, param, None)
+                raw = getattr(ws.Layers, param, None)
             elif param.startswith("E"):
-                return getattr(ws.Emotion, param, None)
+                raw = getattr(ws.Emotion, param, None)
+            else:
+                return None
+            # Unwrap ParameterWithUncertainty, pass bool through
+            if hasattr(raw, 'value') and not isinstance(raw, bool):
+                return float(raw.value)
+            return None if raw is None else float(raw) if not isinstance(raw, bool) else None
         except Exception:
             return None
 

@@ -115,7 +115,7 @@ class HealthScorer:
             emotion_target: 目标情绪名 (包含情绪关键词, 如 "温柔觉醒")
 
         Returns:
-            float [0, 100]
+            float [-100, 100]. Positive = closer to target, negative = further from target.
         """
         if target_vec is None:
             target_vec = self._get_ideal_vector(emotion_target)
@@ -127,11 +127,11 @@ class HealthScorer:
         dist_processed = np.linalg.norm(processed_vec - target_vec)
 
         if dist_raw < 1e-9:
-            return 50.0  # 中性
+            return 50.0
 
         norm_dist = dist_processed / dist_raw
         eds = 100.0 * (1.0 - norm_dist)
-        return round(max(0.0, min(100.0, eds)), 1)
+        return round(max(-100.0, min(100.0, eds)), 1)
 
     def get_eds_level(self, eds: float) -> str:
         """EDS 数值 → 等级描述"""
@@ -143,11 +143,17 @@ class HealthScorer:
     # ——— 辅助 ————————————————————————————————
 
     def _get_ideal_vector(self, emotion: str) -> np.ndarray:
-        """根据情绪名获取理想处理五维向量"""
+        """根据情绪名/代码获取理想处理五维向量。支持中文名和2字符代码。"""
+        # 尝试 emotion_targets 的精确查询 (支持 "GA", "DR" 等代码)
+        try:
+            from moodify.knowledge.emotion_targets import get_ideal_process_vector
+            return get_ideal_process_vector(emotion)
+        except Exception:
+            pass
+        # 回退: 中文子串匹配
         for key in EMOTION_IDEAL_VECTORS:
             if key in emotion:
                 return EMOTION_IDEAL_VECTORS[key]
-        # 默认中值
         return np.array([0.55, 0.55, 0.45, 0.55, 0.50])
 
     @staticmethod
@@ -163,23 +169,23 @@ class HealthScorer:
         e = ws.Emotion
 
         # E: S3_MidClarity 主导, S5_SpectralTilt 惩戒
-        tilt_abs = abs(s.S5_SpectralTilt)
+        tilt_abs = abs(s.S5_SpectralTilt.value)
         tilt_penalty = min(tilt_abs / 12.0, 1.0)
-        E = max(0.0, min(1.0, s.S3_MidClarity * 0.7 + (1.0 - tilt_penalty) * 0.3))
+        E = max(0.0, min(1.0, s.S3_MidClarity.value * 0.7 + (1.0 - tilt_penalty) * 0.3))
 
         # D: D1_LRA 主导, range [2, 16] → [0, 1]
-        D = max(0.0, min(1.0, (d.D1_LRA - 2.0) / 14.0))
+        D = max(0.0, min(1.0, (d.D1_LRA.value - 2.0) / 14.0))
 
         # S: SP1_Correlation 反比 + SP3_RT60 惩戒
-        corr_score = max(0.0, min(1.0, 1.0 - sp.SP1_Correlation))
-        rt60_penalty = min(sp.SP3_RT60Consist / 0.8, 1.0)
+        corr_score = max(0.0, min(1.0, 1.0 - sp.SP1_Correlation.value))
+        rt60_penalty = min(sp.SP3_RT60Consist.value / 0.8, 1.0)
         S = max(0.0, min(1.0, corr_score * 0.7 + (1.0 - rt60_penalty) * 0.3))
 
         # T: L3_DrumDetect 主导
-        T = max(0.0, min(1.0, l.L3_DrumDetect * 1.1))
+        T = max(0.0, min(1.0, l.L3_DrumDetect.value * 1.1))
 
         # H: E3_FatigueRisk 反比
-        H = max(0.0, min(1.0, 1.0 - e.E3_FatigueRisk / 120.0))
+        H = max(0.0, min(1.0, 1.0 - e.E3_FatigueRisk.value / 120.0))
 
         return np.array([E, D, S, T, H])
 

@@ -29,8 +29,9 @@ def amp_to_db(value: float, eps: float = 1e-12) -> float:
 
 
 def load_audio(path: str | Path):
-    data, sr = sf.read(str(path), always_2d=True)
-    mono = data.mean(axis=1) if data.shape[1] > 1 else data[:, 0]
+    from moodify.audio_io import load_audio as _load
+    data, sr = _load(str(path), always_2d=True)
+    mono = data.mean(axis=1) if data.ndim > 1 and data.shape[1] > 1 else data[:, 0] if data.ndim > 1 else data
     return mono, sr, data
 
 
@@ -72,9 +73,9 @@ BANDS = {
 class SpectrumAnalyzer:
     """GCS-001 第 4 节：频谱状态计算"""
 
-    def __init__(self, n_fft: int = 4096):
-        self.n_fft = n_fft
-        self.hop_length = n_fft // 4
+    def __init__(self, n_fft: int = 2048):
+        self.n_fft = n_fft                        # PHYS-002 标准: 2048
+        self.hop_length = n_fft // 4              # PHYS-002 标准: hop=512
 
     def stft(self, mono: np.ndarray, sr: int):
         n_fft = self.n_fft
@@ -229,8 +230,11 @@ class DynamicsAnalyzer:
         loud_density = float(np.sum(rms_db > rms_median) / len(rms_db))
 
         # DFI v0.4: 线性映射替代参考值锚定
-        # f_DR: DR=20→0, DR=4→1.0  线性映射，全范围可区分
-        # f_Crest: Crest=14→0, Crest=2→1.0  线性映射
+        # 归一化声明 (SPEC-011 T7.1):
+        #   f_DR:    [4, 20] dB → [0, 1], 来源: EBU 3342 典型音乐 DR 范围
+        #   f_Crest: [2, 14] dB → [0, 1], 来源: 实测 crest factor 分布
+        #   权重:    等权 1:1:1, 未校准
+        #   线性假设: 最小-最大归一化, 差异在校准后可比较
         f_dr    = max(0.0, min(1.0, (20.0 - dr) / 16.0))
         f_crest = max(0.0, min(1.0, (14.0 - crest_mean) / 12.0))
         dfi = (f_dr + f_crest + loud_density) / 3.0
@@ -312,8 +316,8 @@ class SpaceAnalyzer:
         side_stability = 1.0 / (1.0 + float(np.std(sr_frame)))
 
         # Center stability (vocal band 500-5000Hz in mid)
-        n_fft_c = 4096
-        hop_c = n_fft_c // 4
+        n_fft_c = 2048           # PHYS-002 标准
+        hop_c = n_fft_c // 4     # 512
         window_c = get_window("hann", n_fft_c, fftbins=True)
         freqs_c = np.fft.rfftfreq(n_fft_c, 1.0 / sr)
         mask_c = (freqs_c >= 500) & (freqs_c <= 5000)

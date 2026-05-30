@@ -192,17 +192,31 @@ class DeepSeekClient:
     # ── 内部 ────────────────────────────────────
 
     def _call(self, system_prompt: str, user_content: str) -> dict | None:
-        """调用 DeepSeek API, 带 3 次重试. 失败返回 None."""
+        """调用 LLM API, 带 3 次重试. 失败返回 None.
+
+        两种模式:
+          - 如果 MODEL_SUPPORTS_SYSTEM=true: 标准 system + user 消息
+          - 否则: 将 system prompt 合并到 user 消息前 (兼容不支持 system 角色的 API)
+        """
         if not self.available:
             return None
+
+        use_system_role = os.getenv("MODEL_SUPPORTS_SYSTEM", "true").lower() == "true"
+
         for attempt in range(3):
             try:
-                r = self._client.chat.completions.create(
-                    model=self._model,
-                    messages=[
+                if use_system_role:
+                    messages = [
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_content},
-                    ],
+                    ]
+                else:
+                    merged = f"[System Instruction]\n{system_prompt}\n\n[User Input]\n{user_content}"
+                    messages = [{"role": "user", "content": merged}]
+
+                r = self._client.chat.completions.create(
+                    model=self._model,
+                    messages=messages,
                     response_format={"type": "json_object"},
                     timeout=15.0,
                     temperature=0.2,

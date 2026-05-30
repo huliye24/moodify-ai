@@ -79,24 +79,10 @@ class Preprocessor:
     # ——— 内部 ————————————————————————
 
     def _load(self, path: str) -> tuple[np.ndarray, int, int]:
-        """加载音频文件, 自动选择后端"""
-        try:
-            import soundfile as sf
-            data, sr = sf.read(str(path), always_2d=True)
-            return data, sr, data.shape[1]
-        except Exception:
-            pass
-
-        try:
-            import librosa
-            y, sr = librosa.load(str(path), sr=None, mono=False)
-            if y.ndim == 1:
-                y = np.stack([y, y], axis=1)
-            return y, sr, y.shape[1] if y.ndim > 1 else 1
-        except Exception:
-            pass
-
-        raise RuntimeError(f"Cannot load audio file: {path}")
+        """加载音频文件, 自动选择后端 (WAV/MP3/FLAC/...)"""
+        from moodify.audio_io import load_audio
+        data, sr = load_audio(str(path), always_2d=True)
+        return data, sr, data.shape[1] if data.ndim > 1 else 1
 
     def _resample(self, y: np.ndarray, orig_sr: int) -> np.ndarray:
         """快速重采样: soxr > scipy resample_poly > librosa"""

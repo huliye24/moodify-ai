@@ -184,19 +184,19 @@ class QualityGate:
         checks["TruePeak"] = output_true_peak <= -1.0
 
         # 3. LRA
-        checks["LRA"] = d.D1_LRA >= 6.0
+        checks["LRA"] = d.D1_LRA.value >= 6.0
 
         # 4. PLR
-        checks["PLR"] = d.D4_PLR >= 6.0
+        checks["PLR"] = d.D4_PLR.value >= 6.0
 
         # 5. WidthHealth
         checks["WidthHealth"] = sp.SP4_WidthHealth
 
         # 6. Bass correlation (SP1)
-        checks["BassCorr"] = sp.SP1_Correlation > 0.1
+        checks["BassCorr"] = sp.SP1_Correlation.value > 0.1
 
         # 7. Fatigue risk
-        checks["Fatigue"] = e.E3_FatigueRisk <= 80
+        checks["Fatigue"] = e.E3_FatigueRisk.value <= 80
 
         # 8-10. (placeholders for THD, mono loss, EQ range)
         checks["THD_ok"] = True  # placeholder

@@ -12,6 +12,7 @@ HPSS 基于 FFT 中值滤波, <1s 完成, 无 DL 伪影, 更适合 AI 音乐特�
 import os
 import time
 import uuid
+import logging
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
@@ -20,6 +21,8 @@ from typing import Optional
 
 import numpy as np
 import soundfile
+
+logger = logging.getLogger(__name__)
 
 
 class PhaseStatus(Enum):
@@ -59,6 +62,12 @@ class WorkflowResult:
     total_elapsed_ms: float
     success: bool
     process_id: str = ""
+    # 扩展字段 (SPEC-013: AI 评测管道)
+    scores: list[float] = field(default_factory=list)       # proxy scores per candidate
+    candidates: list[dict] = field(default_factory=list)    # 15-DSP param dicts
+    strengths: list[dict] = field(default_factory=list)     # 5-D strength vectors
+    best_params: dict = field(default_factory=dict)          # 实际使用的 15 DSP params
+    best_strength: dict = field(default_factory=dict)       # 实际使用的 5D strength
 
 
 @dataclass
@@ -176,7 +185,7 @@ class WorkflowOrchestrator:
             from moodify.knowledge.emotion_targets import resolve_emotion_from_nl
             ctx.emotion_parsed = resolve_emotion_from_nl(ctx.emotion_target)
         except Exception:
-            pass
+            logger.debug(f"[resolve_emotion] NL resolution failed for '{ctx.emotion_target}', using fallback")
 
         if not ctx.emotion_parsed:
             ctx.emotion_parsed = {
@@ -243,7 +252,34 @@ class WorkflowOrchestrator:
                                   "layer": 0.5, "master": 0.5}]
                 ctx.scores = [0.0]
 
+        # ── 安全投影 (SPEC-008): DP before DSP ──
+        self._apply_safety_projection(ctx, phase1_5)
+
         ctx.phases.append(phase1_5)
+
+    def _apply_safety_projection(self, ctx: PipelineContext,
+                                  phase1_5: PhaseResult) -> None:
+        """对每个候选参数运行四级安全投影, 结果写回 ctx.candidates.
+
+        任何 LLM/RAG/搜索来源的推荐参数在进入 DSP 前必须通过此出口。
+        """
+        if not ctx.candidates:
+            return
+        emotion_code = ctx.emotion_parsed.get("emotion_code", "GA")
+
+        try:
+            from moodify.safety.projection import project
+        except ImportError:
+            return
+
+        safe_list = []
+        for params in ctx.candidates:
+            safe_p, proj_log = project(params, emotion_code)
+            safe_list.append(safe_p)
+            for entry in proj_log:
+                phase1_5.warnings.append(f"[safety] {entry}")
+
+        ctx.candidates = safe_list
 
     def _try_rag(self, ctx: PipelineContext) -> tuple:
         """尝试 RAG 检索 + LLM 参数推荐。
@@ -340,12 +376,11 @@ class WorkflowOrchestrator:
         # Phase 4-6: 每版本独立处理 + 测量
         for i, ver_audio in enumerate(versions):
             p4 = self._run_spatial(ver_audio, ctx.sr, ctx.emotion_target, None)
-            p5 = self._run_resynthesis(p4.output["audio"], ctx.sr)
             p6 = self._run_mastering(
-                p5.output["audio"], ctx.sr, ctx.input_path,
+                p4.output["audio"], ctx.sr, ctx.input_path,
                 ctx.emotion_target, ctx.platform, version_suffix=f"_v{i}",
             )
-            ctx.phases.extend([p4, p5, p6])
+            ctx.phases.extend([p4, p6])
 
             # 测量
             ver_output = p6.output.get("output_path", "")
@@ -358,8 +393,8 @@ class WorkflowOrchestrator:
                         ctx.diagnosis, ws_a, ctx.emotion_target,
                         vector_bias=ctx.emotion_parsed.get("vector_bias"),
                     )
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"[measurement] re-diagnose failed for version {i}: {e}")
 
             if eds_a > ctx.best_eds:
                 ctx.best_eds = eds_a
@@ -390,7 +425,7 @@ class WorkflowOrchestrator:
                         emotion_name=ctx.emotion_target,
                     )
         except Exception:
-            pass
+            logger.debug("[narrative] LLM diagnosis narration failed (non-critical)")
 
         # 历史记录
         try:
@@ -411,9 +446,10 @@ class WorkflowOrchestrator:
                 emotion_name=ctx.emotion_parsed.get("emotion_name", ctx.emotion_target),
                 user_intent="", satisfied=None, user_feedback="",
                 timestamp=datetime.now().isoformat(),
+                schema_version=1,
             ))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"[history] save failed: {e}")
 
         # ── 在线校准: 自动对比 proxy vs real, 更新偏差估计 ──
         try:
@@ -434,8 +470,11 @@ class WorkflowOrchestrator:
                     ws_after_5d=ws_after_5d,
                     storage_dir=self._output_dir,
                 )
-        except Exception:
-            pass
+                logger.debug(f"[calibration] updated for {ctx.emotion_parsed.get('emotion_code', 'GA')}: "
+                            f"proxy={ctx.scores[ctx.best_idx] if ctx.scores and ctx.best_idx < len(ctx.scores) else 0:.0f} "
+                            f"real_eds={ctx.best_eds:.0f}")
+        except Exception as e:
+            logger.warning(f"[calibration] update failed: {e}")
 
     def _build_result(self, ctx: PipelineContext) -> WorkflowResult:
         """构建 WorkflowResult。"""
@@ -444,7 +483,7 @@ class WorkflowOrchestrator:
             try:
                 ws_after_obj = self._diagnose_audio(ctx.best_output)
             except Exception:
-                pass
+                pass  # re-diagnose best_output failed — ws_after_obj stays None
 
         total_elapsed = (time.perf_counter() - ctx.total_start) * 1000
         success = all(
@@ -469,6 +508,12 @@ class WorkflowOrchestrator:
             total_elapsed_ms=total_elapsed,
             success=success,
             process_id=ctx.process_id,
+            # SPEC-013 扩展字段
+            scores=list(ctx.scores),
+            candidates=list(ctx.candidates),
+            strengths=list(ctx.strengths),
+            best_params=dict(ctx.best_params),
+            best_strength=dict(ctx.best_strength),
         )
 
     # ═══════════════════════════════════════════════════════════
@@ -519,11 +564,11 @@ class WorkflowOrchestrator:
         )
 
     def _run_load_audio(self, input_path: str) -> PhaseResult:
-        """Phase 2: 音频加载"""
+        """Phase 2: 音频加载 (WAV/MP3/FLAC/...)"""
         t0 = time.perf_counter()
         try:
-            audio, sr = soundfile.read(input_path)
-            audio = audio.astype(np.float32)
+            from moodify.audio_io import load_audio
+            audio, sr = load_audio(input_path, always_2d=False)
         except Exception as e:
             return PhaseResult(
                 phase=2, name="音频加载",
@@ -614,118 +659,91 @@ class WorkflowOrchestrator:
             elapsed_ms=(time.perf_counter() - t0) * 1000,
         )
 
-    def _run_resynthesis(self, audio: np.ndarray, sr: int) -> PhaseResult:
-        """Phase 5: 再合成 — 透传"""
-        t0 = time.perf_counter()
-        return PhaseResult(
-            phase=5, name="再合成",
-            status=PhaseStatus.COMPLETED,
-            output={"audio": audio},
-            elapsed_ms=(time.perf_counter() - t0) * 1000,
-        )
+
+    # ── Phase 6 helpers ───────────────────────────────────
+
+    @staticmethod
+    def _normalize_loudness(audio_f32: np.ndarray, sr: int,
+                            target_lufs: float) -> tuple[np.ndarray, list[str]]:
+        """LUFS loudness normalization. Returns (audio, warnings)."""
+        import pyloudnorm as pyln
+        meter = pyln.Meter(sr)
+        loudness = meter.integrated_loudness(audio_f32)
+        if np.isinf(loudness) or np.isnan(loudness):
+            return audio_f32, ["Could not measure loudness; skipping normalization"]
+        return pyln.normalize.loudness(audio_f32, loudness, target_lufs), []
+
+    @staticmethod
+    def _apply_limiter(audio_f32: np.ndarray, sr: int) -> tuple[np.ndarray, float, list[str]]:
+        """Peak limiter. Returns (audio, risk_delta, warnings)."""
+        import pedalboard
+        limiter = pedalboard.Limiter(threshold_db=-1.0, release_ms=50)
+        x = audio_f32.T if audio_f32.ndim > 1 else audio_f32.reshape(1, -1)
+        y = limiter(x.astype(np.float32), sr)
+        result = (y.T if audio_f32.ndim > 1 else y[0]).astype(audio_f32.dtype)
+        peak = np.max(np.abs(result))
+        if peak > 0.99:
+            result *= 0.99 / peak
+        risk = 0.2 if np.max(np.abs(result)) > 0.999 else 0.0
+        warnings = ["Output near digital ceiling"] if risk > 0 else []
+        return result, risk, warnings
+
+    def _export_wav(self, audio_data: np.ndarray, sr: int,
+                    input_path: str, emotion_target: str,
+                    platform: str, version_suffix: str) -> str:
+        """Write WAV and return output path."""
+        os.makedirs(self._output_dir, exist_ok=True)
+        base = Path(input_path).stem
+        emo = emotion_target[:2] if len(emotion_target) >= 2 else emotion_target
+        path = os.path.join(self._output_dir, f"{base}_{emo}_{platform}{version_suffix}.wav")
+        soundfile.write(path, audio_data, sr, subtype='PCM_16')
+        return path
 
     def _run_mastering(self, audio: np.ndarray, sr: int,
                         input_path: str, emotion_target: str,
                         platform: str = "spotify",
                         version_suffix: str = "") -> PhaseResult:
-        """Phase 6: 情绪显影 + 母带 — 响度标准化 + 限幅 + 导出"""
+        """Phase 6: 情绪显影 + 母带 — loudness norm → limiter → export."""
         t0 = time.perf_counter()
-        warnings = []
+        target_lufs = -16.0 if platform == "apple_music" else -14.0
+        warnings: list[str] = []
         total_risk = 0.0
-        risk_level = "green"
 
         try:
-            import pyloudnorm as pyln
-            import pedalboard
-
             audio_f32 = audio.astype(np.float32)
+            audio_f32, w = self._normalize_loudness(audio_f32, sr, target_lufs)
+            warnings += w
+            audio_f32, risk_delta, w = self._apply_limiter(audio_f32, sr)
+            total_risk += risk_delta
+            warnings += w
+            output_path = self._export_wav(
+                audio_f32, sr, input_path, emotion_target, platform, version_suffix)
 
-            if platform == "apple_music":
-                target_lufs = -16.0
-            else:
-                target_lufs = -14.0
-
-            meter = pyln.Meter(sr)
-            loudness = meter.integrated_loudness(audio_f32)
-
-            if not np.isinf(loudness) and not np.isnan(loudness):
-                audio_normalized = pyln.normalize.loudness(audio_f32, loudness, target_lufs)
-            else:
-                audio_normalized = audio_f32
-                warnings.append("Could not measure loudness; skipping normalization")
-
-            limiter = pedalboard.Limiter(threshold_db=-1.0, release_ms=50)
-            if audio_normalized.ndim > 1:
-                audio_limited = limiter(audio_normalized.T.astype(np.float32), sr).T
-            else:
-                audio_limited = limiter(
-                    audio_normalized.reshape(1, -1).astype(np.float32), sr
-                )[0]
-
-            peak = np.max(np.abs(audio_limited))
-            if peak > 0.99:
-                audio_limited *= 0.99 / peak
-
-            os.makedirs(self._output_dir, exist_ok=True)
-            base_name = Path(input_path).stem
-            emotion_short = emotion_target[:2] if len(emotion_target) >= 2 else emotion_target
-            output_filename = f"{base_name}_{emotion_short}_{platform}{version_suffix}.wav"
-            output_path = os.path.join(self._output_dir, output_filename)
-
-            soundfile.write(output_path, audio_limited, sr, subtype='PCM_16')
-
-            if np.max(np.abs(audio_limited)) > 0.999:
-                risk_level = "yellow"
-                total_risk += 0.2
-                warnings.append("Output near digital ceiling")
-
+            risk_level = "yellow" if total_risk > 0 else "green"
             return PhaseResult(
-                phase=6, name="情绪显影+母带",
-                status=PhaseStatus.COMPLETED,
-                output={
-                    "output_path": output_path,
-                    "audio": audio_limited,
-                    "total_risk": total_risk,
-                    "risk_level": risk_level,
-                    "loudness_normalized": True,
-                    "target_lufs": target_lufs,
-                },
-                warnings=warnings,
-                elapsed_ms=(time.perf_counter() - t0) * 1000,
-            )
-
+                phase=6, name="情绪显影+母带", status=PhaseStatus.COMPLETED,
+                output={"output_path": output_path, "audio": audio_f32,
+                        "total_risk": total_risk, "risk_level": risk_level,
+                        "loudness_normalized": True, "target_lufs": target_lufs},
+                warnings=warnings, elapsed_ms=(time.perf_counter() - t0) * 1000)
         except Exception as e:
+            logger.warning(f"[mastering] failed: {e}, exporting raw audio")
             try:
-                os.makedirs(self._output_dir, exist_ok=True)
-                base_name = Path(input_path).stem
-                emotion_short = emotion_target[:2]
-                output_path = os.path.join(
-                    self._output_dir,
-                    f"{base_name}_{emotion_short}_{platform}{version_suffix}.wav"
-                )
-                soundfile.write(output_path, audio, sr, subtype='PCM_16')
-                warnings.append(f"Mastering failed ({e}); exported raw audio")
+                output_path = self._export_wav(
+                    audio, sr, input_path, emotion_target, platform, version_suffix)
                 return PhaseResult(
-                    phase=6, name="情绪显影+母带",
-                    status=PhaseStatus.COMPLETED,
-                    output={
-                        "output_path": output_path,
-                        "audio": audio,
-                        "total_risk": 0.5,
-                        "risk_level": "yellow",
-                    },
-                    warnings=warnings,
-                    elapsed_ms=(time.perf_counter() - t0) * 1000,
-                )
+                    phase=6, name="情绪显影+母带", status=PhaseStatus.COMPLETED,
+                    output={"output_path": output_path, "audio": audio,
+                            "total_risk": 0.5, "risk_level": "yellow"},
+                    warnings=[f"Mastering failed ({e}); exported raw audio"],
+                    elapsed_ms=(time.perf_counter() - t0) * 1000)
             except Exception as e2:
+                logger.warning(f"[mastering] export also failed: {e2}")
                 return PhaseResult(
-                    phase=6, name="情绪显影+母带",
-                    status=PhaseStatus.FAILED,
+                    phase=6, name="情绪显影+母带", status=PhaseStatus.FAILED,
                     output={"output_path": "", "total_risk": 1.0, "risk_level": "red"},
-                    warnings=warnings + [f"Export failed: {e2}"],
-                    elapsed_ms=(time.perf_counter() - t0) * 1000,
-                    gate_passed=False,
-                )
+                    warnings=[f"Export failed: {e2}"],
+                    elapsed_ms=(time.perf_counter() - t0) * 1000, gate_passed=False)
 
     def _run_strength_search(self, ws_diagnosis, emotion_target: str,
                              defects=None, vector_bias=None,

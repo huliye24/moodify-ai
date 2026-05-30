@@ -3,6 +3,9 @@ diagnosis_engine.py — 完整 18 参数诊断引擎 (SPEC §5)
 ======================================================
 Moodify 核心引擎的"第一触点"——将 AI 音频的波场状态量化为 18 个可计算参数。
 
+Pattern: 每个参数独立计算, 失败时回退到默认值 (best-effort measurement)。
+         except Exception 是设计选择——个别参数不可算不应中断整条诊断管线。
+
 依赖: moodify_metrics.py (已有), pyloudnorm (新增), librosa, scipy
 输出: WaveStateDiagnosis 数据类
 
@@ -30,7 +33,9 @@ from moodify.diagnosis.metrics import (
 from moodify.data_types import (
     WaveStateDiagnosis, SpectrumDiagnosis, DynamicsDiagnosis,
     SpaceDiagnosis, LayersDiagnosis, EmotionDiagnosis,
+    ParameterWithUncertainty,
 )
+from moodify.protocol import STFT_CONFIG_STANDARD, STFT_CONFIG_QUICK
 
 
 # ============================================================
@@ -54,10 +59,11 @@ DIAGNOSIS_BANDS = {
 class DiagnosisEngine:
     """完整 18 参数诊断引擎 (SPEC §4.2)"""
 
-    def __init__(self, sr: int = 44100, n_fft: int = 1024):
+    def __init__(self, sr: int = 44100, n_fft: int = 2048):
         self.sr = sr
-        self.n_fft = n_fft       # SPEC §1.4: n_fft=1024
-        self.hop_length = n_fft // 2  # SPEC §1.4: hop=512
+        self.n_fft = n_fft       # PHYS-002 标准: n_fft=2048
+        self.hop_length = n_fft // 4  # PHYS-002 标准: hop=512
+        self._fallbacks: dict[str, str] = {}  # SPEC-011 T3: 回退追踪
 
         # 现有权威计算器
         self._spec = SpectrumAnalyzer(n_fft=n_fft)
@@ -80,6 +86,7 @@ class DiagnosisEngine:
             mode: "quick" (最小测量集, <5s) | "full" (全量, 含 RT60 等重型计算)
         """
         t0 = time.perf_counter()
+        self._fallbacks.clear()  # SPEC-011 T3: 每次诊断前清空回退记录
         full_mode = (mode == "full")
 
         mono, sr, data = load_audio(audio_path)
@@ -108,6 +115,12 @@ class DiagnosisEngine:
         if elapsed_ms > 5000:
             print(f"  WARN: diagnosis took {elapsed_ms:.0f}ms (target < 5000ms)")
 
+        # SPEC-011 T3.4: 未消耗的回退标记 (说明 extract 方法遗漏了某个参数)
+        if self._fallbacks:
+            for k, v in self._fallbacks.items():
+                print(f"  WARN: unpopped fallback [{k}]: {v}")
+
+        stft_cfg = STFT_CONFIG_STANDARD.copy() if mode == "full" else STFT_CONFIG_QUICK.copy()
         return WaveStateDiagnosis(
             Spectrum=spectrum,
             Dynamics=dynamics,
@@ -117,6 +130,8 @@ class DiagnosisEngine:
             audio_path=str(audio_path),
             duration_s=duration_s,
             sample_rate=sr,
+            protocol_mode=mode,
+            stft_config=stft_cfg,
         )
 
     @staticmethod
@@ -143,9 +158,9 @@ class DiagnosisEngine:
 
     @staticmethod
     def _compute_stft_fast(mono: np.ndarray, sr: int):
-        """Vectorized STFT using sliding_window_view — ~6x faster than loop"""
-        n_fft = 1024
-        hop = n_fft // 2  # 512
+        """Vectorized STFT — PHYS-002 标准: N_FFT=2048, hop=512, hann."""
+        n_fft = 2048
+        hop = n_fft // 4  # 512
         from numpy.lib.stride_tricks import sliding_window_view
         window = np.hanning(n_fft).astype(np.float32)
         frames = sliding_window_view(mono.astype(np.float32), n_fft)[::hop] * window
@@ -210,11 +225,11 @@ class DiagnosisEngine:
             S5 = 0.0
 
         return SpectrumDiagnosis(
-            S1_SubPresence=round(S1, 2),
-            S2_BassWarmth=round(S2, 2),
-            S3_MidClarity=S3,
-            S4_AirBand=round(S4, 2),
-            S5_SpectralTilt=S5,
+            S1_SubPresence=ParameterWithUncertainty(value=round(S1, 2)),
+            S2_BassWarmth=ParameterWithUncertainty(value=round(S2, 2)),
+            S3_MidClarity=ParameterWithUncertainty(value=S3),
+            S4_AirBand=ParameterWithUncertainty(value=round(S4, 2)),
+            S5_SpectralTilt=ParameterWithUncertainty(value=S5),
         )
 
     # ——— 动态维度 D1-D4 (§5.2) ————————————————————
@@ -231,14 +246,27 @@ class DiagnosisEngine:
             D2 = self._estimate_chorus_impact_quick(mono, sr)
             D3 = self._estimate_micro_dynamics_fast(mono, sr)
             peak_db = 20.0 * math.log10(np.max(np.abs(mono)) + 1e-12)
+            # 快速模式使用简化算法, 标记为回退
+            self._fallbacks.setdefault("D2_ChorusImpact",
+                "quick mode: RMS contrast instead of LUFS")
+            self._fallbacks.setdefault("D3_MicroDynamics",
+                "quick mode: RMS frame diffs instead of momentary-vs-short-term LUFS")
         integrated_lufs = self._get_integrated_lufs(mono, sr)
         D4 = round(peak_db - integrated_lufs, 2)
 
+        def _p(val, key):
+            fb = key in self._fallbacks
+            note = self._fallbacks.pop(key, "")
+            return ParameterWithUncertainty(
+                value=val, is_fallback=fb, fallback_note=note,
+                confidence="low" if fb else "medium",
+            )
+
         return DynamicsDiagnosis(
-            D1_LRA=round(D1, 2),
-            D2_ChorusImpact=round(D2, 2),
-            D3_MicroDynamics=round(D3, 3),
-            D4_PLR=D4,
+            D1_LRA=_p(round(D1, 2), "D1_LRA"),
+            D2_ChorusImpact=_p(round(D2, 2), "D2_ChorusImpact"),
+            D3_MicroDynamics=_p(round(D3, 3), "D3_MicroDynamics"),
+            D4_PLR=_p(D4, "D4_PLR"),
         )
 
     def _compute_lra(self, mono: np.ndarray, sr: int) -> float:
@@ -264,7 +292,10 @@ class DiagnosisEngine:
                     continue
 
             if len(block_loudness) < 3:
-                return 6.0  # 默认
+                self._fallbacks["D1_LRA"] = (
+                    f"insufficient blocks ({len(block_loudness)} < 3), using default 6.0 LU"
+                )
+                return 6.0
 
             # 排序 → 高低百分位差
             sorted_loud = sorted(block_loudness)
@@ -273,11 +304,11 @@ class DiagnosisEngine:
             p95 = sorted_loud[int(n * 0.95)]
             return p95 - p10
         except ImportError:
-            # pyloudnorm 不可用时的回退估算
+            self._fallbacks["D1_LRA"] = "pyloudnorm unavailable, using RMS-based LRA estimate"
             return self._estimate_lra_fallback(mono, sr)
 
     def _estimate_lra_fallback(self, mono: np.ndarray, sr: int) -> float:
-        """无 pyloudnorm 时的 LRA 估算"""
+        """无 pyloudnorm 时的 LRA 估算 (偏差估计: ±2 LU)."""
         frames, _ = frame_signal(mono, sr, frame_ms=3000, hop_ms=1500)
         rms_vals = 20 * np.log10(np.sqrt(np.mean(frames**2, axis=1) + 1e-12))
         if len(rms_vals) < 3:
@@ -287,12 +318,15 @@ class DiagnosisEngine:
         return float(sorted_rms[int(n*0.95)] - sorted_rms[int(n*0.10)])
 
     def _compute_chorus_impact(self, mono: np.ndarray, sr: int) -> float:
-        """副歌冲击力: 4 段中最大最小响度差"""
+        """副歌冲击力: 4 段中最大最小响度差."""
         try:
             import pyloudnorm as pyln
             meter = pyln.Meter(sr)
         except ImportError:
-            return 3.0  # 默认
+            self._fallbacks["D2_ChorusImpact"] = (
+                "pyloudnorm unavailable, using default 3.0 LU"
+            )
+            return 3.0
 
         # 分为 4 段
         n_sections = 4
@@ -310,15 +344,21 @@ class DiagnosisEngine:
                 continue
 
         if len(sec_loudness) < 2:
+            self._fallbacks["D2_ChorusImpact"] = (
+                f"insufficient sections ({len(sec_loudness)} < 2), using default 3.0 LU"
+            )
             return 3.0
         return max(sec_loudness) - min(sec_loudness)
 
     def _compute_micro_dynamics(self, mono: np.ndarray, sr: int) -> float:
-        """微动态: mean(|momentary(400ms) - short_term(3s)|) [LU]"""
+        """微动态: mean(|momentary(400ms) - short_term(3s)|) [LU]."""
         try:
             import pyloudnorm as pyln
             meter = pyln.Meter(sr)
         except ImportError:
+            self._fallbacks["D3_MicroDynamics"] = (
+                "pyloudnorm unavailable, using default 1.0 LU"
+            )
             return 1.0
 
         # 短时 (3s) 响度
@@ -348,6 +388,9 @@ class DiagnosisEngine:
         # 将 momentary 对齐到 short-term 时间轴
         ratio = n_mom // n_st
         if ratio < 1:
+            self._fallbacks["D3_MicroDynamics"] = (
+                f"momentary/short-term ratio < 1 ({ratio=}), using default 1.0 LU"
+            )
             return 1.0
         mom_aligned = np.array([
             np.mean(mom_loudness[i*ratio:(i+1)*ratio])
@@ -361,8 +404,9 @@ class DiagnosisEngine:
             meter = pyln.Meter(sr)
             return meter.integrated_loudness(mono)
         except ImportError:
+            self._fallbacks["D4_PLR"] = "pyloudnorm unavailable, using RMS-based LUFS estimate"
             rms_db = 20 * math.log10(np.sqrt(np.mean(mono**2) + 1e-12))
-            return rms_db  # 近似
+            return rms_db
 
     # ——— 空间维度 SP1-SP4 (§5.3) ————————————————————
 
@@ -379,12 +423,22 @@ class DiagnosisEngine:
         else:
             SP1 = self._compute_correlation_quick(left, right)
             SP3 = 0.3
-            SP4 = (SP1 > 0.0)  # simplified width health from global correlation
+            SP4 = (SP1 > 0.0)
+            self._fallbacks.setdefault("SP3_RT60Consist",
+                "quick mode: hardcoded default 0.3 instead of RT60 measurement")
+
+        def _p(val, key):
+            fb = key in self._fallbacks
+            note = self._fallbacks.pop(key, "")
+            return ParameterWithUncertainty(
+                value=val, is_fallback=fb, fallback_note=note,
+                confidence="low" if fb else "medium",
+            )
 
         return SpaceDiagnosis(
-            SP1_Correlation=round(SP1, 4),
-            SP2_ForeBackSep=round(SP2, 2),
-            SP3_RT60Consist=round(SP3, 3),
+            SP1_Correlation=_p(round(SP1, 4), "SP1_Correlation"),
+            SP2_ForeBackSep=_p(round(SP2, 2), "SP2_ForeBackSep"),
+            SP3_RT60Consist=_p(round(SP3, 3), "SP3_RT60Consist"),
             SP4_WidthHealth=SP4,
         )
 
@@ -481,20 +535,29 @@ class DiagnosisEngine:
         L1 = self._compute_vocal_snr(data, sr, is_stereo)
         L2 = self._compute_bass_clarity(P, freqs)
         L3 = self._compute_drum_detect_fast(mono, sr)
-        L4 = 3
+        L4 = 3  # 主观评分, 非回退
+
+        def _p(val, key):
+            fb = key in self._fallbacks
+            note = self._fallbacks.pop(key, "")
+            return ParameterWithUncertainty(
+                value=val, is_fallback=fb, fallback_note=note,
+                confidence="low" if fb else "medium",
+            )
 
         return LayersDiagnosis(
-            L1_VocalSNR=round(L1, 2),
-            L2_BassClarity=round(L2, 4),
-            L3_DrumDetect=round(L3, 4),
-            L4_LayerCount=L4,
+            L1_VocalSNR=_p(round(L1, 2), "L1_VocalSNR"),
+            L2_BassClarity=_p(round(L2, 4), "L2_BassClarity"),
+            L3_DrumDetect=_p(round(L3, 4), "L3_DrumDetect"),
+            L4_LayerCount=ParameterWithUncertainty(value=float(L4), level="L2"),
         )
 
     def _compute_vocal_snr(self, data: np.ndarray, sr: int,
                             is_stereo: bool) -> float:
-        """人声 SNR: M/S 分解后中声道 1-4kHz vs 侧声道 1-4kHz"""
+        """人声 SNR: M/S 分解后中声道 1-4kHz vs 侧声道 1-4kHz."""
         if not is_stereo or data.shape[1] < 2:
-            return 6.0  # 单声道默认
+            self._fallbacks["L1_VocalSNR"] = "mono audio, using default 6.0 dB"
+            return 6.0
 
         mid = (data[:, 0] + data[:, 1]) / 2.0
         side = (data[:, 0] - data[:, 1]) / 2.0
@@ -519,7 +582,7 @@ class DiagnosisEngine:
         return round(1.0 - entropy / max_entropy, 4)
 
     def _compute_drum_detect(self, mono: np.ndarray, sr: int) -> float:
-        """L3: transient detection rate via librosa onset_detect (full mode)"""
+        """L3: transient detection rate via librosa onset_detect (full mode)."""
         try:
             import librosa
             onset_frames = librosa.onset.onset_detect(
@@ -533,13 +596,19 @@ class DiagnosisEngine:
             rate = len(onset_frames) / max(expected_events, 1)
             return min(1.0, rate)
         except Exception:
+            self._fallbacks["L3_DrumDetect"] = (
+                "librosa onset_detect failed, using default 0.5"
+            )
             return 0.5
 
     def _compute_drum_detect_fast(self, mono: np.ndarray, sr: int) -> float:
-        """L3 fast: frame energy peak detection instead of librosa onset"""
+        """L3 fast: frame energy peak detection instead of librosa onset."""
         frames, _ = frame_signal(mono, sr, frame_ms=23, hop_ms=11)  # ~44fps
         rms_frames = np.sqrt(np.mean(frames**2, axis=1) + 1e-12)
         if len(rms_frames) < 10:
+            self._fallbacks["L3_DrumDetect"] = (
+                f"insufficient frames ({len(rms_frames)} < 10), using default 0.5"
+            )
             return 0.5
         # Detect peaks in RMS energy envelope
         rms_smooth = uniform_filter1d(rms_frames, 5)
@@ -577,7 +646,7 @@ class DiagnosisEngine:
 
         roughness = self._compute_roughness_fast(mono, sr)
         lufs = abs(self._get_integrated_lufs(mono, sr))
-        lra = max(dynamics.D1_LRA, 0.1)
+        lra = max(dynamics.D1_LRA.value, 0.1)
         E3 = round((roughness * lufs) / lra, 2)
 
         if P is not None:
@@ -585,11 +654,21 @@ class DiagnosisEngine:
         else:
             E4 = self._compute_section_continuity(mono, sr)
 
+        E1_is_fallback = "E1" not in (subjective or {})
+        E2_is_fallback = "E2" not in (subjective or {})
         return EmotionDiagnosis(
-            E1_Direction=E1,
-            E2_Richness=E2,
-            E3_FatigueRisk=E3,
-            E4_SectionCont=round(E4, 4),
+            E1_Direction=ParameterWithUncertainty(
+                value=float(E1), level="L2",
+                is_fallback=E1_is_fallback,
+                fallback_note="default value, no subjective rating" if E1_is_fallback else "",
+            ),
+            E2_Richness=ParameterWithUncertainty(
+                value=float(E2), level="L2",
+                is_fallback=E2_is_fallback,
+                fallback_note="default value, no subjective rating" if E2_is_fallback else "",
+            ),
+            E3_FatigueRisk=ParameterWithUncertainty(value=E3),
+            E4_SectionCont=ParameterWithUncertainty(value=round(E4, 4)),
         )
 
     def _compute_roughness_fast(self, mono: np.ndarray, sr: int) -> float:

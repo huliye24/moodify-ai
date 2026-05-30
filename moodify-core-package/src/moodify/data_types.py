@@ -1,5 +1,8 @@
 """
-Moodify Lab 数据类型定义
+Moodify Lab 数据类型定义 — MATH/PHYS Foundation 升级版 (SPEC-011 批次 1).
+
+每个诊断参数从裸 float/int 升级为 ParameterWithUncertainty 组合体,
+包含: 点估计 + 标准不确定度 + 95% CI + 层级 + 置信等级 + 来源 + 协议版本.
 """
 
 from dataclasses import dataclass, field
@@ -324,99 +327,173 @@ class CraftCardV2:
 
 
 # ============================================================================
-#  WaveState_Diagnosis — 完整 18 参数诊断数据结构 (SPEC §2.2)
+#  ParameterWithUncertainty — MATH-001 可测量量组合体 (SPEC-011 T1.1~T1.4)
+# ============================================================================
+
+@dataclass
+class ParameterWithUncertainty:
+    """MATH-001 可测量量 — 参数值 + 不确定度 + 元数据的组合体.
+
+    MATH-001 公理 D: 每个报告值必须绑定 protocol_version, tool_version.
+    MATH-006 §8.1: 强制报告点估计 + 标准不确定度 + 95% CI.
+    PHYS-001 §2: 每个量必须显式声明层级 L0/L1/L2.
+    """
+
+    value: float = 0.0
+    uncertainty: float = 0.0               # 标准不确定度 ±σ
+    ci_lower: Optional[float] = None       # 95% CI 下界
+    ci_upper: Optional[float] = None       # 95% CI 上界
+    level: str = "L1"                      # PHYS-001 层级: L0/L1/L2
+    confidence: str = "medium"             # high / medium / low / fallback
+    provenance: str = "experiment"         # experiment / computed / fallback
+    protocol: str = "unknown"              # 协议版本
+    is_fallback: bool = False              # 是否使用回退路径
+    fallback_note: str = ""                # 回退说明
+
+    def to_dict(self) -> dict:
+        return {
+            "value": self.value,
+            "uncertainty": self.uncertainty,
+            "ci_95": [self.ci_lower, self.ci_upper],
+            "level": self.level,
+            "confidence": self.confidence,
+            "provenance": self.provenance,
+            "protocol": self.protocol,
+            "is_fallback": self.is_fallback,
+            "fallback_note": self.fallback_note,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "ParameterWithUncertainty":
+        ci = d.get("ci_95", [None, None])
+        return cls(
+            value=d.get("value", 0.0),
+            uncertainty=d.get("uncertainty", 0.0),
+            ci_lower=ci[0] if ci else None,
+            ci_upper=ci[1] if len(ci) > 1 else None,
+            level=d.get("level", "L1"),
+            confidence=d.get("confidence", "medium"),
+            provenance=d.get("provenance", "experiment"),
+            protocol=d.get("protocol", "unknown"),
+            is_fallback=d.get("is_fallback", False),
+            fallback_note=d.get("fallback_note", ""),
+        )
+
+
+# ============================================================================
+#  WaveState_Diagnosis — 完整 18 参数诊断数据结构 (SPEC §2.2 + SPEC-011 T1)
 # ============================================================================
 
 @dataclass
 class SpectrumDiagnosis:
-    """频谱维度 5 参数"""
-    S1_SubPresence: float = 0.0      # RMS(20-60Hz) / RMS(full) [dB]
-    S2_BassWarmth: float = 0.0       # RMS(60-250Hz) / RMS(full) [dB]
-    S3_MidClarity: float = 0.0       # 1 - masking_index(250-5000Hz) [0-1]
-    S4_AirBand: float = 0.0          # RMS(8-16kHz) / RMS(full) [dB]
-    S5_SpectralTilt: float = 0.0     # linear fit log(f) vs log(amp) [dB/oct]
+    """频谱维度 5 参数 — MATH-001 公理体系升级版"""
+    S1_SubPresence: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    S2_BassWarmth: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    S3_MidClarity: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    S4_AirBand: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    S5_SpectralTilt: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
 
     def to_dict(self) -> dict:
         return {
-            "S1_SubPresence": self.S1_SubPresence,
-            "S2_BassWarmth": self.S2_BassWarmth,
-            "S3_MidClarity": self.S3_MidClarity,
-            "S4_AirBand": self.S4_AirBand,
-            "S5_SpectralTilt": self.S5_SpectralTilt,
+            "S1_SubPresence": self.S1_SubPresence.to_dict(),
+            "S2_BassWarmth": self.S2_BassWarmth.to_dict(),
+            "S3_MidClarity": self.S3_MidClarity.to_dict(),
+            "S4_AirBand": self.S4_AirBand.to_dict(),
+            "S5_SpectralTilt": self.S5_SpectralTilt.to_dict(),
         }
 
 
 @dataclass
 class DynamicsDiagnosis:
-    """动态维度 4 参数"""
-    D1_LRA: float = 0.0              # Loudness Range per EBU 3342 [LU]
-    D2_ChorusImpact: float = 0.0     # LUFS(chorus) - LUFS(verse) [LU]
-    D3_MicroDynamics: float = 0.0    # mean(|momentary - short-term|) [LU]
-    D4_PLR: float = 0.0              # Peak-to-Loudness Ratio [dB]
+    """动态维度 4 参数 — MATH-001 公理体系升级版"""
+    D1_LRA: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    D2_ChorusImpact: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    D3_MicroDynamics: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    D4_PLR: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
 
     def to_dict(self) -> dict:
         return {
-            "D1_LRA": self.D1_LRA,
-            "D2_ChorusImpact": self.D2_ChorusImpact,
-            "D3_MicroDynamics": self.D3_MicroDynamics,
-            "D4_PLR": self.D4_PLR,
+            "D1_LRA": self.D1_LRA.to_dict(),
+            "D2_ChorusImpact": self.D2_ChorusImpact.to_dict(),
+            "D3_MicroDynamics": self.D3_MicroDynamics.to_dict(),
+            "D4_PLR": self.D4_PLR.to_dict(),
         }
 
 
 @dataclass
 class SpaceDiagnosis:
-    """空间维度 4 参数"""
-    SP1_Correlation: float = 0.0     # mean phase correlation 100-8000Hz [0-1]
-    SP2_ForeBackSep: float = 0.0     # M energy / S energy (midband) [dB]
-    SP3_RT60Consist: float = 0.0     # std(RT60 per octave band) [s]
-    SP4_WidthHealth: bool = True     # corr(2k-8k) > 0 AND mono compatible
+    """空间维度 4 参数 — SP4 保持 bool (非测量量)"""
+    SP1_Correlation: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    SP2_ForeBackSep: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    SP3_RT60Consist: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    SP4_WidthHealth: bool = True     # 派生判断, 非测量量
 
     def to_dict(self) -> dict:
         return {
-            "SP1_Correlation": self.SP1_Correlation,
-            "SP2_ForeBackSep": self.SP2_ForeBackSep,
-            "SP3_RT60Consist": self.SP3_RT60Consist,
+            "SP1_Correlation": self.SP1_Correlation.to_dict(),
+            "SP2_ForeBackSep": self.SP2_ForeBackSep.to_dict(),
+            "SP3_RT60Consist": self.SP3_RT60Consist.to_dict(),
             "SP4_WidthHealth": self.SP4_WidthHealth,
         }
 
 
 @dataclass
 class LayersDiagnosis:
-    """层级维度 4 参数"""
-    L1_VocalSNR: float = 0.0         # RMS(1-4kHz) / RMS(background same band) [dB]
-    L2_BassClarity: float = 0.0      # 1 - entropy(normalized 20-250Hz) [0-1]
-    L3_DrumDetect: float = 0.0       # transient detection rate [0-1]
-    L4_LayerCount: int = 3           # 主观评分 [1-6]
+    """层级维度 4 参数 — L4 主观评分 (L2 桥接量)"""
+    L1_VocalSNR: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    L2_BassClarity: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    L3_DrumDetect: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    L4_LayerCount: ParameterWithUncertainty = field(
+        default_factory=lambda: ParameterWithUncertainty(value=3.0, level="L2"))
 
     def to_dict(self) -> dict:
         return {
-            "L1_VocalSNR": self.L1_VocalSNR,
-            "L2_BassClarity": self.L2_BassClarity,
-            "L3_DrumDetect": self.L3_DrumDetect,
-            "L4_LayerCount": self.L4_LayerCount,
+            "L1_VocalSNR": self.L1_VocalSNR.to_dict(),
+            "L2_BassClarity": self.L2_BassClarity.to_dict(),
+            "L3_DrumDetect": self.L3_DrumDetect.to_dict(),
+            "L4_LayerCount": self.L4_LayerCount.to_dict(),
         }
 
 
 @dataclass
 class EmotionDiagnosis:
-    """情绪维度 4 参数"""
-    E1_Direction: int = 5            # 情绪方向明确度 [1-10]
-    E2_Richness: int = 5             # 情绪层次丰富度 [1-10]
-    E3_FatigueRisk: float = 0.0      # (roughness × LUFS) / max(LRA,0.1)
-    E4_SectionCont: float = 0.0      # 1 - mean(cosine_distance between sections) [0-1]
+    """情绪维度 4 参数 — E1/E2 主观评分 (L2 桥接量)"""
+    E1_Direction: ParameterWithUncertainty = field(
+        default_factory=lambda: ParameterWithUncertainty(value=5.0, level="L2"))
+    E2_Richness: ParameterWithUncertainty = field(
+        default_factory=lambda: ParameterWithUncertainty(value=5.0, level="L2"))
+    E3_FatigueRisk: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
+    E4_SectionCont: ParameterWithUncertainty = field(
+        default_factory=ParameterWithUncertainty)
 
     def to_dict(self) -> dict:
         return {
-            "E1_Direction": self.E1_Direction,
-            "E2_Richness": self.E2_Richness,
-            "E3_FatigueRisk": self.E3_FatigueRisk,
-            "E4_SectionCont": self.E4_SectionCont,
+            "E1_Direction": self.E1_Direction.to_dict(),
+            "E2_Richness": self.E2_Richness.to_dict(),
+            "E3_FatigueRisk": self.E3_FatigueRisk.to_dict(),
+            "E4_SectionCont": self.E4_SectionCont.to_dict(),
         }
 
 
 @dataclass
 class WaveStateDiagnosis:
-    """五维波场诊断状态 — 完整 18 参数 (SPEC §2.2)"""
+    """五维波场诊断状态 — 完整 18 参数 (SPEC §2.2 + SPEC-011 T2)"""
     Spectrum: SpectrumDiagnosis = field(default_factory=SpectrumDiagnosis)
     Dynamics: DynamicsDiagnosis = field(default_factory=DynamicsDiagnosis)
     Space: SpaceDiagnosis = field(default_factory=SpaceDiagnosis)
@@ -426,6 +503,11 @@ class WaveStateDiagnosis:
     duration_s: float = 0.0
     sample_rate: int = 44100
     timestamp: datetime = field(default_factory=datetime.now)
+    # SPEC-011 T2.2~T2.3: 协议元数据
+    protocol_mode: str = "full"              # "quick" or "full"
+    stft_config: dict = field(default_factory=dict)  # FFT 参数快照
+    # SPEC-011 T7.4: 归一化声明
+    normalization_notes: list = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -438,26 +520,29 @@ class WaveStateDiagnosis:
             "duration_s": self.duration_s,
             "sample_rate": self.sample_rate,
             "timestamp": self.timestamp.isoformat(),
+            "protocol_mode": self.protocol_mode,
+            "stft_config": self.stft_config,
+            "normalization_notes": self.normalization_notes,
         }
 
     def get_auto_params(self) -> dict[str, float]:
-        """提取全部 14 个自动测量参数"""
+        """提取全部 14 个自动测量参数的点估计值"""
         return {
-            "S1_SubPresence": self.Spectrum.S1_SubPresence,
-            "S2_BassWarmth": self.Spectrum.S2_BassWarmth,
-            "S3_MidClarity": self.Spectrum.S3_MidClarity,
-            "S4_AirBand": self.Spectrum.S4_AirBand,
-            "S5_SpectralTilt": self.Spectrum.S5_SpectralTilt,
-            "D1_LRA": self.Dynamics.D1_LRA,
-            "D2_ChorusImpact": self.Dynamics.D2_ChorusImpact,
-            "D3_MicroDynamics": self.Dynamics.D3_MicroDynamics,
-            "D4_PLR": self.Dynamics.D4_PLR,
-            "SP1_Correlation": self.Space.SP1_Correlation,
-            "SP2_ForeBackSep": self.Space.SP2_ForeBackSep,
-            "SP3_RT60Consist": self.Space.SP3_RT60Consist,
-            "L3_DrumDetect": self.Layers.L3_DrumDetect,
-            "E3_FatigueRisk": self.Emotion.E3_FatigueRisk,
-            "E4_SectionCont": self.Emotion.E4_SectionCont,
+            "S1_SubPresence": self.Spectrum.S1_SubPresence.value,
+            "S2_BassWarmth": self.Spectrum.S2_BassWarmth.value,
+            "S3_MidClarity": self.Spectrum.S3_MidClarity.value,
+            "S4_AirBand": self.Spectrum.S4_AirBand.value,
+            "S5_SpectralTilt": self.Spectrum.S5_SpectralTilt.value,
+            "D1_LRA": self.Dynamics.D1_LRA.value,
+            "D2_ChorusImpact": self.Dynamics.D2_ChorusImpact.value,
+            "D3_MicroDynamics": self.Dynamics.D3_MicroDynamics.value,
+            "D4_PLR": self.Dynamics.D4_PLR.value,
+            "SP1_Correlation": self.Space.SP1_Correlation.value,
+            "SP2_ForeBackSep": self.Space.SP2_ForeBackSep.value,
+            "SP3_RT60Consist": self.Space.SP3_RT60Consist.value,
+            "L3_DrumDetect": self.Layers.L3_DrumDetect.value,
+            "E3_FatigueRisk": self.Emotion.E3_FatigueRisk.value,
+            "E4_SectionCont": self.Emotion.E4_SectionCont.value,
         }
 
     def is_complete(self) -> bool:

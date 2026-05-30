@@ -36,41 +36,39 @@ class TestDiagnosisEngine:
         from moodify.diagnosis import DiagnosisEngine
         engine = DiagnosisEngine()
         assert engine.sr == 44100
-        assert engine.n_fft == 1024
+        assert engine.n_fft == 2048
 
     def test_diagnose_mock_wav(self, mock_wav):
         from moodify.diagnosis import DiagnosisEngine
         engine = DiagnosisEngine()
         ws = engine.diagnose_quick(mock_wav)
         assert ws.is_complete()
-        assert 0 <= ws.Spectrum.S3_MidClarity <= 1
+        assert 0 <= ws.Spectrum.S3_MidClarity.value <= 1
 
     def test_extract_spectrum(self, mock_wav):
         from moodify.diagnosis import DiagnosisEngine
         engine = DiagnosisEngine()
         ws = engine.diagnose_quick(mock_wav)
         s = ws.Spectrum
-        # Narrow-band sine yields extreme band ratios — just verify they're finite
-        assert not math.isnan(s.S1_SubPresence)
-        assert not math.isnan(s.S2_BassWarmth)
-        assert 0 <= s.S3_MidClarity <= 1
-        assert not math.isnan(s.S4_AirBand)
+        assert not math.isnan(s.S1_SubPresence.value)
+        assert not math.isnan(s.S2_BassWarmth.value)
+        assert 0 <= s.S3_MidClarity.value <= 1
+        assert not math.isnan(s.S4_AirBand.value)
 
     def test_extract_dynamics(self, mock_wav):
         from moodify.diagnosis import DiagnosisEngine
         engine = DiagnosisEngine()
         ws = engine.diagnose_quick(mock_wav)
         d = ws.Dynamics
-        # Steady sine => LRA can be 0; just verify finite
-        assert not math.isnan(d.D1_LRA)
-        assert not math.isnan(d.D4_PLR)
+        assert not math.isnan(d.D1_LRA.value)
+        assert not math.isnan(d.D4_PLR.value)
 
     def test_extract_space(self, mock_wav):
         from moodify.diagnosis import DiagnosisEngine
         engine = DiagnosisEngine()
         ws = engine.diagnose_quick(mock_wav)
         sp = ws.Space
-        assert -1 <= sp.SP1_Correlation <= 1
+        assert -1 <= sp.SP1_Correlation.value <= 1
         assert isinstance(sp.SP4_WidthHealth, bool)
 
 

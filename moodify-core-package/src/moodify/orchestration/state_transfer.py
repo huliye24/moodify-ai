@@ -185,14 +185,14 @@ class StateTransferEngine:
         l = ws_diag.Layers
         e = ws_diag.Emotion
 
-        tilt_penalty = min(abs(s.S5_SpectralTilt) / 12.0, 1.0)
-        E = max(0.0, min(1.0, s.S3_MidClarity * 0.7 + (1.0 - tilt_penalty) * 0.3))
-        D = max(0.0, min(1.0, (d.D1_LRA - 2.0) / 14.0))
-        corr_score = 1.0 - sp.SP1_Correlation
-        rt60_penalty = min(sp.SP3_RT60Consist / 0.8, 1.0)
+        tilt_penalty = min(abs(s.S5_SpectralTilt.value) / 12.0, 1.0)
+        E = max(0.0, min(1.0, s.S3_MidClarity.value * 0.7 + (1.0 - tilt_penalty) * 0.3))
+        D = max(0.0, min(1.0, (d.D1_LRA.value - 2.0) / 14.0))
+        corr_score = 1.0 - sp.SP1_Correlation.value
+        rt60_penalty = min(sp.SP3_RT60Consist.value / 0.8, 1.0)
         S = max(0.0, min(1.0, corr_score * 0.7 + (1.0 - rt60_penalty) * 0.3))
-        T = max(0.0, min(1.0, l.L3_DrumDetect * 1.1))
-        H = max(0.0, min(1.0, 1.0 - e.E3_FatigueRisk / 120.0))
+        T = max(0.0, min(1.0, l.L3_DrumDetect.value * 1.1))
+        H = max(0.0, min(1.0, 1.0 - e.E3_FatigueRisk.value / 120.0))
 
         return WaveStateProcess(E=E, D=D, S=S, T=T, H=H)
 

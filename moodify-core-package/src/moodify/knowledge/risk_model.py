@@ -108,12 +108,12 @@ class RiskModel:
         s = ws.Spectrum
         d = ws.Dynamics
 
-        hfr = np.clip((s.S4_AirBand + 3.0) / 12.0, 0.0, 1.0)
+        hfr = np.clip((s.S4_AirBand.value + 3.0) / 12.0, 0.0, 1.0)
         sibilance = self._estimate_sibilance(ws)
         lufs_val = integrated_lufs if integrated_lufs is not None else -14
         loudness_risk = np.clip((-10.0 - lufs_val) / 10.0, 0.0, 1.0)
-        low_lra = np.clip((6.0 - d.D1_LRA) / 6.0, 0.0, 1.0)
-        harsh = np.clip((d.D4_PLR - 6.0) / 12.0, 0.0, 1.0)
+        low_lra = np.clip((6.0 - d.D1_LRA.value) / 6.0, 0.0, 1.0)
+        harsh = np.clip((d.D4_PLR.value - 6.0) / 12.0, 0.0, 1.0)
 
         self._lfr_factors_cache = {
             "HighFreqRoughness": round(hfr, 4),
@@ -131,8 +131,8 @@ class RiskModel:
     @staticmethod
     def _estimate_sibilance(ws: WaveStateDiagnosis) -> float:
         s = ws.Spectrum
-        presence_clarity = s.S3_MidClarity
-        air_band = s.S4_AirBand
+        presence_clarity = s.S3_MidClarity.value
+        air_band = s.S4_AirBand.value
         risk = (1.0 - presence_clarity) * 0.5 + np.clip((air_band - 3) / 12.0, 0, 1) * 0.5
         return round(float(risk), 4)
 
@@ -191,7 +191,7 @@ class RiskModel:
                 return 0.4
         # 从诊断估算: 高频与中频比过高可能表示失真
         s = ws.Spectrum
-        air_mid_ratio = abs(s.S4_AirBand / max(abs(s.S2_BassWarmth), 0.1))
+        air_mid_ratio = abs(s.S4_AirBand.value / max(abs(s.S2_BassWarmth.value), 0.1))
         return float(np.clip(air_mid_ratio / 8.0, 0.0, 1.0))
 
     @staticmethod
