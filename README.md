@@ -4,11 +4,12 @@ AI 音乐二次处理与情绪声波工程系统。
 
 ## Status
 
-- **Version**: v0.1.0-alpha.1
+- **Version**: v0.1.0-alpha.2
 - **Mainline**: v01
 - **CLI**: `analyze` / `process` 默认走 v01 主线
 - **API**: `/process` 走 `v01_pipeline`
 - **Tests**: 20 v01 tests, 104 total tests, all green
+- **Experience loop**: process → inspect → calibrate → record → feedback → aggregate
 
 ## What Moodify Does
 
@@ -139,11 +140,29 @@ memory/        — SQLite + JSONL history
 - 不要在 v0.1.0 阶段做 GUI
 - `pytest` 始终跑全量，`pytest -m v01` 用于快速检查主线
 
+## Local Experience Loop
+
+Moodify v0.1.0-alpha.2 includes a local experience loop:
+
+```text
+process audio
+  ↓
+inspect before / after  (scripts/v01_inspector.py)
+  ↓
+calibrate presets       (scripts/v01_calibrate_presets.py)
+  ↓
+create treatment record (scripts/v01_create_treatment_record.py)
+  ↓
+write human feedback    (scripts/v01_update_treatment_feedback.py)
+  ↓
+aggregate records       (scripts/v01_aggregate_treatment_records.py)
+```
+
 ## Links
 
 - Repository: https://github.com/huliye24/moodify-o3is
-- Latest tag: `v0.1.0-alpha.1`
-- Project snapshot: `docs/PROJECT_SNAPSHOT_v0.1.0-alpha.1.md`
+- Latest tag: `v0.1.0-alpha.2`
+- Project snapshot: `docs/PROJECT_SNAPSHOT_v0.1.0-alpha.2.md`
 
 ## License
 
