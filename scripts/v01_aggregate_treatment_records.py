@@ -64,12 +64,22 @@ def extract_flat_record(rec: dict) -> dict:
         "warning_level": loudness.get("warning_level"),
         "crest_delta": delta.get("crest_delta"),
         "dynamic_range_delta_db": delta.get("dynamic_range_delta_db"),
-        "correlation_delta": delta.get("correlation_delta"),
+        "correlation_delta": _first_present(delta, [
+            "correlation_delta", "correlation_lr_delta", "lr_correlation_delta"]),
         "presence_delta_db": delta.get("presence_delta_db"),
         "air_delta_db": delta.get("air_delta_db"),
         "feedback_status": fb.get("status", "unknown"),
         "better_than_before": fb.get("better_than_before"),
     }
+
+
+def _first_present(data: dict, keys: list[str], default=None):
+    """Return the first key in `keys` that exists and is non-None in `data`."""
+    for k in keys:
+        v = data.get(k)
+        if v is not None:
+            return v
+    return default
 
 
 def safe_mean(values: list) -> float | None:

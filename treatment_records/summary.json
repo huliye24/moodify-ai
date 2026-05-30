@@ -1,0 +1,109 @@
+{
+  "schema_version": "0.1.0",
+  "summary_type": "moodify_treatment_record_summary",
+  "record_count": 3,
+  "presets": {
+    "warm_vocal": {
+      "count": 1,
+      "avg_delta": {
+        "rms_delta_db": 9.06,
+        "crest_delta": -2.54,
+        "dynamic_range_delta_db": -4.25,
+        "correlation_delta": -0.09,
+        "presence_delta_db": 1.3,
+        "air_delta_db": 0.8
+      },
+      "human_feedback": {
+        "pending": 1,
+        "completed": 0,
+        "better_yes": 0,
+        "better_no": 0,
+        "better_uncertain": 0
+      }
+    },
+    "clean_master": {
+      "count": 1,
+      "avg_delta": {
+        "rms_delta_db": 5.33,
+        "crest_delta": -0.34,
+        "dynamic_range_delta_db": -0.3,
+        "correlation_delta": -0.01,
+        "presence_delta_db": 0.2,
+        "air_delta_db": 0.6
+      },
+      "human_feedback": {
+        "pending": 1,
+        "completed": 0,
+        "better_yes": 0,
+        "better_no": 0,
+        "better_uncertain": 0
+      }
+    },
+    "wide_space": {
+      "count": 1,
+      "avg_delta": {
+        "rms_delta_db": 8.02,
+        "crest_delta": -1.75,
+        "dynamic_range_delta_db": -3.37,
+        "correlation_delta": -0.12,
+        "presence_delta_db": 1.7,
+        "air_delta_db": 1.3
+      },
+      "human_feedback": {
+        "pending": 1,
+        "completed": 0,
+        "better_yes": 0,
+        "better_no": 0,
+        "better_uncertain": 0
+      }
+    }
+  },
+  "records": [
+    {
+      "record_file": "electronic_wide_space.json",
+      "song_id": "electronic_001",
+      "preset": "wide_space",
+      "rms_delta_db": 8.02,
+      "after_gain_match_db": -8.02,
+      "warning_level": "strong",
+      "crest_delta": -1.75,
+      "dynamic_range_delta_db": -3.37,
+      "correlation_delta": -0.12,
+      "presence_delta_db": 1.7,
+      "air_delta_db": 1.3,
+      "feedback_status": "pending",
+      "better_than_before": null
+    },
+    {
+      "record_file": "piano_clean_master.json",
+      "song_id": "piano_001",
+      "preset": "clean_master",
+      "rms_delta_db": 5.33,
+      "after_gain_match_db": -5.33,
+      "warning_level": "strong",
+      "crest_delta": -0.34,
+      "dynamic_range_delta_db": -0.3,
+      "correlation_delta": -0.01,
+      "presence_delta_db": 0.2,
+      "air_delta_db": 0.6,
+      "feedback_status": "pending",
+      "better_than_before": null
+    },
+    {
+      "record_file": "vocal_folk_warm_vocal.json",
+      "song_id": "vocal_folk_001",
+      "preset": "warm_vocal",
+      "rms_delta_db": 9.06,
+      "after_gain_match_db": -9.06,
+      "warning_level": "strong",
+      "crest_delta": -2.54,
+      "dynamic_range_delta_db": -4.25,
+      "correlation_delta": -0.09,
+      "presence_delta_db": 1.3,
+      "air_delta_db": 0.8,
+      "feedback_status": "pending",
+      "better_than_before": null
+    }
+  ],
+  "errors": []
+}
