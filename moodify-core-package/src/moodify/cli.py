@@ -2,11 +2,12 @@
 Moodify CLI — AI music post-processing, one command.
 
 Usage:
-  moodify process <audio> <emotion>    Process one file (WAV/MP3/FLAC)
-  moodify batch <dir> <emotion>        Process all audio files in a directory
-  moodify analyze <audio>              Diagnose only, no processing
-  moodify emotions                     List 8 emotion targets
+  moodify analyze <audio>              Spectrum analysis -> PNG + metrics
+  moodify process <audio> --preset X   Process with v0.1.0 preset -> WAV
+  moodify presets                      List v0.1.0 presets
   moodify serve                        Start API server
+  moodify legacy-analyze <audio>       (Legacy) Old diagnosis engine
+  moodify legacy-process <audio> <emotion> (Legacy) Old workflow engine
 """
 
 import sys, os, argparse, time
@@ -15,8 +16,8 @@ from pathlib import Path
 SUPPORTED_EXTENSIONS = {'.wav', '.mp3', '.flac', '.aiff', '.aif', '.m4a', '.ogg'}
 
 
-def cmd_analyze(args):
-    """诊断分析命令"""
+def cmd_legacy_analyze(args):
+    """[legacy] 旧系统诊断分析"""
     from moodify.diagnosis.engine import DiagnosisEngine
     from moodify.diagnosis.defect_classifier import DefectClassifier
     from moodify.diagnosis.health_scorer import HealthScorer
@@ -93,8 +94,8 @@ def cmd_analyze(args):
     return 0
 
 
-def cmd_process(args):
-    """Process one audio file — WAV, MP3, FLAC all supported."""
+def cmd_legacy_process(args):
+    """[legacy] Process one audio file — WAV, MP3, FLAC all supported."""
     from moodify.orchestration.workflow_engine import WorkflowOrchestrator
 
     path = args.audio_path
@@ -366,20 +367,20 @@ def main():
     )
     sub = parser.add_subparsers(dest="command")
 
-    # analyze
-    p_analyze = sub.add_parser("analyze", help="诊断分析音频文件")
+    # analyze (v0.1.0 mainline)
+    p_analyze = sub.add_parser("analyze", help="频谱分析音频文件 [v0.1.0]")
     p_analyze.add_argument("audio_path", help="音频文件路径")
+    p_analyze.add_argument("--output-dir", default="outputs", help="输出目录")
     p_analyze.add_argument("--json", action="store_true", help="JSON 格式输出")
 
-    # process
-    p_process = sub.add_parser("process", help="一键处理音频")
+    # process (v0.1.0 mainline)
+    p_process = sub.add_parser("process", help="一键处理音频 [v0.1.0]")
     p_process.add_argument("audio_path", help="音频文件路径")
-    p_process.add_argument("emotion", help="目标情绪 (温柔觉醒/神圣空灵/...)")
-    p_process.add_argument("--platform", default="spotify",
-                           choices=["spotify", "youtube", "apple_music"])
+    p_process.add_argument("--preset", default="clean_master",
+                           choices=["warm_vocal", "clean_master", "wide_space"],
+                           help="处理预设")
     p_process.add_argument("--output-dir", default="outputs", help="输出目录")
-    p_process.add_argument("--mode", default="auto", choices=["auto", "expert"])
-    p_process.add_argument("--verbose", action="store_true")
+    p_process.add_argument("--json", action="store_true", help="JSON 格式输出")
 
     # batch
     p_batch = sub.add_parser("batch", help="批量处理目录中的音频文件")
@@ -415,9 +416,26 @@ def main():
     p_v01_process.add_argument("--output-dir", default="outputs", help="输出目录")
     p_v01_process.add_argument("--json", action="store_true", help="JSON 格式输出")
 
+    sub.add_parser("presets", help="列出可用预设 [v0.1.0]")
     sub.add_parser("v01-presets", help="[v0.1.0] 列出可用预设")
 
     # ── legacy commands (v1.x, kept for backward compat) ──
+    # legacy-analyze: 旧系统诊断分析
+    p_legacy_analyze = sub.add_parser("legacy-analyze", help="[legacy] 旧系统诊断分析")
+    p_legacy_analyze.add_argument("audio_path", help="音频文件路径")
+    p_legacy_analyze.add_argument("--json", action="store_true", help="JSON 格式输出")
+
+    # legacy-process: 旧系统一键处理
+    p_legacy_process = sub.add_parser("legacy-process", help="[legacy] 旧系统一键处理")
+    p_legacy_process.add_argument("audio_path", help="音频文件路径")
+    p_legacy_process.add_argument("emotion", help="目标情绪")
+    p_legacy_process.add_argument("--platform", default="spotify",
+                                   choices=["spotify", "youtube", "apple_music"])
+    p_legacy_process.add_argument("--output-dir", default="outputs", help="输出目录")
+    p_legacy_process.add_argument("--mode", default="auto", choices=["auto", "expert"])
+    p_legacy_process.add_argument("--verbose", action="store_true")
+
+    # ── evaluate commands ──
     # evaluate-run: 批量 AI 评测
     p_eval_run = sub.add_parser("evaluate-run", help="批量 AI 评测（驱动数据飞轮）")
     p_eval_run.add_argument("assets_dir", help="音乐资产目录")
@@ -444,12 +462,15 @@ def main():
 
     handlers = {
         # v0.1.0 mainline
+        "analyze": cmd_v01_analyze,
+        "process": cmd_v01_process,
+        "presets": cmd_v01_presets,
         "v01-analyze": cmd_v01_analyze,
         "v01-process": cmd_v01_process,
         "v01-presets": cmd_v01_presets,
         # legacy
-        "analyze": cmd_analyze,
-        "process": cmd_process,
+        "legacy-analyze": cmd_legacy_analyze,
+        "legacy-process": cmd_legacy_process,
         "batch": cmd_batch,
         "emotions": cmd_emotions,
         "crafts": cmd_crafts,
