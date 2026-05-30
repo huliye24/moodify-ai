@@ -161,7 +161,7 @@ aggregate records       (scripts/v01_aggregate_treatment_records.py)
 ## Links
 
 - Repository: https://github.com/huliye24/moodify-o3is
-- Latest tag: `v0.1.0-alpha.2`
+- Latest tag: `v0.1.0-alpha.3`
 - Project snapshot: `docs/PROJECT_SNAPSHOT_v0.1.0-alpha.2.md`
 
 ## License
