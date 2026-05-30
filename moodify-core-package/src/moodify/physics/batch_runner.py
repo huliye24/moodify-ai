@@ -31,9 +31,18 @@ from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Callable
 
+# ── sys.path ──────────────────────────────────────────
+_SELF_DIR = Path(__file__).resolve().parent  # physics/
+_SRC_DIR = _SELF_DIR.parent.parent  # src/
+if str(_SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(_SRC_DIR))
+
 # ── 配置 ──────────────────────────────────────────────
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
+PROJECT_ROOT = Path(os.environ.get(
+    "MOODIFY_ROOT",
+    Path(__file__).resolve().parent.parent.parent.parent.parent
+))
 OUTPUT_ROOT = PROJECT_ROOT / "outputs"
 REPORT_DIR = OUTPUT_ROOT / "reports"
 

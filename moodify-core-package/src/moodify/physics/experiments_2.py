@@ -56,7 +56,7 @@ def get_audio_paths():
 #  500 samples, per-emotion B matrix, compare predicted vs actual
 # ═══════════════════════════════════════════════════════════
 
-def experiment_G(n_samples: int = 100, emotions: list = None) -> dict:
+def experiment_G(n_samples: int = 100, emotions: list = None, **kwargs) -> dict:
     """CH-1: Validate T_EFFECTS against real DSP measurements."""
     print("\n" + "="*60)
     print("EXPERIMENT G: T_EFFECTS Validation (Extended)")
@@ -226,7 +226,7 @@ def _estimate_strength_from_params(params: dict, emotion_code: str) -> dict:
 #  Experiment H: LHS Search Convergence (CH-9)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_H() -> dict:
+def experiment_H(**kwargs) -> dict:
     """CH-9: Test if 2000 LHS samples are enough for search convergence."""
     print("\n" + "="*60)
     print("EXPERIMENT H: LHS Search Convergence")
@@ -292,7 +292,7 @@ def experiment_H() -> dict:
 #  Experiment I: AI Music Diagnostic Distribution (CH-8)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_I() -> dict:
+def experiment_I(**kwargs) -> dict:
     """CH-8: Measure diagnostic parameter distribution on AI music."""
     print("\n" + "="*60)
     print("EXPERIMENT I: AI Music Diagnostic Distribution")
@@ -390,7 +390,7 @@ def experiment_I() -> dict:
 #  Experiment J: EMA Alpha Optimization (CH-11)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_J() -> dict:
+def experiment_J(**kwargs) -> dict:
     """CH-11: Find optimal EMA alpha for bias estimation."""
     print("\n" + "="*60)
     print("EXPERIMENT J: EMA Alpha Optimization")
@@ -479,7 +479,7 @@ def experiment_J() -> dict:
 #  Experiment K: Euclidean vs Mahalanobis Distance (CH-13)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_K() -> dict:
+def experiment_K(**kwargs) -> dict:
     """CH-13: Compare Euclidean vs Mahalanobis distance rankings."""
     print("\n" + "="*60)
     print("EXPERIMENT K: Euclidean vs Mahalanobis Distance")
@@ -566,7 +566,7 @@ def experiment_K() -> dict:
 #  Experiment L: HPSS Margin Optimization (CH-18)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_L() -> dict:
+def experiment_L(**kwargs) -> dict:
     """CH-18: Find optimal HPSS margin for AI music."""
     print("\n" + "="*60)
     print("EXPERIMENT L: HPSS Margin Optimization")
@@ -653,7 +653,7 @@ def experiment_L() -> dict:
 #  Experiment M: Master Dimension Validity (CH-14)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_M() -> dict:
+def experiment_M(**kwargs) -> dict:
     """CH-14: Test if master dimension has any effect on output."""
     print("\n" + "="*60)
     print("EXPERIMENT M: Master Dimension Validity")
@@ -744,7 +744,7 @@ def experiment_M() -> dict:
 #  Experiment N: Quick vs Full Diagnosis (CH-17)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_N() -> dict:
+def experiment_N(**kwargs) -> dict:
     """CH-17: Compare quick vs full diagnosis modes."""
     print("\n" + "="*60)
     print("EXPERIMENT N: Quick vs Full Diagnosis")
@@ -814,7 +814,7 @@ def experiment_N() -> dict:
 #  Experiment O: Reverb & Distortion Mapping (CH-19, CH-20)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_O() -> dict:
+def experiment_O(**kwargs) -> dict:
     """CH-19/20: Validate reverb and distortion parameter mappings."""
     print("\n" + "="*60)
     print("EXPERIMENT O: Reverb & Distortion Mapping Validation")

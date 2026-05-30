@@ -66,7 +66,17 @@ def _process_batch(args):
                 "status": "ok",
             })
         except Exception as e:
-            results.append({"dx": None, "du": None, "status": str(e)[:100]})
+            reason = "unknown"
+            msg = str(e)[:100]
+            if "No such file" in msg or "not found" in msg.lower():
+                reason = "file_not_found"
+            elif "too short" in msg.lower() or "length" in msg.lower():
+                reason = "audio_too_short"
+            elif "decode" in msg.lower() or "format" in msg.lower() or "corrupt" in msg.lower():
+                reason = "decode_error"
+            elif "memory" in msg.lower() or "allocation" in msg.lower():
+                reason = "out_of_memory"
+            results.append({"dx": None, "du": None, "status": f"{reason}: {msg[:80]}"})
 
     return results
 
@@ -103,10 +113,20 @@ def identify_b_matrix(emotion, audio_path, n_samples, n_workers):
     print(f"\n  [{emotion}] Generating {n_samples} parameter sets...")
     params_list = _generate_params(emotion, n_samples)
 
-    audio, sr = soundfile.read(audio_path)
-    audio = audio.astype(np.float32)
-    if audio.ndim == 1:
-        audio = np.column_stack([audio, audio])
+    try:
+        audio, sr = soundfile.read(audio_path)
+        audio = audio.astype(np.float32)
+        if audio.ndim == 1:
+            audio = np.column_stack([audio, audio])
+        if len(audio) < sr * 3:
+            return {"emotion": emotion, "error": "Audio too short (< 3s)",
+                    "n_failed": n_samples, "failure_reasons": {"audio_too_short": n_samples}}
+    except FileNotFoundError:
+        return {"emotion": emotion, "error": f"Audio file not found: {audio_path}",
+                "n_failed": n_samples, "failure_reasons": {"file_not_found": n_samples}}
+    except Exception as e:
+        return {"emotion": emotion, "error": f"Audio load failed: {e}",
+                "n_failed": n_samples, "failure_reasons": {"decode_error": n_samples}}
 
     # Split into batches for parallel processing
     batch_size = max(1, n_samples // n_workers)
@@ -127,8 +147,13 @@ def identify_b_matrix(emotion, audio_path, n_samples, n_workers):
 
     elapsed = time.perf_counter() - t0
 
-    # Extract valid results
+    # Extract valid results and categorize failures
     valid = [r for r in all_results if r["status"] == "ok"]
+    failure_reasons = {}
+    for r in all_results:
+        if r["status"] != "ok":
+            reason = r["status"].split(":")[0] if r["status"] else "unknown"
+            failure_reasons[reason] = failure_reasons.get(reason, 0) + 1
     n_failed = len(all_results) - len(valid)
 
     if len(valid) < 15:
@@ -176,6 +201,7 @@ def identify_b_matrix(emotion, audio_path, n_samples, n_workers):
         "n_samples": n_samples,
         "n_valid": len(valid),
         "n_failed": n_failed,
+        "failure_reasons": failure_reasons,
         "significant_entries": n_sig,
         "fraction_significant": round(n_sig / 75, 3),
         "effective_rank": rank_eff,

@@ -59,7 +59,7 @@ def _diagnose_5d(audio: np.ndarray, sr: int) -> np.ndarray:
 #  对 15 个参数逐个扫描, 测量每个参数对 5D 输出的因果效应
 # ═══════════════════════════════════════════════════════════
 
-def experiment_P(n_steps: int = 11) -> dict:
+def experiment_P(n_steps: int = 11, **kwargs) -> dict:
     """Single-parameter sweeps: measure d(output)/d(parameter) for all 15 params."""
     print("\n" + "="*60)
     print("EXPERIMENT P: Single-Parameter Sensitivity Sweeps")
@@ -204,7 +204,7 @@ def experiment_P(n_steps: int = 11) -> dict:
 #  测试关键参数对的交互效应 (非可加性)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_Q() -> dict:
+def experiment_Q(**kwargs) -> dict:
     """Detect non-additive interactions between parameter pairs."""
     print("\n" + "="*60)
     print("EXPERIMENT Q: Parameter Interaction Detection")
@@ -309,7 +309,7 @@ def experiment_Q() -> dict:
 #  For each strength dimension, measure actual (not T_EFFECTS) effect
 # ═══════════════════════════════════════════════════════════
 
-def experiment_R() -> dict:
+def experiment_R(**kwargs) -> dict:
     """Calibrate: what does changing each 5D strength actually do to the output?"""
     print("\n" + "="*60)
     print("EXPERIMENT R: 5D Strength-to-Effect Calibration")

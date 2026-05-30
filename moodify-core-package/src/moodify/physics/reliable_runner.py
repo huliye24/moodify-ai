@@ -25,7 +25,10 @@ _SRC_DIR = _SELF_DIR.parent.parent  # src/
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
+PROJECT_ROOT = Path(os.environ.get(
+    "MOODIFY_ROOT",
+    Path(__file__).resolve().parent.parent.parent.parent.parent
+))
 OUTPUT_ROOT = PROJECT_ROOT / "outputs"
 STATUS_DIR = OUTPUT_ROOT / "status"
 
@@ -72,11 +75,17 @@ def preflight_check() -> dict:
             raise PreFlightError(f"Cannot import {mod}: {e}")
 
     # 4. 基准音频存在
-    audio_paths = [
+    audio_search = [
+        Path(os.environ.get("MOODIFY_BASELINE_AUDIO", "")),
+        Path(os.environ.get("MOODIFY_AUDIO", "")) / "piano.wav",
         PROJECT_ROOT / "tests" / "baseline" / "test_audio" / "piano.wav",
+        _SRC_DIR.parent / "tests" / "baseline" / "test_audio" / "piano.wav",
+        _SRC_DIR / "moodify" / "moodify-core-package" / "tests" / "baseline" / "test_audio" / "piano.wav",
         Path("/home/ubuntu/phys-lab/test_audio/piano.wav"),
         Path("/home/ubuntu/moodify/test_audio/piano.wav"),
+        Path("/home/ubuntu/moodify/moodify-core-package/tests/baseline/test_audio/piano.wav"),
     ]
+    audio_paths = [p for p in audio_search if p != Path("") and p != Path(".")]
     audio_found = False
     for p in audio_paths:
         if p.exists():

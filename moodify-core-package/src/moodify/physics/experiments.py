@@ -55,7 +55,7 @@ def save_results(exp_id: str, results: dict, raw_data: list = None):
 #  Experiment D: Diagnosis Noise Covariance
 # ═══════════════════════════════════════════════════════════
 
-def experiment_D(n_repeats: int = 50) -> dict:
+def experiment_D(n_repeats: int = 50, **kwargs) -> dict:
     """重复诊断同一音频 N 次，估计测量噪声协方差."""
     print("\n" + "="*60)
     print("EXPERIMENT D: Diagnosis Noise Covariance")
@@ -127,7 +127,7 @@ def experiment_D(n_repeats: int = 50) -> dict:
 #  Experiment E: M Factor (Proxy-Reality Correlation)
 # ═══════════════════════════════════════════════════════════
 
-def experiment_E() -> dict:
+def experiment_E(**kwargs) -> dict:
     """测定代理评分与重诊断排序的 Spearman 相关性."""
     print("\n" + "="*60)
     print("EXPERIMENT E: M Factor (Proxy-Reality Correlation)")
@@ -193,7 +193,7 @@ def experiment_E() -> dict:
 #  Experiment F: Emotion Plasticity
 # ═══════════════════════════════════════════════════════════
 
-def experiment_F() -> dict:
+def experiment_F(**kwargs) -> dict:
     """测定每个 (曲目, 情绪) 组合的可塑性 ΔI."""
     print("\n" + "="*60)
     print("EXPERIMENT F: Emotion Plasticity")
@@ -291,7 +291,7 @@ def experiment_F() -> dict:
 #  Experiment C: D(n) Growth
 # ═══════════════════════════════════════════════════════════
 
-def experiment_C(n_iterations: int = 30) -> dict:
+def experiment_C(n_iterations: int = 30, **kwargs) -> dict:
     """运行 N 次 process，追踪 D 值增长曲线."""
     print("\n" + "="*60)
     print("EXPERIMENT C: D(n) Growth Curve")
@@ -366,7 +366,7 @@ def experiment_C(n_iterations: int = 30) -> dict:
 #  Experiment A: B Matrix Identification
 # ═══════════════════════════════════════════════════════════
 
-def experiment_A(n_samples: int = 50) -> dict:
+def experiment_A(n_samples: int = 50, **kwargs) -> dict:
     """系统辨识 — 估计 B 矩阵（15D 参数 → 5D 状态变化）."""
     print("\n" + "="*60)
     print("EXPERIMENT A: B Matrix Identification")
@@ -477,7 +477,7 @@ def experiment_A(n_samples: int = 50) -> dict:
 #  Experiment B: Closed-loop Convergence
 # ═══════════════════════════════════════════════════════════
 
-def experiment_B(n_iterations: int = 5) -> dict:
+def experiment_B(n_iterations: int = 5, **kwargs) -> dict:
     """闭环收敛性测试 — 多次迭代是否减小误差."""
     print("\n" + "="*60)
     print("EXPERIMENT B: Closed-loop Convergence")
