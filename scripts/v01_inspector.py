@@ -64,10 +64,10 @@ def compute_basic_metrics(mono: np.ndarray, sr: int) -> dict:
     peak_lin = float(np.max(np.abs(mono)))
     rms_val = float(np.sqrt(np.mean(mono ** 2)))
     return {
-        "peak_db": round(20.0 * math.log10(peak_lin + 1e-12), 1),
-        "rms_db": round(20.0 * math.log10(rms_val + 1e-12), 1),
+        "peak_db": round(20.0 * math.log10(peak_lin + 1e-12), 2),
+        "rms_db": round(20.0 * math.log10(rms_val + 1e-12), 2),
         "crest_factor": round(peak_lin / (rms_val + 1e-12), 2),
-        "dynamic_range_db": round(_compute_dynamic_range(mono, sr), 1),
+        "dynamic_range_db": round(_compute_dynamic_range(mono, sr), 2),
     }
 
 
@@ -85,7 +85,7 @@ def compute_spatial_metrics(audio: np.ndarray) -> dict:
     rms_side = np.sqrt(np.mean(side ** 2)) + 1e-12
     ms_ratio = float(20.0 * math.log10(rms_side / rms_mid))
 
-    return {"correlation_lr": round(corr, 3), "mid_side_ratio_db": round(ms_ratio, 1)}
+    return {"correlation_lr": round(corr, 3), "mid_side_ratio_db": round(ms_ratio, 2)}
 
 
 def compute_band_energy(mono: np.ndarray, sr: int) -> dict:
@@ -176,7 +176,7 @@ def compute_delta(before: dict, after: dict) -> dict:
     for band in ["sub_db", "bass_db", "low_mid_db", "mid_db", "presence_db", "air_db"]:
         if band in before.get("bands", {}) and band in after.get("bands", {}):
             delta[f"{band.replace('_db', '')}_delta_db"] = round(
-                after["bands"][band] - before["bands"][band], 1)
+                after["bands"][band] - before["bands"][band], 2)
 
     return delta
 
@@ -341,6 +341,51 @@ def write_markdown_report(data: dict, out_path: str):
     if warnings:
         lines.append(f"- **Warnings**: {', '.join(warnings)}")
 
+    # Loudness warning
+    loudness = data.get("loudness", {})
+    if loudness:
+        rms_delta = loudness.get("rms_delta_db", 0)
+        gain = loudness.get("after_gain_match_db", 0)
+        level = loudness.get("warning_level", "")
+        level_icon = {"none": "", "moderate": "⚠️ ", "strong": "🔴 "}.get(level, "")
+
+        lines += [
+            "",
+            "## Loudness Warning",
+            "",
+            f"{level_icon}After is **{_fmt(rms_delta, 2)} dB RMS** {level}er than before.",
+            "",
+            "This may cause a \"louder = better\" listening bias.",
+            "",
+        ]
+        if abs(rms_delta) > 0.5:
+            lines.append(f"Recommended matched listening: apply **{_fmt(gain, 2)} dB** gain to the after file.")
+        else:
+            lines.append("No significant loudness mismatch. Direct A/B comparison is valid.")
+        lines.append("")
+
+        # Listening preparation
+        matched = loudness.get("matched_after_path", "")
+        lines += [
+            "## Listening Preparation",
+            "",
+        ]
+        if matched:
+            lines += [
+                "For formal listening evaluation, compare:",
+                "",
+                f"- **Before**: original file (`{Path(data['before_path']).name}`)",
+                f"- **After (matched)**: `{matched}`",
+                "",
+                "Do **not** judge using the un-matched processed file.",
+            ]
+        else:
+            lines += [
+                "No matched-after file generated.",
+                "Run Inspector with `--write-matched-after` for fair A/B listening.",
+            ]
+        lines.append("")
+
     # Core metrics table
     metric_rows = [
         ("Peak (dB)", "peak_db", "dB"),
@@ -431,15 +476,54 @@ def write_markdown_report(data: dict, out_path: str):
         "",
         "## Listening Checklist",
         "",
-        "| Item | Score (1–5) | Notes |",
-        "|------|------------|-------|",
-        "| Clarity | — | |",
-        "| Warmth | — | |",
-        "| Space | — | |",
-        "| Harshness | — | |",
-        "| Plastic feel | — | |",
-        "| Artifacts | — | |",
-        "| **Better than before?** | yes / no / uncertain | |",
+        "Scoring rules:",
+        "- **Clarity / Warmth / Space**: 1 = worst, 5 = best",
+        "- **Harshness / Plastic / Artifact control**: 1 = severe problem, 5 = no problem",
+        "- **Target fit**: 1 = misses preset goal, 5 = perfectly achieves preset goal",
+        "",
+        "| # | Item | Score | Notes |",
+        "|---|------|-------|-------|",
+        "| 1 | Volume matched? | yes / no / uncertain | |",
+        "| 2 | Clarity | — / 5 | 1=muddy, 5=clear |",
+        "| 3 | Warmth | — / 5 | 1=cold/thin, 5=warm/full |",
+        "| 4 | Space | — / 5 | 1=flat/crowded, 5=open/deep |",
+        "| 5 | Harshness control | — / 5 | 1=harsh, 5=smooth |",
+        "| 6 | Plastic feel control | — / 5 | 1=obvious AI/plastic, 5=natural |",
+        "| 7 | Artifact control | — / 5 | 1=obvious artifacts, 5=clean |",
+        "| 8 | Target fit | — / 5 | Does this preset achieve its intended purpose? |",
+        "| 9 | **Better than before?** | yes / no / uncertain | Final judgement |",
+        "",
+        "## Redline Checks",
+        "",
+    ]
+
+    # Add preset-specific redlines
+    preset = data.get("preset", "")
+    if preset == "warm_vocal":
+        lines += [
+            "- [ ] No added harshness or sibilance",
+            "- [ ] Vocals not muddy or bloated",
+            "- [ ] Bass not boomy or overwhelming",
+            "- [ ] Vocals not \"pasted onto face\" (too forward)",
+            "- [ ] Warmth gained, clarity retained",
+        ]
+    elif preset == "clean_master":
+        lines += [
+            "- [ ] Not more fatiguing than original",
+            "- [ ] Original character preserved",
+            "- [ ] Not sterile or lifeless",
+            "- [ ] Not \"louder = better\" illusion",
+        ]
+    elif preset == "wide_space":
+        lines += [
+            "- [ ] Low end not scattered or thin",
+            "- [ ] Center image not collapsed",
+            "- [ ] Vocals not pushed too far back",
+            "- [ ] Space feels natural, not \"pasted on\"",
+            "- [ ] Mono compatibility not noticeably worse",
+        ]
+
+    lines += [
         "",
         "## Notes",
         "",
@@ -447,6 +531,179 @@ def write_markdown_report(data: dict, out_path: str):
 
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
+
+
+def write_html_report(data: dict, out_dir: str):
+    """Generate a self-contained HTML report referencing local PNGs."""
+    before = data["before"]
+    after = data["after"]
+    delta = data["delta"]
+    preset = data.get("preset", "")
+
+    def _v(d, k, prec=1):
+        v = d.get(k, "—")
+        if isinstance(v, float):
+            return f"{v:+.{prec}f}"
+        return str(v)
+
+    band_keys = ["sub_db", "bass_db", "low_mid_db", "mid_db", "presence_db", "air_db"]
+    band_labels = ["Sub", "Bass", "Low-mid", "Mid", "Presence", "Air"]
+
+    rows_core = ""
+    for label, key in [
+        ("Peak (dB)", "peak_db"), ("RMS (dB)", "rms_db"),
+        ("Crest Factor", "crest_factor"), ("Dynamic Range (dB)", "dynamic_range_db"),
+        ("L/R Correlation", "correlation_lr"), ("Mid/Side Ratio (dB)", "mid_side_ratio_db"),
+    ]:
+        dk = simple_delta_key(key)
+        rows_core += (
+            f"<tr><td>{label}</td>"
+            f"<td>{_v(before, key)}</td><td>{_v(after, key)}</td>"
+            f"<td class=\"delta\">{_v(delta, dk)}</td></tr>\n"
+        )
+
+    rows_band = ""
+    for bl, bk in zip(band_labels, band_keys):
+        dk = f"{bk.replace('_db', '')}_delta_db"
+        rows_band += (
+            f"<tr><td>{bl}</td>"
+            f"<td>{_v(before['bands'], bk)}</td><td>{_v(after['bands'], bk)}</td>"
+            f"<td class=\"delta\">{_v(delta, dk)}</td></tr>\n"
+        )
+
+    rows_spec = ""
+    for key, label in [
+        ("spectral_centroid", "Centroid (Hz)"), ("spectral_rolloff_95", "Rolloff 95% (Hz)"),
+        ("spectral_flatness", "Flatness"),
+    ]:
+        dk = simple_delta_key(key)
+        rows_spec += (
+            f"<tr><td>{label}</td>"
+            f"<td>{_v(before, key, 0)}</td><td>{_v(after, key, 0)}</td>"
+            f"<td class=\"delta\">{_v(delta, dk)}</td></tr>\n"
+        )
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{data.get('title', 'Moodify Inspector')}</title>
+<style>
+  body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+         max-width: 1100px; margin: 0 auto; padding: 24px; background: #0d1117; color: #c9d1d9; }}
+  h1 {{ color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 12px; }}
+  h2 {{ color: #f0883e; margin-top: 36px; }}
+  h3 {{ color: #d2a8ff; }}
+  .meta {{ color: #8b949e; font-size: 14px; margin-bottom: 8px; }}
+  table {{ border-collapse: collapse; width: 100%; margin: 12px 0; }}
+  th, td {{ padding: 6px 12px; text-align: left; border-bottom: 1px solid #21262d; }}
+  th {{ background: #161b22; color: #c9d1d9; font-weight: 600; }}
+  tr:hover {{ background: #161b22; }}
+  .delta {{ color: #f0883e; font-weight: 600; }}
+  .delta-pos {{ color: #7ee787; }}
+  .delta-neg {{ color: #f85149; }}
+  img {{ max-width: 100%; border: 1px solid #30363d; border-radius: 4px; margin: 8px 0; }}
+  .pair {{ display: flex; gap: 12px; }}
+  .pair img {{ max-width: calc(50% - 6px); }}
+  .checklist td:first-child {{ width: 30px; text-align: center; }}
+  .checklist td:nth-child(2) {{ width: 220px; }}
+  .checklist td:nth-child(3) {{ width: 80px; }}
+  .redline {{ color: #f85149; }}
+  ul.redlines {{ list-style: none; padding-left: 0; }}
+  ul.redlines li::before {{ content: '☐ '; color: #f85149; }}
+</style>
+</head>
+<body>
+
+<h1>{data.get('title', 'Moodify Inspector Report')}</h1>
+
+<div class="meta">
+  <strong>Preset:</strong> {preset or '—'} &nbsp;|&nbsp;
+  <strong>Duration:</strong> {before['duration_s']}s → {after['duration_s']}s &nbsp;|&nbsp;
+  <strong>Sample rate:</strong> {before['sample_rate']}Hz
+</div>
+
+<!-- Loudness warning -->
+"""
+
+    loudness = data.get("loudness", {})
+    if loudness:
+        rms_d = loudness.get("rms_delta_db", 0)
+        gain = loudness.get("after_gain_match_db", 0)
+        level = loudness.get("warning_level", "")
+        bg = {"strong": "#3d1f1f", "moderate": "#3d3510", "none": "#1a2e1a"}.get(level, "transparent")
+        icon = {"strong": "🔴", "moderate": "⚠️", "none": ""}.get(level, "")
+        html += f"""<div style="background:{bg};border:1px solid #f85149;padding:12px 16px;border-radius:6px;margin:16px 0">
+<strong>{icon} Loudness Warning — {level.upper()}</strong><br>
+After RMS is <strong>{rms_d:+.2f} dB</strong> vs before.<br>
+"""
+        if abs(rms_d) > 0.5:
+            html += f"Apply <strong>{gain:+.2f} dB</strong> gain to after for fair A/B comparison.<br>"
+            matched = loudness.get("matched_after_path", "")
+            if matched:
+                html += f"Use <code>{matched}</code> for formal listening.<br>"
+        else:
+            html += "No significant loudness mismatch. Direct comparison is valid.<br>"
+        html += "</div>\n"
+
+    html += f"""
+<h2>1. Spectrum — Most Important</h2>
+
+<h3>Spectrum Delta (After − Before)</h3>
+<p style="color:#8b949e;">Positive = boosted after processing. Negative = reduced. This shows exactly what the preset changed.</p>
+<img src="spectrum_delta.png" alt="Spectrum Delta">
+
+<h3>Spectrum Overlay</h3>
+<p style="color:#8b949e;">Blue = Before, Red = After. Full frequency response comparison.</p>
+<img src="spectrum_overlay.png" alt="Spectrum Overlay">
+
+<h2>2. Core Metrics</h2>
+<table>
+<tr><th>Metric</th><th>Before</th><th>After</th><th>Delta</th></tr>
+{rows_core}
+</table>
+
+<h2>3. Band Energy</h2>
+<table>
+<tr><th>Band</th><th>Before (dB)</th><th>After (dB)</th><th>Delta</th></tr>
+{rows_band}
+</table>
+<img src="band_energy_comparison.png" alt="Band Energy">
+
+<h2>4. Spectral Features</h2>
+<table>
+<tr><th>Feature</th><th>Before</th><th>After</th><th>Delta</th></tr>
+{rows_spec}
+</table>
+
+<h2>5. Waveform</h2>
+<img src="waveform_before_after.png" alt="Waveform">
+
+<h2>6. Spectrograms</h2>
+<div class="pair">
+  <div><strong>Before</strong><br><img src="spectrogram_before.png" alt="Before"></div>
+  <div><strong>After</strong><br><img src="spectrogram_after.png" alt="After"></div>
+</div>
+
+<h2>7. Listening Checklist</h2>
+<table class="checklist">
+<tr><th>#</th><th>Item</th><th>Score</th><th>Notes</th></tr>
+<tr><td>1</td><td>Volume matched?</td><td>yes / no</td><td></td></tr>
+<tr><td>2</td><td>Clarity (1=muddy, 5=clear)</td><td>— / 5</td><td></td></tr>
+<tr><td>3</td><td>Warmth (1=cold, 5=warm)</td><td>— / 5</td><td></td></tr>
+<tr><td>4</td><td>Space (1=flat, 5=open)</td><td>— / 5</td><td></td></tr>
+<tr><td>5</td><td>Harshness control (1=harsh, 5=smooth)</td><td>— / 5</td><td></td></tr>
+<tr><td>6</td><td>Plastic feel control (1=plastic, 5=natural)</td><td>— / 5</td><td></td></tr>
+<tr><td>7</td><td>Artifact control (1=artifacts, 5=clean)</td><td>— / 5</td><td></td></tr>
+<tr><td>8</td><td>Target fit</td><td>— / 5</td><td></td></tr>
+<tr><td>9</td><td><strong>Better than before?</strong></td><td><strong>yes / no</strong></td><td></td></tr>
+</table>
+
+</body>
+</html>"""
+
+    with open(f"{out_dir}/report.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
 
 # ═══════════════════════════════════════════════════
@@ -481,6 +738,8 @@ def main():
     parser.add_argument("--output-dir", required=True, help="Output directory for reports")
     parser.add_argument("--preset", default="", help="Preset name (optional)")
     parser.add_argument("--title", default="Moodify Inspector", help="Report title")
+    parser.add_argument("--write-matched-after", action="store_true",
+                        help="Generate RMS-matched after file for fair A/B listening")
     args = parser.parse_args()
 
     if not Path(args.before).exists():
@@ -543,6 +802,42 @@ def main():
     plot_band_energy(metrics_b["bands"], metrics_a["bands"], str(out_dir / "band_energy_comparison.png"))
     print("    band_energy_comparison.png")
 
+    # Loudness analysis
+    rms_delta_db = round(metrics_a["rms_db"] - metrics_b["rms_db"], 2)
+    after_gain_match_db = round(metrics_b["rms_db"] - metrics_a["rms_db"], 2)
+    abs_delta = abs(rms_delta_db)
+    if abs_delta <= 1.5:
+        warn_level = "none"
+    elif abs_delta <= 3.0:
+        warn_level = "moderate"
+    else:
+        warn_level = "strong"
+
+    loudness = {
+        "rms_delta_db": rms_delta_db,
+        "after_gain_match_db": after_gain_match_db,
+        "warning_level": warn_level,
+        "matched_after_path": None,
+    }
+
+    matched_written = False
+    if args.write_matched_after and abs_delta > 0.5:
+        gain_linear = 10.0 ** (after_gain_match_db / 20.0)
+        matched = (audio_a * gain_linear).astype(np.float32)
+        peak = float(np.max(np.abs(matched)))
+        if peak > 0.999:
+            matched = matched * (0.999 / peak)
+        import soundfile as sf
+        matched_path = out_dir / "after_matched.wav"
+        sf.write(str(matched_path), matched, sr_a)
+        loudness["matched_after_path"] = "after_matched.wav"
+        matched_written = True
+        print(f"    after_matched.wav (gain {after_gain_match_db:+.2f} dB)")
+
+    print(f"  RMS delta: {rms_delta_db:+.2f} dB  [{warn_level} warning]")
+    if after_gain_match_db != 0:
+        print(f"  Recommended after gain for fair A/B: {after_gain_match_db:+.2f} dB")
+
     # Reports
     report_data = {
         "title": args.title,
@@ -553,6 +848,7 @@ def main():
         "before": metrics_b,
         "after": metrics_a,
         "delta": delta,
+        "loudness": loudness,
     }
 
     json_path = out_dir / "metrics_comparison.json"
@@ -562,6 +858,8 @@ def main():
     md_path = out_dir / "report.md"
     write_markdown_report(report_data, str(md_path))
     print(f"    report.md")
+    write_html_report(report_data, str(out_dir))
+    print(f"    report.html")
 
     print(f"\n  Done. {out_dir}/")
     return 0
