@@ -151,7 +151,7 @@ def _save_spectrum_png(metrics: AudioMetrics, output_dir: str) -> None:
     colors = ["#4a0e4e", "#6b2fa0", "#3a7ca5", "#2d9c6b",
               "#c4a43e", "#d4756b"]
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(10, 5))
     bars = ax.bar(bands, values, color=colors, edgecolor="white", linewidth=0.5)
     ax.axhline(y=0, color="gray", linestyle="--", linewidth=0.8)
     ax.set_ylabel("dB (relative to total RMS)")

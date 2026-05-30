@@ -49,3 +49,8 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "v01: v0.1.0 mainline tests",
+    "legacy: old system tests kept for compatibility",
+    "experimental: future or research modules not required by v0.1.0",
+]
