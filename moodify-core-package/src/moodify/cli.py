@@ -273,9 +273,96 @@ def cmd_evaluate_single(args):
     return _single(args)
 
 
+# ═══════════════════════════════════════════════════════════
+#  v0.1.0 handlers (new mainline)
+# ═══════════════════════════════════════════════════════════
+
+def cmd_v01_analyze(args):
+    """v0.1.0: Analyze audio → spectrum PNG + metrics."""
+    from moodify.v01_analyzer import analyze
+    import json
+
+    path = args.audio_path
+    if not Path(path).exists():
+        print(f"ERROR: File not found: {path}")
+        return 1
+
+    print(f"Moodify v0.1.0 — analyze: {path}")
+    metrics = analyze(path, args.output_dir)
+
+    stem = Path(path).stem
+    print(f"  Duration:  {metrics.duration_s:.1f}s  |  {metrics.sample_rate}Hz  |  "
+          f"{metrics.channels}ch")
+    print(f"  Peak:      {metrics.peak_db:+.1f} dB")
+    print(f"  Crest:     {metrics.crest_factor:.2f}")
+    print(f"  Dyn Range: {metrics.dynamic_range_db:.1f} dB")
+    print(f"  Corr L/R:  {metrics.correlation_lr:.3f}")
+    print(f"  Spectrum:  sub={metrics.rms_sub:+.1f}  bass={metrics.rms_bass:+.1f}  "
+          f"low-mid={metrics.rms_low_mid:+.1f}  mid={metrics.rms_mid:+.1f}  "
+          f"presence={metrics.rms_presence:+.1f}  air={metrics.rms_air:+.1f}")
+    print(f"  Output:    {args.output_dir}/{stem}_spectrum.png")
+
+    if args.json:
+        print(json.dumps(metrics.to_dict(), ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_v01_process(args):
+    """v0.1.0: Full pipeline — analyze → diagnose → process → export."""
+    from moodify.v01_pipeline import process_audio, list_presets
+
+    path = args.audio_path
+    preset = args.preset
+    if not Path(path).exists():
+        print(f"ERROR: File not found: {path}")
+        return 1
+    if preset not in list_presets():
+        print(f"ERROR: Unknown preset '{preset}'. Valid: {', '.join(list_presets())}")
+        return 1
+
+    print(f"Moodify v0.1.0 — process: {Path(path).name}")
+    print(f"  preset: {preset}  |  output: {args.output_dir}/")
+
+    result = process_audio(path, preset, args.output_dir)
+
+    if not result.success:
+        print(f"  FAILED: {result.error}")
+        return 1
+
+    rep = result.diagnosis
+    print(f"  Health:   {rep.overall_health}  ({len(rep.strengths)} strengths, "
+          f"{len(rep.issues)} issues)")
+    if rep.issues:
+        for issue in rep.issues:
+            print(f"    ! {issue}")
+    if rep.suggested_presets:
+        print(f"  Suggested: {', '.join(rep.suggested_presets)}")
+    print(f"  Output:    {result.output_path}")
+
+    if args.json:
+        import json
+        print(json.dumps({
+            "input": path, "preset": preset, "output": result.output_path,
+            "health": rep.overall_health,
+            "issues": rep.issues, "strengths": rep.strengths,
+            "metrics": rep.metrics.to_dict(),
+        }, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_v01_presets(args):
+    """v0.1.0: List available presets."""
+    from moodify.v01_presets import PRESETS
+
+    print(f"\nMoodify v0.1.0 presets ({len(PRESETS)}):\n")
+    for key, info in PRESETS.items():
+        print(f"  {key:15s}  {info['name_zh']:8s}  {info['description']}")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Moodify Core Engine — AI 音乐情绪波场显影器",
+        description="Moodify v0.1.0 — AI 音乐二次处理与情绪声波工程系统",
     )
     sub = parser.add_subparsers(dest="command")
 
@@ -314,6 +401,23 @@ def main():
     p_serve.add_argument("--host", default="0.0.0.0")
     p_serve.add_argument("--port", type=int, default=8000)
 
+    # ── v0.1.0 commands (new mainline) ──
+    p_v01_analyze = sub.add_parser("v01-analyze", help="[v0.1.0] 频谱分析 → PNG + JSON")
+    p_v01_analyze.add_argument("audio_path", help="音频文件路径")
+    p_v01_analyze.add_argument("--output-dir", default="outputs", help="输出目录")
+    p_v01_analyze.add_argument("--json", action="store_true", help="JSON 格式输出")
+
+    p_v01_process = sub.add_parser("v01-process", help="[v0.1.0] 一键处理 → WAV")
+    p_v01_process.add_argument("audio_path", help="音频文件路径")
+    p_v01_process.add_argument("--preset", default="clean_master",
+                               choices=["warm_vocal", "clean_master", "wide_space"],
+                               help="处理预设")
+    p_v01_process.add_argument("--output-dir", default="outputs", help="输出目录")
+    p_v01_process.add_argument("--json", action="store_true", help="JSON 格式输出")
+
+    sub.add_parser("v01-presets", help="[v0.1.0] 列出可用预设")
+
+    # ── legacy commands (v1.x, kept for backward compat) ──
     # evaluate-run: 批量 AI 评测
     p_eval_run = sub.add_parser("evaluate-run", help="批量 AI 评测（驱动数据飞轮）")
     p_eval_run.add_argument("assets_dir", help="音乐资产目录")
@@ -339,6 +443,11 @@ def main():
         return 0
 
     handlers = {
+        # v0.1.0 mainline
+        "v01-analyze": cmd_v01_analyze,
+        "v01-process": cmd_v01_process,
+        "v01-presets": cmd_v01_presets,
+        # legacy
         "analyze": cmd_analyze,
         "process": cmd_process,
         "batch": cmd_batch,

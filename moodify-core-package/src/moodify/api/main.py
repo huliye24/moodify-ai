@@ -11,7 +11,7 @@ from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Moodify", version="0.3.0")
+app = FastAPI(title="Moodify", version="0.1.0")
 
 # CORS: 允许 Web 前端跨域访问
 app.add_middleware(
@@ -41,7 +41,7 @@ def _get_orchestrator():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "version": "0.2.0"}
+    return {"status": "ok", "version": "0.1.0", "mode": "v01"}
 
 
 @app.post("/process")
