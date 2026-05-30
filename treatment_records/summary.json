@@ -14,9 +14,9 @@
         "air_delta_db": 0.8
       },
       "human_feedback": {
-        "pending": 1,
-        "completed": 0,
-        "better_yes": 0,
+        "pending": 0,
+        "completed": 1,
+        "better_yes": 1,
         "better_no": 0,
         "better_uncertain": 0
       }
@@ -101,8 +101,8 @@
       "correlation_delta": -0.09,
       "presence_delta_db": 1.3,
       "air_delta_db": 0.8,
-      "feedback_status": "pending",
-      "better_than_before": null
+      "feedback_status": "completed",
+      "better_than_before": true
     }
   ],
   "errors": []
