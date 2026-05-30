@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moodify 云端实验控制面板</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; padding: 24px; }
+.container { max-width: 1200px; margin: 0 auto; }
+h1 { font-size: 24px; font-weight: 600; color: #58a6ff; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #21262d; }
+.meta { font-size: 13px; color: #8b949e; }
+.status-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.status-pill { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; }
+.status-pill.online { background: #23863622; border: 1px solid #238636; color: #3fb950; }
+.status-pill.offline { background: #da363322; border: 1px solid #da3633; color: #f85149; }
+.status-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+.status-pill.online .dot { background: #3fb950; animation: pulse 1.5s infinite; }
+.status-pill.offline .dot { background: #f85149; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.experiment { background: #161b22; border: 1px solid #21262d; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+.exp-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #1c2128; }
+.exp-title { font-size: 16px; font-weight: 600; }
+.exp-status { font-size: 13px; }
+.exp-body { padding: 0; }
+.task-row { display: flex; align-items: center; padding: 10px 20px; border-bottom: 1px solid #21262d33; gap: 12px; }
+.task-row:hover { background: #1c2128; }
+.task-id { font-size: 12px; color: #8b949e; min-width: 50px; font-weight: 600; }
+.task-name { flex: 1; font-size: 14px; }
+.task-status { min-width: 90px; text-align: center; }
+.task-time { min-width: 80px; text-align: right; font-size: 12px; color: #8b949e; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+.badge.pending { background: #30363d; color: #8b949e; }
+.badge.running { background: #1f6feb22; color: #58a6ff; }
+.badge.done { background: #23863622; color: #3fb950; }
+.badge.failed { background: #da363322; color: #f85149; }
+.findings { padding: 12px 20px; background: #0d1117; border-top: 1px solid #21262d; }
+.findings-title { font-size: 11px; text-transform: uppercase; color: #8b949e; margin-bottom: 6px; }
+.finding { font-size: 13px; padding: 4px 8px; border-radius: 4px; margin: 2px 0; }
+.finding.warn { border-left: 3px solid #d29922; background: #d2992211; }
+.finding.ok { border-left: 3px solid #238636; background: #23863611; }
+.finding.error { border-left: 3px solid #da3633; background: #da363311; }
+.progress-bar { height: 3px; background: #21262d; }
+.progress-fill { height: 100%; transition: width 0.5s; background: #238636; }
+.no-data { text-align: center; padding: 60px 20px; color: #8b949e; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.summary-card { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 16px; text-align: center; }
+.summary-card .value { font-size: 28px; font-weight: 700; }
+.summary-card .label { font-size: 12px; color: #8b949e; margin-top: 4px; }
+.section-title { font-size: 13px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; margin-bottom: 12px; margin-top: 24px; }
+.error-box { background: #da363322; border: 1px solid #da3633; border-radius: 8px; padding: 16px; margin-bottom: 16px; color: #f85149; }
+footer { text-align: center; padding: 24px; font-size: 12px; color: #484f58; border-top: 1px solid #21262d; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div>
+      <h1>Moodify 云端控制面板</h1>
+      <div class="meta">最后更新: <span id="lastUpdate">—</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="connectionPill" class="status-pill offline"><span class="dot"></span> 离线</span>
+      <select id="refreshInterval" onchange="setRefresh()" style="background:#161b22;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:6px 10px;font-size:13px;">
+        <option value="10">10s</option>
+        <option value="30" selected>30s</option>
+        <option value="60">60s</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <div id="errorBox" style="display:none" class="error-box">
+    <strong>无法连接云端</strong><br>
+    可能原因：<br>
+    1. 云端 status API 未启动 → SSH 到云端运行 <code>STATUS_PORT=8000 MOODIFY_ROOT=/home/ubuntu/moodify nohup python3 cloud_status.py &</code><br>
+    2. 腾讯云安全组未放行端口 → 到控制台添加入站规则 TCP 8000<br>
+    3. 云端已关机 → 检查腾讯云 CVM 控制台
+  </div>
+
+  <div class="section-title">云端系统</div>
+  <div class="summary-grid">
+    <div class="summary-card"><div class="value" id="sysCpu" style="color:#8b949e">—</div><div class="label">CPU 使用率</div></div>
+    <div class="summary-card"><div class="value" id="sysMem" style="color:#8b949e">—</div><div class="label">内存使用</div></div>
+    <div class="summary-card"><div class="value" id="sysDisk" style="color:#8b949e">—</div><div class="label">磁盘可用</div></div>
+    <div class="summary-card"><div class="value" id="sysUptime" style="color:#8b949e">—</div><div class="label">运行时间</div></div>
+  </div>
+
+  <div class="section-title">实验状态 <span style="font-weight:400;text-transform:none;font-size:12px" id="expProgress"></span></div>
+  <div id="experimentsContainer">
+    <div class="no-data">正在连接云端...</div>
+  </div>
+
+  <footer>
+    Moodify 云端实验控制面板 · 自动刷新 · 数据来源: 腾讯云 139.199.186.106
+  </footer>
+</div>
+
+<script>
+const CLOUD = 'http://139.199.186.106:8000';
+
+let refreshSec = 30;
+function setRefresh() {
+  refreshSec = parseInt(document.getElementById('refreshInterval').value);
+}
+
+function fmt(n) { return n != null ? n.toFixed(1) : '—'; }
+
+function renderSummary(data) {
+  const g = document.getElementById('summaryGrid');
+  if (!data || !data.experiments) { g.innerHTML = ''; return; }
+
+  let running = 0, done = 0, failed = 0, pending = 0;
+  data.experiments.forEach(e => {
+    if (e.status === 'running') running++;
+    else if (e.status === 'done') done++;
+    else if (e.status === 'failed') failed++;
+    else pending++;
+  });
+
+  g.innerHTML =
+    `<div class="summary-card"><div class="value" style="color:#58a6ff">${running}</div><div class="label">运行中</div></div>
+     <div class="summary-card"><div class="value" style="color:#3fb950">${done}</div><div class="label">已完成</div></div>
+     <div class="summary-card"><div class="value" style="color:#f85149">${failed}</div><div class="label">失败</div></div>
+     <div class="summary-card"><div class="value" style="color:#8b949e">${pending}</div><div class="label">待执行</div></div>
+     <div class="summary-card"><div class="value" style="color:#a371f7">${data.experiments.length}</div><div class="label">总实验数</div></div>
+     <div class="summary-card"><div class="value" style="color:#d29922">${fmt(data.elapsed_h)}h</div><div class="label">总耗时</div></div>`;
+}
+
+function badge(status) {
+  const map = { pending: ['○ pending', 'pending'], running: ['● running', 'running'],
+                done: ['✓ done', 'done'], failed: ['✗ failed', 'failed'], skipped: ['— skipped', 'skipped'] };
+  const [text, cls] = map[status] || [status, 'pending'];
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+function renderSystem(sys) {
+  document.getElementById('sysCpu').textContent = sys ? fmt(sys.cpu_pct) + '%' : '—';
+  document.getElementById('sysMem').textContent = sys ? sys.mem_used + '/' + sys.mem_total : '—';
+  document.getElementById('sysDisk').textContent = sys ? sys.disk_free : '—';
+  document.getElementById('sysUptime').textContent = sys ? sys.uptime : '—';
+}
+
+function renderExperiments(data) {
+  const container = document.getElementById('experimentsContainer');
+  if (!data || !data.experiments || data.experiments.length === 0) {
+    container.innerHTML = '<div class="no-data">暂无实验数据</div>';
+    return;
+  }
+
+  let html = '';
+  data.experiments.forEach(exp => {
+    const nDone = exp.tasks ? exp.tasks.filter(t => t.status === 'done').length : 0;
+    const nTotal = exp.tasks ? exp.tasks.length : 0;
+    const pct = nTotal > 0 ? Math.round(nDone / nTotal * 100) : 0;
+
+    html += `<div class="experiment">
+      <div class="exp-header">
+        <div><span class="exp-title">${exp.name}</span></div>
+        <div class="exp-status">${badge(exp.status)} <span style="margin-left:12px;color:#8b949e;font-size:13px">${nDone}/${nTotal} · ${fmt(exp.elapsed_m)}m</span></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="exp-body">`;
+
+    if (exp.tasks) {
+      exp.tasks.forEach(t => {
+        html += `<div class="task-row">
+          <div class="task-id">${t.id}</div>
+          <div class="task-name">${t.name}</div>
+          <div class="task-status">${badge(t.status)}</div>
+          <div class="task-time">${t.elapsed || '—'}</div>
+        </div>`;
+        if (t.findings && t.findings.length > 0) {
+          html += `<div class="findings"><div class="findings-title">结果</div>`;
+          t.findings.forEach(f => {
+            const cls = f.type === 'warn' ? 'warn' : (f.type === 'error' ? 'error' : 'ok');
+            html += `<div class="finding ${cls}">${f.text}</div>`;
+          });
+          html += `</div>`;
+        }
+      });
+    }
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+  document.getElementById('expProgress').textContent =
+    data.experiments.length > 0 ? `(${data.experiments.filter(e => e.status === 'done').length}/${data.experiments.length} 完成)` : '';
+}
+
+function updateConnection(online) {
+  const pill = document.getElementById('connectionPill');
+  pill.className = 'status-pill ' + (online ? 'online' : 'offline');
+  pill.innerHTML = online ? '<span class="dot"></span> 已连接' : '<span class="dot"></span> 离线';
+}
+
+async function fetchStatus() {
+  const errBox = document.getElementById('errorBox');
+  try {
+    const resp = await fetch(CLOUD + '/status', { signal: AbortSignal.timeout(5000) });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    updateConnection(true);
+    errBox.style.display = 'none';
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleString('zh-CN');
+    renderSummary(data);
+    renderSystem(data.system);
+    renderExperiments(data);
+  } catch (e) {
+    updateConnection(false);
+    errBox.style.display = 'block';
+    errBox.textContent = '无法连接云端 (' + (e.message || '网络错误') + ')。请确认 cloud_status.py 在云端运行中。';
+  }
+}
+
+// Initial fetch
+fetchStatus();
+// Auto-refresh
+setInterval(() => fetchStatus(), refreshSec * 1000);
+// Re-apply interval on change
+document.getElementById('refreshInterval').addEventListener('change', function() {
+  refreshSec = parseInt(this.value);
+});
+</script>
+</body>
+</html>
