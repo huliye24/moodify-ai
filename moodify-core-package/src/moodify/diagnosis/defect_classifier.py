@@ -15,8 +15,7 @@ defect_classifier.py — AI 音乐缺陷分类器 (SPEC §6.3)
   P4 (审美级): 其余轻微缺陷
 """
 
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 from moodify.data_types import WaveStateDiagnosis
 

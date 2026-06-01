@@ -17,7 +17,6 @@ from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 import numpy as np
 import soundfile
@@ -772,7 +771,8 @@ class WorkflowOrchestrator:
                 elapsed_ms=(time.perf_counter() - t0) * 1000,
             )
         except Exception as e:
-            import traceback; traceback.print_exc()
+            import traceback
+            traceback.print_exc()
             return PhaseResult(
                 phase=1.5, name="强度搜索",
                 status=PhaseStatus.COMPLETED,
@@ -846,5 +846,5 @@ def one_click_process(input_path: str,
         print(f"  EDS: {result.eds:.0f}")
         print(f"  Risk: {result.total_risk:.2f} [{result.risk_level}]")
     else:
-        print(f"  FAILED")
+        print("  FAILED")
     return result.output_path

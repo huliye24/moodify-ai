@@ -8,7 +8,12 @@
   python -m moodify.physics.b_matrix_parallel --emotions GA,DR,WL --samples 200
 """
 
-import os, sys, json, time, argparse, multiprocessing as mp
+import os
+import sys
+import json
+import time
+import argparse
+import multiprocessing as mp
 from pathlib import Path
 from datetime import datetime
 import numpy as np
@@ -36,8 +41,8 @@ def _process_batch(args):
     from moodify.processing.spectral_chain import SpectralDSPChain
     from moodify.orchestration.state_transfer import StateTransferEngine
     from moodify.knowledge.craft_chains import get_recommended_params, PARAM_KEYS
-    from moodify.safety.bounds import HARD_BOUNDS
     import tempfile as tf
+    import soundfile
 
     engine = DiagnosisEngine()
     chain = SpectralDSPChain()

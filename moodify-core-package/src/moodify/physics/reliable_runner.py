@@ -14,9 +14,15 @@
   python reliable_runner.py --suite bmatrix --timeout 3600
 """
 
-import os, sys, json, time, signal, traceback, argparse
+import os
+import sys
+import json
+import time
+import signal
+import traceback
+import argparse
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import dataclass, field
 
 # 确保 moodify 包在路径中 (云端和本地都可能需要)
@@ -205,9 +211,9 @@ def postflight_validate(result_file: Path) -> dict:
 
     # 检查必要字段
     required = ["experiment", "verdict"]
-    for field in required:
-        if field not in data:
-            issues.append(f"Missing required field: {field}")
+    for fld in required:
+        if fld not in data:
+            issues.append(f"Missing required field: {fld}")
 
     # 检查数据是否"跑空"
     if "n_valid" in data and data["n_valid"] == 0:
@@ -262,7 +268,7 @@ def run_with_guard(
     def timeout_handler(signum, frame):
         raise TimeoutError(f"Experiment exceeded {timeout_s}s limit")
 
-    old_handler = signal.signal(signal.SIGALRM, timeout_handler)
+    signal.signal(signal.SIGALRM, timeout_handler)
     signal.alarm(timeout_s)
 
     try:
@@ -388,7 +394,7 @@ def run_suite(suite_name: str, timeout_per_experiment: int = 3600) -> list[Guard
 
         # 连续两个实验 CRASHED → 中止套件
         if len(results) >= 2 and results[-1].status == "CRASHED" and results[-2].status == "CRASHED":
-            print(f"\nABORT: 2 consecutive crashes. Check server state.")
+            print("\nABORT: 2 consecutive crashes. Check server state.")
             break
 
     total_s = time.perf_counter() - t_suite_start
@@ -416,17 +422,17 @@ def _generate_reliability_report(suite_name: str, results: list[GuardedResult], 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     lines = [
-        f"# Moodify 实验报告 (可靠性执行)",
-        f"",
+        "# Moodify 实验报告 (可靠性执行)",
+        "",
         f"**套件**: {suite_name}",
         f"**时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"**总耗时**: {total_s:.0f}s ({total_s/60:.1f} min)",
         f"**可靠性**: 预检通过 (disk={checks.get('disk_free_mb', '?')}MB)",
-        f"",
-        f"## 实验可靠性",
-        f"",
-        f"| 实验 | 状态 | 判定 | 有效样本 | 失败 | 耗时 | 问题 |",
-        f"|------|------|------|---------|------|------|------|",
+        "",
+        "## 实验可靠性",
+        "",
+        "| 实验 | 状态 | 判定 | 有效样本 | 失败 | 耗时 | 问题 |",
+        "|------|------|------|---------|------|------|------|",
     ]
 
     for r in results:
@@ -440,14 +446,14 @@ def _generate_reliability_report(suite_name: str, results: list[GuardedResult], 
     success_rate = round(100 * total_valid / max(total_valid + total_failed, 1), 1)
 
     lines += [
-        f"",
-        f"## 数据质量",
-        f"",
+        "",
+        "## 数据质量",
+        "",
         f"- 总有效样本: {total_valid}",
         f"- 总失败样本: {total_failed}",
         f"- 成功率: {success_rate}%",
-        f"",
-        f"---",
+        "",
+        "---",
         f"*可靠执行 · {timestamp} · Moodify Physics*",
     ]
 

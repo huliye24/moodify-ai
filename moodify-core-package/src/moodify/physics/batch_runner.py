@@ -25,11 +25,14 @@
           raw_data.csv
 """
 
-import os, sys, json, time, argparse, subprocess
+import os
+import sys
+import json
+import time
+import argparse
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Callable
 
 # ── sys.path ──────────────────────────────────────────
 _SELF_DIR = Path(__file__).resolve().parent  # physics/
@@ -162,19 +165,19 @@ def generate_report(suite_name: str, description: str, results: list[ExperimentR
     errors = sum(1 for r in results if r.status == "ERROR")
 
     lines = [
-        f"# Moodify 实验报告",
-        f"",
+        "# Moodify 实验报告",
+        "",
         f"**套件**: {suite_name} — {description}",
         f"**时间**: {timestamp}",
         f"**总耗时**: {total_s:.0f}s ({total_s/60:.1f} min)",
         f"**结果**: {passed} PASS / {failed} FAIL / {errors} ERROR / {len(results)} total",
-        f"",
-        f"---",
-        f"",
-        f"## 实验结果",
-        f"",
-        f"| # | 实验 | 状态 | 判定 | 耗时 |",
-        f"|---|------|------|------|------|",
+        "",
+        "---",
+        "",
+        "## 实验结果",
+        "",
+        "| # | 实验 | 状态 | 判定 | 耗时 |",
+        "|---|------|------|------|------|",
     ]
 
     for i, r in enumerate(results):
@@ -182,11 +185,11 @@ def generate_report(suite_name: str, description: str, results: list[ExperimentR
         lines.append(f"| {i+1} | {r.id} | {status_icon} {r.status} | {r.verdict[:60]} | {r.elapsed_s:.0f}s |")
 
     lines += [
-        f"",
-        f"---",
-        f"",
-        f"## 详细结果",
-        f"",
+        "",
+        "---",
+        "",
+        "## 详细结果",
+        "",
     ]
 
     for r in results:
@@ -194,10 +197,10 @@ def generate_report(suite_name: str, description: str, results: list[ExperimentR
         lines.append(f"- **耗时**: {r.elapsed_s:.0f}s")
         lines.append(f"- **判定**: {r.verdict}")
         if r.error_msg:
-            lines.append(f"- **错误**:")
-            lines.append(f"```")
+            lines.append("- **错误**:")
+            lines.append("```")
             lines.append(r.error_msg[:500])
-            lines.append(f"```")
+            lines.append("```")
         if r.data:
             # Show key metrics
             for k, v in r.data.items():
@@ -206,8 +209,8 @@ def generate_report(suite_name: str, description: str, results: list[ExperimentR
         lines.append("")
 
     lines += [
-        f"---",
-        f"",
+        "---",
+        "",
         f"*报告自动生成 · {timestamp} · Moodify Physics Batch Runner*",
     ]
 
@@ -249,7 +252,7 @@ def main():
     exp_list = suite["experiments"]
 
     print("=" * 60)
-    print(f"Moodify Experiment Batch Runner")
+    print("Moodify Experiment Batch Runner")
     print(f"Suite: {args.suite} — {suite['description']}")
     print(f"Experiments: {len(exp_list)}")
     print(f"Output: {OUTPUT_ROOT}")
@@ -279,8 +282,8 @@ def main():
 
     # 生成报告
     print(f"\n{'=' * 60}")
-    print(f"Generating report...")
-    report_text = generate_report(args.suite, suite["description"], results, total_s, OUTPUT_ROOT)
+    print("Generating report...")
+    generate_report(args.suite, suite["description"], results, total_s, OUTPUT_ROOT)
 
     # 打印摘要
     passed = sum(1 for r in results if r.status == "PASS")
@@ -293,7 +296,7 @@ def main():
     # 列出报告文件
     reports = sorted(REPORT_DIR.glob("*_report.md"))
     if reports:
-        print(f"\nRecent reports:")
+        print("\nRecent reports:")
         for r in reports[-5:]:
             print(f"  {r.name}  ({r.stat().st_size} bytes)")
 

@@ -27,8 +27,7 @@ from scipy.signal import butter, sosfilt
 from scipy.ndimage import uniform_filter1d
 
 from moodify.diagnosis.metrics import (
-    SpectrumAnalyzer, DynamicsAnalyzer, SpaceAnalyzer, LayersAnalyzer,
-    BANDS as EXISTING_BANDS, amp_to_db, frame_signal, load_audio,
+    SpectrumAnalyzer, DynamicsAnalyzer, SpaceAnalyzer, BANDS as EXISTING_BANDS, frame_signal, load_audio,
 )
 from moodify.data_types import (
     WaveStateDiagnosis, SpectrumDiagnosis, DynamicsDiagnosis,
@@ -194,7 +193,7 @@ class DiagnosisEngine:
 
         # S3: MidClarity — 1 - MaskingIndex(250-5000Hz) [0-1] — SPEC §5.1
         # 用拥挤度作为掩蔽代理: clarity = 1 - mean(crowd in mid bands)
-        bands_result = self._spec.all_band_energies(P, freqs)
+        self._spec.all_band_energies(P, freqs)  # preload band energies
         # 使用现有 BANDS 计算拥挤度
         total_energy = float(np.mean(np.sum(P, axis=1)))
         crowding = {}

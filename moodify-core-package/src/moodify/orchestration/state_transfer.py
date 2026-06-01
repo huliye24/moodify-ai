@@ -16,10 +16,9 @@ state_transfer.py — 波场状态转移函数 (SPEC §14)
 
 import numpy as np
 from dataclasses import dataclass
-from typing import Callable
 
 from moodify.data_types import WaveStateDiagnosis
-from moodify.knowledge.emotion_targets import get_safety_bounds, resolve_emotion
+from moodify.knowledge.emotion_targets import get_safety_bounds
 
 
 @dataclass
@@ -182,7 +181,7 @@ class StateTransferEngine:
         s = ws_diag.Spectrum
         d = ws_diag.Dynamics
         sp = ws_diag.Space
-        l = ws_diag.Layers
+        layers = ws_diag.Layers
         e = ws_diag.Emotion
 
         tilt_penalty = min(abs(s.S5_SpectralTilt.value) / 12.0, 1.0)
@@ -191,7 +190,7 @@ class StateTransferEngine:
         corr_score = 1.0 - sp.SP1_Correlation.value
         rt60_penalty = min(sp.SP3_RT60Consist.value / 0.8, 1.0)
         S = max(0.0, min(1.0, corr_score * 0.7 + (1.0 - rt60_penalty) * 0.3))
-        T = max(0.0, min(1.0, l.L3_DrumDetect.value * 1.1))
+        T = max(0.0, min(1.0, layers.L3_DrumDetect.value * 1.1))
         H = max(0.0, min(1.0, 1.0 - e.E3_FatigueRisk.value / 120.0))
 
         return WaveStateProcess(E=E, D=D, S=S, T=T, H=H)

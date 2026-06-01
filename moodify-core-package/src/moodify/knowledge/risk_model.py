@@ -9,10 +9,9 @@ risk_model.py — 完整三层风险模型 (SPEC §15)
 
 import numpy as np
 from dataclasses import dataclass, field
-from typing import Optional
 
 from moodify.data_types import WaveStateDiagnosis
-from moodify.knowledge.emotion_targets import get_emotion_target, get_ideal_process_vector
+from moodify.knowledge.emotion_targets import get_ideal_process_vector
 from moodify.diagnosis.health_scorer import HealthScorer
 
 

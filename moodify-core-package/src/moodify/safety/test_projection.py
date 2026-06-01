@@ -1,6 +1,5 @@
 """安全投影测试 (SPEC-008 §5)."""
 
-import pytest
 from moodify.safety.projection import project
 
 

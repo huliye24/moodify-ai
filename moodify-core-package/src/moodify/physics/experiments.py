@@ -9,7 +9,13 @@
   results.json, raw_data.csv, checksum.txt, report.md
 """
 
-import os, sys, json, time, hashlib, random, argparse
+import os
+import sys
+import json
+import time
+import hashlib
+import random
+import argparse
 from pathlib import Path
 from datetime import datetime
 
@@ -337,7 +343,6 @@ def experiment_C(n_iterations: int = 30, **kwargs) -> dict:
         print(f"    D={d_val:.4f}, total_n={state.total_n}")
 
     # Fit both models
-    ns = np.array([r["total_n"] for r in raw_data])
     ds = np.array([r["D"] for r in raw_data])
 
     # Hyperbolic: D = D0 + (Dmax-D0) * n/(n+n_half)

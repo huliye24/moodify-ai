@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
 import logging
 import json
 
@@ -244,14 +243,14 @@ class AcousticJudge:
             s = ws.get("spectrum", {})
             d = ws.get("dynamics", {})
             sp = ws.get("space", {})
-            l = ws.get("layers", {})
+            layers = ws.get("layers", {})
             e = ws.get("emotion", {})
 
             return np.array([
                 float(s.get("S3_MidClarity", 0.5)),
                 float(d.get("D1_LRA", 8.0) / 20.0),  # 归一化
                 float(sp.get("SP1_Correlation", 0.5)),
-                float(l.get("L3_DrumDetect", 0.5)),
+                float(layers.get("L3_DrumDetect", 0.5)),
                 float(e.get("E2_Richness", 0.5)),
             ])
 
@@ -576,7 +575,6 @@ class EvaluatorOrchestrator:
         try:
             # 更新 ProcessingHistory
             from moodify.memory.history import ProcessingHistory, ProcessingRecord
-            from moodify.orchestration.state_transfer import StateTransferEngine
 
             history = ProcessingHistory(storage_dir)
 

@@ -114,7 +114,6 @@ class DiagnosisListener(AudioListener):
         emotion_code: str,
     ) -> tuple[list[int], list[float], np.ndarray | None]:
         from moodify.knowledge.emotion_targets import get_ideal_process_vector
-        from moodify.orchestration.state_transfer import StateTransferEngine
 
         ideal = get_ideal_process_vector(emotion_code).copy()
         if self._vector_bias:
