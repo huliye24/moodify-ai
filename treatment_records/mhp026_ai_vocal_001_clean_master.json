@@ -91,17 +91,18 @@
     "matched_after_path": "after_matched.wav"
   },
   "human_feedback": {
-    "status": "pending",
-    "volume_matched": null,
-    "clarity": null,
-    "warmth": null,
-    "space": null,
-    "harshness_control": null,
-    "plastic_feel_control": null,
-    "artifact_control": null,
-    "target_fit": null,
-    "better_than_before": null,
-    "notes": "matched_after=E:\\moodify\\inspector_reports\\mhp026_mhp026_ai_vocal_001_clean_master\\after_matched.wav"
+    "status": "completed",
+    "volume_matched": true,
+    "clarity": 5,
+    "warmth": 5,
+    "space": 4,
+    "harshness_control": 3,
+    "plastic_feel_control": 4,
+    "artifact_control": 4,
+    "target_fit": 4,
+    "better_than_before": true,
+    "notes": "最开始的效果很惊艳，而到了后面声音开始发散，开始好像有一种紊乱的感觉，声波好像收不住了",
+    "updated_at": "2026-06-01T10:12:00Z"
   },
   "algorithm_learning": {
     "usable_for_future_adaptive_preset": true,

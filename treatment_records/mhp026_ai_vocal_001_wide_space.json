@@ -91,17 +91,18 @@
     "matched_after_path": "after_matched.wav"
   },
   "human_feedback": {
-    "status": "pending",
-    "volume_matched": null,
-    "clarity": null,
-    "warmth": null,
-    "space": null,
-    "harshness_control": null,
-    "plastic_feel_control": null,
-    "artifact_control": null,
-    "target_fit": null,
-    "better_than_before": null,
-    "notes": "matched_after=E:\\moodify\\inspector_reports\\mhp026_mhp026_ai_vocal_001_wide_space\\after_matched.wav"
+    "status": "completed",
+    "volume_matched": true,
+    "clarity": 5,
+    "warmth": 4,
+    "space": 5,
+    "harshness_control": 3,
+    "plastic_feel_control": 3,
+    "artifact_control": 4,
+    "target_fit": 3,
+    "better_than_before": true,
+    "notes": "这首歌曲的空间感最好，有一种在房间里播放的感觉，听起来很不错，但是声音的发散更加明显，和真实的音乐有很大差距",
+    "updated_at": "2026-06-01T10:12:00Z"
   },
   "algorithm_learning": {
     "usable_for_future_adaptive_preset": true,

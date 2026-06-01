@@ -4,10 +4,10 @@
   "record_count": 30,
   "feedback_overview": {
     "total_records": 30,
-    "completed_records": 3,
-    "pending_records": 27,
-    "feedback_coverage": 0.1,
-    "better_yes": 3,
+    "completed_records": 6,
+    "pending_records": 24,
+    "feedback_coverage": 0.2,
+    "better_yes": 6,
     "better_no": 0,
     "better_uncertain": 0,
     "global_better_rate": 1.0
@@ -24,27 +24,27 @@
         "air_delta_db": 0.87
       },
       "human_feedback": {
-        "pending": 9,
-        "completed": 1,
-        "better_yes": 1,
+        "pending": 8,
+        "completed": 2,
+        "better_yes": 2,
         "better_no": 0,
         "better_uncertain": 0
       },
       "feedback_scores": {
-        "avg_clarity": 4,
-        "avg_warmth": 5,
-        "avg_space": 3,
+        "avg_clarity": 4.5,
+        "avg_warmth": 4.5,
+        "avg_space": 4,
         "avg_harshness_control": 4,
-        "avg_plastic_feel_control": 4,
-        "avg_artifact_control": 5,
-        "avg_target_fit": 5
+        "avg_plastic_feel_control": 3.5,
+        "avg_artifact_control": 4,
+        "avg_target_fit": 4
       },
       "feedback_quality": {
-        "feedback_coverage": 0.1,
+        "feedback_coverage": 0.2,
         "better_rate": 1.0,
-        "completed_count": 1,
-        "pending_count": 9,
-        "better_yes_count": 1,
+        "completed_count": 2,
+        "pending_count": 8,
+        "better_yes_count": 2,
         "better_no_count": 0,
         "better_uncertain_count": 0
       }
@@ -60,27 +60,27 @@
         "air_delta_db": 0.83
       },
       "human_feedback": {
-        "pending": 9,
-        "completed": 1,
-        "better_yes": 1,
+        "pending": 8,
+        "completed": 2,
+        "better_yes": 2,
         "better_no": 0,
         "better_uncertain": 0
       },
       "feedback_scores": {
-        "avg_clarity": 4,
-        "avg_warmth": 3,
-        "avg_space": 3,
-        "avg_harshness_control": 5,
-        "avg_plastic_feel_control": 5,
-        "avg_artifact_control": 5,
-        "avg_target_fit": 5
+        "avg_clarity": 4.5,
+        "avg_warmth": 4,
+        "avg_space": 3.5,
+        "avg_harshness_control": 4,
+        "avg_plastic_feel_control": 4.5,
+        "avg_artifact_control": 4.5,
+        "avg_target_fit": 4.5
       },
       "feedback_quality": {
-        "feedback_coverage": 0.1,
+        "feedback_coverage": 0.2,
         "better_rate": 1.0,
-        "completed_count": 1,
-        "pending_count": 9,
-        "better_yes_count": 1,
+        "completed_count": 2,
+        "pending_count": 8,
+        "better_yes_count": 2,
         "better_no_count": 0,
         "better_uncertain_count": 0
       }
@@ -96,27 +96,27 @@
         "air_delta_db": 1.4
       },
       "human_feedback": {
-        "pending": 9,
-        "completed": 1,
-        "better_yes": 1,
+        "pending": 8,
+        "completed": 2,
+        "better_yes": 2,
         "better_no": 0,
         "better_uncertain": 0
       },
       "feedback_scores": {
-        "avg_clarity": 4,
-        "avg_warmth": 3,
+        "avg_clarity": 4.5,
+        "avg_warmth": 3.5,
         "avg_space": 5,
-        "avg_harshness_control": 4,
-        "avg_plastic_feel_control": 4,
+        "avg_harshness_control": 3.5,
+        "avg_plastic_feel_control": 3.5,
         "avg_artifact_control": 4,
-        "avg_target_fit": 5
+        "avg_target_fit": 4
       },
       "feedback_quality": {
-        "feedback_coverage": 0.1,
+        "feedback_coverage": 0.2,
         "better_rate": 1.0,
-        "completed_count": 1,
-        "pending_count": 9,
-        "better_yes_count": 1,
+        "completed_count": 2,
+        "pending_count": 8,
+        "better_yes_count": 2,
         "better_no_count": 0,
         "better_uncertain_count": 0
       }
@@ -204,16 +204,16 @@
       "correlation_delta": -0.03,
       "presence_delta_db": 0.8,
       "air_delta_db": 1.2,
-      "feedback_status": "pending",
-      "better_than_before": null,
-      "clarity": null,
-      "warmth": null,
-      "space": null,
-      "harshness_control": null,
-      "plastic_feel_control": null,
-      "artifact_control": null,
-      "target_fit": null,
-      "volume_matched": null
+      "feedback_status": "completed",
+      "better_than_before": true,
+      "clarity": 5,
+      "warmth": 5,
+      "space": 4,
+      "harshness_control": 3,
+      "plastic_feel_control": 4,
+      "artifact_control": 4,
+      "target_fit": 4,
+      "volume_matched": true
     },
     {
       "record_file": "mhp026_ai_vocal_001_warm_vocal.json",
@@ -227,16 +227,16 @@
       "correlation_delta": -0.06,
       "presence_delta_db": 1.7,
       "air_delta_db": 1.1,
-      "feedback_status": "pending",
-      "better_than_before": null,
-      "clarity": null,
-      "warmth": null,
-      "space": null,
-      "harshness_control": null,
-      "plastic_feel_control": null,
-      "artifact_control": null,
-      "target_fit": null,
-      "volume_matched": null
+      "feedback_status": "completed",
+      "better_than_before": true,
+      "clarity": 5,
+      "warmth": 4,
+      "space": 5,
+      "harshness_control": 4,
+      "plastic_feel_control": 3,
+      "artifact_control": 3,
+      "target_fit": 3,
+      "volume_matched": true
     },
     {
       "record_file": "mhp026_ai_vocal_001_wide_space.json",
@@ -250,16 +250,16 @@
       "correlation_delta": -0.1,
       "presence_delta_db": 1.8,
       "air_delta_db": 1.8,
-      "feedback_status": "pending",
-      "better_than_before": null,
-      "clarity": null,
-      "warmth": null,
-      "space": null,
-      "harshness_control": null,
-      "plastic_feel_control": null,
-      "artifact_control": null,
-      "target_fit": null,
-      "volume_matched": null
+      "feedback_status": "completed",
+      "better_than_before": true,
+      "clarity": 5,
+      "warmth": 4,
+      "space": 5,
+      "harshness_control": 3,
+      "plastic_feel_control": 3,
+      "artifact_control": 4,
+      "target_fit": 3,
+      "volume_matched": true
     },
     {
       "record_file": "mhp026_ambient_001_clean_master.json",

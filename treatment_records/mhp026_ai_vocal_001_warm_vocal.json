@@ -91,17 +91,18 @@
     "matched_after_path": "after_matched.wav"
   },
   "human_feedback": {
-    "status": "pending",
-    "volume_matched": null,
-    "clarity": null,
-    "warmth": null,
-    "space": null,
-    "harshness_control": null,
-    "plastic_feel_control": null,
-    "artifact_control": null,
-    "target_fit": null,
-    "better_than_before": null,
-    "notes": "matched_after=E:\\moodify\\inspector_reports\\mhp026_mhp026_ai_vocal_001_warm_vocal\\after_matched.wav"
+    "status": "completed",
+    "volume_matched": true,
+    "clarity": 5,
+    "warmth": 4,
+    "space": 5,
+    "harshness_control": 4,
+    "plastic_feel_control": 3,
+    "artifact_control": 3,
+    "target_fit": 3,
+    "better_than_before": true,
+    "notes": "还是有点模糊，有一点声音的破碎感和散着的感觉，距离真实的乐感还很远，最开始的效果不错，而后面开始紊乱",
+    "updated_at": "2026-06-01T10:12:00Z"
   },
   "algorithm_learning": {
     "usable_for_future_adaptive_preset": true,

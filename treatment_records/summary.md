@@ -4,26 +4,26 @@
 
 - **Total records**: 30
 - **Presets**: warm_vocal, clean_master, wide_space
-- **Pending feedback**: 27
-- **Completed feedback**: 3
-- **Feedback coverage**: 3/30 (10%)
-- **Global better rate**: 3/3 yes (100%)
+- **Pending feedback**: 24
+- **Completed feedback**: 6
+- **Feedback coverage**: 6/30 (20%)
+- **Global better rate**: 6/6 yes (100%)
 
 ## Preset Summary
 
 | Preset | Count | Avg RMS Δ | Avg Crest Δ | Avg DynRange Δ | Avg Corr Δ | Avg Presence Δ | Avg Air Δ | FB Pending | FB Done |
 |--------|------:|----------:|------------:|---------------:|----------:|---------------:|---------:|-----------:|--------:|
-| warm_vocal | 10 | +6.59 | -2.01 | -6.69 | -0.05 | +1.48 | +0.87 | 9 | 1 |
-| clean_master | 10 | +4.01 | -0.82 | -2.64 | -0.02 | +0.39 | +0.83 | 9 | 1 |
-| wide_space | 10 | +5.85 | -1.70 | -5.82 | -0.10 | +1.39 | +1.40 | 9 | 1 |
+| warm_vocal | 10 | +6.59 | -2.01 | -6.69 | -0.05 | +1.48 | +0.87 | 8 | 2 |
+| clean_master | 10 | +4.01 | -0.82 | -2.64 | -0.02 | +0.39 | +0.83 | 8 | 2 |
+| wide_space | 10 | +5.85 | -1.70 | -5.82 | -0.10 | +1.39 | +1.40 | 8 | 2 |
 
 ## Feedback Score Summary
 
 | Preset | Completed | Coverage | Better Rate | Clarity | Warmth | Space | Harsh Ctrl | Plastic Ctrl | Artifact Ctrl | Target Fit |
 |--------|----------:|---------:|------------:|--------:|-------:|------:|----------:|------------:|-------------:|----------:|
-| warm_vocal | 1 | 10% | 100% | 4.0 | 5.0 | 3.0 | 4.0 | 4.0 | 5.0 | 5.0 |
-| clean_master | 1 | 10% | 100% | 4.0 | 3.0 | 3.0 | 5.0 | 5.0 | 5.0 | 5.0 |
-| wide_space | 1 | 10% | 100% | 4.0 | 3.0 | 5.0 | 4.0 | 4.0 | 4.0 | 5.0 |
+| warm_vocal | 2 | 20% | 100% | 4.5 | 4.5 | 4.0 | 4.0 | 3.5 | 4.0 | 4.0 |
+| clean_master | 2 | 20% | 100% | 4.5 | 4.0 | 3.5 | 4.0 | 4.5 | 4.5 | 4.5 |
+| wide_space | 2 | 20% | 100% | 4.5 | 3.5 | 5.0 | 3.5 | 3.5 | 4.0 | 4.0 |
 
 ## Records
 
@@ -32,9 +32,9 @@
 | electronic_clean_master.json | electronic_001 | clean_master | +5.38 | -5.38 | strong | -0.50 | -0.48 | -0.02 | pending | — | — |
 | electronic_warm_vocal.json | electronic_001 | warm_vocal | +9.02 | -9.02 | strong | -2.28 | -4.57 | -0.13 | pending | — | — |
 | electronic_wide_space.json | electronic_001 | wide_space | +8.02 | -8.02 | strong | -1.75 | -3.37 | -0.12 | completed | yes | 5 |
-| mhp026_ai_vocal_001_clean_master.json | mhp026_ai_vocal_001 | clean_master | +3.96 | -3.96 | strong | -0.04 | -2.91 | -0.03 | pending | — | — |
-| mhp026_ai_vocal_001_warm_vocal.json | mhp026_ai_vocal_001 | warm_vocal | +6.06 | -6.06 | strong | -0.87 | -7.61 | -0.06 | pending | — | — |
-| mhp026_ai_vocal_001_wide_space.json | mhp026_ai_vocal_001 | wide_space | +5.30 | -5.30 | strong | -0.60 | -5.90 | -0.10 | pending | — | — |
+| mhp026_ai_vocal_001_clean_master.json | mhp026_ai_vocal_001 | clean_master | +3.96 | -3.96 | strong | -0.04 | -2.91 | -0.03 | completed | yes | 4 |
+| mhp026_ai_vocal_001_warm_vocal.json | mhp026_ai_vocal_001 | warm_vocal | +6.06 | -6.06 | strong | -0.87 | -7.61 | -0.06 | completed | yes | 3 |
+| mhp026_ai_vocal_001_wide_space.json | mhp026_ai_vocal_001 | wide_space | +5.30 | -5.30 | strong | -0.60 | -5.90 | -0.10 | completed | yes | 3 |
 | mhp026_ambient_001_clean_master.json | mhp026_ambient_001 | clean_master | +4.34 | -4.34 | strong | -1.21 | -2.69 | -0.02 | pending | — | — |
 | mhp026_ambient_001_warm_vocal.json | mhp026_ambient_001 | warm_vocal | +6.64 | -6.64 | strong | -2.13 | -6.70 | -0.04 | pending | — | — |
 | mhp026_ambient_001_wide_space.json | mhp026_ambient_001 | wide_space | +5.97 | -5.97 | strong | -1.89 | -6.33 | -0.11 | pending | — | — |
@@ -65,6 +65,9 @@
 | Record | Song ID | Preset | Target Fit | Notes |
 |--------|---------|--------|----------:|-------|
 | electronic_wide_space.json | electronic_001 | wide_space | 5 |  |
+| mhp026_ai_vocal_001_clean_master.json | mhp026_ai_vocal_001 | clean_master | 4 |  |
+| mhp026_ai_vocal_001_warm_vocal.json | mhp026_ai_vocal_001 | warm_vocal | 3 |  |
+| mhp026_ai_vocal_001_wide_space.json | mhp026_ai_vocal_001 | wide_space | 3 |  |
 | piano_clean_master.json | piano_001 | clean_master | 5 |  |
 | vocal_folk_warm_vocal.json | vocal_folk_001 | warm_vocal | 5 |  |
 
@@ -74,9 +77,6 @@
 |--------|---------|--------|
 | electronic_clean_master.json | electronic_001 | clean_master |
 | electronic_warm_vocal.json | electronic_001 | warm_vocal |
-| mhp026_ai_vocal_001_clean_master.json | mhp026_ai_vocal_001 | clean_master |
-| mhp026_ai_vocal_001_warm_vocal.json | mhp026_ai_vocal_001 | warm_vocal |
-| mhp026_ai_vocal_001_wide_space.json | mhp026_ai_vocal_001 | wide_space |
 | mhp026_ambient_001_clean_master.json | mhp026_ambient_001 | clean_master |
 | mhp026_ambient_001_warm_vocal.json | mhp026_ambient_001 | warm_vocal |
 | mhp026_ambient_001_wide_space.json | mhp026_ambient_001 | wide_space |
@@ -104,9 +104,9 @@
 
 | Preset | Pending | Completed | Better Yes | Better No | Uncertain |
 |--------|--------:|----------:|-----------:|----------:|----------:|
-| warm_vocal | 9 | 1 | 1 | 0 | 0 |
-| clean_master | 9 | 1 | 1 | 0 | 0 |
-| wide_space | 9 | 1 | 1 | 0 | 0 |
+| warm_vocal | 8 | 2 | 2 | 0 | 0 |
+| clean_master | 8 | 2 | 2 | 0 | 0 |
+| wide_space | 8 | 2 | 2 | 0 | 0 |
 
 ## Notes
 
