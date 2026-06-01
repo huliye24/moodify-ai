@@ -10,8 +10,6 @@ GCS-001 第 9 节：T(θ): W_raw → W_processed
 from __future__ import annotations
 
 import numpy as np
-from scipy.signal import sosfilt, butter, lfilter
-from scipy.signal import convolve
 
 
 # ============================================================
@@ -65,7 +63,6 @@ def apply_eq(audio: np.ndarray, sr: int,
     def _process_channel(signal):
         n = len(signal)
         out = np.zeros(n)
-        weight = np.zeros(n)  # overlap-add weights
 
         pos = 0
         while pos < n:

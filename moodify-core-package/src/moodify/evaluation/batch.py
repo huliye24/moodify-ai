@@ -258,7 +258,7 @@ class BatchEvaluator:
             return 0.05
 
     def _print_plan(self, assets: list[Path]) -> None:
-        print(f"\n=== Batch Evaluation Plan ===")
+        print("\n=== Batch Evaluation Plan ===")
         print(f"  Assets dir: {self.config.assets_dir}")
         print(f"  Tracks: {len(assets)}")
         print(f"  Emotions: {self.config.emotions}")
@@ -289,7 +289,7 @@ def cmd_evaluate_run(args) -> int:
     except Exception:
         print("D before: 0.050 (no calibration data)")
 
-    print(f"\nRunning batch evaluation...")
+    print("\nRunning batch evaluation...")
     print(f"  Assets: {config.assets_dir}")
     print(f"  Emotions: {config.emotions}")
     print(f"  Dry run: {config.dry_run}\n")
@@ -298,7 +298,7 @@ def cmd_evaluate_run(args) -> int:
     run_result = evaluator.run()
 
     # 结果报告
-    print(f"\n=== Batch Run Report ===")
+    print("\n=== Batch Run Report ===")
     print(f"  Run ID: {run_result.run_id}")
     print(f"  Completed: {run_result.completed}/{run_result.total_evaluations}")
     print(f"  Failed: {run_result.failed}")
@@ -336,7 +336,7 @@ def cmd_evaluate_status(args) -> int:
 
     storage_dir = str(getattr(args, "output_dir", "outputs"))
 
-    print(f"\n=== Moodify AI Evaluation Status ===")
+    print("\n=== Moodify AI Evaluation Status ===")
     print(f"  Storage: {storage_dir}\n")
 
     try:
@@ -345,9 +345,9 @@ def cmd_evaluate_status(args) -> int:
 
         print(f"  D value: {summary['estimated_D']:.3f} (target: 0.40)")
         print(f"  Total processed: {summary['total_processed']}")
-        print(f"  Target: D=0.15 at n≈50, D=0.30 at n≈200\n")
+        print("  Target: D=0.15 at n≈50, D=0.30 at n≈200\n")
 
-        print(f"  Per-emotion breakdown:")
+        print("  Per-emotion breakdown:")
         print(f"  {'Code':6s} {'n':6s} {'bias':8s} {'confidence':11s} {'rho':8s}")
         print(f"  {'-'*6} {'-'*6} {'-'*8} {'-'*11} {'-'*8}")
         for code, info in summary["emotions"].items():
@@ -363,7 +363,7 @@ def cmd_evaluate_status(args) -> int:
 
     except Exception as e:
         print(f"  Error loading calibration state: {e}")
-        print(f"  D: 0.050 (initial)")
+        print("  D: 0.050 (initial)")
 
     return 0
 
@@ -395,7 +395,7 @@ def cmd_evaluate_single(args) -> int:
         d_before = 0.05
 
     # 处理
-    print(f"  Processing...")
+    print("  Processing...")
     orch = WorkflowOrchestrator()
     result = orch.process(audio_path, emotion, output_dir=storage_dir)
 
@@ -404,7 +404,7 @@ def cmd_evaluate_single(args) -> int:
         return 1
 
     # 诊断
-    print(f"  Diagnosing...")
+    print("  Diagnosing...")
     engine = DiagnosisEngine()
     ws_before = engine.diagnose_quick(audio_path)
     ws_after = engine.diagnose_quick(result.output_path)
@@ -421,7 +421,7 @@ def cmd_evaluate_single(args) -> int:
     emotion_desc = emotion_info.get("primary", "")
 
     # AI 评测
-    print(f"  AI evaluating (3 judges)...")
+    print("  AI evaluating (3 judges)...")
     evaluator = EvaluatorOrchestrator()
     assessment = evaluator.evaluate(
         raw_audio_path=audio_path,
@@ -447,7 +447,7 @@ def cmd_evaluate_single(args) -> int:
         d_after = d_before
 
     # 打印结果
-    print(f"\n  === AI Assessment Result ===")
+    print("\n  === AI Assessment Result ===")
     print(f"  Final Score:    {assessment.final_score:.1f} / 100")
     print(f"  Confidence:      {assessment.consensus_confidence:.1%}")
     print(f"  Consensus Std:   {assessment.consensus_std:.2f}")
@@ -455,11 +455,11 @@ def cmd_evaluate_single(args) -> int:
     print(f"  Real EDS Equiv:  {assessment.real_eds_equivalent:.1f}")
     print(f"  Proxy Error:     {abs(assessment.proxy_score - assessment.real_eds_equivalent):.1f}")
 
-    print(f"\n  === Judge Breakdown ===")
+    print("\n  === Judge Breakdown ===")
     for j in assessment.judges:
         print(f"  {j.name:18s} overall={j.overall:5.1f}  emotion={j.emotion_score:5.1f}  quality={j.quality_score:5.1f}  conf={j.confidence:.0%}")
 
-    print(f"\n  === Calibration ===")
+    print("\n  === Calibration ===")
     print(f"  D: {d_before:.3f} → {d_after:.3f} ({d_after-d_before:+.3f})")
 
     if d_after - d_before > 0.001:

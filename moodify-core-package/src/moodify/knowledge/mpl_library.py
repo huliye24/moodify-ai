@@ -12,7 +12,6 @@ mpl_library.py — Moodify Parameter Library (SPEC §17)
 """
 
 import json
-import math
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
@@ -267,7 +266,7 @@ class MoodifyParameterLibrary:
 
 def initialize_mpl_from_craft_cards(data_dir: str = "data/mpl") -> MoodifyParameterLibrary:
     """从 8 张工艺卡初始化 MPL 数据库 (120 基础条目)"""
-    from moodify.knowledge.craft_chains import CRAFT_CHAINS_15PARAMS, PARAM_KEYS
+    from moodify.knowledge.craft_chains import CRAFT_CHAINS_15PARAMS
     from moodify.knowledge.emotion_targets import EMOTION_TARGETS_V2
 
     mpl = MoodifyParameterLibrary(data_dir=data_dir)

@@ -14,14 +14,12 @@ MatchScore = 0.30*DefectCoverage + 0.30*EmotionTargetFit
 """
 
 import numpy as np
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 from moodify.data_types import CraftCardV2, WaveStateDiagnosis, EmotionTarget
 from moodify.diagnosis.defect_classifier import Defect
 from moodify.knowledge.emotion_targets import (
     get_emotion_target, get_safety_bounds, get_ideal_process_vector,
-    resolve_emotion,
 )
 from moodify.diagnosis.health_scorer import HealthScorer
 
@@ -194,14 +192,13 @@ class CraftChainMatch:
 
 def generate_craft_cards_from_data() -> list[CraftCardV2]:
     """从 C3 数据文件生成 8 张完整 CraftCardV2 (用于工艺库初始化)"""
-    from moodify.knowledge.emotion_targets import EMOTION_TARGETS_V2, KEY_TO_CODE
+    from moodify.knowledge.emotion_targets import EMOTION_TARGETS_V2
     from moodify.knowledge.craft_chains import CRAFT_CHAINS_15PARAMS, PARAM_KEYS
     from moodify.data_types import (
-        CraftCardV2, EmotionTarget, ApplicableSources,
+        CraftCardV2, ApplicableSources,
         DiagnosticMarkers, ProcessingStep, ParameterRange,
         ConfidenceMetrics, VersionEntry,
     )
-    from datetime import datetime
 
     cards = []
     for emotion_key, target in EMOTION_TARGETS_V2.items():

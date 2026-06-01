@@ -8,7 +8,11 @@
 输出: outputs/physics_3/
 """
 
-import os, sys, json, time, argparse
+import os
+import sys
+import json
+import time
+import argparse
 from pathlib import Path
 from datetime import datetime
 import numpy as np
@@ -211,7 +215,7 @@ def experiment_Q(**kwargs) -> dict:
     print("="*60)
 
     import soundfile
-    from moodify.knowledge.craft_chains import get_recommended_params, PARAM_KEYS
+    from moodify.knowledge.craft_chains import get_recommended_params
     from moodify.processing.spectral_chain import SpectralDSPChain
 
     audio, sr = soundfile.read(BASELINE_AUDIO)
@@ -316,7 +320,6 @@ def experiment_R(**kwargs) -> dict:
     print("="*60)
 
     import soundfile
-    from moodify.knowledge.craft_chains import get_recommended_params
     from moodify.optimizer.search import strength_to_params, CHAIN_ORDER
     from moodify.processing.spectral_chain import SpectralDSPChain
 

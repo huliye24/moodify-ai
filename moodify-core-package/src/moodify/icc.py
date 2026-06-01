@@ -8,7 +8,6 @@ ICCTracker: 跨多次诊断调用累积评分, 当数据充足时自动计算 IC
 
 from __future__ import annotations
 
-from typing import Optional
 
 import numpy as np
 

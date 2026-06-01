@@ -8,7 +8,13 @@
 输出: outputs/physics_2/<experiment_id>/
 """
 
-import os, sys, json, time, hashlib, random, argparse
+import os
+import sys
+import json
+import time
+import hashlib
+import random
+import argparse
 from pathlib import Path
 from datetime import datetime
 
@@ -92,7 +98,7 @@ def experiment_G(n_samples: int = 100, emotions: list = None, **kwargs) -> dict:
     for emotion in emotions:
         print(f"\n  --- {emotion} ---")
         preset = get_recommended_params(emotion)
-        ideal = get_ideal_process_vector(emotion)
+        get_ideal_process_vector(emotion)  # preload ideal vector
 
         # Baseline state
         vecs_before = []
@@ -145,21 +151,20 @@ def experiment_G(n_samples: int = 100, emotions: list = None, **kwargs) -> dict:
                     "dT_real": float(dx_real[3]), "dT_te": float(dx_te[3]),
                     "dH_real": float(dx_real[4]), "dH_te": float(dx_te[4]),
                 })
-            except Exception as e:
+            except Exception:
                 continue
 
             if (i+1) % 20 == 0:
                 print(f"    {i+1}/{n_samples}, mean TE error: {np.mean(te_errors[-20:]):.4f}")
 
         # Analysis
-        dX = np.array(delta_X).T
+        np.array(delta_X).T  # validate shape
         te_arr = np.array(te_errors)
 
         # Per-dimension correlation: T_EFFECTS predicted vs real
         dim_names = ["E", "D", "S", "T", "H"]
         dim_corrs = {}
         for j, dim in enumerate(dim_names):
-            real_dims = dX[j, :]
             # Extract TE predictions from raw_data
             te_preds = np.array([r[f"d{dim}_te"] for r in raw_data if r["emotion"] == emotion])
             real_vals = np.array([r[f"d{dim}_real"] for r in raw_data if r["emotion"] == emotion])
@@ -201,7 +206,7 @@ def experiment_G(n_samples: int = 100, emotions: list = None, **kwargs) -> dict:
 
 def _estimate_strength_from_params(params: dict, emotion_code: str) -> dict:
     """Rough inverse: estimate 5D strength from 15D params."""
-    from moodify.knowledge.craft_chains import CRAFT_CHAINS_15PARAMS, PARAM_KEYS
+    from moodify.knowledge.craft_chains import CRAFT_CHAINS_15PARAMS
     from moodify.optimizer.search import STRENGTH_TO_PARAMS, CHAIN_ORDER
 
     chain = CRAFT_CHAINS_15PARAMS.get(emotion_code, {})
@@ -300,7 +305,6 @@ def experiment_I(**kwargs) -> dict:
 
     from moodify.diagnosis.engine import DiagnosisEngine
     from moodify.diagnosis.defect_classifier import DefectClassifier
-    from moodify.orchestration.state_transfer import StateTransferEngine
 
     songs = get_audio_paths()
     if not songs:
@@ -447,9 +451,8 @@ def experiment_J(**kwargs) -> dict:
             best_error = mean_error
             best_alpha = float(alpha)
 
-    # Theoretical half-life for alpha=0.15
-    hl_015 = np.log(2) / np.log(1 / (1 - 0.15))
-    hl_015_correct = np.log(0.5) / np.log(1 - 0.15)  # = ln(0.5)/ln(0.85) ≈ 4.27
+    # Theoretical half-life for alpha=0.15 — ln(0.5)/ln(0.85) ≈ 4.27
+    hl_015_correct = np.log(0.5) / np.log(1 - 0.15)
 
     results = {
         "experiment": "J",
@@ -462,12 +465,12 @@ def experiment_J(**kwargs) -> dict:
         "optimal_error": round(best_error, 4),
         "alpha_scan": raw_data,
         "h1_accepted": abs(best_alpha - 0.15) < 0.05,
-        "verdict": f"PASS (alpha=0.15 near optimal)"
+        "verdict": "PASS (alpha=0.15 near optimal)"
                    if abs(best_alpha - 0.15) < 0.05
                    else f"FAIL (optimal alpha={best_alpha:.2f}, not 0.15)",
     }
     path = save_results("J_ema_alpha", results, raw_data)
-    print(f"  Claimed half-life (code): 7 steps")
+    print("  Claimed half-life (code): 7 steps")
     print(f"  Actual half-life (math): {hl_015_correct:.1f} steps")
     print(f"  Optimal alpha: {best_alpha:.2f} (current: 0.15)")
     print(f"  H1: {results['h1_accepted']} | {results['verdict']}")
@@ -637,7 +640,7 @@ def experiment_L(**kwargs) -> dict:
         "improvement_db": round(current_error - best_error, 2),
         "margin_scan": {str(k): round(v, 2) for k, v in avg_errors.items()},
         "h1_accepted": best_margin == 2.0 or abs(current_error - best_error) < 1.0,
-        "verdict": f"PASS (margin=2.0 near optimal)"
+        "verdict": "PASS (margin=2.0 near optimal)"
                    if best_margin == 2.0 or abs(current_error - best_error) < 1.0
                    else f"FAIL (optimal margin={best_margin}, not 2.0)",
     }
@@ -662,7 +665,7 @@ def experiment_M(**kwargs) -> dict:
     import soundfile
     from moodify.diagnosis.engine import DiagnosisEngine
     from moodify.processing.spectral_chain import SpectralDSPChain
-    from moodify.optimizer.search import strength_to_params, STRENGTH_TO_PARAMS, CHAIN_ORDER
+    from moodify.optimizer.search import strength_to_params, CHAIN_ORDER
     from moodify.orchestration.state_transfer import StateTransferEngine
 
     songs = get_audio_paths()
@@ -680,8 +683,8 @@ def experiment_M(**kwargs) -> dict:
     # Baseline: all dimensions = 0.5
     base_strength = {d: 0.5 for d in CHAIN_ORDER}
     base_params = strength_to_params(base_strength, "GA")
-    base_audio = chain.process(audio, sr, base_params)
-    ws_base = engine.diagnose_quick.__wrapped__ if hasattr(engine.diagnose_quick, '__wrapped__') else engine.diagnose_quick
+    chain.process(audio, sr, base_params)  # warm up chain
+    engine.diagnose_quick.__wrapped__ if hasattr(engine.diagnose_quick, '__wrapped__') else engine.diagnose_quick
 
     # Test: vary master from 0.1 to 0.9, keep others fixed
     raw_data = []

@@ -10,7 +10,9 @@ Usage:
   moodify legacy-process <audio> <emotion> (Legacy) Old workflow engine
 """
 
-import sys, os, argparse, time
+import sys
+import argparse
+import time
 from pathlib import Path
 
 SUPPORTED_EXTENSIONS = {'.wav', '.mp3', '.flac', '.aiff', '.aif', '.m4a', '.ogg'}
@@ -39,32 +41,32 @@ def cmd_legacy_analyze(args):
     whs = scorer.compute_whs(ws, defects)
 
     print(f"\n=== Diagnosis Report ({elapsed*1000:.0f}ms) ===")
-    s, d, sp, l, e = ws.Spectrum, ws.Dynamics, ws.Space, ws.Layers, ws.Emotion
-    print(f"\n[Spectrum]")
+    s, d, sp, layers, e = ws.Spectrum, ws.Dynamics, ws.Space, ws.Layers, ws.Emotion
+    print("\n[Spectrum]")
     print(f"  S1_SubPresence:  {s.S1_SubPresence.value:+.1f} dB")
     print(f"  S2_BassWarmth:   {s.S2_BassWarmth.value:+.1f} dB")
     print(f"  S3_MidClarity:   {s.S3_MidClarity.value:.3f}")
     print(f"  S4_AirBand:      {s.S4_AirBand.value:+.1f} dB")
     print(f"  S5_SpectralTilt: {s.S5_SpectralTilt.value:+.1f} dB/oct")
 
-    print(f"\n[Dynamics]")
+    print("\n[Dynamics]")
     print(f"  D1_LRA:          {d.D1_LRA.value:.1f} LU")
     print(f"  D2_ChorusImpact: {d.D2_ChorusImpact.value:.1f} LU")
     print(f"  D3_MicroDynamics:{d.D3_MicroDynamics.value:.2f} LU")
     print(f"  D4_PLR:          {d.D4_PLR.value:.1f} dB")
 
-    print(f"\n[Space]")
+    print("\n[Space]")
     print(f"  SP1_Correlation: {sp.SP1_Correlation.value:.3f}")
     print(f"  SP2_ForeBackSep: {sp.SP2_ForeBackSep.value:.1f} dB")
     print(f"  SP3_RT60Consist: {sp.SP3_RT60Consist.value:.3f} s")
     print(f"  SP4_WidthHealth: {sp.SP4_WidthHealth}")
 
-    print(f"\n[Layers]")
-    print(f"  L1_VocalSNR:     {l.L1_VocalSNR.value:.1f} dB")
-    print(f"  L2_BassClarity:  {l.L2_BassClarity.value:.3f}")
-    print(f"  L3_DrumDetect:   {l.L3_DrumDetect.value:.3f}")
+    print("\n[Layers]")
+    print(f"  L1_VocalSNR:     {layers.L1_VocalSNR.value:.1f} dB")
+    print(f"  L2_BassClarity:  {layers.L2_BassClarity.value:.3f}")
+    print(f"  L3_DrumDetect:   {layers.L3_DrumDetect.value:.3f}")
 
-    print(f"\n[Health]")
+    print("\n[Health]")
     print(f"  WHS: {whs['WHS']:.1f} [{whs['level']}]")
     print(f"  Dim scores: {whs['dim_scores']}")
 
@@ -82,7 +84,7 @@ def cmd_legacy_analyze(args):
             "spectrum": s.to_dict(),
             "dynamics": d.to_dict(),
             "space": sp.to_dict(),
-            "layers": l.to_dict(),
+            "layers": layers.to_dict(),
             "emotion": e.to_dict(),
             "whs": whs,
             "defects": [{"id": d.defect_id, "severity": d.severity,
@@ -170,7 +172,8 @@ def cmd_batch(args):
         try:
             result = orch.process(str(fp), emotion, output_dir=output_dir)
             if result.success:
-                ok += 1; eds_sum += result.eds
+                ok += 1
+                eds_sum += result.eds
                 eds_s = f'{result.eds:+.0f}'
                 print(f"  [{i}/{len(files)}] {fp.name[:40]:40s} EDS={eds_s:>5s}  WHS {result.whs_before:.0f}->{result.whs_after:.0f}  ({result.total_elapsed_ms:.0f}ms)")
             else:
@@ -206,7 +209,7 @@ def cmd_emotions(args):
         code = t['code']
         chain_info = ""
         if code in CRAFT_CHAINS_15PARAMS:
-            chain_info = f"[craft chain ready]"
+            chain_info = "[craft chain ready]"
         print(f"  {code:4s} {t['name_cn']:8s} {t['name_en']:25s} "
               f"{t['primary']:15s} {t['reverb_style']:20s} {chain_info}")
     return 0

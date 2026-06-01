@@ -16,13 +16,13 @@ API:
 
 from __future__ import annotations
 
-import json, os, math, time
+import json
+import os
+import time
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
-from fastapi import FastAPI, Query
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from pydantic import BaseModel
 import uvicorn
 

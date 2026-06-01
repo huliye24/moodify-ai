@@ -3,7 +3,10 @@
 Validates: EDS fix, M Factor per emotion, plasticity, WHS/EDS correlation.
 Usage: python validation_suite.py
 """
-import sys, os, time, json, numpy as np, soundfile as sf
+import sys
+import os
+import numpy as np
+import soundfile as sf
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['MOODIFY_OUTPUT'] = '/home/ubuntu/moodify/outputs'
 
@@ -69,7 +72,7 @@ for emo in emotions:
                 dist_after = np.linalg.norm(vec_after - ideal)
                 real_eds = 100 * (1 - dist_after / max(dist_before, 1e-9))
                 pairs.append((proxy_score, real_eds))
-        except Exception as e:
+        except Exception:
             pass
 
     if len(pairs) >= 5:

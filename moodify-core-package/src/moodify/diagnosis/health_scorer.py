@@ -9,14 +9,12 @@ EDS (Emotion Development Score): 处理后向目标情绪靠近的程度
   EDS = 100 * (1 - norm_dist), where norm_dist = dist(WS_final, WS_target) / dist(WS_raw, WS_target)
 """
 
-import math
 import numpy as np
-from typing import Optional
 
 from moodify.data_types import WaveStateDiagnosis
 from moodify.diagnosis.defect_classifier import (
     DefectClassifier, Defect,
-    DIMENSION_WEIGHTS, SEVERITY_WEIGHTS, DIMENSION_PARAMS,
+    DIMENSION_WEIGHTS,
 )
 
 
@@ -165,7 +163,7 @@ class HealthScorer:
         s = ws.Spectrum
         d = ws.Dynamics
         sp = ws.Space
-        l = ws.Layers
+        layers = ws.Layers
         e = ws.Emotion
 
         # E: S3_MidClarity 主导, S5_SpectralTilt 惩戒
@@ -182,7 +180,7 @@ class HealthScorer:
         S = max(0.0, min(1.0, corr_score * 0.7 + (1.0 - rt60_penalty) * 0.3))
 
         # T: L3_DrumDetect 主导
-        T = max(0.0, min(1.0, l.L3_DrumDetect.value * 1.1))
+        T = max(0.0, min(1.0, layers.L3_DrumDetect.value * 1.1))
 
         # H: E3_FatigueRisk 反比
         H = max(0.0, min(1.0, 1.0 - e.E3_FatigueRisk.value / 120.0))

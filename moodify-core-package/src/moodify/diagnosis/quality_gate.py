@@ -7,8 +7,7 @@ Gate 3: 平台合规性 — Phase 6 完成后
 """
 
 import math
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 
 @dataclass

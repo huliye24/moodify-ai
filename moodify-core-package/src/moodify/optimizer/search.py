@@ -6,7 +6,8 @@ B 矩阵模式: 用实验测量的 B ∈ R^(5×15) 预测 Δx = B @ Δu, 替代 
 
 from __future__ import annotations
 
-import time, os, json
+import time
+import os
 from pathlib import Path
 import numpy as np
 from scipy.stats import qmc
@@ -408,7 +409,6 @@ def search_3d(
     废弃的维度: dynamic 固定 0.5, master 固定 0.5.
     若无 B 矩阵则回退到 T_EFFECTS.
     """
-    t0 = time.perf_counter()
 
     from moodify.knowledge.emotion_targets import resolve_emotion, KEY_TO_CODE
     from moodify.diagnosis.defect_classifier import DefectClassifier
@@ -467,7 +467,6 @@ def search_3d(
         params = strength_to_params(vec, emotion_code)
         result.append((vec, params, score))
 
-    elapsed = (time.perf_counter() - t0) * 1000
     return result
 
 
