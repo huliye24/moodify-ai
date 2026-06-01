@@ -1,0 +1,112 @@
+{
+  "schema_version": "0.1.0",
+  "record_type": "moodify_treatment_record",
+  "song_id": "mhp026_rock_001",
+  "preset": "warm_vocal",
+  "created_at": "2026-06-01T08:37:54Z",
+  "paths": {
+    "before_audio": "E:\\moodify\\local_audio_assets\\mhp026\\source\\03_rock\\mhp026_03_rock__black_therapy.mp3",
+    "after_audio": "E:\\moodify\\outputs\\mhp026_03_rock__black_therapy_warm_vocal.wav",
+    "inspector_metrics": "E:\\moodify\\inspector_reports\\mhp026_mhp026_rock_001_warm_vocal\\metrics_comparison.json",
+    "matched_after_audio": "E:\\moodify\\inspector_reports\\mhp026_mhp026_rock_001_warm_vocal\\after_matched.wav",
+    "inspector_report_md": "E:\\moodify\\inspector_reports\\mhp026_mhp026_rock_001_warm_vocal\\report.md",
+    "inspector_report_html": "E:\\moodify\\inspector_reports\\mhp026_mhp026_rock_001_warm_vocal\\report.html"
+  },
+  "before_features": {
+    "peak_db": -0.08,
+    "rms_db": -12.04,
+    "crest_factor": 3.96,
+    "dynamic_range_db": 10.24,
+    "correlation_lr": 0.891,
+    "mid_side_ratio_db": -12.41,
+    "bands": {
+      "sub": -16.5,
+      "bass": -3.0,
+      "low_mid": -8.7,
+      "mid": -6.3,
+      "presence": -12.0,
+      "air": -17.6
+    },
+    "spectral_centroid": 4175.1,
+    "spectral_rolloff_95": 13699.7,
+    "spectral_flatness": 0.0528
+  },
+  "after_features": {
+    "peak_db": -0.01,
+    "rms_db": -8.59,
+    "crest_factor": 2.68,
+    "dynamic_range_db": 2.65,
+    "correlation_lr": 0.872,
+    "mid_side_ratio_db": -11.66,
+    "bands": {
+      "sub": -15.4,
+      "bass": -2.6,
+      "low_mid": -9.6,
+      "mid": -7.1,
+      "presence": -10.9,
+      "air": -17.6
+    },
+    "spectral_centroid": 4349.8,
+    "spectral_rolloff_95": 14103.5,
+    "spectral_flatness": 0.2803
+  },
+  "delta_features": {
+    "peak_delta_db": 0.07,
+    "rms_delta_db": 3.45,
+    "crest_delta": -1.28,
+    "dynamic_range_delta_db": -7.59,
+    "correlation_lr_delta": -0.02,
+    "mid_side_ratio_delta_db": 0.75,
+    "spectral_centroid_delta": 174.7,
+    "spectral_rolloff_95_delta": 403.8,
+    "spectral_flatness_delta": 0.23,
+    "sub_delta_db": 1.1,
+    "bass_delta_db": 0.4,
+    "low_mid_delta_db": -0.9,
+    "mid_delta_db": -0.8,
+    "presence_delta_db": 1.1,
+    "air_delta_db": 0.0
+  },
+  "preset_params": {
+    "P01_vocal_presence_freq": 3000.0,
+    "P02_vocal_presence_gain": 2.5,
+    "P03_vocal_presence_q": 0.7,
+    "P04_proximity_low_freq": 200.0,
+    "P05_proximity_low_gain": 2.5,
+    "P06_compression_ratio": 1.45,
+    "P07_compression_attack": 25.0,
+    "P08_compression_release": 220.0,
+    "P09_compression_threshold": -16.0,
+    "P10_reverb_t60": 1.2,
+    "P11_reverb_dry_wet": 0.2,
+    "P12_reverb_width": 0.8,
+    "P13_harmonic_drive": 0.08,
+    "P14_high_shelf_freq": 10000.0,
+    "P15_high_shelf_gain": 1.5
+  },
+  "loudness_match": {
+    "rms_delta_db": 3.45,
+    "after_gain_match_db": -3.45,
+    "warning_level": "strong",
+    "matched_after_path": "after_matched.wav"
+  },
+  "human_feedback": {
+    "status": "pending",
+    "volume_matched": null,
+    "clarity": null,
+    "warmth": null,
+    "space": null,
+    "harshness_control": null,
+    "plastic_feel_control": null,
+    "artifact_control": null,
+    "target_fit": null,
+    "better_than_before": null,
+    "notes": "matched_after=E:\\moodify\\inspector_reports\\mhp026_mhp026_rock_001_warm_vocal\\after_matched.wav"
+  },
+  "algorithm_learning": {
+    "usable_for_future_adaptive_preset": true,
+    "issue_tags": [],
+    "positive_tags": [],
+    "parameter_adjustment_suggestion": null
+  }
+}
