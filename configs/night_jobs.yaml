@@ -1,0 +1,48 @@
+# ===========================================================================
+# Moodify Night Worker — 夜间自动任务配置
+# 用法: python workers/night_worker.py --config configs/night_jobs.yaml
+# ===========================================================================
+
+run_name: cloud_night_auto
+input_dir: data/raw_audio
+output_dir: runs/night_auto
+preset_grid: configs/preset_grid.yaml
+server_limits: configs/server_limits.yaml
+
+# ── Job 开关 ────────────────────────────────────────
+jobs:
+  batch_audio_analysis: true
+  parameter_sweep: true
+  best_preset_selection: true
+  throughput_benchmark: true
+  final_report: true
+
+# ── 资源限制 (运行时可被 server_limits.yaml 覆盖) ──
+limits:
+  max_audio_duration_seconds: 60
+  max_versions_per_audio: 20     # ⚠️ 保守首跑: 每个音频最多 20 版本
+  max_parallel_workers: 2        # ⚠️ 保守首跑: 双线程
+  min_free_disk_gb: 10
+
+# ── 评分权重 ────────────────────────────────────────
+scoring:
+  weights:
+    spectrum_balance:    0.25
+    dynamic_health:      0.20
+    stereo_stability:    0.15
+    crest_normalization: 0.10
+    air_presence:        0.10
+    bass_warmth:         0.10
+    transient_retention: 0.10
+
+# ── 测试音频生成 (当 input_dir 为空时) ─────────────
+test_audio:
+  generate_if_empty: false        # 已有真实音频, 不生成合成测试数据
+
+# ── 报告 ──────────────────────────────────────────
+reports:
+  generate_csv: true
+  generate_json: true
+  generate_md: true
+  top_n_best_presets: 5
+  include_spectrum_plots: false   # 避免远程服务器无 GUI

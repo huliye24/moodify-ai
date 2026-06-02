@@ -1,0 +1,127 @@
+# ===========================================================================
+# Moodify Night Worker — Preset 参数扫描网格
+#
+# 四类扫描:
+#   warm_reality    — 温暖现实: 人声温度 + 低频饱满度
+#   dynamic_recovery — 动态恢复: 压缩比 + 动态范围
+#   soft_space      — 柔光空间: 混响 + 宽度
+#   anti_fatigue    — 抗疲劳: 高频衰减 + 瞬态保护
+#
+# 每个参数: [min, max, steps]  线性均匀采样
+# ===========================================================================
+
+preset_categories:
+
+  # ── Warm Reality ──────────────────────────────────
+  warm_reality:
+    description: "温暖现实 — 人声存在感 + 低频温暖度扫描"
+    sweep_params:
+      P02_vocal_presence_gain:
+        range: [0.5, 5.0]
+        steps: 5
+      P05_proximity_low_gain:
+        range: [0.5, 5.0]
+        steps: 5
+      P13_harmonic_drive:
+        range: [0.0, 0.20]
+        steps: 3
+    fixed_params:
+      P01_vocal_presence_freq: 3000.0
+      P03_vocal_presence_q: 0.7
+      P04_proximity_low_freq: 200.0
+      P06_compression_ratio: 1.45
+      P07_compression_attack: 25.0
+      P08_compression_release: 220.0
+      P09_compression_threshold: -16.0
+      P10_reverb_t60: 1.2
+      P11_reverb_dry_wet: 0.20
+      P12_reverb_width: 0.8
+      P14_high_shelf_freq: 10000.0
+      P15_high_shelf_gain: 1.5
+
+  # ── Dynamic Recovery ─────────────────────────────
+  dynamic_recovery:
+    description: "动态恢复 — 压缩/动态范围/瞬态保持扫描"
+    sweep_params:
+      P06_compression_ratio:
+        range: [1.0, 4.0]
+        steps: 5
+      P07_compression_attack:
+        range: [5.0, 80.0]
+        steps: 4
+      P08_compression_release:
+        range: [50.0, 400.0]
+        steps: 4
+      P09_compression_threshold:
+        range: [-30.0, -6.0]
+        steps: 5
+    fixed_params:
+      P01_vocal_presence_freq: 3000.0
+      P02_vocal_presence_gain: 1.5
+      P03_vocal_presence_q: 0.7
+      P04_proximity_low_freq: 200.0
+      P05_proximity_low_gain: 1.5
+      P10_reverb_t60: 1.5
+      P11_reverb_dry_wet: 0.15
+      P12_reverb_width: 0.9
+      P13_harmonic_drive: 0.05
+      P14_high_shelf_freq: 10000.0
+      P15_high_shelf_gain: 1.0
+
+  # ── Soft Space ───────────────────────────────────
+  soft_space:
+    description: "柔光空间 — 混响深度/宽度/高频空间感扫描"
+    sweep_params:
+      P10_reverb_t60:
+        range: [0.3, 4.0]
+        steps: 5
+      P11_reverb_dry_wet:
+        range: [0.05, 0.45]
+        steps: 5
+      P12_reverb_width:
+        range: [0.4, 1.0]
+        steps: 4
+      P15_high_shelf_gain:
+        range: [-1.0, 3.0]
+        steps: 4
+    fixed_params:
+      P01_vocal_presence_freq: 3000.0
+      P02_vocal_presence_gain: 1.0
+      P03_vocal_presence_q: 0.5
+      P04_proximity_low_freq: 200.0
+      P05_proximity_low_gain: 1.0
+      P06_compression_ratio: 1.25
+      P07_compression_attack: 35.0
+      P08_compression_release: 250.0
+      P09_compression_threshold: -14.0
+      P13_harmonic_drive: 0.05
+      P14_high_shelf_freq: 8000.0
+
+  # ── Anti Fatigue ─────────────────────────────────
+  anti_fatigue:
+    description: "抗疲劳 — 高频保护/瞬态柔和度扫描"
+    sweep_params:
+      P15_high_shelf_gain:
+        range: [-3.0, 2.0]
+        steps: 5
+      P02_vocal_presence_gain:
+        range: [-2.0, 3.0]
+        steps: 4
+      P06_compression_ratio:
+        range: [1.0, 2.5]
+        steps: 4
+      P13_harmonic_drive:
+        range: [0.0, 0.15]
+        steps: 3
+    fixed_params:
+      P01_vocal_presence_freq: 3000.0
+      P03_vocal_presence_q: 0.6
+      P04_proximity_low_freq: 200.0
+      P05_proximity_low_gain: 1.0
+      P07_compression_attack: 30.0
+      P08_compression_release: 200.0
+      P09_compression_threshold: -18.0
+      P10_reverb_t60: 1.5
+      P11_reverb_dry_wet: 0.18
+      P12_reverb_width: 0.9
+      P14_high_shelf_freq: 10000.0

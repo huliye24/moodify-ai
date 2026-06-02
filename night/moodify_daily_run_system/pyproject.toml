@@ -1,0 +1,18 @@
+[project]
+name = "moodify-daily-run-system"
+version = "0.1.0"
+description = "Moodify Daily Run System: input registry, run queue, cloud runner, metrics, reports, and craft memory."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+audio = ["numpy>=1.23", "soundfile>=0.12"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+moodify-runtime = "moodify_runtime.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

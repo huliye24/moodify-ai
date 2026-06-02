@@ -1,0 +1,32 @@
+{
+  "project_root": ".",
+  "input_dir": "data/night_inputs",
+  "output_base_dir": "outputs/night_runs",
+  "presets": [
+    "warm_vocal",
+    "clean_master",
+    "wide_space"
+  ],
+  "max_files": 30,
+  "recurse": false,
+  "timeout_seconds_per_task": 900,
+  "sleep_seconds_between_tasks": 2,
+  "max_retries_per_task": 2,
+  "keep_last_n_runs": 10,
+  "min_free_disk_gb": 1.0,
+  "python": "python3",
+  "stop_on_first_success_template": true,
+  "preflight_commands": [
+    "{python} --version",
+    "{python} cli.py --help"
+  ],
+  "command_templates": [
+    "{python} cli.py process --input {input} --output {output_dir} --preset {preset}",
+    "{python} -m moodify.cli process --input {input} --output {output_dir} --preset {preset}",
+    "{python} cli.py process {input} --output {output_dir} --preset {preset}"
+  ],
+  "env": {
+    "PYTHONUNBUFFERED": "1",
+    "MOODIFY_NIGHT_RUN": "1"
+  }
+}

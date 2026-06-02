@@ -1,0 +1,39 @@
+# ===========================================================================
+# Moodify Night Worker — 服务器资源限制
+#
+# 确保夜间任务不会让服务器失控。
+# 单位: CPU 百分比(0-100), 内存 GB, 磁盘 GB, 并行进程数
+# ===========================================================================
+
+# ── CPU ────────────────────────────────────────────
+cpu:
+  max_total_pct: 80          # 总 CPU 使用率上限 (%)
+  max_single_core_pct: 90    # 单核心上限 (%)
+  throttle_at_pct: 70        # 达到此值降低并行度
+  poll_interval_seconds: 5   # 检查间隔
+
+# ── 内存 ────────────────────────────────────────────
+memory:
+  max_total_gb: 6.0          # 最大内存占用 (GB)
+  throttle_at_gb: 4.5        # 达到此值降低并行度
+  per_worker_estimate_mb: 800  # 每个 worker 估算内存占用 (MB)
+
+# ── 磁盘 ────────────────────────────────────────────
+disk:
+  min_free_gb: 10            # 最少剩余空间 (GB) — 低于此值停止生成
+  warn_free_gb: 20           # 警告阈值 (GB)
+  max_output_size_gb: 100    # 单次运行输出总大小上限 (GB)
+
+# ── 并行控制 ────────────────────────────────────────
+parallelism:
+  default_workers: 2         # 默认并行 worker 数
+  max_workers: 4             # 硬上限
+  min_workers: 1             # 硬下限
+  cooldown_seconds: 3        # 降级后冷却时间 (避免频繁切换)
+
+# ── 安全闸 ──────────────────────────────────────────
+safety:
+  max_total_audio_processed: 500     # 单次运行最多处理音频数
+  max_wall_time_seconds: 43200       # 最大运行时长 12 小时
+  max_versions_total: 2000           # 单次运行最多生成的版本数
+  emergency_stop_free_mb: 500        # 磁盘低于此值强制停止 (MB)

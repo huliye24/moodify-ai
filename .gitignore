@@ -36,3 +36,31 @@ listening_test/
 !treatment_records/
 !treatment_records/*.json
 !treatment_records/*.md
+
+# ── Moodify Night Worker generated ─────────────────
+runs/
+data/raw_audio/
+data/processed_audio/
+*.key
+*.pem
+*.token
+outputs/*.wav
+outputs/*.mp3
+outputs/*.png
+logs/
+
+# ── Large output assets ───────────────────────────
+outputs/sync_*/
+# Moodify Daily Run generated
+*.log
+# Runtime data (not code)
+data/night_inputs/
+data/moodify_runtime/
+# Experimental runs
+experiments/
+# Local config (keep example)
+configs/runtime_config.json
+# Temp outputs
+moodify-core-package/outputs/
+# Shell snapshot artifacts
+.claude/shell-snapshots/

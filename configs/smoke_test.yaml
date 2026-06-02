@@ -1,0 +1,42 @@
+# ===========================================================================
+# Moodify Night Worker — Smoke Test 配置 (极小规模验证)
+# ===========================================================================
+
+run_name: cloud_smoke_test
+input_dir: data/raw_audio
+output_dir: runs/smoke_test
+preset_grid: configs/preset_grid.yaml
+server_limits: configs/server_limits.yaml
+
+jobs:
+  batch_audio_analysis: true
+  parameter_sweep: true
+  best_preset_selection: true
+  throughput_benchmark: true
+  final_report: true
+
+limits:
+  max_audio_duration_seconds: 30
+  max_versions_per_audio: 5     # ⚠️ Smoke test: 每个音频仅 3-5 版本
+  max_parallel_workers: 1        # ⚠️ Smoke test: 单线程
+  min_free_disk_gb: 5
+
+scoring:
+  weights:
+    spectrum_balance:    0.25
+    dynamic_health:      0.20
+    stereo_stability:    0.15
+    crest_normalization: 0.10
+    air_presence:        0.10
+    bass_warmth:         0.10
+    transient_retention: 0.10
+
+test_audio:
+  generate_if_empty: false       # ⚠️ Smoke test: 无真实音频则失败
+
+reports:
+  generate_csv: true
+  generate_json: true
+  generate_md: true
+  top_n_best_presets: 3
+  include_spectrum_plots: false
