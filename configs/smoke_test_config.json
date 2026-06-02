@@ -1,0 +1,39 @@
+{
+  "project_root": ".",
+  "data_root": "data/moodify_runtime_test",
+  "input_dirs": [
+    "data/smoke_inputs"
+  ],
+  "output_root": "outputs/smoke_test",
+  "registry_path": "data/moodify_runtime_test/input_registry.jsonl",
+  "queue_path": "data/moodify_runtime_test/run_queue.jsonl",
+  "craft_memory_dir": "data/moodify_runtime_test/craft_memory",
+  "report_dir": "reports/smoke_test",
+  "presets": [
+    "warm_vocal",
+    "clean_master",
+    "wide_space"
+  ],
+  "max_files": 3,
+  "recurse": false,
+  "timeout_seconds_per_task": 900,
+  "sleep_seconds_between_tasks": 1,
+  "max_retries_per_task": 0,
+  "keep_last_n_runs": 3,
+  "min_free_disk_gb": 1.0,
+  "python": "python3",
+  "stop_on_first_success_template": true,
+  "audio_suffixes": [
+    ".mp3",
+    ".flac",
+    ".wav"
+  ],
+  "command_templates": [
+    "{python} -m moodify.cli process {input} --preset {preset} --output-dir {output_dir}"
+  ],
+  "env": {
+    "PYTHONUNBUFFERED": "1",
+    "MOODIFY_SMOKE_TEST": "1"
+  },
+  "allow_missing_outputs": true
+}

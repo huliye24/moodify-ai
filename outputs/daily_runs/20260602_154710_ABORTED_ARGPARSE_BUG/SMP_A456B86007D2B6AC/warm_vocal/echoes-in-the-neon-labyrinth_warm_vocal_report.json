@@ -1,0 +1,34 @@
+{
+  "preset": "warm_vocal",
+  "elapsed_s": 5.8,
+  "overall_health": "good",
+  "issues": [],
+  "strengths": [
+    "Healthy crest factor — good balance of impact and body."
+  ],
+  "suggested_presets": [
+    "clean_master"
+  ],
+  "metrics": {
+    "file_path": "/home/ubuntu/moodify-o3is/data/night_inputs/echoes-in-the-neon-labyrinth.mp3",
+    "duration_s": 269.5,
+    "sample_rate": 48000,
+    "channels": 2,
+    "spectrum": {
+      "sub_bass": -10.1,
+      "bass": -3.2,
+      "low_mid": -8.6,
+      "mid": -7.2,
+      "presence": -12.1,
+      "air": -19.4
+    },
+    "dynamics": {
+      "peak_db": -2.0,
+      "crest_factor": 5.16,
+      "dynamic_range_db": 11.2
+    },
+    "stereo": {
+      "correlation_lr": 0.894
+    }
+  }
+}

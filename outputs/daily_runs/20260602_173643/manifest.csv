@@ -1,0 +1,2 @@
+run_id,task_id,sample_id,input_path,preset,status,return_code,elapsed_seconds,output_dir,template_index,pseudo_mrs_before,pseudo_mrs_after,pseudo_delta_mrs,mrs_open_v031_before,mrs_open_v031_after,delta_mrs_open_v031,mrs_open_flags,error
+20260602_173643,TASK_SMP_D9C1933EC36CADB4_warm_vocal,SMP_D9C1933EC36CADB4,/home/ubuntu/moodify-o3is/data/night_inputs/北极星与黑夜_02.flac,warm_vocal,done,0,3.78,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_173643/SMP_D9C1933EC36CADB4/warm_vocal,0,,54.23933993756083,,1139.9,1133.9,-6.0,,

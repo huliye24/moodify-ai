@@ -1,0 +1,35 @@
+{
+  "preset": "warm_vocal",
+  "elapsed_s": 5.0,
+  "overall_health": "good",
+  "issues": [],
+  "strengths": [
+    "Healthy crest factor — good balance of impact and body.",
+    "Well-balanced stereo image."
+  ],
+  "suggested_presets": [
+    "clean_master"
+  ],
+  "metrics": {
+    "file_path": "/home/ubuntu/moodify-o3is/data/night_inputs/我想被偏爱，不想被路过 (1).mp3",
+    "duration_s": 222.8,
+    "sample_rate": 48000,
+    "channels": 2,
+    "spectrum": {
+      "sub_bass": -10.0,
+      "bass": -4.5,
+      "low_mid": -6.6,
+      "mid": -6.6,
+      "presence": -11.0,
+      "air": -19.2
+    },
+    "dynamics": {
+      "peak_db": -3.1,
+      "crest_factor": 4.58,
+      "dynamic_range_db": 14.6
+    },
+    "stereo": {
+      "correlation_lr": 0.789
+    }
+  }
+}

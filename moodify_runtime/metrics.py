@@ -37,14 +37,19 @@ def _init_mrs_open() -> bool:
         from workers.mrs_open_benchmark_v03 import compute_mrs_open, calibrate_dref
         import yaml
 
+        # Load D_ref from config, with fallback default
+        _MRS_OPEN_DREF = 0.274350  # default
         config_path = _project_root / "configs" / "mrs_open_v03.yaml"
         if config_path.exists():
-            with open(config_path) as f:
-                cfg = yaml.safe_load(f) or {}
-            cal = cfg.get("calibration", {})
-            _MRS_OPEN_DREF = cal.get("d_ref", 0.274350)
-        else:
-            _MRS_OPEN_DREF = 0.274350
+            try:
+                with open(config_path) as f:
+                    cfg = yaml.safe_load(f) or {}
+                cal = cfg.get("calibration", {})
+                configured_dref = cal.get("d_ref")
+                if configured_dref is not None:
+                    _MRS_OPEN_DREF = float(configured_dref)
+            except Exception:
+                pass  # use default
 
         _MRS_OPEN_ENGINE = compute_mrs_open
         return True

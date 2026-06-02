@@ -1,0 +1,34 @@
+{
+  "preset": "wide_space",
+  "elapsed_s": 4.8,
+  "overall_health": "good",
+  "issues": [],
+  "strengths": [
+    "Healthy crest factor — good balance of impact and body."
+  ],
+  "suggested_presets": [
+    "clean_master"
+  ],
+  "metrics": {
+    "file_path": "/home/ubuntu/moodify-o3is/data/night_inputs/Moonlight Girl.mp3",
+    "duration_s": 214.7,
+    "sample_rate": 48000,
+    "channels": 2,
+    "spectrum": {
+      "sub_bass": -6.6,
+      "bass": -4.7,
+      "low_mid": -11.3,
+      "mid": -6.3,
+      "presence": -11.0,
+      "air": -16.1
+    },
+    "dynamics": {
+      "peak_db": -1.9,
+      "crest_factor": 4.95,
+      "dynamic_range_db": 15.9
+    },
+    "stereo": {
+      "correlation_lr": 0.89
+    }
+  }
+}

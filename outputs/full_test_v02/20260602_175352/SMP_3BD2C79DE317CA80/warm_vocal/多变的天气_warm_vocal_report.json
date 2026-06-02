@@ -1,0 +1,39 @@
+{
+  "preset": "warm_vocal",
+  "elapsed_s": 2.1,
+  "overall_health": "fair",
+  "issues": [
+    "Bass is very forward — mid-range clarity may suffer.",
+    "Presence band is weak — vocals may lack clarity."
+  ],
+  "strengths": [
+    "Wide dynamic range — track has natural loudness variation.",
+    "Healthy crest factor — good balance of impact and body.",
+    "Well-balanced stereo image."
+  ],
+  "suggested_presets": [
+    "warm_vocal"
+  ],
+  "metrics": {
+    "file_path": "/home/ubuntu/moodify-o3is/data/night_inputs/多变的天气.mp3",
+    "duration_s": 100.8,
+    "sample_rate": 48000,
+    "channels": 2,
+    "spectrum": {
+      "sub_bass": -15.3,
+      "bass": -3.0,
+      "low_mid": -5.3,
+      "mid": -8.1,
+      "presence": -19.2,
+      "air": -26.0
+    },
+    "dynamics": {
+      "peak_db": -2.8,
+      "crest_factor": 4.73,
+      "dynamic_range_db": 35.9
+    },
+    "stereo": {
+      "correlation_lr": 0.813
+    }
+  }
+}

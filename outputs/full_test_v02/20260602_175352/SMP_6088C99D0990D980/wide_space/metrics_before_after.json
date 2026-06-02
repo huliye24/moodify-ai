@@ -1,0 +1,92 @@
+{
+  "input": {
+    "path": "/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy.mp3",
+    "filename": "_Black Therapy.mp3",
+    "suffix": ".mp3",
+    "analyzed_at": "2026-06-02T10:40:13+00:00",
+    "supported": false,
+    "engine": "stdlib_wave",
+    "duration_seconds": null,
+    "sample_rate": null,
+    "channels": null,
+    "sample_width_bytes": null,
+    "frame_count": null,
+    "rms": null,
+    "peak": null,
+    "crest_factor": null,
+    "dc_offset": null,
+    "error": "non_wav_file_basic_metrics_only",
+    "pseudo_mrs_v001": null
+  },
+  "outputs": [
+    {
+      "path": "/home/ubuntu/moodify-o3is/outputs/full_test_v02/20260602_175352/SMP_6088C99D0990D980/wide_space/_Black Therapy_wide_space.wav",
+      "filename": "_Black Therapy_wide_space.wav",
+      "suffix": ".wav",
+      "analyzed_at": "2026-06-02T10:40:13+00:00",
+      "supported": true,
+      "engine": "stdlib_wave",
+      "duration_seconds": 306.55997916666666,
+      "sample_rate": 48000,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "frame_count": 14714879,
+      "rms": 0.3668726401549127,
+      "peak": 0.9990234375,
+      "crest_factor": 2.7230796962078183,
+      "dc_offset": -0.0017462724978628827,
+      "error": null,
+      "pseudo_mrs_v001": 52.23371432547847
+    }
+  ],
+  "best_output": {
+    "path": "/home/ubuntu/moodify-o3is/outputs/full_test_v02/20260602_175352/SMP_6088C99D0990D980/wide_space/_Black Therapy_wide_space.wav",
+    "filename": "_Black Therapy_wide_space.wav",
+    "suffix": ".wav",
+    "analyzed_at": "2026-06-02T10:40:13+00:00",
+    "supported": true,
+    "engine": "stdlib_wave",
+    "duration_seconds": 306.55997916666666,
+    "sample_rate": 48000,
+    "channels": 2,
+    "sample_width_bytes": 2,
+    "frame_count": 14714879,
+    "rms": 0.3668726401549127,
+    "peak": 0.9990234375,
+    "crest_factor": 2.7230796962078183,
+    "dc_offset": -0.0017462724978628827,
+    "error": null,
+    "pseudo_mrs_v001": 52.23371432547847
+  },
+  "pseudo_mrs_before": null,
+  "pseudo_mrs_after": 52.23371432547847,
+  "pseudo_delta_mrs": null,
+  "mrs_open_v031_before": 1023.1,
+  "mrs_open_v031_after": 1113.0,
+  "delta_mrs_open_v031": 89.89999999999998,
+  "mrs_open_before_detail": {
+    "mrs_open": 1023.1,
+    "d_real": 0.22981,
+    "subscores": {
+      "spectral_reality": 85.0,
+      "dynamic_reality": 76.1,
+      "texture_reality": 96.0,
+      "spatial_reality": 100.0,
+      "transient_reality": 95.0,
+      "anti_fatigue": 100.0,
+      "balance_reality": 31.9,
+      "plastic_risk": 15.0
+    },
+    "extra_penalties": {
+      "over_dark": 0.1
+    },
+    "penalty_flags": [
+      "over_dark"
+    ],
+    "error": null
+  },
+  "mrs_open_flags": [],
+  "mrs_open_avail": true,
+  "mrs_open_error": null,
+  "note": "pseudo_mrs_v001 是 Daily Run v0.1 占位指标。mrs_open_v031 是 MRS Open v0.3.1 实验指标。"
+}

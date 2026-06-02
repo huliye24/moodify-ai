@@ -1,0 +1,30 @@
+{
+  "project_root": "/home/ubuntu/moodify-o3is",
+  "data_root": "/home/ubuntu/moodify-o3is/data/moodify_runtime_test",
+  "input_dirs": ["/home/ubuntu/moodify-o3is/test_audio"],
+  "output_root": "/home/ubuntu/moodify-o3is/outputs/daily_runs_test",
+  "registry_path": "/home/ubuntu/moodify-o3is/data/moodify_runtime_test/input_registry.jsonl",
+  "queue_path": "/home/ubuntu/moodify-o3is/data/moodify_runtime_test/run_queue.jsonl",
+  "craft_memory_dir": "/home/ubuntu/moodify-o3is/data/moodify_runtime_test/craft_memory",
+  "report_dir": "/home/ubuntu/moodify-o3is/reports/daily_runs_test",
+  "presets": ["warm_vocal", "clean_master", "wide_space"],
+  "max_files": 30,
+  "recurse": false,
+  "timeout_seconds_per_task": 300,
+  "sleep_seconds_between_tasks": 0.5,
+  "max_retries_per_task": 1,
+  "keep_last_n_runs": 10,
+  "min_free_disk_gb": 0.5,
+  "python": "python3",
+  "stop_on_first_success_template": true,
+  "audio_suffixes": [".wav", ".mp3", ".flac", ".m4a", ".aac", ".ogg"],
+  "command_templates": [
+    "{python} -m moodify.cli process {input} --preset {preset} --output-dir {output_dir}"
+  ],
+  "env": {
+    "PYTHONUNBUFFERED": "1",
+    "MOODIFY_DAILY_RUN": "1"
+  },
+  "metric_audio_suffixes": [".wav", ".mp3", ".flac"],
+  "allow_missing_outputs": true
+}

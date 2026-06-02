@@ -1,0 +1,34 @@
+{
+  "preset": "clean_master",
+  "elapsed_s": 2.8,
+  "overall_health": "good",
+  "issues": [],
+  "strengths": [
+    "Healthy crest factor — good balance of impact and body."
+  ],
+  "suggested_presets": [
+    "clean_master"
+  ],
+  "metrics": {
+    "file_path": "/home/ubuntu/moodify-o3is/data/night_inputs/句点15.mp3",
+    "duration_s": 154.9,
+    "sample_rate": 48000,
+    "channels": 2,
+    "spectrum": {
+      "sub_bass": -15.3,
+      "bass": -3.2,
+      "low_mid": -7.4,
+      "mid": -7.5,
+      "presence": -10.1,
+      "air": -19.1
+    },
+    "dynamics": {
+      "peak_db": -1.3,
+      "crest_factor": 5.6,
+      "dynamic_range_db": 14.0
+    },
+    "stereo": {
+      "correlation_lr": 0.883
+    }
+  }
+}

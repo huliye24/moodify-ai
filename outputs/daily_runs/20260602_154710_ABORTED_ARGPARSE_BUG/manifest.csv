@@ -1,0 +1,142 @@
+run_id,task_id,sample_id,input_path,preset,status,return_code,elapsed_seconds,output_dir,template_index,pseudo_mrs_before,pseudo_mrs_after,pseudo_delta_mrs,mrs_open_v031_before,mrs_open_v031_after,delta_mrs_open_v031,mrs_open_flags,error
+20260602_154710,TASK_SMP_26D0AF3DCDB9758C_warm_vocal,SMP_26D0AF3DCDB9758C,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy (1).mp3,warm_vocal,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_26D0AF3DCDB9758C/warm_vocal,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy (1).mp3
+"
+20260602_154710,TASK_SMP_26D0AF3DCDB9758C_clean_master,SMP_26D0AF3DCDB9758C,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy (1).mp3,clean_master,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_26D0AF3DCDB9758C/clean_master,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy (1).mp3
+"
+20260602_154710,TASK_SMP_26D0AF3DCDB9758C_wide_space,SMP_26D0AF3DCDB9758C,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy (1).mp3,wide_space,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_26D0AF3DCDB9758C/wide_space,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy (1).mp3
+"
+20260602_154710,TASK_SMP_9E7ADE6DCF63F6EA_warm_vocal,SMP_9E7ADE6DCF63F6EA,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy (2).mp3,warm_vocal,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_9E7ADE6DCF63F6EA/warm_vocal,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy (2).mp3
+"
+20260602_154710,TASK_SMP_9E7ADE6DCF63F6EA_clean_master,SMP_9E7ADE6DCF63F6EA,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy (2).mp3,clean_master,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_9E7ADE6DCF63F6EA/clean_master,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy (2).mp3
+"
+20260602_154710,TASK_SMP_9E7ADE6DCF63F6EA_wide_space,SMP_9E7ADE6DCF63F6EA,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy (2).mp3,wide_space,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_9E7ADE6DCF63F6EA/wide_space,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy (2).mp3
+"
+20260602_154710,TASK_SMP_6088C99D0990D980_warm_vocal,SMP_6088C99D0990D980,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy.mp3,warm_vocal,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_6088C99D0990D980/warm_vocal,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy.mp3
+"
+20260602_154710,TASK_SMP_6088C99D0990D980_clean_master,SMP_6088C99D0990D980,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy.mp3,clean_master,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_6088C99D0990D980/clean_master,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy.mp3
+"
+20260602_154710,TASK_SMP_6088C99D0990D980_wide_space,SMP_6088C99D0990D980,/home/ubuntu/moodify-o3is/data/night_inputs/_Black Therapy.mp3,wide_space,failed,2,0.10,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_6088C99D0990D980/wide_space,0,,,,1023.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Therapy.mp3
+"
+20260602_154710,TASK_SMP_811A5C0573682420_warm_vocal,SMP_811A5C0573682420,/home/ubuntu/moodify-o3is/data/night_inputs/_Neural Poison   - 副本.mp3,warm_vocal,failed,2,0.12,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_811A5C0573682420/warm_vocal,0,,,,1038.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Poison - 副本.mp3
+"
+20260602_154710,TASK_SMP_811A5C0573682420_clean_master,SMP_811A5C0573682420,/home/ubuntu/moodify-o3is/data/night_inputs/_Neural Poison   - 副本.mp3,clean_master,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_811A5C0573682420/clean_master,0,,,,1038.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Poison - 副本.mp3
+"
+20260602_154710,TASK_SMP_811A5C0573682420_wide_space,SMP_811A5C0573682420,/home/ubuntu/moodify-o3is/data/night_inputs/_Neural Poison   - 副本.mp3,wide_space,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_811A5C0573682420/wide_space,0,,,,1038.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Poison - 副本.mp3
+"
+20260602_154710,TASK_SMP_2EA956CA1265E84F_warm_vocal,SMP_2EA956CA1265E84F,/home/ubuntu/moodify-o3is/data/night_inputs/_Neural Poison  .mp3,warm_vocal,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_2EA956CA1265E84F/warm_vocal,0,,,,1038.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Poison .mp3
+"
+20260602_154710,TASK_SMP_2EA956CA1265E84F_clean_master,SMP_2EA956CA1265E84F,/home/ubuntu/moodify-o3is/data/night_inputs/_Neural Poison  .mp3,clean_master,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_2EA956CA1265E84F/clean_master,0,,,,1038.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Poison .mp3
+"
+20260602_154710,TASK_SMP_2EA956CA1265E84F_wide_space,SMP_2EA956CA1265E84F,/home/ubuntu/moodify-o3is/data/night_inputs/_Neural Poison  .mp3,wide_space,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_2EA956CA1265E84F/wide_space,0,,,,1038.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Poison .mp3
+"
+20260602_154710,TASK_SMP_34DDCB399F568BB2_warm_vocal,SMP_34DDCB399F568BB2,/home/ubuntu/moodify-o3is/data/night_inputs/Control Theory.mp3,warm_vocal,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_34DDCB399F568BB2/warm_vocal,0,,,,1042.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Theory.mp3
+"
+20260602_154710,TASK_SMP_34DDCB399F568BB2_clean_master,SMP_34DDCB399F568BB2,/home/ubuntu/moodify-o3is/data/night_inputs/Control Theory.mp3,clean_master,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_34DDCB399F568BB2/clean_master,0,,,,1042.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Theory.mp3
+"
+20260602_154710,TASK_SMP_34DDCB399F568BB2_wide_space,SMP_34DDCB399F568BB2,/home/ubuntu/moodify-o3is/data/night_inputs/Control Theory.mp3,wide_space,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_34DDCB399F568BB2/wide_space,0,,,,1042.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Theory.mp3
+"
+20260602_154710,TASK_SMP_A456B86007D2B6AC_warm_vocal,SMP_A456B86007D2B6AC,/home/ubuntu/moodify-o3is/data/night_inputs/echoes-in-the-neon-labyrinth.mp3,warm_vocal,done,0,5.95,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_A456B86007D2B6AC/warm_vocal,0,,54.31953682851006,,1032.0,1038.8,6.7999999999999545,over_dark,
+20260602_154710,TASK_SMP_A456B86007D2B6AC_clean_master,SMP_A456B86007D2B6AC,/home/ubuntu/moodify-o3is/data/night_inputs/echoes-in-the-neon-labyrinth.mp3,clean_master,done,0,5.01,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_A456B86007D2B6AC/clean_master,0,,65.17013577317893,,1032.0,1038.1,6.099999999999909,over_dark,
+20260602_154710,TASK_SMP_A456B86007D2B6AC_wide_space,SMP_A456B86007D2B6AC,/home/ubuntu/moodify-o3is/data/night_inputs/echoes-in-the-neon-labyrinth.mp3,wide_space,done,0,5.77,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_A456B86007D2B6AC/wide_space,0,,55.037125514718355,,1032.0,1044.4,12.400000000000091,over_dark,
+20260602_154710,TASK_SMP_6B8418ECA2677400_warm_vocal,SMP_6B8418ECA2677400,/home/ubuntu/moodify-o3is/data/night_inputs/Moonlight Girl.mp3,warm_vocal,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_6B8418ECA2677400/warm_vocal,0,,,,1029.2,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Girl.mp3
+"
+20260602_154710,TASK_SMP_6B8418ECA2677400_clean_master,SMP_6B8418ECA2677400,/home/ubuntu/moodify-o3is/data/night_inputs/Moonlight Girl.mp3,clean_master,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_6B8418ECA2677400/clean_master,0,,,,1029.2,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Girl.mp3
+"
+20260602_154710,TASK_SMP_6B8418ECA2677400_wide_space,SMP_6B8418ECA2677400,/home/ubuntu/moodify-o3is/data/night_inputs/Moonlight Girl.mp3,wide_space,failed,2,0.12,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_6B8418ECA2677400/wide_space,0,,,,1029.2,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Girl.mp3
+"
+20260602_154710,TASK_SMP_8B140FF13F82EDAA_warm_vocal,SMP_8B140FF13F82EDAA,/home/ubuntu/moodify-o3is/data/night_inputs/Okay Okay 刚刚好.mp3,warm_vocal,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_8B140FF13F82EDAA/warm_vocal,0,,,,1041.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Okay 刚刚好.mp3
+"
+20260602_154710,TASK_SMP_8B140FF13F82EDAA_clean_master,SMP_8B140FF13F82EDAA,/home/ubuntu/moodify-o3is/data/night_inputs/Okay Okay 刚刚好.mp3,clean_master,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_8B140FF13F82EDAA/clean_master,0,,,,1041.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Okay 刚刚好.mp3
+"
+20260602_154710,TASK_SMP_8B140FF13F82EDAA_wide_space,SMP_8B140FF13F82EDAA,/home/ubuntu/moodify-o3is/data/night_inputs/Okay Okay 刚刚好.mp3,wide_space,failed,2,0.10,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_8B140FF13F82EDAA/wide_space,0,,,,1041.1,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: Okay 刚刚好.mp3
+"
+20260602_154710,TASK_SMP_317DAF1B61A3C3AB_warm_vocal,SMP_317DAF1B61A3C3AB,/home/ubuntu/moodify-o3is/data/night_inputs/Silk and Ruin2.mp3,warm_vocal,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_317DAF1B61A3C3AB/warm_vocal,0,,,,1033.6,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: and Ruin2.mp3
+"
+20260602_154710,TASK_SMP_317DAF1B61A3C3AB_clean_master,SMP_317DAF1B61A3C3AB,/home/ubuntu/moodify-o3is/data/night_inputs/Silk and Ruin2.mp3,clean_master,failed,2,0.09,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_317DAF1B61A3C3AB/clean_master,0,,,,1033.6,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: and Ruin2.mp3
+"
+20260602_154710,TASK_SMP_317DAF1B61A3C3AB_wide_space,SMP_317DAF1B61A3C3AB,/home/ubuntu/moodify-o3is/data/night_inputs/Silk and Ruin2.mp3,wide_space,failed,2,0.11,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_317DAF1B61A3C3AB/wide_space,0,,,,1033.6,,,,"usage: cli.py [-h]
+              {analyze,process,batch,emotions,crafts,serve,v01-analyze,v01-process,presets,v01-presets,legacy-analyze,legacy-process,evaluate-run,evaluate-single,evaluate-status}
+              ...
+cli.py: error: unrecognized arguments: and Ruin2.mp3
+"
+20260602_154710,TASK_SMP_D58B3AF59430FD8E_warm_vocal,SMP_D58B3AF59430FD8E,/home/ubuntu/moodify-o3is/data/night_inputs/假装无所谓2.mp3,warm_vocal,done,0,5.40,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_D58B3AF59430FD8E/warm_vocal,0,,53.99572670285866,,1043.2,1047.7,4.5,over_dark,
+20260602_154710,TASK_SMP_D58B3AF59430FD8E_clean_master,SMP_D58B3AF59430FD8E,/home/ubuntu/moodify-o3is/data/night_inputs/假装无所谓2.mp3,clean_master,done,0,4.59,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_D58B3AF59430FD8E/clean_master,0,,66.93547113953142,,1043.2,1048.3,5.099999999999909,over_dark,
+20260602_154710,TASK_SMP_D58B3AF59430FD8E_wide_space,SMP_D58B3AF59430FD8E,/home/ubuntu/moodify-o3is/data/night_inputs/假装无所谓2.mp3,wide_space,done,0,5.34,/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_D58B3AF59430FD8E/wide_space,0,,56.185614605313475,,1043.2,1047.6,4.399999999999864,over_dark,

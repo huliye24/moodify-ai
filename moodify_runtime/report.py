@@ -185,6 +185,8 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
         "## 6. 最佳提升任务 (pseudo)",
         "",
     ]
+
+    if best:
         md_lines += [
             f"- task_id：`{best.get('task_id')}`",
             f"- sample_id：`{best.get('sample_id')}`",

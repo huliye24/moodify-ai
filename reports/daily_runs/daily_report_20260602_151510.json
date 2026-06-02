@@ -1,0 +1,41 @@
+{
+  "run_id": "20260602_151510",
+  "generated_at": "2026-06-02T07:15:41+00:00",
+  "run_dir": "/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_151510",
+  "total_tasks": 9,
+  "success": 9,
+  "failed": 0,
+  "avg_pseudo_delta_mrs": -19.72761441219984,
+  "best_task": {
+    "run_id": "20260602_151510",
+    "task_id": "TASK_SMP_16B0C4F0B2F6707D_clean_master",
+    "sample_id": "SMP_16B0C4F0B2F6707D",
+    "input_path": "/home/ubuntu/moodify-o3is/data/night_inputs/electronic.wav",
+    "preset": "clean_master",
+    "status": "done",
+    "return_code": "0",
+    "elapsed_seconds": "0.69",
+    "output_dir": "/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_151510/SMP_16B0C4F0B2F6707D/clean_master",
+    "template_index": "0",
+    "pseudo_mrs_before": "91.68789489802597",
+    "pseudo_mrs_after": "87.87491251872736",
+    "pseudo_delta_mrs": "-3.8129823792986173",
+    "error": ""
+  },
+  "worst_task": {
+    "run_id": "20260602_151510",
+    "task_id": "TASK_SMP_D2536D072BD30E33_warm_vocal",
+    "sample_id": "SMP_D2536D072BD30E33",
+    "input_path": "/home/ubuntu/moodify-o3is/data/night_inputs/vocal_folk.wav",
+    "preset": "warm_vocal",
+    "status": "done",
+    "return_code": "0",
+    "elapsed_seconds": "0.85",
+    "output_dir": "/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_151510/SMP_D2536D072BD30E33/warm_vocal",
+    "template_index": "0",
+    "pseudo_mrs_before": "91.50347490440389",
+    "pseudo_mrs_after": "59.530938800258795",
+    "pseudo_delta_mrs": "-31.972536104145092",
+    "error": ""
+  }
+}

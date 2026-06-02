@@ -1,0 +1,94 @@
+{
+  "input": {
+    "path": "/home/ubuntu/moodify-o3is/test_audio/electronic.wav",
+    "filename": "electronic.wav",
+    "suffix": ".wav",
+    "analyzed_at": "2026-06-02T07:42:16+00:00",
+    "supported": true,
+    "engine": "stdlib_wave",
+    "duration_seconds": 40.0,
+    "sample_rate": 48000,
+    "channels": 2,
+    "sample_width_bytes": 2,
+    "frame_count": 1920000,
+    "rms": 0.08716112731694786,
+    "peak": 0.576263427734375,
+    "crest_factor": 6.611472860359903,
+    "dc_offset": 0.00010491679509480794,
+    "error": null,
+    "pseudo_mrs_v001": 91.68789489802597
+  },
+  "outputs": [
+    {
+      "path": "/home/ubuntu/moodify-o3is/outputs/daily_runs_test/20260602_154052/SMP_16B0C4F0B2F6707D/wide_space/electronic_wide_space.wav",
+      "filename": "electronic_wide_space.wav",
+      "suffix": ".wav",
+      "analyzed_at": "2026-06-02T07:42:16+00:00",
+      "supported": true,
+      "engine": "stdlib_wave",
+      "duration_seconds": 40.0,
+      "sample_rate": 48000,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "frame_count": 1920000,
+      "rms": 0.22760547777117937,
+      "peak": 0.9990234375,
+      "crest_factor": 4.389276775246847,
+      "dc_offset": 0.0006205642302831014,
+      "error": null,
+      "pseudo_mrs_v001": 70.33133348598122
+    }
+  ],
+  "best_output": {
+    "path": "/home/ubuntu/moodify-o3is/outputs/daily_runs_test/20260602_154052/SMP_16B0C4F0B2F6707D/wide_space/electronic_wide_space.wav",
+    "filename": "electronic_wide_space.wav",
+    "suffix": ".wav",
+    "analyzed_at": "2026-06-02T07:42:16+00:00",
+    "supported": true,
+    "engine": "stdlib_wave",
+    "duration_seconds": 40.0,
+    "sample_rate": 48000,
+    "channels": 2,
+    "sample_width_bytes": 2,
+    "frame_count": 1920000,
+    "rms": 0.22760547777117937,
+    "peak": 0.9990234375,
+    "crest_factor": 4.389276775246847,
+    "dc_offset": 0.0006205642302831014,
+    "error": null,
+    "pseudo_mrs_v001": 70.33133348598122
+  },
+  "pseudo_mrs_before": 91.68789489802597,
+  "pseudo_mrs_after": 70.33133348598122,
+  "pseudo_delta_mrs": -21.356561412044755,
+  "mrs_open_v031_before": 1036.9,
+  "mrs_open_v031_after": 1036.1,
+  "delta_mrs_open_v031": -0.8000000000001819,
+  "mrs_open_before_detail": {
+    "mrs_open": 1036.9,
+    "d_real": 0.20661,
+    "subscores": {
+      "spectral_reality": 89.0,
+      "dynamic_reality": 75.8,
+      "texture_reality": 100.0,
+      "spatial_reality": 100.0,
+      "transient_reality": 87.0,
+      "anti_fatigue": 100.0,
+      "balance_reality": 31.3,
+      "plastic_risk": 0.0
+    },
+    "extra_penalties": {
+      "over_dark": 0.1
+    },
+    "penalty_flags": [
+      "over_dark"
+    ],
+    "error": null
+  },
+  "mrs_open_flags": [
+    "over_dark"
+  ],
+  "mrs_open_avail": true,
+  "mrs_open_error": null,
+  "note": "pseudo_mrs_v001 是 Daily Run v0.1 占位指标。mrs_open_v031 是 MRS Open v0.3.1 实验指标。"
+}

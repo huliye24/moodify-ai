@@ -1,0 +1,35 @@
+{
+  "preset": "warm_vocal",
+  "elapsed_s": 3.4,
+  "overall_health": "good",
+  "issues": [],
+  "strengths": [
+    "Healthy crest factor — good balance of impact and body.",
+    "Well-balanced stereo image."
+  ],
+  "suggested_presets": [
+    "clean_master"
+  ],
+  "metrics": {
+    "file_path": "/home/ubuntu/moodify-o3is/data/night_inputs/句点11.mp3",
+    "duration_s": 164.0,
+    "sample_rate": 48000,
+    "channels": 2,
+    "spectrum": {
+      "sub_bass": -11.8,
+      "bass": -3.3,
+      "low_mid": -6.4,
+      "mid": -7.7,
+      "presence": -13.2,
+      "air": -22.2
+    },
+    "dynamics": {
+      "peak_db": -4.2,
+      "crest_factor": 4.33,
+      "dynamic_range_db": 14.7
+    },
+    "stereo": {
+      "correlation_lr": 0.814
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "input": {
+    "path": "/home/ubuntu/moodify-o3is/data/night_inputs/Okay Okay 刚刚好.mp3",
+    "filename": "Okay Okay 刚刚好.mp3",
+    "suffix": ".mp3",
+    "analyzed_at": "2026-06-02T08:54:59+00:00",
+    "supported": false,
+    "engine": "stdlib_wave",
+    "duration_seconds": null,
+    "sample_rate": null,
+    "channels": null,
+    "sample_width_bytes": null,
+    "frame_count": null,
+    "rms": null,
+    "peak": null,
+    "crest_factor": null,
+    "dc_offset": null,
+    "error": "non_wav_file_basic_metrics_only",
+    "pseudo_mrs_v001": null
+  },
+  "outputs": [],
+  "best_output": null,
+  "pseudo_mrs_before": null,
+  "pseudo_mrs_after": null,
+  "pseudo_delta_mrs": null,
+  "mrs_open_v031_before": 1041.1,
+  "mrs_open_v031_after": null,
+  "delta_mrs_open_v031": null,
+  "mrs_open_before_detail": {
+    "mrs_open": 1041.1,
+    "d_real": 0.20006,
+    "subscores": {
+      "spectral_reality": 95.0,
+      "dynamic_reality": 76.3,
+      "texture_reality": 96.8,
+      "spatial_reality": 100.0,
+      "transient_reality": 87.0,
+      "anti_fatigue": 100.0,
+      "balance_reality": 31.4,
+      "plastic_risk": 0.0
+    },
+    "extra_penalties": {
+      "over_dark": 0.1
+    },
+    "penalty_flags": [
+      "over_dark"
+    ],
+    "error": null
+  },
+  "mrs_open_flags": [],
+  "mrs_open_avail": true,
+  "mrs_open_error": null,
+  "note": "pseudo_mrs_v001 是 Daily Run v0.1 占位指标。mrs_open_v031 是 MRS Open v0.3.1 实验指标。"
+}

@@ -1,7 +1,7 @@
 Metadata-Version: 2.4
 Name: moodify
 Version: 0.1.0
-Summary: Moodify Core Engine — AI音乐情绪波场显影器
+Summary: Moodify v0.1.0 — AI 音乐二次处理与情绪声波工程系统
 Author: 文川院 / Moodify 声音实验室
 License: Proprietary — 文川院 / Moodify 声音实验室
 Classifier: Development Status :: 3 - Alpha
@@ -35,6 +35,7 @@ Requires-Dist: python-multipart; extra == "api"
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: httpx>=0.24.0; extra == "dev"
+Requires-Dist: matplotlib>=3.5; extra == "dev"
 Provides-Extra: full
 Requires-Dist: moodify[api,dev,dsp,separation]; extra == "full"
 Dynamic: requires-python

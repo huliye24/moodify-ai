@@ -1,0 +1,94 @@
+{
+  "input": {
+    "path": "/home/ubuntu/moodify-o3is/data/night_inputs/echoes-in-the-neon-labyrinth.mp3",
+    "filename": "echoes-in-the-neon-labyrinth.mp3",
+    "suffix": ".mp3",
+    "analyzed_at": "2026-06-02T08:41:23+00:00",
+    "supported": false,
+    "engine": "stdlib_wave",
+    "duration_seconds": null,
+    "sample_rate": null,
+    "channels": null,
+    "sample_width_bytes": null,
+    "frame_count": null,
+    "rms": null,
+    "peak": null,
+    "crest_factor": null,
+    "dc_offset": null,
+    "error": "non_wav_file_basic_metrics_only",
+    "pseudo_mrs_v001": null
+  },
+  "outputs": [
+    {
+      "path": "/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_A456B86007D2B6AC/wide_space/echoes-in-the-neon-labyrinth_wide_space.wav",
+      "filename": "echoes-in-the-neon-labyrinth_wide_space.wav",
+      "suffix": ".wav",
+      "analyzed_at": "2026-06-02T08:41:23+00:00",
+      "supported": true,
+      "engine": "stdlib_wave",
+      "duration_seconds": 269.51997916666664,
+      "sample_rate": 48000,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "frame_count": 12936959,
+      "rms": 0.32295334035347795,
+      "peak": 0.9990234375,
+      "crest_factor": 3.0933986823190986,
+      "dc_offset": 0.0005973964002526719,
+      "error": null,
+      "pseudo_mrs_v001": 55.037125514718355
+    }
+  ],
+  "best_output": {
+    "path": "/home/ubuntu/moodify-o3is/outputs/daily_runs/20260602_154710/SMP_A456B86007D2B6AC/wide_space/echoes-in-the-neon-labyrinth_wide_space.wav",
+    "filename": "echoes-in-the-neon-labyrinth_wide_space.wav",
+    "suffix": ".wav",
+    "analyzed_at": "2026-06-02T08:41:23+00:00",
+    "supported": true,
+    "engine": "stdlib_wave",
+    "duration_seconds": 269.51997916666664,
+    "sample_rate": 48000,
+    "channels": 2,
+    "sample_width_bytes": 2,
+    "frame_count": 12936959,
+    "rms": 0.32295334035347795,
+    "peak": 0.9990234375,
+    "crest_factor": 3.0933986823190986,
+    "dc_offset": 0.0005973964002526719,
+    "error": null,
+    "pseudo_mrs_v001": 55.037125514718355
+  },
+  "pseudo_mrs_before": null,
+  "pseudo_mrs_after": 55.037125514718355,
+  "pseudo_delta_mrs": null,
+  "mrs_open_v031_before": 1032.0,
+  "mrs_open_v031_after": 1044.4,
+  "delta_mrs_open_v031": 12.400000000000091,
+  "mrs_open_before_detail": {
+    "mrs_open": 1032.0,
+    "d_real": 0.21465,
+    "subscores": {
+      "spectral_reality": 95.0,
+      "dynamic_reality": 75.8,
+      "texture_reality": 95.4,
+      "spatial_reality": 100.0,
+      "transient_reality": 95.0,
+      "anti_fatigue": 100.0,
+      "balance_reality": 29.9,
+      "plastic_risk": 15.0
+    },
+    "extra_penalties": {
+      "over_dark": 0.1
+    },
+    "penalty_flags": [
+      "over_dark"
+    ],
+    "error": null
+  },
+  "mrs_open_flags": [
+    "over_dark"
+  ],
+  "mrs_open_avail": true,
+  "mrs_open_error": null,
+  "note": "pseudo_mrs_v001 是 Daily Run v0.1 占位指标。mrs_open_v031 是 MRS Open v0.3.1 实验指标。"
+}

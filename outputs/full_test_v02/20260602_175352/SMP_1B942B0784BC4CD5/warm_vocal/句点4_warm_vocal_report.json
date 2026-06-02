@@ -1,0 +1,36 @@
+{
+  "preset": "warm_vocal",
+  "elapsed_s": 3.4,
+  "overall_health": "good",
+  "issues": [],
+  "strengths": [
+    "Wide dynamic range — track has natural loudness variation.",
+    "Healthy crest factor — good balance of impact and body.",
+    "Well-balanced stereo image."
+  ],
+  "suggested_presets": [
+    "clean_master"
+  ],
+  "metrics": {
+    "file_path": "/home/ubuntu/moodify-o3is/data/night_inputs/句点4.mp3",
+    "duration_s": 164.8,
+    "sample_rate": 48000,
+    "channels": 2,
+    "spectrum": {
+      "sub_bass": -10.9,
+      "bass": -3.6,
+      "low_mid": -6.9,
+      "mid": -7.1,
+      "presence": -13.3,
+      "air": -16.9
+    },
+    "dynamics": {
+      "peak_db": -2.6,
+      "crest_factor": 4.94,
+      "dynamic_range_db": 21.2
+    },
+    "stereo": {
+      "correlation_lr": 0.826
+    }
+  }
+}

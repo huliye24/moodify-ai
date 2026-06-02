@@ -1,0 +1,94 @@
+{
+  "input": {
+    "path": "/home/ubuntu/moodify-o3is/data/night_inputs/多变的天气.mp3",
+    "filename": "多变的天气.mp3",
+    "suffix": ".mp3",
+    "analyzed_at": "2026-06-02T13:59:10+00:00",
+    "supported": false,
+    "engine": "stdlib_wave",
+    "duration_seconds": null,
+    "sample_rate": null,
+    "channels": null,
+    "sample_width_bytes": null,
+    "frame_count": null,
+    "rms": null,
+    "peak": null,
+    "crest_factor": null,
+    "dc_offset": null,
+    "error": "non_wav_file_basic_metrics_only",
+    "pseudo_mrs_v001": null
+  },
+  "outputs": [
+    {
+      "path": "/home/ubuntu/moodify-o3is/outputs/full_test_v02/20260602_175352/SMP_3BD2C79DE317CA80/warm_vocal/多变的天气_warm_vocal.wav",
+      "filename": "多变的天气_warm_vocal.wav",
+      "suffix": ".wav",
+      "analyzed_at": "2026-06-02T13:59:10+00:00",
+      "supported": true,
+      "engine": "stdlib_wave",
+      "duration_seconds": 100.75997916666667,
+      "sample_rate": 48000,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "frame_count": 4836479,
+      "rms": 0.32782824462755084,
+      "peak": 0.9990234375,
+      "crest_factor": 3.0473989165729183,
+      "dc_offset": -0.001325514064696725,
+      "error": null,
+      "pseudo_mrs_v001": 53.81078303462592
+    }
+  ],
+  "best_output": {
+    "path": "/home/ubuntu/moodify-o3is/outputs/full_test_v02/20260602_175352/SMP_3BD2C79DE317CA80/warm_vocal/多变的天气_warm_vocal.wav",
+    "filename": "多变的天气_warm_vocal.wav",
+    "suffix": ".wav",
+    "analyzed_at": "2026-06-02T13:59:10+00:00",
+    "supported": true,
+    "engine": "stdlib_wave",
+    "duration_seconds": 100.75997916666667,
+    "sample_rate": 48000,
+    "channels": 2,
+    "sample_width_bytes": 2,
+    "frame_count": 4836479,
+    "rms": 0.32782824462755084,
+    "peak": 0.9990234375,
+    "crest_factor": 3.0473989165729183,
+    "dc_offset": -0.001325514064696725,
+    "error": null,
+    "pseudo_mrs_v001": 53.81078303462592
+  },
+  "pseudo_mrs_before": null,
+  "pseudo_mrs_after": 53.81078303462592,
+  "pseudo_delta_mrs": null,
+  "mrs_open_v031_before": 990.7,
+  "mrs_open_v031_after": 1002.8,
+  "delta_mrs_open_v031": 12.099999999999909,
+  "mrs_open_before_detail": {
+    "mrs_open": 990.7,
+    "d_real": 0.29474,
+    "subscores": {
+      "spectral_reality": 85.0,
+      "dynamic_reality": 76.4,
+      "texture_reality": 97.9,
+      "spatial_reality": 100.0,
+      "transient_reality": 87.0,
+      "anti_fatigue": 100.0,
+      "balance_reality": 33.4,
+      "plastic_risk": 0.0
+    },
+    "extra_penalties": {
+      "over_dark": 0.18
+    },
+    "penalty_flags": [
+      "over_dark"
+    ],
+    "error": null
+  },
+  "mrs_open_flags": [
+    "over_dark"
+  ],
+  "mrs_open_avail": true,
+  "mrs_open_error": null,
+  "note": "pseudo_mrs_v001 是 Daily Run v0.1 占位指标。mrs_open_v031 是 MRS Open v0.3.1 实验指标。"
+}

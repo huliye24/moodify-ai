@@ -210,7 +210,7 @@ def quote_cmd(cmd: List[str]) -> str:
 
 
 def render_template_to_argv(template: str, values: Dict[str, Any]) -> List[str]:
-    return shlex.split(template.format(**{k: str(v) for k, v in values.items()}))
+    return shlex.split(template.format(**{k: shlex.quote(str(v)) for k, v in values.items()}))
 
 
 def run_command(
