@@ -1,0 +1,75 @@
+# ===========================================================================
+# Moodify MRS v0.1 — 声音真实度评分权重配置
+#
+# MRS (Moodify Reality Score): 0-100 声音真实度综合评分
+#
+# 公式:
+#   MRS = w1*spectral + w2*dynamic + w3*texture + w4*spatial
+#       + w5*anti_fatigue + w6*balance - w7*plastic_risk
+#
+# 所有子分数归一化到 0-100
+# ===========================================================================
+
+version: "0.1"
+
+# ── 权重 (sum ~1.0) ──────────────────────────────
+weights:
+  spectral_reality: 0.22
+  dynamic_reality: 0.20
+  texture_reality: 0.18
+  spatial_reality: 0.15
+  anti_fatigue: 0.15
+  balance_score: 0.10
+  plastic_risk_penalty: 0.25    # 从总分中减去
+
+# ── 频谱阈值 ──────────────────────────────────────
+spectrum:
+  high_centroid_hz: 4500          # 谱质心高于此值 → 偏亮/偏尖
+  low_centroid_hz: 800            # 谱质心低于此值 → 偏闷
+  ideal_centroid_range: [1200, 3500]
+  harsh_band_low_hz: 2500
+  harsh_band_high_hz: 5000
+  air_band_low_hz: 8000
+  air_band_high_hz: 12000
+  sub_bass_healthy_min_db: -30    # sub 低于此值 → 缺失
+  bass_healthy_min_db: -18        # bass 低于此值 → 薄
+  presence_healthy_max_db: -6     # presence 高于此值 → 刺耳
+
+# ── 动态阈值 ──────────────────────────────────────
+dynamics:
+  crest_ideal_min: 3.0            # crest 太低 → 压扁
+  crest_ideal_max: 8.0            # crest 太高 → 峰值危险
+  dynamic_range_ideal_min_db: 5   # DR 太低 → 平坦
+  dynamic_range_ideal_max_db: 18  # DR 太高 → 不稳定
+  low_lufs: -23                   # 太安静
+  excessive_lufs: -9              # 太响 (疲劳风险)
+
+# ── 质感阈值 ──────────────────────────────────────
+texture:
+  flatness_high: 0.7              # 频谱太平 → 塑料感
+  roughness_high: 0.15            # 粗糙度太高 → 毛刺
+  spike_high: 0.05                # 频谱尖峰太多 → 数字化
+  zcr_low: 0.02                   # ZCR 太低 → 缺乏质感
+  zcr_high: 0.15                  # ZCR 太高 → 噪声化
+
+# ── 空间阈值 ──────────────────────────────────────
+spatial:
+  correlation_ideal_min: 0.3
+  correlation_ideal_max: 0.85
+  side_ratio_high: 2.0            # M/S > 2.0 → 过度拉宽
+  mono_compat_min: 0.4            # 单声道兼容低于此值 → 风险
+
+# ── 塑料感检测阈值 ─────────────────────────────────
+plastic:
+  flatness_trigger: 0.65          # 频谱平度超过此值触发
+  crest_trigger: 2.5              # crest 低于此值触发
+  high_correlation_trigger: 0.9   # 声场过窄触发
+  low_dynamic_trigger_db: 4       # 动态过低触发
+  harsh_ratio_trigger: 0.25       # 刺耳频段占比触发
+
+# ── 评分范围 ──────────────────────────────────────
+scoring:
+  min_score: 0
+  max_score: 100
+  silence_threshold_db: -60       # RMS 低于此值 → 静音检测
+  min_duration_s: 0.5             # 最短有效音频长度

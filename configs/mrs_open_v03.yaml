@@ -1,0 +1,93 @@
+# ===========================================================================
+# Moodify MRS Open Benchmark v0.3.1 — Open Benchmark Configuration
+#
+# MRS_open = 1000 + 300 * log10(D_ref / (D_real + eps))
+#
+# v0.3.1 changes:
+#   - Added over_dark penalty for dark-only sample suppression
+#   - Enhanced HQ damage penalty (lower thresholds, crest collapse detection)
+#   - Relaxed V7 thresholds to -20/-40/-80 tier system
+# ===========================================================================
+
+version: "0.3.1"
+experimental: true
+
+# ── D_real 权重 (sum = 1.0) ─────────────────────────
+weights:
+  spectrum:       0.18    # 频谱真实度
+  dynamic:        0.16    # 动态真实度
+  texture:        0.16    # 质感真实度
+  space:          0.14    # 空间真实度
+  transient:      0.14    # 瞬态真实度
+  anti_fatigue:   0.08    # 抗疲劳度
+  balance:        0.07    # 维度平衡度
+  plastic_risk:   0.07    # 塑性风险
+
+# ── 额外惩罚项配置 ─────────────────────────────────
+penalties:
+  high_quality_damage:
+    enabled: true
+    trigger_d_real_low: 0.25
+    delta_texture: 0.05            # v0.3.1: 从 0.10 降到 0.05
+    delta_transient: 0.05
+    delta_dynamic: 0.05
+    delta_space: 0.05
+    penalty_per_dim: 0.12          # v0.3.1: 从 0.10 升到 0.12
+    max_penalty: 0.60              # v0.3.1: 从 0.30 升到 0.60
+    crest_collapse_trigger: 2.0    # v0.3.1 新增
+    crest_collapse_penalty: 0.15
+
+  loudness_anomaly:
+    enabled: true
+    lufs_upper: -8
+    lufs_lower: -30
+    penalty: 0.15
+
+  extreme_flatness:
+    enabled: true
+    flatness_trigger: 0.80
+    penalty: 0.08
+
+  # v0.3.1 新增
+  over_dark:
+    enabled: true
+    air_band_starvation: 0.005     # air 频段能量低于此值触发
+    air_penalty: 0.08
+    slope_steep_trigger: -9.0      # 频谱斜率陡于此值
+    slope_penalty: 0.10
+    centroid_drop_ratio: 0.25      # 质心相对参考下降超过 25%
+    centroid_drop_penalty: 0.10
+    combined_max_penalty: 0.25
+
+# ── 公式参数 (不变) ─────────────────────────────────
+formula:
+  baseline: 1000
+  scaling_factor: 300
+  eps: 1.0e-12
+
+# ── 校准 (不变) ─────────────────────────────────────
+calibration:
+  method: median
+  target_median_mrs: 1000
+
+# ── 验证阈值 v0.3.1 ───────────────────────────────
+validation:
+  spearman_min: 0.70
+
+  destructive_top20_max: 0.10
+  loudness_only_top20_max: 0.10
+  dark_only_top20_max: 0.10
+
+  improved_ratio_min: 0.50
+  mean_delta_positive: true
+
+  # v0.3.1: V7 改为三级制
+  hq_damage_pass: -20               # PASS: mean drop <= -20
+  hq_damage_strong: -40             # STRONG: mean drop <= -40
+  hq_damage_extreme: -80            # EXTREME: mean drop <= -80
+
+  loudness_only_mean_delta_max: 50
+
+  zero_crash_required: true
+  zero_nan_required: true
+  zero_inf_required: true
