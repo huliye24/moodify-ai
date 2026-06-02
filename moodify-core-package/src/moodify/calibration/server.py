@@ -31,7 +31,8 @@ from moodify.calibration.online import CalibrationState, get_state
 
 app = FastAPI(title="Moodify Calibration Engine", version="1.0")
 
-STORAGE_DIR = os.environ.get("MOODIFY_OUTPUT", "/root/moodify/outputs")
+from moodify.config import OUTPUT_ROOT
+STORAGE_DIR = os.environ.get("MOODIFY_OUTPUT", str(OUTPUT_ROOT))
 HISTORY_PATH = os.path.join(STORAGE_DIR, "d_history.jsonl")
 
 

@@ -6,7 +6,6 @@ Lower D_R means closer to real audio distribution.
 from __future__ import annotations
 
 import math
-from pathlib import Path
 from typing import Optional
 
 import numpy as np
@@ -53,14 +52,7 @@ def _amp_to_db(x: np.ndarray) -> np.ndarray:
 
 # ── Spectrum features ──────────────────────────────────────
 
-BANDS_6 = [
-    ("sub", 20, 60),
-    ("bass", 60, 250),
-    ("low_mid", 250, 500),
-    ("mid", 500, 2000),
-    ("presence", 2000, 5000),
-    ("air", 8000, 16000),
-]
+from moodify.bands import BAND_6_EDGES as BANDS_6
 
 
 def _spectrum_features(mono: np.ndarray, sr: int) -> dict:

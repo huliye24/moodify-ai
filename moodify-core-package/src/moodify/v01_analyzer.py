@@ -72,14 +72,7 @@ def analyze(input_path: str, output_dir: str = "outputs") -> AudioMetrics:
 
 # ── internal helpers ────────────────────────────────────
 
-BAND_EDGES = [
-    ("sub",      20,   60),
-    ("bass",     60,  250),
-    ("low_mid", 250,  500),
-    ("mid",     500, 2000),
-    ("presence",2000, 5000),
-    ("air",    8000, 16000),
-]
+from moodify.bands import BAND_6_EDGES as BAND_EDGES, BAND_6_COLORS as BAND_COLORS
 
 
 def _compute_band_rms(mono: np.ndarray, sr: int) -> dict[str, float]:
@@ -143,13 +136,12 @@ def _save_spectrum_png(metrics: AudioMetrics, output_dir: str) -> None:
     stem = Path(metrics.file_path).stem
     out_path = os.path.join(output_dir, f"{stem}_spectrum.png")
 
-    bands = ["Sub", "Bass", "Low-Mid", "Mid", "Presence", "Air"]
+    from moodify.bands import BAND_6_DISPLAYS; bands = list(BAND_6_DISPLAYS)
     values = [
         metrics.rms_sub, metrics.rms_bass, metrics.rms_low_mid,
         metrics.rms_mid, metrics.rms_presence, metrics.rms_air,
     ]
-    colors = ["#4a0e4e", "#6b2fa0", "#3a7ca5", "#2d9c6b",
-              "#c4a43e", "#d4756b"]
+    colors = list(BAND_COLORS)
 
     fig, ax = plt.subplots(figsize=(10, 5))
     bars = ax.bar(bands, values, color=colors, edgecolor="white", linewidth=0.5)

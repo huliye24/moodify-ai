@@ -7,8 +7,8 @@ import sys
 import os
 import numpy as np
 import soundfile as sf
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ['MOODIFY_OUTPUT'] = '/home/ubuntu/moodify/outputs'
+from moodify.config import PROJECT_ROOT, OUTPUT_ROOT, TEST_AUDIO_DIR
+os.environ['MOODIFY_OUTPUT'] = str(OUTPUT_ROOT)
 
 from moodify.diagnosis.engine import DiagnosisEngine
 from moodify.diagnosis.health_scorer import HealthScorer
@@ -28,9 +28,9 @@ w = WorkflowOrchestrator()
 
 emotions = ['WL', 'GA', 'DR', 'SE', 'HL', 'LW', 'UD', 'CN']
 test_songs = [
-    '/home/ubuntu/moodify/test_audio/piano.wav',
-    '/home/ubuntu/moodify/test_audio/vocal_folk.wav',
-    '/home/ubuntu/moodify/test_audio/electronic.wav',
+    str(TEST_AUDIO_DIR / 'piano.wav'),
+    str(TEST_AUDIO_DIR / 'vocal_folk.wav'),
+    str(TEST_AUDIO_DIR / 'electronic.wav'),
 ]
 
 print('=' * 60)
@@ -43,7 +43,7 @@ piano_ws = engine.diagnose_quick(test_songs[0])
 eds_same = scorer.compute_eds(piano_ws, piano_ws, 'GA')
 print(f'  same audio EDS: {eds_same:.1f} (expect near 0)')
 
-result = w.process(test_songs[0], 'GA', output_dir='/home/ubuntu/moodify/outputs')
+result = w.process(test_songs[0], 'GA', output_dir=str(OUTPUT_ROOT))
 eds_val = result.eds
 v1_pass = abs(eds_val) > 0.1
 print(f'  piano x GA EDS: {eds_val:+.1f}')
@@ -91,7 +91,7 @@ for song_path in test_songs:
     name = os.path.basename(song_path)[:15]
     for emo in ['WL', 'GA', 'DR']:
         try:
-            result = w.process(song_path, emo, output_dir='/home/ubuntu/moodify/outputs')
+            result = w.process(song_path, emo, output_dir=str(OUTPUT_ROOT))
             whs_d = result.whs_after - result.whs_before
             plasticity.append((name, emo, result.eds, whs_d))
             print(f'  {name:15s} x {emo}: EDS={result.eds:+5.1f}  WHS_d={whs_d:+3.0f}')
@@ -100,7 +100,7 @@ for song_path in test_songs:
 
 # ── V4: Proxy-Real Correlation ──
 print('\n[V4] Proxy-Real from calibration data')
-state = CalibrationState.load('/home/ubuntu/moodify/outputs')
+state = CalibrationState.load(str(OUTPUT_ROOT))
 for emo in ['WL', 'GA', 'DR']:
     ec = state.emotions.get(emo)
     if ec and len(ec.proxy_real_pairs) >= 5:

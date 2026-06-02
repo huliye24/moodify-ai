@@ -20,14 +20,7 @@ import numpy as np
 
 from moodify.audio_io import load_audio
 
-BAND_EDGES = [
-    ("sub",      20,   60),
-    ("bass",     60,  250),
-    ("low_mid", 250,  500),
-    ("mid",     500, 2000),
-    ("presence",2000, 5000),
-    ("air",    8000, 16000),
-]
+from moodify.bands import BAND_6_EDGES as BAND_EDGES
 
 DELTA_INTERPRETATIONS = {
     "peak_delta_db":         "负值=峰值降低，正值=峰值提高",

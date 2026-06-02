@@ -87,9 +87,9 @@ def preflight_check() -> dict:
         PROJECT_ROOT / "tests" / "baseline" / "test_audio" / "piano.wav",
         _SRC_DIR.parent / "tests" / "baseline" / "test_audio" / "piano.wav",
         _SRC_DIR / "moodify" / "moodify-core-package" / "tests" / "baseline" / "test_audio" / "piano.wav",
-        Path("/home/ubuntu/phys-lab/test_audio/piano.wav"),
-        Path("/home/ubuntu/moodify/test_audio/piano.wav"),
-        Path("/home/ubuntu/moodify/moodify-core-package/tests/baseline/test_audio/piano.wav"),
+        PROJECT_ROOT / "tests" / "baseline" / "test_audio" / "piano.wav",  # primary via MOODIFY_ROOT
+        Path.home() / "moodify" / "tests" / "baseline" / "test_audio" / "piano.wav",  # fallback
+        Path.home() / "phys-lab" / "test_audio" / "piano.wav",  # legacy fallback
     ]
     audio_paths = [p for p in audio_search if p != Path("") and p != Path(".")]
     audio_found = False
