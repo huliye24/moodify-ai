@@ -11,7 +11,7 @@ go mod tidy
 ### 2. 配置环境变量
 编辑 `.env` 文件，填入你的 DeepSeek API Key：
 ```bash
-DEEPSEEK_API_KEY=sk-your-api-key
+DEEPSEEK_API_KEY=your-deepseek-api-key
 ```
 
 ### 3. 启动服务器

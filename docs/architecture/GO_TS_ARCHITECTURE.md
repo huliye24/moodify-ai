@@ -222,7 +222,7 @@ export const api = {
 DATABASE_URL=postgres://user:password@localhost:5432/moodify
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-secret-key
-DEEPSEEK_API_KEY=sk-xxxxx
+DEEPSEEK_API_KEY=your-deepseek-api-key
 PORT=8080
 ```
 

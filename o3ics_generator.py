@@ -8,8 +8,7 @@ from openai import OpenAI
 
 from character import Character
 
-# DeepSeek API Key
-DEEPSEEK_API_KEY = "sk-40d3ce6ab0f749cf9c3ce1ffb8f8e665"
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 
 # 随机创意因子池 - 用于增加生成多样性，模拟摇色子的随机效果
 RANDOM_CREATIVE_HINTS = [

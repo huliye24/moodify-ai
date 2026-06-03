@@ -78,7 +78,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
               type="password"
               value={localKey}
               onChange={(e) => setLocalKey(e.target.value)}
-              placeholder="sk-xxxxxxxxxxxxxxxx"
+              placeholder="Paste your DeepSeek API key"
               className="input-field"
             />
             <p style={{ fontSize: '0.75rem', color: T.tertiary, marginTop: '0.25rem' }}>
