@@ -12,6 +12,11 @@ from pathlib import Path
 import numpy as np
 
 from moodify.audio_io import load_audio
+from moodify.bands import (
+    BAND_6_COLORS as BAND_COLORS,
+    BAND_6_DISPLAYS as BAND_DISPLAYS,
+    BAND_6_EDGES as BAND_EDGES,
+)
 from moodify.v01_types import AudioMetrics
 
 
@@ -71,9 +76,6 @@ def analyze(input_path: str, output_dir: str = "outputs") -> AudioMetrics:
 
 
 # ── internal helpers ────────────────────────────────────
-
-from moodify.bands import BAND_6_EDGES as BAND_EDGES, BAND_6_COLORS as BAND_COLORS
-
 
 def _compute_band_rms(mono: np.ndarray, sr: int) -> dict[str, float]:
     """Compute RMS energy per frequency band via FFT."""
@@ -136,7 +138,7 @@ def _save_spectrum_png(metrics: AudioMetrics, output_dir: str) -> None:
     stem = Path(metrics.file_path).stem
     out_path = os.path.join(output_dir, f"{stem}_spectrum.png")
 
-    from moodify.bands import BAND_6_DISPLAYS; bands = list(BAND_6_DISPLAYS)
+    bands = list(BAND_DISPLAYS)
     values = [
         metrics.rms_sub, metrics.rms_bass, metrics.rms_low_mid,
         metrics.rms_mid, metrics.rms_presence, metrics.rms_air,

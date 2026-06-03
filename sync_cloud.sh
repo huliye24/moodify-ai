@@ -6,9 +6,9 @@
 # ============================================================
 set -e
 
-CLOUD_HOST="ubuntu@139.199.186.106"
-CLOUD_MOODIFY="/home/ubuntu/moodify"
-CLOUD_PHYS="/home/ubuntu/phys-lab"
+CLOUD_HOST="${MOODIFY_CLOUD_HOST:-ubuntu@43.156.175.4}"
+CLOUD_MOODIFY="${MOODIFY_CLOUD_DIR:-/home/ubuntu/moodify-mainline}"
+CLOUD_PHYS="${MOODIFY_CLOUD_PHYS_DIR:-/home/ubuntu/phys-lab}"
 LOCAL_ROOT="$(cd "$(dirname "$0")" && pwd)"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 SYNC_DIR="$LOCAL_ROOT/outputs/sync_$TIMESTAMP"
