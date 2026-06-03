@@ -5,7 +5,7 @@ setup(
     version="0.1.0",
     description="Moodify Core Engine — AI音乐情绪波场显影器",
     author="文川院 / Moodify 声音实验室",
-    license="Proprietary",
+    license="Apache-2.0",
     python_requires=">=3.10",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
