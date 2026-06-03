@@ -39,7 +39,7 @@ from moodify.reality_metrics import (
     EPS,
 )
 
-DEFAULT_CFG = str(_PROJECT_ROOT / "runs" / "mrs_formula_validation_v02" / "configs" / "mrs_formula_v02.yaml")
+DEFAULT_CFG = str(_PROJECT_ROOT / "configs" / "mrs_formula_v02.yaml")
 
 
 def _load_cfg(path: Optional[str] = None) -> dict:
@@ -51,6 +51,30 @@ def _load_cfg(path: Optional[str] = None) -> dict:
 
 
 # ═══════════════════════════════════════════════════════════════
+def _analysis_max_seconds() -> Optional[float]:
+    cfg = _load_cfg()
+    runtime = cfg.get("runtime", {})
+    value = runtime.get("analysis_max_seconds")
+    if value is None:
+        value = cfg.get("analysis", {}).get("max_seconds")
+    try:
+        seconds = float(value)
+    except (TypeError, ValueError):
+        return None
+    return seconds if seconds > 0 else None
+
+
+def _limit_analysis_window(mono: np.ndarray, stereo: np.ndarray, sr: int) -> tuple[np.ndarray, np.ndarray, float, float]:
+    original_duration = len(mono) / sr if sr else 0.0
+    max_seconds = _analysis_max_seconds()
+    if not max_seconds or not sr:
+        return mono, stereo, original_duration, original_duration
+    max_samples = int(max_seconds * sr)
+    if max_samples <= 0 or len(mono) <= max_samples:
+        return mono, stereo, original_duration, original_duration
+    return mono[:max_samples], stereo[:, :max_samples], original_duration, max_seconds
+
+
 # Extra feature extractors
 # ═══════════════════════════════════════════════════════════════
 
@@ -116,6 +140,7 @@ def _short_time_energy_variance(mono: np.ndarray, sr: int) -> float:
 
 def _extract_all_features(audio_path: str) -> dict:
     mono, stereo, sr = _load_mono_stereo(audio_path)
+    mono, stereo, original_duration, analysis_duration = _limit_analysis_window(mono, stereo, sr)
     spec = _spectrum_features(mono, sr)
     dyn = _dynamic_features(mono, sr)
     trans = _transient_features(mono, sr)
@@ -124,12 +149,12 @@ def _extract_all_features(audio_path: str) -> dict:
     return {
         "spectrum": spec, "dynamic": dyn, "transient": trans,
         "space": space, "texture": tex,
-        "sample_rate": sr, "duration_s": len(mono) / sr,
+        "sample_rate": sr, "duration_s": original_duration,
+        "analysis_duration_s": analysis_duration,
         "_mono": mono, "path": audio_path,
     }
 
 
-# ═══════════════════════════════════════════════════════════════
 # MRS_abs: Absolute Reality Score
 # ═══════════════════════════════════════════════════════════════
 

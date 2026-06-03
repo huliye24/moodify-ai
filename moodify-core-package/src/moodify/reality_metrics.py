@@ -181,16 +181,17 @@ def _texture_features(mono: np.ndarray, sr: int) -> dict:
     n = len(mono)
     fft = np.abs(np.fft.rfft(mono * np.hanning(n)))
 
-    # Spectral roughness proxy: mean local variance of spectrum
+    # Spectral roughness proxy: vectorized local variance of spectrum.
     if len(fft) > 10:
-        local_var = np.zeros(len(fft) - 4)
-        for i in range(len(local_var)):
-            local_var[i] = float(np.var(fft[i:i + 5]))
+        kernel5 = np.ones(5, dtype=np.float64) / 5.0
+        local_mean = np.convolve(fft, kernel5, mode="valid")
+        local_sq_mean = np.convolve(fft ** 2, kernel5, mode="valid")
+        local_var = np.maximum(local_sq_mean - local_mean ** 2, 0.0)
         roughness = float(np.mean(local_var) / (np.mean(fft ** 2) + EPS))
     else:
         roughness = 0.0
 
-    # High frequency smoothness: energy rolloff in highest octave
+    # High frequency smoothness: energy rolloff in highest octave.
     freqs = np.fft.rfftfreq(n, 1.0 / sr)
     hf_mask = freqs > sr / 4
     if np.sum(hf_mask) > 10:
@@ -200,13 +201,12 @@ def _texture_features(mono: np.ndarray, sr: int) -> dict:
     else:
         hf_smoothness = 0.5
 
-    # Spectral spike score: count narrow peaks in spectrum
+    # Spectral spike score: vectorized count of narrow peaks in spectrum.
     if len(fft) > 20:
-        spike_count = 0
-        for i in range(5, len(fft) - 5):
-            local_env = np.mean(fft[i - 5:i + 6])
-            if local_env > EPS and fft[i] > 3.0 * local_env:
-                spike_count += 1
+        kernel11 = np.ones(11, dtype=np.float64) / 11.0
+        local_env = np.convolve(fft, kernel11, mode="valid")
+        center = fft[5:-5]
+        spike_count = int(np.count_nonzero((local_env > EPS) & (center > 3.0 * local_env)))
         spike_score = float(spike_count / max(1, len(fft)))
     else:
         spike_score = 0.0

@@ -26,3 +26,18 @@ cat runs/mrs_validation/*summary*.txt
 ```bash
 python3 scripts/generate_mrs_report.py --input runs/mrs_validation/ --output reports/mrs_validation_summary.md
 ```
+
+
+## MT-002 real AI baseline
+
+```bash
+cd /home/ubuntu/moodify-mainline
+.venv/bin/python scripts/mt002_mrs_score_manifest.py \
+  --manifest outputs/mt001_gate3_real_ai/mt001_gate3_real_ai_20260603/manifest.csv \
+  --run-id mt002_mrs_baseline_gate3_20260603 \
+  --output-dir reports/mt002_mrs_baseline \
+  --expected-records 90 \
+  --require-complete
+```
+
+Expected tracked evidence: `docs/cloud/MT002_MRS_BASELINE_EVIDENCE.md`.

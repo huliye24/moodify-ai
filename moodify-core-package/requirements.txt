@@ -20,3 +20,6 @@ pedalboard>=0.9.0,<1.0.0
 fastapi>=0.100.0,<1.0.0
 uvicorn>=0.20.0,<1.0.0
 python-multipart>=0.0.5,<1.0.0
+
+# Config parsing for MRS engines
+PyYAML>=6.0,<7.0

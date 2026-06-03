@@ -1,0 +1,55 @@
+# ==============================================================================
+# Moodify MRS v0.2 Formula Validation — Experiment Config
+# ==============================================================================
+version: "0.2"
+
+# ── 核心公式 ───────────────────────────────────────────
+#   MRS_final = α * MRS_after + β * ΔMRS - γ * OPR - η * LoudnessPenalty
+# ────────────────────────────────────────────────────────
+formula:
+  alpha: 0.55       # 处理后的绝对真实度权重
+  beta: 0.30        # 改善幅度的奖励
+  gamma: 0.25       # 过度处理风险惩罚
+  eta: 0.15         # 响度异常惩罚
+
+score_range:
+  min: 0
+  max: 100
+
+# ── 实验通过阈值 ─────────────────────────────────────
+acceptance:
+  synthetic_control_accuracy_min: 0.75
+  human_rank_spearman_min: 0.60
+  synthetic_weak_label_spearman_min: 0.70
+  overprocessing_detection_min: 0.70
+  loudness_false_positive_max: 0.20
+  stable_under_repeated_runs: true
+
+# ── 过度处理风险阈值 ────────────────────────────────
+thresholds:
+  max_safe_lufs_increase: 2.0        # LUFS 增加超过此值触发惩罚
+  peak_risk_dbfs: -1.0               # 峰值接近 0dBFS 触发风险
+  over_bright_centroid_hz: 4500      # 谱质心高于此值 → 过亮
+  over_dark_centroid_hz: 1200        # 谱质心低于此值 → 过暗
+  harsh_band_low_hz: 2500
+  harsh_band_high_hz: 5000
+  air_band_low_hz: 8000
+  air_band_high_hz: 12000
+  min_safe_crest_factor_db: 8        # crest factor 低于此值 → 动态损伤
+  max_safe_stereo_width: 1.25        # stereo width 高于此值 → 相位风险
+  max_spectral_centroid_shift_hz: 800   # 谱质心偏移超过此值 → 频谱偏移风险
+  max_crest_factor_drop: 2.0            # crest factor 下降超过此值 → 动态损伤
+  max_correlation_drop: 0.3             # 相关性下降超过此值 → 相位风险
+
+# ── 人工标注评分范围 ────────────────────────────────
+human_labels:
+  realness: [1, 5]       # 1 = very fake, 5 = very real
+  warmth: [1, 5]         # 1 = cold/thin, 5 = warm/natural
+  fatigue: [1, 5]        # 1 = no fatigue, 5 = extreme fatigue
+  plastic: [1, 5]        # 1 = natural, 5 = extreme plastic
+  overprocessed: [1, 5]  # 1 = clean, 5 = destroyed
+
+# Runtime scoring guardrails
+runtime:
+  analysis_max_seconds: 60
+
