@@ -59,6 +59,22 @@ MT-001_Runtime_NEM_Package 完成，并可放入 docs/nem/
 
 ---
 
+
+### Evidence (2026-06-03 UTC)
+
+```text
+command: bash scripts/mt001_smoke_run.sh configs/mt001_runtime_smoke.json mt001_gate1_20260603
+log: logs/mt001_gate1_20260603.log
+summary: outputs/mt001_smoke/mt001_gate1_20260603/summary.json
+manifest: outputs/mt001_smoke/mt001_gate1_20260603/manifest.csv
+report: reports/mt001_smoke/daily_report_mt001_gate1_20260603.md
+selected: 9
+success: 9
+failed: 0
+manifest_rows: 9
+status: PASS
+```
+
 ## Gate 2｜无人值守运行
 
 ### 要求
@@ -80,6 +96,25 @@ MT-001_Runtime_NEM_Package 完成，并可放入 docs/nem/
 待验证。
 
 ---
+
+
+### Evidence (2026-06-03 UTC)
+
+```text
+launcher: detached tmux session
+session: mt001-gate2
+command: tmux new-session -d -s mt001-gate2 -c /home/ubuntu/moodify-mainline "bash scripts/mt001_smoke_run.sh configs/mt001_runtime_smoke.json mt001_gate2_unattended_20260603"
+session_result: exited automatically
+log: logs/mt001_gate2_unattended_20260603.log
+summary: outputs/mt001_smoke/mt001_gate2_unattended_20260603/summary.json
+manifest: outputs/mt001_smoke/mt001_gate2_unattended_20260603/manifest.csv
+report: reports/mt001_smoke/daily_report_mt001_gate2_unattended_20260603.md
+selected: 9
+success: 9
+failed: 0
+manifest_rows: 9
+status: PASS
+```
 
 ## Gate 3｜真实样本运行
 
@@ -143,21 +178,3 @@ MT-001 状态从 ACTIVE 升级为 ADOPT
 未完成。
 
 
-## Gate 1 Evidence Addendum
-
-### ??
-
-```text
-?????bash scripts/mt001_smoke_run.sh configs/mt001_runtime_smoke.json mt001_gate1_20260603
-?????logs/mt001_gate1_20260603.log
-?????outputs/mt001_smoke/mt001_gate1_20260603
-?????reports/mt001_smoke/daily_report_mt001_gate1_20260603.md
-Manifest?outputs/mt001_smoke/mt001_gate1_20260603/manifest.csv
-?????selected=9 success=9 failed=0
-?????0
-?????2026-06-03 UTC
-```
-
-### ????
-
-???

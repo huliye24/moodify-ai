@@ -82,3 +82,4 @@ bash scripts/mt001_smoke_run.sh
 Expected gate result: 3 baseline audio files x 3 presets = 9 successful tasks, followed by report, craft memory, failure analysis, and next-plan output.
 
 MT-001 Gate 1 evidence: `docs/cloud/MT001_GATE1_EVIDENCE.md`
+MT-001 Gate 2 evidence: `docs/cloud/MT001_GATE2_EVIDENCE.md`
