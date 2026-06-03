@@ -24,6 +24,13 @@ def _to_float(x: Any) -> Optional[float]:
         return None
 
 
+def _fmt_float(x: Any, digits: int = 1) -> str:
+    value = _to_float(x)
+    if value is None:
+        return "-"
+    return f"{value:.{digits}f}"
+
+
 def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> Dict[str, Any]:
     cfg = cfg.resolved()
     if run_id is None:
@@ -115,8 +122,8 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
             flags = (r.get("mrs_open_flags") or "-")[:30]
             md_lines.append(
                 f"| {i} | {r.get('sample_id')} | {r.get('preset')} | "
-                f"{_to_float(r.get('mrs_open_v031_after')):.1f} | "
-                f"{_to_float(r.get('pseudo_mrs_after')):.1f} | "
+                f"{_fmt_float(r.get('mrs_open_v031_after'))} | "
+                f"{_fmt_float(r.get('pseudo_mrs_after'))} | "
                 f"{flags} |"
             )
         md_lines += [""]
@@ -136,9 +143,9 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
         for i, r in enumerate(mrs_open_delta_top, 1):
             md_lines.append(
                 f"| {i} | {r.get('sample_id')} | {r.get('preset')} | "
-                f"{_to_float(r.get('delta_mrs_open_v031')):.1f} | "
-                f"{_to_float(r.get('pseudo_delta_mrs')):.1f} | "
-                f"{_to_float(r.get('mrs_open_v031_before')):.0f} → {_to_float(r.get('mrs_open_v031_after')):.0f} |"
+                f"{_fmt_float(r.get('delta_mrs_open_v031'))} | "
+                f"{_fmt_float(r.get('pseudo_delta_mrs'))} | "
+                f"{_fmt_float(r.get('mrs_open_v031_before'), 0)} → {_fmt_float(r.get('mrs_open_v031_after'), 0)} |"
             )
         md_lines += [""]
     else:
@@ -158,8 +165,8 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
             flags = (r.get("mrs_open_flags") or "-")[:40]
             md_lines.append(
                 f"| {i} | {r.get('sample_id')} | {r.get('preset')} | "
-                f"{_to_float(r.get('mrs_open_v031_after')):.1f} | "
-                f"{_to_float(r.get('pseudo_mrs_after')):.1f} | "
+                f"{_fmt_float(r.get('mrs_open_v031_after'))} | "
+                f"{_fmt_float(r.get('pseudo_mrs_after'))} | "
                 f"{flags} |"
             )
         md_lines += [""]
@@ -185,7 +192,6 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
         "## 6. 最佳提升任务 (pseudo)",
         "",
     ]
-
     if best:
         md_lines += [
             f"- task_id：`{best.get('task_id')}`",
