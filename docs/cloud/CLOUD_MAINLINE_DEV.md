@@ -86,3 +86,4 @@ MT-001 Gate 2 evidence: `docs/cloud/MT001_GATE2_EVIDENCE.md`
 MT-001 Gate 3 evidence: `docs/cloud/MT001_GATE3_EVIDENCE.md`
 
 MT-002 MRS baseline evidence: `docs/cloud/MT002_MRS_BASELINE_EVIDENCE.md`
+MT-002 Gate 2 validation matrix evidence: `docs/cloud/MT002_GATE2_VALIDATION_MATRIX_EVIDENCE.md`

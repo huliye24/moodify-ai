@@ -45,3 +45,14 @@
 - 不要改动无关节点。
 - 如果需要修改评分标准，必须写入 Decision Log。
 - 如果验证失败，标记为 HOLD，不要强行 ADOPT。
+
+
+## 2026-06-03 Cloud Run
+
+- Validation run: `mt002_validation_matrix_gate2_20260603`
+- Tests runnable: `9`
+- Result: `7 PASS / 2 HOLD / 0 FAIL`
+- Decision: `EXPERIMENTAL`
+- Evidence: `docs/cloud/MT002_GATE2_VALIDATION_MATRIX_EVIDENCE.md`
+
+Open HOLDs are tracked in `backlog/MT-002_Backlog.md` and prevent Gate 5 adoption until resolved.

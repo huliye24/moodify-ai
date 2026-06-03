@@ -7,3 +7,13 @@
 - Status：ACTIVE。
 
 ---
+
+
+## 2026-06-03?Gate 2 validation matrix executable
+
+- Decision: keep `mrs_open_v031` as `EXPERIMENTAL` rather than ADOPT.
+- Reason: Gate 2 produced `7 PASS / 2 HOLD / 0 FAIL` across `9` runnable checks. The matrix is executable, but v0.2/v0.3.1 correlation and loudness-cheat resistance need dedicated controls.
+- Evidence: `docs/cloud/MT002_GATE2_VALIDATION_MATRIX_EVIDENCE.md`.
+- Status: ACTIVE.
+
+---

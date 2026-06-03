@@ -11,3 +11,9 @@
 - 研究 vocal-specific MRS。
 - 研究 mastering-damage MRS。
 - 建立 MRS 历史版本对比表。
+
+
+## Gate 2 HOLD follow-up - 2026-06-03
+
+- Build dedicated v0.2/v0.3.1 comparison set; current pseudo score Spearman is `-0.0898` and cannot validate MRS Open ranking.
+- Build loudness-cheat positive controls so `loudness_cheat_resistance` can move from HOLD to PASS.

@@ -6,8 +6,8 @@
 - 优先级：P0
 - 计划周期：2026.06 - 2026.07
 - 前置依赖：MT-001 Runtime 可稳定产生数据
-- 当前 Gate：Gate 1｜MRS 单位定义
-- 当前完成度：节点建档完成，工程执行待启动
+- Current Gate: Gate 5 | ADOPT decision prep
+- Current progress: Gate 2 matrix executable; Gate 3/4 real baseline complete; MRS version remains EXPERIMENTAL
 
 ## 节点目标
 
@@ -30,3 +30,5 @@
 ## 最近更新
 
 2026-06-02：创建 MT-002 NEM 节点容器。
+
+2026-06-03: Gate 2 validation matrix completed with `7 PASS / 2 HOLD / 0 FAIL`; Gate 5 adoption remains blocked by HOLD items.

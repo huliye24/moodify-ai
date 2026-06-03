@@ -41,3 +41,18 @@ cd /home/ubuntu/moodify-mainline
 ```
 
 Expected tracked evidence: `docs/cloud/MT002_MRS_BASELINE_EVIDENCE.md`.
+
+
+## MT-002 Gate 2 validation matrix
+
+```bash
+cd /home/ubuntu/moodify-mainline
+.venv/bin/python scripts/mt002_validate_mrs_matrix.py \
+  --records reports/mt002_mrs_baseline/mt002_mrs_baseline_gate3_20260603/mrs_score_records.jsonl \
+  --manifest outputs/mt001_gate3_real_ai/mt001_gate3_real_ai_20260603/manifest.csv \
+  --run-id mt002_validation_matrix_gate2_20260603 \
+  --output-dir reports/mt002_mrs_validation \
+  --min-runnable-tests 8
+```
+
+Expected tracked evidence: `docs/cloud/MT002_GATE2_VALIDATION_MATRIX_EVIDENCE.md`.
