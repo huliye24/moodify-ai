@@ -27,11 +27,11 @@ from pydantic import BaseModel
 import uvicorn
 
 from moodify.calibration.online import CalibrationState, get_state
+from moodify.config import OUTPUT_ROOT
 
 
 app = FastAPI(title="Moodify Calibration Engine", version="1.0")
 
-from moodify.config import OUTPUT_ROOT
 STORAGE_DIR = os.environ.get("MOODIFY_OUTPUT", str(OUTPUT_ROOT))
 HISTORY_PATH = os.path.join(STORAGE_DIR, "d_history.jsonl")
 

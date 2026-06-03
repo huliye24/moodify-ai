@@ -7,13 +7,13 @@
 #
 # 前提:
 #   1. 腾讯云服务器已开机
-#   2. SSH 可达: ssh ubuntu@139.199.186.106
+#   2. SSH 可达: ssh ubuntu@43.156.175.4
 #   3. 服务器上已有 moodify-o3is 项目
 # ===========================================================================
 set -e
 
-CLOUD_HOST="ubuntu@139.199.186.106"
-CLOUD_PROJECT="/home/ubuntu/moodify-o3is"
+CLOUD_HOST="${MOODIFY_CLOUD_HOST:-ubuntu@43.156.175.4}"
+CLOUD_PROJECT="${MOODIFY_CLOUD_DIR:-/home/ubuntu/moodify-mainline}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 

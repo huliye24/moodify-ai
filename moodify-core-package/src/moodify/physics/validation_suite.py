@@ -3,11 +3,10 @@
 Validates: EDS fix, M Factor per emotion, plasticity, WHS/EDS correlation.
 Usage: python validation_suite.py
 """
-import sys
 import os
 import numpy as np
 import soundfile as sf
-from moodify.config import PROJECT_ROOT, OUTPUT_ROOT, TEST_AUDIO_DIR
+from moodify.config import OUTPUT_ROOT, TEST_AUDIO_DIR
 os.environ['MOODIFY_OUTPUT'] = str(OUTPUT_ROOT)
 
 from moodify.diagnosis.engine import DiagnosisEngine

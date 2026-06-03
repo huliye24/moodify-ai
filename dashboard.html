@@ -95,12 +95,12 @@ footer { text-align: center; padding: 24px; font-size: 12px; color: #484f58; bor
   </div>
 
   <footer>
-    Moodify 云端实验控制面板 · 自动刷新 · 数据来源: 腾讯云 139.199.186.106
+    Moodify 云端实验控制面板 · 自动刷新 · 数据来源: 腾讯云 43.156.175.4
   </footer>
 </div>
 
 <script>
-const CLOUD = 'http://139.199.186.106:8000';
+const CLOUD = window.MOODIFY_CLOUD_URL || 'http://43.156.175.4:8000';
 
 let refreshSec = 30;
 function setRefresh() {
