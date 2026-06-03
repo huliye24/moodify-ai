@@ -123,3 +123,20 @@ register -> plan -> run -> report -> craft -> failures -> next
 ```text
 selected=9 success=9 failed=0
 ```
+
+---
+
+## 13. Gate 3 Real AI Music Batch
+
+Run 30 uploaded AI music files through the same runtime path:
+
+```bash
+cd /home/ubuntu/moodify-mainline
+bash scripts/mt001_gate3_real_run.sh configs/mt001_gate3_real_ai_30.json mt001_gate3_real_ai_20260603
+```
+
+Expected result:
+
+```text
+unique_samples=30 selected=90 success=90 failed=0
+```

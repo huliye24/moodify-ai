@@ -137,6 +137,29 @@ status: PASS
 
 ---
 
+
+### Evidence (2026-06-03 UTC)
+
+```text
+launcher: detached tmux session
+session: mt001-gate3
+source_dir: /home/ubuntu/moodify-o3is/data/night_inputs
+input_link: data/mt001_real_inputs
+config: configs/mt001_gate3_real_ai_30.json
+command: bash scripts/mt001_gate3_real_run.sh configs/mt001_gate3_real_ai_30.json mt001_gate3_real_ai_20260603
+session_result: exited automatically
+log: logs/mt001_gate3_real_ai_20260603.log
+summary: outputs/mt001_gate3_real_ai/mt001_gate3_real_ai_20260603/summary.json
+manifest: outputs/mt001_gate3_real_ai/mt001_gate3_real_ai_20260603/manifest.csv
+report: reports/mt001_gate3_real_ai/daily_report_mt001_gate3_real_ai_20260603.md
+unique_samples: 30
+selected: 90
+success: 90
+failed: 0
+manifest_rows: 90
+status: PASS
+```
+
 ## Gate 4｜长时稳定运行
 
 ### 要求

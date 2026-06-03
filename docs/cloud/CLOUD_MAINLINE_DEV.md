@@ -83,3 +83,4 @@ Expected gate result: 3 baseline audio files x 3 presets = 9 successful tasks, f
 
 MT-001 Gate 1 evidence: `docs/cloud/MT001_GATE1_EVIDENCE.md`
 MT-001 Gate 2 evidence: `docs/cloud/MT001_GATE2_EVIDENCE.md`
+MT-001 Gate 3 evidence: `docs/cloud/MT001_GATE3_EVIDENCE.md`
