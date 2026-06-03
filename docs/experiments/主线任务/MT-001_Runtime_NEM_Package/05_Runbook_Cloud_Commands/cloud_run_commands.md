@@ -100,3 +100,26 @@ Claude 不监视；
 跑完停止；
 跑完出结果。
 ```
+
+---
+
+## 12. ????? Gate 1/2 Smoke Run
+
+??????? worktree ????
+
+```bash
+cd /home/ubuntu/moodify-mainline
+bash scripts/mt001_smoke_run.sh
+```
+
+?????? `configs/mt001_runtime_smoke.json`??????? baseline audio ?????
+
+```text
+register -> plan -> run -> report -> craft -> failures -> next
+```
+
+?????
+
+```text
+selected=9 success=9 failed=0
+```

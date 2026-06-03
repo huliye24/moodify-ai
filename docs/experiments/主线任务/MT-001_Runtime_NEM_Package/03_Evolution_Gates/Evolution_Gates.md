@@ -141,3 +141,23 @@ MT-001 状态从 ACTIVE 升级为 ADOPT
 ### 当前状态
 
 未完成。
+
+
+## Gate 1 Evidence Addendum
+
+### ??
+
+```text
+?????bash scripts/mt001_smoke_run.sh configs/mt001_runtime_smoke.json mt001_gate1_20260603
+?????logs/mt001_gate1_20260603.log
+?????outputs/mt001_smoke/mt001_gate1_20260603
+?????reports/mt001_smoke/daily_report_mt001_gate1_20260603.md
+Manifest?outputs/mt001_smoke/mt001_gate1_20260603/manifest.csv
+?????selected=9 success=9 failed=0
+?????0
+?????2026-06-03 UTC
+```
+
+### ????
+
+???

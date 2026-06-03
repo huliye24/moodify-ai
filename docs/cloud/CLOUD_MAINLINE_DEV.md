@@ -69,3 +69,16 @@ cd /home/ubuntu/moodify-mainline
 .venv/bin/python -m pytest moodify-core-package/tests -q
 .venv/bin/ruff check moodify-core-package/src/moodify moodify_runtime
 ```
+
+## MT-001 Runtime Smoke
+
+Run the first mainline gate from the clean worktree:
+
+```bash
+cd /home/ubuntu/moodify-mainline
+bash scripts/mt001_smoke_run.sh
+```
+
+Expected gate result: 3 baseline audio files x 3 presets = 9 successful tasks, followed by report, craft memory, failure analysis, and next-plan output.
+
+MT-001 Gate 1 evidence: `docs/cloud/MT001_GATE1_EVIDENCE.md`

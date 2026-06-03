@@ -78,3 +78,8 @@ id_*
 *.key
 # Test/runtime temporary reports
 outputs/tmp*_report.json
+
+# MT-001 local runtime evidence
+data/moodify_runtime_mt001/
+outputs/mt001_smoke/
+reports/mt001_smoke/
