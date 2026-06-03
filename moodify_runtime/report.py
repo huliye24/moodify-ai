@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import csv
 from pathlib import Path
@@ -22,6 +22,13 @@ def _to_float(x: Any) -> Optional[float]:
         return float(x)
     except Exception:
         return None
+
+
+def _fmt_float(x: Any, digits: int = 1) -> str:
+    value = _to_float(x)
+    if value is None:
+        return "-"
+    return f"{value:.{digits}f}"
 
 
 def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> Dict[str, Any]:
@@ -48,7 +55,7 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
         best = max(rows, key=lambda r: _to_float(r.get("pseudo_delta_mrs")) if _to_float(r.get("pseudo_delta_mrs")) is not None else -1e9)
         worst = min(rows, key=lambda r: _to_float(r.get("pseudo_delta_mrs")) if _to_float(r.get("pseudo_delta_mrs")) is not None else 1e9)
 
-    # ── MRS Open v0.3.1 ranking ─────────────────────────
+    # 鈹€鈹€ MRS Open v0.3.1 ranking 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
     mrs_open_scored = [
         r for r in rows
         if _to_float(r.get("mrs_open_v031_after")) is not None
@@ -86,23 +93,23 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
     }
 
     md_lines = [
-        f"# Moodify Daily Run Report — {run_id}",
+        f"# Moodify Daily Run Report 鈥?{run_id}",
         "",
-        f"生成时间：{report['generated_at']}",
+        f"鐢熸垚鏃堕棿锛歿report['generated_at']}",
         "",
-        "## 1. 今日运行总览",
+        "## 1. 浠婃棩杩愯鎬昏",
         "",
-        f"- 总任务数：{len(rows)}",
-        f"- 成功任务：{len(success)}",
-        f"- 失败任务：{len(failed)}",
-        f"- 平均 pseudo ΔMRS：{avg_delta:.4f}" if avg_delta is not None else "- 平均 pseudo ΔMRS：暂无",
-        f"- MRS Open v0.3.1 可用：{len(mrs_open_scored)} 样本" if mrs_open_scored else "- MRS Open v0.3.1：不可用",
+        f"- 鎬讳换鍔℃暟锛歿len(rows)}",
+        f"- 鎴愬姛浠诲姟锛歿len(success)}",
+        f"- 澶辫触浠诲姟锛歿len(failed)}",
+        f"- 骞冲潎 pseudo 螖MRS锛歿avg_delta:.4f}" if avg_delta is not None else "- 骞冲潎 pseudo 螖MRS锛氭殏鏃?,
+        f"- MRS Open v0.3.1 鍙敤锛歿len(mrs_open_scored)} 鏍锋湰" if mrs_open_scored else "- MRS Open v0.3.1锛氫笉鍙敤",
         "",
-        "说明：",
-        "- `pseudo_mrs_v001` 是 Daily Run v0.1 的占位工程指标。",
-        "- `mrs_open_v031` 是 MRS Open v0.3.1 实验指标（开放式跑分，不设上限）。",
+        "璇存槑锛?,
+        "- `pseudo_mrs_v001` 鏄?Daily Run v0.1 鐨勫崰浣嶅伐绋嬫寚鏍囥€?,
+        "- `mrs_open_v031` 鏄?MRS Open v0.3.1 瀹為獙鎸囨爣锛堝紑鏀惧紡璺戝垎锛屼笉璁句笂闄愶級銆?,
         "",
-        "## 2. MRS Open v0.3.1 — Top 10 真实度最高",
+        "## 2. MRS Open v0.3.1 鈥?Top 10 鐪熷疄搴︽渶楂?,
         "",
     ]
 
@@ -115,37 +122,37 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
             flags = (r.get("mrs_open_flags") or "-")[:30]
             md_lines.append(
                 f"| {i} | {r.get('sample_id')} | {r.get('preset')} | "
-                f"{_to_float(r.get('mrs_open_v031_after')):.1f} | "
-                f"{_to_float(r.get('pseudo_mrs_after')):.1f} | "
+                f"{_fmt_float(r.get('mrs_open_v031_after'))} | "
+                f"{_fmt_float(r.get('pseudo_mrs_after'))} | "
                 f"{flags} |"
             )
         md_lines += [""]
     else:
-        md_lines += ["MRS Open v0.3.1 不可用，跳过。", ""]
+        md_lines += ["MRS Open v0.3.1 涓嶅彲鐢紝璺宠繃銆?, ""]
 
     md_lines += [
-        "## 3. MRS Open v0.3.1 — Top 10 提升最大 (ΔMRS)",
+        "## 3. MRS Open v0.3.1 鈥?Top 10 鎻愬崌鏈€澶?(螖MRS)",
         "",
     ]
 
     if mrs_open_delta_top:
         md_lines += [
-            "| Rank | Sample | Preset | Δ MRS Open | Δ Pseudo | Before → After |",
+            "| Rank | Sample | Preset | 螖 MRS Open | 螖 Pseudo | Before 鈫?After |",
             "|------|--------|--------|------------|----------|-----------------|",
         ]
         for i, r in enumerate(mrs_open_delta_top, 1):
             md_lines.append(
                 f"| {i} | {r.get('sample_id')} | {r.get('preset')} | "
-                f"{_to_float(r.get('delta_mrs_open_v031')):.1f} | "
-                f"{_to_float(r.get('pseudo_delta_mrs')):.1f} | "
-                f"{_to_float(r.get('mrs_open_v031_before')):.0f} → {_to_float(r.get('mrs_open_v031_after')):.0f} |"
+                f"{_fmt_float(r.get('delta_mrs_open_v031'))} | "
+                f"{_fmt_float(r.get('pseudo_delta_mrs'))} | "
+                f"{_fmt_float(r.get('mrs_open_v031_before'), 0)} 鈫?{_fmt_float(r.get('mrs_open_v031_after'), 0)} |"
             )
         md_lines += [""]
     else:
-        md_lines += ["MRS Open v0.3.1 不可用，跳过。", ""]
+        md_lines += ["MRS Open v0.3.1 涓嶅彲鐢紝璺宠繃銆?, ""]
 
     md_lines += [
-        "## 4. MRS Open v0.3.1 — Bottom 10 (需复盘)",
+        "## 4. MRS Open v0.3.1 鈥?Bottom 10 (闇€澶嶇洏)",
         "",
     ]
 
@@ -158,16 +165,16 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
             flags = (r.get("mrs_open_flags") or "-")[:40]
             md_lines.append(
                 f"| {i} | {r.get('sample_id')} | {r.get('preset')} | "
-                f"{_to_float(r.get('mrs_open_v031_after')):.1f} | "
-                f"{_to_float(r.get('pseudo_mrs_after')):.1f} | "
+                f"{_fmt_float(r.get('mrs_open_v031_after'))} | "
+                f"{_fmt_float(r.get('pseudo_mrs_after'))} | "
                 f"{flags} |"
             )
         md_lines += [""]
     else:
-        md_lines += ["MRS Open v0.3.1 不可用，跳过。", ""]
+        md_lines += ["MRS Open v0.3.1 涓嶅彲鐢紝璺宠繃銆?, ""]
 
     md_lines += [
-        "## 5. MRS Open Penalty Flags 汇总",
+        "## 5. MRS Open Penalty Flags 姹囨€?,
         "",
     ]
     if penalty_counts:
@@ -179,40 +186,39 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
             md_lines.append(f"| {flag} | {count} |")
         md_lines += [""]
     else:
-        md_lines += ["未触发 penalty。", ""]
+        md_lines += ["鏈Е鍙?penalty銆?, ""]
 
     md_lines += [
-        "## 6. 最佳提升任务 (pseudo)",
+        "## 6. 鏈€浣虫彁鍗囦换鍔?(pseudo)",
         "",
     ]
-
     if best:
         md_lines += [
-            f"- task_id：`{best.get('task_id')}`",
-            f"- sample_id：`{best.get('sample_id')}`",
-            f"- preset：`{best.get('preset')}`",
-            f"- pseudo ΔMRS：`{best.get('pseudo_delta_mrs')}`",
-            f"- output_dir：`{best.get('output_dir')}`",
+            f"- task_id锛歚{best.get('task_id')}`",
+            f"- sample_id锛歚{best.get('sample_id')}`",
+            f"- preset锛歚{best.get('preset')}`",
+            f"- pseudo 螖MRS锛歚{best.get('pseudo_delta_mrs')}`",
+            f"- output_dir锛歚{best.get('output_dir')}`",
             "",
         ]
     else:
-        md_lines += ["暂无。", ""]
+        md_lines += ["鏆傛棤銆?, ""]
 
-    md_lines += ["## 7. 最差/需复盘任务 (pseudo)", ""]
+    md_lines += ["## 7. 鏈€宸?闇€澶嶇洏浠诲姟 (pseudo)", ""]
     if worst:
         md_lines += [
-            f"- task_id：`{worst.get('task_id')}`",
-            f"- sample_id：`{worst.get('sample_id')}`",
-            f"- preset：`{worst.get('preset')}`",
-            f"- pseudo ΔMRS：`{worst.get('pseudo_delta_mrs')}`",
-            f"- error：`{worst.get('error')}`",
+            f"- task_id锛歚{worst.get('task_id')}`",
+            f"- sample_id锛歚{worst.get('sample_id')}`",
+            f"- preset锛歚{worst.get('preset')}`",
+            f"- pseudo 螖MRS锛歚{worst.get('pseudo_delta_mrs')}`",
+            f"- error锛歚{worst.get('error')}`",
             "",
         ]
     else:
-        md_lines += ["暂无。", ""]
+        md_lines += ["鏆傛棤銆?, ""]
 
     md_lines += [
-        "## 8. 失败任务列表",
+        "## 8. 澶辫触浠诲姟鍒楄〃",
         "",
     ]
     if failed:
@@ -221,17 +227,17 @@ def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> D
                 f"- `{r.get('task_id')}` / preset `{r.get('preset')}` / error `{(r.get('error') or '')[:180]}`"
             ]
     else:
-        md_lines += ["无失败任务。"]
+        md_lines += ["鏃犲け璐ヤ换鍔°€?]
 
     md_lines += [
         "",
-        "## 9. 明日建议",
+        "## 9. 鏄庢棩寤鸿",
         "",
-        "- 保留提升稳定的 preset，继续扩大同类样本。",
-        "- 对 ΔMRS 下降的样本建立失败案例卡。",
-        "- 检查失败任务是否来自 CLI 参数、输出路径或音频格式。",
-        "- 优先参考 MRS Open ranking 做人工复盘。",
-        "- penalty_flags ≠ '' 的样本应优先标记为待检查。",
+        "- 淇濈暀鎻愬崌绋冲畾鐨?preset锛岀户缁墿澶у悓绫绘牱鏈€?,
+        "- 瀵?螖MRS 涓嬮檷鐨勬牱鏈缓绔嬪け璐ユ渚嬪崱銆?,
+        "- 妫€鏌ュけ璐ヤ换鍔℃槸鍚︽潵鑷?CLI 鍙傛暟銆佽緭鍑鸿矾寰勬垨闊抽鏍煎紡銆?,
+        "- 浼樺厛鍙傝€?MRS Open ranking 鍋氫汉宸ュ鐩樸€?,
+        "- penalty_flags 鈮?'' 鐨勬牱鏈簲浼樺厛鏍囪涓哄緟妫€鏌ャ€?,
         "",
     ]
 
