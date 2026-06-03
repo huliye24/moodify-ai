@@ -79,5 +79,4 @@ def get_band(name: str, band_spec: str = "6") -> FrequencyBand | None:
 
 def band_mask(freqs, low_hz: float, high_hz: float):
     """Convenience: boolean mask for numpy frequency array."""
-    import numpy as np
     return (freqs >= low_hz) & (freqs <= high_hz)

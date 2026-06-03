@@ -11,6 +11,8 @@ from typing import Optional
 import numpy as np
 import soundfile as sf
 
+from moodify.bands import BAND_6_EDGES as BANDS_6
+
 
 def load_audio(path: str, always_2d: bool = True) -> tuple[np.ndarray, int]:
     """Load audio file, return (numpy_array, sample_rate)."""
@@ -51,9 +53,6 @@ def _amp_to_db(x: np.ndarray) -> np.ndarray:
 
 
 # ── Spectrum features ──────────────────────────────────────
-
-from moodify.bands import BAND_6_EDGES as BANDS_6
-
 
 def _spectrum_features(mono: np.ndarray, sr: int) -> dict:
     n = len(mono)
