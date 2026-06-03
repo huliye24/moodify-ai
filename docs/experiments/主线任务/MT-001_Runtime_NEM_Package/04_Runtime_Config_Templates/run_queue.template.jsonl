@@ -1,0 +1,3 @@
+{"task_id":"TASK_001","sample_id":"SMP_16B0C4F0B2F6707D","input_path":"data/night_inputs/electronic.wav","preset":"warm","output_dir":"runs/day_run_001","status":"pending"}
+{"task_id":"TASK_002","sample_id":"SMP_16B0C4F0B2F6707D","input_path":"data/night_inputs/electronic.wav","preset":"clear","output_dir":"runs/day_run_001","status":"pending"}
+{"task_id":"TASK_003","sample_id":"SMP_16B0C4F0B2F6707D","input_path":"data/night_inputs/electronic.wav","preset":"space","output_dir":"runs/day_run_001","status":"pending"}

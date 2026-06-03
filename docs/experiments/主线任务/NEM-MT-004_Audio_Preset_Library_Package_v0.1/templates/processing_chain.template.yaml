@@ -1,0 +1,18 @@
+preset_id: PRESET-CATEGORY-NAME-v0.1
+chain:
+  - stage: spectral_balance
+    module: eq
+    enabled: true
+    parameters: {}
+  - stage: transient_repair
+    module: transient_shaper
+    enabled: false
+    parameters: {}
+  - stage: dynamic_recovery
+    module: dynamics
+    enabled: false
+    parameters: {}
+  - stage: spatial_reality
+    module: spatial_processor
+    enabled: false
+    parameters: {}

@@ -1,0 +1,8 @@
+quality_tiers:
+  raw_inbox: temporary and not registered
+  registered: has sample_id and metadata
+  baseline: representative sample for comparison
+  validation: used to validate scoring or preset stability
+  stress_test: contains extreme or problematic cases
+  production_candidate: high-value, rights-clear sample for product testing
+  archived: inactive but preserved

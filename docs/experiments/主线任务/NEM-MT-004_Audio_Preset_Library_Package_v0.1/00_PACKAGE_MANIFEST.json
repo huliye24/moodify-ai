@@ -1,0 +1,23 @@
+{
+  "package_id": "NEM-MT-004",
+  "package_name": "Audio Processing Preset Library",
+  "project": "Moodify",
+  "version": "0.1",
+  "created_at": "2026-06-02",
+  "planned_period": "2026.7-2026.8",
+  "priority": "P0",
+  "status": "PLANNED",
+  "prerequisites": [
+    "Runtime stable data generation",
+    "MRS initial usable",
+    "MRS performance entering controllable state"
+  ],
+  "human_entry": "pdf/NEM-MT-004_Audio_Preset_Library_Readable.pdf",
+  "ai_entry": "00_README_AI.md",
+  "main_nem_file": "nem/NEM-MT-004_Audio_Preset_Library.md",
+  "current_gate": "GATE-0_Node_Documentation",
+  "current_next_action": "Build preset taxonomy and preset spec schema before writing concrete presets",
+  "aep_count": 10,
+  "gate_count": 6,
+  "core_output": "Reusable, versioned, MRS-linked audio processing preset library"
+}

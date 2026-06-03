@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Sample Registry Record",
+  "type": "object",
+  "required": [
+    "sample_id",
+    "original_filename",
+    "source_platform",
+    "source_type",
+    "registered_at",
+    "file_format",
+    "rights_status",
+    "storage_path",
+    "status"
+  ],
+  "properties": {
+    "sample_id": {
+      "type": "string"
+    },
+    "original_filename": {
+      "type": "string"
+    },
+    "source_platform": {
+      "type": "string"
+    },
+    "source_type": {
+      "type": "string"
+    },
+    "collected_at": {
+      "type": "string"
+    },
+    "registered_at": {
+      "type": "string"
+    },
+    "file_format": {
+      "type": "string"
+    },
+    "duration_sec": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "sample_rate": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "bit_depth": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "channels": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "genre_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "emotion_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "problem_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "quality_tier": {
+      "type": "string"
+    },
+    "dataset_split": {
+      "type": "string"
+    },
+    "rights_status": {
+      "enum": [
+        "internal_research_only",
+        "user_owned",
+        "public_domain",
+        "licensed",
+        "uncertain",
+        "restricted"
+      ]
+    },
+    "rights_note": {
+      "type": "string"
+    },
+    "storage_path": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}

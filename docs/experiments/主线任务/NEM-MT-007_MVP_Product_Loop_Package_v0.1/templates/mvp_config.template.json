@@ -1,0 +1,11 @@
+{
+  "mvp_version": "0.1",
+  "input_dir": "data/mvp_inputs/",
+  "output_dir": "runs/mvp_outputs/",
+  "default_preset": "balanced_reality_v0",
+  "mrs_mode": "quick_mrs",
+  "report_mode": "user_and_technical",
+  "export_audio_format": "wav",
+  "generate_pdf_report": true,
+  "generate_manifest": true
+}

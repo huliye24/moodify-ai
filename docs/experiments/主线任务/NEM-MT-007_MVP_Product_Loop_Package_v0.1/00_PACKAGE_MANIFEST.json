@@ -1,0 +1,36 @@
+{
+  "package_id": "NEM-MT-007",
+  "package_name": "MVP Product Loop",
+  "project": "Moodify",
+  "version": "0.1",
+  "created_at": "2026-06-02",
+  "period": "2026.8-10",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "node_type": "NEM",
+  "human_entry": "pdf/NEM-MT-007_MVP_Product_Loop_Readable.pdf",
+  "human_markdown": "human/NEM-MT-007_MVP_Product_Loop_Readable.md",
+  "ai_entry": "00_README_AI.md",
+  "main_nem_file": "nem/NEM-MT-007_MVP_Product_Loop.md",
+  "current_gate": "GATE-1_Product_Flow_Definition",
+  "current_next_action": "Execute AEP-MT007-001_MVP_Product_Scope before building UI or export flow",
+  "dependencies": [
+    "MT-001 Runtime",
+    "MT-002 MRS",
+    "MT-003 MRS Performance",
+    "MT-004 Preset Library",
+    "MT-005 Sample Asset Library",
+    "MT-006 Report Explainability"
+  ],
+  "aep_count": 10,
+  "gate_count": 6,
+  "mvp_loop": [
+    "import",
+    "validate",
+    "preset_select",
+    "process",
+    "score",
+    "explain",
+    "export"
+  ]
+}

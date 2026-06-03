@@ -1,0 +1,11 @@
+{
+  "export_id": "EXP_xxx",
+  "job_id": "MVPJOB_xxx",
+  "input_audio": "data/mvp_inputs/example.wav",
+  "processed_audio": "output/processed_audio.wav",
+  "user_report": "output/user_report.pdf",
+  "technical_report": "output/technical_report.md",
+  "mrs_result": "output/mrs_result.json",
+  "metadata": "output/processing_metadata.json",
+  "created_at": "YYYY-MM-DDTHH:MM:SS"
+}

@@ -1,0 +1,41 @@
+{
+  "preset_id": "PRESET-CATEGORY-NAME-v0.1",
+  "preset_name": "Human readable preset name",
+  "category": "plastic_reduction",
+  "maturity_level": "EXPERIMENTAL",
+  "version": "0.1.0",
+  "target_problem": "Describe the sound problem this preset tries to solve",
+  "applicable_inputs": [
+    "AI generated pop",
+    "flat high-frequency texture"
+  ],
+  "not_applicable_inputs": [
+    "already high-quality master",
+    "very dark mix"
+  ],
+  "processing_chain": [
+    {
+      "stage": "spectral_balance",
+      "module": "eq",
+      "parameters": {
+        "note": "fill later"
+      }
+    },
+    {
+      "stage": "dynamic_recovery",
+      "module": "compressor",
+      "parameters": {
+        "note": "fill later"
+      }
+    }
+  ],
+  "mrs_evaluation": {
+    "mrs_before": null,
+    "mrs_after": null,
+    "delta_mrs": null
+  },
+  "side_effects": [],
+  "runtime_callable": false,
+  "created_at": "YYYY-MM-DD",
+  "updated_at": "YYYY-MM-DD"
+}

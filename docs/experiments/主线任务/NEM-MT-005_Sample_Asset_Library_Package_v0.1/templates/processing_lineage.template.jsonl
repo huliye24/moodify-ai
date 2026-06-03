@@ -1,0 +1,1 @@
+{"run_id": "RUN-YYYYMMDD-HASH8", "sample_id": "SMP-...", "input_path": ".../original.wav", "preset_id": "PRESET-...", "output_path": ".../processed/RUN-.../output.wav", "runtime_version": "", "started_at": "", "finished_at": "", "status": "completed"}

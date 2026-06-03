@@ -1,0 +1,10 @@
+{
+  "mrs_result_id": "MRSRUN_xxx",
+  "job_id": "MVPJOB_xxx",
+  "mrs_before": null,
+  "mrs_after": null,
+  "delta_mrs": null,
+  "mrs_mode": "quick_mrs",
+  "scoring_version": "mrs_open_v031",
+  "status": "pending"
+}

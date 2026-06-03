@@ -1,0 +1,44 @@
+{
+  "package_id": "NEM-MT-003",
+  "package_name": "MRS Performance Optimization and Production Scaling",
+  "package_name_cn": "MRS 性能优化与批量生产瓶颈突破",
+  "project": "Moodify",
+  "version": "0.1",
+  "created_at": "2026-06-02",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "planned_cycle": "2026.06-2026.07",
+  "dependency": [
+    "MT-001 Runtime stable data generation",
+    "MT-002 MRS initial usable benchmark"
+  ],
+  "human_entry": "pdf/NEM-MT-003_MRS_Performance_Optimization_Readable.pdf",
+  "ai_entry": "00_README_AI.md",
+  "main_nem_file": "nem/NEM-MT-003_MRS_Performance_Optimization.md",
+  "current_gate": "GATE-1_Performance_Baseline",
+  "current_next_action": "Run MRS profiling baseline across representative audio durations and formats",
+  "aep_count": 10,
+  "gate_count": 6,
+  "layers": {
+    "human_layer": [
+      "pdf/",
+      "00_README_HUMAN.md"
+    ],
+    "ai_layer": [
+      "00_README_AI.md",
+      "00_PACKAGE_MANIFEST.json",
+      "00_NODE_STATUS.md",
+      "nem/",
+      "aep/",
+      "gate/",
+      "rules/"
+    ],
+    "runtime_layer": [
+      "templates/",
+      "commands/",
+      "reports/",
+      "logs/",
+      "schemas/"
+    ]
+  }
+}

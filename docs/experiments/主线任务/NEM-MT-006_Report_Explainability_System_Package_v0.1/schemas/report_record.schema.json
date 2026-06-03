@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Report Record",
+  "type": "object",
+  "required": [
+    "report_id",
+    "run_id",
+    "sample_id",
+    "preset_id",
+    "mrs_version",
+    "outputs"
+  ],
+  "properties": {
+    "report_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "sample_id": {
+      "type": "string"
+    },
+    "preset_id": {
+      "type": "string"
+    },
+    "mrs_version": {
+      "type": "string"
+    },
+    "mrs_before": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "mrs_after": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "mrs_delta": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "outputs": {
+      "type": "object"
+    }
+  }
+}

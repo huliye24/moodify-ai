@@ -1,0 +1,19 @@
+{
+  "package_id": "NEM-MT-002",
+  "package_name": "MRS Scoring System - AI Music Reality Benchmark Unit",
+  "project": "Moodify",
+  "version": "0.1.0",
+  "created_at": "2026-06-02",
+  "node_type": "NEM",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "human_entry": "pdf/NEM-MT-002_MRS_Scoring_System_Readable.pdf",
+  "ai_entry": "00_README_AI.md",
+  "main_nem_file": "nem/NEM-MT-002_MRS_Scoring_System.md",
+  "current_gate": "GATE-1_MRS_Unit_Definition",
+  "current_next_action": "Define MRS unit, baseline scale, validation matrix, and Runtime optional scoring interface.",
+  "dependency": "MT-001 Runtime can stably produce cloud-run data.",
+  "aep_count": 10,
+  "gate_count": 6,
+  "principle": "MRS is an open benchmark-like unit for AI music reality; higher means closer to real sound; no full score."
+}

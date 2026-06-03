@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MRS Performance Record",
+  "type": "object",
+  "required": [
+    "task_id",
+    "sample_id",
+    "filename",
+    "scoring_mode",
+    "total_time_sec",
+    "status"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "sample_id": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "audio_duration_sec": {
+      "type": "number"
+    },
+    "input_file_size_mb": {
+      "type": "number"
+    },
+    "scoring_mode": {
+      "enum": [
+        "off",
+        "quick_mrs",
+        "full_mrs",
+        "mrs_open_v031"
+      ]
+    },
+    "cache_hit": {
+      "type": "boolean"
+    },
+    "total_time_sec": {
+      "type": "number"
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "failed",
+        "skipped"
+      ]
+    }
+  }
+}

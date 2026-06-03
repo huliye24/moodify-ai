@@ -1,0 +1,14 @@
+{
+  "report_id": "RPT_YYYYMMDD_RUN_SAMPLE_PRESET",
+  "run_id": "RUN_xxx",
+  "sample_id": "SMP_xxx",
+  "preset_id": "PRESET_xxx",
+  "mrs_version": "mrs_open_v031",
+  "mrs_before": null,
+  "mrs_after": null,
+  "mrs_delta": null,
+  "dimensions": {},
+  "charts": [],
+  "explanations": [],
+  "outputs": {}
+}

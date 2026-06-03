@@ -1,0 +1,31 @@
+{
+  "package_id": "NEM-MT-001",
+  "package_name": "Runtime 云端运行系统",
+  "project": "Moodify",
+  "created_at": "2026-06-02",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "type": "Node Evolution Molecule",
+  "description": "Moodify 云端稳定自动运行工程地基，让 Moodify 在云服务器上稳定、自动、可追踪、可恢复、可长期运行。",
+  "directories": [
+    "00_README",
+    "01_NEM_Node",
+    "02_AEP_Atomic_Packages",
+    "03_Evolution_Gates",
+    "04_Runtime_Config_Templates",
+    "05_Runbook_Cloud_Commands",
+    "06_Report_Templates",
+    "07_PoEW_Evidence",
+    "08_Decision_Log",
+    "09_Backlog"
+  ],
+  "aep_count": 10,
+  "gates": [
+    "Gate 0",
+    "Gate 1",
+    "Gate 2",
+    "Gate 3",
+    "Gate 4",
+    "Gate 5"
+  ]
+}

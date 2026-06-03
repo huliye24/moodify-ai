@@ -1,0 +1,10 @@
+{
+  "job_id": "MVPJOB_xxx",
+  "import_id": "IMP_xxx",
+  "preset_id": "PRESET_xxx",
+  "preset_version": "v0.1",
+  "runtime_task_id": "TASK_xxx",
+  "status": "pending",
+  "started_at": null,
+  "ended_at": null
+}

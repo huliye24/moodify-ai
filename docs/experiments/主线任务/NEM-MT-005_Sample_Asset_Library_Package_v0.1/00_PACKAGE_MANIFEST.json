@@ -1,0 +1,23 @@
+{
+  "package_id": "NEM-MT-005",
+  "package_name": "AI Music Sample Asset Library",
+  "project": "Moodify",
+  "version": "0.1",
+  "created_at": "2026-06-02",
+  "planned_period": "2026.7-2026.9",
+  "priority": "P0",
+  "status": "PLANNED",
+  "prerequisites": [
+    "Runtime stable",
+    "storage convention",
+    "MRS/preset experiments beginning to produce outputs"
+  ],
+  "human_entry": "pdf/NEM-MT-005_Sample_Asset_Library_Readable.pdf",
+  "ai_entry": "00_README_AI.md",
+  "main_nem_file": "nem/NEM-MT-005_Sample_Asset_Library.md",
+  "current_gate": "GATE-0_Node_Documentation",
+  "current_next_action": "Build sample_id system, sample registry schema, and storage layout before collecting large sample volume",
+  "aep_count": 10,
+  "gate_count": 6,
+  "core_output": "Structured, traceable, rights-aware AI music sample asset library"
+}

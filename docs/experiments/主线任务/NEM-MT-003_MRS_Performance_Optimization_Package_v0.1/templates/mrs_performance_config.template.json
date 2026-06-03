@@ -1,0 +1,11 @@
+{
+  "scoring_mode": "quick_mrs",
+  "enable_cache": true,
+  "cache_dir": "runs/cache/mrs_features",
+  "max_workers": 2,
+  "timeout_sec_per_file": 600,
+  "record_profiling": true,
+  "write_report": true,
+  "fail_policy": "record_and_continue",
+  "mrs_version": "mrs_open_v031"
+}

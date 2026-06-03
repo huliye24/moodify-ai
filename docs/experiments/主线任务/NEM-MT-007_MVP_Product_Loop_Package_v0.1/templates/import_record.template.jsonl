@@ -1,0 +1,1 @@
+{"import_id": "IMP_xxx", "file_name": "example.wav", "file_path": "data/mvp_inputs/example.wav", "format": "wav", "sample_rate": 44100, "channels": 2, "duration_sec": 180.0, "file_size_mb": 38.2, "validation_status": "passed", "created_at": "YYYY-MM-DDTHH:MM:SS"}

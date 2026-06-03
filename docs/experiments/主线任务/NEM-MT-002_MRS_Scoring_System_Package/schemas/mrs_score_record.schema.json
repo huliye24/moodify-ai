@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MRS Score Record",
+  "type": "object",
+  "required": [
+    "run_id",
+    "sample_id",
+    "mrs_version",
+    "mrs_score",
+    "status"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "sample_id": {
+      "type": "string"
+    },
+    "input_path": {
+      "type": "string"
+    },
+    "output_path": {
+      "type": "string"
+    },
+    "preset": {
+      "type": "string"
+    },
+    "mrs_version": {
+      "type": "string"
+    },
+    "mrs_score": {
+      "type": "number"
+    },
+    "mrs_delta": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "subscores": {
+      "type": "object"
+    },
+    "penalties": {
+      "type": "object"
+    },
+    "duration_sec": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "failed",
+        "skipped"
+      ]
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

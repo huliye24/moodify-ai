@@ -1,0 +1,15 @@
+{
+  "runtime_scoring": {
+    "enabled": true,
+    "mode": "quick_mrs",
+    "async_or_optional": true,
+    "fail_policy": "do_not_block_audio_processing",
+    "output_columns": [
+      "mrs_score",
+      "mrs_mode",
+      "mrs_version",
+      "mrs_status",
+      "mrs_time_sec"
+    ]
+  }
+}

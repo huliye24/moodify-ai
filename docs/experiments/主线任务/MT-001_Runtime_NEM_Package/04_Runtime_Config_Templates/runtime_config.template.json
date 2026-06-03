@@ -1,0 +1,36 @@
+{
+  "runtime_id": "MT-001",
+  "project": "Moodify",
+  "input_dir": "data/night_inputs",
+  "output_dir": "runs/day_run_001",
+  "log_dir": "logs",
+  "report_dir": "reports",
+  "presets": [
+    "warm",
+    "clear",
+    "space"
+  ],
+  "dry_run": false,
+  "max_tasks": null,
+  "max_runtime_hours": 24,
+  "scoring": {
+    "enabled": false,
+    "mode": "off",
+    "available_modes": [
+      "off",
+      "quick_mrs",
+      "full_mrs",
+      "mrs_open_v031"
+    ],
+    "fail_open": true
+  },
+  "retry": {
+    "enabled": false,
+    "max_retry": 1
+  },
+  "command_template": "python3 -m moodify.cli process {input} --preset {preset} --output-dir {output_dir}",
+  "report": {
+    "generate_final_summary": true,
+    "generate_markdown_report": true
+  }
+}

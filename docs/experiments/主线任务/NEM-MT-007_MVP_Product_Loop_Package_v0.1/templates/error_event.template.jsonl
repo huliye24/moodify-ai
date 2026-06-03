@@ -1,0 +1,1 @@
+{"error_id": "ERR_xxx", "job_id": "MVPJOB_xxx", "stage": "import|validate|process|score|report|export", "message": "human readable error", "technical_detail": "stack trace or exception summary", "retryable": true, "created_at": "YYYY-MM-DDTHH:MM:SS"}

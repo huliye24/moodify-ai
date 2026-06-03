@@ -1,0 +1,22 @@
+# MRS configuration template
+mrs_version: "mrs_open_v031"
+mode: "quick_mrs"   # off | quick_mrs | full_mrs | mrs_open_v031
+baseline:
+  method: "median_anchor"
+  anchor_score: 1000
+  d_ref: null
+features:
+  spectral_reality: true
+  dynamic_reality: true
+  transient_reality: true
+  spatial_reality: true
+  texture_reality: true
+penalties:
+  loudness_cheat: true
+  over_bright: true
+  over_dark: true
+  hq_damage: true
+output:
+  write_jsonl: true
+  write_csv: true
+  write_markdown_report: true

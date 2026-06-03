@@ -1,0 +1,32 @@
+Moodify Runtime Final Summary
+
+Run ID:
+Start Time:
+End Time:
+Duration:
+
+Total Tasks:
+Completed:
+Failed:
+Skipped:
+
+Input Dir:
+Output Dir:
+Log File:
+Report File:
+
+MRS Enabled:
+MRS Mode:
+
+Gate Result:
+PASS / HOLD / FAIL
+
+Main Issues:
+1.
+2.
+3.
+
+Next Actions:
+1.
+2.
+3.

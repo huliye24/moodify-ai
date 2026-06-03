@@ -1,0 +1,1 @@
+{"task_id":"TASK_xxx","sample_id":"SMP_xxx","filename":"example.wav","audio_duration_sec":180.0,"input_file_size_mb":45.0,"scoring_mode":"quick_mrs","cache_hit":false,"load_time_sec":0.0,"resample_time_sec":0.0,"feature_extract_time_sec":0.0,"scoring_time_sec":0.0,"report_write_time_sec":0.0,"total_time_sec":0.0,"cpu_peak_percent":0.0,"memory_peak_mb":0.0,"status":"completed"}

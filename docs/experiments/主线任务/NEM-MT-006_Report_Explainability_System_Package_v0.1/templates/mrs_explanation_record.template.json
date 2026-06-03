@@ -1,0 +1,12 @@
+{
+  "explanation_id": "EXP_xxx",
+  "dimension": "R_dynamic",
+  "before_value": null,
+  "after_value": null,
+  "delta": null,
+  "interpretation": "",
+  "evidence": [
+    "mrs_dimension",
+    "chart_path"
+  ]
+}

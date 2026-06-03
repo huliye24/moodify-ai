@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Preset Spec",
+  "type": "object",
+  "required": [
+    "preset_id",
+    "preset_name",
+    "category",
+    "maturity_level",
+    "version",
+    "target_problem",
+    "applicable_inputs",
+    "processing_chain",
+    "mrs_evaluation",
+    "runtime_callable"
+  ],
+  "properties": {
+    "preset_id": {
+      "type": "string"
+    },
+    "preset_name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "maturity_level": {
+      "enum": [
+        "IDEA",
+        "EXPERIMENTAL",
+        "CANDIDATE",
+        "STABLE",
+        "ADOPTED",
+        "DEPRECATED"
+      ]
+    },
+    "version": {
+      "type": "string"
+    },
+    "target_problem": {
+      "type": "string"
+    },
+    "applicable_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "not_applicable_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "processing_chain": {
+      "type": "array"
+    },
+    "mrs_evaluation": {
+      "type": "object"
+    },
+    "runtime_callable": {
+      "type": "boolean"
+    }
+  }
+}

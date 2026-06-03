@@ -64,3 +64,17 @@ configs/runtime_config.json
 moodify-core-package/outputs/
 # Shell snapshot artifacts
 .claude/shell-snapshots/
+
+# Moodify mainline task docs are part of the development source.
+!docs/experiments/
+!docs/experiments/*/
+!docs/experiments/*/**
+
+# Local Tencent Cloud / SSH material must never enter git.
+tc_key*
+id_*
+*.ppk
+*.pem
+*.key
+# Test/runtime temporary reports
+outputs/tmp*_report.json
