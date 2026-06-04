@@ -19,6 +19,7 @@ class RuntimeConfig:
     registry_path: Path = Path("data/moodify_runtime/input_registry.jsonl")
     queue_path: Path = Path("data/moodify_runtime/run_queue.jsonl")
     operator_jobs_path: Path = Path("data/moodify_runtime/operator_jobs.jsonl")
+    operator_detail_dir: Path = Path("data/moodify_runtime/operator_job_details")
     craft_memory_dir: Path = Path("data/moodify_runtime/craft_memory")
     report_dir: Path = Path("reports/daily_runs")
     presets: List[str] = field(default_factory=lambda: ["warm_vocal", "clean_master", "wide_space"])
@@ -81,6 +82,7 @@ class RuntimeConfig:
         clone.registry_path = rp(self.registry_path)
         clone.queue_path = rp(self.queue_path)
         clone.operator_jobs_path = rp(self.operator_jobs_path)
+        clone.operator_detail_dir = rp(self.operator_detail_dir)
         clone.craft_memory_dir = rp(self.craft_memory_dir)
         clone.report_dir = rp(self.report_dir)
         return clone

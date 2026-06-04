@@ -8,7 +8,12 @@ from .config import load_config
 from .craft_memory import seed_craft_memory
 from .failure import analyze_failures
 from .planner import suggest_next_plan
-from .operator_console import create_operator_job, list_operator_jobs
+from .operator_console import (
+    attach_run_report_to_job,
+    create_operator_job,
+    get_operator_job_detail,
+    list_operator_jobs,
+)
 from .queue import plan_queue
 from .registry import register_inputs
 from .report import generate_daily_report
@@ -68,6 +73,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("operator-list", help="List internal operator-console Jobs")
     sp.add_argument("--status", default=None)
+
+
+    sp = sub.add_parser("operator-attach-run", help="Attach runtime run/report evidence to an Operator Job")
+    sp.add_argument("--job-id", required=True)
+    sp.add_argument("--run-id", required=True)
+    sp.add_argument("--run-dir", default=None)
+    sp.add_argument("--report-path", default=None)
+    sp.add_argument("--required-mrs-delta", type=float, default=0.0)
+
+    sp = sub.add_parser("operator-detail", help="Read Operator Job with attached industrial detail")
+    sp.add_argument("--job-id", required=True)
 
     sp = sub.add_parser("all", help="register → plan → run → report → craft")
     sp.add_argument("--source", default="unknown")
@@ -132,6 +148,22 @@ def main(argv=None) -> int:
 
     if args.command == "operator-list":
         print_json({"jobs": list_operator_jobs(cfg, status=args.status)})
+        return 0
+
+
+    if args.command == "operator-attach-run":
+        print_json(attach_run_report_to_job(
+            cfg,
+            job_id=args.job_id,
+            run_id=args.run_id,
+            run_dir=args.run_dir,
+            report_path=args.report_path,
+            required_mrs_delta=args.required_mrs_delta,
+        ))
+        return 0
+
+    if args.command == "operator-detail":
+        print_json(get_operator_job_detail(cfg, job_id=args.job_id))
         return 0
 
     if args.command == "all":

@@ -126,3 +126,174 @@ def test_operator_cli_create_and_list(tmp_path, capsys):
     assert rc == 0
     listed = capsys.readouterr().out
     assert "project-x" in listed
+
+
+
+def _write_manifest(run_dir, rows):
+    import csv
+
+    fields = [
+        "run_id",
+        "task_id",
+        "sample_id",
+        "input_path",
+        "preset",
+        "status",
+        "return_code",
+        "elapsed_seconds",
+        "output_dir",
+        "template_index",
+        "pseudo_mrs_before",
+        "pseudo_mrs_after",
+        "pseudo_delta_mrs",
+        "mrs_open_v031_before",
+        "mrs_open_v031_after",
+        "delta_mrs_open_v031",
+        "mrs_open_flags",
+        "error",
+    ]
+    run_dir.mkdir(parents=True)
+    with (run_dir / "manifest.csv").open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def test_attach_run_report_to_job_builds_detail(tmp_path):
+    from moodify_runtime.operator_console import attach_run_report_to_job, get_operator_job_detail
+
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        output_root=tmp_path / "outputs",
+        report_dir=tmp_path / "reports",
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+    )
+    job = create_operator_job(cfg, source_audio="input/song.wav", processing_depth="deep_process")
+    run_dir = tmp_path / "outputs" / "run_001"
+    _write_manifest(
+        run_dir,
+        [
+            {
+                "run_id": "run_001",
+                "task_id": "TASK_A",
+                "sample_id": "SMP_A",
+                "input_path": "input/song.wav",
+                "preset": "clean_master",
+                "status": "done",
+                "return_code": "0",
+                "elapsed_seconds": "12.5",
+                "output_dir": "outputs/run_001/SMP_A/clean_master",
+                "template_index": "0",
+                "pseudo_mrs_before": "10",
+                "pseudo_mrs_after": "12",
+                "pseudo_delta_mrs": "2",
+                "mrs_open_v031_before": "1000",
+                "mrs_open_v031_after": "1005",
+                "delta_mrs_open_v031": "5",
+                "mrs_open_flags": "",
+                "error": "",
+            },
+            {
+                "run_id": "run_001",
+                "task_id": "TASK_B",
+                "sample_id": "SMP_A",
+                "input_path": "input/song.wav",
+                "preset": "wide_space",
+                "status": "done",
+                "return_code": "0",
+                "elapsed_seconds": "11.0",
+                "output_dir": "outputs/run_001/SMP_A/wide_space",
+                "template_index": "0",
+                "pseudo_mrs_before": "10",
+                "pseudo_mrs_after": "9",
+                "pseudo_delta_mrs": "-1",
+                "mrs_open_v031_before": "1000",
+                "mrs_open_v031_after": "999",
+                "delta_mrs_open_v031": "-1",
+                "mrs_open_flags": "over_dark",
+                "error": "",
+            },
+        ],
+    )
+    report_path = tmp_path / "reports" / "daily_report_run_001.md"
+    report_path.parent.mkdir(parents=True)
+    report_path.write_text("# report", encoding="utf-8")
+
+    detail = attach_run_report_to_job(
+        cfg,
+        job_id=job["job_id"],
+        run_id="run_001",
+        report_path=report_path,
+        required_mrs_delta=0.0,
+    )
+
+    assert detail["summary"]["candidate_count"] == 2
+    assert detail["summary"]["gate_counts"] == {"approve": 1, "reprocess": 1}
+    assert detail["score_results"][0]["mrs_score"] == 1005.0
+    assert detail["gate_decisions"][1]["decision"] == "reprocess"
+
+    loaded = get_operator_job_detail(cfg, job["job_id"])
+    assert loaded["job"]["status"] == "reprocess"
+    assert loaded["job"]["run_id"] == "run_001"
+    assert loaded["detail"]["report_path"] == str(report_path)
+
+
+def test_operator_cli_attach_and_detail(tmp_path, capsys):
+    config_path = tmp_path / "runtime_config.json"
+    config_path.write_text(
+        '{"project_root":"%s","output_root":"outputs","report_dir":"reports",'
+        '"operator_jobs_path":"operator_jobs.jsonl",'
+        '"operator_detail_dir":"operator_details"}' % tmp_path.as_posix(),
+        encoding="utf-8",
+    )
+    run_dir = tmp_path / "outputs" / "run_cli"
+    _write_manifest(
+        run_dir,
+        [
+            {
+                "run_id": "run_cli",
+                "task_id": "TASK_CLI",
+                "sample_id": "SMP_CLI",
+                "input_path": "input/song.wav",
+                "preset": "clean_master",
+                "status": "done",
+                "return_code": "0",
+                "elapsed_seconds": "4.0",
+                "output_dir": "outputs/run_cli/SMP_CLI/clean_master",
+                "template_index": "0",
+                "pseudo_mrs_before": "10",
+                "pseudo_mrs_after": "15",
+                "pseudo_delta_mrs": "5",
+                "mrs_open_v031_before": "",
+                "mrs_open_v031_after": "",
+                "delta_mrs_open_v031": "",
+                "mrs_open_flags": "",
+                "error": "",
+            }
+        ],
+    )
+
+    assert main([
+        "--config", str(config_path),
+        "operator-create",
+        "--source-audio", "input/song.wav",
+        "--depth", "standard_process",
+    ]) == 0
+    created = capsys.readouterr().out
+    import json
+
+    job_id = json.loads(created)["job_id"]
+    assert main([
+        "--config", str(config_path),
+        "operator-attach-run",
+        "--job-id", job_id,
+        "--run-id", "run_cli",
+    ]) == 0
+    attached = capsys.readouterr().out
+    assert "candidate_versions" in attached
+
+    assert main(["--config", str(config_path), "operator-detail", "--job-id", job_id]) == 0
+    detail = json.loads(capsys.readouterr().out)
+    assert detail["job"]["status"] == "gate_review"
+    assert detail["detail"]["summary"]["gate_counts"] == {"approve": 1}
