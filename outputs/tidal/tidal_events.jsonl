@@ -7,3 +7,19 @@
 {"timestamp": "2026-06-04T10:01:59Z", "event_type": "PHASE", "cycle": 1, "message": "craft: OK"}
 {"timestamp": "2026-06-04T10:01:59Z", "event_type": "CYCLE_END", "cycle": 1, "message": "Cycle 1 complete", "tasks_processed": 0, "elapsed_s": 0.0}
 {"timestamp": "2026-06-04T10:01:59Z", "event_type": "SLEEP", "cycle": 1, "message": "Sleeping 3581s until next tide"}
+{"timestamp": "2026-06-04T10:14:23Z", "event_type": "CYCLE_START", "cycle": "manual-2", "message": "🌊 Manual tide cycle 2 starting"}
+{"timestamp": "2026-06-04T10:14:23Z", "event_type": "PHASE", "cycle": "manual-2", "message": "register: OK"}
+{"timestamp": "2026-06-04T10:14:24Z", "event_type": "PHASE", "cycle": "manual-2", "message": "plan: OK"}
+{"timestamp": "2026-06-04T10:14:41Z", "event_type": "PHASE", "cycle": "manual-2", "message": "run: OK", "exit_code": 0}
+{"timestamp": "2026-06-04T10:14:41Z", "event_type": "PHASE", "cycle": "manual-2", "message": "report: OK"}
+{"timestamp": "2026-06-04T10:14:41Z", "event_type": "PHASE", "cycle": "manual-2", "message": "craft: OK"}
+{"timestamp": "2026-06-04T10:14:41Z", "event_type": "CYCLE_END", "cycle": "manual-2", "message": "Tide 2 complete — 5 tasks", "tasks": 5}
+{"timestamp": "2026-06-04T10:14:53Z", "event_type": "ENGINE_START", "cycle": 0, "message": "Tidal engine starting. Interval=7200s, max_cycles=∞"}
+{"timestamp": "2026-06-04T10:14:53Z", "event_type": "CYCLE_START", "cycle": 1, "message": "Cycle 1 started", "cycle_id": "TIDE_2026-06-04_10-14-53"}
+{"timestamp": "2026-06-04T10:14:53Z", "event_type": "PHASE", "cycle": 1, "message": "register: OK"}
+{"timestamp": "2026-06-04T10:14:53Z", "event_type": "PHASE", "cycle": 1, "message": "plan: OK"}
+{"timestamp": "2026-06-04T10:15:12Z", "event_type": "PHASE", "cycle": 1, "message": "run: OK", "exit_code": 0, "attempts": 1}
+{"timestamp": "2026-06-04T10:15:12Z", "event_type": "PHASE", "cycle": 1, "message": "report: OK"}
+{"timestamp": "2026-06-04T10:15:12Z", "event_type": "PHASE", "cycle": 1, "message": "craft: OK"}
+{"timestamp": "2026-06-04T10:15:12Z", "event_type": "CYCLE_END", "cycle": 1, "message": "Cycle 1 complete", "tasks_processed": 0, "elapsed_s": 0.0}
+{"timestamp": "2026-06-04T10:15:12Z", "event_type": "SLEEP", "cycle": 1, "message": "Sleeping 7181s until next tide"}
