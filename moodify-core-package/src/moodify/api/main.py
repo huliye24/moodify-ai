@@ -22,12 +22,21 @@ import time
 from pathlib import Path
 from typing import Optional
 
+from pydantic import BaseModel
+
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 from moodify.v01_pipeline import process_audio
 from moodify.v01_presets import PRESETS, list_presets
+from moodify_runtime.config import load_config
+from moodify_runtime.operator_console import (
+    attach_run_report_to_job,
+    create_operator_job,
+    get_operator_job_detail,
+    list_operator_jobs,
+)
 
 
 APP_VERSION = "0.1.0"
@@ -35,6 +44,25 @@ API_MODE = "v01"
 MAX_SIZE = 50 * 1024 * 1024  # 50 MB
 DEFAULT_OUTPUT_DIR = "outputs"
 DEFAULT_PRESET = "clean_master"
+
+
+class OperatorJobCreateRequest(BaseModel):
+    source_audio: str
+    processing_depth: str = "quick_scan"
+    project_label: str = ""
+    customer_label: str = ""
+    target_notes: str = ""
+    priority: int = 5
+    delivery_mode: str = "report_bundle"
+
+
+class OperatorAttachRunRequest(BaseModel):
+    run_id: str
+    run_dir: Optional[str] = None
+    report_path: Optional[str] = None
+    required_mrs_delta: float = 0.0
+
+
 
 
 app = FastAPI(
@@ -131,6 +159,19 @@ def _result_header(result, elapsed_ms: float, preset_source: str) -> str:
     return json.dumps(payload, ensure_ascii=True)[:1000]
 
 
+
+def _runtime_cfg():
+    return load_config(os.environ.get("MOODIFY_RUNTIME_CONFIG"))
+
+
+def _operator_error(exc: Exception) -> HTTPException:
+    if isinstance(exc, KeyError):
+        return HTTPException(status_code=404, detail=str(exc))
+    if isinstance(exc, (ValueError, FileNotFoundError)):
+        return HTTPException(status_code=400, detail=str(exc))
+    return HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}")
+
+
 @app.get("/health")
 async def health():
     return {
@@ -159,6 +200,54 @@ async def presets():
         ],
     }
 
+
+
+@app.post("/operator/jobs")
+async def operator_create_job(request: OperatorJobCreateRequest):
+    try:
+        return create_operator_job(
+            _runtime_cfg(),
+            source_audio=request.source_audio,
+            processing_depth=request.processing_depth,
+            project_label=request.project_label,
+            customer_label=request.customer_label,
+            target_notes=request.target_notes,
+            priority=request.priority,
+            delivery_mode=request.delivery_mode,
+        )
+    except Exception as exc:
+        raise _operator_error(exc) from exc
+
+
+@app.get("/operator/jobs")
+async def operator_list_jobs(status: Optional[str] = None):
+    try:
+        return {"jobs": list_operator_jobs(_runtime_cfg(), status=status)}
+    except Exception as exc:
+        raise _operator_error(exc) from exc
+
+
+@app.get("/operator/jobs/{job_id}")
+async def operator_job_detail(job_id: str):
+    try:
+        return get_operator_job_detail(_runtime_cfg(), job_id=job_id)
+    except Exception as exc:
+        raise _operator_error(exc) from exc
+
+
+@app.post("/operator/jobs/{job_id}/attach-run")
+async def operator_attach_run(job_id: str, request: OperatorAttachRunRequest):
+    try:
+        return attach_run_report_to_job(
+            _runtime_cfg(),
+            job_id=job_id,
+            run_id=request.run_id,
+            run_dir=request.run_dir,
+            report_path=request.report_path,
+            required_mrs_delta=request.required_mrs_delta,
+        )
+    except Exception as exc:
+        raise _operator_error(exc) from exc
 
 @app.post("/process")
 async def process(
