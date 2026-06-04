@@ -1,6 +1,6 @@
 # MHP-183: Craft Library Audit
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-SYSTEM-008 / System Plan-6A: Standardization / S5 (Systemization)
 **Depends on**: MHP-182
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

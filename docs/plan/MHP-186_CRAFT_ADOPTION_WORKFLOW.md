@@ -1,6 +1,6 @@
 # MHP-186: Craft Adoption Workflow
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-SYSTEM-008 / System Plan-6B: Product Connection / S8 (Execution)
 **Depends on**: MHP-185
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
