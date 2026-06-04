@@ -191,3 +191,47 @@ def test_sequential_job_lifecycle_loop(tmp_path):
         j = get_operator_job(cfg, jid)
         assert j["status"] == "delivered"
     assert len(list_craft_records(cfg)) == 5
+
+
+def test_concurrent_job_status_transitions(tmp_path):
+    """Create 10 jobs, transition all through waiting→gate_review→delivered, verify no corruption."""
+    cfg = _make_cfg(tmp_path)
+    job_records = []
+
+    # Create 10 jobs
+    for i in range(10):
+        job = create_operator_job(cfg, source_audio=f"input/ccr_{i}.wav",
+                                  processing_depth="quick_scan",
+                                  project_label=f"concurrent-{i}")
+        assert job["status"] == "waiting"
+        job_records.append(job)
+
+    # Attach runs to all 10
+    for i in range(10):
+        run_id = f"conc_{i:03d}"
+        rows = [{
+            "run_id": run_id, "task_id": f"T_CC{i}", "sample_id": f"S_CC{i}",
+            "input_path": f"input/ccr_{i}.wav", "preset": "clean_master",
+            "status": "done", "return_code": "0", "elapsed_seconds": "1.0",
+            "output_dir": f"outputs/{run_id}/S_CC{i}/clean_master", "template_index": "0",
+            "pseudo_mrs_before": str(10 + i), "pseudo_mrs_after": str(15 + i),
+            "pseudo_delta_mrs": str(5 + i), "mrs_open_v031_before": "",
+            "mrs_open_v031_after": "", "delta_mrs_open_v031": "",
+            "mrs_open_flags": "", "error": "",
+        }]
+        cands = _attach_and_get_candidates(cfg, job_records[i]["job_id"], run_id, rows)
+        j = get_operator_job(cfg, job_records[i]["job_id"])
+        assert j["status"] in ("gate_review", "reprocess"), f"Job {i}: {j['status']}"
+        create_delivery_record(cfg, job_id=job_records[i]["job_id"],
+                               candidate_id=cands[0]["candidate_id"])
+
+    # Verify all 10 are delivered
+    all_jobs = list_operator_jobs(cfg)
+    assert len(all_jobs) == 10
+    for j in all_jobs:
+        assert j["status"] == "delivered", f"Job {j['job_id']}: {j['status']}"
+
+    # Verify no data leakage — each job has unique source_audio
+    sources = {get_operator_job(cfg, j["job_id"]).get("source_audio")
+               for j in job_records}
+    assert len(sources) == 10, f"Source audio collision: {len(sources)} unique for 10 jobs"

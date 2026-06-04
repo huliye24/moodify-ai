@@ -1,6 +1,6 @@
 # MHP-056: Full Stack Smoke Test — Server + CLI + UI
 
-**Status**: proposed
+**Status**: completed
 **Direction**: 6-Step Plan — V2 (Validation)
 **Depends on**: MHP-055
 **Protocol**: 泫榛 6-Step Plan Protocol

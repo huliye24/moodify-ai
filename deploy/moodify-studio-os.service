@@ -1,0 +1,34 @@
+[Unit]
+Description=Moodify Studio OS Alpha API Server
+Documentation=https://github.com/moodify/moodify-mainline
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=moodify
+Group=moodify
+WorkingDirectory=/opt/moodify
+Environment=MOODIFY_RUNTIME_CONFIG=/opt/moodify/data/runtime_config.json
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 -m uvicorn moodify_runtime.operator_api:app \
+    --host 127.0.0.1 --port 8700
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/moodify/data /opt/moodify/outputs /opt/moodify/reports /opt/moodify/logs
+PrivateTmp=yes
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=moodify-studio-os
+
+[Install]
+WantedBy=multi-user.target
