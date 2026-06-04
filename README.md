@@ -43,19 +43,18 @@ Treatment Records
 
 ## Status
 
-* **Current Version**: `v0.1.0-alpha.3`
-* **Current Engineering State**: `MHP-031 direction pivot`
-* **Mainline**: `v01`
+* **Current Version**: `v0.2.0-alpha` (NEM-18 complete — first NEM node: Studio OS Alpha)
+* **Current Engineering State**: `Harden-6 complete — Gate: ADOPT`
+* **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
+* **Mainline**: `codex/mainline-cloud-dev-20260603`
 * **Core Mode**: Industrial-system-first / runtime-first / report-first
 * **Strategic Direction**: enterprise acoustic industrial system
-* **CLI**: `analyze` / `process` / `presets` use the v01 mainline
-* **API**: pending alignment — `/process` still needs migration to `v01_pipeline`
-* **Tests**: 20 v01 tests, 104 total tests reported green
-* **Treatment Records**: 9
-* **Completed Human Feedback**: 3 / 9
-* **Feedback Coverage**: 33%
-* **Current Better Rate**: 3 / 3 completed feedback says “better than before”
-* **Current Phase**: v0.1 runtime proof -> v0.2 internal operator console
+* **CLI**: 40+ subcommands via `moodify_runtime.cli`
+* **API**: 40 routes via `moodify_runtime.operator_api` (FastAPI)
+* **Console**: 8 views (Queue, Jobs, Reports, Delivery, Craft, Studio, Scheduler, Calibration)
+* **Tests**: 129 (119 unit + 3 real audio + 7 full stack smoke)
+* **Pass Rate**: 100% (129/129)
+* **X-CLP Score**: ~30 (Script tier) → target ≥60 next cycle
 
 ---
 
@@ -461,15 +460,33 @@ pytest -m v01
 Run full test suite:
 
 ```bash
-pytest
+# Unit tests (fast)
+python3 -m pytest moodify_runtime/tests/ -q --ignore=moodify_runtime/tests/test_real_audio.py --ignore=moodify_runtime/tests/test_full_stack_smoke.py
+
+# Real audio tests (slow — requires DSP pipeline)
+python3 -m pytest moodify_runtime/tests/test_real_audio.py -v -m slow
+
+# Full stack smoke (requires uvicorn server)
+python3 -m pytest moodify_runtime/tests/test_full_stack_smoke.py -v
 ```
 
 Current reported status:
 
 ```text
-20 v01 tests passed
-104 total tests passed
+119 unit tests passed (0.76s)
+3 real audio tests passed (6.67s)
+7 full stack smoke tests passed (3.74s)
+129 total tests — 100% pass rate
 ```
+
+### NEM-18 Node Status
+
+| Node | ID | Status | Gate | Tests |
+|------|-----|--------|------|-------|
+| Studio OS Alpha | NEM-MOODIFY-STUDIO-OS-001 | COMPLETE | ADOPT | 129 green |
+| Next | TBD (MRS-002 or RUNTIME-003) | planned | — | — |
+
+See `docs/nem/NEM-MOODIFY-STUDIO-OS-001.md` and `PROJECT_ROADMAP.md`.
 
 Known test gap:
 

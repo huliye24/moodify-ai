@@ -1,6 +1,6 @@
 # MHP-068: Integration Audit — CLI ↔ API ↔ Console ↔ Runtime Alignment
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-STUDIO-OS-001 / Harden-6 / V (Validation)
 **Depends on**: MHP-067 (regression passed)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

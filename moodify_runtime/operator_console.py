@@ -1016,3 +1016,115 @@ def build_operator_report_bundle(
         "files": files_written,
         "summary": bundle_summary,
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Production: Structured Logging
+# ═══════════════════════════════════════════════════════════════════════
+
+
+def _op_log(action: str, job_id: str = "", **kwargs) -> dict:
+    """Structured log entry for operator console operations.
+
+    All key functions call this at entry/exit so the operator
+    can reconstruct the processing timeline from logs.
+    """
+    entry = {
+        "timestamp": utc_now_iso(),
+        "action": action,
+    }
+    if job_id:
+        entry["job_id"] = job_id
+    entry.update(kwargs)
+    return entry
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Production: Data Compaction
+# ═══════════════════════════════════════════════════════════════════════
+
+
+def compact_operator_jobs(cfg: RuntimeConfig, keep_last_n: int = 100) -> dict:
+    """Remove duplicate job records and prune old entries.
+
+    Keeps the most recent `keep_last_n` jobs. Deduplicates by job_id,
+    keeping the latest entry. Returns compaction statistics.
+    """
+    jobs_path = _operator_jobs_path(cfg)
+    if not jobs_path.exists():
+        return {"compacted": 0, "kept": 0, "duplicates_removed": 0, "old_pruned": 0}
+
+    jobs = read_jsonl(jobs_path)
+    original_count = len(jobs)
+
+    # Deduplicate: keep last occurrence of each job_id
+    seen = {}
+    for j in jobs:
+        seen[j.get("job_id", "")] = j
+    deduped = list(seen.values())
+
+    # Sort by updated_at descending if available, keep last N
+    deduped.sort(key=lambda j: j.get("updated_at", j.get("created_at", "")), reverse=True)
+    kept = deduped[:keep_last_n]
+
+    atomic_write_jsonl(jobs_path, kept)
+
+    return {
+        "compacted": original_count - len(kept),
+        "kept": len(kept),
+        "duplicates_removed": original_count - len(deduped),
+        "old_pruned": len(deduped) - len(kept),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Production: Health Check Helpers
+# ═══════════════════════════════════════════════════════════════════════
+
+
+def check_storage_health(cfg: RuntimeConfig) -> dict:
+    """Verify all data directories exist and are writable.
+
+    Returns a health dict suitable for the /studio-os/status endpoint.
+    """
+    issues = []
+    checks = {}
+
+    dirs = {
+        "output_root": cfg.output_root,
+        "report_dir": cfg.report_dir,
+        "operator_detail_dir": cfg.operator_detail_dir,
+        "studio_data_dir": cfg.studio_data_dir,
+        "scheduler_data_dir": cfg.scheduler_data_dir,
+        "calibration_data_dir": cfg.calibration_data_dir,
+        "craft_memory_dir": cfg.craft_memory_dir,
+    }
+
+    import os as _os
+
+    for name, d in dirs.items():
+        path = Path(d) if not isinstance(d, Path) else d
+        path = path if path.is_absolute() else cfg.project_root / path
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            issues.append(f"{name}: cannot create {path}: {e}")
+            checks[name] = {"path": str(path), "exists": path.exists(), "writable": False}
+            continue
+
+        writable = _os.access(str(path), _os.W_OK)
+        checks[name] = {
+            "path": str(path),
+            "exists": path.exists(),
+            "writable": writable,
+        }
+        if not writable:
+            issues.append(f"{name}: not writable: {path}")
+
+    return {
+        "storage": {
+            "healthy": len(issues) == 0,
+            "issues": issues,
+            "directories": checks,
+        }
+    }

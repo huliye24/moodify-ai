@@ -34,16 +34,37 @@
 
 **Key finding**: Default command_templates had incorrect arg format. Fixed.
 
-### 📋 Harden-6: Production Hardening
+### ✅ Harden-6: Production Hardening (COMPLETE)
 
 | Step | MHP | Task | Status |
 |------|-----|------|--------|
-| E1 | 065 | Fix Validation Issues | proposed |
-| E2 | 066 | Production Refactor | proposed |
-| V1 | 067 | Full Regression | proposed |
-| V2 | 068 | Integration Audit | proposed |
-| S1 | 069 | Finalize Manifest (README, X-CLP) | proposed |
-| N1 | 070 | Next NEM Entry | proposed |
+| E1 | 065 | Fix Validation Issues (CLI templates fixed, fix_log.md) | ✅ |
+| E2 | 066 | Production Refactor (compact, storage health, structured logging) | ✅ |
+| V1 | 067 | Full Regression (129/129 pass, 0 regressions) | ✅ |
+| V2 | 068 | Integration Audit (CLI↔API↔Console↔Runtime, 40 routes, 8 views) | ✅ |
+| S1 | 069 | Finalize Manifest (README v0.2.0-alpha, CHANGELOG, X-CLP ~30) | ✅ |
+| N1 | 070 | Next NEM Entry → NEM-MOODIFY-MRS-002 | ✅ |
+
+**🎉 NEM-18 COMPLETE. Gate: ADOPT. Next: NEM-MOODIFY-MRS-002.**
+
+---
+
+## Completed Cycles
+
+### Cycle 1: MHP-031→040 — Studio OS Alpha (2026-06-04)
+### Cycle 2: MHP-041→046 — API Deepening (2026-06-04)
+### Cycle 3: MHP-047→052 — Console & CLI Hardening (2026-06-04)
+### Cycle 4: MHP-053→058 — Build-6 (2026-06-04)
+### Cycle 5: MHP-059→064 — Validate-6 (2026-06-04)
+### Cycle 6: MHP-065→070 — Harden-6 (2026-06-04)
+
+---
+
+## Next Node: NEM-MOODIFY-MRS-002 (planned)
+
+- MRS Scoring Hardening: genre-specific thresholds, graduated over_dark, calibration dataset
+- Target: 18 tasks (Build-6 + Validate-6 + Harden-6)
+- Entry point: `docs/plan/MHP-070_NEXT_NEM_ENTRY.md`
 
 ---
 

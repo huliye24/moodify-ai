@@ -1,6 +1,6 @@
 # MHP-069: Finalize Manifest — Docs, X-CLP Score, Version Bump
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-STUDIO-OS-001 / Harden-6 / S (Systemization)
 **Depends on**: MHP-068 (integration audit complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

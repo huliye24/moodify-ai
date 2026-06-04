@@ -7,21 +7,21 @@
 - **Project**: Moodify
 - **Status**: EXPERIMENT
 - **Start Date**: 2026-06-04
-- **Target Gate**: ADOPT
-- **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
+- **Target Gate**: ADOPT ✅ (achieved 2026-06-04)
+- **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6 (COMPLETE)
 
 ## 2. Node Purpose
 
-Moodify has completed two 6-step plan cycles (MHP-031→040, MHP-041→052), producing:
+Moodify has completed the full NEM-18 protocol for NEM-MOODIFY-STUDIO-OS-001. The system evolved from "all tests pass locally with synthetic data" to **"production-ready, real-audio-validated, deployment-configured."**
 
+Final state:
 - 6 subsystems: Operator Console, Studio, Scheduler, Calibration, Craft, Runtime
-- 45 CLI commands, 45 API routes, 8 Console views
-- 107 tests, all green
-- JSONL-backed durable storage for all subsystems
-
-But the system has **never been tested with real audio processing**. All 107 tests use synthetic manifest.csv injection. The Console UI has 8 views but zero interaction tests. There is no deployment configuration. No production runtime data exists.
-
-This node takes Studio OS Alpha from "all tests pass locally with synthetic data" to **"production-ready, real-audio-validated, deployment-configured."**
+- 40 CLI commands, 40 API routes, 8 Console views
+- 129 tests, all green (119 unit + 3 real audio + 7 full stack smoke)
+- JSONL-backed durable storage with compaction
+- Dockerfile, systemd unit, nginx config, backup script, deploy script
+- 30-sample validation dataset with ground truth labels
+- Gate: ADOPT ✅
 
 ## 3. Build-6: Real Integration & Console Completion
 

@@ -21,6 +21,8 @@ from .craft_memory import list_craft_records, writeback_delivery_to_craft_record
 from .operator_console import (
     attach_run_report_to_job,
     build_operator_report_bundle,
+    check_storage_health,
+    compact_operator_jobs,
     create_delivery_record,
     create_operator_job,
     get_delivery_record,
@@ -96,13 +98,25 @@ def _get_app():
             cfg = load_config()
             jobs = list_operator_jobs(cfg)
             deliveries = list_delivery_records(cfg)
+            storage = check_storage_health(cfg)
             return {
                 "active_jobs": len([j for j in jobs if j["status"] not in ("delivered", "failed")]),
                 "pending_gates": len([j for j in jobs if j["status"] == "gate_review"]),
                 "delivered_jobs": len([j for j in jobs if j["status"] == "delivered"]),
                 "total_jobs": len(jobs),
                 "total_deliveries": len(deliveries),
+                "storage": storage["storage"],
             }
+
+        @app.post("/operator/compact")
+        async def api_compact(keep: int = 100):
+            """Deduplicate and prune operator_jobs.jsonl. Keeps most recent `keep` jobs."""
+            cfg = load_config()
+            try:
+                result = compact_operator_jobs(cfg, keep_last_n=keep)
+                return {"status": "ok", **result}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"compaction failed: {e}")
 
         # ═══════════════════════════════════════════════════════════════
         # Operator Jobs (MHP-031)
