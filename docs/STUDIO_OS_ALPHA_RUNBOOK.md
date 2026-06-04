@@ -1,6 +1,6 @@
 # Moodify Studio OS Alpha — Runbook
 
-**MHP-040** | **Version:** v0.1.0-alpha  | **Date:** 2026-06-04
+**MHP-040→050** | **Version:** v0.1.0-alpha.4  | **Date:** 2026-06-04
 
 ## Quick Start
 
@@ -8,11 +8,73 @@
 # 1. Start the Operator API server
 python3 -m uvicorn moodify_runtime.operator_api:app --host 0.0.0.0 --port 8700
 
-# 2. Open the Operator Console
+# 2. Open the Operator Console (8 views now)
 open http://localhost:8700/operator
 
-# 3. Run the end-to-end integration test
-python3 -m pytest moodify_runtime/tests/test_studio_os_alpha.py -v
+# 3. Run all tests
+python3 -m pytest moodify_runtime/tests/ -v
+```
+
+## Test Results
+
+```text
+107 tests passed
+  - 42 API endpoint tests (system, jobs, studio, scheduler, calibration)
+  - 12 contract tests (field shapes, status values, empty states)
+  - 12 edge case tests (state transitions, double-submit, boundaries)
+  - 13 operator_console (jobs, gates, delivery)
+  - 10 operator_job_runner (plan, run, live, timestamps)
+  -  4 operator_report_bundle
+  -  4 command_safety
+  -  3 mt001_gate3_config
+  -  2 mt001_smoke_config
+  -  2 mt002_mrs_score_manifest
+  -  2 mt002_validate_mrs_matrix
+  -  1 studio_os_alpha (end-to-end)
+```
+
+## CLI Quick Reference
+
+### All 45 subcommands (Cycle 2 additions marked ★)
+
+```
+operator-create operator-list operator-detail
+operator-attach-run operator-deliver operator-delivery-get operator-delivery-list
+operator-plan-runtime operator-show-plan operator-run
+operator-report operator-deliver
+★ scheduler-schedule scheduler-requests scheduler-allocate
+★ scheduler-record scheduler-runs scheduler-costs
+★ calibration-set-create calibration-sets
+★ calibration-review calibration-reviews
+★ calibration-audit calibration-audits
+★ calibration-threshold calibration-thresholds
+★ craft-writeback craft-records
+studio-client-create studio-client-list studio-project-create studio-project-list
+studio-order-create studio-order-list studio-order-link studio-order-context
+studio-note-create studio-note-list
+register plan run report craft failures next all
+```
+
+## Console Views (8 panels)
+
+| View | Route | Subsystem |
+|------|-------|-----------|
+| Queue | /operator | MHP-031 |
+| Jobs | /operator (create form) | MHP-031 |
+| Reports | /operator/jobs/{id}/report | MHP-033 |
+| Delivery | /operator/deliveries | MHP-034 |
+| Craft Library | /craft/records | MHP-037 |
+| ★ Studio | /studio/* | MHP-036 |
+| ★ Scheduler | /scheduler/* | MHP-038 |
+| ★ Calibration | /calibration/* | MHP-039 |
+
+## API Routes (45 endpoints)
+
+See `docs/ARCHITECTURE.md` for the full route table. Key Cycle 2 additions:
+- 10 studio endpoints (clients, projects, orders, notes)
+- 6 scheduler endpoints (requests, leases, runs, costs)
+- 8 calibration endpoints (sample sets, reviews, audits, thresholds)
+- 2 craft endpoints (writeback, records)
 ```
 
 ## Full Pipeline

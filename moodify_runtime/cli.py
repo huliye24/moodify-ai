@@ -5,9 +5,28 @@ import json
 from typing import Any
 
 from .config import load_config
-from .craft_memory import seed_craft_memory
+from .craft_memory import seed_craft_memory, writeback_delivery_to_craft_record, list_craft_records
 from .failure import analyze_failures
+from .mrs_calibration import (
+    create_calibration_sample_set,
+    list_calibration_audits,
+    list_calibration_reviews,
+    list_calibration_sample_sets,
+    list_calibration_thresholds,
+    propose_threshold,
+    run_gate_audit,
+    submit_calibration_review,
+)
 from .planner import suggest_next_plan
+from .scheduler import (
+    allocate_lease,
+    list_scheduler_costs,
+    list_scheduler_leases,
+    list_scheduler_requests,
+    list_scheduler_runs,
+    record_compute_run,
+    schedule_job,
+)
 from .operator_console import (
     attach_run_report_to_job,
     build_operator_report_bundle,
@@ -31,6 +50,7 @@ from .studio import (
     list_clients,
     list_orders,
     list_projects,
+    list_staff_notes,
 )
 from .queue import plan_queue
 from .registry import register_inputs
@@ -121,9 +141,10 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("operator-show-plan", help="Show planned commands for an Operator Job (dry-run)")
     sp.add_argument("--job-id", required=True)
 
-    sp = sub.add_parser("operator-run", help="Execute the runtime for an Operator Job")
+    sp = sub.add_parser("operator-run", help="Execute the runtime for an Operator Job (default: dry-run)")
     sp.add_argument("--job-id", required=True)
-    sp.add_argument("--dry-run", action="store_true")
+    sp.add_argument("--dry-run", action="store_true", default=True, help="Plan only, no execution (default)")
+    sp.add_argument("--live", dest="dry_run", action="store_false", help="Execute for real")
 
     sp = sub.add_parser("operator-report", help="Build Operator Report Bundle for a job")
     sp.add_argument("--job-id", required=True)
@@ -167,6 +188,74 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--target-id", required=True)
     sp.add_argument("--content", required=True)
     sp.add_argument("--author", default="operator")
+
+    sp = sub.add_parser("studio-note-list", help="List staff notes")
+    sp.add_argument("--target-type", default=None)
+    sp.add_argument("--target-id", default=None)
+
+    # ── Scheduler (MHP-038) ──────────────────────────────
+    sp = sub.add_parser("scheduler-schedule", help="Create a compute request for a job")
+    sp.add_argument("--job-id", required=True)
+    sp.add_argument("--compute-class", default="cpu_standard")
+    sp.add_argument("--priority", type=int, default=5)
+
+    sp = sub.add_parser("scheduler-requests", help="List scheduler requests")
+
+    sp = sub.add_parser("scheduler-allocate", help="Allocate a compute lease")
+    sp.add_argument("--request-id", required=True)
+    sp.add_argument("--node-id", required=True)
+    sp.add_argument("--ttl-minutes", type=int, default=120)
+
+    sp = sub.add_parser("scheduler-record", help="Record a completed compute run")
+    sp.add_argument("--lease-id", required=True)
+    sp.add_argument("--request-id", required=True)
+    sp.add_argument("--job-id", required=True)
+    sp.add_argument("--status", default="completed")
+    sp.add_argument("--duration-seconds", type=float, default=0.0)
+    sp.add_argument("--node-id", default="")
+
+    sp = sub.add_parser("scheduler-runs", help="List scheduler runs")
+    sp = sub.add_parser("scheduler-costs", help="List scheduler costs")
+
+    # ── Calibration (MHP-039) ─────────────────────────────
+    sp = sub.add_parser("calibration-set-create", help="Create a calibration sample set")
+    sp.add_argument("--name", required=True)
+    sp.add_argument("--description", default="")
+
+    sp = sub.add_parser("calibration-sets", help="List calibration sample sets")
+
+    sp = sub.add_parser("calibration-review", help="Submit a calibration review")
+    sp.add_argument("--set-id", required=True)
+    sp.add_argument("--candidate-id", required=True)
+    sp.add_argument("--human-decision", required=True, choices=["better","worse","no_change","unsure"])
+    sp.add_argument("--gate-decision", required=True, choices=["approve","reject","reprocess"])
+    sp.add_argument("--notes", default="")
+
+    sp = sub.add_parser("calibration-reviews", help="List calibration reviews")
+    sp.add_argument("--set-id", default=None)
+
+    sp = sub.add_parser("calibration-audit", help="Run gate audit for a sample set")
+    sp.add_argument("--set-id", required=True)
+
+    sp = sub.add_parser("calibration-audits", help="List calibration audits")
+
+    sp = sub.add_parser("calibration-threshold", help="Propose a threshold change")
+    sp.add_argument("--parameter", required=True)
+    sp.add_argument("--current-value", type=float, required=True)
+    sp.add_argument("--proposed-value", type=float, required=True)
+    sp.add_argument("--justification", default="")
+
+    sp = sub.add_parser("calibration-thresholds", help="List calibration thresholds")
+
+    # ── Craft (MHP-037) ───────────────────────────────────
+    sp = sub.add_parser("craft-writeback", help="Create craft record from delivered job")
+    sp.add_argument("--job-id", required=True)
+    sp.add_argument("--candidate-id", required=True)
+    sp.add_argument("--adoption-status", default="candidate")
+    sp.add_argument("--operator-notes", default="")
+
+    sp = sub.add_parser("craft-records", help="List craft records")
+    sp.add_argument("--adoption-status", default=None)
 
     sp = sub.add_parser("all", help="register → plan → run → report → craft")
     sp.add_argument("--source", default="unknown")
@@ -314,6 +403,70 @@ def main(argv=None) -> int:
     if args.command == "studio-note-create":
         print_json(create_staff_note(cfg, target_type=args.target_type, target_id=args.target_id,
                                      content=args.content, author=args.author))
+        return 0
+    if args.command == "studio-note-list":
+        print_json({"notes": list_staff_notes(cfg, target_type=args.target_type, target_id=args.target_id)})
+        return 0
+
+    # ── Scheduler handlers ───────────────────────────────
+    if args.command == "scheduler-schedule":
+        print_json(schedule_job(cfg, job_id=args.job_id, compute_class=args.compute_class, priority=args.priority))
+        return 0
+    if args.command == "scheduler-requests":
+        print_json({"requests": list_scheduler_requests(cfg)})
+        return 0
+    if args.command == "scheduler-allocate":
+        print_json(allocate_lease(cfg, request_id=args.request_id, node_id=args.node_id, ttl_minutes=args.ttl_minutes))
+        return 0
+    if args.command == "scheduler-record":
+        print_json(record_compute_run(cfg, lease_id=args.lease_id, request_id=args.request_id,
+                                      job_id=args.job_id, status=args.status,
+                                      duration_seconds=args.duration_seconds, node_id=args.node_id))
+        return 0
+    if args.command == "scheduler-runs":
+        print_json({"runs": list_scheduler_runs(cfg)})
+        return 0
+    if args.command == "scheduler-costs":
+        print_json({"costs": list_scheduler_costs(cfg)})
+        return 0
+
+    # ── Calibration handlers ─────────────────────────────
+    if args.command == "calibration-set-create":
+        print_json(create_calibration_sample_set(cfg, name=args.name, description=args.description))
+        return 0
+    if args.command == "calibration-sets":
+        print_json({"sample_sets": list_calibration_sample_sets(cfg)})
+        return 0
+    if args.command == "calibration-review":
+        print_json(submit_calibration_review(cfg, set_id=args.set_id, candidate_id=args.candidate_id,
+                                             human_decision=args.human_decision,
+                                             gate_decision=args.gate_decision, notes=args.notes))
+        return 0
+    if args.command == "calibration-reviews":
+        print_json({"reviews": list_calibration_reviews(cfg, set_id=args.set_id)})
+        return 0
+    if args.command == "calibration-audit":
+        print_json(run_gate_audit(cfg, set_id=args.set_id))
+        return 0
+    if args.command == "calibration-audits":
+        print_json({"audits": list_calibration_audits(cfg)})
+        return 0
+    if args.command == "calibration-threshold":
+        print_json(propose_threshold(cfg, parameter=args.parameter, current_value=args.current_value,
+                                     proposed_value=args.proposed_value, justification=args.justification))
+        return 0
+    if args.command == "calibration-thresholds":
+        print_json({"thresholds": list_calibration_thresholds(cfg)})
+        return 0
+
+    # ── Craft handlers ────────────────────────────────────
+    if args.command == "craft-writeback":
+        print_json(writeback_delivery_to_craft_record(cfg, job_id=args.job_id, candidate_id=args.candidate_id,
+                                                       adoption_status=args.adoption_status,
+                                                       operator_notes=args.operator_notes))
+        return 0
+    if args.command == "craft-records":
+        print_json({"records": list_craft_records(cfg, adoption_status=args.adoption_status)})
         return 0
 
     if args.command == "all":

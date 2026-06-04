@@ -183,8 +183,23 @@ def propose_threshold(
     return t.to_dict()
 
 
+def list_calibration_sample_sets(cfg: RuntimeConfig) -> List[Dict[str, Any]]:
+    """Return all calibration sample sets."""
+    return read_jsonl(_cal_path(cfg, "sample_sets"))
+
+
 def list_calibration_reviews(cfg: RuntimeConfig, set_id: Optional[str] = None) -> List[Dict[str, Any]]:
     rows = read_jsonl(_cal_path(cfg, "reviews"))
     if set_id:
         rows = [r for r in rows if r.get("set_id") == set_id]
     return rows
+
+
+def list_calibration_audits(cfg: RuntimeConfig) -> List[Dict[str, Any]]:
+    """Return all gate audits."""
+    return read_jsonl(_cal_path(cfg, "audits"))
+
+
+def list_calibration_thresholds(cfg: RuntimeConfig) -> List[Dict[str, Any]]:
+    """Return all threshold proposals."""
+    return read_jsonl(_cal_path(cfg, "thresholds"))

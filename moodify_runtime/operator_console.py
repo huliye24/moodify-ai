@@ -43,6 +43,8 @@ class OperatorJob:
     current_step: str = "intake"
     run_id: Optional[str] = None
     run_dir: Optional[str] = None
+    run_started_at: Optional[str] = None
+    run_finished_at: Optional[str] = None
     report_path: Optional[str] = None
     detail_path: Optional[str] = None
     delivery_path: Optional[str] = None
@@ -659,18 +661,49 @@ def run_operator_job(
     run evidence back to the job via attach_run_report_to_job.
 
     On failure the job status is set to 'failed' and last_error is recorded.
+
+    Guardrails:
+    - Verifies queue has pending tasks before running (real mode only).
+    - Verifies manifest.csv exists after a real run.
+    - Records run_started_at / run_finished_at timestamps on the job.
     """
-    from .runner import run_daily
+    from .queue import load_queue
+    from .runner import run_daily, select_pending_tasks
 
     cfg = cfg.resolved()
     get_operator_job(cfg, job_id)
 
+    # Pre-flight: check that the queue has pending tasks
+    if not dry_run:
+        queue_rows = load_queue(cfg)
+        pending = select_pending_tasks(queue_rows)
+        if not pending:
+            now = utc_now_iso()
+            _update_job(
+                cfg, job_id,
+                {
+                    "status": "failed",
+                    "current_step": "runtime_failed",
+                    "run_started_at": now,
+                    "run_finished_at": now,
+                    "last_error": "No pending tasks in queue. Run plan-runtime first.",
+                },
+            )
+            return {
+                "job_id": job_id,
+                "status": "failed",
+                "error": "No pending tasks in queue. Run plan-runtime first.",
+                "dry_run": False,
+            }
+
+    now = utc_now_iso()
     _update_job(
         cfg,
         job_id,
         {
             "status": "running",
             "current_step": "runtime_executing",
+            "run_started_at": now,
         },
     )
 
@@ -683,6 +716,7 @@ def run_operator_job(
             {
                 "status": "failed",
                 "current_step": "runtime_failed",
+                "run_finished_at": utc_now_iso(),
                 "last_error": f"{type(exc).__name__}: {exc}",
             },
         )
@@ -695,7 +729,7 @@ def run_operator_job(
 
     # On dry-run, don't attach anything — just return the plan
     if dry_run:
-        _update_job(cfg, job_id, {"status": "waiting", "current_step": "intake"})
+        _update_job(cfg, job_id, {"status": "waiting", "current_step": "intake", "run_finished_at": utc_now_iso()})
         return {
             "job_id": job_id,
             "status": "dry_run_complete",
@@ -711,6 +745,7 @@ def run_operator_job(
             {
                 "status": "failed",
                 "current_step": "runtime_failed",
+                "run_finished_at": utc_now_iso(),
                 "last_error": result.get("fatal_error", "")[-1000:],
             },
         )
@@ -721,12 +756,35 @@ def run_operator_job(
             "run": result,
         }
 
+    # Verify manifest exists after a real run
+    run_dir = cfg.output_root / run_id
+    manifest_path = run_dir / "manifest.csv"
+    if not manifest_path.exists():
+        _update_job(
+            cfg,
+            job_id,
+            {
+                "status": "failed",
+                "current_step": "runtime_failed",
+                "run_finished_at": utc_now_iso(),
+                "last_error": f"manifest.csv not found at {manifest_path}",
+            },
+        )
+        return {
+            "job_id": job_id,
+            "status": "failed",
+            "error": f"manifest.csv not found at {manifest_path}",
+            "run": result,
+        }
+
     # Attach run evidence back to the job
     detail = attach_run_report_to_job(
         cfg,
         job_id=job_id,
         run_id=run_id,
     )
+
+    _update_job(cfg, job_id, {"run_finished_at": utc_now_iso()})
 
     return {
         "job_id": job_id,
@@ -821,9 +879,10 @@ def build_operator_report_bundle(
     job = get_operator_job(cfg, job_id)
 
     # Load detail
-    detail_path = Path(job.get("detail_path", ""))
+    dp = job.get("detail_path")
+    detail_path = Path(dp) if dp else None
     detail: Dict[str, Any] = {}
-    if detail_path.exists():
+    if detail_path and detail_path.exists():
         detail = read_json(detail_path, default={}) or {}
 
     report_dir = _operator_report_dir(cfg, job_id)

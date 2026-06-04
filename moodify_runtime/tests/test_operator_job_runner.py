@@ -215,3 +215,91 @@ def test_operator_show_plan_cli(tmp_path, capsys):
     plan = jmod.loads(capsys.readouterr().out)
     assert "commands" in plan
     assert len(plan["commands"]) >= 1
+
+
+# ── MHP-042: Real Runtime Integration tests ────────────────────────
+
+
+def test_run_operator_job_fails_on_empty_queue(tmp_path):
+    """run_operator_job with --live should fail if queue is empty."""
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        data_root=tmp_path / "data",
+        queue_path=tmp_path / "queue.jsonl",
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+    )
+    job = create_operator_job(cfg, source_audio="input/song.wav", processing_depth="quick_scan")
+    # No plan-runtime called — queue is empty
+
+    result = run_operator_job(cfg, job_id=job["job_id"], dry_run=False)  # --live
+    assert result["status"] == "failed"
+    assert "No pending tasks" in result["error"]
+
+    updated = get_operator_job(cfg, job["job_id"])
+    assert updated["status"] == "failed"
+    assert "No pending tasks" in (updated.get("last_error") or "")
+
+
+def test_run_operator_job_records_timestamps(tmp_path):
+    """run_operator_job should record run_started_at and run_finished_at."""
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        data_root=tmp_path / "data",
+        input_dirs=[tmp_path / "input"],
+        output_root=tmp_path / "outputs",
+        report_dir=tmp_path / "reports",
+        registry_path=tmp_path / "registry.jsonl",
+        queue_path=tmp_path / "queue.jsonl",
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+    )
+    src = BASELINE / "piano.wav"
+    input_dir = tmp_path / "input"
+    input_dir.mkdir(parents=True)
+    (input_dir / "piano.wav").write_bytes(src.read_bytes())
+
+    job = create_operator_job(cfg, source_audio=str(input_dir / "piano.wav"), processing_depth="quick_scan")
+    plan_operator_runtime(cfg, job_id=job["job_id"])
+
+    # Dry-run should still record timestamps
+    result = run_operator_job(cfg, job_id=job["job_id"], dry_run=True)
+    assert result["status"] == "dry_run_complete"
+
+    updated = get_operator_job(cfg, job["job_id"])
+    assert updated.get("run_started_at") is not None
+    assert updated.get("run_finished_at") is not None
+
+
+def test_operator_run_cli_live_flag(tmp_path, capsys):
+    """CLI operator-run --live should fail cleanly on empty queue (not crash)."""
+    import json as jmod
+
+    config_path = tmp_path / "runtime_config.json"
+    config_path.write_text(
+        '{"project_root":"%s","data_root":"data","input_dirs":["input"],'
+        '"output_root":"outputs","report_dir":"reports",'
+        '"registry_path":"registry.jsonl","queue_path":"queue.jsonl",'
+        '"operator_jobs_path":"operator_jobs.jsonl",'
+        '"operator_detail_dir":"operator_details"}' % tmp_path.as_posix(),
+        encoding="utf-8",
+    )
+    assert main([
+        "--config", str(config_path),
+        "operator-create",
+        "--source-audio", "/nonexistent/file.wav",
+        "--depth", "quick_scan",
+    ]) == 0
+    job = jmod.loads(capsys.readouterr().out)
+
+    # Run with --live on empty queue should exit cleanly with error JSON
+    rc = main([
+        "--config", str(config_path),
+        "operator-run",
+        "--job-id", job["job_id"],
+        "--live",
+    ])
+    assert rc == 0  # CLI returns 0 even for failed jobs (error is in JSON)
+    out = jmod.loads(capsys.readouterr().out)
+    assert out["status"] == "failed"
+    assert "No pending tasks" in out.get("error", "")

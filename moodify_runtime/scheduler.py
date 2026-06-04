@@ -170,6 +170,16 @@ def record_compute_run(
     return {"run": run.to_dict(), "cost": cost.to_dict()}
 
 
+def list_scheduler_requests(cfg: RuntimeConfig) -> List[Dict[str, Any]]:
+    """Return all compute requests sorted by creation time."""
+    return read_jsonl(_sched_path(cfg, "requests"))
+
+
+def list_scheduler_leases(cfg: RuntimeConfig) -> List[Dict[str, Any]]:
+    """Return all compute leases sorted by lease time."""
+    return read_jsonl(_sched_path(cfg, "leases"))
+
+
 def list_scheduler_runs(cfg: RuntimeConfig) -> List[Dict[str, Any]]:
     return read_jsonl(_sched_path(cfg, "runs"))
 
