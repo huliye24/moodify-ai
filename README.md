@@ -667,7 +667,9 @@ code
 
 ## License
 
-Proprietary — 文川院 / Moodify 声音实验室 · 影焰实验室
+Moodify uses Apache License 2.0. See [LICENSE](LICENSE).
+
+Unless stated otherwise, source code and documentation in this repository are licensed under Apache-2.0. Input audio, generated audio, third-party models, third-party datasets, and external media remain under their own rights and license terms.
 
 Repository:
 
