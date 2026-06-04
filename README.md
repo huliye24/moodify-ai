@@ -1,5 +1,20 @@
 # Moodify
 
+## 2026-06-04 Direction Update
+
+Moodify is now directed as an enterprise acoustic industrial system, not a consumer one-click music app.
+
+Working definition:
+
+> Moodify is not a button. Moodify is a machine.
+
+The product should be built around an internal operator console, job queue, deep acoustic scans, cloud/runtime processing, candidate versions, MRS quality gates, reports, delivery records, and craft-library accumulation.
+
+Read the active direction documents first:
+
+- `docs/strategy/MOODIFY_INDUSTRIAL_DIRECTION.md`
+- `docs/plan/MHP-031_INTERNAL_OPERATOR_CONSOLE.md`
+
 AI 音乐二次处理与情绪声波工程系统。
 
 Moodify 的目标不是再次生成音乐，而是对 AI 生成音乐进行二次处理、频谱诊断、DSP 工艺修正、听感校准和经验沉淀。
@@ -29,9 +44,10 @@ Treatment Records
 ## Status
 
 * **Current Version**: `v0.1.0-alpha.3`
-* **Current Engineering State**: `MHP-024`
+* **Current Engineering State**: `MHP-031 direction pivot`
 * **Mainline**: `v01`
-* **Core Mode**: Local-first / CLI-first / experience-loop-first
+* **Core Mode**: Industrial-system-first / runtime-first / report-first
+* **Strategic Direction**: enterprise acoustic industrial system
 * **CLI**: `analyze` / `process` / `presets` use the v01 mainline
 * **API**: pending alignment — `/process` still needs migration to `v01_pipeline`
 * **Tests**: 20 v01 tests, 104 total tests reported green
@@ -39,7 +55,7 @@ Treatment Records
 * **Completed Human Feedback**: 3 / 9
 * **Feedback Coverage**: 33%
 * **Current Better Rate**: 3 / 3 completed feedback says “better than before”
-* **Current Phase**: local experience loop + feedback-aware aggregation + preparation for rule-based adaptive preset
+* **Current Phase**: v0.1 runtime proof -> v0.2 internal operator console
 
 ---
 
@@ -366,6 +382,8 @@ But it should not be reconnected to the v01 `/process` path during the v0.1.x ph
 
 Do:
 
+* Treat Moodify as an industrial system, not a consumer one-click app.
+* Build around jobs, queues, reports, gate decisions, delivery records, and craft-library writeback.
 * Keep v01 small and stable.
 * Add tests when changing the pipeline.
 * Preserve treatment records.
@@ -376,10 +394,12 @@ Do:
 
 Do not:
 
+* Do not make casual C-end onboarding the next product center.
+* Do not make instant one-click processing the core interaction.
 * Do not delete legacy systems.
 * Do not reconnect `WorkflowOrchestrator` to the v01 mainline.
 * Do not expand presets too early.
-* Do not build GUI in v0.1.x.
+* Do not build a consumer GUI in v0.1.x; the next UI is the internal operator console.
 * Do not start cloud/database/model training in v0.1.x.
 * Do not call current feedback statistically conclusive.
 * Do not judge processed audio without loudness matching.
@@ -475,6 +495,31 @@ Current known issues:
 ---
 
 ## Next Milestones
+
+### MHP-031 Internal Operator Console
+
+Goal:
+
+```text
+Make the next product surface an internal industrial operator console.
+```
+
+Tasks:
+
+```text
+- Define durable Job / Candidate / Score / Gate / Report / Delivery records
+- Create or align queue storage for internal jobs
+- Attach runtime/MRS evidence to report bundles
+- Build the first console view around queue and job detail
+- Promote reports and gate decisions into the main workflow
+- Keep heavy audio outputs out of Git
+```
+
+Reference:
+
+```text
+docs/plan/MHP-031_INTERNAL_OPERATOR_CONSOLE.md
+```
 
 ### MHP-025 — API v01 Alignment
 
