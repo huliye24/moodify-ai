@@ -135,3 +135,93 @@ def seed_craft_memory(cfg: RuntimeConfig, run_id: Optional[str] = None, top_k: i
 
     path.write_text("\n".join(lines), encoding="utf-8")
     return {"craft_memory_path": str(path), "best_count": len(best), "worst_count": len(worst)}
+
+
+# ── MHP-037: Craft Library Writeback ────────────────────────────────
+CRAFT_STATUSES = {"experimental", "candidate", "stable", "adopted"}
+
+
+def writeback_delivery_to_craft_record(
+    cfg: RuntimeConfig,
+    job_id: str,
+    candidate_id: str,
+    adoption_status: str = "candidate",
+    operator_notes: str = "",
+) -> Dict[str, Any]:
+    """Create a Craft Record from a delivered job's candidate.
+
+    Records the processing chain, MRS statistics, risk conditions, and lineage.
+    The adoption_status flows: experimental → candidate → stable → adopted.
+    """
+    import uuid
+
+    from .operator_console import get_operator_job, get_operator_job_detail
+
+    if adoption_status not in CRAFT_STATUSES:
+        raise ValueError(f"adoption_status must be one of {sorted(CRAFT_STATUSES)}")
+
+    cfg = cfg.resolved()
+    job = get_operator_job(cfg, job_id)
+    detail_data = get_operator_job_detail(cfg, job_id)
+    detail = detail_data.get("detail", {})
+
+    candidates = detail.get("candidate_versions", [])
+    scores = detail.get("score_results", [])
+    gates = detail.get("gate_decisions", [])
+
+    candidate = next((c for c in candidates if c.get("candidate_id") == candidate_id), None)
+    if not candidate:
+        raise ValueError(f"candidate_id={candidate_id!r} not found in job detail")
+
+    score = next((s for s in scores if s.get("candidate_id") == candidate_id), {})
+    gate = next((g for g in gates if g.get("candidate_id") == candidate_id), {})
+
+    craft_id = f"CRFT_{uuid.uuid4().hex[:12].upper()}"
+    now = utc_now_iso()
+
+    record = {
+        "craft_id": craft_id,
+        "source_job_id": job_id,
+        "source_candidate_id": candidate_id,
+        "audio_class": job.get("project_label", ""),
+        "preset": candidate.get("preset", ""),
+        "processing_chain": candidate.get("processing_chain", candidate.get("preset", "")),
+        "expected_improvement": f"MRS Δ={score.get('mrs_score_delta')}",
+        "mrs_score": score.get("mrs_score"),
+        "mrs_score_delta": score.get("mrs_score_delta"),
+        "risk_conditions": {
+            "over_dark_triggered": score.get("over_dark_triggered", False),
+            "transient_damage": score.get("transient_damage"),
+            "loudness_penalty": score.get("loudness_penalty"),
+        },
+        "gate_decision": gate.get("decision", "unknown"),
+        "failure_cases": [r for r in gate.get("reasons", []) if r != "all_gates_passed"],
+        "operator_notes": operator_notes,
+        "adoption_status": adoption_status,
+        "version_history": [{"status": adoption_status, "at": now, "note": "initial writeback"}],
+        "output_path": candidate.get("output_path", ""),
+        "created_at": now,
+        "updated_at": now,
+    }
+
+    craft_path = cfg.craft_memory_dir / "craft_records.jsonl"
+    craft_path.parent.mkdir(parents=True, exist_ok=True)
+    from .utils import append_jsonl
+
+    append_jsonl(craft_path, record)
+
+    return record
+
+
+def list_craft_records(
+    cfg: RuntimeConfig, adoption_status: Optional[str] = None
+) -> list[Dict[str, Any]]:
+    """List craft records, optionally filtered by adoption status."""
+    from .utils import read_jsonl
+
+    cfg = cfg.resolved()
+    path = cfg.craft_memory_dir / "craft_records.jsonl"
+    rows = read_jsonl(path)
+    if adoption_status:
+        rows = [r for r in rows if r.get("adoption_status") == adoption_status]
+    return sorted(rows, key=lambda r: r.get("created_at", ""), reverse=True)

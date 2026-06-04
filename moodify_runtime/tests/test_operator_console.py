@@ -297,3 +297,305 @@ def test_operator_cli_attach_and_detail(tmp_path, capsys):
     detail = json.loads(capsys.readouterr().out)
     assert detail["job"]["status"] == "gate_review"
     assert detail["detail"]["summary"]["gate_counts"] == {"approve": 1}
+
+
+# ── Delivery Record tests ────────────────────────────────────────
+
+
+def test_create_delivery_record_for_approved_candidate(tmp_path):
+    from moodify_runtime.operator_console import (
+        attach_run_report_to_job,
+        create_delivery_record,
+        get_delivery_record,
+        get_operator_job,
+    )
+
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        output_root=tmp_path / "outputs",
+        report_dir=tmp_path / "reports",
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+        operator_deliveries_path=tmp_path / "operator_deliveries.jsonl",
+    )
+    job = create_operator_job(cfg, source_audio="input/song.wav", processing_depth="deep_process")
+    run_dir = tmp_path / "outputs" / "run_dlv"
+    _write_manifest(
+        run_dir,
+        [
+            {
+                "run_id": "run_dlv",
+                "task_id": "TASK_A",
+                "sample_id": "SMP_A",
+                "input_path": "input/song.wav",
+                "preset": "clean_master",
+                "status": "done",
+                "return_code": "0",
+                "elapsed_seconds": "5.0",
+                "output_dir": "outputs/run_dlv/SMP_A/clean_master",
+                "template_index": "0",
+                "pseudo_mrs_before": "10",
+                "pseudo_mrs_after": "15",
+                "pseudo_delta_mrs": "5",
+                "mrs_open_v031_before": "",
+                "mrs_open_v031_after": "",
+                "delta_mrs_open_v031": "",
+                "mrs_open_flags": "",
+                "error": "",
+            }
+        ],
+    )
+    report_path = tmp_path / "reports" / "daily_report_run_dlv.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("# report", encoding="utf-8")
+
+    attach_run_report_to_job(cfg, job_id=job["job_id"], run_id="run_dlv", report_path=report_path)
+
+    # Read the actual candidate_id from the detail
+    import json as _j
+    detail_file = tmp_path / "operator_details" / f"{job['job_id']}.json"
+    detail = _j.loads(detail_file.read_text())
+    cand_id = detail["candidate_versions"][0]["candidate_id"]
+
+    delivery = create_delivery_record(
+        cfg,
+        job_id=job["job_id"],
+        candidate_id=cand_id,
+        operator_decision="approved",
+        notes="operator signed off",
+    )
+    assert delivery["delivery_id"].startswith("DLV_")
+    assert delivery["job_id"] == job["job_id"]
+
+    updated = get_operator_job(cfg, job["job_id"])
+    assert updated["status"] == "delivered"
+
+    d = get_delivery_record(cfg, job["job_id"])
+    assert d["delivery_id"] == delivery["delivery_id"]
+
+
+def test_delivery_rejects_missing_candidate(tmp_path):
+    from moodify_runtime.operator_console import create_delivery_record, create_operator_job
+
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+        operator_deliveries_path=tmp_path / "operator_deliveries.jsonl",
+    )
+    job = create_operator_job(cfg, source_audio="input/song.wav")
+    # No detail attached → candidate lookup will fail
+    with pytest.raises(ValueError, match="candidate_id"):
+        create_delivery_record(cfg, job_id=job["job_id"], candidate_id="NONEXISTENT")
+
+
+def test_delivery_override_allows_reprocess(tmp_path):
+    from moodify_runtime.operator_console import (
+        attach_run_report_to_job,
+        create_delivery_record,
+        create_operator_job,
+    )
+
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        output_root=tmp_path / "outputs",
+        report_dir=tmp_path / "reports",
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+        operator_deliveries_path=tmp_path / "operator_deliveries.jsonl",
+    )
+    job = create_operator_job(cfg, source_audio="input/song.wav", processing_depth="deep_process")
+    run_dir = tmp_path / "outputs" / "run_ovr"
+    _write_manifest(
+        run_dir,
+        [
+            {
+                "run_id": "run_ovr",
+                "task_id": "TASK_OVR",
+                "sample_id": "SMP_OVR",
+                "input_path": "input/song.wav",
+                "preset": "clean_master",
+                "status": "done",
+                "return_code": "0",
+                "elapsed_seconds": "5.0",
+                "output_dir": "outputs/run_ovr/SMP_OVR/clean_master",
+                "template_index": "0",
+                "pseudo_mrs_before": "10",
+                "pseudo_mrs_after": "9",
+                "pseudo_delta_mrs": "-1",
+                "mrs_open_v031_before": "",
+                "mrs_open_v031_after": "",
+                "delta_mrs_open_v031": "",
+                "mrs_open_flags": "over_dark",
+                "error": "",
+            }
+        ],
+    )
+    report_path = tmp_path / "reports" / "daily_report_run_ovr.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("# report", encoding="utf-8")
+
+    attach_run_report_to_job(cfg, job_id=job["job_id"], run_id="run_ovr", report_path=report_path)
+
+    # Without override, reprocess should fail
+    detail_dir = tmp_path / "operator_details"
+    detail_file = detail_dir / f"{job['job_id']}.json"
+    import json
+    detail = json.loads(detail_file.read_text())
+    cand_id = detail["candidate_versions"][0]["candidate_id"]
+
+    with pytest.raises(ValueError, match="override"):
+        create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id)
+
+    # With override it should succeed
+    delivery = create_delivery_record(
+        cfg,
+        job_id=job["job_id"],
+        candidate_id=cand_id,
+        override=True,
+        notes="manual override after review",
+    )
+    assert delivery["delivery_id"].startswith("DLV_")
+
+
+def test_list_delivery_records(tmp_path):
+    from moodify_runtime.operator_console import (
+        attach_run_report_to_job,
+        create_delivery_record,
+        create_operator_job,
+        list_delivery_records,
+    )
+
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        output_root=tmp_path / "outputs",
+        report_dir=tmp_path / "reports",
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+        operator_deliveries_path=tmp_path / "operator_deliveries.jsonl",
+    )
+
+    deliveries = []
+    for i in range(2):
+        job = create_operator_job(cfg, source_audio=f"input/song_{i}.wav", processing_depth="deep_process")
+        run_dir = tmp_path / "outputs" / f"run_lst_{i}"
+        _write_manifest(
+            run_dir,
+            [
+                {
+                    "run_id": f"run_lst_{i}",
+                    "task_id": f"TASK_{i}",
+                    "sample_id": f"SMP_{i}",
+                    "input_path": f"input/song_{i}.wav",
+                    "preset": "clean_master",
+                    "status": "done",
+                    "return_code": "0",
+                    "elapsed_seconds": "3.0",
+                    "output_dir": f"outputs/run_lst_{i}/SMP_{i}/clean_master",
+                    "template_index": "0",
+                    "pseudo_mrs_before": "10",
+                    "pseudo_mrs_after": "15",
+                    "pseudo_delta_mrs": "5",
+                    "mrs_open_v031_before": "",
+                    "mrs_open_v031_after": "",
+                    "delta_mrs_open_v031": "",
+                    "mrs_open_flags": "",
+                    "error": "",
+                }
+            ],
+        )
+        report_path = tmp_path / "reports" / f"daily_report_run_lst_{i}.md"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text("# report", encoding="utf-8")
+        attach_run_report_to_job(cfg, job_id=job["job_id"], run_id=f"run_lst_{i}", report_path=report_path)
+
+        detail_dir = tmp_path / "operator_details"
+        import json as jmod
+        detail = jmod.loads((detail_dir / f"{job['job_id']}.json").read_text())
+        cand_id = detail["candidate_versions"][0]["candidate_id"]
+
+        deliveries.append(create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id))
+
+    records = list_delivery_records(cfg)
+    assert len(records) == 2
+    delivery_ids = {r["delivery_id"] for r in records}
+    assert deliveries[0]["delivery_id"] in delivery_ids
+    assert deliveries[1]["delivery_id"] in delivery_ids
+
+
+def test_operator_deliver_cli(tmp_path, capsys):
+    import json as jmod
+
+    config_path = tmp_path / "runtime_config.json"
+    config_path.write_text(
+        '{"project_root":"%s","output_root":"outputs","report_dir":"reports",'
+        '"operator_jobs_path":"operator_jobs.jsonl",'
+        '"operator_detail_dir":"operator_details",'
+        '"operator_deliveries_path":"operator_deliveries.jsonl"}' % tmp_path.as_posix(),
+        encoding="utf-8",
+    )
+    run_dir = tmp_path / "outputs" / "run_cli_dlv"
+    _write_manifest(
+        run_dir,
+        [
+            {
+                "run_id": "run_cli_dlv",
+                "task_id": "TASK_CLI_DLV",
+                "sample_id": "SMP_CLI_DLV",
+                "input_path": "input/song.wav",
+                "preset": "clean_master",
+                "status": "done",
+                "return_code": "0",
+                "elapsed_seconds": "2.0",
+                "output_dir": "outputs/run_cli_dlv/SMP_CLI_DLV/clean_master",
+                "template_index": "0",
+                "pseudo_mrs_before": "10",
+                "pseudo_mrs_after": "15",
+                "pseudo_delta_mrs": "5",
+                "mrs_open_v031_before": "",
+                "mrs_open_v031_after": "",
+                "delta_mrs_open_v031": "",
+                "mrs_open_flags": "",
+                "error": "",
+            }
+        ],
+    )
+    report_path = tmp_path / "reports" / "daily_report_run_cli_dlv.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("# report", encoding="utf-8")
+
+    # Create job
+    assert main(["--config", str(config_path), "operator-create",
+                 "--source-audio", "input/song.wav", "--depth", "standard_process"]) == 0
+    job = jmod.loads(capsys.readouterr().out)
+    job_id = job["job_id"]
+
+    # Attach run
+    assert main(["--config", str(config_path), "operator-attach-run",
+                 "--job-id", job_id, "--run-id", "run_cli_dlv"]) == 0
+    _ = capsys.readouterr().out  # flush
+
+    # Get detail to find candidate_id
+    assert main(["--config", str(config_path), "operator-detail", "--job-id", job_id]) == 0
+    detail = jmod.loads(capsys.readouterr().out)
+    cand_id = detail["detail"]["candidate_versions"][0]["candidate_id"]
+
+    # Deliver
+    assert main(["--config", str(config_path), "operator-deliver",
+                 "--job-id", job_id, "--candidate-id", cand_id]) == 0
+    delivered = jmod.loads(capsys.readouterr().out)
+    assert delivered["job_id"] == job_id
+    assert delivered["delivery_id"].startswith("DLV_")
+
+    # Get delivery
+    assert main(["--config", str(config_path), "operator-delivery-get",
+                 "--job-id", job_id]) == 0
+    d = jmod.loads(capsys.readouterr().out)
+    assert d["delivery_id"] == delivered["delivery_id"]
+
+    # List deliveries — at minimum our delivery should appear
+    assert main(["--config", str(config_path), "operator-delivery-list"]) == 0
+    dl = jmod.loads(capsys.readouterr().out)
+    assert len(dl["deliveries"]) >= 1
+    our_ids = {d["delivery_id"] for d in dl["deliveries"]}
+    assert delivered["delivery_id"] in our_ids

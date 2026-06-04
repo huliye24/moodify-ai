@@ -10,9 +10,27 @@ from .failure import analyze_failures
 from .planner import suggest_next_plan
 from .operator_console import (
     attach_run_report_to_job,
+    build_operator_report_bundle,
+    create_delivery_record,
     create_operator_job,
+    get_delivery_record,
     get_operator_job_detail,
+    list_delivery_records,
     list_operator_jobs,
+    plan_operator_runtime,
+    run_operator_job,
+    show_operator_runtime_plan,
+)
+from .studio import (
+    create_client,
+    create_order,
+    create_project,
+    create_staff_note,
+    get_order_context,
+    link_job_to_order,
+    list_clients,
+    list_orders,
+    list_projects,
 )
 from .queue import plan_queue
 from .registry import register_inputs
@@ -84,6 +102,71 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("operator-detail", help="Read Operator Job with attached industrial detail")
     sp.add_argument("--job-id", required=True)
+
+    sp = sub.add_parser("operator-deliver", help="Create delivery record for a gate-approved candidate")
+    sp.add_argument("--job-id", required=True)
+    sp.add_argument("--candidate-id", required=True)
+    sp.add_argument("--decision", default="approved")
+    sp.add_argument("--notes", default="")
+    sp.add_argument("--override", action="store_true", help="Force delivery for reprocess/reject candidates")
+
+    sp = sub.add_parser("operator-delivery-get", help="Read delivery record for a job")
+    sp.add_argument("--job-id", required=True)
+
+    sp = sub.add_parser("operator-delivery-list", help="List all delivery records")
+
+    sp = sub.add_parser("operator-plan-runtime", help="Create runtime queue tasks from an Operator Job")
+    sp.add_argument("--job-id", required=True)
+
+    sp = sub.add_parser("operator-show-plan", help="Show planned commands for an Operator Job (dry-run)")
+    sp.add_argument("--job-id", required=True)
+
+    sp = sub.add_parser("operator-run", help="Execute the runtime for an Operator Job")
+    sp.add_argument("--job-id", required=True)
+    sp.add_argument("--dry-run", action="store_true")
+
+    sp = sub.add_parser("operator-report", help="Build Operator Report Bundle for a job")
+    sp.add_argument("--job-id", required=True)
+
+    # ── Studio (MHP-036) ─────────────────────────────────
+    sp = sub.add_parser("studio-client-create", help="Create a studio client")
+    sp.add_argument("--name", required=True)
+    sp.add_argument("--contact", default="")
+    sp.add_argument("--notes", default="")
+
+    sp = sub.add_parser("studio-client-list", help="List studio clients")
+
+    sp = sub.add_parser("studio-project-create", help="Create a studio project")
+    sp.add_argument("--client-id", required=True)
+    sp.add_argument("--name", required=True)
+    sp.add_argument("--description", default="")
+
+    sp = sub.add_parser("studio-project-list", help="List studio projects")
+    sp.add_argument("--client-id", default=None)
+
+    sp = sub.add_parser("studio-order-create", help="Create a studio order")
+    sp.add_argument("--project-id", required=True)
+    sp.add_argument("--client-id", required=True)
+    sp.add_argument("--description", default="")
+    sp.add_argument("--package", default="standard")
+    sp.add_argument("--deadline", default="")
+    sp.add_argument("--priority", type=int, default=5)
+
+    sp = sub.add_parser("studio-order-list", help="List studio orders")
+    sp.add_argument("--project-id", default=None)
+
+    sp = sub.add_parser("studio-order-link", help="Link an operator job to a studio order")
+    sp.add_argument("--order-id", required=True)
+    sp.add_argument("--job-id", required=True)
+
+    sp = sub.add_parser("studio-order-context", help="Get full order context (client+project+linked jobs)")
+    sp.add_argument("--order-id", required=True)
+
+    sp = sub.add_parser("studio-note-create", help="Create a staff note")
+    sp.add_argument("--target-type", required=True, choices=["order", "project", "client"])
+    sp.add_argument("--target-id", required=True)
+    sp.add_argument("--content", required=True)
+    sp.add_argument("--author", default="operator")
 
     sp = sub.add_parser("all", help="register → plan → run → report → craft")
     sp.add_argument("--source", default="unknown")
@@ -164,6 +247,73 @@ def main(argv=None) -> int:
 
     if args.command == "operator-detail":
         print_json(get_operator_job_detail(cfg, job_id=args.job_id))
+        return 0
+
+    if args.command == "operator-deliver":
+        print_json(create_delivery_record(
+            cfg,
+            job_id=args.job_id,
+            candidate_id=args.candidate_id,
+            operator_decision=args.decision,
+            notes=args.notes,
+            override=args.override,
+        ))
+        return 0
+
+    if args.command == "operator-delivery-get":
+        print_json(get_delivery_record(cfg, job_id=args.job_id))
+        return 0
+
+    if args.command == "operator-delivery-list":
+        print_json({"deliveries": list_delivery_records(cfg)})
+        return 0
+
+    if args.command == "operator-plan-runtime":
+        print_json(plan_operator_runtime(cfg, job_id=args.job_id))
+        return 0
+
+    if args.command == "operator-show-plan":
+        print_json(show_operator_runtime_plan(cfg, job_id=args.job_id))
+        return 0
+
+    if args.command == "operator-run":
+        print_json(run_operator_job(cfg, job_id=args.job_id, dry_run=args.dry_run))
+        return 0
+
+    if args.command == "operator-report":
+        print_json(build_operator_report_bundle(cfg, job_id=args.job_id))
+        return 0
+
+    # ── Studio handlers ─────────────────────────────────
+    if args.command == "studio-client-create":
+        print_json(create_client(cfg, name=args.name, contact=args.contact, notes=args.notes))
+        return 0
+    if args.command == "studio-client-list":
+        print_json({"clients": list_clients(cfg)})
+        return 0
+    if args.command == "studio-project-create":
+        print_json(create_project(cfg, client_id=args.client_id, name=args.name, description=args.description))
+        return 0
+    if args.command == "studio-project-list":
+        print_json({"projects": list_projects(cfg, client_id=args.client_id)})
+        return 0
+    if args.command == "studio-order-create":
+        print_json(create_order(cfg, project_id=args.project_id, client_id=args.client_id,
+                                description=args.description, processing_package=args.package,
+                                deadline=args.deadline, priority=args.priority))
+        return 0
+    if args.command == "studio-order-list":
+        print_json({"orders": list_orders(cfg, project_id=args.project_id)})
+        return 0
+    if args.command == "studio-order-link":
+        print_json(link_job_to_order(cfg, order_id=args.order_id, job_id=args.job_id))
+        return 0
+    if args.command == "studio-order-context":
+        print_json(get_order_context(cfg, order_id=args.order_id))
+        return 0
+    if args.command == "studio-note-create":
+        print_json(create_staff_note(cfg, target_type=args.target_type, target_id=args.target_id,
+                                     content=args.content, author=args.author))
         return 0
 
     if args.command == "all":
