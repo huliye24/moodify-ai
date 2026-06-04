@@ -1,10 +1,22 @@
 # Moodify — Project Roadmap
 
 **Updated**: 2026-06-04
-**Current Node**: Mainline state reconciliation after E-Chain 008-012 implementation
+**Current Node**: ECHAIN-MOODIFY-NIGHT-RESULT-013 / NEM-MOODIFY-NIGHT-RESULT-PROBE-039
 **Previous Node**: NEM-MOODIFY-STUDIO-OS-001 (ADOPT ✅)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
 **Verified Mainline Tests**: 719 passing (607 runtime + 112 core)
+
+## Current Execution Target — 2026-06-05 Night
+
+Run ECHAIN-MOODIFY-NIGHT-RESULT-013 Probe Plan-6A (MHP-737 to MHP-742).
+
+Goal:
+
+```text
+implemented mainline modules -> one-night reproducible evidence bundle
+```
+
+Start from `docs/plan/MHP-741_WRITE_TONIGHT_RUNBOOK.md`.
 
 ## Current Mainline Snapshot — 2026-06-04
 

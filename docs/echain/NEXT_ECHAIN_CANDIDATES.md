@@ -2,6 +2,26 @@
 
 **Date**: 2026-06-04 | **From**: ECHAIN-MOODIFY-RUNTIME-001
 
+## Current Adopted Next Chain — 2026-06-05
+
+**ECHAIN-MOODIFY-NIGHT-RESULT-013: Night Result Evidence Run** is the current adopted next chain.
+
+Reason:
+
+- E-Chains 001-012 have moved substantial code and documentation onto the mainline branch.
+- The immediate bottleneck is no longer feature inventory; it is whether the system can produce a coherent night result that a human can review in the morning.
+- E-Chain 013 turns runtime health, tidal state, tidal intelligence, tidal operations, test evidence, and X-CLP scoring into a single reproducible evidence bundle.
+
+Entry:
+
+```text
+docs/echain/ECHAIN-MOODIFY-NIGHT-RESULT-013.md
+docs/nem/NEM-MOODIFY-NIGHT-RESULT-PROBE-039.md
+docs/plan/MHP-741_WRITE_TONIGHT_RUNBOOK.md
+```
+
+Tonight's minimum target is Probe Plan-6A, MHP-737 to MHP-742.
+
 ## Candidates
 
 ### 1. ECHAIN-MOODIFY-PRESET-002: Preset Library Productionization
