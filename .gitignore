@@ -96,3 +96,4 @@ reports/mt002_mrs_validation/
 outputs/nem_validate_001/
 data/validation/samples/
 # Validation runtime artifacts
+outputs/data/

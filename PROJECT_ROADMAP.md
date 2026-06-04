@@ -1,12 +1,13 @@
 # Moodify — Project Roadmap
 
 **Updated**: 2026-06-04
-**Current Node**: NEM-MOODIFY-STUDIO-OS-001
+**Current Node**: NEM-MOODIFY-MRS-002 (active)
+**Previous Node**: NEM-MOODIFY-STUDIO-OS-001 (ADOPT ✅)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
 
 ---
 
-## NEM-18 Progress
+## NEM-001: Studio OS Alpha (COMPLETE ✅)
 
 ### ✅ Build-6: Real Integration & Console Completion (COMPLETE)
 
@@ -60,24 +61,28 @@
 
 ---
 
-## Next Node: NEM-MOODIFY-MRS-002 (planned)
+## NEM-002: MRS Scoring Hardening (⏳ NEXT)
 
-- MRS Scoring Hardening: genre-specific thresholds, graduated over_dark, calibration dataset
-- Target: 18 tasks (Build-6 + Validate-6 + Harden-6)
-- Entry point: `docs/plan/MHP-070_NEXT_NEM_ENTRY.md`
+| Step | MHP | Task | Status |
+|------|-----|------|--------|
+| E1 | 071 | Genre-Specific Threshold Config | proposed |
+| E2 | 072 | Graduated Over-Dark Detector (3-level) | proposed |
+| V1 | 073 | Pseudo-MRS Weight Calibration | proposed |
+| V2 | 074 | Gate Threshold Unit Tests | proposed |
+| S1 | 075 | MRS Calibration Guide | proposed |
+| N1 | 076 | Build-6 Next Entry → Validate-6 | proposed |
+| E1 | 077 | Calibration Dataset (50+ samples) | proposed |
+| E2 | 078 | Calibration Pipeline Run | proposed |
+| V1 | 079 | MRS Comparison (pseudo vs calibrated vs Open) | proposed |
+| V2 | 080 | Gate Accuracy Analysis (FP/FN per genre) | proposed |
+| S1 | 081 | Calibration Report | proposed |
+| N1 | 082 | Gate Decision (ADOPT/HOLD/REBUILD) | proposed |
+| E1 | 083 | Fix Calibration Issues | proposed |
+| E2 | 084 | MRS Engine Refactor (score_audio entry point) | proposed |
+| V1 | 085 | Full Regression (150+ tests) | proposed |
+| V2 | 086 | Integration Audit (MRS↔Gate↔CLI↔API↔Console) | proposed |
+| S1 | 087 | Finalize MRS Manifest + Version Bump | proposed |
+| N1 | 088 | Next NEM Entry (RUNTIME-003 or PRESET-004) | proposed |
 
----
-
-## Completed Cycles
-
-### Cycle 1: MHP-031→040 — Studio OS Alpha (completed 2026-06-04)
-6 subsystems: Operator Console, Studio, Scheduler, Calibration, Craft, Runtime
-
-### Cycle 2: MHP-041→046 — API Deepening (completed 2026-06-04)
-45 API routes, 8 Console views, ARCHITECTURE.md rewrite
-
-### Cycle 3: MHP-047→052 — Console & CLI Hardening (completed 2026-06-04)
-Console system views, CLI parity audit, edge cases, runbook
-
-### Cycle 5: MHP-059→064 — Validate-6 (completed 2026-06-04)
-Dev server deployment, 30-sample validation dataset, failure analysis, gate decision: ADOPT
+**Entry**: `docs/nem/NEM-MOODIFY-MRS-002.md` (18 MHP files: `docs/plan/MHP-07[1-8]_*.md`)
+**Target**: 150+ tests, gate accuracy ≥85%, graduated over_dark, genre-specific thresholds
