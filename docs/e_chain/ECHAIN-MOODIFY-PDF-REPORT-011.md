@@ -6,7 +6,7 @@ Moodify Cloud PDF Report Module
 
 ## Status
 
-PLANNED
+IMPLEMENTED ON MAINLINE — status reconciliation pending
 
 ## Strategic Intent
 
@@ -172,4 +172,3 @@ python3 -m moodify_runtime.cli pdf-report render-comparison --help
 - Reports include logo, manifest, diagnostic summary, and stable visual scales.
 - Existing demo PDFs are improved or regenerated through the new module.
 - No PDF generation step depends on the local Windows machine.
-

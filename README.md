@@ -50,10 +50,10 @@ Treatment Records
 * **Core Mode**: Industrial-system-first / runtime-first / report-first
 * **Strategic Direction**: enterprise acoustic industrial system
 * **CLI**: 40+ subcommands via `moodify_runtime.cli`
-* **API**: 40 routes via `moodify_runtime.operator_api` (FastAPI)
+* **API**: 48 FastAPI routes via `moodify_runtime.operator_api`
 * **Console**: 8 views (Queue, Jobs, Reports, Delivery, Craft, Studio, Scheduler, Calibration)
-* **Tests**: 129 (119 unit + 3 real audio + 7 full stack smoke)
-* **Pass Rate**: 100% (129/129)
+* **Tests**: 719 passing locally (607 runtime + 112 core)
+* **Pass Rate**: 100% on the current mainline branch
 * **X-CLP Score**: ~30 (Script tier) → target ≥60 next cycle
 
 ---
@@ -460,31 +460,28 @@ pytest -m v01
 Run full test suite:
 
 ```bash
-# Unit tests (fast)
-python3 -m pytest moodify_runtime/tests/ -q --ignore=moodify_runtime/tests/test_real_audio.py --ignore=moodify_runtime/tests/test_full_stack_smoke.py
+# Runtime tests
+python3 -m pytest moodify_runtime/tests/ -q
 
-# Real audio tests (slow — requires DSP pipeline)
-python3 -m pytest moodify_runtime/tests/test_real_audio.py -v -m slow
-
-# Full stack smoke (requires uvicorn server)
-python3 -m pytest moodify_runtime/tests/test_full_stack_smoke.py -v
+# Core package tests
+python3 -m pytest moodify-core-package/tests -q
 ```
 
 Current reported status:
 
 ```text
-119 unit tests passed (0.76s)
-3 real audio tests passed (6.67s)
-7 full stack smoke tests passed (3.74s)
-129 total tests — 100% pass rate
+607 runtime tests passed, 9 skipped
+112 core package tests passed
+719 total passing tests on codex/mainline-cloud-dev-20260603
 ```
 
-### NEM-18 Node Status
+### Mainline Node Status
 
 | Node | ID | Status | Gate | Tests |
 |------|-----|--------|------|-------|
-| Studio OS Alpha | NEM-MOODIFY-STUDIO-OS-001 | COMPLETE | ADOPT | 129 green |
-| Next | TBD (MRS-002 or RUNTIME-003) | planned | — | — |
+| Studio OS Alpha | NEM-MOODIFY-STUDIO-OS-001 | COMPLETE | ADOPT | covered |
+| MRS / Runtime / Craft / Tidal expansion | E-Chain 001-012 workstream | IMPLEMENTED ON MAINLINE BRANCH | verify before release | 719 green |
+| Next | Documentation/state reconciliation and main merge | active | — | — |
 
 See `docs/nem/NEM-MOODIFY-STUDIO-OS-001.md` and `PROJECT_ROADMAP.md`.
 

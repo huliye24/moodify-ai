@@ -1,14 +1,14 @@
-# Moodify Architecture — v0.1.0-alpha.4 (Studio OS Alpha)
+# Moodify Architecture — v0.2.0-alpha (Industrial Runtime Mainline)
 
-**Updated**: 2026-06-04  |  **95 tests**  |  **17 modules**  |  **45 API routes**
+**Updated**: 2026-06-04  |  **719 passing tests**  |  **runtime-first industrial system**  |  **48 FastAPI routes**
 
 ## Overview
 
 Moodify has evolved from a two-mainline audio processor into an **integrated industrial operator system**. The `moodify_runtime/` package now controls the full production pipeline: intake → processing → scoring → gating → reporting → delivery → craft memory.
 
-Two top-level entry points:
+Primary entry points:
 - **CLI** (`cli.py`) — 40+ subcommands for operator workflow
-- **API** (`operator_api.py`) — FastAPI server with 45 routes, serving the Operator Console UI
+- **API** (`operator_api.py`) — FastAPI server with 48 routes, serving the Operator Console UI
 
 ## Module Dependency Graph
 
@@ -78,7 +78,16 @@ Sample Audio
 | MRS Calibration | mrs_calibration | 039 | alpha |
 | Integration | test_studio_os_alpha | 040 | alpha |
 
-## API Route Table (45 routes)
+## API Route Table
+
+The current application exposes 48 FastAPI routes including OpenAPI/docs routes. The table below lists the operator-facing surface and may lag newly added internal endpoints; verify exact route count with:
+
+```bash
+python3 - <<'PY'
+from moodify_runtime.operator_api import app
+print(len(app.routes))
+PY
+```
 
 ### System
 | Method | Path | Handler |

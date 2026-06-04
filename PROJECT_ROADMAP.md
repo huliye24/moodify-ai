@@ -1,9 +1,23 @@
 # Moodify — Project Roadmap
 
 **Updated**: 2026-06-04
-**Current Node**: NEM-MOODIFY-MRS-002 (active)
+**Current Node**: Mainline state reconciliation after E-Chain 008-012 implementation
 **Previous Node**: NEM-MOODIFY-STUDIO-OS-001 (ADOPT ✅)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
+**Verified Mainline Tests**: 719 passing (607 runtime + 112 core)
+
+## Current Mainline Snapshot — 2026-06-04
+
+The active development branch is `codex/mainline-cloud-dev-20260603`.
+
+Code and tests have advanced beyond the older NEM-002 roadmap section. The branch includes runtime productionization, MRS hardening, preset/craft work, listening lab, cloud worker, operator OS, velocity infrastructure, acoustic CT, tidal modules, PDF report modules, and craft-22 modules.
+
+Release hygiene still needs attention before treating this branch as the public `main` baseline:
+
+- reconcile roadmap and E-Chain status files with the implemented code;
+- preserve the Apache-2.0 licensing update from `origin/main`;
+- keep generated audio/output artifacts out of git;
+- merge or PR `codex/mainline-cloud-dev-20260603` into `main` only after the two `origin/main` compliance commits are retained.
 
 ---
 

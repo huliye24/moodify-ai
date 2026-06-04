@@ -5,7 +5,7 @@
 - **E-Chain ID**: ECHAIN-MOODIFY-TIDAL-CORE-008
 - **Owner**: Raphael Davad
 - **Project**: Moodify
-- **Status**: PLANNED
+- **Status**: IMPLEMENTED ON MAINLINE — status reconciliation pending
 - **Start Date**: 2026-06-04
 - **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
 - **Parent**: ECHAIN-MOODIFY-ACOUSTIC-CT-007 and existing tidal engine

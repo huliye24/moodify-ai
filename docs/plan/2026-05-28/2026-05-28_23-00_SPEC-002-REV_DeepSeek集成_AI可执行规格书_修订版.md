@@ -846,7 +846,7 @@ class DeepSeekClient:
 **验收**:
 ```python
 import os
-os.environ["DEEPSEEK_API_KEY"] = "sk-xxx"
+os.environ["DEEPSEEK_API_KEY"] = "your-deepseek-api-key"
 
 client = DeepSeekClient()
 assert client.available
@@ -1062,7 +1062,7 @@ except Exception:
 ├── 09. 创建 llm/client.py ← 按 3.1.1→3.1.3 顺序实现
 ├── 10. 修改 knowledge/emotion_targets.py ← 追加 resolve_emotion_from_nl()
 ├── 11. 修改 workflow_engine.py ← 修改点 E (LLM 解读) + 修改点 F (Phase 0)
-├── 12. $env:DEEPSEEK_API_KEY="sk-xxx" → CLI 测试 NL 情绪输入
+├── 12. $env:DEEPSEEK_API_KEY="your-deepseek-api-key" → CLI 测试 NL 情绪输入
 └── 13. $env:DEEPSEEK_API_KEY="" → CLI 测试 fallback 路径
 
 阶段 C — 推迟
@@ -1125,7 +1125,7 @@ assert len(results[0][1]) == 15
 
 # === 阶段 B 验证 ===
 # 设置 key
-$env:DEEPSEEK_API_KEY="sk-xxxxxxxx"
+$env:DEEPSEEK_API_KEY="your-deepseek-api-key"
 
 python -c "
 from moodify.llm.client import DeepSeekClient

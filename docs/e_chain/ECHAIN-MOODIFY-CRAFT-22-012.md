@@ -6,7 +6,7 @@ Moodify 22-Process Craft System
 
 ## Status
 
-PLANNED
+IMPLEMENTED ON MAINLINE — status reconciliation pending
 
 ## Strategic Intent
 
@@ -166,4 +166,3 @@ python3 -m moodify_runtime.cli craft run --help
 - Each processing result has a manifest with operation order, parameters, metrics, and safety gates.
 - Tidal Cycle can use craft chains as a system-level module.
 - Acoustic CT PDF reports can show the processing chain and before/after effects.
-
