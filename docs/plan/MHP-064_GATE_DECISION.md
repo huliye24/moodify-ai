@@ -1,6 +1,6 @@
 # MHP-064: Gate Decision — ADOPT / HOLD / REBUILD
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-STUDIO-OS-001 / Validate-6 / N (Next Entry)
 **Depends on**: MHP-063 (validation report complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

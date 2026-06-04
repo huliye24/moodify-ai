@@ -1,6 +1,6 @@
 # MHP-059: Dev Server Deployment — Docker + Systemd + Nginx
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-STUDIO-OS-001 / Validate-6 / E (Execution)
 **Depends on**: MHP-058 (Build-6 complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

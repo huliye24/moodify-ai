@@ -25,6 +25,7 @@ BASELINE = __import__("pathlib").Path(
 # Moodify CLI matches: python3 -m moodify.cli process <audio> --output-dir <dir> --preset <name>
 CORRECT_TEMPLATES = [
     "python3 -m moodify.cli process {input} --output-dir {output_dir} --preset {preset}",
+    "python3 -m moodify.cli process {input} --output-dir {output_dir} --preset {preset} --json",
 ]
 
 

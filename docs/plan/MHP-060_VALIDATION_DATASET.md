@@ -1,6 +1,6 @@
 # MHP-060: Validation Dataset — 30+ Audio Samples, 3 Presets, Ground Truth Labels
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-STUDIO-OS-001 / Validate-6 / E (Execution)
 **Depends on**: MHP-059 (dev server deployed)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

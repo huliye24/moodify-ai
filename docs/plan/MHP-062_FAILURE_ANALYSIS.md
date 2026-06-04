@@ -1,6 +1,6 @@
 # MHP-062: Failure Analysis — Classify, Root-Cause, Recommend
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-STUDIO-OS-001 / Validate-6 / V (Validation)
 **Depends on**: MHP-061 (6h run complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

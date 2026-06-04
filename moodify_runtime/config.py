@@ -39,9 +39,8 @@ class RuntimeConfig:
     stop_on_first_success_template: bool = True
     audio_suffixes: List[str] = field(default_factory=lambda: list(DEFAULT_AUDIO_SUFFIXES))
     command_templates: List[str] = field(default_factory=lambda: [
-        "{python} cli.py process --input {input} --output {output_dir} --preset {preset}",
-        "{python} -m moodify.cli process --input {input} --output {output_dir} --preset {preset}",
-        "{python} cli.py process {input} --output {output_dir} --preset {preset}",
+        "{python} -m moodify.cli process {input} --output-dir {output_dir} --preset {preset}",
+        "{python} -m moodify.cli process {input} --output-dir {output_dir} --preset {preset} --json",
     ])
     env: Dict[str, str] = field(default_factory=lambda: {
         "PYTHONUNBUFFERED": "1",

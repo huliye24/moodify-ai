@@ -1,0 +1,10 @@
+{"sample_id": "SMP_268202A7", "genre": "ambient", "human_label": "reference_track", "expected_preset": "wide_space", "notes": "Baseline ambient sample — _Neural Poison   - 副本"}
+{"sample_id": "SMP_EBC9587A", "genre": "ambient", "human_label": "reference_track", "expected_preset": "wide_space", "notes": "Baseline ambient sample — 时间不对"}
+{"sample_id": "SMP_925BCA8F", "genre": "electronic", "human_label": "reference_track", "expected_preset": "clean_master", "notes": "Baseline electronic sample — Control Theory"}
+{"sample_id": "SMP_7139095B", "genre": "electronic", "human_label": "reference_track", "expected_preset": "clean_master", "notes": "Baseline electronic sample — Moonlight Girl"}
+{"sample_id": "SMP_A736DC1D", "genre": "piano", "human_label": "reference_track", "expected_preset": "warm_vocal", "notes": "Baseline piano sample — 句点10"}
+{"sample_id": "SMP_208BA869", "genre": "piano", "human_label": "reference_track", "expected_preset": "warm_vocal", "notes": "Baseline piano sample — 句点11"}
+{"sample_id": "SMP_A9A2ABC1", "genre": "rock", "human_label": "reference_track", "expected_preset": "wide_space", "notes": "Baseline rock sample — _Black Therapy (1)"}
+{"sample_id": "SMP_A2E74EBF", "genre": "rock", "human_label": "reference_track", "expected_preset": "wide_space", "notes": "Baseline rock sample — _Black Therapy (2)"}
+{"sample_id": "SMP_99AE53B1", "genre": "vocal", "human_label": "reference_track", "expected_preset": "warm_vocal", "notes": "Baseline vocal sample — Okay Okay 刚刚好"}
+{"sample_id": "SMP_F0B99D37", "genre": "vocal", "human_label": "reference_track", "expected_preset": "warm_vocal", "notes": "Baseline vocal sample — 假装无所谓2"}

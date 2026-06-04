@@ -1,6 +1,6 @@
 # MHP-061: 6-Hour Unattended Run — Production Metrics Collection
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-STUDIO-OS-001 / Validate-6 / V (Validation)
 **Depends on**: MHP-060 (validation dataset ready)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

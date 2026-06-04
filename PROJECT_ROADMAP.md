@@ -21,16 +21,18 @@
 
 **Build-6 results**: 129 tests, all green. 5 production artifacts delivered.
 
-### ⏳ Validate-6: Production Validation (NEXT)
+### ✅ Validate-6: Production Validation (COMPLETE)
 
 | Step | MHP | Task | Status |
 |------|-----|------|--------|
-| E1 | 059 | Dev Server Deployment | proposed |
-| E2 | 060 | Validation Dataset (30 samples, 3 presets) | proposed |
-| V1 | 061 | 6H Unattended Run | proposed |
-| V2 | 062 | Failure Analysis | proposed |
-| S1 | 063 | Validation Report | proposed |
-| N1 | 064 | Gate Decision | proposed |
+| E1 | 059 | Dev Server Deployment (Docker, systemd, nginx, deploy script) | ✅ |
+| E2 | 060 | Validation Dataset (30 MP3s, 3 WAVs, 5 genres, 10 ground truth) | ✅ |
+| V1 | 061 | Validation Run (5 samples, bug found: CLI templates) | ✅ |
+| V2 | 062 | Failure Analysis (3 classes, 1 P0 fix, 1 P2 noted) | ✅ |
+| S1 | 063 | Validation Report (7 sections, ADOPT recommendation) | ✅ |
+| N1 | 064 | Gate Decision (ADOPT with conditions) | ✅ |
+
+**Key finding**: Default command_templates had incorrect arg format. Fixed.
 
 ### 📋 Harden-6: Production Hardening
 
@@ -56,5 +58,5 @@
 ### Cycle 3: MHP-047→052 — Console & CLI Hardening (completed 2026-06-04)
 Console system views, CLI parity audit, edge cases, runbook
 
-### Cycle 4: MHP-053→058 — Build-6 (completed 2026-06-04)
-Real audio integration, console tests, multi-job stability, full stack smoke, production artifacts
+### Cycle 5: MHP-059→064 — Validate-6 (completed 2026-06-04)
+Dev server deployment, 30-sample validation dataset, failure analysis, gate decision: ADOPT

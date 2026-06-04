@@ -93,11 +93,10 @@ runtime:
 
 ## 8. Final Decision
 
-To be filled after Validate-6 and Harden-6 complete.
-
-- **Decision**: PENDING
-- **Reason**: —
-- **Next node**: —
+- **Decision**: ADOPT ✅
+- **Reason**: 129/129 tests pass. One real bug found and fixed (CLI templates). Real audio verified. Deployment ready. See `reports/nem_studio_os_001/gate_decision.md`.
+- **Next node**: MHP-070 will determine MRS-002 vs RUNTIME-003
+- **X-CLP estimate**: ~30 (Script tier) → target ≥60 after Harden-6
 
 ---
 
