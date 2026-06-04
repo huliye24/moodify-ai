@@ -1,12 +1,31 @@
 # Moodify — Project Roadmap
 
-**Updated**: 2026-06-04
-**Current Node**: ECHAIN-MOODIFY-NIGHT-RESULT-013 / NEM-MOODIFY-NIGHT-RESULT-PROBE-039
+**Updated**: 2026-06-05
+**Current Node**: ECHAIN-MOODIFY-DATA-LOOP-014 / NEM-MOODIFY-DATA-LOOP-PROBE-042
 **Previous Node**: NEM-MOODIFY-STUDIO-OS-001 (ADOPT ✅)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
 **Verified Mainline Tests**: 719 passing (607 runtime + 112 core)
 
-## Current Execution Target — 2026-06-05 Night
+## Current Learning Loop Target — 2026-06-05 Night
+
+Run ECHAIN-MOODIFY-DATA-LOOP-014 Probe Plan-6A (MHP-791 to MHP-796).
+
+Goal:
+
+```text
+nightly result data -> continuous software optimization loops
+```
+
+Start from `docs/plan/MHP-795_WRITE_DATA_LOOP_RUNBOOK.md`.
+
+The first learning loops are:
+
+- Runtime Reliability Loop: turn fatal errors and missing artifacts into root-cause fix tasks.
+- Scoring Calibration Loop: compare pseudo MRS, MRS Open, penalty flags, and human review.
+- Craft/Preset Selection Loop: convert sample/preset outcomes into craft memory and selector policy updates.
+- Operator Report Loop: produce PASS/HOLD/REWORK morning decisions and next MHP entries.
+
+## Previous Execution Target — 2026-06-05 Night
 
 Run ECHAIN-MOODIFY-NIGHT-RESULT-013 Probe Plan-6A (MHP-737 to MHP-742).
 

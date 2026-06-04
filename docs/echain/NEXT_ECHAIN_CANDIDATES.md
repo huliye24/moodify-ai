@@ -4,23 +4,29 @@
 
 ## Current Adopted Next Chain — 2026-06-05
 
-**ECHAIN-MOODIFY-NIGHT-RESULT-013: Night Result Evidence Run** is the current adopted next chain.
+**ECHAIN-MOODIFY-DATA-LOOP-014: Data Optimization Loop** is the current adopted next chain.
 
 Reason:
 
-- E-Chains 001-012 have moved substantial code and documentation onto the mainline branch.
-- The immediate bottleneck is no longer feature inventory; it is whether the system can produce a coherent night result that a human can review in the morning.
-- E-Chain 013 turns runtime health, tidal state, tidal intelligence, tidal operations, test evidence, and X-CLP scoring into a single reproducible evidence bundle.
+- E-Chain 013 established the first night-result evidence bundle and exposed usable metrics from last night's run.
+- The immediate bottleneck is now the learning loop: turning nightly output into repeatable optimization decisions.
+- E-Chain 014 converts run summaries, MRS deltas, penalty flags, queue state, and morning decisions into runtime reliability, scoring calibration, craft selection, and operator-report loops.
 
 Entry:
 
 ```text
-docs/echain/ECHAIN-MOODIFY-NIGHT-RESULT-013.md
-docs/nem/NEM-MOODIFY-NIGHT-RESULT-PROBE-039.md
-docs/plan/MHP-741_WRITE_TONIGHT_RUNBOOK.md
+docs/echain/ECHAIN-MOODIFY-DATA-LOOP-014.md
+docs/nem/NEM-MOODIFY-DATA-LOOP-PROBE-042.md
+docs/plan/MHP-795_WRITE_DATA_LOOP_RUNBOOK.md
 ```
 
-Tonight's minimum target is Probe Plan-6A, MHP-737 to MHP-742.
+Tonight's minimum target is Probe Plan-6A, MHP-791 to MHP-796.
+
+## Previous Adopted Chain — 2026-06-05
+
+**ECHAIN-MOODIFY-NIGHT-RESULT-013: Night Result Evidence Run** remains the parent evidence chain.
+
+It turns runtime health, tidal state, tidal intelligence, tidal operations, test evidence, and X-CLP scoring into a reproducible evidence bundle.
 
 ## Candidates
 
