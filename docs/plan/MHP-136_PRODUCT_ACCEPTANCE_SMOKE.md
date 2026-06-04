@@ -1,6 +1,6 @@
 # MHP-136: Product Acceptance Smoke
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-SYSTEM-005 / System Plan-6B: Product Connection / S12 (Next Entry)
 **Depends on**: MHP-135
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

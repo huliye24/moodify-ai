@@ -1,6 +1,6 @@
 # MHP-137: Runtime Manifest Version
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-SYSTEM-005 / System Plan-6C: Next Chain Entry / S13 (Execution)
 **Depends on**: MHP-136
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

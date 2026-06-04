@@ -1,6 +1,6 @@
 # MHP-124: System NEM Entry
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-BUILD-004 / Build Plan-6C: Stability Validation / B18 (Next Entry)
 **Depends on**: MHP-123
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

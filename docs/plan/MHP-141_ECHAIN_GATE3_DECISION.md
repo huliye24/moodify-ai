@@ -1,6 +1,6 @@
 # MHP-141: E-Chain Gate 3 Decision
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-SYSTEM-005 / System Plan-6C: Next Chain Entry / S17 (Systemization)
 **Depends on**: MHP-140
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
