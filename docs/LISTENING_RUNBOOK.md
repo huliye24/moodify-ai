@@ -1,0 +1,1 @@
+# Listening Runbook — MHP-243 | Blind A/B review: create_batch → randomize order → review ≤20 pairs → save JSONL → compare_mrs_to_human(). Reviewer calibration: monthly reference tracks. SLO: agreement ≥70%, accuracy ≥85%.

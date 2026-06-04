@@ -1,6 +1,6 @@
 # MHP-216: Blind Review Batch Builder
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-BUILD-010 / Build Plan-6A: Core Implementation / B2 (Execution)
 **Depends on**: MHP-215
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

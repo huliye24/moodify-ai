@@ -1,6 +1,6 @@
 # MHP-235: Benchmark Dataset Standard
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-SYSTEM-011 / System Plan-6A: Standardization / S3 (Validation)
 **Depends on**: MHP-234
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

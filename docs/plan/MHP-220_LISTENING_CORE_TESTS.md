@@ -1,6 +1,6 @@
 # MHP-220: Listening Core Tests
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-BUILD-010 / Build Plan-6A: Core Implementation / B6 (Next Entry)
 **Depends on**: MHP-219
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

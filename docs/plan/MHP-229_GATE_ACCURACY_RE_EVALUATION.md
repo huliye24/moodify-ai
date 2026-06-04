@@ -1,6 +1,6 @@
 # MHP-229: Gate Accuracy Re-Evaluation
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-BUILD-010 / Build Plan-6C: Stability Validation / B15 (Validation)
 **Depends on**: MHP-228
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

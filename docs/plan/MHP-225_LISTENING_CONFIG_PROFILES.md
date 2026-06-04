@@ -1,6 +1,6 @@
 # MHP-225: Listening Config Profiles
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-BUILD-010 / Build Plan-6B: Runtime/Product Integration / B11 (Systemization)
 **Depends on**: MHP-224
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

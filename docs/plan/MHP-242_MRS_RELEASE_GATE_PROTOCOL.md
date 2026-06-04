@@ -1,6 +1,6 @@
 # MHP-242: MRS Release Gate Protocol
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-SYSTEM-011 / System Plan-6B: Product Connection / S10 (Validation)
 **Depends on**: MHP-241
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

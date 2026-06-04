@@ -1,6 +1,6 @@
 # MHP-245: Listening Manifest Version
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-SYSTEM-011 / System Plan-6C: Next Chain Entry / S13 (Execution)
 **Depends on**: MHP-244
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

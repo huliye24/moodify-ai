@@ -1,0 +1,1 @@
+# E-Chain Gate 3 Decision — MHP-249 | **SEALED** ✅ | All 3 NEMs complete: Probe (197→214), Build (215→232), System (233→250). 178 tests pass. Listening protocol, blind review, pairwise preference, genre sensitivity, score explanation, reviewer agreement — all standardized.

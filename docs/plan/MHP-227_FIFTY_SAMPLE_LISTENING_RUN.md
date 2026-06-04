@@ -1,6 +1,6 @@
 # MHP-227: Fifty-Sample Listening Run
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-BUILD-010 / Build Plan-6C: Stability Validation / B13 (Execution)
 **Depends on**: MHP-226
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

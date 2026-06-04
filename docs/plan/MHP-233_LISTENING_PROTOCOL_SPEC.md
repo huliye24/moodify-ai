@@ -1,6 +1,6 @@
 # MHP-233: Listening Protocol Spec
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-SYSTEM-011 / System Plan-6A: Standardization / S1 (Execution)
 **Depends on**: MHP-232
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

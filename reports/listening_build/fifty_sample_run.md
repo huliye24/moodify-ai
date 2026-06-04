@@ -1,0 +1,1 @@
+# 50-Sample Listening Run — MHP-227 | 50 A/B pairs generated via create_blind_review_batch(). 5 genres × 2 presets × 5 samples each. Pairwise agreement with MRS: awaiting human reviewers.

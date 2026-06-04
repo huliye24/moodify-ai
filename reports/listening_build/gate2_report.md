@@ -1,0 +1,1 @@
+# Build Gate Report — MHP-231 | **Gate 2: ADOPT**. 178 tests pass. Label schema, blind review, pairwise preference, genre sensitivity, score explanation, reviewer agreement, MRS comparison — all operational.

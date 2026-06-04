@@ -1,6 +1,6 @@
 # MHP-230: Listening Resource Cost Summary
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-BUILD-010 / Build Plan-6C: Stability Validation / B16 (Validation)
 **Depends on**: MHP-229
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

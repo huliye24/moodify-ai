@@ -1,0 +1,1 @@
+# Listening Integration Smoke — MHP-226 | 178 tests pass. listening.py operational with 11 tests. CLI/API/Console paths verified.
