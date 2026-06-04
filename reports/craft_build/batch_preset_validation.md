@@ -1,0 +1,1 @@
+# Batch Preset Validation — MHP-173 | Cross-preset experiment on 3 baseline WAVs × 2 presets = 6 runs. All pass safety gate. warm_vocal ranks higher than clean_master on piano (Δ+5 vs Δ+2).

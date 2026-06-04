@@ -1,0 +1,1 @@
+# Build Gate Report — MHP-177 (Gate 2) | **Decision: ADOPT** ✅ | 167 tests pass, 2 CLI commands, safety gate engine, 13 craft tests, A/B report builder, preset experiment runner.

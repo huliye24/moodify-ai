@@ -1,6 +1,6 @@
 # MHP-168: Craft API Endpoints
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-BUILD-007 / Build Plan-6B: Runtime/Product Integration / B8 (Execution)
 **Depends on**: MHP-167
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-162: Preset Metadata Model
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-BUILD-007 / Build Plan-6A: Core Implementation / B2 (Execution)
 **Depends on**: MHP-161
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

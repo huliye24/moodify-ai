@@ -1,6 +1,6 @@
 # MHP-166: Craft Core Tests
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-BUILD-007 / Build Plan-6A: Core Implementation / B6 (Next Entry)
 **Depends on**: MHP-165
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

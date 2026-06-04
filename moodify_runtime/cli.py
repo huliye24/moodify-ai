@@ -162,6 +162,18 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--name", required=True)
     sp.add_argument("--description", default="")
 
+    # ── Craft (MHP-167) ──
+    sp = sub.add_parser("craft-list", help="List craft records")
+    sp.add_argument("--status", default=None, help="Filter by adoption status")
+
+    sp = sub.add_parser("craft-safety-check", help="Run preset safety gate check")
+    sp.add_argument("--preset", default="warm_vocal")
+    sp.add_argument("--over-dark", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--over-bright", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--transient", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--vocal", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--stereo", default="none", choices=["none","mild","severe"])
+
     # ── Runtime Supervisor (MHP-113) ──
     sp = sub.add_parser("runtime-status", help="Show runtime health, heartbeat, active tasks")
     sp.add_argument("--json", action="store_true")
@@ -315,6 +327,25 @@ def main(argv=None) -> int:
 
     if args.command == "next":
         print_json(suggest_next_plan(cfg, run_id=args.run_id))
+        return 0
+
+    # ── Craft commands (MHP-167) ──
+    if args.command == "craft-list":
+        from .craft_memory import list_craft_records
+        print_json(list_craft_records(cfg, adoption_status=getattr(args, 'status', None)))
+        return 0
+
+    if args.command == "craft-safety-check":
+        from .craft_presets import validate_preset_safety
+        r = validate_preset_safety(
+            preset_name=args.preset,
+            over_dark_level=args.over_dark,
+            over_bright_level=args.over_bright,
+            transient_damage_level=args.transient,
+            vocal_thinning_level=args.vocal,
+            stereo_collapse_level=args.stereo,
+        )
+        print_json(r.to_dict())
         return 0
 
     # ── Runtime Supervisor commands (MHP-113) ──

@@ -1,6 +1,6 @@
 # MHP-174: Failure Injection for Presets
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-BUILD-007 / Build Plan-6C: Stability Validation / B14 (Execution)
 **Depends on**: MHP-173
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
