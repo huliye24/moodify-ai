@@ -9,6 +9,8 @@
 
 Provide a runbook that extracts a usable optimization dataset from last night's run and converts it into DeepSeek v4 micro-tasks.
 
+This runbook follows `docs/protocol/AEP_WORKER_PROTOCOL.md`.
+
 ## DeepSeek v4 Constraint
 
 DeepSeek should not inspect the repository. It receives one JSONL line, makes one decision, and returns one JSON object.
@@ -224,6 +226,23 @@ Expected output example:
 }
 ```
 
+## Validate and Select
+
+After writing DeepSeek outputs to `model_outputs.jsonl`, run:
+
+```bash
+python3 scripts/aep_worker_protocol.py validate \
+  --tasks "$OUT/deepseek_tasks.jsonl" \
+  --outputs "$OUT/model_outputs.jsonl" \
+  --schema "$OUT/expected_output_schema.json" \
+  --valid "$OUT/deepseek_decisions_validated.jsonl" \
+  --rejected "$OUT/rejected_outputs.jsonl"
+
+python3 scripts/aep_worker_protocol.py select \
+  --valid "$OUT/deepseek_decisions_validated.jsonl" \
+  --out "$OUT/next_three_optimization_tasks.json"
+```
+
 ## Acceptance Criteria
 
 - The snapshot exists.
@@ -231,3 +250,4 @@ Expected output example:
 - Each DeepSeek task has one loop only.
 - Score-direction disagreement is explicit.
 - Model output can be validated against `expected_output_schema.json`.
+- `next_three_optimization_tasks.json` contains no more than three items.

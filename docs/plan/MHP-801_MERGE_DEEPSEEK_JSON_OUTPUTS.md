@@ -9,6 +9,8 @@
 
 Merge DeepSeek outputs without trusting free-form text.
 
+Use `scripts/aep_worker_protocol.py validate` for the first implementation.
+
 ## Input
 
 - `deepseek_tasks.jsonl`

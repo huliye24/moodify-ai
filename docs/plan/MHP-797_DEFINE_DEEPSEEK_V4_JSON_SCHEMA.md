@@ -9,6 +9,8 @@
 
 Keep model calls cheap and reliable by forcing every DeepSeek v4 response into one small JSON shape.
 
+Use `docs/protocol/AEP_WORKER_PROTOCOL.md` as the shared contract and `scripts/aep_worker_protocol.py` as the validator/selector.
+
 ## Input Contract
 
 Each request contains exactly one line from `deepseek_tasks.jsonl`.

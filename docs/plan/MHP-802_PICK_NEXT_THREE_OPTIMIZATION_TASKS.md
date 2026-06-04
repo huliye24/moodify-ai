@@ -9,6 +9,8 @@
 
 Turn validated DeepSeek decisions into a small next-action list.
 
+Use `scripts/aep_worker_protocol.py select` for the first implementation.
+
 ## Input
 
 `deepseek_decisions_validated.jsonl`

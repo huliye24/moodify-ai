@@ -12,6 +12,7 @@
 - **Target Gate**: SEALED
 - **Primary Goal**: convert nightly runtime data into software, scoring, craft, and operator improvements.
 - **Runner Constraint**: DeepSeek v4 cost mode. Keep each model task small, schema-bound, and independent.
+- **Worker Protocol**: `docs/protocol/AEP_WORKER_PROTOCOL.md`
 
 ## 2. Phase Transition Target
 
@@ -43,6 +44,13 @@ Model task limits:
 - output JSON only.
 
 The script layer handles extraction, grouping, sorting, and report merging. DeepSeek v4 only classifies a small record into a loop, severity, reason, and next action.
+
+Validation and final selection should use:
+
+```bash
+python3 scripts/aep_worker_protocol.py validate --help
+python3 scripts/aep_worker_protocol.py select --help
+```
 
 ## 3. Last-Night Signals
 
@@ -239,6 +247,7 @@ It writes:
 - `expected_output_schema.json`.
 
 DeepSeek v4 should process `deepseek_tasks.jsonl` one line at a time.
+After model calls, validate outputs with `scripts/aep_worker_protocol.py`.
 
 ## 8. Gate 1 Definition
 
