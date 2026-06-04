@@ -1,6 +1,6 @@
 # MHP-296: Cloud Release Protocol
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-SYSTEM-014 / System Plan-6B: Product Connection / S10 (Validation)
 **Depends on**: MHP-295
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

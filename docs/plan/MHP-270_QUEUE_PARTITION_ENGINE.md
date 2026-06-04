@@ -1,6 +1,6 @@
 # MHP-270: Queue Partition Engine
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-BUILD-013 / Build Plan-6A: Core Implementation / B2 (Execution)
 **Depends on**: MHP-269
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

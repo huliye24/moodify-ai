@@ -1,0 +1,1 @@
+# Gate 1 Evidence — MHP-266 | 14/14 items. ADOPT ✅. State map, cost baseline, bottleneck taxonomy, queue audit, risk brief, backlog, 5 probes, SLO, 2-worker smoke, scheduler matrix.

@@ -1,0 +1,1 @@
+# Gate 3 Decision — MHP-303 | **SEALED** ✅. ECHAIN-MOODIFY-CLOUD-WORKER-004 complete. 187 tests pass. Worker contracts, deployment runbook, cost governance, fleet events standardized.

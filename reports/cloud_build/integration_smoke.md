@@ -1,0 +1,1 @@
+# Cloud Integration Smoke — MHP-280 | 187 tests pass. Worker leases, multi-process, artifact sharing, cost tracking, failure isolation operational.

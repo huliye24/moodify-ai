@@ -1,6 +1,6 @@
 # MHP-272: Artifact Sync Layer
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-BUILD-013 / Build Plan-6A: Core Implementation / B4 (Validation)
 **Depends on**: MHP-271
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

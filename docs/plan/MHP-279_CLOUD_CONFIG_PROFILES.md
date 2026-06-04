@@ -1,6 +1,6 @@
 # MHP-279: Cloud Config Profiles
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-BUILD-013 / Build Plan-6B: Runtime/Product Integration / B11 (Systemization)
 **Depends on**: MHP-278
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-295: Delivery Artifact Linkage
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-SYSTEM-014 / System Plan-6B: Product Connection / S9 (Validation)
 **Depends on**: MHP-294
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,0 +1,1 @@
+# Cloud Probe Report — MHP-262 | 5/5 probes passed. Worker lease, multi-process, artifact sharing, cost, failure isolation — all proven. 9 tests. Gate 1: ADOPT.

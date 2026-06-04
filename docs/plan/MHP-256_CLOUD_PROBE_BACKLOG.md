@@ -1,6 +1,6 @@
 # MHP-256: Cloud Probe Backlog
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-PROBE-012 / Probe Plan-6A: Problem Boundary / P6 (Next Entry)
 **Depends on**: MHP-255
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

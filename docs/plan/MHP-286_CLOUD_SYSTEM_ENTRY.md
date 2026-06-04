@@ -1,6 +1,6 @@
 # MHP-286: Cloud System Entry
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-BUILD-013 / Build Plan-6C: Stability Validation / B18 (Next Entry)
 **Depends on**: MHP-285
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

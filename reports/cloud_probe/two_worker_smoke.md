@@ -1,0 +1,1 @@
+# Two-Worker Smoke — MHP-264 | 2 parallel workers, 4 tasks. All succeed. multiprocessing.Pool works.

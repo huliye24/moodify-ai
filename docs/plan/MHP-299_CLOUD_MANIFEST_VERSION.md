@@ -1,6 +1,6 @@
 # MHP-299: Cloud Manifest Version
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-SYSTEM-014 / System Plan-6C: Next Chain Entry / S13 (Execution)
 **Depends on**: MHP-298
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

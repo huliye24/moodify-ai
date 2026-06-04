@@ -1,6 +1,6 @@
 # MHP-275: Cloud CLI Commands
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-BUILD-013 / Build Plan-6B: Runtime/Product Integration / B7 (Execution)
 **Depends on**: MHP-274
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-300: Cloud Ownership Map
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-SYSTEM-014 / System Plan-6C: Next Chain Entry / S14 (Execution)
 **Depends on**: MHP-299
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

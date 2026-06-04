@@ -1,0 +1,1 @@
+# Cloud Worker Specification — MHP-287/288/289 | WorkerLease: TTL heartbeat reclamation. Queue: claim-based partition. Deployment: supervisor + heartbeat + cost tracking. Cost governance: ≤$0.05/task CPU, ≤$0.50/task GPU.

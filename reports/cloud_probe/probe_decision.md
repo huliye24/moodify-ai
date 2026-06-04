@@ -1,0 +1,1 @@
+# Cloud Probe Decision — MHP-267 | **Gate 1: ADOPT** ✅. All probes pass. 187 tests green. cloud_worker.py operational. Build NEM next.

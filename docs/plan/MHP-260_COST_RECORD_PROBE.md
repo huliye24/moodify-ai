@@ -1,6 +1,6 @@
 # MHP-260: Cost Record Probe
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-PROBE-012 / Probe Plan-6B: Technical Probe / P10 (Validation)
 **Depends on**: MHP-259
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

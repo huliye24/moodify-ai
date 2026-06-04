@@ -1,0 +1,1 @@
+# Scheduler Feasibility — MHP-265 | WorkerLease: ✅. Queue partition: claim-based ✅. Artifacts: local FS ✅. Cost: per-task estimation ✅. Fleet SLO: targets defined ✅.

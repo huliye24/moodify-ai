@@ -1,6 +1,6 @@
 # MHP-254: Queue Partition Audit
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-CLOUD-WORKER-004 / NEM-MOODIFY-CLOUD-PROBE-012 / Probe Plan-6A: Problem Boundary / P4 (Validation)
 **Depends on**: MHP-253
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
