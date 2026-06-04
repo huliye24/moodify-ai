@@ -1,6 +1,6 @@
 # MHP-094: Probe Experiment Backlog
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-PROBE-003 / Probe Plan-6A: Problem Boundary / P6 (Next Entry)
 **Depends on**: MHP-093
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

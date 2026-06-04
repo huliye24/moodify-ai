@@ -1,6 +1,6 @@
 # MHP-096: Run Heartbeat Experiment
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-PROBE-003 / Probe Plan-6B: Technical Probe / P8 (Execution)
 **Depends on**: MHP-095
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

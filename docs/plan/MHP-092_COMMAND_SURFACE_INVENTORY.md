@@ -1,6 +1,6 @@
 # MHP-092: Command Surface Inventory
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-PROBE-003 / Probe Plan-6A: Problem Boundary / P4 (Validation)
 **Depends on**: MHP-091
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

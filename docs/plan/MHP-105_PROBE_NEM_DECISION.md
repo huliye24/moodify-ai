@@ -1,6 +1,6 @@
 # MHP-105: Probe NEM Decision
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-PROBE-003 / Probe Plan-6C: Feasibility Gate / P17 (Systemization)
 **Depends on**: MHP-104
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
