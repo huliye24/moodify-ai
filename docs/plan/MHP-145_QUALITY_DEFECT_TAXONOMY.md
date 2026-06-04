@@ -1,6 +1,6 @@
 # MHP-145: Quality Defect Taxonomy
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-PROBE-006 / Probe Plan-6A: Problem Boundary / P3 (Validation)
 **Depends on**: MHP-144
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

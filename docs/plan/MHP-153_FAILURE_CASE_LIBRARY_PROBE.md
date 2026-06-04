@@ -1,6 +1,6 @@
 # MHP-153: Failure Case Library Probe
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-PROBE-006 / Probe Plan-6B: Technical Probe / P11 (Systemization)
 **Depends on**: MHP-152
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

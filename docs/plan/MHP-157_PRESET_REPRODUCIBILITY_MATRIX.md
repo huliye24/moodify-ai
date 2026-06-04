@@ -1,6 +1,6 @@
 # MHP-157: Preset Reproducibility Matrix
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-PROBE-006 / Probe Plan-6C: Feasibility Gate / P15 (Validation)
 **Depends on**: MHP-156
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

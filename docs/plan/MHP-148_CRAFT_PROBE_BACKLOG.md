@@ -1,6 +1,6 @@
 # MHP-148: Craft Probe Backlog
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-PRESET-CRAFT-002 / NEM-MOODIFY-PRESET-PROBE-006 / Probe Plan-6A: Problem Boundary / P6 (Next Entry)
 **Depends on**: MHP-147
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
