@@ -1,6 +1,6 @@
 # MHP-383: Auto Summary Generator
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-BUILD-019 / Build Plan-6B: Report, Gate, and Failure Automation / B7 (Execution)
 **Depends on**: MHP-382
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

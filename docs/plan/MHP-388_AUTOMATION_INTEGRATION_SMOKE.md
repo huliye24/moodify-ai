@@ -1,6 +1,6 @@
 # MHP-388: Automation Integration Smoke
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-BUILD-019 / Build Plan-6B: Report, Gate, and Failure Automation / B12 (Next Entry)
 **Depends on**: MHP-387
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-360: Engineering Friction Taxonomy
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-PROBE-018 / Probe Plan-6A: Friction Boundary / P2 (Execution)
 **Depends on**: MHP-359
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

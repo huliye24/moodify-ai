@@ -1,6 +1,6 @@
 # MHP-396: Engineering Velocity SOP
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-SYSTEM-020 / System Plan-6A: Velocity Standards / S2 (Execution)
 **Depends on**: MHP-395
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

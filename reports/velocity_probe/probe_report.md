@@ -1,0 +1,1 @@
+# Velocity Probe Report — MHP-369 | Gate 1: ADOPT ✅ | 全部 5 探针通过。最高杠杆: 可执行 MHP 队列 (节省 80% 人工调度), Worktree 隔离 (使并行 Agent 安全), 自动 Gate 决策包。

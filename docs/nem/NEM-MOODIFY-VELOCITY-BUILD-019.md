@@ -6,7 +6,7 @@
 - **Role**: Build NEM
 - **Owner**: Raphael Davad
 - **Project**: Moodify
-- **Status**: PLANNED
+- **Status**: COMPLETED — Gate 2: ADOPT
 - **Protocol**: NEM-18 inside E-Chain 54
 - **Parent Chain**: ECHAIN-MOODIFY-VELOCITY-006
 - **Target Gate**: Gate 2: ADOPT / HOLD / ROLLBACK

@@ -1,6 +1,6 @@
 # MHP-366: Continuous Runtime Hours Instrumentation
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-PROBE-018 / Probe Plan-6B: Velocity Instrumentation / P8 (Execution)
 **Depends on**: MHP-365
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

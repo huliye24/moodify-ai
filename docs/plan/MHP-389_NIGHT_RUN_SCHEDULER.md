@@ -1,6 +1,6 @@
 # MHP-389: Night Run Scheduler
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-BUILD-019 / Build Plan-6C: Night Run Validation / B13 (Execution)
 **Depends on**: MHP-388
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

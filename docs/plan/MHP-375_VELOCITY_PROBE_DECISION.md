@@ -1,6 +1,6 @@
 # MHP-375: Velocity Probe Decision
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-PROBE-018 / Probe Plan-6C: Automation Gate / P17 (Systemization)
 **Depends on**: MHP-374
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

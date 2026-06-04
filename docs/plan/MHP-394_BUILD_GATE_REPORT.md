@@ -1,6 +1,6 @@
 # MHP-394: Build Gate Report
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-BUILD-019 / Build Plan-6C: Night Run Validation / B18 (Next Entry)
 **Depends on**: MHP-393
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

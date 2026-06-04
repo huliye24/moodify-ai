@@ -1,0 +1,1 @@
+# X-AEVF Current State Baseline — MHP-359 | 5 E-Chains SEALED, 270 MHP, 199 tests, 潮汐运行中。**摩擦点**: AI Agent 无隔离环境, MHP 手动执行, 报告手动生成, Gate 手动判断。**加速杠杆**: P1 可执行 MHP 队列, P2 自动报告/闸门, P3 Worktree 隔离, P4 失败重放库。

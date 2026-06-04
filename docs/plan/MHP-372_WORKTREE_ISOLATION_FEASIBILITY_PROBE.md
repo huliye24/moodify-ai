@@ -1,6 +1,6 @@
 # MHP-372: Worktree Isolation Feasibility Probe
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-PROBE-018 / Probe Plan-6C: Automation Gate / P14 (Execution)
 **Depends on**: MHP-371
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

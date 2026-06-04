@@ -1,6 +1,6 @@
 # MHP-407: Velocity Manifest Version
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-SYSTEM-020 / System Plan-6C: Seal and Next Scaling Entry / S13 (Execution)
 **Depends on**: MHP-406
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

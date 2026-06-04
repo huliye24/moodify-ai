@@ -1,6 +1,6 @@
 # MHP-382: Build Plan Entry Report
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-BUILD-019 / Build Plan-6A: Isolation and Queue Core / B6 (Next Entry)
 **Depends on**: MHP-381
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

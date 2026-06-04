@@ -1,6 +1,6 @@
 # MHP-400: Velocity System Entry Report
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-SYSTEM-020 / System Plan-6A: Velocity Standards / S6 (Next Entry)
 **Depends on**: MHP-399
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

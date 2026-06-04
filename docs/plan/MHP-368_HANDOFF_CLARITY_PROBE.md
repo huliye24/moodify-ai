@@ -1,6 +1,6 @@
 # MHP-368: Handoff Clarity Probe
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-VELOCITY-006 / NEM-MOODIFY-VELOCITY-PROBE-018 / Probe Plan-6B: Velocity Instrumentation / P10 (Validation)
 **Depends on**: MHP-367
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
