@@ -1,0 +1,1 @@
+# Listening Probe Decision — MHP-213 | **Gate 1: ADOPT**. All probes pass. 178 tests green. Blind review infrastructure operational. Pairwise preference is more reliable than absolute scoring. Build NEM next.

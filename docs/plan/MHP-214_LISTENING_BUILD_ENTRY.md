@@ -1,6 +1,6 @@
 # MHP-214: Listening Build Entry
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-PROBE-009 / Probe Plan-6C: Feasibility Gate / P18 (Next Entry)
 **Depends on**: MHP-213
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

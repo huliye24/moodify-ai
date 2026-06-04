@@ -1,0 +1,1 @@
+# Mini Human Label Batch — MHP-210 | 10 A/B pairs with simulated labels. warm_vocal on piano: 4/5 "better". clean_master on electronic: 3/5 "better". Inter-reviewer agreement: 0.8 (simulated 2 reviewers).

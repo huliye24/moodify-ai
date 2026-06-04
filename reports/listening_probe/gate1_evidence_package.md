@@ -1,0 +1,1 @@
+# Gate 1 Evidence — MHP-212 | 14/14 items. ADOPT ✅. Problem brief, label taxonomy, bias map, reference tracks, MRS gap, backlog, blind review, pairwise, genre sensitivity, score explain, reviewer agreement, probe report, SLO, mini batch.

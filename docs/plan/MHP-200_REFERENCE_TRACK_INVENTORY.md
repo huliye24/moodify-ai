@@ -1,6 +1,6 @@
 # MHP-200: Reference Track Inventory
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-PROBE-009 / Probe Plan-6A: Problem Boundary / P4 (Validation)
 **Depends on**: MHP-199
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

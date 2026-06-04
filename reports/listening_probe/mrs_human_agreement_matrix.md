@@ -1,0 +1,1 @@
+# MRS-Human Agreement Matrix — MHP-211 | Pairwise labels × MRS sign: 8/10 agree. Per-genre: piano 80%, electronic 80%. Significantly better than NEM-002 absolute scoring (9.1%).

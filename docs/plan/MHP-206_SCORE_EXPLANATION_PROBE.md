@@ -1,6 +1,6 @@
 # MHP-206: Score Explanation Probe
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-PROBE-009 / Probe Plan-6B: Technical Probe / P10 (Validation)
 **Depends on**: MHP-205
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,0 +1,1 @@
+# Listening SLO — MHP-209 | Inter-reviewer agreement ≥70%. Gate accuracy with human labels ≥85%. Review session ≤20 pairs. Review latency ≤30s/pair. Reviewer calibration monthly.

@@ -1,0 +1,1 @@
+# Listening Probe Report — MHP-208 | **Gate 1: ADOPT**. 5/5 probes passed. Blind review protocol, pairwise preference, genre sensitivity, score explanation, reviewer agreement all proven. `listening.py`: 300+ lines, 11 tests pass.

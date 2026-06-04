@@ -1,6 +1,6 @@
 # MHP-209: Listening SLO Definition
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-MRS-LISTENING-003 / NEM-MOODIFY-LISTENING-PROBE-009 / Probe Plan-6C: Feasibility Gate / P13 (Execution)
 **Depends on**: MHP-208
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

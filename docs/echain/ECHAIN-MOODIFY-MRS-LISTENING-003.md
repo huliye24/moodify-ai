@@ -5,7 +5,7 @@
 - **E-Chain ID**: ECHAIN-MOODIFY-MRS-LISTENING-003
 - **Owner**: Raphael Davad
 - **Project**: Moodify
-- **Status**: PLANNED
+- **Status**: IN PROGRESS — Probe: ADOPT ✅ → Build: NEXT
 - **Start Date**: 2026-06-04
 - **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
 - **Parent**: NEM-MOODIFY-MRS-002 and ECHAIN-MOODIFY-RUNTIME-001
