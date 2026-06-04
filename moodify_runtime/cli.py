@@ -2,10 +2,17 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 from typing import Any
 
 from .config import load_config
 from .craft_memory import seed_craft_memory, writeback_delivery_to_craft_record, list_craft_records
+from .tidal_intelligence import cli_intelligence_report, cli_morning_brief
+from .tidal_operations import (
+    cli_operations_report, get_tidal_state, get_dashboard_snapshot,
+    create_alert, get_active_alerts, acknowledge_alert,
+    write_operator_note, read_operator_notes,
+)
 from .failure import analyze_failures
 from .mrs_calibration import (
     create_calibration_sample_set,
@@ -282,6 +289,80 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("craft-records", help="List craft records")
     sp.add_argument("--adoption-status", default=None)
 
+    # ── PDF Report (MHP-665-667) ──────────────────────────
+    sp = sub.add_parser("pdf-report", help="PDF report commands")
+    pdf_sub = sp.add_subparsers(dest="pdf_action", required=True)
+
+    sp_single = pdf_sub.add_parser("render-single", help="Render single-scan Acoustic CT PDF")
+    sp_single.add_argument("--wav", required=True, help="Path to WAV file")
+    sp_single.add_argument("--sample-id", default="")
+    sp_single.add_argument("--genre", default="")
+    sp_single.add_argument("--preset", default="")
+    sp_single.add_argument("--mrs-before", type=float, default=None)
+    sp_single.add_argument("--mrs-after", type=float, default=None)
+    sp_single.add_argument("--output-dir", default=None)
+
+    sp_comp = pdf_sub.add_parser("render-comparison", help="Render before/after comparison PDF")
+    sp_comp.add_argument("--before-wav", required=True, help="Path to before WAV")
+    sp_comp.add_argument("--after-wav", required=True, help="Path to after WAV")
+    sp_comp.add_argument("--sample-id", default="")
+    sp_comp.add_argument("--genre", default="")
+    sp_comp.add_argument("--preset", default="")
+    sp_comp.add_argument("--mrs-before", type=float, default=None)
+    sp_comp.add_argument("--mrs-after", type=float, default=None)
+    sp_comp.add_argument("--output-dir", default=None)
+
+    sp_inspect = pdf_sub.add_parser("inspect", help="Inspect a PDF report and its manifest")
+    sp_inspect.add_argument("--pdf-path", required=True, help="Path to PDF file")
+
+    # ── Craft 22 commands (MHP-714-716) ────────────────────
+    sp = sub.add_parser("craft-plan", help="Plan a craft chain for audio (dry-run)")
+    sp.add_argument("--wav", required=True, help="Path to input WAV file")
+    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
+    sp.add_argument("--genre", default="")
+    sp.add_argument("--ct-findings", default="")
+
+    sp = sub.add_parser("craft-run", help="Run a craft chain on audio")
+    sp.add_argument("--wav", required=True, help="Path to input WAV file")
+    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
+    sp.add_argument("--output", default=None, help="Output WAV path")
+    sp.add_argument("--keep-artifacts", action="store_true")
+
+    sp = sub.add_parser("craft-inspect", help="Inspect a craft chain manifest")
+    sp.add_argument("--manifest", required=True, help="Path to chain manifest JSON")
+
+    # ═══ Tidal Intelligence (ECHAIN-009) ═══
+    sp = sub.add_parser("tidal-intel", help="Run tidal intelligence smoke/report")
+    sp.add_argument("--run-id", default="", help="Run ID for report context")
+
+    sp = sub.add_parser("tidal-intel-brief", help="Generate morning brief markdown")
+    sp.add_argument("--run-id", default="", help="Run ID for report context")
+
+    # ═══ Tidal Operations (ECHAIN-010) ═══
+    sp = sub.add_parser("tidal-ops", help="Run tidal operations smoke/report")
+    sp.add_argument("--run-id", default="", help="Run ID for report context")
+
+    sp = sub.add_parser("tidal-state", help="Show tidal cycle state (PID, cycle, health)")
+
+    sp = sub.add_parser("tidal-alert", help="Create a tidal operator alert")
+    sp.add_argument("--level", default="info", choices=["info", "warn", "critical"])
+    sp.add_argument("--message", required=True, help="Alert message")
+    sp.add_argument("--title", default="", help="Alert title")
+
+    sp = sub.add_parser("tidal-alerts", help="List active tidal alerts")
+
+    sp = sub.add_parser("tidal-ack", help="Acknowledge a tidal alert")
+    sp.add_argument("--alert-id", required=True, help="Alert ID to acknowledge")
+
+    sp = sub.add_parser("tidal-note", help="Write an operator note")
+    sp.add_argument("--target", required=True, help="Target task/sample ID")
+    sp.add_argument("--content", required=True, help="Note content")
+    sp.add_argument("--type", default="task", help="Target type")
+    sp.add_argument("--tags", default="", help="Comma-separated tags")
+
+    sp = sub.add_parser("tidal-notes", help="Read operator notes")
+    sp.add_argument("--target", default="", help="Filter by target ID")
+
     sp = sub.add_parser("all", help="register → plan → run → report → craft")
     sp.add_argument("--source", default="unknown")
     sp.add_argument("--genre", default="")
@@ -323,6 +404,53 @@ def main(argv=None) -> int:
 
     if args.command == "failures":
         print_json(analyze_failures(cfg, run_id=args.run_id))
+        return 0
+
+    # ═══ Tidal Intelligence ═══
+    if args.command == "tidal-intel":
+        print_json(cli_intelligence_report(run_id=args.run_id))
+        return 0
+
+    if args.command == "tidal-intel-brief":
+        print(cli_morning_brief(run_id=args.run_id))
+        return 0
+
+    # ═══ Tidal Operations ═══
+    if args.command == "tidal-ops":
+        print_json(cli_operations_report(run_id=args.run_id))
+        return 0
+
+    if args.command == "tidal-state":
+        state = get_tidal_state()
+        print_json(state.to_dict())
+        return 0
+
+    if args.command == "tidal-alert":
+        a = create_alert(args.level, args.message, title=args.title or args.message[:60])
+        print_json(a.to_dict())
+        return 0
+
+    if args.command == "tidal-alerts":
+        print_json([a.to_dict() for a in get_active_alerts()])
+        return 0
+
+    if args.command == "tidal-ack":
+        a = acknowledge_alert(args.alert_id)
+        if a:
+            print_json(a.to_dict())
+        else:
+            print_json({"error": f"Alert {args.alert_id} not found"})
+        return 0
+
+    if args.command == "tidal-note":
+        tags = [t.strip() for t in args.tags.split(",") if t.strip()] if args.tags else []
+        n = write_operator_note(args.target, args.content, target_type=args.type, tags=tags)
+        print_json(n.to_dict())
+        return 0
+
+    if args.command == "tidal-notes":
+        notes = read_operator_notes(target=args.target)
+        print_json([n.to_dict() for n in notes])
         return 0
 
     if args.command == "next":
@@ -549,6 +677,80 @@ def main(argv=None) -> int:
         return 0
     if args.command == "craft-records":
         print_json({"records": list_craft_records(cfg, adoption_status=args.adoption_status)})
+        return 0
+
+    # ── PDF Report handlers ────────────────────────────────
+    if args.command == "pdf-report":
+        if args.pdf_action == "render-single":
+            from .pdf_ct_builder import generate_single_scan_pdf
+            output_dir = Path(args.output_dir) if args.output_dir else None
+            manifest = generate_single_scan_pdf(
+                wav_path=args.wav,
+                output_dir=output_dir,
+                sample_id=args.sample_id,
+                genre=args.genre,
+                preset=args.preset,
+                mrs_before=args.mrs_before,
+                mrs_after=args.mrs_after,
+            )
+            print_json(manifest.to_dict())
+            return 0
+
+        if args.pdf_action == "render-comparison":
+            from .pdf_ct_builder import generate_comparison_pdf
+            output_dir = Path(args.output_dir) if args.output_dir else None
+            manifest = generate_comparison_pdf(
+                before_wav=args.before_wav,
+                after_wav=args.after_wav,
+                output_dir=output_dir,
+                sample_id=args.sample_id,
+                genre=args.genre,
+                preset=args.preset,
+                mrs_before=args.mrs_before,
+                mrs_after=args.mrs_after,
+            )
+            print_json(manifest.to_dict())
+            return 0
+
+        if args.pdf_action == "inspect":
+            from .pdf_qa import run_full_qa
+            pdf_path = args.pdf_path
+            manifest_path = Path(pdf_path).with_suffix(".manifest.json")
+            result = {"pdf_path": pdf_path, "qa": None, "manifest": None}
+            result["qa"] = run_full_qa(pdf_path).to_dict()
+            if manifest_path.exists():
+                import json as _json
+                result["manifest"] = _json.loads(manifest_path.read_text())
+            print_json(result)
+            return 0
+
+    # ── Craft 22 handlers ──────────────────────────────────
+    if args.command == "craft-plan":
+        from .craft_chain import ChainStep, CraftChainExecutor, preset_to_chain
+        steps = preset_to_chain(args.preset)
+        executor = CraftChainExecutor()
+        plan = executor.plan(steps, source=args.wav)
+        print_json(plan.to_dict())
+        return 0
+
+    if args.command == "craft-run":
+        from .craft_chain import CraftChainExecutor, preset_to_chain
+        steps = preset_to_chain(args.preset)
+        executor = CraftChainExecutor(keep_artifacts=args.keep_artifacts)
+        result = executor.execute(args.wav, steps, output_path=args.output)
+        print_json(result.to_dict())
+        if not args.keep_artifacts:
+            executor.cleanup()
+        return 0 if result.success else 1
+
+    if args.command == "craft-inspect":
+        import json as _json
+        manifest_path = Path(args.manifest)
+        if manifest_path.exists():
+            data = _json.loads(manifest_path.read_text())
+            print_json(data)
+        else:
+            print_json({"error": f"Manifest not found: {args.manifest}"})
         return 0
 
     if args.command == "all":

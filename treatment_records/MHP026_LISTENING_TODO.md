@@ -88,7 +88,7 @@ song_id=mhp026_ai_vocal_001 preset=wide_space clarity= warmth= space= harshness_
 
 ---
 
-## 完成标准
+## 完成标准 ⚠️ 工业封口
 - [ ] 7 首 × 每首 3 preset = 21 条 → 选至少 7 条写 completed feedback（建议分布: warm_vocal +3, clean_master +2, wide_space +2）
 - [ ] 总数 completed ≥ 10（3 existing + 7 new）
 - [ ] 所有反馈基于 matched-loudness A/B，volume_matched=true

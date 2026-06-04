@@ -99,3 +99,14 @@ data/validation/samples/
 outputs/data/
 outputs/nem_mrs_002/
 data/calibration/mrs_002/source/
+
+# ── Generated outputs (never track) ──
+outputs/
+reports/daily_runs/
+data/
+.pytest_cache/
+*.pyc
+__pycache__/
+
+# ── Tidal runtime artifacts ──
+outputs/tidal/
