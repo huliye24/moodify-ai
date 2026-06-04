@@ -1,6 +1,6 @@
 # MHP-071: Genre-Specific Threshold Configuration
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Build-6 / E1 (Execution)
 **Depends on**: MHP-070 (NEM-MOODIFY-STUDIO-OS-001 complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

@@ -1,6 +1,6 @@
 # MHP-075: MRS Calibration Guide — Operator Documentation
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Build-6 / S1 (Systemization)
 **Depends on**: MHP-074 (gate tests pass)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

@@ -1,0 +1,45 @@
+# MRS Gate Threshold Configuration — NEM-MOODIFY-MRS-002
+# Genre-specific thresholds for decide_candidate_gate().
+# Defaults are applied when no genre is specified or genre is unknown.
+
+defaults:
+  required_mrs_delta: 0.0
+  transient_threshold: 1.0
+  loudness_penalty_threshold: 1.0
+  over_dark_policy: binary           # "binary" | "graduated"
+
+genres:
+  electronic:
+    required_mrs_delta: 2.0
+    transient_threshold: 0.8
+    loudness_penalty_threshold: 1.0
+    over_dark_policy: graduated
+    note: "Electronic tolerates more sub-bass; transient sensitivity is higher due to fast attacks."
+
+  piano:
+    required_mrs_delta: 1.0
+    transient_threshold: 1.2
+    loudness_penalty_threshold: 1.0
+    over_dark_policy: graduated
+    note: "Piano benefits from subtle MRS improvements; transient threshold relaxed for natural decay."
+
+  vocal:
+    required_mrs_delta: 1.5
+    transient_threshold: 1.0
+    loudness_penalty_threshold: 0.7
+    over_dark_policy: graduated
+    note: "Vocal clarity is critical; loudness penalty is strict to prevent vocal distortion."
+
+  rock:
+    required_mrs_delta: 2.5
+    transient_threshold: 0.6
+    loudness_penalty_threshold: 1.0
+    over_dark_policy: graduated
+    note: "Rock already has high energy; needs significant MRS improvement. Transients are tight."
+
+  ambient:
+    required_mrs_delta: 3.0
+    transient_threshold: 1.0
+    loudness_penalty_threshold: 0.5
+    over_dark_policy: graduated
+    note: "Ambient is subtle; loudness changes are very noticeable. MRS delta must be large to matter."

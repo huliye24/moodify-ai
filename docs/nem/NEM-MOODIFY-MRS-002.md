@@ -25,14 +25,14 @@ This node hardens the MRS scoring layer so that gate decisions are backed by cal
 
 ## 3. Build-6: MRS Calibration Infrastructure
 
-| Step | Type | MHP | Task |
-|------|------|-----|------|
-| B1 | E | 071 | Genre-specific threshold configuration — YAML with per-genre defaults |
-| B2 | E | 072 | Graduated over_dark detector — 3-level (none/mild/severe) replacing binary flag |
-| B3 | V | 073 | Pseudo-MRS weight calibration — run grid search on calibration data |
-| B4 | V | 074 | Gate threshold unit tests — verify new thresholds gate correctly |
-| B5 | S | 075 | MRS calibration guide — how to tune thresholds, add genres, run audits |
-| B6 | N | 076 | Generate Validate-6 entry from Build-6 evidence |
+| Step | Type | MHP | Task | Status |
+|------|------|-----|------|--------|
+| B1 | E | 071 | Genre-specific threshold configuration — YAML with per-genre defaults | ✅ |
+| B2 | E | 072 | Graduated over_dark detector — 3-level (none/mild/severe) replacing binary flag | ✅ |
+| B3 | V | 073 | Pseudo-MRS weight calibration — run grid search on calibration data | ✅ |
+| B4 | V | 074 | Gate threshold unit tests — 16 tests, all paths covered | ✅ |
+| B5 | S | 075 | MRS calibration guide — 6 sections, operator-ready | ✅ |
+| B6 | N | 076 | Generate Validate-6 entry from Build-6 evidence | ✅ |
 
 ## 4. Validate-6: Calibration Dataset & Live Audit
 

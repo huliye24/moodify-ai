@@ -61,16 +61,16 @@
 
 ---
 
-## NEM-002: MRS Scoring Hardening (⏳ NEXT)
+## NEM-002: MRS Scoring Hardening (Build-6 ✅, Validate-6 ⏳)
 
 | Step | MHP | Task | Status |
 |------|-----|------|--------|
-| E1 | 071 | Genre-Specific Threshold Config | proposed |
-| E2 | 072 | Graduated Over-Dark Detector (3-level) | proposed |
-| V1 | 073 | Pseudo-MRS Weight Calibration | proposed |
-| V2 | 074 | Gate Threshold Unit Tests | proposed |
-| S1 | 075 | MRS Calibration Guide | proposed |
-| N1 | 076 | Build-6 Next Entry → Validate-6 | proposed |
+| E1 | 071 | Genre-Specific Threshold Config | ✅ completed |
+| E2 | 072 | Graduated Over-Dark Detector (3-level) | ✅ completed |
+| V1 | 073 | Pseudo-MRS Weight Calibration | ✅ completed |
+| V2 | 074 | Gate Threshold Unit Tests (16 tests) | ✅ completed |
+| S1 | 075 | MRS Calibration Guide | ✅ completed |
+| N1 | 076 | Build-6 Next Entry → Validate-6 | ✅ completed |
 | E1 | 077 | Calibration Dataset (50+ samples) | proposed |
 | E2 | 078 | Calibration Pipeline Run | proposed |
 | V1 | 079 | MRS Comparison (pseudo vs calibrated vs Open) | proposed |

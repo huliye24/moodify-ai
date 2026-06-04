@@ -252,6 +252,39 @@ def get_operator_job(cfg: RuntimeConfig, job_id: str) -> Dict[str, Any]:
     raise KeyError(f"operator job not found: {job_id}")
 
 
+def _load_genre_thresholds(genre: str = "") -> Dict[str, Any]:
+    """Load per-genre gate thresholds from configs/mrs_thresholds.yaml.
+
+    Returns a dict with keys: required_mrs_delta, transient_threshold,
+    loudness_penalty_threshold, over_dark_policy.
+    Falls back to defaults when genre is unspecified or unknown.
+    """
+    import yaml as _yaml
+
+    defaults = {
+        "required_mrs_delta": 0.0,
+        "transient_threshold": 1.0,
+        "loudness_penalty_threshold": 1.0,
+        "over_dark_policy": "binary",
+    }
+    try:
+        config_path = Path(__file__).resolve().parent.parent / "configs" / "mrs_thresholds.yaml"
+        with open(config_path) as fh:
+            cfg = _yaml.safe_load(fh) or {}
+    except Exception:
+        return defaults
+
+    defaults.update(cfg.get("defaults", {}))
+    genre_cfg = cfg.get("genres", {}).get(genre, {}) if genre else {}
+
+    result = dict(defaults)
+    for key in ("required_mrs_delta", "transient_threshold",
+                "loudness_penalty_threshold", "over_dark_policy"):
+        if key in genre_cfg:
+            result[key] = genre_cfg[key]
+    return result
+
+
 def decide_candidate_gate(
     candidate_id: str,
     job_id: str,
@@ -259,13 +292,26 @@ def decide_candidate_gate(
     mrs_score_delta: Optional[float] = None,
     required_mrs_delta: float = 0.0,
     over_dark_triggered: bool = False,
+    over_dark_level: str = "",
     transient_damage: Optional[float] = None,
     transient_threshold: float = 1.0,
     loudness_penalty: Optional[float] = None,
     loudness_penalty_threshold: float = 1.0,
+    genre: str = "",
 ) -> Dict[str, Any]:
     reasons: List[str] = []
     decision = "approve"
+
+    # ── Genre-specific threshold override ──
+    if genre:
+        t = _load_genre_thresholds(genre)
+        # Only override if caller didn't explicitly pass a non-default value
+        if required_mrs_delta == 0.0:
+            required_mrs_delta = t["required_mrs_delta"]
+        if transient_threshold == 1.0:
+            transient_threshold = t["transient_threshold"]
+        if loudness_penalty_threshold == 1.0:
+            loudness_penalty_threshold = t["loudness_penalty_threshold"]
 
     if not runtime_success:
         reasons.append("runtime_failed")
@@ -280,7 +326,16 @@ def decide_candidate_gate(
         if decision == "approve":
             decision = "reprocess"
 
-    if over_dark_triggered:
+    # ── Over-dark: graduated level overrides binary flag ──
+    if over_dark_level == "severe":
+        reasons.append("over_dark_severe")
+        decision = "reject"
+    elif over_dark_level == "mild":
+        reasons.append("over_dark_mild")
+        if decision == "approve":
+            decision = "reprocess"
+    elif over_dark_triggered:
+        # Legacy binary flag: conservatively reprocess
         reasons.append("over_dark_triggered")
         if decision == "approve":
             decision = "reprocess"
@@ -312,11 +367,18 @@ def build_operator_detail_from_run(
     run_dir: Optional[str | Path] = None,
     report_path: Optional[str | Path] = None,
     required_mrs_delta: float = 0.0,
+    genre: str = "",
 ) -> Dict[str, Any]:
     cfg = cfg.resolved()
     run_dir_path = Path(run_dir) if run_dir else cfg.output_root / run_id
     rows = _read_manifest(run_dir_path / "manifest.csv")
     generated_at = utc_now_iso()
+
+    # ── Genre-specific threshold override ──
+    if genre:
+        t = _load_genre_thresholds(genre)
+        if required_mrs_delta == 0.0:
+            required_mrs_delta = t["required_mrs_delta"]
 
     candidates: List[Dict[str, Any]] = []
     scores: List[Dict[str, Any]] = []
@@ -371,6 +433,7 @@ def build_operator_detail_from_run(
                 mrs_score_delta=mrs_delta,
                 required_mrs_delta=required_mrs_delta,
                 over_dark_triggered="over_dark" in flags,
+                genre=genre,
             )
         )
 
@@ -408,6 +471,7 @@ def attach_run_report_to_job(
     run_dir: Optional[str | Path] = None,
     report_path: Optional[str | Path] = None,
     required_mrs_delta: float = 0.0,
+    genre: str = "",
 ) -> Dict[str, Any]:
     get_operator_job(cfg, job_id)
     detail = build_operator_detail_from_run(
@@ -417,6 +481,7 @@ def attach_run_report_to_job(
         run_dir=run_dir,
         report_path=report_path,
         required_mrs_delta=required_mrs_delta,
+        genre=genre,
     )
     detail_path = _operator_detail_path(cfg, job_id)
     atomic_write_json(detail_path, detail)

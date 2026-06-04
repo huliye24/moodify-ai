@@ -180,6 +180,7 @@ def _get_app():
             run_dir: Optional[str] = None,
             report_path: Optional[str] = None,
             required_mrs_delta: float = 0.0,
+            genre: str = "",
         ):
             cfg = load_config()
             try:
@@ -190,6 +191,7 @@ def _get_app():
                     run_dir=run_dir,
                     report_path=report_path,
                     required_mrs_delta=required_mrs_delta,
+                    genre=genre,
                 )
             except KeyError:
                 raise HTTPException(status_code=404, detail=f"Job not found: {job_id}")

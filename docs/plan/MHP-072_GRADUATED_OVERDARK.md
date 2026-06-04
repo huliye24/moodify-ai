@@ -1,6 +1,6 @@
 # MHP-072: Graduated Over-Dark Detector — 3-Level Replacement for Binary Flag
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Build-6 / E2 (Execution)
 **Depends on**: MHP-071 (genre thresholds configured)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

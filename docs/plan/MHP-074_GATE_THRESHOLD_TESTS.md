@@ -1,6 +1,6 @@
 # MHP-074: Gate Threshold Unit Tests — Verify New Thresholds Gate Correctly
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Build-6 / V2 (Validation)
 **Depends on**: MHP-073 (pseudo-MRS calibrated)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

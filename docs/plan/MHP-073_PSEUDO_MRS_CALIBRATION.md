@@ -1,6 +1,6 @@
 # MHP-073: Pseudo-MRS Weight Calibration — Grid Search on Calibration Data
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Build-6 / V1 (Validation)
 **Depends on**: MHP-072 (over_dark graduated)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
