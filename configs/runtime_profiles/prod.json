@@ -1,0 +1,15 @@
+{
+  "profile": "prod",
+  "timeout_seconds_per_task": 300,
+  "max_retries_per_task": 2,
+  "sleep_seconds_between_tasks": 1.0,
+  "keep_last_n_runs": 20,
+  "min_free_disk_gb": 5.0,
+  "stop_on_first_success_template": true,
+  "command_templates": [
+    "python3 -m moodify.cli process {input} --output-dir {output_dir} --preset {preset} --json"
+  ],
+  "heartbeat_interval": 15,
+  "event_writer_enabled": true,
+  "supervisor_enabled": true
+}
