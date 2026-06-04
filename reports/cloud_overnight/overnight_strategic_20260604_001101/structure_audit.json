@@ -1,0 +1,134 @@
+{
+  "source_file_count": 146,
+  "total_source_lines": 30823,
+  "long_files_over_300": 36,
+  "very_long_files_over_800": 4,
+  "top_30_long_files": [
+    {
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "lines": 970
+    },
+    {
+      "path": "scripts/v01_inspector.py",
+      "lines": 862
+    },
+    {
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "lines": 850
+    },
+    {
+      "path": "workers/night_worker.py",
+      "lines": 809
+    },
+    {
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "lines": 760
+    },
+    {
+      "path": "workers/mrs_metrics.py",
+      "lines": 709
+    },
+    {
+      "path": "moodify-core-package/src/moodify/knowledge/emotion_targets.py",
+      "lines": 695
+    },
+    {
+      "path": "night/workers/cloud_night_worker.py",
+      "lines": 686
+    },
+    {
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "lines": 667
+    },
+    {
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "lines": 663
+    },
+    {
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "lines": 632
+    },
+    {
+      "path": "workers/mrs_open_benchmark_v03.py",
+      "lines": 627
+    },
+    {
+      "path": "moodify-core-package/src/moodify/data_types.py",
+      "lines": 554
+    },
+    {
+      "path": "workers/mrs_formula_v02.py",
+      "lines": 517
+    },
+    {
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "lines": 500
+    },
+    {
+      "path": "moodify-core-package/src/moodify/cli.py",
+      "lines": 489
+    },
+    {
+      "path": "scripts/v01_aggregate_treatment_records.py",
+      "lines": 472
+    },
+    {
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "lines": 471
+    },
+    {
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "lines": 457
+    },
+    {
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "lines": 451
+    },
+    {
+      "path": "workers/report_builder.py",
+      "lines": 441
+    },
+    {
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "lines": 412
+    },
+    {
+      "path": "moodify-core-package/src/moodify/diagnosis/defect_classifier.py",
+      "lines": 405
+    },
+    {
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "lines": 389
+    },
+    {
+      "path": "moodify-core-package/src/moodify/diagnosis/metrics.py",
+      "lines": 378
+    },
+    {
+      "path": "moodify-core-package/src/moodify/processing/operators.py",
+      "lines": 378
+    },
+    {
+      "path": "moodify_runtime/utils.py",
+      "lines": 344
+    },
+    {
+      "path": "night/moodify_daily_run_system/moodify_runtime/utils.py",
+      "lines": 344
+    },
+    {
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "lines": 343
+    },
+    {
+      "path": "scripts/mt002_validate_mrs_matrix.py",
+      "lines": 327
+    }
+  ],
+  "strategic_priority": [
+    "Keep ruff and pytest green before new feature work.",
+    "Split files over 800 lines first; they dominate X-CLP structure risk.",
+    "Move runtime reports to MRS Open-first metrics and treat pseudo metrics as optional.",
+    "Keep cloud runtime evidence reproducible by run_id and manifest path."
+  ]
+}

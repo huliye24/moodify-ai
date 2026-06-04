@@ -1,0 +1,48 @@
+{
+  "run_id": "overnight_strategic_20260604_001101",
+  "status": "PASS",
+  "finished_at": "2026-06-04T03:33:12.241012+08:00",
+  "branch": "codex/mainline-cloud-dev-20260603",
+  "commit": "6887de6",
+  "total_steps": 25,
+  "failed_steps": 0,
+  "report_files": [
+    {
+      "path": "reports/cloud_overnight/overnight_strategic_20260604_001101/HANDOFF.md",
+      "bytes": 1404,
+      "sha256": "52e4f09b0e11725f37f1fcc99f7357da98033698d3a975fc26afcd393302d706"
+    },
+    {
+      "path": "reports/cloud_overnight/overnight_strategic_20260604_001101/log_tail.txt",
+      "bytes": 5375,
+      "sha256": "09e22d386f4fcd19c194d580ce8ae10f7c8c05f94b7b88b4b707c818b0e00bdb"
+    },
+    {
+      "path": "reports/cloud_overnight/overnight_strategic_20260604_001101/results.jsonl",
+      "bytes": 8077,
+      "sha256": "fed46abfb7c88c39e5df23d9f82f3e97d32baf996653cf06672088a039e81561"
+    },
+    {
+      "path": "reports/cloud_overnight/overnight_strategic_20260604_001101/structure_audit.json",
+      "bytes": 3371,
+      "sha256": "7b87c7fba433cc7952d2c16cb241c40c7f7c64964f35a82805501f5fd0671d84"
+    },
+    {
+      "path": "reports/cloud_overnight/overnight_strategic_20260604_001101/structure_audit.md",
+      "bytes": 2414,
+      "sha256": "38b6e55d7f51ef209b85df4ee9e86ce0a3f2cfaac21554770dc6d599e2ca3ff2"
+    },
+    {
+      "path": "reports/cloud_overnight/overnight_strategic_20260604_001101/summary.json",
+      "bytes": 386,
+      "sha256": "8cab99028d5ff1d94ed34e3ac3f92433cf93ea1df2ca601fdda81c5ccd6a10dd"
+    },
+    {
+      "path": "reports/cloud_overnight/overnight_strategic_20260604_001101/summary.md",
+      "bytes": 1944,
+      "sha256": "dc4667bc199431f2b74614e8d0bb476b100fc3ea33cc60ee89e888e0a1b4ec89"
+    }
+  ],
+  "full_log": "/home/ubuntu/moodify-mainline/logs/overnight_strategic_20260604_001101.log",
+  "notes": "Full logs stay under ignored logs/. This bundle keeps lightweight handoff evidence."
+}

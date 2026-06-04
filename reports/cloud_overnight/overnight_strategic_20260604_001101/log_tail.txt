@@ -1,0 +1,140 @@
+
+===== [mt001_real_batch_5] start 2026-06-04T02:25:48+08:00 remaining=33852s free=50G =====
+MT-001 Gate 3 real AI PASS: overnight_strategic_20260604_001101_real_iter05
+===== [mt001_real_batch_5] end 2026-06-04T02:40:33+08:00 rc=0 =====
+
+===== [mt002_score_5] start 2026-06-04T02:40:33+08:00 remaining=32967s free=50G =====
+scored 10/90 records
+scored 20/90 records
+scored 30/90 records
+scored 40/90 records
+scored 50/90 records
+scored 60/90 records
+scored 70/90 records
+scored 80/90 records
+scored 90/90 records
+{
+  "run_id": "overnight_strategic_20260604_001101_real_iter05_mt002_score",
+  "mrs_version": "mrs_open_v031",
+  "total_records": 90,
+  "completed": 90,
+  "failed": 0,
+  "unique_samples": 30,
+  "score_median": 1041.75,
+  "delta_median": 6.4500000000000455,
+  "decision": "PASS"
+}
+===== [mt002_score_5] end 2026-06-04T02:44:29+08:00 rc=0 =====
+
+===== [mt002_validate_5] start 2026-06-04T02:44:29+08:00 remaining=32731s free=50G =====
+{
+  "run_id": "overnight_strategic_20260604_001101_real_iter05_mt002_validation",
+  "mrs_version": "mrs_open_v031",
+  "decision": "EXPERIMENTAL",
+  "pass_count": 7,
+  "hold_count": 2,
+  "fail_count": 0,
+  "record_count": 90
+}
+===== [mt002_validate_5] end 2026-06-04T02:44:29+08:00 rc=0 =====
+
+######## Real batch iteration 6 / 6: overnight_strategic_20260604_001101_real_iter06 ########
+
+===== [mt001_real_batch_6] start 2026-06-04T02:59:29+08:00 remaining=31831s free=50G =====
+MT-001 Gate 3 real AI PASS: overnight_strategic_20260604_001101_real_iter06
+===== [mt001_real_batch_6] end 2026-06-04T03:14:18+08:00 rc=0 =====
+
+===== [mt002_score_6] start 2026-06-04T03:14:18+08:00 remaining=30942s free=50G =====
+scored 10/90 records
+scored 20/90 records
+scored 30/90 records
+scored 40/90 records
+scored 50/90 records
+scored 60/90 records
+scored 70/90 records
+scored 80/90 records
+scored 90/90 records
+{
+  "run_id": "overnight_strategic_20260604_001101_real_iter06_mt002_score",
+  "mrs_version": "mrs_open_v031",
+  "total_records": 90,
+  "completed": 90,
+  "failed": 0,
+  "unique_samples": 30,
+  "score_median": 1041.75,
+  "delta_median": 6.4500000000000455,
+  "decision": "PASS"
+}
+===== [mt002_score_6] end 2026-06-04T03:18:11+08:00 rc=0 =====
+
+===== [mt002_validate_6] start 2026-06-04T03:18:11+08:00 remaining=30709s free=50G =====
+{
+  "run_id": "overnight_strategic_20260604_001101_real_iter06_mt002_validation",
+  "mrs_version": "mrs_open_v031",
+  "decision": "EXPERIMENTAL",
+  "pass_count": 7,
+  "hold_count": 2,
+  "fail_count": 0,
+  "record_count": 90
+}
+===== [mt002_validate_6] end 2026-06-04T03:18:11+08:00 rc=0 =====
+
+===== [final_disk_usage] start 2026-06-04T03:33:11+08:00 remaining=29809s free=50G =====
+17G	outputs
+1.5M	reports
+2.8M	logs
+284K	data
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda2        99G   45G   50G  47% /
+?? reports/cloud_overnight/
+===== [final_disk_usage] end 2026-06-04T03:33:12+08:00 rc=0 =====
+{
+  "run_id": "overnight_strategic_20260604_001101",
+  "finished_at": "2026-06-04T03:33:12.241012+08:00",
+  "total_steps": 25,
+  "failed_steps": 0,
+  "status": "PASS",
+  "log_file": "/home/ubuntu/moodify-mainline/logs/overnight_strategic_20260604_001101.log",
+  "report_root": "/home/ubuntu/moodify-mainline/reports/cloud_overnight/overnight_strategic_20260604_001101",
+  "failed": []
+}
+
+# Moodify Overnight Strategic Summary ? overnight_strategic_20260604_001101
+
+- Finished at: 2026-06-04T03:33:12.241012+08:00
+- Status: `PASS`
+- Total steps: 25
+- Failed steps: 0
+- Log: `/home/ubuntu/moodify-mainline/logs/overnight_strategic_20260604_001101.log`
+- Report root: `/home/ubuntu/moodify-mainline/reports/cloud_overnight/overnight_strategic_20260604_001101`
+
+## Steps
+
+| Time | Step | RC |
+|---|---|---:|
+| 2026-06-04T00:11:01.412996+08:00 | `env_snapshot` | 0 |
+| 2026-06-04T00:11:01.436877+08:00 | `ruff_core` | 0 |
+| 2026-06-04T00:11:03.870633+08:00 | `pytest_v01` | 0 |
+| 2026-06-04T00:11:08.732173+08:00 | `pytest_full` | 0 |
+| 2026-06-04T00:11:08.790442+08:00 | `gate4_report_regression` | 0 |
+| 2026-06-04T00:11:09.424173+08:00 | `structure_audit` | 0 |
+| 2026-06-04T00:25:55.239857+08:00 | `mt001_real_batch_1` | 0 |
+| 2026-06-04T00:29:45.579850+08:00 | `mt002_score_1` | 0 |
+| 2026-06-04T00:29:45.635496+08:00 | `mt002_validate_1` | 0 |
+| 2026-06-04T00:59:32.238253+08:00 | `mt001_real_batch_2` | 0 |
+| 2026-06-04T01:03:29.291871+08:00 | `mt002_score_2` | 0 |
+| 2026-06-04T01:03:29.347211+08:00 | `mt002_validate_2` | 0 |
+| 2026-06-04T01:33:14.570931+08:00 | `mt001_real_batch_3` | 0 |
+| 2026-06-04T01:37:09.522851+08:00 | `mt002_score_3` | 0 |
+| 2026-06-04T01:37:09.578449+08:00 | `mt002_validate_3` | 0 |
+| 2026-06-04T02:06:56.150975+08:00 | `mt001_real_batch_4` | 0 |
+| 2026-06-04T02:10:48.879989+08:00 | `mt002_score_4` | 0 |
+| 2026-06-04T02:10:48.935589+08:00 | `mt002_validate_4` | 0 |
+| 2026-06-04T02:40:33.603506+08:00 | `mt001_real_batch_5` | 0 |
+| 2026-06-04T02:44:29.791897+08:00 | `mt002_score_5` | 0 |
+| 2026-06-04T02:44:29.848334+08:00 | `mt002_validate_5` | 0 |
+| 2026-06-04T03:14:18.699520+08:00 | `mt001_real_batch_6` | 0 |
+| 2026-06-04T03:18:11.683597+08:00 | `mt002_score_6` | 0 |
+| 2026-06-04T03:18:11.739612+08:00 | `mt002_validate_6` | 0 |
+| 2026-06-04T03:33:12.226651+08:00 | `final_disk_usage` | 0 |
+OVERNIGHT_DONE 2026-06-04T03:33:12+08:00 status_file=/home/ubuntu/moodify-mainline/reports/cloud_overnight/overnight_strategic_20260604_001101/summary.json

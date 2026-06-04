@@ -1,0 +1,10 @@
+{
+  "run_id": "overnight_strategic_20260604_001101",
+  "finished_at": "2026-06-04T03:33:12.241012+08:00",
+  "total_steps": 25,
+  "failed_steps": 0,
+  "status": "PASS",
+  "log_file": "/home/ubuntu/moodify-mainline/logs/overnight_strategic_20260604_001101.log",
+  "report_root": "/home/ubuntu/moodify-mainline/reports/cloud_overnight/overnight_strategic_20260604_001101",
+  "failed": []
+}
