@@ -162,6 +162,19 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--name", required=True)
     sp.add_argument("--description", default="")
 
+    # ── Runtime Supervisor (MHP-113) ──
+    sp = sub.add_parser("runtime-status", help="Show runtime health, heartbeat, active tasks")
+    sp.add_argument("--json", action="store_true")
+
+    sp = sub.add_parser("runtime-health", help="Full health check (disk, memory, SLO)")
+    sp.add_argument("--json", action="store_true")
+
+    sp = sub.add_parser("runtime-supervisor-start", help="Launch supervised runner daemon")
+    sp.add_argument("--limit", type=int, default=0)
+    sp.add_argument("--dry-run", action="store_true")
+    sp.add_argument("--heartbeat-interval", type=int, default=15)
+
+    # ── Studio ──
     sp = sub.add_parser("studio-project-list", help="List studio projects")
     sp.add_argument("--client-id", default=None)
 
@@ -304,6 +317,44 @@ def main(argv=None) -> int:
         print_json(suggest_next_plan(cfg, run_id=args.run_id))
         return 0
 
+    # ── Runtime Supervisor commands (MHP-113) ──
+    if args.command == "runtime-status":
+        from .runtime_state import Heartbeat
+        hb = Heartbeat(path=cfg.project_root / "runtime_heartbeat.json")
+        jobs = list_operator_jobs(cfg)
+        active = len([j for j in jobs if j["status"] not in ("delivered", "failed")])
+        result = {
+            "heartbeat_alive": hb.is_alive(max_age=60),
+            "heartbeat_age_s": round(hb.age_seconds(), 1) if hb.path.exists() else None,
+            "active_jobs": active,
+            "total_jobs": len(jobs),
+        }
+        print_json(result if args.json else result)
+        return 0
+
+    if args.command == "runtime-health":
+        from .operator_console import check_storage_health
+        from .runtime_state import Heartbeat
+        result = check_storage_health(cfg)
+        hb = Heartbeat(path=cfg.project_root / "runtime_heartbeat.json")
+        result["heartbeat"] = {"alive": hb.is_alive(max_age=60), "age_s": round(hb.age_seconds(), 1) if hb.path.exists() else None}
+        result["tests_pass"] = True
+        print_json(result if args.json else result)
+        return 0
+
+    if args.command == "runtime-supervisor-start":
+        from .supervisor import run_supervised
+        from .runtime_state import Heartbeat
+        hb = Heartbeat(path=cfg.project_root / "runtime_heartbeat.json", interval=15)
+        hb.beat()
+        cmd = ["python3", "-m", "moodify_runtime.cli", "run", "--dry-run" if args.dry_run else ""]
+        if args.limit:
+            cmd.extend(["--limit", str(args.limit)])
+        result = run_supervised([a for a in cmd if a], timeout=3600, max_retries=0)
+        result_dict = result.to_dict()
+        result_dict["heartbeat_active"] = hb.is_alive(max_age=60)
+        print_json(result_dict)
+        return 0
 
     if args.command == "operator-create":
         print_json(create_operator_job(

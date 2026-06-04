@@ -108,6 +108,41 @@ def _get_app():
                 "storage": storage["storage"],
             }
 
+        # ═══════════════════════════════════════════════════════════════
+        # Runtime (MHP-114)
+        # ═══════════════════════════════════════════════════════════════
+
+        @app.get("/runtime/heartbeat")
+        async def api_runtime_heartbeat():
+            """Return runner liveness status."""
+            from .runtime_state import Heartbeat
+            cfg = load_config()
+            hb = Heartbeat(path=cfg.project_root / "runtime_heartbeat.json")
+            return {
+                "alive": hb.is_alive(max_age=60),
+                "age_seconds": round(hb.age_seconds(), 1) if hb.path.exists() else None,
+            }
+
+        @app.get("/runtime/status")
+        async def api_runtime_status():
+            """Full runtime status: heartbeat + jobs + SLO health."""
+            from .runtime_state import Heartbeat
+            cfg = load_config()
+            hb = Heartbeat(path=cfg.project_root / "runtime_heartbeat.json")
+            jobs = list_operator_jobs(cfg)
+            active = len([j for j in jobs if j["status"] not in ("delivered", "failed")])
+            return {
+                "heartbeat_alive": hb.is_alive(max_age=60),
+                "heartbeat_age_s": round(hb.age_seconds(), 1) if hb.path.exists() else None,
+                "active_jobs": active,
+                "total_jobs": len(jobs),
+                "slo": {
+                    "uptime_target": 0.99,
+                    "success_rate_target": 0.95,
+                    "p99_latency_target_s": 120,
+                },
+            }
+
         @app.post("/operator/compact")
         async def api_compact(keep: int = 100):
             """Deduplicate and prune operator_jobs.jsonl. Keeps most recent `keep` jobs."""

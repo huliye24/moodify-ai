@@ -1,6 +1,6 @@
 # MHP-108: Heartbeat and Lease Model
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-BUILD-004 / Build Plan-6A: Core Implementation / B2 (Execution)
 **Depends on**: MHP-107
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

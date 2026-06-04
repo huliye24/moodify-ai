@@ -1,6 +1,6 @@
 # MHP-118: Runtime Integration Smoke
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-BUILD-004 / Build Plan-6B: Runtime Integration / B12 (Next Entry)
 **Depends on**: MHP-117
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

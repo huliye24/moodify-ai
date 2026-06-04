@@ -1,6 +1,6 @@
 # MHP-111: Failure Classifier and Retry Policy
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-BUILD-004 / Build Plan-6A: Core Implementation / B5 (Systemization)
 **Depends on**: MHP-110
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-115: Console Runtime Views
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-BUILD-004 / Build Plan-6B: Runtime Integration / B9 (Validation)
 **Depends on**: MHP-114
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-122: Resource Usage and Cost Summary
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-BUILD-004 / Build Plan-6C: Stability Validation / B16 (Validation)
 **Depends on**: MHP-121
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-120: Synthetic Failure Injection
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-RUNTIME-001 / NEM-MOODIFY-RUNTIME-BUILD-004 / Build Plan-6C: Stability Validation / B14 (Execution)
 **Depends on**: MHP-119
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
