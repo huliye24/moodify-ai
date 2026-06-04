@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-from .config import RuntimeConfig, load_config
+from .config import load_config
 from .craft_memory import seed_craft_memory
 from .failure import analyze_failures
 from .planner import suggest_next_plan
+from .operator_console import create_operator_job, list_operator_jobs
 from .queue import plan_queue
 from .registry import register_inputs
 from .report import generate_daily_report
 from .runner import run_daily
-from .utils import write_json
 
 
 def print_json(obj: Any) -> None:
@@ -56,6 +55,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("next", help="给出下一轮实验建议")
     sp.add_argument("--run-id", default=None)
+
+
+    sp = sub.add_parser("operator-create", help="Create internal operator-console Job")
+    sp.add_argument("--source-audio", required=True)
+    sp.add_argument("--depth", default="quick_scan", choices=["quick_scan", "standard_process", "deep_process", "studio_process"])
+    sp.add_argument("--project-label", default="")
+    sp.add_argument("--customer-label", default="")
+    sp.add_argument("--target-notes", default="")
+    sp.add_argument("--priority", type=int, default=5)
+    sp.add_argument("--delivery-mode", default="report_bundle")
+
+    sp = sub.add_parser("operator-list", help="List internal operator-console Jobs")
+    sp.add_argument("--status", default=None)
 
     sp = sub.add_parser("all", help="register → plan → run → report → craft")
     sp.add_argument("--source", default="unknown")
@@ -102,6 +114,24 @@ def main(argv=None) -> int:
 
     if args.command == "next":
         print_json(suggest_next_plan(cfg, run_id=args.run_id))
+        return 0
+
+
+    if args.command == "operator-create":
+        print_json(create_operator_job(
+            cfg,
+            source_audio=args.source_audio,
+            processing_depth=args.depth,
+            project_label=args.project_label,
+            customer_label=args.customer_label,
+            target_notes=args.target_notes,
+            priority=args.priority,
+            delivery_mode=args.delivery_mode,
+        ))
+        return 0
+
+    if args.command == "operator-list":
+        print_json({"jobs": list_operator_jobs(cfg, status=args.status)})
         return 0
 
     if args.command == "all":
