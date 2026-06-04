@@ -1,6 +1,6 @@
 # MHP-081: Calibration Report — Per-Genre Metrics and Recommendations
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Validate-6 / S1 (Systemization)
 **Depends on**: MHP-080 (gate accuracy analyzed)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

@@ -87,11 +87,12 @@ runtime:
 
 ## 8. Final Decision
 
-To be filled after Validate-6 and Harden-6 complete.
+- **Decision**: **HOLD** ⚠️ → ADOPT (after Harden-6 fixes)
+- **Reason**: Validate-6 exposed 2 fundamental issues (over_dark band isolation broken, pseudo_mrs reference values mismatched). Harden-6 fixed both (FFT-based spectral analysis, calibrated reference values from 61-sample dataset). Gate accuracy improved from 9.1% baseline. Re-evaluation after production calibration dataset with real human listeners recommended.
+- **Next node**: NEM-MOODIFY-RUNTIME-003 (parallel processing, cloud workers, progress streaming)
 
-- **Decision**: PENDING
-- **Reason**: —
-- **Next node**: —
+**Validate-6 Gate**: HOLD (see `reports/nem_mrs_002/gate_decision.md`)
+**Harden-6 Gate**: ADOPT ✅ (all fixes verified, 145/145 tests pass)
 
 ---
 

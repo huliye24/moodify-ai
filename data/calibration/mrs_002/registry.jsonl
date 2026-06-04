@@ -1,0 +1,61 @@
+{"sample_id": "CALELE001", "genre": "electronic", "source_file": "Control Theory.mp3", "path": "source/electronic/CALELE001.wav", "duration_s": 204.56}
+{"sample_id": "CALELE002", "genre": "electronic", "source_file": "Moonlight Girl.mp3", "path": "source/electronic/CALELE002.wav", "duration_s": 214.68}
+{"sample_id": "CALVOC003", "genre": "vocal", "source_file": "Okay Okay 刚刚好.mp3", "path": "source/vocal/CALVOC003.wav", "duration_s": 126.0}
+{"sample_id": "CALELE004", "genre": "electronic", "source_file": "Silk and Ruin2.mp3", "path": "source/electronic/CALELE004.wav", "duration_s": 174.6}
+{"sample_id": "CALROC005", "genre": "rock", "source_file": "_Black Therapy (1).mp3", "path": "source/rock/CALROC005.wav", "duration_s": 306.56}
+{"sample_id": "CALROC006", "genre": "rock", "source_file": "_Black Therapy (2).mp3", "path": "source/rock/CALROC006.wav", "duration_s": 306.56}
+{"sample_id": "CALROC007", "genre": "rock", "source_file": "_Black Therapy.mp3", "path": "source/rock/CALROC007.wav", "duration_s": 306.56}
+{"sample_id": "CALAMB008", "genre": "ambient", "source_file": "_Neural Poison   - 副本.mp3", "path": "source/ambient/CALAMB008.wav", "duration_s": 219.96}
+{"sample_id": "CALELE009", "genre": "electronic", "source_file": "_Neural Poison  .mp3", "path": "source/electronic/CALELE009.wav", "duration_s": 219.96}
+{"sample_id": "CALELE010", "genre": "electronic", "source_file": "echoes-in-the-neon-labyrinth.mp3", "path": "source/electronic/CALELE010.wav", "duration_s": 269.52}
+{"sample_id": "CALVOC011", "genre": "vocal", "source_file": "假装无所谓2.mp3", "path": "source/vocal/CALVOC011.wav", "duration_s": 265.12}
+{"sample_id": "CALPIA012", "genre": "piano", "source_file": "句点10.mp3", "path": "source/piano/CALPIA012.wav", "duration_s": 177.36}
+{"sample_id": "CALPIA013", "genre": "piano", "source_file": "句点11.mp3", "path": "source/piano/CALPIA013.wav", "duration_s": 164.04}
+{"sample_id": "CALPIA014", "genre": "piano", "source_file": "句点12.mp3", "path": "source/piano/CALPIA014.wav", "duration_s": 134.84}
+{"sample_id": "CALPIA015", "genre": "piano", "source_file": "句点15 (1).mp3", "path": "source/piano/CALPIA015.wav", "duration_s": 154.88}
+{"sample_id": "CALPIA016", "genre": "piano", "source_file": "句点15.mp3", "path": "source/piano/CALPIA016.wav", "duration_s": 154.88}
+{"sample_id": "CALPIA017", "genre": "piano", "source_file": "句点4.mp3", "path": "source/piano/CALPIA017.wav", "duration_s": 164.84}
+{"sample_id": "CALPIA018", "genre": "piano", "source_file": "句点8 (1).mp3", "path": "source/piano/CALPIA018.wav", "duration_s": 183.04}
+{"sample_id": "CALPIA019", "genre": "piano", "source_file": "句点8.mp3", "path": "source/piano/CALPIA019.wav", "duration_s": 183.04}
+{"sample_id": "CALVOC020", "genre": "vocal", "source_file": "唯有痛苦从不说谎.mp3", "path": "source/vocal/CALVOC020.wav", "duration_s": 199.24}
+{"sample_id": "CALELE021", "genre": "electronic", "source_file": "多变的天气.mp3", "path": "source/electronic/CALELE021.wav", "duration_s": 100.76}
+{"sample_id": "CALVOC022", "genre": "vocal", "source_file": "我想被偏爱，不想被路过 (1).mp3", "path": "source/vocal/CALVOC022.wav", "duration_s": 222.76}
+{"sample_id": "CALVOC023", "genre": "vocal", "source_file": "我想被偏爱，不想被路过.mp3", "path": "source/vocal/CALVOC023.wav", "duration_s": 222.76}
+{"sample_id": "CALVOC024", "genre": "vocal", "source_file": "我曾遥望银河星光 (1).mp3", "path": "source/vocal/CALVOC024.wav", "duration_s": 199.2}
+{"sample_id": "CALVOC025", "genre": "vocal", "source_file": "我曾遥望银河星光.mp3", "path": "source/vocal/CALVOC025.wav", "duration_s": 196.0}
+{"sample_id": "CALROC026", "genre": "rock", "source_file": "散焦之界 (1).mp3", "path": "source/rock/CALROC026.wav", "duration_s": 312.88}
+{"sample_id": "CALROC027", "genre": "rock", "source_file": "散焦之界.mp3", "path": "source/rock/CALROC027.wav", "duration_s": 312.88}
+{"sample_id": "CALAMB028", "genre": "ambient", "source_file": "时间不对.mp3", "path": "source/ambient/CALAMB028.wav", "duration_s": 235.28}
+{"sample_id": "CALVOC029", "genre": "vocal", "source_file": "茧中微光 (1).mp3", "path": "source/vocal/CALVOC029.wav", "duration_s": 127.64}
+{"sample_id": "CALVOC030", "genre": "vocal", "source_file": "茧中微光.mp3", "path": "source/vocal/CALVOC030.wav", "duration_s": 113.52}
+{"sample_id": "CALAMB031", "genre": "ambient", "source_file": "variant of CALAMB008", "path": "source/ambient/CALAMB031.wav", "variant": "pitch_up"}
+{"sample_id": "CALAMB032", "genre": "ambient", "source_file": "variant of CALAMB008", "path": "source/ambient/CALAMB032.wav", "variant": "pitch_down"}
+{"sample_id": "CALAMB033", "genre": "ambient", "source_file": "variant of CALAMB028", "path": "source/ambient/CALAMB033.wav", "variant": "pitch_up"}
+{"sample_id": "CALAMB034", "genre": "ambient", "source_file": "variant of CALAMB028", "path": "source/ambient/CALAMB034.wav", "variant": "pitch_down"}
+{"sample_id": "CALELE035", "genre": "electronic", "source_file": "variant of CALELE001", "path": "source/electronic/CALELE035.wav", "variant": "pitch_up"}
+{"sample_id": "CALELE036", "genre": "electronic", "source_file": "variant of CALELE001", "path": "source/electronic/CALELE036.wav", "variant": "pitch_down"}
+{"sample_id": "CALELE037", "genre": "electronic", "source_file": "variant of CALELE002", "path": "source/electronic/CALELE037.wav", "variant": "pitch_up"}
+{"sample_id": "CALELE038", "genre": "electronic", "source_file": "variant of CALELE002", "path": "source/electronic/CALELE038.wav", "variant": "pitch_down"}
+{"sample_id": "CALELE039", "genre": "electronic", "source_file": "variant of CALELE004", "path": "source/electronic/CALELE039.wav", "variant": "pitch_up"}
+{"sample_id": "CALELE040", "genre": "electronic", "source_file": "variant of CALELE004", "path": "source/electronic/CALELE040.wav", "variant": "pitch_down"}
+{"sample_id": "CALPIA041", "genre": "piano", "source_file": "variant of CALPIA012", "path": "source/piano/CALPIA041.wav", "variant": "pitch_up"}
+{"sample_id": "CALPIA042", "genre": "piano", "source_file": "variant of CALPIA012", "path": "source/piano/CALPIA042.wav", "variant": "pitch_down"}
+{"sample_id": "CALPIA043", "genre": "piano", "source_file": "variant of CALPIA013", "path": "source/piano/CALPIA043.wav", "variant": "pitch_up"}
+{"sample_id": "CALPIA044", "genre": "piano", "source_file": "variant of CALPIA013", "path": "source/piano/CALPIA044.wav", "variant": "pitch_down"}
+{"sample_id": "CALPIA045", "genre": "piano", "source_file": "variant of CALPIA014", "path": "source/piano/CALPIA045.wav", "variant": "pitch_up"}
+{"sample_id": "CALPIA046", "genre": "piano", "source_file": "variant of CALPIA014", "path": "source/piano/CALPIA046.wav", "variant": "pitch_down"}
+{"sample_id": "CALROC047", "genre": "rock", "source_file": "variant of CALROC005", "path": "source/rock/CALROC047.wav", "variant": "pitch_up"}
+{"sample_id": "CALROC048", "genre": "rock", "source_file": "variant of CALROC005", "path": "source/rock/CALROC048.wav", "variant": "pitch_down"}
+{"sample_id": "CALROC049", "genre": "rock", "source_file": "variant of CALROC006", "path": "source/rock/CALROC049.wav", "variant": "pitch_up"}
+{"sample_id": "CALROC050", "genre": "rock", "source_file": "variant of CALROC006", "path": "source/rock/CALROC050.wav", "variant": "pitch_down"}
+{"sample_id": "CALROC051", "genre": "rock", "source_file": "variant of CALROC007", "path": "source/rock/CALROC051.wav", "variant": "pitch_up"}
+{"sample_id": "CALROC052", "genre": "rock", "source_file": "variant of CALROC007", "path": "source/rock/CALROC052.wav", "variant": "pitch_down"}
+{"sample_id": "CALVOC053", "genre": "vocal", "source_file": "variant of CALVOC003", "path": "source/vocal/CALVOC053.wav", "variant": "pitch_up"}
+{"sample_id": "CALVOC054", "genre": "vocal", "source_file": "variant of CALVOC003", "path": "source/vocal/CALVOC054.wav", "variant": "pitch_down"}
+{"sample_id": "CALVOC055", "genre": "vocal", "source_file": "variant of CALVOC011", "path": "source/vocal/CALVOC055.wav", "variant": "pitch_up"}
+{"sample_id": "CALVOC056", "genre": "vocal", "source_file": "variant of CALVOC011", "path": "source/vocal/CALVOC056.wav", "variant": "pitch_down"}
+{"sample_id": "CALVOC057", "genre": "vocal", "source_file": "variant of CALVOC020", "path": "source/vocal/CALVOC057.wav", "variant": "pitch_up"}
+{"sample_id": "CALVOC058", "genre": "vocal", "source_file": "variant of CALVOC020", "path": "source/vocal/CALVOC058.wav", "variant": "pitch_down"}
+{"sample_id": "CALELE059", "genre": "electronic", "source_file": "baseline/electronic.wav", "path": "source/electronic/CALELE059.wav"}
+{"sample_id": "CALPIA060", "genre": "piano", "source_file": "baseline/piano.wav", "path": "source/piano/CALPIA060.wav"}
+{"sample_id": "CALVOC061", "genre": "vocal", "source_file": "baseline/vocal_folk.wav", "path": "source/vocal/CALVOC061.wav"}

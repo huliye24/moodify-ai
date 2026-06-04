@@ -1,6 +1,6 @@
 # MHP-086: Integration Audit — MRS ↔ Gate ↔ CLI ↔ API ↔ Console
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Harden-6 / V2 (Validation)
 **Depends on**: MHP-085 (regression passed)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

@@ -1,0 +1,87 @@
+{
+  "mrs_comparison": {
+    "pseudo_mrs": {
+      "n": 33,
+      "spearman_r": 0.1881,
+      "agreement": 0.0909
+    },
+    "mrs_open": {
+      "n": 33,
+      "spearman_r": 0.0471,
+      "agreement": 0.6061
+    },
+    "per_genre": {
+      "electronic": {
+        "n": 7,
+        "pseudo_r": -0.2041,
+        "pseudo_agree": 0.0
+      },
+      "vocal": {
+        "n": 10,
+        "pseudo_r": 0.1952,
+        "pseudo_agree": 0.1
+      },
+      "rock": {
+        "n": 5,
+        "pseudo_r": -0.4082,
+        "pseudo_agree": 0.2
+      },
+      "ambient": {
+        "n": 2,
+        "pseudo_r": 0,
+        "pseudo_agree": 0.0
+      },
+      "piano": {
+        "n": 9,
+        "pseudo_r": 0.2863,
+        "pseudo_agree": 0.1111
+      }
+    }
+  },
+  "gate_accuracy": {
+    "overall": {
+      "accuracy": 0.0909,
+      "total": 33,
+      "correct": 3
+    },
+    "false_positives": 30,
+    "false_negatives": 0,
+    "per_genre": {
+      "electronic": {
+        "total": 7,
+        "correct": 0,
+        "fp": 7,
+        "fn": 0,
+        "accuracy": 0.0
+      },
+      "vocal": {
+        "total": 10,
+        "correct": 1,
+        "fp": 9,
+        "fn": 0,
+        "accuracy": 0.1
+      },
+      "rock": {
+        "total": 5,
+        "correct": 1,
+        "fp": 4,
+        "fn": 0,
+        "accuracy": 0.2
+      },
+      "ambient": {
+        "total": 2,
+        "correct": 0,
+        "fp": 2,
+        "fn": 0,
+        "accuracy": 0.0
+      },
+      "piano": {
+        "total": 9,
+        "correct": 1,
+        "fp": 8,
+        "fn": 0,
+        "accuracy": 0.1111
+      }
+    }
+  }
+}

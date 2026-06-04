@@ -1,6 +1,6 @@
 # MHP-085: Full Regression — All Studio OS Tests + New MRS Tests
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Harden-6 / V1 (Validation)
 **Depends on**: MHP-084 (MRS engine refactored)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

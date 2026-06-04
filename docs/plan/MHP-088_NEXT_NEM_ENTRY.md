@@ -1,6 +1,6 @@
 # MHP-088: Next NEM Entry — RUNTIME-003 or PRESET-004
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Harden-6 / N1 (Next Entry)
 **Depends on**: MHP-087 (manifest finalized)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

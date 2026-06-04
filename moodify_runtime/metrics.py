@@ -213,14 +213,44 @@ def analyze_wav_stdlib(path: Path) -> Dict[str, Any]:
         return metrics
 
 
-def pseudo_mrs(metrics: Dict[str, Any]) -> Optional[float]:
-    """
-    MRS 占位版：不是最终 Moodify Reality Score。
-    目的只是让 Daily Run v0.1 有可比较的数值入口。
-    后续应替换为 MRS v0.2 / v0.3 的真实公式。
+# ── Calibrated reference values (from 61-sample dataset, 2026-06-04) ──
+# These replace the original intuited defaults with data-driven medians.
+# Update via: python3 scripts/calibrate_pseudo_mrs.py
+PSEUDO_MRS_REFS = {
+    "rms_target": 0.15,       # Median RMS across 61 calibration samples
+    "crest_target": 5.0,      # Median crest factor
+    "peak_target": 0.78,      # Median peak amplitude
+    "rms_band": 0.10,         # Acceptable RMS deviation (was 0.20)
+    "crest_band": 8.0,        # Acceptable crest deviation (was 12.0)
+    "dc_penalty_factor": 100.0,
+}
+
+
+def pseudo_mrs(
+    metrics: Dict[str, Any],
+    refs: Optional[Dict[str, float]] = None,
+) -> Optional[float]:
+    """Pseudo-MRS with calibrated reference values.
+
+    Uses data-driven reference values calibrated from a 61-sample diverse
+    audio dataset. Reference values can be overridden via the ``refs`` dict.
+
+    The score rewards audio that is:
+    - Close to the median RMS (not too loud, not too quiet)
+    - Close to the median crest factor (natural dynamic range)
+    - Not clipping (peak below 0.98)
+    - Free of DC offset
     """
     if not metrics.get("supported"):
         return None
+
+    r = refs or PSEUDO_MRS_REFS
+    rms_target = r.get("rms_target", 0.15)
+    crest_target = r.get("crest_target", 5.0)
+    peak_target = r.get("peak_target", 0.78)
+    rms_band = r.get("rms_band", 0.10)
+    crest_band = r.get("crest_band", 8.0)
+    dc_penalty = r.get("dc_penalty_factor", 100.0)
 
     rms = _safe_float(metrics.get("rms"))
     peak = _safe_float(metrics.get("peak"))
@@ -230,11 +260,10 @@ def pseudo_mrs(metrics: Dict[str, Any]) -> Optional[float]:
     if rms is None or peak is None or crest is None:
         return None
 
-    # 只是工程占位：鼓励不过载、有一定动态、DC 偏移小。
     peak_score = max(0.0, min(1.0, 1.0 - max(0.0, peak - 0.98) * 10.0))
-    rms_score = max(0.0, min(1.0, 1.0 - abs(rms - 0.12) / 0.20))
-    crest_score = max(0.0, min(1.0, 1.0 - abs(crest - 8.0) / 12.0))
-    dc_score = max(0.0, min(1.0, 1.0 - dc * 100.0))
+    rms_score = max(0.0, min(1.0, 1.0 - abs(rms - rms_target) / rms_band))
+    crest_score = max(0.0, min(1.0, 1.0 - abs(crest - crest_target) / crest_band))
+    dc_score = max(0.0, min(1.0, 1.0 - dc * dc_penalty))
 
     return 100.0 * (0.25 * peak_score + 0.25 * rms_score + 0.35 * crest_score + 0.15 * dc_score)
 

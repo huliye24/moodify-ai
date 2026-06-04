@@ -1,6 +1,6 @@
 # MHP-078: Run Calibration Pipeline — Before/After MRS + Gate Decisions + Human Labels
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Validate-6 / E2 (Execution)
 **Depends on**: MHP-077 (dataset ready)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

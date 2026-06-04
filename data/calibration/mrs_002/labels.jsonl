@@ -1,0 +1,33 @@
+{"sample_id": "CALELE001", "genre": "electronic", "human_decision": "better", "preset": "clean_master", "notes": "Control Theory — clearer transients, less mud in low-mids"}
+{"sample_id": "CALELE002", "genre": "electronic", "human_decision": "better", "preset": "clean_master", "notes": "Moonlight Girl — sparkle improved, no over-dark"}
+{"sample_id": "CALVOC003", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Okay Okay — vocal presence enhanced, natural warmth"}
+{"sample_id": "CALELE004", "genre": "electronic", "human_decision": "no_change", "preset": "clean_master", "notes": "Silk and Ruin — already well-mastered, minimal change"}
+{"sample_id": "CALROC005", "genre": "rock", "human_decision": "better", "preset": "wide_space", "notes": "Black Therapy v1 — stereo width improved, guitars breathe"}
+{"sample_id": "CALROC006", "genre": "rock", "human_decision": "worse", "preset": "wide_space", "notes": "Black Therapy v2 — over-dark in low-mids, bass became muddy"}
+{"sample_id": "CALROC007", "genre": "rock", "human_decision": "better", "preset": "wide_space", "notes": "Black Therapy original — tighter low end, better transient punch"}
+{"sample_id": "CALAMB008", "genre": "ambient", "human_decision": "no_change", "preset": "wide_space", "notes": "Neural Poison copy — ambient texture unchanged, gate should be cautious"}
+{"sample_id": "CALELE009", "genre": "electronic", "human_decision": "better", "preset": "clean_master", "notes": "Neural Poison — bass tightened, highs clearer"}
+{"sample_id": "CALELE010", "genre": "electronic", "human_decision": "better", "preset": "clean_master", "notes": "Echoes in Neon — synth texture preserved, dynamic range improved"}
+{"sample_id": "CALVOC011", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Pretend indifferent — vocal warmth added, sibilance reduced"}
+{"sample_id": "CALPIA012", "genre": "piano", "human_decision": "better", "preset": "warm_vocal", "notes": "Period 10 — piano tone richer, less sterile"}
+{"sample_id": "CALPIA013", "genre": "piano", "human_decision": "no_change", "preset": "warm_vocal", "notes": "Period 11 — subtle change, borderline improvement"}
+{"sample_id": "CALPIA014", "genre": "piano", "human_decision": "better", "preset": "warm_vocal", "notes": "Period 12 — low registers warmer, sustain improved"}
+{"sample_id": "CALPIA015", "genre": "piano", "human_decision": "worse", "preset": "warm_vocal", "notes": "Period 15 copy — over-dark introduced, bass resonance excessive"}
+{"sample_id": "CALPIA016", "genre": "piano", "human_decision": "better", "preset": "warm_vocal", "notes": "Period 15 — natural decay preserved, dynamics good"}
+{"sample_id": "CALPIA017", "genre": "piano", "human_decision": "better", "preset": "warm_vocal", "notes": "Period 4 — cleaner attacks, less pedal noise"}
+{"sample_id": "CALPIA018", "genre": "piano", "human_decision": "better", "preset": "warm_vocal", "notes": "Period 8 copy — warmer midrange, good balance"}
+{"sample_id": "CALPIA019", "genre": "piano", "human_decision": "no_change", "preset": "warm_vocal", "notes": "Period 8 — minimal processing effect, well-recorded source"}
+{"sample_id": "CALVOC020", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Only pain never lies — vocal emotion preserved, less harsh"}
+{"sample_id": "CALELE021", "genre": "electronic", "human_decision": "better", "preset": "clean_master", "notes": "Changeable weather — bass punch improved, highs controlled"}
+{"sample_id": "CALVOC022", "genre": "vocal", "human_decision": "worse", "preset": "warm_vocal", "notes": "Want to be favored copy — over-dark in lower vocals, warmth became mud"}
+{"sample_id": "CALVOC023", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Want to be favored — vocal clarity improved, reduced harshness"}
+{"sample_id": "CALVOC024", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Galaxy starlight copy — air band enhanced, spacious"}
+{"sample_id": "CALVOC025", "genre": "vocal", "human_decision": "no_change", "preset": "warm_vocal", "notes": "Galaxy starlight — already well-balanced, minimal change"}
+{"sample_id": "CALROC026", "genre": "rock", "human_decision": "better", "preset": "wide_space", "notes": "Defocus copy — stereo image wider, guitars separated"}
+{"sample_id": "CALROC027", "genre": "rock", "human_decision": "better", "preset": "wide_space", "notes": "Defocus — drum transients more defined, bass controlled"}
+{"sample_id": "CALAMB028", "genre": "ambient", "human_decision": "better", "preset": "wide_space", "notes": "Wrong timing — spaciousness enhanced, no artifacts"}
+{"sample_id": "CALVOC029", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Cocoon glimmer copy — warm but not dark, clarity maintained"}
+{"sample_id": "CALVOC030", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Cocoon glimmer — natural warmth, vocal texture preserved"}
+{"sample_id": "CALELE059", "genre": "electronic", "human_decision": "better", "preset": "clean_master", "notes": "Baseline electronic — DSP improved clarity without artifacts"}
+{"sample_id": "CALPIA060", "genre": "piano", "human_decision": "better", "preset": "warm_vocal", "notes": "Baseline piano — warmer but not muddy, dynamics preserved"}
+{"sample_id": "CALVOC061", "genre": "vocal", "human_decision": "better", "preset": "warm_vocal", "notes": "Baseline vocal folk — natural warmth, sibilance controlled"}

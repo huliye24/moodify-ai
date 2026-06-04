@@ -1,6 +1,6 @@
 # MHP-083: Fix Calibration Issues — Patch Failures from Validate-6
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Harden-6 / E1 (Execution)
 **Depends on**: MHP-082 (Gate Decision)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

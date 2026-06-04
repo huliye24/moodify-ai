@@ -1,6 +1,6 @@
 # MHP-077: Build Calibration Dataset — 50+ Labeled Samples Across 5 Genres
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Validate-6 / E1 (Execution)
 **Depends on**: MHP-076 (Build-6 complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

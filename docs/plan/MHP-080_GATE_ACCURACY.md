@@ -1,6 +1,6 @@
 # MHP-080: Gate Accuracy Analysis — False Positive/Negative Rates Per Genre
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Validate-6 / V2 (Validation)
 **Depends on**: MHP-079 (MRS comparison complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

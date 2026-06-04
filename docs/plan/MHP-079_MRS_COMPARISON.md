@@ -1,6 +1,6 @@
 # MHP-079: MRS Comparison — Calibrated vs Pseudo-MRS vs MRS Open
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Validate-6 / V1 (Validation)
 **Depends on**: MHP-078 (pipeline run complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

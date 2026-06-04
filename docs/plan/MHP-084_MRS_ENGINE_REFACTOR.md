@@ -1,6 +1,6 @@
 # MHP-084: MRS Scoring Engine Refactor — Configurable Thresholds, Genre Dispatch
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Harden-6 / E2 (Execution)
 **Depends on**: MHP-083 (issues fixed)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

@@ -1,6 +1,6 @@
 # MHP-087: Finalize MRS Manifest — Thresholds Doc, D_ref Audit, Version Bump
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Harden-6 / S1 (Systemization)
 **Depends on**: MHP-086 (integration audit complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

@@ -1,6 +1,6 @@
 # MHP-082: Gate Decision — ADOPT / HOLD / REBUILD for MRS Scoring
 
-**Status**: proposed
+**Status**: completed
 **Direction**: NEM-MOODIFY-MRS-002 / Validate-6 / N1 (Next Entry)
 **Depends on**: MHP-081 (calibration report complete)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
