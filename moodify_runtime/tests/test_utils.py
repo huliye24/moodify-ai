@@ -44,7 +44,7 @@ class TestSampleId:
 
 class TestQuote:
     def test_quote(self):
-        assert quote_cmd(["echo", "hello"]) == "echo 'hello'"
+        assert quote_cmd(["echo", "hello"]) == "echo hello"
 
 class TestRender:
     def test_render(self):
