@@ -22,6 +22,8 @@ docs/plan/MHP-795_WRITE_DATA_LOOP_RUNBOOK.md
 
 Tonight's minimum target is Probe Plan-6A, MHP-791 to MHP-796.
 
+Cost-mode runner: `MHP-795` generates DeepSeek v4 micro-tasks as JSONL. Process one line per model call and validate against `expected_output_schema.json`.
+
 ## Previous Adopted Chain — 2026-06-05
 
 **ECHAIN-MOODIFY-NIGHT-RESULT-013: Night Result Evidence Run** remains the parent evidence chain.

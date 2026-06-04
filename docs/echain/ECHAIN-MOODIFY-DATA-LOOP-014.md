@@ -11,6 +11,7 @@
 - **Parent**: ECHAIN-MOODIFY-NIGHT-RESULT-013
 - **Target Gate**: SEALED
 - **Primary Goal**: convert nightly runtime data into software, scoring, craft, and operator improvements.
+- **Runner Constraint**: DeepSeek v4 cost mode. Keep each model task small, schema-bound, and independent.
 
 ## 2. Phase Transition Target
 
@@ -19,6 +20,29 @@ nightly result data -> continuous software optimization loops
 ```
 
 Moodify now produces useful runtime artifacts: `summary.json`, `manifest.csv`, queue records, tidal events, daily reports, MRS deltas, penalty flags, and craft memory. These artifacts should not remain passive reports. They should drive repeatable loops that decide what to tune, what to block, what to rerun, and what code or configuration needs improvement.
+
+## 2A. DeepSeek v4 Execution Rule
+
+This E-Chain must be runnable by a cheaper model with limited context. Do not ask the model to inspect the repository or infer across many files.
+
+Use this contract:
+
+```text
+one input record -> one short decision -> one JSON object
+```
+
+Model task limits:
+
+- input per task: one run-level record or one task-level record;
+- max source fields: 12;
+- max output fields: 8;
+- max recommendation count: 3;
+- no multi-file reasoning;
+- no code editing;
+- no hidden assumptions;
+- output JSON only.
+
+The script layer handles extraction, grouping, sorting, and report merging. DeepSeek v4 only classifies a small record into a loop, severity, reason, and next action.
 
 ## 3. Last-Night Signals
 
@@ -32,6 +56,8 @@ From `outputs/20260605_000141/summary.json`:
 | Fatal error still occurred | summary recorded missing `daily_run.log` | Runtime reliability loop is needed. |
 
 ## 4. Four Data Loops
+
+For DeepSeek v4, each loop is a separate micro-task type. Do not combine loops in one prompt.
 
 ### Loop A: Runtime Reliability Loop
 
@@ -52,6 +78,13 @@ Primary metrics:
 - phase duration;
 - retry count.
 
+DeepSeek task:
+
+```text
+Input: run_id, success, failed, fatal_error, missing_artifacts
+Output: severity, reason, next_action
+```
+
 ### Loop B: Scoring Calibration Loop
 
 ```text
@@ -69,6 +102,13 @@ Primary metrics:
 - penalty precision;
 - false positive / false negative gate cases;
 - per-genre score drift.
+
+DeepSeek task:
+
+```text
+Input: task_id, sample_id, preset, pseudo_delta_mrs, delta_mrs_open_v031, score_direction_disagreement
+Output: severity, reason, next_action
+```
 
 ### Loop C: Craft/Preset Selection Loop
 
@@ -88,6 +128,13 @@ Primary metrics:
 - average MRS Open delta by preset;
 - accepted craft record count.
 
+DeepSeek task:
+
+```text
+Input: task_id, sample_id, preset, delta_mrs_open_v031, mrs_open_flags
+Output: preset_verdict, reason, next_action
+```
+
 ### Loop D: Operator Report Loop
 
 ```text
@@ -105,6 +152,13 @@ Primary metrics:
 - morning review time;
 - X-CLP score;
 - next-action clarity.
+
+DeepSeek task:
+
+```text
+Input: run_id, fatal_error, task_count, disagreement_count, flagged_count
+Output: morning_decision, reason, next_mhp
+```
 
 ## 5. Three-NEM Structure
 
@@ -124,12 +178,12 @@ Primary metrics:
 | 794 | V | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6A: Loop Boundary | Define Optimization Decision Taxonomy |
 | 795 | S | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6A: Loop Boundary | Write Data Loop Runbook |
 | 796 | N | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6A: Loop Boundary | Data Loop Probe Backlog |
-| 797 | E | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: Metric Probe | Build Runtime Reliability Scorecard |
-| 798 | E | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: Metric Probe | Build MRS Disagreement Matrix |
-| 799 | V | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: Metric Probe | Build Preset Outcome Table |
-| 800 | V | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: Metric Probe | Build Penalty Flag Review Queue |
-| 801 | S | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: Metric Probe | Produce Metric Probe Report |
-| 802 | N | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: Metric Probe | Metric Probe Gate Decision |
+| 797 | E | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: DeepSeek Micro Tasks | Define DeepSeek v4 JSON Schema |
+| 798 | E | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: DeepSeek Micro Tasks | Generate Runtime Reliability Task JSONL |
+| 799 | V | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: DeepSeek Micro Tasks | Generate Scoring Calibration Task JSONL |
+| 800 | V | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: DeepSeek Micro Tasks | Generate Craft/Preset Task JSONL |
+| 801 | S | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: DeepSeek Micro Tasks | Merge DeepSeek JSON Outputs |
+| 802 | N | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6B: DeepSeek Micro Tasks | Pick Next Three Optimization Tasks |
 | 803 | E | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6C: Feasibility Gate | Define Data Loop SLO |
 | 804 | E | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6C: Feasibility Gate | Run Two-Cycle Learning Probe |
 | 805 | V | NEM-MOODIFY-DATA-LOOP-PROBE-042 | Probe Plan-6C: Feasibility Gate | Validate Recommendation Replayability |
@@ -175,44 +229,24 @@ Primary metrics:
 
 ## 7. Tonight Minimum Run
 
-Run Probe Plan-6A only:
+Run Probe Plan-6A only. The executable entry is `docs/plan/MHP-795_WRITE_DATA_LOOP_RUNBOOK.md`.
 
-```bash
-RUN_ID=data_loop_014_$(date -u +%Y%m%d_%H%M%S)
-OUT=reports/echain_moodify_data_loop_014/$RUN_ID
-mkdir -p "$OUT"
+It writes:
 
-python3 - <<'PY' > "$OUT/last_night_metric_snapshot.json"
-import json, glob, pathlib
-summary = json.load(open("outputs/20260605_000141/summary.json"))
-tasks = summary.get("tasks", [])
-rows = []
-for t in tasks:
-    rows.append({
-        "task_id": t.get("task_id"),
-        "sample_id": t.get("sample_id"),
-        "preset": t.get("preset"),
-        "pseudo_delta_mrs": t.get("pseudo_delta_mrs"),
-        "delta_mrs_open_v031": t.get("delta_mrs_open_v031"),
-        "mrs_open_flags": t.get("mrs_open_flags"),
-        "status": t.get("status"),
-        "error": t.get("error"),
-    })
-print(json.dumps({
-    "source_run": summary.get("run_id"),
-    "success": summary.get("success"),
-    "failed": summary.get("failed"),
-    "fatal_error": summary.get("fatal_error"),
-    "tasks": rows,
-}, ensure_ascii=False, indent=2))
-PY
-```
+- `last_night_metric_snapshot.json`;
+- `deepseek_tasks.jsonl`;
+- `deepseek_prompt.md`;
+- `expected_output_schema.json`.
+
+DeepSeek v4 should process `deepseek_tasks.jsonl` one line at a time.
 
 ## 8. Gate 1 Definition
 
 Gate 1 ADOPT requires:
 
 - one metric snapshot exists;
+- one DeepSeek JSONL task file exists;
 - at least one optimization signal is identified;
 - each signal maps to exactly one software action type: code fix, config change, preset/craft policy, scoring calibration, or operator review;
+- every model output validates as JSON with `task_id`, `loop`, `severity`, `reason`, and `next_action`;
 - the next run can verify whether the action helped.

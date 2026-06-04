@@ -18,6 +18,8 @@ nightly result data -> continuous software optimization loops
 
 Start from `docs/plan/MHP-795_WRITE_DATA_LOOP_RUNBOOK.md`.
 
+Cost-mode constraint: generate `deepseek_tasks.jsonl` and send DeepSeek v4 one line per call. The model only returns fixed JSON decisions; scripts handle extraction and merging.
+
 The first learning loops are:
 
 - Runtime Reliability Loop: turn fatal errors and missing artifacts into root-cause fix tasks.

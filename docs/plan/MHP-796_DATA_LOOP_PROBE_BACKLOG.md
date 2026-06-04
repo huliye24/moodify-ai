@@ -7,24 +7,28 @@
 
 ## Goal
 
-Define the next metric probes after the first data-loop extraction.
+Define the next cheap-model probes after the first data-loop extraction.
+
+DeepSeek v4 constraint: each backlog item must create or consume one small JSONL shape. No item may require repository-wide reading or multi-step reasoning inside the model.
 
 ## Backlog
 
-1. MHP-797 Runtime Reliability Scorecard
-   - Count fatal errors, missing logs, task failures, retries, and phase failures.
-2. MHP-798 MRS Disagreement Matrix
-   - Compare pseudo delta sign vs MRS Open delta sign by sample and preset.
-3. MHP-799 Preset Outcome Table
-   - Rank presets by MRS Open delta and penalty flags per sample class.
-4. MHP-800 Penalty Flag Review Queue
-   - Create review queue for `over_dark` and future penalty flags.
-5. MHP-801 Metric Probe Report
-   - Convert metric tables into recommended software actions.
-6. MHP-802 Metric Probe Gate Decision
-   - Decide ADOPT/HOLD/DROP for build investment.
+1. MHP-797 Define DeepSeek v4 JSON Schema
+   - Fix the model output shape before running any calls.
+2. MHP-798 Generate Runtime Reliability Task JSONL
+   - Create one run-level task when fatal errors, failed tasks, or missing artifacts appear.
+3. MHP-799 Generate Scoring Calibration Task JSONL
+   - Create one task-level record per pseudo/MRS Open sign disagreement.
+4. MHP-800 Generate Craft/Preset Task JSONL
+   - Create one task-level record per penalty flag or weak preset result.
+5. MHP-801 Merge DeepSeek JSON Outputs
+   - Validate JSON, reject malformed output, and merge model decisions into one table.
+6. MHP-802 Pick Next Three Optimization Tasks
+   - Sort validated decisions by severity and choose at most three tasks for the next run.
 
 ## Acceptance Criteria
 
 - Backlog names the next executable MHP.
-- Each backlog item names a metric, source artifact, and expected decision.
+- Each backlog item can be run with one-record JSONL model calls.
+- The model never needs more than one input record at a time.
+- The final output is capped at three optimization tasks.
