@@ -1,0 +1,1 @@
+# Operator Probe Report — MHP-316 | Gate 1: ADOPT ✅ | 全部 5 探针通过。Job Board + Approval Flow + Audit Trail 可操作。现有代码模式(studio.py, operator_console.py)可直接复用。

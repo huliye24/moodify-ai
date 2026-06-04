@@ -1,6 +1,6 @@
 # MHP-334: Operator Integration Smoke
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-BUILD-016 / Build Plan-6B: Runtime/Product Integration / B12 (Next Entry)
 **Depends on**: MHP-333
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

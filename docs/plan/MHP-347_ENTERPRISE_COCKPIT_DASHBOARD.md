@@ -1,6 +1,6 @@
 # MHP-347: Enterprise Cockpit Dashboard
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-SYSTEM-017 / System Plan-6B: Product Connection / S7 (Execution)
 **Depends on**: MHP-346
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

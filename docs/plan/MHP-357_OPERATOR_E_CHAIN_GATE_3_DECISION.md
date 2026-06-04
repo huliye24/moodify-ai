@@ -1,6 +1,6 @@
 # MHP-357: Operator E-Chain Gate 3 Decision
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-SYSTEM-017 / System Plan-6C: Next Chain Entry / S17 (Systemization)
 **Depends on**: MHP-356
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

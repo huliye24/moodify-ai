@@ -1,6 +1,6 @@
 # MHP-332: Runtime Status Integration
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-BUILD-016 / Build Plan-6B: Runtime/Product Integration / B10 (Validation)
 **Depends on**: MHP-331
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

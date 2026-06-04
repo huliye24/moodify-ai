@@ -1,6 +1,6 @@
 # MHP-322: Operator Build Entry
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-PROBE-015 / Probe Plan-6C: Feasibility Gate / P18 (Next Entry)
 **Depends on**: MHP-321
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

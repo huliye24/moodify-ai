@@ -1,6 +1,6 @@
 # MHP-324: Job Board Implementation
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-BUILD-016 / Build Plan-6A: Core Implementation / B2 (Execution)
 **Depends on**: MHP-323
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-340: Operator System Entry
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-BUILD-016 / Build Plan-6C: Stability Validation / B18 (Next Entry)
 **Depends on**: MHP-339
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

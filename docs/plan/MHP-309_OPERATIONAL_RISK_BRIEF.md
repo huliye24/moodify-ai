@@ -1,6 +1,6 @@
 # MHP-309: Operational Risk Brief
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-PROBE-015 / Probe Plan-6A: Problem Boundary / P5 (Systemization)
 **Depends on**: MHP-308
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-338: Operations Resource Summary
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-BUILD-016 / Build Plan-6C: Stability Validation / B16 (Validation)
 **Depends on**: MHP-337
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

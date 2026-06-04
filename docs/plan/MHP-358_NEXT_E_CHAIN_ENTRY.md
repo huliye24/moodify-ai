@@ -1,6 +1,6 @@
 # MHP-358: Next E-Chain Entry
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-SYSTEM-017 / System Plan-6C: Next Chain Entry / S18 (Next Entry)
 **Depends on**: MHP-357
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

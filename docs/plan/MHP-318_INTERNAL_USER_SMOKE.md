@@ -1,6 +1,6 @@
 # MHP-318: Internal User Smoke
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-PROBE-015 / Probe Plan-6C: Feasibility Gate / P14 (Execution)
 **Depends on**: MHP-317
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,0 +1,1 @@
+# Internal Role Inventory — MHP-306 | Operator(创建job,运行,交付), Reviewer(审听,批准/驳回), Admin(配置,用户管理)。当前无角色系统 — 所有操作无权限检查。

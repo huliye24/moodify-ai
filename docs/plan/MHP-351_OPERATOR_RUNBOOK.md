@@ -1,6 +1,6 @@
 # MHP-351: Operator Runbook
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-SYSTEM-017 / System Plan-6B: Product Connection / S11 (Systemization)
 **Depends on**: MHP-350
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

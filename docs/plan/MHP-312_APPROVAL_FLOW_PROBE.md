@@ -1,6 +1,6 @@
 # MHP-312: Approval Flow Probe
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-PROBE-015 / Probe Plan-6B: Technical Probe / P8 (Execution)
 **Depends on**: MHP-311
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

@@ -1,6 +1,6 @@
 # MHP-352: Operator Product Smoke
 
-**Status**: planned
+**Status**: completed
 **Direction**: ECHAIN-MOODIFY-OPERATOR-OS-005 / NEM-MOODIFY-OPERATOR-SYSTEM-017 / System Plan-6B: Product Connection / S12 (Next Entry)
 **Depends on**: MHP-351
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18
