@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moodify.dev/schemas/map_chain_report.schema.json",
+  "title": "MAP-Chain Report v0.1",
+  "description": "Canonical JSON schema for a Moodify MAP-Chain delivery report. Validated against v01 pipeline output.",
+  "type": "object",
+  "required": [
+    "workflow",
+    "preset",
+    "requested_preset",
+    "elapsed_s",
+    "stage_timings",
+    "scan",
+    "feature_analysis",
+    "diagnosis_report",
+    "validation_result",
+    "quality_gate",
+    "metrics_before",
+    "metrics_after",
+    "delivery"
+  ],
+  "properties": {
+    "workflow": {
+      "type": "array",
+      "description": "Ordered MAP seven-stage workflow names.",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "string",
+        "enum": [
+          "S_scan",
+          "A_analyze",
+          "D_diagnose",
+          "P_process",
+          "V_validate",
+          "R_report",
+          "G_generate"
+        ]
+      }
+    },
+    "preset": {
+      "type": "string",
+      "description": "Resolved preset actually applied."
+    },
+    "requested_preset": {
+      "type": "string",
+      "description": "User-requested preset or 'auto'."
+    },
+    "elapsed_s": {
+      "type": "number",
+      "description": "Total pipeline elapsed time in seconds.",
+      "minimum": 0
+    },
+    "stage_timings": {
+      "type": "object",
+      "description": "Per-stage elapsed seconds.",
+      "required": ["total_s"],
+      "properties": {
+        "S_scan_s": { "type": "number", "minimum": 0 },
+        "A_analyze_s": { "type": "number", "minimum": 0 },
+        "D_diagnose_s": { "type": "number", "minimum": 0 },
+        "P_process_s": { "type": "number", "minimum": 0 },
+        "V_validate_s": { "type": "number", "minimum": 0 },
+        "R_report_s": { "type": "number", "minimum": 0 },
+        "G_generate_s": { "type": "number", "minimum": 0 },
+        "total_s": { "type": "number", "minimum": 0 }
+      }
+    },
+    "scan": {
+      "$ref": "#/$defs/ScanResult"
+    },
+    "feature_analysis": {
+      "$ref": "#/$defs/FeatureAnalysis"
+    },
+    "diagnosis_report": {
+      "$ref": "#/$defs/DiagnosisResult"
+    },
+    "validation_result": {
+      "$ref": "#/$defs/ValidationResult"
+    },
+    "quality_gate": {
+      "$ref": "#/$defs/ValidationResult",
+      "description": "Synonym for validation_result (backwards compatibility)."
+    },
+    "metrics_before": {
+      "$ref": "#/$defs/FeatureAnalysis"
+    },
+    "metrics_after": {
+      "$ref": "#/$defs/FeatureAnalysis"
+    },
+    "delivery": {
+      "$ref": "#/$defs/DeliveryPackage"
+    },
+    "overall_health": {
+      "type": "string",
+      "enum": ["good", "fair", "poor"],
+      "description": "Top-level diagnosis health (from DiagnosisResult, may appear at root for compat)."
+    },
+    "issues": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "strengths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "suggested_presets": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "metrics": {
+      "$ref": "#/$defs/FeatureAnalysis",
+      "description": "Metrics at root level (compat — use metrics_before instead)."
+    }
+  },
+
+  "$defs": {
+    "ScanResult": {
+      "type": "object",
+      "required": ["input_path", "exists", "extension", "file_size_bytes", "readable", "warnings"],
+      "properties": {
+        "input_path": { "type": "string" },
+        "exists": { "type": "boolean" },
+        "extension": { "type": "string" },
+        "file_size_bytes": { "type": "integer", "minimum": 0 },
+        "readable": { "type": "boolean" },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "FeatureAnalysis": {
+      "type": "object",
+      "required": ["file_path", "duration_s", "sample_rate", "channels", "spectrum", "dynamics", "stereo"],
+      "properties": {
+        "file_path": { "type": "string" },
+        "duration_s": { "type": "number", "minimum": 0 },
+        "sample_rate": { "type": "integer", "minimum": 1 },
+        "channels": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "spectrum": {
+          "type": "object",
+          "required": ["sub_bass", "bass", "low_mid", "mid", "presence", "air"],
+          "properties": {
+            "sub_bass": { "type": "number" },
+            "bass": { "type": "number" },
+            "low_mid": { "type": "number" },
+            "mid": { "type": "number" },
+            "presence": { "type": "number" },
+            "air": { "type": "number" }
+          }
+        },
+        "dynamics": {
+          "type": "object",
+          "required": ["peak_db", "crest_factor", "dynamic_range_db"],
+          "properties": {
+            "peak_db": { "type": "number" },
+            "crest_factor": { "type": "number" },
+            "dynamic_range_db": { "type": "number" }
+          }
+        },
+        "stereo": {
+          "type": "object",
+          "required": ["correlation_lr"],
+          "properties": {
+            "correlation_lr": { "type": "number", "minimum": -1, "maximum": 1 }
+          }
+        }
+      }
+    },
+
+    "DiagnosisResult": {
+      "type": "object",
+      "required": ["overall_health", "issues", "strengths", "suggested_presets", "metrics"],
+      "properties": {
+        "overall_health": {
+          "type": "string",
+          "enum": ["good", "fair", "poor"]
+        },
+        "issues": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "strengths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "suggested_presets": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "metrics": {
+          "$ref": "#/$defs/FeatureAnalysis"
+        }
+      }
+    },
+
+    "ValidationResult": {
+      "type": "object",
+      "required": [
+        "passed",
+        "warnings",
+        "deltas",
+        "mrs_version",
+        "mrs_before",
+        "mrs_after",
+        "mrs_delta",
+        "damage_loss",
+        "risk_flags"
+      ],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "deltas": {
+          "type": "object",
+          "properties": {
+            "peak_db": { "type": "number" },
+            "crest_factor": { "type": "number" },
+            "dynamic_range_db": { "type": "number" },
+            "correlation_lr": { "type": "number" },
+            "air": { "type": "number" },
+            "presence": { "type": "number" },
+            "bass": { "type": "number" }
+          }
+        },
+        "mrs_version": {
+          "type": "string",
+          "description": "MRS version identifier. 'mrs_proxy_v01' = temporary proxy; 'mrs_calibrated_v02' = target calibrated MRS."
+        },
+        "mrs_before": { "type": "number" },
+        "mrs_after": { "type": "number" },
+        "mrs_delta": { "type": "number" },
+        "damage_loss": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Aggregate damage metric. 0 = no damage, 1 = severe."
+        },
+        "risk_flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "peak_risk",
+              "over_dark",
+              "dynamic_damage",
+              "mrs_regression",
+              "damage_loss_high"
+            ]
+          }
+        }
+      }
+    },
+
+    "DeliveryPackage": {
+      "type": "object",
+      "required": ["output_audio", "json_report", "pdf_report", "spectrum_before", "spectrum_after"],
+      "properties": {
+        "output_audio": { "type": "string" },
+        "json_report": { "type": "string" },
+        "pdf_report": { "type": "string" },
+        "spectrum_before": { "type": "string" },
+        "spectrum_after": { "type": "string" }
+      }
+    }
+  }
+}

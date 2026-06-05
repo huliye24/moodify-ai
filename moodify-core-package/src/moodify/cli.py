@@ -312,7 +312,7 @@ def cmd_v01_analyze(args):
 
 
 def cmd_v01_process(args):
-    """v0.1.0: Full pipeline — analyze → diagnose → process → export."""
+    """v0.1.0: Full pipeline — scan → analyze → process → report → deliver."""
     from moodify.v01_pipeline import process_audio, list_presets
 
     path = args.audio_path
@@ -320,8 +320,9 @@ def cmd_v01_process(args):
     if not Path(path).exists():
         print(f"ERROR: File not found: {path}")
         return 1
-    if preset not in list_presets():
-        print(f"ERROR: Unknown preset '{preset}'. Valid: {', '.join(list_presets())}")
+    valid_presets = ["auto", *list_presets()]
+    if preset not in valid_presets:
+        print(f"ERROR: Unknown preset '{preset}'. Valid: {', '.join(valid_presets)}")
         return 1
 
     print(f"Moodify v0.1.0 — process: {Path(path).name}")
@@ -334,6 +335,8 @@ def cmd_v01_process(args):
         return 1
 
     rep = result.diagnosis
+    if result.requested_preset == "auto":
+        print(f"  Selected: {result.preset}")
     print(f"  Health:   {rep.overall_health}  ({len(rep.strengths)} strengths, "
           f"{len(rep.issues)} issues)")
     if rep.issues:
@@ -341,15 +344,27 @@ def cmd_v01_process(args):
             print(f"    ! {issue}")
     if rep.suggested_presets:
         print(f"  Suggested: {', '.join(rep.suggested_presets)}")
+    if result.quality_gate.warnings:
+        print("  Quality:  review")
+        for warning in result.quality_gate.warnings:
+            print(f"    ! {warning}")
+    else:
+        print("  Quality:  pass")
     print(f"  Output:    {result.output_path}")
+    print(f"  Report:    {result.report_path}")
 
     if args.json:
         import json
         print(json.dumps({
-            "input": path, "preset": preset, "output": result.output_path,
+            "input": path, "requested_preset": preset, "preset": result.preset,
+            "output": result.output_path,
+            "report": result.report_path,
             "health": rep.overall_health,
+            "quality_gate": result.quality_gate.to_dict(),
             "issues": rep.issues, "strengths": rep.strengths,
             "metrics": rep.metrics.to_dict(),
+            "metrics_after": result.metrics_after.to_dict(),
+            "delivery": result.delivery.to_dict(),
         }, ensure_ascii=False, indent=2))
     return 0
 
@@ -380,8 +395,8 @@ def main():
     p_process = sub.add_parser("process", help="一键处理音频 [v0.1.0]")
     p_process.add_argument("audio_path", help="音频文件路径")
     p_process.add_argument("--preset", default="clean_master",
-                           choices=["warm_vocal", "clean_master", "wide_space"],
-                           help="处理预设")
+                           choices=["auto", "warm_vocal", "clean_master", "wide_space"],
+                           help="处理预设；auto 会根据扫描报告选择")
     p_process.add_argument("--output-dir", default="outputs", help="输出目录")
     p_process.add_argument("--json", action="store_true", help="JSON 格式输出")
 
@@ -414,8 +429,8 @@ def main():
     p_v01_process = sub.add_parser("v01-process", help="[v0.1.0] 一键处理 → WAV")
     p_v01_process.add_argument("audio_path", help="音频文件路径")
     p_v01_process.add_argument("--preset", default="clean_master",
-                               choices=["warm_vocal", "clean_master", "wide_space"],
-                               help="处理预设")
+                               choices=["auto", "warm_vocal", "clean_master", "wide_space"],
+                               help="处理预设；auto 会根据扫描报告选择")
     p_v01_process.add_argument("--output-dir", default="outputs", help="输出目录")
     p_v01_process.add_argument("--json", action="store_true", help="JSON 格式输出")
 

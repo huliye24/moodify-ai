@@ -1,0 +1,29 @@
+{
+  "limit": 3,
+  "selected": [
+    {
+      "loop": "runtime_reliability",
+      "needs_human_review": false,
+      "next_action": "Add daily_run.log existence check at phase start; emit log or skip with warning.",
+      "reason": "Fatal FileNotFoundError for daily_run.log blocks operator review and auto-report generation.",
+      "severity": "high",
+      "task_id": "20260605_000141:runtime"
+    },
+    {
+      "loop": "scoring_calibration",
+      "needs_human_review": true,
+      "next_action": "Flag warm_vocal preset for calibration review; log disagreement for MRS weight tuning.",
+      "reason": "Extreme sign disagreement: pseudo MRS dropped 20 points while MRS Open gained 83. Calibration is broken.",
+      "severity": "high",
+      "task_id": "TASK_SMP_D2536D072BD30E33_warm_vocal:score"
+    },
+    {
+      "loop": "craft_preset_selection",
+      "needs_human_review": false,
+      "next_action": "Down-rank wide_space for piano class; test bright_master as substitute.",
+      "reason": "wide_space on piano triggered over_dark. Delta is small and negative — preset may be too dark for this class.",
+      "severity": "medium",
+      "task_id": "TASK_SMP_58C86AEACFD2BF8D_wide_space:craft"
+    }
+  ]
+}

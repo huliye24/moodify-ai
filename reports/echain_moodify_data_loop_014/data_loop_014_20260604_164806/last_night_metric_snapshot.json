@@ -1,0 +1,53 @@
+{
+  "source_run": "20260605_000141",
+  "source_file": "/home/ubuntu/moodify-mainline/outputs/20260605_000141/summary.json",
+  "success": 4,
+  "failed": 0,
+  "fatal_error": "FileNotFoundError: [Errno 2] No such file or directory: '/home/ubuntu/moodify-mainline/outputs/20260605_000141/daily_run.log'",
+  "tasks": [
+    {
+      "task_id": "TASK_SMP_58C86AEACFD2BF8D_wide_space",
+      "sample_id": "SMP_58C86AEACFD2BF8D",
+      "preset": "wide_space",
+      "status": "done",
+      "pseudo_delta_mrs": -7.430760409086645,
+      "delta_mrs_open_v031": -1.599999999999909,
+      "score_direction_disagreement": false,
+      "mrs_open_flags": "over_dark",
+      "recommended_loop": "runtime_reliability"
+    },
+    {
+      "task_id": "TASK_SMP_D2536D072BD30E33_warm_vocal",
+      "sample_id": "SMP_D2536D072BD30E33",
+      "preset": "warm_vocal",
+      "status": "done",
+      "pseudo_delta_mrs": -20.475033322608965,
+      "delta_mrs_open_v031": 83.10000000000014,
+      "score_direction_disagreement": true,
+      "mrs_open_flags": "",
+      "recommended_loop": "runtime_reliability"
+    },
+    {
+      "task_id": "TASK_SMP_D2536D072BD30E33_clean_master",
+      "sample_id": "SMP_D2536D072BD30E33",
+      "preset": "clean_master",
+      "status": "done",
+      "pseudo_delta_mrs": 1.7533975190011972,
+      "delta_mrs_open_v031": -0.09999999999990905,
+      "score_direction_disagreement": true,
+      "mrs_open_flags": "over_dark",
+      "recommended_loop": "runtime_reliability"
+    },
+    {
+      "task_id": "TASK_SMP_D2536D072BD30E33_wide_space",
+      "sample_id": "SMP_D2536D072BD30E33",
+      "preset": "wide_space",
+      "status": "done",
+      "pseudo_delta_mrs": -18.801100429662824,
+      "delta_mrs_open_v031": 82.20000000000005,
+      "score_direction_disagreement": true,
+      "mrs_open_flags": "",
+      "recommended_loop": "runtime_reliability"
+    }
+  ]
+}

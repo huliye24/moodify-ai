@@ -1,0 +1,2 @@
+{"output": {"__line__": 8, "loop": "wrong_loop", "needs_human_review": false, "next_action": "this should be rejected", "reason": "loop changed", "severity": "high", "task_id": "20260605_000141:runtime"}, "reject_reason": "loop does not match input task"}
+{"output": {"__line__": 9, "loop": "runtime_reliability", "needs_human_review": false, "next_action": "this should be rejected", "reason": "invalid severity", "severity": "critical", "task_id": "20260605_000141:runtime"}, "reject_reason": "unsupported severity"}

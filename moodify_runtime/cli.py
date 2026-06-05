@@ -363,6 +363,26 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("tidal-notes", help="Read operator notes")
     sp.add_argument("--target", default="", help="Filter by target ID")
 
+    # ═══ Data Loop (ECHAIN-MOODIFY-DATA-LOOP-014) ═══
+    dl = sub.add_parser("data-loop", help="Data optimization loop commands")
+    dl_sub = dl.add_subparsers(dest="data_loop_action")
+
+    dl_run = dl_sub.add_parser("run", help="Run full data loop: collect → recommend → report")
+    dl_run.add_argument("--summary", required=True, help="Path to summary.json")
+    dl_run.add_argument("--manifest", default=None, help="Path to manifest.csv (optional)")
+    dl_run.add_argument("--queue", default=None, help="Path to queue.jsonl (optional)")
+    dl_run.add_argument("--tidal-events", default=None, help="Path to tidal_events.jsonl (optional)")
+    dl_run.add_argument("--tidal-heartbeat", default=None, help="Path to tidal_heartbeat.json (optional)")
+    dl_run.add_argument("--output-dir", default="reports/data_loop", help="Output directory")
+    dl_run.add_argument("--writeback", action="store_true", help="Write craft + calibration proposals")
+    dl_run.add_argument("--craft-memory-dir", default=None, help="Craft memory output directory")
+
+    dl_report = dl_sub.add_parser("report", help="Generate data loop report from existing outputs")
+    dl_report.add_argument("--record", required=True, help="Path to night_metric_record.json")
+    dl_report.add_argument("--bundle", required=True, help="Path to recommendation_bundle.json")
+    dl_report.add_argument("--output-dir", default="reports/data_loop", help="Output directory")
+
+    # ── All-in-one ──
     sp = sub.add_parser("all", help="register → plan → run → report → craft")
     sp.add_argument("--source", default="unknown")
     sp.add_argument("--genre", default="")
@@ -752,6 +772,51 @@ def main(argv=None) -> int:
         else:
             print_json({"error": f"Manifest not found: {args.manifest}"})
         return 0
+
+    # ═══ Data Loop ═══
+    if args.command == "data-loop":
+        from .data_loop_runner import DataLoopRunner
+
+        if args.data_loop_action == "run":
+            runner = DataLoopRunner(
+                summary_path=args.summary,
+                manifest_path=args.manifest,
+                queue_path=args.queue,
+                tidal_events_path=args.tidal_events,
+                tidal_heartbeat_path=args.tidal_heartbeat,
+                output_dir=args.output_dir,
+                craft_memory_dir=args.craft_memory_dir,
+            )
+            result = runner.run(writeback=args.writeback)
+            print_json(result.to_dict())
+            decision = result.recommendation_bundle.get("summary", {}).get("decision", "?")
+            return 0 if decision == "PASS" else 2
+
+        if args.data_loop_action == "report":
+            from .data_loop_runner import DataLoopRunner
+            record = json.loads(Path(args.record).read_text(encoding="utf-8"))
+            bundle_data = json.loads(Path(args.bundle).read_text(encoding="utf-8"))
+            # Reconstruct a temporary runner just to format the report
+            from moodify_runtime.recommenders.base import Recommendation, RecommendationBundle
+            from moodify_runtime.recommenders.operator_next_mhp import OperatorNextMhpWriter
+
+            # Build bundle from saved data
+            recs = [
+                Recommendation(**{k: v for k, v in r.items() if k in Recommendation.__dataclass_fields__})
+                for r in bundle_data.get("recommendations", [])
+            ]
+            bundle = RecommendationBundle(
+                run_id=bundle_data.get("run_id", ""),
+                generated_at=bundle_data.get("generated_at", ""),
+                recommendations=recs,
+                summary=bundle_data.get("summary", {}),
+            )
+            report = DataLoopRunner._format_report(record, bundle)
+            out = Path(args.output_dir)
+            out.mkdir(parents=True, exist_ok=True)
+            (out / "data_loop_report.md").write_text(report, encoding="utf-8")
+            print_json({"report_written": str(out / "data_loop_report.md")})
+            return 0
 
     if args.command == "all":
         presets = args.presets.split(",") if args.presets else None

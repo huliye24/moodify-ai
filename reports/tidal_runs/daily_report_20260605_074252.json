@@ -1,0 +1,13 @@
+{
+  "run_id": "20260605_074252",
+  "generated_at": "2026-06-04T23:42:52+00:00",
+  "run_dir": "/home/ubuntu/moodify-mainline/outputs/tidal_runs/20260605_074252",
+  "total_tasks": 0,
+  "success": 0,
+  "failed": 0,
+  "avg_pseudo_delta_mrs": null,
+  "best_task": null,
+  "worst_task": null,
+  "mrs_open_available": false,
+  "mrs_open_penalty_summary": {}
+}

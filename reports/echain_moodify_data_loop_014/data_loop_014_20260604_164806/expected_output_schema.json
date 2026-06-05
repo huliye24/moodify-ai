@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "required": [
+    "task_id",
+    "loop",
+    "severity",
+    "reason",
+    "next_action",
+    "needs_human_review"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "loop": {
+      "enum": [
+        "runtime_reliability",
+        "scoring_calibration",
+        "craft_preset_selection",
+        "operator_report"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "maxLength": 180
+    },
+    "next_action": {
+      "type": "string",
+      "maxLength": 220
+    },
+    "needs_human_review": {
+      "type": "boolean"
+    }
+  }
+}

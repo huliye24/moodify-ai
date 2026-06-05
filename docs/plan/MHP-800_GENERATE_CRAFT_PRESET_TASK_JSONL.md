@@ -1,6 +1,6 @@
 # MHP-800: Generate Craft/Preset Task JSONL
 
-**Status**: planned
+**Status**: done
 **Direction**: ECHAIN-MOODIFY-DATA-LOOP-014 / NEM-MOODIFY-DATA-LOOP-PROBE-042 / Probe Plan-6B: DeepSeek Micro Tasks / P4 (Validation)
 **Depends on**: MHP-797
 **Protocol**: E-Chain 54 = Probe NEM-18 + Build NEM-18 + System NEM-18

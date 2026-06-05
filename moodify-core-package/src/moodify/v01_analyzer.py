@@ -20,7 +20,8 @@ from moodify.bands import (
 from moodify.v01_types import AudioMetrics
 
 
-def analyze(input_path: str, output_dir: str = "outputs") -> AudioMetrics:
+def analyze(input_path: str, output_dir: str = "outputs",
+            label: str = "") -> AudioMetrics:
     """Load audio and compute basic metrics.
 
     Args:
@@ -70,7 +71,7 @@ def analyze(input_path: str, output_dir: str = "outputs") -> AudioMetrics:
         correlation_lr=round(corr, 3),
     )
 
-    _save_spectrum_png(metrics, output_dir)
+    _save_spectrum_png(metrics, output_dir, label=label)
 
     return metrics
 
@@ -125,7 +126,16 @@ def _compute_correlation(audio: np.ndarray) -> float:
     return float(np.corrcoef(left, right)[0, 1])
 
 
-def _save_spectrum_png(metrics: AudioMetrics, output_dir: str) -> None:
+def spectrum_png_path(input_path: str, output_dir: str = "outputs",
+                      label: str = "") -> str:
+    """Return the expected spectrum PNG path for an analyzed file."""
+    stem = Path(input_path).stem
+    suffix = f"_{label}" if label else ""
+    return os.path.join(output_dir, f"{stem}{suffix}_spectrum.png")
+
+
+def _save_spectrum_png(metrics: AudioMetrics, output_dir: str,
+                       label: str = "") -> None:
     """Save a simple bar-chart spectrum PNG."""
     try:
         import matplotlib
@@ -136,7 +146,7 @@ def _save_spectrum_png(metrics: AudioMetrics, output_dir: str) -> None:
 
     os.makedirs(output_dir, exist_ok=True)
     stem = Path(metrics.file_path).stem
-    out_path = os.path.join(output_dir, f"{stem}_spectrum.png")
+    out_path = spectrum_png_path(metrics.file_path, output_dir, label=label)
 
     bands = list(BAND_DISPLAYS)
     values = [
@@ -149,7 +159,8 @@ def _save_spectrum_png(metrics: AudioMetrics, output_dir: str) -> None:
     bars = ax.bar(bands, values, color=colors, edgecolor="white", linewidth=0.5)
     ax.axhline(y=0, color="gray", linestyle="--", linewidth=0.8)
     ax.set_ylabel("dB (relative to total RMS)")
-    ax.set_title(f"Spectrum — {stem}")
+    title_label = f" ({label})" if label else ""
+    ax.set_title(f"Spectrum — {stem}{title_label}")
     ax.set_ylim(max(-40, min(values) - 5), max(values) + 5)
 
     for bar, val in zip(bars, values):
@@ -160,3 +171,63 @@ def _save_spectrum_png(metrics: AudioMetrics, output_dir: str) -> None:
     fig.tight_layout()
     fig.savefig(out_path, dpi=150)
     plt.close(fig)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MAP v0.2 Feature Vector (MHP-852 / MHP-865)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def _clamp(value: float, low: float = 0.0, high: float = 1.0) -> float:
+    return max(low, min(high, value))
+
+
+def compute_feature_vector(metrics: AudioMetrics) -> "FeatureVector":
+    """Derive the MAP 8-D feature vector from AudioMetrics.
+
+    MHP-852 / MHP-865: All dimensions clamped to [0, 1].
+    Uses only fields already present in AudioMetrics.
+    """
+    import math
+
+    from moodify.v01_types import FeatureVector
+
+    bass_balance = _clamp(math.tanh((metrics.rms_bass + 15.0) / 10.0))
+    warmth = _clamp(math.tanh((metrics.rms_low_mid + 10.0) / 10.0))
+    clarity = _clamp(math.tanh((metrics.rms_mid + 10.0) / 10.0))
+    presence_energy = _clamp(math.tanh((metrics.rms_presence + 15.0) / 12.0))
+    density = _clamp(1.0 - min(1.0, metrics.crest_factor / 12.0))
+    stereo_width = _clamp(1.0 - abs(metrics.correlation_lr))
+    rms_total = metrics.rms_total
+    transient_energy = _clamp(
+        math.tanh((metrics.peak_db - rms_total - 6.0) / 8.0)
+    )
+    reality_index = _clamp(1.0 - abs(metrics.dynamic_range_db - 12.0) / 18.0)
+
+    return FeatureVector(
+        bass_balance=round(bass_balance, 4),
+        warmth=round(warmth, 4),
+        clarity=round(clarity, 4),
+        presence_energy=round(presence_energy, 4),
+        density=round(density, 4),
+        stereo_width=round(stereo_width, 4),
+        transient_energy=round(transient_energy, 4),
+        reality_index=round(reality_index, 4),
+    )
+
+
+def weighted_feature_distance(fv1: "FeatureVector", fv2: "FeatureVector",
+                               genre: str = "default") -> float:
+    """Compute genre-weighted Euclidean distance between two feature vectors.
+
+    MHP-852: d(a,b) = sqrt(sum(w_g[i] * (a[i] - b[i])^2))
+    """
+    import math
+
+    from moodify.v01_types import GENRE_WEIGHTS
+
+    weights = GENRE_WEIGHTS.get(genre, GENRE_WEIGHTS["default"])
+    v1 = fv1.to_list()
+    v2 = fv2.to_list()
+    sq = sum(weights[i] * (v1[i] - v2[i]) ** 2 for i in range(8))
+    return round(math.sqrt(sq), 4)

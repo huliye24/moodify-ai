@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moodify.local/schemas/night_metric_record.schema.json",
+  "title": "Night Metric Record",
+  "description": "Formal schema for the nightly metric snapshot — the input contract for all four data optimization loops. Each field traces to a specific source artifact from the runtime.",
+  "type": "object",
+  "required": ["run_id", "started_at", "collected_at", "runtime", "scoring", "craft", "queue", "tidal"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "Source run identifier, e.g. 20260605_000141"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the source run started (ISO 8601)"
+    },
+    "collected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this record was collected (ISO 8601)"
+    },
+    "source_artifacts": {
+      "type": "object",
+      "description": "Paths to the source artifacts this record was built from",
+      "properties": {
+        "summary_json": { "type": "string" },
+        "manifest_csv": { "type": "string" },
+        "tidal_events_jsonl": { "type": "string" },
+        "tidal_heartbeat_json": { "type": "string" },
+        "queue_jsonl": { "type": "string" },
+        "daily_run_log": { "type": "string" }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "description": "Loop A: Runtime Reliability signals",
+      "required": ["success", "failed", "total_selected", "dry_run"],
+      "properties": {
+        "success": {
+          "type": "integer", "minimum": 0,
+          "description": "Number of successfully completed tasks"
+        },
+        "failed": {
+          "type": "integer", "minimum": 0,
+          "description": "Number of failed tasks"
+        },
+        "total_selected": {
+          "type": "integer", "minimum": 0,
+          "description": "Total tasks selected from the queue"
+        },
+        "dry_run": {
+          "type": "boolean",
+          "description": "Whether this was a dry run"
+        },
+        "fatal_error": {
+          "type": ["string", "null"],
+          "description": "Fatal error message if the run crashed"
+        },
+        "elapsed_seconds": {
+          "type": "number", "minimum": 0,
+          "description": "Total wall-clock duration of the run"
+        },
+        "missing_artifacts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Artifact files expected but not found"
+        }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "description": "Loop B: Scoring Calibration signals — aggregated across all tasks",
+      "required": ["task_count", "disagreement_count", "agreement_rate"],
+      "properties": {
+        "task_count": {
+          "type": "integer", "minimum": 0,
+          "description": "Total tasks with both pseudo and MRS Open scores"
+        },
+        "disagreement_count": {
+          "type": "integer", "minimum": 0,
+          "description": "Tasks where pseudo delta and MRS Open delta have opposite signs"
+        },
+        "agreement_rate": {
+          "type": "number", "minimum": 0, "maximum": 1,
+          "description": "1 - disagreement_count / task_count"
+        },
+        "disagreeing_presets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Preset names that triggered at least one disagreement"
+        },
+        "max_abs_disagreement": {
+          "type": "number",
+          "description": "Maximum absolute sign-disagreement magnitude (pseudo delta vs open delta)"
+        }
+      }
+    },
+    "craft": {
+      "type": "object",
+      "description": "Loop C: Craft/Preset Selection signals",
+      "required": ["task_count", "flagged_count", "flag_rate"],
+      "properties": {
+        "task_count": {
+          "type": "integer", "minimum": 0,
+          "description": "Total tasks"
+        },
+        "flagged_count": {
+          "type": "integer", "minimum": 0,
+          "description": "Tasks with non-empty mrs_open_flags"
+        },
+        "flag_rate": {
+          "type": "number", "minimum": 0, "maximum": 1,
+          "description": "flagged_count / task_count"
+        },
+        "flag_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Distinct flag types observed (over_dark, over_bright, etc.)"
+        },
+        "flagged_presets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Preset names that triggered at least one flag"
+        },
+        "preset_delta_stats": {
+          "type": "object",
+          "description": "Per-preset MRS Open delta statistics (mean, min, max, count)",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "mean_delta": { "type": "number" },
+              "min_delta": { "type": "number" },
+              "max_delta": { "type": "number" },
+              "count": { "type": "integer" },
+              "flagged": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "type": "object",
+      "description": "Queue state at collection time",
+      "required": ["total_tasks", "pending", "done", "failed"],
+      "properties": {
+        "total_tasks": { "type": "integer", "minimum": 0 },
+        "pending": { "type": "integer", "minimum": 0 },
+        "done": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "claimed": { "type": "integer", "minimum": 0 },
+        "running": { "type": "integer", "minimum": 0 },
+        "abandoned": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "tidal": {
+      "type": "object",
+      "description": "Tidal cycle events since last collection",
+      "required": ["cycle_count", "events_since_last"],
+      "properties": {
+        "cycle_count": {
+          "type": "integer", "minimum": 0,
+          "description": "Total tidal cycles completed"
+        },
+        "events_since_last": {
+          "type": "integer", "minimum": 0,
+          "description": "Tidal events emitted since the last collection window"
+        },
+        "last_cycle_phases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Phases completed in the most recent cycle"
+        },
+        "last_heartbeat_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "description": "Per-task detail records — the atomic unit for DeepSeek worker micro-tasks",
+      "items": {
+        "type": "object",
+        "required": ["task_id", "sample_id", "preset", "status"],
+        "properties": {
+          "task_id": { "type": "string" },
+          "sample_id": { "type": "string" },
+          "preset": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "claimed", "running", "done", "failed", "abandoned"] },
+          "return_code": { "type": ["integer", "null"] },
+          "elapsed_seconds": { "type": ["number", "null"] },
+          "pseudo_mrs_before": { "type": ["number", "null"] },
+          "pseudo_mrs_after": { "type": ["number", "null"] },
+          "pseudo_delta_mrs": { "type": ["number", "null"] },
+          "mrs_open_v031_before": { "type": ["number", "null"] },
+          "mrs_open_v031_after": { "type": ["number", "null"] },
+          "delta_mrs_open_v031": { "type": ["number", "null"] },
+          "mrs_open_flags": { "type": "string" },
+          "score_direction_disagreement": { "type": ["boolean", "null"] },
+          "recommended_loop": {
+            "type": "string",
+            "enum": ["runtime_reliability", "scoring_calibration", "craft_preset_selection", "operator_report"]
+          }
+        }
+      }
+    }
+  }
+}

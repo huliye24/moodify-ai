@@ -1,14 +1,24 @@
 # Moodify — Project Roadmap
 
 **Updated**: 2026-06-05
-**Current Node**: ECHAIN-MOODIFY-DATA-LOOP-014 / NEM-MOODIFY-DATA-LOOP-PROBE-042
-**Previous Node**: NEM-MOODIFY-STUDIO-OS-001 (ADOPT ✅)
+**Current Node**: ECHAIN-MOODIFY-DEEPSEEK-API-015 (E-Chain 014 SEALED ✅)
+**Previous Node**: ECHAIN-MOODIFY-DATA-LOOP-014 (SEALED ✅)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6
-**Verified Mainline Tests**: 719 passing (607 runtime + 112 core)
+**Verified Data Loop Tests**: 88 passing (29 collectors + 30 recommenders + 11 integration + 18 product)
 
-## Current Learning Loop Target — 2026-06-05 Night
+## Current Status — 2026-06-05 (E-Chain 014 Complete ✅)
 
-Run ECHAIN-MOODIFY-DATA-LOOP-014 Probe Plan-6A (MHP-791 to MHP-796).
+ECHAIN-MOODIFY-DATA-LOOP-014 is SEALED — all 54 MHPs delivered across 3 NEMs.
+
+The data optimization loop system is production-ready:
+- `python3 -m moodify_runtime.cli data-loop run` — full pipeline
+- 4 optimization loops: runtime reliability, scoring calibration, craft/preset, operator report
+- 88 tests, all green
+- Product integration: operator dashboard, craft library, MRS calibration, release gate
+
+Next E-Chain candidates:
+1. DeepSeek v4 API integration (smallest gap — protocol is ready)
+2. Multi-night learning store (trend analysis + statistical significance)
 
 Goal:
 

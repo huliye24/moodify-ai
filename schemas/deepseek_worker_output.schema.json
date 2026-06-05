@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moodify.local/schemas/deepseek_worker_output.schema.json",
+  "title": "DeepSeek v4 Worker Output Schema",
+  "description": "Bounded output schema for DeepSeek v4 worker micro-tasks. One record per request, no markdown, JSON only.",
+  "type": "object",
+  "required": ["task_id", "loop", "severity", "reason", "next_action", "needs_human_review"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Copied verbatim from the input task. Must match exactly."
+    },
+    "loop": {
+      "type": "string",
+      "enum": ["runtime_reliability", "scoring_calibration", "craft_preset_selection", "operator_report"],
+      "description": "Copied verbatim from the input task. Must match exactly."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Worker-classified severity for this micro-task."
+    },
+    "reason": {
+      "type": "string",
+      "maxLength": 180,
+      "description": "Short explanation of the classification. Under 180 characters."
+    },
+    "next_action": {
+      "type": "string",
+      "maxLength": 220,
+      "description": "One concrete next action. Under 220 characters."
+    },
+    "needs_human_review": {
+      "type": "boolean",
+      "description": "Whether a human should review before the action is applied."
+    }
+  },
+  "additionalProperties": false
+}

@@ -115,7 +115,7 @@ def _resolve_preset(preset: Optional[str], emotion: Optional[str]) -> tuple[str,
     Returns:
         (resolved_preset, source)
     """
-    valid_presets = set(list_presets())
+    valid_presets = {"auto", *list_presets()}
 
     if preset:
         key = preset.strip()
@@ -254,7 +254,7 @@ async def process(
     audio: UploadFile = File(...),
     preset: Optional[str] = Form(
         None,
-        description="v0.1.0 preset: warm_vocal / clean_master / wide_space",
+        description="v0.1.0 preset: auto / warm_vocal / clean_master / wide_space",
     ),
     emotion: Optional[str] = Form(
         None,
@@ -276,7 +276,7 @@ async def process(
     """Process one audio file through the v0.1.0 pipeline.
 
     v0.1.0 flow:
-        upload -> analyze -> diagnose -> preset DSP -> export WAV
+        upload -> scan -> analyze -> diagnose -> smart process -> report -> export WAV
 
     Success default:
         returns audio/wav FileResponse
@@ -335,13 +335,18 @@ async def process(
             "success": True,
             "version": APP_VERSION,
             "mode": API_MODE,
+            "requested_preset": result.requested_preset,
             "preset": result.preset,
             "preset_source": preset_source,
             "legacy_platform_ignored": platform,
             "output_path": result.output_path,
+            "report_path": result.report_path,
             "elapsed_ms": round(elapsed_ms, 1),
             "diagnosis": diagnosis,
             "metrics_before": metrics,
+            "metrics_after": result.metrics_after.to_dict(),
+            "quality_gate": result.quality_gate.to_dict(),
+            "delivery": result.delivery.to_dict(),
         }
 
         if return_json:
