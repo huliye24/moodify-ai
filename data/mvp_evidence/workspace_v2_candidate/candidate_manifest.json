@@ -1,0 +1,37 @@
+{
+  "schema_version": "workspace_v2_release_candidate_evidence.v1",
+  "candidate": "Moodify Studio Workspace v2 MVP",
+  "verified_at": "2026-07-25T23:59:00+08:00",
+  "candidate_commit": "1c0f270e28d9e767fd372f799a00836ffb4a5321",
+  "baseline_tag": "v2.0.0-mvp",
+  "baseline_tag_created": true,
+  "baseline_note": "The annotated tag points to the sealing commit; its first parent is the verified candidate commit above.",
+  "automated_verification": {
+    "workspace_v2_tests": {
+      "passed": 179,
+      "failed": 0,
+      "warnings": 2,
+      "junit_xml": "data/mvp_evidence/workspace_v2_candidate/v2_pytest.xml",
+      "junit_sha256": "86F4B45F2EBD874DF3D9EB88D2854F2542927FFB97A5A3BDD82AAB7A48DDF1CB"
+    },
+    "registered_sample": {
+      "sample_id": "WSA_20260724_001",
+      "source_integrity": "PASS",
+      "candidate_versions": 2,
+      "lineage": "PASS",
+      "judge_fallback_disclosure": "PASS",
+      "human_approval_record": "PASS (automated acceptance fixture)",
+      "archive_integrity": "PASS"
+    },
+    "workspace_ui": {
+      "route": "/workspace/projects/ui",
+      "three_panel_layout": "PASS",
+      "real_api_loading": "PASS",
+      "version_comparison": "PASS",
+      "audio_playback": "PASS",
+      "approval_actions": "PASS"
+    }
+  },
+  "release_decision": "PASS",
+  "remaining_manual_gates": []
+}
