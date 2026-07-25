@@ -1,0 +1,177 @@
+{
+  "schema_version": "workspace_acceptance_sample.v1",
+  "sample_id": "WSA_20260724_001",
+  "title": "J'apprends à te recevoir maladroitement",
+  "status": "active",
+  "sample_type": "two_stem_song",
+  "registered_at": "2026-07-24T23:25:00+08:00",
+  "purpose": "Moodify Studio Workspace v2 MVP end-to-end golden-path acceptance",
+  "rights": {
+    "usage_scope": "local_product_development_and_acceptance_only",
+    "redistribution": "not_authorized",
+    "owner_confirmation_required_before_external_release": true
+  },
+  "source": {
+    "root": "pre-music/2026-07-24_1441_split_by_lalalai",
+    "separation_provider": "LALAL.AI",
+    "stems": [
+      {
+        "role": "instrumental",
+        "path": "pre-music/2026-07-24_1441_split_by_lalalai/Japprends à te recevoir maladroitement_no_vocals_split_by_lalalai.wav",
+        "format": "wav",
+        "sample_rate_hz": 48000,
+        "channels": 2,
+        "bit_depth": 16,
+        "duration_s": 131.48,
+        "bytes": 25244410,
+        "sha256": "6A98BE1E354BB4B8CBCA5C20C2F4533FD06680427A691DB989E4C6257F574E2E"
+      },
+      {
+        "role": "vocals",
+        "path": "pre-music/2026-07-24_1441_split_by_lalalai/Japprends à te recevoir maladroitement_vocals_split_by_lalalai.wav",
+        "format": "wav",
+        "sample_rate_hz": 48000,
+        "channels": 2,
+        "bit_depth": 16,
+        "duration_s": 131.48,
+        "bytes": 25244408,
+        "sha256": "CF79E18E5285158E0EC6761915FABE7F37F64A9FBB116F3A928EB965B0A1AD64"
+      }
+    ]
+  },
+  "creative_brief_seed": {
+    "goal": "Produce a warm, intimate and release-ready mix from the separated vocal and instrumental stems.",
+    "preserve": [
+      "original emotional phrasing",
+      "dream-like atmosphere",
+      "natural musical dynamics"
+    ],
+    "avoid": [
+      "harsh high frequencies",
+      "over-compressed vocal",
+      "clipping",
+      "excessive stereo widening"
+    ],
+    "platform": "streaming",
+    "reference": []
+  },
+  "baseline": {
+    "processing_date": "2026-07-24",
+    "instrumental": {
+      "preset": "clean_master",
+      "quality_gate": "pass",
+      "mrs_version": "mrs_proxy_v01",
+      "mrs_delta": 11.86,
+      "report_path": "pre-music/2026-07-24_1441_split_by_lalalai/moodify_post_v1/instrumental/Japprends à te recevoir maladroitement_no_vocals_split_by_lalalai_clean_master_report.json"
+    },
+    "vocals": {
+      "preset": "warm_vocal",
+      "quality_gate": "review",
+      "mrs_version": "mrs_proxy_v01",
+      "mrs_delta": 7.36,
+      "risk_flags": [
+        "dynamic_damage",
+        "damage_loss_high"
+      ],
+      "report_path": "pre-music/2026-07-24_1441_split_by_lalalai/moodify_post_v1/vocals_corrected/Japprends à te recevoir maladroitement_vocals_split_by_lalalai_warm_vocal_report.json"
+    },
+    "delivery": {
+      "path": "pre-music/2026-07-24_1441_split_by_lalalai/moodify_post_v1/Japprends_a_te_recevoir_maladroitement_moodify_delivery_-14LUFS_v1.wav",
+      "integrated_loudness_lufs": -14.0,
+      "loudness_range_lu": 6.2,
+      "true_peak_dbfs": -3.1,
+      "bytes": 25244238,
+      "sha256": "848444ACF8C1B1DA1A7A5C2E1831E568609D61CA6008369421A7C7F0CB09786B"
+    },
+    "known_limitations": [
+      "Full moodify_runtime MRS engine was unavailable; proxy scoring was used.",
+      "The vocal warm_vocal baseline did not pass the dynamic-range quality gate.",
+      "The folder moodify_post_v1/vocals is a known incorrect early trial and must not be used; use vocals_corrected."
+    ]
+  },
+  "workspace_v2_expected_results": {
+    "project": {
+      "created": true,
+      "original_assets_count": 2,
+      "creative_brief_saved": true
+    },
+    "threads": [
+      "producer",
+      "analyst",
+      "designer",
+      "worker",
+      "judge",
+      "archive"
+    ],
+    "versions": {
+      "minimum_candidate_versions": 2,
+      "lineage_required": true,
+      "historical_audio_must_not_be_overwritten": true
+    },
+    "judge": {
+      "technical_checks_required": [
+        "clipping",
+        "true_peak",
+        "integrated_loudness",
+        "dynamic_loss",
+        "stereo_correlation",
+        "mrs_or_proxy"
+      ],
+      "vocal_baseline_expected_to_require_review": true,
+      "degraded_scoring_must_be_disclosed": true
+    },
+    "approval": {
+      "human_approval_required_for_final": true,
+      "judge_reject_must_not_become_final": true
+    },
+    "archive": {
+      "must_include": [
+        "source_asset_references",
+        "creative_brief",
+        "thread_results",
+        "treatment_plans",
+        "version_lineage",
+        "judge_decisions",
+        "human_approval",
+        "final_audio"
+      ]
+    }
+  },
+  "acceptance_gates": [
+    {
+      "gate_id": "AG-01",
+      "name": "source_integrity",
+      "pass_condition": "Both source stem files exist and their SHA-256 hashes match this manifest."
+    },
+    {
+      "gate_id": "AG-02",
+      "name": "project_traceability",
+      "pass_condition": "The workspace project references this sample_id and both source assets."
+    },
+    {
+      "gate_id": "AG-03",
+      "name": "workflow_completion",
+      "pass_condition": "All six logical threads reach a terminal state with persisted outputs."
+    },
+    {
+      "gate_id": "AG-04",
+      "name": "version_lineage",
+      "pass_condition": "At least two candidate versions exist with valid parent lineage and immutable audio paths."
+    },
+    {
+      "gate_id": "AG-05",
+      "name": "judge_safety",
+      "pass_condition": "Judge results disclose proxy fallback and prevent rejected candidates from becoming Final."
+    },
+    {
+      "gate_id": "AG-06",
+      "name": "human_approval",
+      "pass_condition": "Final has an immutable human ApprovalDecision."
+    },
+    {
+      "gate_id": "AG-07",
+      "name": "archive_completeness",
+      "pass_condition": "The final archive contains all required project, thread, version, judge and delivery artifacts."
+    }
+  ]
+}

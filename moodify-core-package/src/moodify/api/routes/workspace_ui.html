@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moodify Studio Workspace v2</title>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --green: #4ade80; --red: #f87171; --amber: #fbbf24;
+  --p0: #ef4444; --p1: #f59e0b; --p2: #3b82f6; --p3: #8b5cf6; --p4: #22c55e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+header h1 { font-size: 18px; font-weight: 600; }
+header .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--accent); color: #000; }
+.layout { display: grid; grid-template-columns: 280px 1fr 320px; gap: 0; height: calc(100vh - 49px); }
+.panel { background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px; }
+.panel.right { border-right: none; border-left: 1px solid var(--border); }
+.panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 12px; }
+.card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.card h3 { font-size: 14px; margin-bottom: 6px; }
+.card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.status-dot.done { background: var(--green); }
+.status-dot.active { background: var(--accent); animation: pulse 2s infinite; }
+.status-dot.pending { background: var(--muted); }
+.status-dot.blocked { background: var(--red); }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.stage-flow { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; }
+.stage { font-size: 10px; padding: 3px 8px; border-radius: 4px; background: var(--border); white-space: nowrap; }
+.stage.current { background: var(--accent); color: #000; font-weight: 600; }
+.stage.done { background: var(--green); color: #000; }
+.stage.failed { background: var(--red); }
+
+.thread-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; font-size: 12px; }
+.thread-item:hover { background: rgba(255,255,255,0.05); }
+.thread-type { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: var(--border); }
+.thread-status { font-size: 10px; padding: 1px 6px; border-radius: 3px; }
+.thread-status.PASSED { background: #065f46; color: var(--green); }
+.thread-status.FAILED { background: #7f1d1d; color: var(--red); }
+.thread-status.RUNNING { background: #1e3a5f; color: var(--accent); }
+.thread-status.REJECTED { background: #78350f; color: var(--amber); }
+.thread-status.QUEUED { background: var(--border); color: var(--muted); }
+
+.version-tree { font-size: 12px; }
+.version-node { padding: 8px; border-left: 2px solid var(--border); margin-left: 12px; margin-bottom: 4px; cursor: pointer; transition: background 0.15s; }
+.version-node:hover { background: rgba(255,255,255,0.05); border-left-color: var(--accent); }
+.version-node.selected { border-left-color: var(--accent); background: rgba(56,189,248,0.1); }
+.version-node .vlabel { font-weight: 600; }
+.version-node .vmeta { font-size: 10px; color: var(--muted); }
+
+.compare-bar { display: flex; gap: 8px; align-items: center; margin: 8px 0; padding: 8px; background: var(--bg); border-radius: 6px; }
+.compare-slot { flex: 1; text-align: center; padding: 8px; border: 1px dashed var(--border); border-radius: 4px; font-size: 11px; cursor: pointer; }
+.compare-slot.filled { border-style: solid; border-color: var(--accent); }
+.compare-slot .pick { font-size: 12px; color: var(--accent); }
+
+.btn { padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: opacity 0.15s; }
+.btn:hover { opacity: 0.85; }
+.btn-accent { background: var(--accent); color: #000; }
+.btn-green { background: var(--green); color: #000; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-amber { background: var(--amber); color: #000; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+.approval-form { margin-top: 8px; }
+.approval-form label { display: block; font-size: 11px; color: var(--muted); margin: 6px 0 2px; }
+.approval-form select, .approval-form textarea, .approval-form input { width: 100%; padding: 6px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 12px; margin-bottom: 8px; }
+.approval-form textarea { min-height: 60px; resize: vertical; }
+
+input, select, textarea { font-family: inherit; }
+
+.tab-bar { display: flex; gap: 0; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+.tab { padding: 6px 12px; font-size: 11px; cursor: pointer; background: none; border: none; color: var(--muted); border-bottom: 2px solid transparent; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.comparison-result { font-size: 11px; }
+.comparison-result table { width: 100%; border-collapse: collapse; }
+.comparison-result th, .comparison-result td { padding: 4px 8px; text-align: left; border-bottom: 1px solid var(--border); font-size: 11px; }
+.comparison-result th { color: var(--muted); font-weight: 500; }
+
+.empty-state { text-align: center; padding: 24px; color: var(--muted); font-size: 12px; }
+.loading { opacity: 0.6; pointer-events: none; }
+
+.toast { position: fixed; bottom: 16px; right: 16px; padding: 10px 16px; border-radius: 6px; font-size: 12px; z-index: 1000; animation: slideUp 0.3s ease; }
+.toast.success { background: #065f46; color: var(--green); border: 1px solid var(--green); }
+.toast.error { background: #7f1d1d; color: var(--red); border: 1px solid var(--red); }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Moodify Studio Workspace <span class="badge">v2 MVP</span></h1>
+  <span id="project-title" style="font-size:14px;color:var(--muted)">—</span>
+</header>
+
+<div class="layout">
+  <!-- LEFT: Thread Panel -->
+  <div class="panel" id="thread-panel">
+    <h2>工作流线程</h2>
+    <div id="stage-flow" class="stage-flow"></div>
+    <div id="thread-list"></div>
+  </div>
+
+  <!-- CENTER: Project Home + Version Tree -->
+  <div style="overflow-y:auto;padding:16px;">
+    <div class="tab-bar">
+      <button class="tab active" data-tab="brief">创意 Brief</button>
+      <button class="tab" data-tab="versions">版本树与试听</button>
+      <button class="tab" data-tab="treatment">处理方案</button>
+    </div>
+    <div id="tab-brief"></div>
+    <div id="tab-versions" style="display:none;"></div>
+    <div id="tab-treatment" style="display:none;"></div>
+  </div>
+
+  <!-- RIGHT: Approval Panel -->
+  <div class="panel right" id="approval-panel">
+    <h2>人工审批</h2>
+    <div id="approval-content"></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const API = '/workspace/projects';
+let currentProjectId = null;
+let selectedVersionA = null;
+let selectedVersionB = null;
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// --- Load project ---
+async function loadProject() {
+  const pid = document.getElementById('project-id-input')?.value || localStorage.getItem('ws_project_id');
+  if (!pid) return showProjectPicker();
+  currentProjectId = pid;
+  localStorage.setItem('ws_project_id', pid);
+  try {
+    const project = await api(`${API}/${pid}`);
+    document.getElementById('project-title').textContent = project.title || pid;
+    await Promise.all([loadThreads(), loadVersions(), loadApprovals(), loadBrief(project)]);
+  } catch (e) {
+    toast(`加载项目失败: ${e.message}`, 'error');
+    showProjectPicker();
+  }
+}
+
+function showProjectPicker() {
+  document.getElementById('project-title').textContent = '选择或创建项目';
+  document.getElementById('tab-brief').innerHTML = `
+    <div class="card">
+      <h3>打开项目</h3>
+      <input id="project-id-input" placeholder="输入项目 ID" style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;margin-bottom:8px;">
+      <button class="btn btn-accent" onclick="loadProject()">加载项目</button>
+      <button class="btn btn-ghost" style="margin-left:8px;" onclick="createProject()">创建新项目</button>
+    </div>`;
+}
+
+async function createProject() {
+  const pid = prompt('项目 ID (英文标识):');
+  if (!pid) return;
+  const title = prompt('项目标题:');
+  if (!title) return;
+  const source = prompt('源音频 ID:');
+  if (!source) return;
+  try {
+    await api(`${API}`, {
+      method: 'POST',
+      body: JSON.stringify({ project_id: pid, title, source_audio_ids: [source] }),
+    });
+    toast('项目创建成功');
+    currentProjectId = pid;
+    localStorage.setItem('ws_project_id', pid);
+    loadProject();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// --- Threads ---
+async function loadThreads() {
+  try {
+    const threads = await api(`${API}/${currentProjectId}/threads`);
+    renderStageFlow(threads);
+    renderThreads(threads);
+  } catch (e) { document.getElementById('thread-list').innerHTML = `<div class="empty-state">加载失败</div>`; }
+}
+
+const STAGES = ['INTAKE','BRIEF','DIAGNOSIS','DESIGN','PROCESS','JUDGE','APPROVAL','FINAL'];
+const STAGE_LABELS = { INTAKE:'接入', BRIEF:'Brief', DIAGNOSIS:'诊断', DESIGN:'设计', PROCESS:'处理', JUDGE:'评判', APPROVAL:'审批', FINAL:'完成' };
+
+function renderStageFlow(threads) {
+  const passedTypes = new Set(threads.filter(t => t.status === 'PASSED').map(t => t.thread_type));
+  const runningTypes = new Set(threads.filter(t => t.status === 'RUNNING' || t.status === 'QUEUED').map(t => t.thread_type));
+  const failedTypes = new Set(threads.filter(t => t.status === 'FAILED' || t.status === 'REJECTED').map(t => t.thread_type));
+  const stageMap = {
+    INTAKE: ['BRIEF'], BRIEF: ['BRIEF'], DIAGNOSIS: ['DIAGNOSIS'],
+    DESIGN: ['DESIGN'], PROCESS: ['EXPORT','VOCAL','SPECTRUM','DYNAMICS','SPACE','LOUDNESS'],
+    JUDGE: ['JUDGE'], APPROVAL: ['APPROVAL'], FINAL: ['ARCHIVE']
+  };
+
+  let html = '';
+  for (const s of STAGES) {
+    const relevant = stageMap[s] || [];
+    const anyPassed = relevant.some(t => passedTypes.has(t));
+    const anyRunning = relevant.some(t => runningTypes.has(t));
+    const anyFailed = relevant.some(t => failedTypes.has(t));
+    let cls = '';
+    if (anyFailed) cls = 'failed';
+    else if (anyRunning) cls = 'current';
+    else if (anyPassed) cls = 'done';
+    html += `<span class="stage ${cls}">${STAGE_LABELS[s]}</span>`;
+  }
+  document.getElementById('stage-flow').innerHTML = html;
+}
+
+function renderThreads(threads) {
+  const sorted = [...threads].reverse();
+  let html = '';
+  for (const t of sorted) {
+    const retryInfo = t.retry_count > 0 ? ` (重试${t.retry_count}/${t.max_retries})` : '';
+    html += `<div class="thread-item">
+      <span class="status-dot ${t.status === 'PASSED' ? 'done' : t.status === 'FAILED' || t.status === 'REJECTED' ? 'blocked' : t.status === 'RUNNING' ? 'active' : 'pending'}"></span>
+      <span class="thread-type">${t.thread_type}</span>
+      <span style="flex:1">${t.thread_id.slice(0,24)}</span>
+      <span class="thread-status ${t.status}">${t.status}${retryInfo}</span>
+    </div>`;
+  }
+  document.getElementById('thread-list').innerHTML = html || '<div class="empty-state">暂无线程</div>';
+}
+
+// --- Versions ---
+async function loadVersions() {
+  try {
+    const versions = await api(`${API}/${currentProjectId}/versions`);
+    renderVersionTree(versions);
+  } catch (e) { document.getElementById('tab-versions').innerHTML = `<div class="empty-state">版本加载失败</div>`; }
+}
+
+function renderVersionTree(versions) {
+  const sorted = [...versions].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  let html = '<h2 style="font-size:13px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">版本树</h2>';
+  html += '<div class="version-tree">';
+
+  const byParent = {};
+  for (const v of sorted) {
+    const pid = v.parent_version_id || '__root__';
+    (byParent[pid] ||= []).push(v);
+  }
+
+  function renderNode(v, depth = 0) {
+    const sel = selectedVersionA === v.version_id || selectedVersionB === v.version_id ? ' selected' : '';
+    let h = `<div class="version-node${sel}" style="margin-left:${depth*16}px" onclick="selectVersion('${v.version_id}')" data-vid="${v.version_id}">
+      <div class="vlabel">${v.name} <span style="font-size:10px;color:var(--muted)">[${v.branch}]</span></div>
+      <div class="vmeta">${v.version_id.slice(0,16)} · ${v.status} · ${v.audio_sha256.slice(0,10)}</div>
+      <audio controls preload="none" onclick="event.stopPropagation()" style="width:100%;height:28px;margin-top:6px;"
+        src="${API}/${currentProjectId}/versions/${v.version_id}/audio"></audio>
+    </div>`;
+    for (const child of (byParent[v.version_id] || [])) {
+      h += renderNode(child, depth + 1);
+    }
+    return h;
+  }
+
+  for (const root of (byParent['__root__'] || [])) {
+    html += renderNode(root);
+  }
+
+  html += '</div>';
+
+  html += '<div class="compare-bar">';
+  html += `<div class="compare-slot${selectedVersionA ? ' filled' : ''}" onclick="pickSlot('A')" id="slot-a">${selectedVersionA ? 'A: ' + selectedVersionA.slice(0,12) : '点击选择版本 A'}</div>`;
+  html += '<span style="color:var(--muted)">vs</span>';
+  html += `<div class="compare-slot${selectedVersionB ? ' filled' : ''}" onclick="pickSlot('B')" id="slot-b">${selectedVersionB ? 'B: ' + selectedVersionB.slice(0,12) : '点击选择版本 B'}</div>`;
+  html += `<button class="btn btn-accent" onclick="compareVersions()" ${!selectedVersionA || !selectedVersionB ? 'disabled' : ''}>比较</button>`;
+  html += '</div>';
+  html += '<div id="comparison-result"></div>';
+
+  document.getElementById('tab-versions').innerHTML = html;
+}
+
+let pickTarget = null;
+function pickSlot(slot) { pickTarget = slot; toast(`请从版本树中选择版本 ${slot}`); }
+function selectVersion(vid) {
+  if (pickTarget === 'A') { selectedVersionA = vid; pickTarget = null; loadVersions(); }
+  else if (pickTarget === 'B') { selectedVersionB = vid; pickTarget = null; loadVersions(); }
+}
+async function compareVersions() {
+  if (!selectedVersionA || !selectedVersionB) return;
+  try {
+    const result = await api(`${API}/${currentProjectId}/versions/${selectedVersionA}/compare/${selectedVersionB}`);
+    renderComparison(result);
+  } catch (e) { toast(e.message, 'error'); }
+}
+function renderComparison(result) {
+  let html = '<div class="comparison-result"><h3 style="font-size:12px;margin:8px 0;">比较结果</h3><table>';
+  const c = result.comparisons || {};
+  for (const [key, val] of Object.entries(c)) {
+    html += `<tr><th>${key}</th><td>${JSON.stringify(val).slice(0,120)}</td></tr>`;
+  }
+  html += '</table></div>';
+  document.getElementById('comparison-result').innerHTML = html;
+}
+
+// --- Brief ---
+function loadBrief(project) {
+  const brief = project.creative_brief;
+  if (!brief) {
+    document.getElementById('tab-brief').innerHTML = `
+      <div class="card"><h3>创建 Creative Brief</h3>
+      <div class="approval-form">
+        <label>目标 (Goal)</label><textarea id="brief-goal" placeholder="描述音频处理目标..."></textarea>
+        <label>保留元素 (逗号分隔)</label><input id="brief-preserve" placeholder="vocal,warmth,dynamic range">
+        <label>避免元素 (逗号分隔)</label><input id="brief-avoid" placeholder="distortion,harshness">
+        <label>平台</label><input id="brief-platform" placeholder="streaming">
+        <label>参考 (逗号分隔)</label><input id="brief-reference" placeholder="ref_track_01">
+        <button class="btn btn-accent" onclick="saveBrief()">保存 Brief</button>
+      </div></div>`;
+    return;
+  }
+  let html = '<div class="card"><h3>Creative Brief</h3>';
+  html += `<p><strong>Goal:</strong> ${esc(brief.goal)}</p>`;
+  html += `<p><strong>Preserve:</strong> ${(brief.preserve||[]).join(', ')}</p>`;
+  html += `<p><strong>Avoid:</strong> ${(brief.avoid||[]).join(', ')}</p>`;
+  html += `<p><strong>Platform:</strong> ${esc(brief.platform)}</p>`;
+  html += `<p><strong>Reference:</strong> ${(brief.reference||[]).join(', ')}</p>`;
+  html += `<button class="btn btn-ghost" style="margin-top:8px;" onclick="editBrief()">编辑 Brief</button></div>`;
+  document.getElementById('tab-brief').innerHTML = html;
+}
+
+async function saveBrief() {
+  const goal = document.getElementById('brief-goal')?.value;
+  if (!goal) return toast('请输入目标', 'error');
+  const body = {
+    goal,
+    preserve: (document.getElementById('brief-preserve')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
+    avoid: (document.getElementById('brief-avoid')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
+    platform: document.getElementById('brief-platform')?.value || 'streaming',
+    reference: (document.getElementById('brief-reference')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
+  };
+  try {
+    await api(`${API}/${currentProjectId}/brief`, { method: 'POST', body: JSON.stringify(body) });
+    toast('Brief 已创建');
+    loadProject();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// --- Approvals ---
+async function loadApprovals() {
+  try {
+    const versions = await api(`${API}/${currentProjectId}/versions`);
+    const reviewable = versions.filter(v => v.status === 'DRAFT' || v.status === 'REVIEWING');
+    let html = '';
+    if (reviewable.length === 0) {
+      html += '<div class="empty-state">暂无待审批版本</div>';
+    }
+    for (const v of reviewable) {
+      html += `<div class="card">
+        <h3>${esc(v.name)}</h3>
+        <p>${v.version_id.slice(0,20)} · ${v.status} · ${v.branch}</p>
+        <div class="approval-form">
+          <label>决定</label>
+          <select id="approval-outcome-${v.version_id}">
+            <option value="APPROVED">批准 (APPROVED)</option>
+            <option value="REJECTED">拒绝 (REJECTED)</option>
+            <option value="RETURNED">退回 (RETURNED)</option>
+          </select>
+          <label>理由</label>
+          <textarea id="approval-reason-${v.version_id}" placeholder="说明审批理由..."></textarea>
+          <label>操作者</label>
+          <input id="approval-operator-${v.version_id}" placeholder="您的姓名">
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <button class="btn btn-green" onclick="submitApproval('${v.version_id}')">提交审批</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    document.getElementById('approval-content').innerHTML = html;
+  } catch (e) {
+    document.getElementById('approval-content').innerHTML = `<div class="empty-state">审批加载失败</div>`;
+  }
+}
+
+async function submitApproval(versionId) {
+  const outcome = document.getElementById(`approval-outcome-${versionId}`)?.value;
+  const reason = document.getElementById(`approval-reason-${versionId}`)?.value;
+  const operator = document.getElementById(`approval-operator-${versionId}`)?.value;
+  if (!reason || !operator) return toast('请填写理由和操作者', 'error');
+  const decisionId = 'DEC' + Date.now();
+  try {
+    await api(`${API}/${currentProjectId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({
+        decision_id: decisionId,
+        version_id: versionId,
+        outcome,
+        reason,
+        operator,
+        actor_type: 'HUMAN',
+      }),
+    });
+    toast(`审批已提交: ${outcome}`);
+    loadProject();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// --- Treatment ---
+async function loadTreatment() {
+  document.getElementById('tab-treatment').innerHTML = '<div class="empty-state">处理方案需通过 Designer 服务生成</div>';
+}
+
+// --- Tabs ---
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-brief').style.display = tab.dataset.tab === 'brief' ? '' : 'none';
+    document.getElementById('tab-versions').style.display = tab.dataset.tab === 'versions' ? '' : 'none';
+    document.getElementById('tab-treatment').style.display = tab.dataset.tab === 'treatment' ? '' : 'none';
+    if (tab.dataset.tab === 'treatment') loadTreatment();
+  });
+});
+
+function esc(s) { return s ? s.replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+
+loadProject();
+</script>
+</body>
+</html>
