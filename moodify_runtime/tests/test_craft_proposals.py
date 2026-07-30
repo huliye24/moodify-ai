@@ -477,3 +477,369 @@ class TestProposalDataIntegrity:
         assert len(ids) == 3  # all unique
         files = list((craft_dir / "proposals").glob("proposal_*.json"))
         assert len(files) == 3
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Rework Expansion — P0 promotion fault and replay matrix
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestPromotionFaultBeforeCraftTmpWrite:
+    """Fault injection BEFORE craft-store tmp write."""
+
+    def test_failure_before_tmp_write_retry_succeeds(
+        self, craft_dir, sample_entry, valid_promotion_evidence, monkeypatch
+    ):
+        proposal = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )[0]
+        craft_path = craft_dir / "craft_records.jsonl"
+
+        import moodify_runtime.craft_proposals as module
+        real_write = module.Path.write_text
+        failed = {"once": False}
+
+        def fail_tmp_write(self_obj, content, encoding=None):
+            obj_str = str(self_obj)
+            if not failed["once"] and "craft_records.jsonl" in obj_str and ".tmp" in obj_str:
+                failed["once"] = True
+                raise OSError("injected before tmp write")
+            return real_write(self_obj, content, encoding=encoding)
+
+        monkeypatch.setattr(module.Path, "write_text", fail_tmp_write)
+        with pytest.raises(OSError, match="before tmp write"):
+            promote_proposal_to_craft(
+                craft_dir, proposal["proposal_id"], valid_promotion_evidence
+            )
+
+        # Retry: should succeed
+        result = promote_proposal_to_craft(
+            craft_dir, proposal["proposal_id"], valid_promotion_evidence
+        )
+        assert result["craft_record_id"].startswith("CRFT_")
+        rows = (craft_dir / "craft_records.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(rows) == 1
+
+
+class TestPromotionFaultAfterTmpWriteBeforeReplace:
+    """Fault injection AFTER tmp write but BEFORE os.replace."""
+
+    def test_failure_after_tmp_before_replace_retry_no_duplicate(
+        self, craft_dir, sample_entry, valid_promotion_evidence, monkeypatch
+    ):
+        proposal = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )[0]
+
+        import moodify_runtime.craft_proposals as module
+        real_replace = module.os.replace
+        failed = {"once": False}
+
+        def fail_first_replace(source, target):
+            if not failed["once"] and "craft_records.jsonl" in str(target):
+                failed["once"] = True
+                raise OSError("injected before atomic replace")
+            return real_replace(source, target)
+
+        monkeypatch.setattr(module.os, "replace", fail_first_replace)
+        with pytest.raises(OSError, match="before atomic replace"):
+            promote_proposal_to_craft(
+                craft_dir, proposal["proposal_id"], valid_promotion_evidence
+            )
+
+        result = promote_proposal_to_craft(
+            craft_dir, proposal["proposal_id"], valid_promotion_evidence
+        )
+        rows = (craft_dir / "craft_records.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(rows) == 1
+        assert result["craft_record_id"] == json.loads(rows[0])["craft_id"]
+
+
+class TestPromotionFaultAtProposalWrite:
+    """Fault injection at proposal temp write or replacement."""
+
+    def test_failure_before_proposal_tmp_write_retry_no_duplicate(
+        self, craft_dir, sample_entry, valid_promotion_evidence, monkeypatch
+    ):
+        proposal = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )[0]
+        proposal_path = craft_dir / "proposals" / f"proposal_{proposal['proposal_id']}.json"
+
+        import moodify_runtime.craft_proposals as module
+        real_replace = module.os.replace
+        failed = {"once": False}
+
+        def fail_proposal_write(source, target):
+            if not failed["once"] and Path(target) == proposal_path:
+                failed["once"] = True
+                raise OSError("injected before proposal replacement")
+            return real_replace(source, target)
+
+        monkeypatch.setattr(module.os, "replace", fail_proposal_write)
+        with pytest.raises(OSError, match="before proposal replacement"):
+            promote_proposal_to_craft(
+                craft_dir, proposal["proposal_id"], valid_promotion_evidence
+            )
+
+        result = promote_proposal_to_craft(
+            craft_dir, proposal["proposal_id"], valid_promotion_evidence
+        )
+        rows = (craft_dir / "craft_records.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(rows) == 1
+        assert result["craft_record_id"] == json.loads(rows[0])["craft_id"]
+
+
+class TestDeterministicCraftIdentity:
+    """Craft ID is deterministically derived from proposal identity."""
+
+    def test_same_proposal_id_produces_same_craft_id(
+        self, craft_dir, sample_entry, valid_promotion_evidence
+    ):
+        p1 = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )[0]
+        result1 = promote_proposal_to_craft(
+            craft_dir, p1["proposal_id"], valid_promotion_evidence
+        )
+
+        # Delete craft record + proposal and recreate
+        (craft_dir / "craft_records.jsonl").unlink()
+        proposal_path = craft_dir / "proposals" / f"proposal_{p1['proposal_id']}.json"
+        proposal_path.unlink()
+
+        p2 = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )[0]
+        result2 = promote_proposal_to_craft(
+            craft_dir, p2["proposal_id"], valid_promotion_evidence
+        )
+
+        # Craft ID is derived only from proposal_id, which is random UUID
+        # so they differ. But repeated promotion of the SAME proposal_id
+        # must produce the same craft_id.
+        r3 = promote_proposal_to_craft(
+            craft_dir, p2["proposal_id"], valid_promotion_evidence
+        )
+        assert r3["status"] == "already_promoted"
+        assert r3["craft_record_id"] == result2["craft_record_id"]
+
+    def test_craft_id_is_hash_of_proposal_id(self, craft_dir):
+        """craft_id = 'CRFT_' + sha256(proposal_id)[:12].upper()"""
+        import hashlib
+
+        # Write a proposal and extract the actual ID
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001",
+            [{"preset": "warm_vocal"}],
+        )
+        pid = results[0]["proposal_id"]
+        expected = "CRFT_" + hashlib.sha256(pid.encode("utf-8")).hexdigest()[:12].upper()
+
+        valid_evidence = {
+            "rights_evidence": {"asset_id": "A1", "manifest": "m1"},
+            "human_reviewer": "reviewer",
+            "review_timestamp": "2026-07-30T10:00:00Z",
+            "source_run_id": "run_001",
+            "regression_evidence": {"tests": 1},
+        }
+        result = promote_proposal_to_craft(craft_dir, pid, valid_evidence)
+        assert result["craft_record_id"] == expected
+
+
+class TestPromotionEvidenceValidation:
+    """Structural evidence validation beyond non-empty checks."""
+
+    def test_rights_evidence_not_dict_rejected(
+        self, craft_dir, sample_entry
+    ):
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+        bad_evidence = {
+            "rights_evidence": "not_a_dict",
+            "human_reviewer": "reviewer",
+            "review_timestamp": "2026-07-30T10:00:00Z",
+            "source_run_id": "run_001",
+            "regression_evidence": {"tests": 1},
+        }
+        with pytest.raises(ValueError, match="non-empty object"):
+            promote_proposal_to_craft(craft_dir, pid, bad_evidence)
+
+    def test_empty_rights_evidence_dict_rejected(
+        self, craft_dir, sample_entry
+    ):
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+        bad_evidence = {
+            "rights_evidence": {},
+            "human_reviewer": "reviewer",
+            "review_timestamp": "2026-07-30T10:00:00Z",
+            "source_run_id": "run_001",
+            "regression_evidence": {"tests": 1},
+        }
+        with pytest.raises(ValueError, match="non-empty object"):
+            promote_proposal_to_craft(craft_dir, pid, bad_evidence)
+
+    def test_regression_evidence_not_struct_rejected(
+        self, craft_dir, sample_entry
+    ):
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+        bad_evidence = {
+            "rights_evidence": {"x": 1},
+            "human_reviewer": "reviewer",
+            "review_timestamp": "2026-07-30T10:00:00Z",
+            "source_run_id": "run_001",
+            "regression_evidence": "not_struct",
+        }
+        with pytest.raises(ValueError, match="non-empty object or list"):
+            promote_proposal_to_craft(craft_dir, pid, bad_evidence)
+
+    def test_empty_reviewer_string_rejected(
+        self, craft_dir, sample_entry
+    ):
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+        bad_evidence = {
+            "rights_evidence": {"x": 1},
+            "human_reviewer": "   ",
+            "review_timestamp": "2026-07-30T10:00:00Z",
+            "source_run_id": "run_001",
+            "regression_evidence": {"tests": 1},
+        }
+        with pytest.raises(ValueError, match="non-empty string"):
+            promote_proposal_to_craft(craft_dir, pid, bad_evidence)
+
+    def test_empty_run_id_rejected(
+        self, craft_dir, sample_entry
+    ):
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+        bad_evidence = {
+            "rights_evidence": {"x": 1},
+            "human_reviewer": "reviewer",
+            "review_timestamp": "2026-07-30T10:00:00Z",
+            "source_run_id": "",
+            "regression_evidence": {"tests": 1},
+        }
+        with pytest.raises(ValueError, match="must not be empty"):
+            promote_proposal_to_craft(craft_dir, pid, bad_evidence)
+
+    def test_empty_timestamp_rejected(
+        self, craft_dir, sample_entry
+    ):
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+        bad_evidence = {
+            "rights_evidence": {"x": 1},
+            "human_reviewer": "reviewer",
+            "review_timestamp": "   ",
+            "source_run_id": "run_001",
+            "regression_evidence": {"tests": 1},
+        }
+        with pytest.raises(ValueError, match="non-empty string"):
+            promote_proposal_to_craft(craft_dir, pid, bad_evidence)
+
+
+class TestPreExistingDuplicate:
+    """Pre-existing malformed JSONL or duplicate entries handled safely."""
+
+    def test_malformed_jsonl_fails_closed_and_preserves_history(
+        self, craft_dir, sample_entry, valid_promotion_evidence
+    ):
+        """Promotion cannot silently replace an unreadable Craft history."""
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+
+        craft_path = craft_dir / "craft_records.jsonl"
+        original = (
+            json.dumps({"craft_id": "CRFT_EXISTING", "source_proposal_id": "older"})
+            + "\nthis is not valid json\n"
+        ).encode("utf-8")
+        craft_path.write_bytes(original)
+
+        with pytest.raises(ValueError, match="promotion stopped without modifying history"):
+            promote_proposal_to_craft(craft_dir, pid, valid_promotion_evidence)
+        assert craft_path.read_bytes() == original
+        assert get_proposal(craft_dir, pid)["status"] == "proposal"
+
+    def test_duplicate_source_proposal_id_reconciled(
+        self, craft_dir, sample_entry, valid_promotion_evidence
+    ):
+        """If source_proposal_id already exists in JSONL, promotion returns it."""
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+
+        # First promotion
+        r1 = promote_proposal_to_craft(craft_dir, pid, valid_promotion_evidence)
+
+        # Directly inject a duplicate with the same source_proposal_id
+        craft_path = craft_dir / "craft_records.jsonl"
+        rows = craft_path.read_text(encoding="utf-8").strip().splitlines()
+        duplicate = json.loads(json.dumps(json.loads(rows[0])))
+        duplicate["craft_id"] = "CRFT_FAKE_DUPLICATE"
+        craft_path.write_text(rows[0] + "\n" + json.dumps(duplicate) + "\n", encoding="utf-8")
+
+        # Retry promotion — reconcile finds the first match (deterministic craft_id)
+        result = promote_proposal_to_craft(craft_dir, pid, valid_promotion_evidence)
+        assert result["status"] == "already_promoted"
+        assert result["craft_record_id"] == r1["craft_record_id"]
+
+    def test_deterministic_retry_after_partial_jsonl_write(
+        self, craft_dir, sample_entry, valid_promotion_evidence
+    ):
+        """Even if a tmp write partially writes, retry recovers."""
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+
+        # Create a tmp file (simulating partial write from prior attempt)
+        tmp_path = craft_dir / f".craft_records.jsonl.{pid}.tmp"
+        tmp_path.write_text("", encoding="utf-8")
+
+        result = promote_proposal_to_craft(craft_dir, pid, valid_promotion_evidence)
+        assert result["craft_record_id"].startswith("CRFT_")
+        rows = (craft_dir / "craft_records.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(rows) == 1
+
+
+class TestRepeatedIdenticalPromotion:
+    """Repeated identical promotion requests produce the same result."""
+
+    def test_ten_identical_promotions_one_record(
+        self, craft_dir, sample_entry, valid_promotion_evidence
+    ):
+        results = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )
+        pid = results[0]["proposal_id"]
+
+        craft_id = None
+        for _ in range(10):
+            r = promote_proposal_to_craft(craft_dir, pid, valid_promotion_evidence)
+            if craft_id is None:
+                craft_id = r["craft_record_id"]
+                assert r["status"] == "promoted"
+            else:
+                assert r["status"] == "already_promoted"
+                assert r["craft_record_id"] == craft_id
+
+        rows = (craft_dir / "craft_records.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(rows) == 1

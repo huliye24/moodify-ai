@@ -195,7 +195,16 @@ def promote_proposal_to_craft(
     craft_path = craft_memory_dir / "craft_records.jsonl"
     craft_path.parent.mkdir(parents=True, exist_ok=True)
     from .utils import read_jsonl
-    existing_rows = read_jsonl(craft_path)
+    try:
+        existing_rows = read_jsonl(craft_path)
+    except json.JSONDecodeError as exc:
+        # Approved Craft history is authoritative. Promotion must never
+        # "repair" a malformed store by treating all existing rows as absent,
+        # because that silently destroys valid history around the bad line.
+        raise ValueError(
+            "Craft store is malformed; promotion stopped without modifying "
+            f"history: {exc}"
+        ) from exc
     existing = next(
         (row for row in existing_rows if row.get("source_proposal_id") == proposal_id),
         None,

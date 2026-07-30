@@ -71,11 +71,15 @@ class AtomicPairWriter:
         stage_dir = self._output_dir / f".pair_tmp_{stage_id}"
         stage_dir.mkdir(parents=True, exist_ok=False)
 
-        # 3. Write both artifacts to staging
+        # 3. Target paths (computed early for exception-scope access)
+        json_target = self._output_dir / json_filename
+        md_target = self._output_dir / md_filename
+
+        json_stage = stage_dir / json_filename
+        md_stage = stage_dir / md_filename
+
         tx_marker = stage_dir / ".tx_active"
         try:
-            json_stage = stage_dir / json_filename
-            md_stage = stage_dir / md_filename
 
             json_stage.write_text(
                 json.dumps(json_data, ensure_ascii=False, indent=2) + "\n",
@@ -107,8 +111,6 @@ class AtomicPairWriter:
             )
 
             # 6. Backup existing files (preserve previous complete pair)
-            json_target = self._output_dir / json_filename
-            md_target = self._output_dir / md_filename
             json_bak = self._output_dir / f"{json_filename}.prev"
             md_bak = self._output_dir / f"{md_filename}.prev"
 
@@ -126,9 +128,17 @@ class AtomicPairWriter:
             tx_marker.unlink()
 
         except Exception:
-            # Promotion may already have replaced one target. Restore the
-            # complete previous pair before transaction evidence is removed.
-            self._restore_previous_pair(json_filename, md_filename)
+            # A staged file that no longer exists was already promoted
+            # (shutil.move succeeded). Both must be promoted for the new
+            # generation to be current; otherwise restore from .prev.
+            json_promoted = not json_stage.exists()
+            md_promoted = not md_stage.exists()
+            if not (json_promoted and md_promoted):
+                self._restore_previous_pair(
+                    json_filename, md_filename,
+                    json_promoted=json_promoted,
+                    md_promoted=md_promoted,
+                )
             if tx_marker.exists():
                 tx_marker.unlink()
             if stage_dir.exists():
@@ -155,15 +165,44 @@ class AtomicPairWriter:
             raise RuntimeError("Current Markdown artifact is empty")
         return data, markdown
 
-    def _restore_previous_pair(self, json_filename: str, md_filename: str) -> bool:
-        """Restore both previous artifacts as one recovery decision."""
-        pairs = (
-            (self._output_dir / json_filename, self._output_dir / f"{json_filename}.prev"),
-            (self._output_dir / md_filename, self._output_dir / f"{md_filename}.prev"),
+    def _restore_previous_pair(
+        self,
+        json_filename: str,
+        md_filename: str,
+        json_promoted: bool = False,
+        md_promoted: bool = False,
+    ) -> bool:
+        """Restore a complete previous generation after partial promotion.
+
+        Promoted targets (staging gone) are overwritten with their .prev
+        backup. Unpromoted targets are left untouched when they exist (old
+        version), or restored from .prev when they were already renamed
+        during backup.
+        """
+        items = (
+            (
+                self._output_dir / json_filename,
+                self._output_dir / f"{json_filename}.prev",
+                json_promoted,
+            ),
+            (
+                self._output_dir / md_filename,
+                self._output_dir / f"{md_filename}.prev",
+                md_promoted,
+            ),
         )
-        if not all(previous.is_file() for _, previous in pairs):
-            return False
-        for target, previous in pairs:
+        for target, previous, promoted in items:
+            if promoted:
+                # New version at target — overwrite from backup
+                if not previous.is_file():
+                    continue
+            else:
+                # Not promoted — leave as-is if target exists (old version),
+                # restore from .prev if target was renamed during backup
+                if target.exists():
+                    continue
+                if not previous.is_file():
+                    return False
             restore_tmp = target.with_name(f".{target.name}.restore")
             shutil.copy2(previous, restore_tmp)
             os.replace(restore_tmp, target)
@@ -221,7 +260,13 @@ class AtomicPairWriter:
                 except Exception as e:
                     # Validation or completion failed. A staged move may have
                     # partially promoted, so restore the previous complete pair.
-                    restored = self._restore_previous_pair(json_filename, md_filename)
+                    json_promoted = not json_stage.exists()
+                    md_promoted = not md_stage.exists()
+                    restored = self._restore_previous_pair(
+                        json_filename, md_filename,
+                        json_promoted=json_promoted,
+                        md_promoted=md_promoted,
+                    )
                     recovered.append({
                         "orphan": orphan_dir.name,
                         "action": "rolled_back",

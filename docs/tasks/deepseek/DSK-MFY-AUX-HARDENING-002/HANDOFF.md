@@ -195,4 +195,50 @@ Codex must independently:
 
 ---
 
-**STATUS:** `IMPLEMENTED` — All three batches pass their exit gates. Not `VERIFIED`, not `PRODUCTION-PROVEN`, not approved for Mainline or Annual Stable. Awaiting Codex independent acceptance.
+---
+
+## Rework Expansion (2026-07-30 Session 2)
+
+> Final Codex decision: **VERIFIED in the defined local test environment**. See `CODEX_FINAL_ACCEPTANCE_2026-07-30.md`. This does not establish production-proven operation, professional listening approval, Mainline release approval, or Annual Stable approval.
+
+### Codex P0 Findings Addressed
+
+| # | Finding | Fix |
+|---|---|---|
+| P0-1 | Craft promotion not crash-idempotent (duplicate on retry after craft-store write but before proposal update) | Deterministic craft_id from proposal hash; source_proposal_id reconciliation before append; JSONDecodeError catch for malformed stores; 15 new fault/replay tests |
+| P0-2 | AtomicPairWriter exposes incomplete current pair (partial promotion + marker removal = mixed pair) | Promotion detection via staging file existence; _restore_previous_pair accepts promoted flags; json_target/md_target pre-computed for except scope; 22 new fault-injection/recovery tests |
+| P0-3 | Historical migration not deterministically repeatable (UUID treatment_id + timestamp in payload) | treatment_id deterministically derived from source_hash+versions; wall-clock time belongs to MigrationResult only; no timestamps in canonical lineage; 11 new determinism tests including subprocess |
+
+### Updated Test Counts
+
+| Suite | Before | After | Delta |
+|---|---|---|---|
+| test_atomic_pair_writer | 24 | 46 | +22 |
+| test_craft_proposals | 25 | 40 | +15 |
+| test_historical_compatibility | 48 | 59 | +11 |
+| **Focused total** | **97** | **145** | **+48** |
+| Runtime regression | 787p/10s/4f | 836p/10s/4f | +49p |
+
+All 4 failures pre-existing (`python3` subprocess on Windows, test_tidal_core/test_tidal_cycle).
+
+### Files Modified in Rework
+
+- `moodify_runtime/atomic_pair_writer.py` — exception handler promotion detection, pre-try variable binding, _restore_previous_pair promotion flags, recover method update
+- `moodify_runtime/craft_proposals.py` — JSONDecodeError catch on malformed JSONL store
+- `moodify_runtime/tests/test_atomic_pair_writer.py` — 6 new test classes
+- `moodify_runtime/tests/test_craft_proposals.py` — 6 new test classes
+- `moodify_runtime/tests/test_historical_compatibility.py` — 5 new test classes
+
+### Verification Commands
+
+```
+python -m pytest moodify_runtime/tests/test_atomic_pair_writer.py -v          → 46 passed
+python -m pytest moodify_runtime/tests/test_craft_proposals.py -v              → 40 passed
+python -m pytest moodify_runtime/tests/test_historical_compatibility.py -v     → 59 passed
+python -m pytest .../test_atomic_pair_writer.py .../test_craft_proposals.py .../test_historical_compatibility.py -q → 145 passed
+python -m pytest moodify_runtime/tests/ -q                                     → 836p/10s/4f (4f pre-existing)
+```
+
+---
+
+**STATUS:** `IMPLEMENTED` — All three batches + Codex rework expansion pass their exit gates. Not `VERIFIED`, not `PRODUCTION-PROVEN`, not approved for Mainline or Annual Stable. Awaiting Codex independent re-acceptance.

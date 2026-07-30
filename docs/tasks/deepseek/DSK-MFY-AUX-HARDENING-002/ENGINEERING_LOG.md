@@ -2,7 +2,7 @@
 
 **Worker:** DeepSeek  
 **Final Judge:** Codex / authorized human owner  
-**State:** Batches A, B, C complete; awaiting Codex independent acceptance
+**State:** Batches A, B, C complete; rework expansion (P0 fault matrices) complete; awaiting Codex independent acceptance
 
 ---
 
@@ -210,3 +210,105 @@ PYTHONPATH=. python scripts/v01_aggregate_treatment_records.py --output-json /tm
 
 ### Gate decision: **PASS**
 ### Next action: Write HANDOFF.md and await Codex independent acceptance
+
+---
+
+## Entry 4 — Rework Expansion (Codex P0 review response)
+
+> Final independent disposition is recorded in Entry 5 below.
+
+- **Time:** 2026-07-30 (second session)
+- **Baseline:** Post-Codex rework checkpoint `ed237193`
+- **Codex review:** `CODEX_INDEPENDENT_REVIEW_2026-07-30.md` — three P0 findings
+- **Scope:** Fault-injection matrices for atomic pair (A), craft promotion (B), deterministic migration (C), plus regression (D)
+
+### Files Changed
+
+- `moodify_runtime/atomic_pair_writer.py` — targeted fixes: promotion detection, partial-backup recovery, early-exception UnboundLocalError fix
+- `moodify_runtime/craft_proposals.py` — catch JSONDecodeError on malformed JSONL store
+- `moodify_runtime/tests/test_atomic_pair_writer.py` — +22 tests (46 total): 6 fault-injection boundaries, 3 recovery boundaries, 6 read_current_pair contracts, 3 first-ever-write, 3 Windows semantics
+- `moodify_runtime/tests/test_craft_proposals.py` — +15 tests (40 total): 3 tmp write/replace faults, 2 deterministic identity, 6 evidence validation, 3 pre-existing duplicate, 1 repeated identical
+- `moodify_runtime/tests/test_historical_compatibility.py` — +11 tests (59 total): 3 deterministic payload, 2 treatment_id preservation, 2 overwrite, 2 failed write, 1 subprocess determinism
+
+### Commands and Exit Codes
+
+**All three focused suites:**
+```
+python -m pytest moodify_runtime/tests/test_atomic_pair_writer.py moodify_runtime/tests/test_craft_proposals.py moodify_runtime/tests/test_historical_compatibility.py -q
+  Exit: 0  145 passed (46 + 40 + 59)
+```
+
+**Full Runtime regression:**
+```
+python -m pytest moodify_runtime/tests/ -q
+  Exit: 1  836 passed, 10 skipped, 4 failed (pre-existing: python3 subprocess on Windows)
+```
+
+### Targeted Corrections (atomic_pair_writer.py)
+
+| Issue | Fix |
+|---|---|
+| Partial promotion (JSON moved, MD failed) left mixed pair | Promotion detected by staging file presence; promoted targets restored from .prev |
+| Full promotion followed by marker-unlink failure wrongly restored old pair | Both promoted → skip restore, keep new generation |
+| Early exception (e.g. json.dumps TypeError) caused UnboundLocalError in except | `json_target`/`md_target`/`json_stage`/`md_stage` computed before try block |
+| Partial backup (JSON renamed to .prev, MD rename failed) not handled | `_restore_previous_pair` accepts promotion flags; skips un-promoted targets that still exist |
+
+### Targeted Corrections (craft_proposals.py)
+
+| Issue | Fix |
+|---|---|
+| Malformed JSONL lines crash `read_jsonl` → promotion blocked | Catch `JSONDecodeError`, treat as empty store, atomic replacement repairs |
+
+### Fault Injection Coverage
+
+**Atomic pair — 6 boundaries tested:**
+1. Before backup (both targets untouched → old pair preserved)
+2. After first backup (JSON renamed to .prev, MD untouched → restore checks both)
+3. After both backups (both .prev exist → both restored)
+4. After JSON promotion only (mixed pair → JSON restored from .prev, MD left old)
+5. After both promotions (new pair current → no restore needed)
+6. Before marker removal with full promotion → recovery completes
+
+**Craft promotion — 4 boundaries tested:**
+1. Before tmp write (IO fails → no state change → retry succeeds)
+2. After tmp write before replace (tmp exists, store unchanged → retry says no duplicate)
+3. After craft store replace before proposal write (store has record, proposal stale → retry reconciles source_proposal_id)
+4. After proposal tmp write (OSError on os.replace of proposal) → retry says already_promoted
+
+**Deterministic migration — verified:**
+1. Same source + same target → identical bytes and hash (3x runs)
+2. Different target dirs → identical payload content and hash
+3. MigrationResult timestamps differ → canonical payload identical
+4. Canonical payload contains no wall-clock timestamps
+5. Existing treatment_id preserved (not overwritten)
+6. Deterministic across subprocess (in-process vs subprocess hash match)
+
+### What This Does Not Prove
+- Filesystem-level atomicity across volumes (Windows `os.replace` is atomic only on same volume)
+- Real network/disk failures (all faults are software-injected via monkeypatch)
+- Concurrent promotion from multiple processes (not a Moodify use case)
+- Multi-version migration chains beyond 0.1.0→0.2.0
+- Sound quality or production operation
+
+### Pre-existing Failures (unchanged)
+4 tests in `test_tidal_core.py`/`test_tidal_cycle.py` fail because `python3` subprocess binary not found on Windows. These are pre-existing and unrelated to hardening work.
+
+### Gate decision: **PASS** — all three P0 issues from Codex review addressed
+### Next action: Update HANDOFF.md and await Codex independent re-acceptance
+
+---
+
+## Entry 5 — Codex Final Independent Acceptance
+
+- **Time:** 2026-07-30
+- **Reviewer:** Codex
+- **Focused evidence:** 145 tests, 0 failures, 0 errors, 0 skipped
+- **Runtime evidence:** 850 tests; 840 passed, 10 skipped, 0 failures, 0 errors
+- **Core evidence:** 447 tests, 0 failures, 0 errors, 0 skipped
+- **Root evidence:** 131 passed, 1 skipped, 0 failures
+- **Additional finding:** malformed Craft JSONL must fail closed; treating the store as empty would silently erase valid history
+- **Correction:** promotion preserves malformed store bytes and proposal state, and raises an actionable error
+- **Gate decision:** PASS / ACCEPT
+- **Capability status:** VERIFIED in the defined local test environment
+- **Excluded claims:** production-proven operation, sound quality, rights approval, professional listening approval, Mainline release, Annual Stable
+- **Inheritance asset:** `CODEX_FINAL_ACCEPTANCE_2026-07-30.md`
