@@ -10,7 +10,9 @@ Part of DSK-MFY-AUX-HARDENING-002 Batch A.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import uuid
 from pathlib import Path
 from typing import Any
@@ -135,6 +137,13 @@ def promote_proposal_to_craft(
             raise ValueError(
                 f"Promotion evidence field '{key}' must not be empty"
             )
+    if not isinstance(promotion_evidence["rights_evidence"], dict) or not promotion_evidence["rights_evidence"]:
+        raise ValueError("rights_evidence must be a non-empty object")
+    if not isinstance(promotion_evidence["regression_evidence"], (dict, list)) or not promotion_evidence["regression_evidence"]:
+        raise ValueError("regression_evidence must be a non-empty object or list")
+    for key in ("human_reviewer", "review_timestamp", "source_run_id"):
+        if not isinstance(promotion_evidence[key], str) or not promotion_evidence[key].strip():
+            raise ValueError(f"Promotion evidence field '{key}' must be a non-empty string")
 
     # ── 2. Load and validate proposal ──────────────────────────────
     proposal = get_proposal(craft_memory_dir, proposal_id)
@@ -165,7 +174,7 @@ def promote_proposal_to_craft(
         )
 
     # ── 4. Create approved Craft record ────────────────────────────
-    craft_id = f"CRFT_{uuid.uuid4().hex[:12].upper()}"
+    craft_id = "CRFT_" + hashlib.sha256(proposal_id.encode("utf-8")).hexdigest()[:12].upper()
     now = utc_now_iso()
 
     craft_record = {
@@ -185,8 +194,24 @@ def promote_proposal_to_craft(
 
     craft_path = craft_memory_dir / "craft_records.jsonl"
     craft_path.parent.mkdir(parents=True, exist_ok=True)
-    from .utils import append_jsonl
-    append_jsonl(craft_path, craft_record)
+    from .utils import read_jsonl
+    existing_rows = read_jsonl(craft_path)
+    existing = next(
+        (row for row in existing_rows if row.get("source_proposal_id") == proposal_id),
+        None,
+    )
+    if existing is None:
+        tmp_path = craft_path.with_name(f".{craft_path.name}.{proposal_id}.tmp")
+        tmp_path.write_text(
+            "".join(
+                json.dumps(row, ensure_ascii=False) + "\n"
+                for row in [*existing_rows, craft_record]
+            ),
+            encoding="utf-8",
+        )
+        os.replace(tmp_path, craft_path)
+    else:
+        craft_id = existing["craft_id"]
 
     # ── 5. Update proposal with promotion evidence ─────────────────
     proposal["status"] = "promoted"
@@ -200,10 +225,12 @@ def promote_proposal_to_craft(
         "promoted_at": now,
     }
     original_path = _proposals_dir(craft_memory_dir) / f"proposal_{proposal_id}.json"
-    original_path.write_text(
+    proposal_tmp = original_path.with_name(f".{original_path.name}.tmp")
+    proposal_tmp.write_text(
         json.dumps(proposal, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    os.replace(proposal_tmp, original_path)
 
     return {
         "status": "promoted",

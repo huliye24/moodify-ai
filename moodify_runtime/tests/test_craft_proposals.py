@@ -220,6 +220,37 @@ class TestRepeatedExecution:
         records = list_craft_records(FakeCfg())
         assert len(records) == 1
 
+    def test_retry_after_proposal_update_failure_does_not_duplicate_record(
+        self, craft_dir, sample_entry, valid_promotion_evidence, monkeypatch
+    ):
+        proposal = write_automated_proposal(
+            craft_dir, "data_loop", "run_001", [sample_entry]
+        )[0]
+        proposal_path = craft_dir / "proposals" / f"proposal_{proposal['proposal_id']}.json"
+
+        import moodify_runtime.craft_proposals as module
+        real_replace = module.os.replace
+        failed = {"once": False}
+
+        def fail_proposal_replace(source, target):
+            if Path(target) == proposal_path and not failed["once"]:
+                failed["once"] = True
+                raise OSError("injected after craft store replacement")
+            return real_replace(source, target)
+
+        monkeypatch.setattr(module.os, "replace", fail_proposal_replace)
+        with pytest.raises(OSError, match="after craft store"):
+            promote_proposal_to_craft(
+                craft_dir, proposal["proposal_id"], valid_promotion_evidence
+            )
+
+        result = promote_proposal_to_craft(
+            craft_dir, proposal["proposal_id"], valid_promotion_evidence
+        )
+        rows = (craft_dir / "craft_records.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(rows) == 1
+        assert result["craft_record_id"] == json.loads(rows[0])["craft_id"]
+
 
 # ── Promotion evidence completeness (fail-closed) ─────────────────────
 

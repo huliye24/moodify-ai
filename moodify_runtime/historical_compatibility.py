@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import shutil
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -285,7 +284,13 @@ def migrate_historical_record(
     # 4. Apply migration transforms
     data = dict(load.data)
     migration_path = f"{load.schema_version}->{target_version}"
-    data = _apply_migration(record_type, load.schema_version, target_version, data)
+    data = _apply_migration(
+        record_type,
+        load.schema_version,
+        target_version,
+        data,
+        source_hash=result.source_hash,
+    )
 
     # 5. Update schema version and add lineage
     data["schema_version"] = target_version
@@ -298,7 +303,6 @@ def migrate_historical_record(
         "source_path": str(source_path.resolve()),
         "migration_path": migration_path,
         "tool_identity": result.tool_identity,
-        "migrated_at": result.migrated_at,
     })
 
     # 6. Write migrated record to target directory
@@ -323,6 +327,7 @@ def _apply_migration(
     source_version: str,
     target_version: str,
     data: dict[str, Any],
+    source_hash: str = "",
 ) -> dict[str, Any]:
     """Apply version-specific migration transforms. Returns modified copy."""
     result = dict(data)
@@ -330,8 +335,10 @@ def _apply_migration(
     if record_type == "treatment" and source_version == "0.1.0" and target_version == "0.2.0":
         # v0.1.0 → v0.2.0: add treatment_id if not present
         if "treatment_id" not in result:
-            import uuid
-            result["treatment_id"] = f"TRT_{uuid.uuid4().hex[:12].upper()}"
+            identity = hashlib.sha256(
+                f"{source_hash}|{record_type}|{source_version}|{target_version}".encode("utf-8")
+            ).hexdigest()[:12].upper()
+            result["treatment_id"] = f"TRT_{identity}"
         # Add v0.2.0 fields with safe defaults
         result.setdefault("processing_chain_version", "v01")
         result.setdefault("mrs_open_v031_delta", None)

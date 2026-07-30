@@ -218,6 +218,34 @@ class TestFaultInjectionBeforePromotion:
 class TestRetryAfterFault:
     """Retry converges without duplicate or mixed artifacts."""
 
+    def test_failure_between_promotions_restores_complete_previous_pair(
+        self, out_dir, monkeypatch
+    ):
+        writer = AtomicPairWriter(out_dir)
+        writer.write(
+            {"generation": "old"}, "summary.json", "generation: old\n", "summary.md"
+        )
+
+        import moodify_runtime.atomic_pair_writer as module
+        real_move = module.shutil.move
+        calls = {"count": 0}
+
+        def fail_second_move(source, target):
+            calls["count"] += 1
+            if calls["count"] == 2:
+                raise OSError("injected between promotions")
+            return real_move(source, target)
+
+        monkeypatch.setattr(module.shutil, "move", fail_second_move)
+        with pytest.raises(OSError, match="between promotions"):
+            writer.write(
+                {"generation": "new"}, "summary.json", "generation: new\n", "summary.md"
+            )
+
+        data, markdown = writer.read_current_pair("summary.json", "summary.md")
+        assert data["generation"] == "old"
+        assert "generation: old" in markdown
+
     def test_retry_after_fault_produces_consistent_pair(self, out_dir, sample_json, sample_md):
         # Create orphan to trigger recovery
         orphan = out_dir / ".pair_tmp_fault"

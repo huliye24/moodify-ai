@@ -1,0 +1,65 @@
+You are the bounded verification worker for Moodify task DSK-MFY-AUX-HARDENING-002 after Codex core rework.
+
+Repository: E:\moodify
+Starting recovery checkpoint: ed237193
+Final architecture and acceptance owner: Codex
+
+Read completely before action:
+
+1. docs/tasks/deepseek/DSK-MFY-AUX-HARDENING-002/CODEX_INDEPENDENT_REVIEW_2026-07-30.md
+2. docs/tasks/deepseek/DSK-MFY-AUX-HARDENING-002/GIT_CHECKPOINT_PROTOCOL.md
+3. docs/standards/MOODIFY_FIVE_PASS_HARDENING_STANDARD.md
+4. the current implementations and tests for craft_proposals, atomic_pair_writer, and historical_compatibility
+
+Codex has already made the high-value contract decisions:
+
+- Atomic pair: interruption restores the complete previous pair; consistency-sensitive readers use read_current_pair(), which recovers before exposing either artifact.
+- Craft promotion: craft identity is deterministically derived from proposal identity; the authoritative JSONL store is replaced atomically and retry reconciles an existing source_proposal_id before adding anything.
+- Historical migration: canonical migrated payload is deterministic; wall-clock execution time belongs to MigrationResult, not embedded canonical lineage.
+
+Do not redesign these contracts. Your task is to spend tokens on adversarial verification and small test/hardening corrections only.
+
+Work packages:
+
+A. Atomic pair fault matrix
+- Inject failure before backup, after first backup, after both backups, after first promotion, after second promotion, before marker removal, and during recovery at corresponding boundaries.
+- Test first-ever write separately from replacement of an existing pair.
+- Assert read_current_pair() returns complete old or complete new data, or fails closed when no complete pair has ever existed.
+- Test malformed JSON, empty Markdown, stale restore files, multiple orphan directories, repeated recovery, and Windows same-volume semantics.
+- Verify source inputs remain unchanged and retry converges.
+
+B. Craft promotion fault and replay matrix
+- Inject failure before and after craft-store temp write, atomic replacement, proposal temp write, and proposal replacement.
+- Retry every case and assert exactly one record for source_proposal_id and the same deterministic craft_id.
+- Add malformed JSONL, pre-existing duplicate, mismatched proposal, malformed rights evidence, malformed regression evidence, empty reviewer, empty run ID, and repeated identical request cases.
+- Exercise direct function plus existing API/CLI surfaces if promotion is exposed there. Do not invent a new public surface.
+- Do not approve rights or listening quality; use synthetic evidence shapes only.
+
+C. Deterministic migration matrix
+- Run identical source migration repeatedly and assert identical canonical bytes and target hash.
+- Confirm MigrationResult may have different event timestamps without changing the payload.
+- Test existing treatment_id preservation, unknown fields, same-version copy, unsupported route, failed write, repeated overwrite of the same target, and source immutability.
+- Test deterministic identity across process restarts using subprocess when supported on Windows.
+
+D. Regression economy
+- Run focused suites while editing.
+- Then run affected Runtime tests and one full Runtime suite.
+- Record exact commands, exit codes, pass/fail/skip counts, warnings, and what they do not prove.
+- Do not run audio-quality claims or rights-pending material.
+
+Allowed edits:
+
+- moodify_runtime/atomic_pair_writer.py
+- moodify_runtime/craft_proposals.py
+- moodify_runtime/historical_compatibility.py
+- their three focused test files
+- this task's ENGINEERING_LOG.md and HANDOFF.md
+
+Any necessary edit outside this whitelist requires HOLD and a report to Codex. Do not commit, push, change branches, install dependencies, weaken tests, or modify unrelated files. Codex will create the next checkpoint after review.
+
+Required handoff:
+
+- Append evidence chronologically to ENGINEERING_LOG.md.
+- Add a clearly labelled "Rework Expansion" section to HANDOFF.md.
+- Report every unresolved counterexample; never convert a failure into a pass by narrowing the claim.
+- Final terminal response no more than 25 lines, then stop for Codex independent review.

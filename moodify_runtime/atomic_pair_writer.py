@@ -12,6 +12,7 @@ Part of DSK-MFY-AUX-HARDENING-002 Batch B.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import uuid
 from pathlib import Path
@@ -125,7 +126,9 @@ class AtomicPairWriter:
             tx_marker.unlink()
 
         except Exception:
-            # Clean up staging
+            # Promotion may already have replaced one target. Restore the
+            # complete previous pair before transaction evidence is removed.
+            self._restore_previous_pair(json_filename, md_filename)
             if tx_marker.exists():
                 tx_marker.unlink()
             if stage_dir.exists():
@@ -136,6 +139,35 @@ class AtomicPairWriter:
                 shutil.rmtree(str(stage_dir), ignore_errors=True)
 
         return result
+
+    def read_current_pair(
+        self, json_filename: str, md_filename: str
+    ) -> tuple[dict[str, Any], str]:
+        """Recover first, then expose both current artifacts or neither."""
+        self.recover(json_filename, md_filename)
+        json_path = self._output_dir / json_filename
+        md_path = self._output_dir / md_filename
+        if not json_path.is_file() or not md_path.is_file():
+            raise RuntimeError("No complete current artifact pair is available")
+        data = json.loads(json_path.read_text(encoding="utf-8"))
+        markdown = md_path.read_text(encoding="utf-8")
+        if not markdown:
+            raise RuntimeError("Current Markdown artifact is empty")
+        return data, markdown
+
+    def _restore_previous_pair(self, json_filename: str, md_filename: str) -> bool:
+        """Restore both previous artifacts as one recovery decision."""
+        pairs = (
+            (self._output_dir / json_filename, self._output_dir / f"{json_filename}.prev"),
+            (self._output_dir / md_filename, self._output_dir / f"{md_filename}.prev"),
+        )
+        if not all(previous.is_file() for _, previous in pairs):
+            return False
+        for target, previous in pairs:
+            restore_tmp = target.with_name(f".{target.name}.restore")
+            shutil.copy2(previous, restore_tmp)
+            os.replace(restore_tmp, target)
+        return True
 
     def recover(
         self,
@@ -187,18 +219,23 @@ class AtomicPairWriter:
                         "reason": "valid staged files found",
                     })
                 except Exception as e:
-                    # Staged files invalid — rollback (discard staging, keep current)
+                    # Validation or completion failed. A staged move may have
+                    # partially promoted, so restore the previous complete pair.
+                    restored = self._restore_previous_pair(json_filename, md_filename)
                     recovered.append({
                         "orphan": orphan_dir.name,
                         "action": "rolled_back",
                         "reason": f"staged files invalid: {e}",
+                        "previous_pair_restored": restored,
                     })
             else:
                 # No active tx marker or incomplete staging — rollback
+                restored = self._restore_previous_pair(json_filename, md_filename)
                 recovered.append({
                     "orphan": orphan_dir.name,
                     "action": "rolled_back",
                     "reason": "incomplete staging or missing tx marker",
+                    "previous_pair_restored": restored,
                 })
 
             # Clean up staging directory

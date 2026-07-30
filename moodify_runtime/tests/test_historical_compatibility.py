@@ -303,7 +303,10 @@ class TestMigration:
         assert lineage["source_version"] == "0.1.0"
         assert lineage["target_version"] == "0.2.0"
         assert lineage["source_hash"] == mr.source_hash
-        assert "migrated_at" in lineage
+        # Wall-clock execution time belongs to the migration event result, not
+        # the canonical migrated payload; otherwise deterministic retry fails.
+        assert "migrated_at" not in lineage
+        assert mr.migrated_at
         assert "tool_identity" in lineage
 
     def test_migration_lineage_embedded_in_record(self, tmp_path):
@@ -475,6 +478,17 @@ class TestEdgeCases:
 
         assert mr1.source_hash == mr2.source_hash, \
             "identical source data should produce identical source hashes"
+
+    def test_migrated_payload_is_deterministic_for_identical_input(self, tmp_path):
+        fixture = build_v01_treatment_fixture()
+        source = _write_fixture(tmp_path, "source.json", fixture)
+        first = migrate_historical_record(
+            source, "treatment", tmp_path / "m1", "0.2.0"
+        )
+        second = migrate_historical_record(
+            source, "treatment", tmp_path / "m2", "0.2.0"
+        )
+        assert first.target_hash == second.target_hash
 
     def test_all_fixture_types_load_successfully(self, tmp_path):
         """Exact load succeeds for all five required fixture types."""
