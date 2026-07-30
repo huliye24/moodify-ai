@@ -55,18 +55,20 @@ def seed_craft_memory(cfg: RuntimeConfig, run_id: Optional[str] = None, top_k: i
     best = scored[:top_k]
     worst = scored[-top_k:] if scored else []
 
-    cfg.craft_memory_dir.mkdir(parents=True, exist_ok=True)
-    path = cfg.craft_memory_dir / f"craft_memory_seed_{run_id}.md"
+    seed_dir = cfg.craft_memory_dir / "seed_proposals"
+    seed_dir.mkdir(parents=True, exist_ok=True)
+    path = seed_dir / f"craft_memory_seed_{run_id}.md"
 
     metric_label = "MRS Open v0.3.1" if mrs_open_used else "pseudo MRS v001"
 
     lines = [
-        f"# Moodify Craft Memory Seed — {run_id}",
+        f"# [PROPOSAL] Moodify Craft Memory Seed — {run_id}",
         "",
         f"生成时间：{utc_now_iso()}",
         f"排序指标：{metric_label}",
         "",
-        "> 这是 Daily Run 自动生成的工艺记忆种子文件。它不是最终结论，而是第二天人工复盘的起点。",
+        "> **状态：PROPOSAL** — 这是 Daily Run 自动生成的工艺记忆种子文件，存放在 `seed_proposals/` 提案命名空间。",
+        "> 它不是最终结论，也不是已批准的工艺知识。必须经过人工复盘和显式 promotion 后才能进入正式 Craft Library。",
         "",
         "## 1. 今日有效工艺候选",
         "",
@@ -155,7 +157,7 @@ def writeback_delivery_to_craft_record(
     """
     import uuid
 
-    from .operator_console import get_operator_job, get_operator_job_detail
+    from .operator_console import get_delivery_record, get_operator_job, get_operator_job_detail
 
     if adoption_status not in CRAFT_STATUSES:
         raise ValueError(f"adoption_status must be one of {sorted(CRAFT_STATUSES)}")
@@ -175,6 +177,16 @@ def writeback_delivery_to_craft_record(
 
     score = next((s for s in scores if s.get("candidate_id") == candidate_id), {})
     gate = next((g for g in gates if g.get("candidate_id") == candidate_id), {})
+    if gate.get("decision") != "approve":
+        raise ValueError("Craft writeback requires an approved technical gate decision")
+
+    delivery = get_delivery_record(cfg, job_id)
+    if not delivery or delivery.get("candidate_id") != candidate_id:
+        raise ValueError("Craft writeback requires a matching delivery record")
+    if not delivery.get("human_approved") or not delivery.get("approved_by"):
+        raise ValueError("Craft writeback requires recorded human listening approval")
+    if not delivery.get("rights_manifest") or not delivery.get("rights_asset_id"):
+        raise ValueError("Craft writeback requires recorded rights evidence")
 
     craft_id = f"CRFT_{uuid.uuid4().hex[:12].upper()}"
     now = utc_now_iso()
@@ -197,6 +209,14 @@ def writeback_delivery_to_craft_record(
         "gate_decision": gate.get("decision", "unknown"),
         "failure_cases": [r for r in gate.get("reasons", []) if r != "all_gates_passed"],
         "operator_notes": operator_notes,
+        "human_approval": {
+            "approved_by": delivery["approved_by"],
+            "delivery_id": delivery["delivery_id"],
+        },
+        "rights_evidence": {
+            "manifest": delivery["rights_manifest"],
+            "asset_id": delivery["rights_asset_id"],
+        },
         "adoption_status": adoption_status,
         "version_history": [{"status": adoption_status, "at": now, "note": "initial writeback"}],
         "output_path": candidate.get("output_path", ""),
@@ -214,14 +234,21 @@ def writeback_delivery_to_craft_record(
 
 
 def list_craft_records(
-    cfg: RuntimeConfig, adoption_status: Optional[str] = None
+    cfg: RuntimeConfig, adoption_status: Optional[str] = None, include_proposals: bool = False
 ) -> list[Dict[str, Any]]:
-    """List craft records, optionally filtered by adoption status."""
+    """List craft records, optionally filtered by adoption status.
+
+    Records with status ``proposal`` or ``pending`` are excluded by default.
+    These statuses belong to the proposal namespace and must not appear as
+    reusable approved Craft knowledge without explicit promotion.
+    """
     from .utils import read_jsonl
 
     cfg = cfg.resolved()
     path = cfg.craft_memory_dir / "craft_records.jsonl"
     rows = read_jsonl(path)
+    if not include_proposals:
+        rows = [r for r in rows if r.get("adoption_status") not in ("proposal", "pending")]
     if adoption_status:
         rows = [r for r in rows if r.get("adoption_status") == adoption_status]
     return sorted(rows, key=lambda r: r.get("created_at", ""), reverse=True)

@@ -19,6 +19,33 @@ SUMMARY_TYPE = "moodify_treatment_record_summary"
 
 PRESET_NAMES = ["warm_vocal", "clean_master", "wide_space"]
 
+REQUIRED_RECORD_FIELDS = ["song_id", "preset", "delta_features", "loudness_match"]
+
+
+def scan_absent_records(input_dir: str) -> list[str]:
+    """List treatment-like .bak artifacts excluded from active aggregation.
+
+    A .bak suffix proves exclusion from the active source set; it does not
+    prove why the file was excluded or that the exclusion was intentional.
+    """
+    root = Path(input_dir)
+    if not root.is_dir():
+        return []
+    baks = sorted(f.name for f in root.iterdir() if f.suffix == ".bak")
+    # Exclude backup files of non-treatment artifacts (e.g., summary.json.bak)
+    return [b for b in baks if not b.startswith("summary")]
+
+
+def validate_record(rec: dict, filename: str) -> list[str]:
+    """Check a treatment record for required fields. Returns list of warnings."""
+    warnings = []
+    for field in REQUIRED_RECORD_FIELDS:
+        if field not in rec or rec[field] is None:
+            warnings.append(f"{filename}: missing required field '{field}'")
+    if rec.get("preset") not in PRESET_NAMES:
+        warnings.append(f"{filename}: unknown preset '{rec.get('preset')}'")
+    return warnings
+
 
 def load_records(input_dir: str) -> tuple[list[dict], list[dict]]:
     """Scan input_dir for JSON treatment records. Returns (records, errors)."""
@@ -39,6 +66,13 @@ def load_records(input_dir: str) -> tuple[list[dict], list[dict]]:
             with open(fp, "r", encoding="utf-8") as f:
                 data = json.load(f)
             if data.get("record_type") != "moodify_treatment_record":
+                continue
+            validation_errors = validate_record(data, fp.name)
+            if validation_errors:
+                errors.extend(
+                    {"file": fp.name, "error": error}
+                    for error in validation_errors
+                )
                 continue
             data["_record_file"] = fp.name
             records.append(data)
@@ -169,7 +203,8 @@ def compute_preset_stats(flat_records: list[dict]) -> dict:
     return result
 
 
-def build_summary(flat_records: list[dict], errors: list[dict]) -> dict:
+def build_summary(flat_records: list[dict], errors: list[dict],
+                  known_absent: list[str] | None = None) -> dict:
     preset_stats = compute_preset_stats(flat_records)
 
     summary_records = []
@@ -233,6 +268,7 @@ def build_summary(flat_records: list[dict], errors: list[dict]) -> dict:
         "feedback_overview": feedback_overview,
         "presets": preset_stats,
         "records": summary_records,
+        "known_absent": known_absent or [],
         "errors": errors,
     }
 
@@ -255,7 +291,8 @@ def _pct(val) -> str:
     return f"{val * 100:.0f}%"
 
 
-def write_summary_md(summary: dict, out_path: str):
+def _build_summary_md_lines(summary: dict) -> list[str]:
+    """Build summary Markdown lines. Formerly write_summary_md."""
     presets_data = summary.get("presets", {})
     records_list = summary.get("records", [])
     fb_overview = summary.get("feedback_overview", {})
@@ -414,6 +451,23 @@ def write_summary_md(summary: dict, out_path: str):
             f"{fd['better_yes']} | {fd['better_no']} | {fd['better_uncertain']} |"
         )
 
+    # Known Absent Records
+    absent = summary.get("known_absent", [])
+    lines += [
+        "",
+        "## Known Absent Records",
+        "",
+    ]
+    if absent:
+        lines.append("The following `.bak` artifacts are excluded from active aggregation. "
+                     "The suffix does not establish why they were excluded, and "
+                     "they contribute no measurements to this summary:")
+        lines.append("")
+        for a in absent:
+            lines.append(f"- `{a}`")
+    else:
+        lines.append("None.")
+
     lines += [
         "",
         "## Notes",
@@ -422,6 +476,12 @@ def write_summary_md(summary: dict, out_path: str):
         "Not a database, not a cloud data layer, not a trained model.",
     ]
 
+    return lines
+
+
+def write_summary_md(summary: dict, out_path: str):
+    """Write summary Markdown to file (compatibility wrapper)."""
+    lines = _build_summary_md_lines(summary)
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
@@ -444,25 +504,40 @@ def main():
     print(f"  Output: {args.output_json}, {args.output_md}\n")
 
     records, errors = load_records(args.input_dir)
+    known_absent = scan_absent_records(args.input_dir)
     print(f"  Records loaded: {len(records)}")
+    print(f"  Known absent (.bak): {len(known_absent)}")
+    if known_absent:
+        for a in known_absent:
+            print(f"    {a}")
 
     if errors:
         for e in errors:
             print(f"  ERROR: {e}")
 
     flat = [extract_flat_record(r) for r in records]
-    summary = build_summary(flat, errors)
+    summary = build_summary(flat, errors, known_absent)
 
-    # Write JSON
+    # Build markdown content
+    md_lines: list[str] = _build_summary_md_lines(summary)
+    md_content = "\n".join(md_lines) + "\n"
+
+    # Atomic pair write — both artifacts land together or not at all
+    from moodify_runtime.atomic_pair_writer import AtomicPairWriter
+
     json_path = Path(args.output_json)
-    json_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, ensure_ascii=False, indent=2)
+    md_path = Path(args.output_md)
+    writer = AtomicPairWriter(json_path.parent)
+    result = writer.write(
+        json_data=summary,
+        json_filename=json_path.name,
+        md_content=md_content,
+        md_filename=md_path.name,
+    )
+    if result.get("recovery"):
+        print(f"  Recovery: {result['recovery']}")
     print(f"  summary.json ({summary['record_count']} records, "
           f"{len(summary['presets'])} presets)")
-
-    # Write MD
-    write_summary_md(summary, args.output_md)
     print(f"  summary.md")
 
     return 0

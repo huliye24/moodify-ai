@@ -178,48 +178,46 @@ def write_craft_learning_feed(
     bundle: dict[str, Any],
     craft_memory_dir: Path,
 ) -> int:
-    """Write data loop craft recommendations into the craft library learning feed.
+    """Write data loop craft recommendations as isolated proposals.
 
-    Each recommendation becomes a craft memory entry with:
-      - adoption_status: "candidate" (pending operator review)
-      - source: "data_loop" (traceable to which night run)
-      - severity: from the recommendation
+    Each recommendation becomes a proposal in the ``proposals/`` subdirectory
+    under ``craft_memory_dir`` with status ``proposal``. Automated output is
+    never placed in the approved Craft Library namespace without an explicit
+    evidence-bearing promotion.
 
     Returns the number of entries written.
     """
+    from moodify_runtime.craft_proposals import write_automated_proposal
+
     recs = bundle.get("recommendations", [])
     craft_recs = [r for r in recs if r.get("loop") == "craft_preset_selection"]
     if not craft_recs:
         return 0
 
-    craft_memory_dir = Path(craft_memory_dir)
-    craft_memory_dir.mkdir(parents=True, exist_ok=True)
-
     run_id = bundle.get("run_id", "unknown")
-    ts = utc_now_iso()
     entries: list[dict[str, Any]] = []
 
     for rec in craft_recs:
-        # Parse preset from task_id: "TASK_SMP_HASH_preset:craft" → "preset"
         task_id = rec.get("task_id", "")
         preset = task_id.split(":")[0].rsplit("_", 1)[-1] if ":" in task_id else task_id
 
         entry = {
-            "craft_record_id": f"dl_{run_id}_{preset}",
             "preset": preset,
             "source": "data_loop",
             "source_run": run_id,
-            "adoption_status": "candidate",
             "severity": rec.get("severity", "medium"),
             "action": rec.get("next_action", ""),
             "reason": rec.get("reason", ""),
             "needs_human_review": rec.get("needs_human_review", False),
-            "created_at": ts,
         }
         entries.append(entry)
 
-    path = craft_memory_dir / f"data_loop_craft_feed_{run_id}.json"
-    path.write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_automated_proposal(
+        craft_memory_dir=Path(craft_memory_dir),
+        source="data_loop_feed",
+        source_run_id=run_id,
+        entries=entries,
+    )
 
     return len(entries)
 

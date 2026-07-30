@@ -53,11 +53,30 @@ def clean_run_data(tmp_path):
 
 
 @pytest.fixture
-def real_live_data():
-    """Use the real 20260605_000141 data for comprehensive integration."""
+def real_live_data(tmp_path):
+    """Build reproducible adverse-run data without relying on ignored artifacts."""
+    summary = {
+        "run_id": "adverse_run_001", "started_at": "2026-06-05T00:01:41Z",
+        "success": 3, "failed": 1, "total_selected": 4, "dry_run": False,
+        "fatal_error": "worker heartbeat lost",
+        "tasks": [
+            {"task_id": "T1", "sample_id": "S1", "preset": "warm_vocal", "status": "done",
+             "pseudo_delta_mrs": -20.0, "delta_mrs_open_v031": 84.0, "mrs_open_flags": ""},
+            {"task_id": "T2", "sample_id": "S2", "preset": "clean_master", "status": "done",
+             "pseudo_delta_mrs": 2.0, "delta_mrs_open_v031": -1.0, "mrs_open_flags": "over_dark"},
+            {"task_id": "T3", "sample_id": "S3", "preset": "wide_space", "status": "done",
+             "pseudo_delta_mrs": -18.0, "delta_mrs_open_v031": 82.0, "mrs_open_flags": "over_dark"},
+            {"task_id": "T4", "sample_id": "S4", "preset": "warm_vocal", "status": "failed",
+             "pseudo_delta_mrs": None, "delta_mrs_open_v031": None, "mrs_open_flags": ""},
+        ],
+    }
+    summary_path = tmp_path / "adverse_summary.json"
+    summary_path.write_text(json.dumps(summary), encoding="utf-8")
+    queue_path = tmp_path / "tidal_queue.jsonl"
+    queue_path.write_text("", encoding="utf-8")
     record = collect_night_metrics(
-        summary_path=Path("outputs/20260605_000141/summary.json"),
-        queue_path=Path("data/tidal_queue.jsonl"),
+        summary_path=summary_path,
+        queue_path=queue_path,
     )
     engine = RecommendationEngine()
     bundle = engine.run(record)
@@ -130,23 +149,26 @@ class TestCraftLearningFeed:
         n = write_craft_learning_feed(bundle, craft_dir)
 
         assert n == 2  # 2 over_dark flagged tasks
-        files = list(craft_dir.glob("data_loop_craft_feed_*.json"))
-        assert len(files) == 1
+        proposals_dir = craft_dir / "proposals"
+        files = list(proposals_dir.glob("proposal_*.json"))
+        assert len(files) == 2  # one per entry
 
     def test_feed_entry_has_required_fields(self, real_live_data, tmp_path):
         _, bundle = real_live_data
         craft_dir = tmp_path / "craft_memory"
         write_craft_learning_feed(bundle, craft_dir)
 
-        files = list(craft_dir.glob("*.json"))
-        entries = json.loads(files[0].read_text(encoding="utf-8"))
-        for entry in entries:
-            assert "craft_record_id" in entry
-            assert "preset" in entry
-            assert "source" in entry
-            assert entry["source"] == "data_loop"
-            assert "adoption_status" in entry
-            assert entry["adoption_status"] == "candidate"
+        proposals_dir = craft_dir / "proposals"
+        files = list(proposals_dir.glob("proposal_*.json"))
+        for fpath in files:
+            proposal = json.loads(fpath.read_text(encoding="utf-8"))
+            assert "proposal_id" in proposal
+            assert proposal["proposal_id"].startswith("PROP_")
+            assert proposal["status"] == "proposal"
+            assert proposal["source"] == "data_loop_feed"
+            assert "source_run_id" in proposal
+            assert "craft_data" in proposal
+            assert proposal["promotion_evidence"] is None
 
     def test_no_craft_recs_returns_zero(self, tmp_path):
         bundle = {"run_id": "test", "recommendations": []}

@@ -172,17 +172,20 @@ class DataLoopRunner:
     # ------------------------------------------------------------------
 
     def _writeback_craft(self, bundle: RecommendationBundle) -> int:
-        """Write craft/preset recommendations back to craft memory."""
+        """Write craft/preset recommendations as isolated proposals.
+
+        Automated output is stored in the proposal namespace, never directly in
+        the approved Craft Library. Promotion requires explicit evidence.
+        """
         if not self._craft_memory_dir:
             return 0
         craft_recs = bundle.by_loop("craft_preset_selection")
         if not craft_recs:
             return 0
 
-        craft_dir = self._craft_memory_dir
-        craft_dir.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        from moodify_runtime.craft_proposals import write_automated_proposal
 
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         entries: list[dict[str, Any]] = []
         for r in craft_recs:
             entries.append({
@@ -194,8 +197,12 @@ class DataLoopRunner:
                 "preset": r.task_id.split(":")[0] if ":" in r.task_id else r.task_id,
             })
 
-        path = craft_dir / f"data_loop_craft_writeback_{ts}.json"
-        path.write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        write_automated_proposal(
+            craft_memory_dir=self._craft_memory_dir,
+            source="data_loop_writeback",
+            source_run_id=self._infer_run_id(),
+            entries=entries,
+        )
         return len(entries)
 
     def _writeback_calibration(self, bundle: RecommendationBundle) -> int:
