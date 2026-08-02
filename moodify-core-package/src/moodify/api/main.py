@@ -31,6 +31,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from moodify.v01_pipeline import process_audio
 from moodify.v01_presets import PRESETS, list_presets
 from moodify.api.routes.workspace_projects import router as workspace_projects_router
+from moodify.api.routes.v1 import router as mobile_v1_router
 from moodify_runtime.config import load_config
 from moodify_runtime.operator_console import (
     attach_run_report_to_job,
@@ -79,6 +80,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(workspace_projects_router)
+app.include_router(mobile_v1_router)
 
 
 # Legacy emotion compatibility.
