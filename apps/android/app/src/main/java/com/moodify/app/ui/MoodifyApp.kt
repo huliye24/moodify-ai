@@ -146,22 +146,21 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
         gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !creatorCenterOpen && !notificationOpen && !copyrightCenterOpen && !dataCenterOpen && !collaborationOpen && !uploadOpen && !worksOpen && !settingsOpen && !helpOpen && !aboutOpen && !cwcIntroOpen && !cwcGiftOpen && !cwcCenterOpen && cwcAuthRequest == null,
         drawerContent = {
             val drawerHighlight = when {
-                worksOpen -> 1
-                selected == 1 -> 2
-                else -> selected
+                worksOpen -> 0
+                selected == 1 -> 1
+                else -> -1
             }
             MoodifyDrawerContent(drawerHighlight) { index ->
                 when (index) {
-                    0 -> { closeOverlays(); selected = 0 }
-                    1 -> { closeOverlays(); worksOpen = true }
-                    2 -> { closeOverlays(); selected = 1 }
-                    4 -> { closeOverlays(); creatorCenterOpen = true; selected = 2 }
-                    5 -> { closeOverlays(); dataCenterOpen = true; selected = 2 }
-                    6 -> { closeOverlays(); copyrightCenterOpen = true; selected = 2 }
-                    7 -> { closeOverlays(); collaborationOpen = true; selected = 2 }
-                    8 -> { closeOverlays(); settingsOpen = true; selected = 2 }
-                    9 -> { closeOverlays(); helpOpen = true; selected = 2 }
-                    10 -> { closeOverlays(); aboutOpen = true; selected = 2 }
+                    0 -> { closeOverlays(); worksOpen = true }
+                    1 -> { closeOverlays(); selected = 1 }
+                    2 -> { closeOverlays(); creatorCenterOpen = true; selected = 2 }
+                    3 -> { closeOverlays(); dataCenterOpen = true; selected = 2 }
+                    4 -> { closeOverlays(); copyrightCenterOpen = true; selected = 2 }
+                    5 -> { closeOverlays(); collaborationOpen = true; selected = 2 }
+                    6 -> { closeOverlays(); settingsOpen = true; selected = 2 }
+                    7 -> { closeOverlays(); helpOpen = true; selected = 2 }
+                    8 -> { closeOverlays(); aboutOpen = true; selected = 2 }
                 }
                 scope.launch { drawerState.close() }
             }

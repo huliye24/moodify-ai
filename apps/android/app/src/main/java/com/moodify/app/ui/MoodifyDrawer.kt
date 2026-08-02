@@ -28,14 +28,14 @@ fun MoodifyDrawerContent(selected: Int, onDestination: (Int) -> Unit) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             Spacer(Modifier.height(26.dp)); ProfileCard(); Spacer(Modifier.height(22.dp))
             listOf(
-                DrawerItem(Icons.Outlined.MusicNote, "发现音乐", 0), DrawerItem(Icons.Outlined.VideoLibrary, "我的作品", 1), DrawerItem(Icons.Outlined.FactCheck, "处理任务", 2, "1"), DrawerItem(Icons.Outlined.CloudQueue, "云端空间")
+                DrawerItem(Icons.Outlined.VideoLibrary, "我的作品", 0), DrawerItem(Icons.Outlined.FactCheck, "处理任务", 1, "1"), DrawerItem(Icons.Outlined.CloudQueue, "云端空间")
             ).forEach { DrawerRow(it, selected, onDestination) }
             HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MoodifyOutline)
             listOf(
-                DrawerItem(Icons.Outlined.PersonOutline, "创作者中心", 4, "•"), DrawerItem(Icons.Outlined.BarChart, "数据中心", 5), DrawerItem(Icons.Outlined.VerifiedUser, "版权与发布", 6, "•"), DrawerItem(Icons.Outlined.Handshake, "合作计划", 7)
+                DrawerItem(Icons.Outlined.PersonOutline, "创作者中心", 2, "•"), DrawerItem(Icons.Outlined.BarChart, "数据中心", 3), DrawerItem(Icons.Outlined.VerifiedUser, "版权与发布", 4, "•"), DrawerItem(Icons.Outlined.Handshake, "合作计划", 5)
             ).forEach { DrawerRow(it, selected, onDestination) }
             HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MoodifyOutline)
-            listOf(DrawerItem(Icons.Outlined.Settings, "设置", 8), DrawerItem(Icons.Outlined.HeadsetMic, "帮助与反馈", 9), DrawerItem(Icons.Outlined.Info, "关于 Moodify", 10)).forEach { DrawerRow(it, selected, onDestination) }
+            listOf(DrawerItem(Icons.Outlined.Settings, "设置", 6), DrawerItem(Icons.Outlined.HeadsetMic, "帮助与反馈", 7), DrawerItem(Icons.Outlined.Info, "关于 Moodify", 8)).forEach { DrawerRow(it, selected, onDestination) }
             Spacer(Modifier.height(16.dp)); StorageCard(); Spacer(Modifier.height(24.dp))
         }
     }
