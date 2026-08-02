@@ -511,6 +511,139 @@ def cmd_case_compare(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def cmd_case_observations_add(args: argparse.Namespace) -> dict[str, Any]:
+    import json as _json
+
+    from moodify.learning.models import AuditoryObservation
+    from moodify.learning.store import CaseLearningStore
+
+    root, _ = _read_project(args.project_dir)
+    store = CaseLearningStore(root / "cases" / args.case_id)
+    obs = AuditoryObservation.from_dict(_json.loads(Path(args.file).read_text(encoding="utf-8")))
+    obs.case_id = args.case_id
+    path = store.save_observation(obs)
+    return _result("case.observations.add", "ok", result_status="AUDITORY_OBSERVATION_RECORDED",
+                   case_id=args.case_id, observation_id=obs.observation_id, path=str(path))
+
+
+def cmd_case_intervention_register(args: argparse.Namespace) -> dict[str, Any]:
+    import json as _json
+
+    from moodify.learning.models import InterventionRecord
+    from moodify.learning.store import CaseLearningStore
+
+    root, _ = _read_project(args.project_dir)
+    store = CaseLearningStore(root / "cases" / args.case_id)
+    rec = InterventionRecord.from_dict(_json.loads(Path(args.file).read_text(encoding="utf-8")))
+    rec.case_id = args.case_id
+    rec.candidate_id = args.candidate_id
+    path = store.save_intervention(rec)
+    return _result("case.intervention.register", "ok", result_status="INTERVENTION_RECORDED",
+                   case_id=args.case_id, intervention_id=rec.intervention_id, path=str(path))
+
+
+def cmd_case_listening_evaluate(args: argparse.Namespace) -> dict[str, Any]:
+    import json as _json
+
+    from moodify.learning.models import HumanListeningEvaluation
+    from moodify.learning.store import CaseLearningStore
+
+    root, _ = _read_project(args.project_dir)
+    store = CaseLearningStore(root / "cases" / args.case_id)
+    ev = HumanListeningEvaluation.from_dict(_json.loads(Path(args.file).read_text(encoding="utf-8")))
+    ev.case_id = args.case_id
+    path = store.save_evaluation(ev)
+    return _result("case.listening.evaluate", "ok", result_status="HUMAN_LISTENING_EVALUATION_RECORDED",
+                   case_id=args.case_id, evaluation_id=ev.evaluation_id,
+                   approval_status=ev.approval_status, path=str(path))
+
+
+def cmd_case_learning_build(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.learning.service import build_learning_record
+    from moodify.learning.store import CaseLearningStore
+
+    root, _ = _read_project(args.project_dir)
+    store = CaseLearningStore(root / "cases" / args.case_id)
+    record = build_learning_record(store, args.case_id)
+    return _result("case.learning.build", "ok", result_status="LEARNING_RECORD_BUILT",
+                   case_id=args.case_id, learning_record_id=record.learning_record_id,
+                   learning_status=record.learning_status,
+                   eligibility=record.training_eligibility)
+
+
+def cmd_case_learning_review(args: argparse.Namespace) -> dict[str, Any]:
+    import json as _json
+
+    from moodify.learning.models import RightsMetadata
+    from moodify.learning.service import review_learning_record
+    from moodify.learning.store import CaseLearningStore
+
+    root, _ = _read_project(args.project_dir)
+    store = CaseLearningStore(root / "cases" / args.case_id)
+    rights = RightsMetadata.from_dict(_json.loads(Path(args.rights).read_text(encoding="utf-8")))
+    record = review_learning_record(store, args.case_id, rights, eligibility=args.eligibility)
+    return _result("case.learning.review", "ok", result_status="LEARNING_RECORD_REVIEWED",
+                   case_id=args.case_id, eligibility=record.training_eligibility,
+                   review_status=record.review_status)
+
+
+def cmd_case_learning_commit(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.learning.service import commit_learning_record
+    from moodify.learning.store import CaseLearningStore
+
+    root, _ = _read_project(args.project_dir)
+    store = CaseLearningStore(root / "cases" / args.case_id)
+    record = commit_learning_record(store, args.case_id, args.by)
+    status = ("LEARNING_RECORD_COMMITTED" if record.learning_status == "COMMITTED"
+              else "LEARNING_RECORD_EXCLUDED")
+    return _result("case.learning.commit", "ok", result_status=status,
+                   case_id=args.case_id, learning_status=record.learning_status,
+                   eligibility=record.training_eligibility,
+                   exclusion_reasons=record.exclusion_reasons)
+
+
+def cmd_learning_dataset_export(args: argparse.Namespace) -> dict[str, Any]:
+    import json as _json
+
+    from moodify.learning.exports import export_learning_records, validate_export_bundle
+    from moodify.learning.store import CaseLearningStore
+
+    root, _ = _read_project(args.project_dir)
+    records = []
+    cases_dir = root / "cases"
+    if cases_dir.is_dir():
+        for case_dir in sorted(cases_dir.iterdir()):
+            if not case_dir.is_dir():
+                continue
+            store = CaseLearningStore(case_dir)
+            rec = store.load_learning_record()
+            if rec is not None:
+                records.append(rec)
+    manifest = export_learning_records(records, Path(args.output), args.dataset_id)
+    problems = validate_export_bundle(Path(args.output), args.dataset_id)
+    if problems:
+        raise CLIError("EXPORT_VERIFICATION_FAILED", "; ".join(problems))
+    return _result("learning.dataset.export", "ok", result_status="DATASET_EXPORT_COMPLETED",
+                   dataset_id=args.dataset_id, included=manifest["included_count"],
+                   excluded=manifest["excluded_count"],
+                   manifest_path=str(Path(args.output) / f"{args.dataset_id}_manifest.json"))
+
+
+def cmd_architecture_inventory(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.auditory.inventory import build_inventory
+    from moodify.auditory.inventory import render_markdown as _render_md
+    from pathlib import Path as _P
+
+    package_dir = _P(__file__).resolve().parent.parent
+    inv = build_inventory(package_dir)
+    if args.format == "json":
+        return _result("architecture.inventory", "ok", result_status="INVENTORY_COMPLETED",
+                       counts=inv["counts"], capabilities=inv["capabilities"])
+    print(_render_md(inv))
+    return _result("architecture.inventory", "ok", result_status="INVENTORY_COMPLETED",
+                   counts=inv["counts"])
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="moodify", description="Moodify AI-native CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -554,6 +687,44 @@ def build_parser() -> argparse.ArgumentParser:
     ccomp.add_argument("project_dir"); ccomp.add_argument("case_id")
     ccomp.add_argument("--candidate-id", required=True)
     ccomp.add_argument("--plan", default=None, help="processing_plan.json 路径")
+
+    # learning-domain commands (AIR-001)
+    cobs = case.add_parser("observations").add_subparsers(dest="observations_command", required=True)
+    p_obs_add = cobs.add_parser("add")
+    p_obs_add.add_argument("project_dir"); p_obs_add.add_argument("case_id")
+    p_obs_add.add_argument("--file", required=True, help="observation.json 路径")
+    cinterv = case.add_parser("intervention").add_subparsers(dest="intervention_command", required=True)
+    p_int_reg = cinterv.add_parser("register")
+    p_int_reg.add_argument("project_dir"); p_int_reg.add_argument("case_id")
+    p_int_reg.add_argument("--candidate-id", required=True)
+    p_int_reg.add_argument("--file", required=True, help="intervention_record.json 路径")
+    clist = case.add_parser("listening").add_subparsers(dest="listening_command", required=True)
+    p_ev = clist.add_parser("evaluate")
+    p_ev.add_argument("project_dir"); p_ev.add_argument("case_id")
+    p_ev.add_argument("--file", required=True, help="human_listening_evaluation.json 路径")
+    clearn = case.add_parser("learning").add_subparsers(dest="learning_command", required=True)
+    p_build = clearn.add_parser("build")
+    p_build.add_argument("project_dir"); p_build.add_argument("case_id")
+    p_review = clearn.add_parser("review")
+    p_review.add_argument("project_dir"); p_review.add_argument("case_id")
+    p_review.add_argument("--rights", required=True, help="rights_review.json 路径")
+    p_review.add_argument("--eligibility", default=None,
+                          choices=["ELIGIBLE", "INELIGIBLE", "PENDING_REVIEW",
+                                   "RESTRICTED_INTERNAL_RESEARCH", "UNKNOWN"])
+    p_commit = clearn.add_parser("commit")
+    p_commit.add_argument("project_dir"); p_commit.add_argument("case_id")
+    p_commit.add_argument("--by", required=True, help="committer id")
+
+    # learning dataset export + architecture inventory (top-level)
+    p_learning = sub.add_parser("learning").add_subparsers(dest="learning_command", required=True)
+    p_ds = p_learning.add_parser("dataset").add_subparsers(dest="dataset_command", required=True)
+    p_exp = p_ds.add_parser("export")
+    p_exp.add_argument("--dataset-id", required=True)
+    p_exp.add_argument("--project-dir", required=True)
+    p_exp.add_argument("--output", required=True)
+    p_inv = sub.add_parser("architecture").add_subparsers(dest="architecture_command", required=True)
+    p_inv_list = p_inv.add_parser("inventory")
+    p_inv_list.add_argument("--format", default="md", choices=["md", "json"])
     return parser
 
 
@@ -568,8 +739,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     key = args.command
     if key in {"project", "asset", "plan", "run", "case"}:
         key = f"{key}.{getattr(args, key + '_command')}"
-    if key == "case.candidate":
-        key = f"{key}.{getattr(args, 'candidate_command')}"
+    if key in {"case.candidate", "case.observations", "case.intervention", "case.listening", "case.learning"}:
+        sub_cmd = key.split(".")[-1] + "_command"
+        key = f"{key}.{getattr(args, sub_cmd)}"
+    if key == "learning.dataset":
+        key = f"{key}.{getattr(args, 'dataset_command')}"
+    if key == "architecture":
+        key = f"{key}.{getattr(args, 'architecture_command')}"
     handlers = {
         "version": cmd_version, "capabilities": cmd_capabilities,
         "project.init": cmd_project_init, "project.inspect": cmd_project_inspect,
@@ -582,6 +758,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         "case.scan": cmd_case_scan,
         "case.candidate.register": cmd_case_candidate_register,
         "case.compare": cmd_case_compare,
+        "case.observations.add": cmd_case_observations_add,
+        "case.intervention.register": cmd_case_intervention_register,
+        "case.listening.evaluate": cmd_case_listening_evaluate,
+        "case.learning.build": cmd_case_learning_build,
+        "case.learning.review": cmd_case_learning_review,
+        "case.learning.commit": cmd_case_learning_commit,
+        "learning.dataset.export": cmd_learning_dataset_export,
+        "architecture.inventory": cmd_architecture_inventory,
     }
     try:
         payload = handlers[key](args)

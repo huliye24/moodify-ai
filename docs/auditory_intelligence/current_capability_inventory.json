@@ -1,0 +1,366 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-02T14:06:27.515581+00:00",
+  "counts": {
+    "INTERVENTION": 16,
+    "SHARED_INFRASTRUCTURE": 15,
+    "REPRESENTATION": 2,
+    "JUDGMENT": 7,
+    "OBSERVATION": 3,
+    "LEGACY_UNKNOWN": 5,
+    "LEARNING": 1,
+    "VERIFICATION": 1
+  },
+  "capabilities": [
+    {
+      "name": "adapters",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/adapters"
+    },
+    {
+      "name": "api",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/api"
+    },
+    {
+      "name": "app",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/app"
+    },
+    {
+      "name": "audio_io",
+      "kind": "module",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/audio_io"
+    },
+    {
+      "name": "auditory",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/auditory"
+    },
+    {
+      "name": "bands",
+      "kind": "module",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/bands"
+    },
+    {
+      "name": "calibration",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/calibration"
+    },
+    {
+      "name": "capability_registry",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/capability_registry"
+    },
+    {
+      "name": "cli",
+      "kind": "module",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/cli"
+    },
+    {
+      "name": "cli_daw",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/cli_daw"
+    },
+    {
+      "name": "cli_v2",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/cli_v2"
+    },
+    {
+      "name": "config",
+      "kind": "module",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/config"
+    },
+    {
+      "name": "conservation",
+      "kind": "module",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/conservation"
+    },
+    {
+      "name": "craft_slider",
+      "kind": "module",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/craft_slider"
+    },
+    {
+      "name": "data_types",
+      "kind": "module",
+      "category": "REPRESENTATION",
+      "confidence": "medium",
+      "path": "moodify/data_types"
+    },
+    {
+      "name": "diagnosis",
+      "kind": "package",
+      "category": "JUDGMENT",
+      "confidence": "high",
+      "path": "moodify/diagnosis"
+    },
+    {
+      "name": "domain",
+      "kind": "package",
+      "category": "REPRESENTATION",
+      "confidence": "medium",
+      "path": "moodify/domain"
+    },
+    {
+      "name": "evaluation",
+      "kind": "package",
+      "category": "JUDGMENT",
+      "confidence": "medium",
+      "path": "moodify/evaluation"
+    },
+    {
+      "name": "features",
+      "kind": "package",
+      "category": "OBSERVATION",
+      "confidence": "high",
+      "path": "moodify/features"
+    },
+    {
+      "name": "fingerprint",
+      "kind": "module",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "medium",
+      "path": "moodify/fingerprint"
+    },
+    {
+      "name": "icc",
+      "kind": "module",
+      "category": "LEGACY_UNKNOWN",
+      "confidence": "low",
+      "path": "moodify/icc"
+    },
+    {
+      "name": "knowledge",
+      "kind": "package",
+      "category": "LEGACY_UNKNOWN",
+      "confidence": "low",
+      "path": "moodify/knowledge"
+    },
+    {
+      "name": "learning",
+      "kind": "package",
+      "category": "LEARNING",
+      "confidence": "high",
+      "path": "moodify/learning"
+    },
+    {
+      "name": "llm",
+      "kind": "package",
+      "category": "LEGACY_UNKNOWN",
+      "confidence": "low",
+      "path": "moodify/llm"
+    },
+    {
+      "name": "memory",
+      "kind": "package",
+      "category": "LEGACY_UNKNOWN",
+      "confidence": "low",
+      "path": "moodify/memory"
+    },
+    {
+      "name": "mrs_adapter",
+      "kind": "module",
+      "category": "JUDGMENT",
+      "confidence": "medium",
+      "path": "moodify/mrs_adapter"
+    },
+    {
+      "name": "mrs_robust",
+      "kind": "module",
+      "category": "JUDGMENT",
+      "confidence": "medium",
+      "path": "moodify/mrs_robust"
+    },
+    {
+      "name": "optimizer",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/optimizer"
+    },
+    {
+      "name": "orchestration",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/orchestration"
+    },
+    {
+      "name": "perception",
+      "kind": "package",
+      "category": "OBSERVATION",
+      "confidence": "high",
+      "path": "moodify/perception"
+    },
+    {
+      "name": "physics",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/physics"
+    },
+    {
+      "name": "ports",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/ports"
+    },
+    {
+      "name": "processing",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "high",
+      "path": "moodify/processing"
+    },
+    {
+      "name": "protocol",
+      "kind": "module",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/protocol"
+    },
+    {
+      "name": "reality_metrics",
+      "kind": "module",
+      "category": "JUDGMENT",
+      "confidence": "medium",
+      "path": "moodify/reality_metrics"
+    },
+    {
+      "name": "safety",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/safety"
+    },
+    {
+      "name": "score_engine",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/score_engine"
+    },
+    {
+      "name": "services",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/services"
+    },
+    {
+      "name": "storage",
+      "kind": "package",
+      "category": "SHARED_INFRASTRUCTURE",
+      "confidence": "high",
+      "path": "moodify/storage"
+    },
+    {
+      "name": "system_depth",
+      "kind": "module",
+      "category": "LEGACY_UNKNOWN",
+      "confidence": "low",
+      "path": "moodify/system_depth"
+    },
+    {
+      "name": "transcription",
+      "kind": "module",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/transcription"
+    },
+    {
+      "name": "transcription_pipeline",
+      "kind": "package",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/transcription_pipeline"
+    },
+    {
+      "name": "uncertainty",
+      "kind": "module",
+      "category": "JUDGMENT",
+      "confidence": "medium",
+      "path": "moodify/uncertainty"
+    },
+    {
+      "name": "v01_analyzer",
+      "kind": "module",
+      "category": "OBSERVATION",
+      "confidence": "high",
+      "path": "moodify/v01_analyzer"
+    },
+    {
+      "name": "v01_delivery",
+      "kind": "module",
+      "category": "VERIFICATION",
+      "confidence": "medium",
+      "path": "moodify/v01_delivery"
+    },
+    {
+      "name": "v01_diagnostics",
+      "kind": "module",
+      "category": "JUDGMENT",
+      "confidence": "high",
+      "path": "moodify/v01_diagnostics"
+    },
+    {
+      "name": "v01_exporter",
+      "kind": "module",
+      "category": "INTERVENTION",
+      "confidence": "high",
+      "path": "moodify/v01_exporter"
+    },
+    {
+      "name": "v01_pipeline",
+      "kind": "module",
+      "category": "INTERVENTION",
+      "confidence": "high",
+      "path": "moodify/v01_pipeline"
+    },
+    {
+      "name": "v01_presets",
+      "kind": "module",
+      "category": "INTERVENTION",
+      "confidence": "high",
+      "path": "moodify/v01_presets"
+    },
+    {
+      "name": "v01_types",
+      "kind": "module",
+      "category": "INTERVENTION",
+      "confidence": "medium",
+      "path": "moodify/v01_types"
+    }
+  ]
+}
