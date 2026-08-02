@@ -33,18 +33,26 @@ import com.moodify.app.ui.screens.ProfileScreen
 import com.moodify.app.ui.screens.ProcessingScreen
 import com.moodify.app.ui.screens.ProcessingHubScreen
 import com.moodify.app.ui.screens.PublishWorkScreen
+import com.moodify.app.data.CwcRepository
+import com.moodify.app.model.AuthMode
 import com.moodify.app.ui.screens.SearchScreen
 import com.moodify.app.ui.screens.SettingsScreen
 import com.moodify.app.ui.screens.HelpFeedbackScreen
 import com.moodify.app.ui.screens.AboutScreen
+import com.moodify.app.ui.screens.CwcIntroScreen
+import com.moodify.app.ui.screens.CwcAuthScreen
+import com.moodify.app.ui.screens.CwcGiftScreen
+import com.moodify.app.ui.screens.CwcCenterScreen
 import com.moodify.app.ui.screens.WorkDetailScreen
 import com.moodify.app.ui.screens.WorksScreen
 import kotlinx.coroutines.launch
 
 private data class MainDestination(val label: String, val icon: ImageVector)
 
+data class CwcAuthRequest(val mode: AuthMode, val prefilledCode: String? = null)
+
 @Composable
-fun MoodifyApp() {
+fun MoodifyApp(pendingCwcCode: String? = null) {
     val destinations = listOf(
         MainDestination("首页", Icons.Outlined.Home),
         MainDestination("处理", Icons.Outlined.GraphicEq),
@@ -66,14 +74,35 @@ fun MoodifyApp() {
     var helpOpen by remember { mutableStateOf(false) }
     var aboutOpen by remember { mutableStateOf(false) }
     var startUploadPage by remember { mutableIntStateOf(0) }
+    var cwcIntroOpen by remember { mutableStateOf(false) }
+    var cwcGiftOpen by remember { mutableStateOf(false) }
+    var cwcCenterOpen by remember { mutableStateOf(false) }
+    var cwcAuthRequest by remember { mutableStateOf<CwcAuthRequest?>(null) }
+    var startupChecked by remember { mutableStateOf(false) }
+    val appContext = androidx.compose.ui.platform.LocalContext.current
+    val cwcRepo = remember(appContext) { CwcRepository(appContext) }
+    val giftCode = remember { pendingCwcCode ?: "CWC-XZ7M-42KP" }
     val drawerState = androidx.compose.material3.rememberDrawerState(androidx.compose.material3.DrawerValue.Closed)
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        when {
+            pendingCwcCode != null -> cwcGiftOpen = true
+            !cwcRepo.isActivated() -> cwcAuthRequest = CwcAuthRequest(AuthMode.Onboarding, null)
+        }
+        startupChecked = true
+    }
+
     val backEnabled = processingOpen || detailOpen || publishOpen || searchOpen ||
         creatorCenterOpen || notificationOpen || copyrightCenterOpen || dataCenterOpen ||
-        collaborationOpen || uploadOpen || worksOpen || settingsOpen || helpOpen || aboutOpen
+        collaborationOpen || uploadOpen || worksOpen || settingsOpen || helpOpen || aboutOpen ||
+        cwcIntroOpen || cwcGiftOpen || cwcCenterOpen || cwcAuthRequest != null
     BackHandler(enabled = backEnabled) {
         when {
+            cwcAuthRequest != null -> cwcAuthRequest = null
+            cwcGiftOpen -> cwcGiftOpen = false
+            cwcIntroOpen -> cwcIntroOpen = false
+            cwcCenterOpen -> cwcCenterOpen = false
             aboutOpen -> aboutOpen = false
             helpOpen -> helpOpen = false
             settingsOpen -> settingsOpen = false
@@ -106,11 +135,15 @@ fun MoodifyApp() {
         settingsOpen = false
         helpOpen = false
         aboutOpen = false
+        cwcIntroOpen = false
+        cwcGiftOpen = false
+        cwcCenterOpen = false
+        cwcAuthRequest = null
     }
 
     androidx.compose.material3.ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !creatorCenterOpen && !notificationOpen && !copyrightCenterOpen && !dataCenterOpen && !collaborationOpen && !uploadOpen && !worksOpen && !settingsOpen && !helpOpen && !aboutOpen,
+        gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !creatorCenterOpen && !notificationOpen && !copyrightCenterOpen && !dataCenterOpen && !collaborationOpen && !uploadOpen && !worksOpen && !settingsOpen && !helpOpen && !aboutOpen && !cwcIntroOpen && !cwcGiftOpen && !cwcCenterOpen && cwcAuthRequest == null,
         drawerContent = {
             val drawerHighlight = when {
                 worksOpen -> 1
@@ -137,23 +170,38 @@ fun MoodifyApp() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar(tonalElevation = 0.dp) {
-                destinations.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selected == index,
-                        onClick = {
-                            closeOverlays()
-                            selected = index
-                        },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                    )
+            // CWC full-screen pages must not be covered by the 3-tab bar.
+            if (cwcAuthRequest == null && !cwcGiftOpen && !cwcIntroOpen && !cwcCenterOpen) {
+                NavigationBar(tonalElevation = 0.dp) {
+                    destinations.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = selected == index,
+                            onClick = {
+                                closeOverlays()
+                                selected = index
+                            },
+                            icon = { Icon(item.icon, contentDescription = item.label) },
+                            label = { Text(item.label) },
+                        )
+                    }
                 }
             }
         },
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
+                cwcAuthRequest != null -> CwcAuthScreen(
+                    mode = cwcAuthRequest!!.mode,
+                    prefilledCode = cwcAuthRequest!!.prefilledCode,
+                    onBack = { cwcAuthRequest = null },
+                    onShowIntro = { cwcIntroOpen = true },
+                    onActivated = { cwcAuthRequest = null; selected = 1 },
+                    onLoggedIn = { cwcAuthRequest = null; selected = 0 },
+                )
+                cwcGiftOpen -> CwcGiftScreen(code = giftCode, onBack = { cwcGiftOpen = false }, onAccept = { code -> cwcGiftOpen = false; cwcAuthRequest = CwcAuthRequest(AuthMode.Onboarding, code) })
+                cwcIntroOpen -> CwcIntroScreen(onBack = { cwcIntroOpen = false }, onStart = { cwcIntroOpen = false; cwcAuthRequest = CwcAuthRequest(AuthMode.Onboarding, null) })
+                cwcCenterOpen -> CwcCenterScreen(onBack = { cwcCenterOpen = false })
+                !startupChecked -> { }
                 settingsOpen -> SettingsScreen(onBack = { settingsOpen = false }, onAbout = { settingsOpen = false; aboutOpen = true })
                 helpOpen -> HelpFeedbackScreen(onBack = { helpOpen = false })
                 aboutOpen -> AboutScreen(onBack = { aboutOpen = false })
@@ -163,7 +211,7 @@ fun MoodifyApp() {
                 dataCenterOpen -> DataCenterScreen(onBack = { dataCenterOpen = false; selected = 2 })
                 copyrightCenterOpen -> CopyrightCenterScreen(onBack = { copyrightCenterOpen = false; selected = 2 }, onContinuePublish = { copyrightCenterOpen = false; detailOpen = true })
                 notificationOpen -> NotificationCenterScreen(onBack = { notificationOpen = false })
-                creatorCenterOpen -> CreatorCenterScreen(onBack = { creatorCenterOpen = false; selected = 2 }, onUpload = { creatorCenterOpen = false; uploadOpen = true })
+                creatorCenterOpen -> CreatorCenterScreen(onBack = { creatorCenterOpen = false; selected = 2 }, onUpload = { creatorCenterOpen = false; uploadOpen = true }, onOpenCwcCenter = { cwcCenterOpen = true })
                 searchOpen -> SearchScreen(onCancel = { searchOpen = false })
                 publishOpen -> PublishWorkScreen(onBack = { publishOpen = false }, onPublished = { publishOpen = false })
                 detailOpen -> WorkDetailScreen(onBack = { detailOpen = false }, onProcessAgain = { detailOpen = false; processingOpen = true }, onPublish = { publishOpen = true })
@@ -178,7 +226,7 @@ fun MoodifyApp() {
                     onOpenRecentTask = { processingOpen = true },
                     onOpenDrawer = { scope.launch { drawerState.open() } },
                 )
-                else -> ProfileScreen()
+                else -> ProfileScreen(onOpenCwcCenter = { cwcCenterOpen = true })
             }
         }
     }

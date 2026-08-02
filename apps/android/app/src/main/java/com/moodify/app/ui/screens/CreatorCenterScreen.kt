@@ -25,10 +25,11 @@ import androidx.compose.ui.unit.sp
 import com.moodify.app.ui.theme.*
 
 @Composable
-fun CreatorCenterScreen(onBack: () -> Unit, onUpload: () -> Unit) {
+fun CreatorCenterScreen(onBack: () -> Unit, onUpload: () -> Unit, onOpenCwcCenter: () -> Unit = {}) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
         Spacer(Modifier.height(12.dp)); Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBackIos, "返回") }; Text("创作者中心", Modifier.weight(1f), color = MoodifyNavy, fontSize = 22.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center); IconButton(onClick = {}) { Icon(Icons.Outlined.Settings, "设置") } }
         Spacer(Modifier.height(12.dp)); Header(); Spacer(Modifier.height(14.dp))
+        CwcStatusCard(onOpenCwcCenter); Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Action(Icons.Outlined.CloudUpload, "上传作品", "分享你的 AI 音乐", Modifier.weight(1f), onUpload); Action(Icons.Outlined.Inventory2, "草稿箱", "管理未发布作品", Modifier.weight(1f)) {} }
         Spacer(Modifier.height(18.dp)); Title("创作概览"); Spacer(Modifier.height(9.dp)); Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) { Overview(Icons.Outlined.Send, "待发布", "3", Modifier.weight(1f)); Overview(Icons.Outlined.GraphicEq, "处理中", "1", Modifier.weight(1f)); Overview(Icons.Outlined.Schedule, "审核中", "2", Modifier.weight(1f)); Overview(Icons.Outlined.VerifiedUser, "版权申请", "6", Modifier.weight(1f)) }
         Spacer(Modifier.height(18.dp)); Title("最近作品"); Spacer(Modifier.height(8.dp)); Works()
@@ -49,3 +50,4 @@ fun CreatorCenterScreen(onBack: () -> Unit, onUpload: () -> Unit) {
 @Composable private fun Title(text: String, action: Boolean = true) { Row { Text(text, Modifier.weight(1f), color = MoodifyNavy, fontSize = 18.sp, fontWeight = FontWeight.Bold); if(action) Text("查看全部  ›", color = MoodifyMuted, fontSize = 10.sp) } }
 @Composable private fun Stat(label: String, value: String) { Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(label, color = MoodifyMuted, fontSize = 9.sp); Text(value, color = MoodifyNavy, fontSize = 16.sp, fontWeight = FontWeight.Bold) } }
 @Composable private fun Div() { Box(Modifier.width(1.dp).height(39.dp).background(MoodifyOutline)) }
+@Composable private fun CwcStatusCard(onOpen: () -> Unit) { Card(onClick = onOpen, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) { Row(Modifier.fillMaxWidth().background(Brush.horizontalGradient(listOf(Color(0xFFF0ECFF), Color(0xFFE8F3FF))), RoundedCornerShape(18.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.ConfirmationNumber, null, tint = MoodifyPurple, modifier = Modifier.size(26.dp)); Column(Modifier.padding(start = 12.dp).weight(1f)) { Text("创作者通行证", color = MoodifyNavy, fontSize = 14.sp, fontWeight = FontWeight.Bold); Text("CWC-XZ7M-42KP · 可使用 · 可赠送 3 张", color = MoodifyMuted, fontSize = 10.sp, modifier = Modifier.padding(top = 3.dp)) }; Icon(Icons.Outlined.ChevronRight, null, tint = MoodifyMuted) } } }

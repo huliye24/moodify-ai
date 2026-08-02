@@ -55,16 +55,22 @@ fun GradientButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier.fillMaxWidth().height(52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(),
         shape = RoundedCornerShape(26.dp),
     ) {
         Box(
-            Modifier.fillMaxWidth().height(52.dp).background(MoodifyGradient, RoundedCornerShape(26.dp)),
+            if (enabled) {
+                Modifier.fillMaxWidth().height(52.dp).background(MoodifyGradient, RoundedCornerShape(26.dp))
+            } else {
+                Modifier.fillMaxWidth().height(52.dp).background(Color(0xFFC9CFE0), RoundedCornerShape(26.dp))
+            },
             contentAlignment = Alignment.Center,
         ) {
             Text(text, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
