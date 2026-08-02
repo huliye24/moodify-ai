@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moodify.app.ui.components.MoodifyMark
+import com.moodify.app.ui.connection.ConnectionCard
 import com.moodify.app.ui.theme.*
 
 @Composable
@@ -27,7 +28,7 @@ fun ProfileScreen() {
         Spacer(Modifier.height(20.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { MoodifyMark(Modifier.size(48.dp, 34.dp)); Spacer(Modifier.width(8.dp)); Text("Moodify", color = MoodifyNavy, fontSize = 27.sp, fontWeight = FontWeight.Bold) }
         Text("智能处理 · 声音更动人", Modifier.fillMaxWidth(), color = MoodifyMuted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-        Spacer(Modifier.height(18.dp)); ProfileHeader(); Spacer(Modifier.height(14.dp)); ProCard(); Spacer(Modifier.height(14.dp)); RecentWorks(); Spacer(Modifier.height(14.dp)); QuickActions(); Spacer(Modifier.height(14.dp)); SettingsCard(); Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(18.dp)); ProfileHeader(); Spacer(Modifier.height(14.dp)); ConnectionCard(); Spacer(Modifier.height(14.dp)); ProCard(); Spacer(Modifier.height(14.dp)); RecentWorks(); Spacer(Modifier.height(14.dp)); QuickActions(); Spacer(Modifier.height(14.dp)); SettingsCard(); Spacer(Modifier.height(14.dp))
         Card(onClick = {}, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(3.dp)) { Text("退出登录", Modifier.fillMaxWidth().padding(15.dp), color = Color(0xFFFF3B45), fontSize = 15.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
         Spacer(Modifier.height(22.dp))
     }

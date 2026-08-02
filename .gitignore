@@ -120,3 +120,8 @@ apps/android/.gradle/
 apps/android/app/build/
 apps/android/.kotlin/
 apps/android/local.properties
+
+# Android data-layer package (not generated outputs)
+!apps/android/app/src/test/java/com/moodify/app/data/
+!apps/android/app/src/main/java/com/moodify/app/data/
+!apps/android/app/src/main/java/com/moodify/app/ui/connection/
