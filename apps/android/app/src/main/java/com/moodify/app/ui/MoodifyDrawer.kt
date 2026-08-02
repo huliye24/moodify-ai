@@ -35,7 +35,7 @@ fun MoodifyDrawerContent(selected: Int, onDestination: (Int) -> Unit) {
                 DrawerItem(Icons.Outlined.PersonOutline, "创作者中心", 4, "•"), DrawerItem(Icons.Outlined.BarChart, "数据中心", 5), DrawerItem(Icons.Outlined.VerifiedUser, "版权与发布", 6, "•"), DrawerItem(Icons.Outlined.Handshake, "合作计划", 7)
             ).forEach { DrawerRow(it, selected, onDestination) }
             HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MoodifyOutline)
-            listOf(DrawerItem(Icons.Outlined.Settings, "设置"), DrawerItem(Icons.Outlined.HeadsetMic, "帮助与反馈"), DrawerItem(Icons.Outlined.Info, "关于 Moodify")).forEach { DrawerRow(it, selected, onDestination) }
+            listOf(DrawerItem(Icons.Outlined.Settings, "设置", 8), DrawerItem(Icons.Outlined.HeadsetMic, "帮助与反馈", 9), DrawerItem(Icons.Outlined.Info, "关于 Moodify", 10)).forEach { DrawerRow(it, selected, onDestination) }
             Spacer(Modifier.height(16.dp)); StorageCard(); Spacer(Modifier.height(24.dp))
         }
     }

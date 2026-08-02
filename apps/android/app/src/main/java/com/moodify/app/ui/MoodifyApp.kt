@@ -1,5 +1,6 @@
 package com.moodify.app.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,9 @@ import com.moodify.app.ui.screens.ProcessingScreen
 import com.moodify.app.ui.screens.ProcessingHubScreen
 import com.moodify.app.ui.screens.PublishWorkScreen
 import com.moodify.app.ui.screens.SearchScreen
+import com.moodify.app.ui.screens.SettingsScreen
+import com.moodify.app.ui.screens.HelpFeedbackScreen
+import com.moodify.app.ui.screens.AboutScreen
 import com.moodify.app.ui.screens.WorkDetailScreen
 import com.moodify.app.ui.screens.WorksScreen
 import kotlinx.coroutines.launch
@@ -58,9 +62,34 @@ fun MoodifyApp() {
     var collaborationOpen by remember { mutableStateOf(false) }
     var uploadOpen by remember { mutableStateOf(false) }
     var worksOpen by remember { mutableStateOf(false) }
+    var settingsOpen by remember { mutableStateOf(false) }
+    var helpOpen by remember { mutableStateOf(false) }
+    var aboutOpen by remember { mutableStateOf(false) }
     var startUploadPage by remember { mutableIntStateOf(0) }
     val drawerState = androidx.compose.material3.rememberDrawerState(androidx.compose.material3.DrawerValue.Closed)
     val scope = androidx.compose.runtime.rememberCoroutineScope()
+
+    val backEnabled = processingOpen || detailOpen || publishOpen || searchOpen ||
+        creatorCenterOpen || notificationOpen || copyrightCenterOpen || dataCenterOpen ||
+        collaborationOpen || uploadOpen || worksOpen || settingsOpen || helpOpen || aboutOpen
+    BackHandler(enabled = backEnabled) {
+        when {
+            aboutOpen -> aboutOpen = false
+            helpOpen -> helpOpen = false
+            settingsOpen -> settingsOpen = false
+            worksOpen -> worksOpen = false
+            uploadOpen -> uploadOpen = false
+            processingOpen -> processingOpen = false
+            detailOpen -> detailOpen = false
+            publishOpen -> publishOpen = false
+            searchOpen -> searchOpen = false
+            creatorCenterOpen -> creatorCenterOpen = false
+            notificationOpen -> notificationOpen = false
+            copyrightCenterOpen -> copyrightCenterOpen = false
+            dataCenterOpen -> dataCenterOpen = false
+            collaborationOpen -> collaborationOpen = false
+        }
+    }
 
     fun closeOverlays() {
         processingOpen = false
@@ -74,11 +103,14 @@ fun MoodifyApp() {
         collaborationOpen = false
         uploadOpen = false
         worksOpen = false
+        settingsOpen = false
+        helpOpen = false
+        aboutOpen = false
     }
 
     androidx.compose.material3.ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !creatorCenterOpen && !notificationOpen && !copyrightCenterOpen && !dataCenterOpen && !collaborationOpen && !uploadOpen && !worksOpen,
+        gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !creatorCenterOpen && !notificationOpen && !copyrightCenterOpen && !dataCenterOpen && !collaborationOpen && !uploadOpen && !worksOpen && !settingsOpen && !helpOpen && !aboutOpen,
         drawerContent = {
             val drawerHighlight = when {
                 worksOpen -> 1
@@ -94,6 +126,9 @@ fun MoodifyApp() {
                     5 -> { closeOverlays(); dataCenterOpen = true; selected = 2 }
                     6 -> { closeOverlays(); copyrightCenterOpen = true; selected = 2 }
                     7 -> { closeOverlays(); collaborationOpen = true; selected = 2 }
+                    8 -> { closeOverlays(); settingsOpen = true; selected = 2 }
+                    9 -> { closeOverlays(); helpOpen = true; selected = 2 }
+                    10 -> { closeOverlays(); aboutOpen = true; selected = 2 }
                 }
                 scope.launch { drawerState.close() }
             }
@@ -119,6 +154,9 @@ fun MoodifyApp() {
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
+                settingsOpen -> SettingsScreen(onBack = { settingsOpen = false }, onAbout = { settingsOpen = false; aboutOpen = true })
+                helpOpen -> HelpFeedbackScreen(onBack = { helpOpen = false })
+                aboutOpen -> AboutScreen(onBack = { aboutOpen = false })
                 uploadOpen -> UploadFlowScreen(startPage = startUploadPage, onExit = { uploadOpen = false }, onProcess = { uploadOpen = false; processingOpen = true }, onPublish = { uploadOpen = false; publishOpen = true }, onLibrary = { uploadOpen = false; worksOpen = true })
                 worksOpen -> WorksScreen(onBack = { worksOpen = false }, onOpenDetail = { worksOpen = false; detailOpen = true })
                 collaborationOpen -> CollaborationHubScreen(onExit = { collaborationOpen = false; selected = 2 })
