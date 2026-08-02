@@ -77,31 +77,40 @@ def _environment() -> dict:
 
 
 def _stft_views(mono: np.ndarray, sr: int, n_fft: int = 8192, hop: int = 2048, n_bins: int = 256) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Streamed STFT -> two downsampled views (linear/log) with frequency axes."""
+    """Streamed STFT -> two downsampled views (linear/log) with frequency axes.
+
+    Vectorized re-binning (bincount) so full-length songs stay fast.
+    """
     freqs = np.fft.rfftfreq(n_fft, 1 / sr)
     n_frames = max(1, (len(mono) - n_fft) // hop + 1)
-    linear = np.zeros((n_frames, n_bins), dtype=np.float32)
-    log = np.zeros((n_frames, n_bins), dtype=np.float32)
+    win = np.hanning(n_fft)
 
     log_bins = np.geomspace(20.0, min(sr / 2, 24000.0), n_bins + 1)
-    log_bins[0] = 0.0  # first log bin would otherwise contain no FFT bins
+    log_bins[0] = 0.0
     lin_edges = np.linspace(0.0, sr / 2, n_bins + 1)
 
+    lin_idx = np.clip(np.searchsorted(lin_edges, freqs, side="right") - 1, 0, n_bins - 1)
+    log_idx = np.clip(np.searchsorted(log_bins, freqs, side="right") - 1, 0, n_bins - 1)
+
+    linear = np.zeros((n_frames, n_bins), dtype=np.float32)
+    log = np.zeros((n_frames, n_bins), dtype=np.float32)
     for i in range(n_frames):
         seg = mono[i * hop: i * hop + n_fft]
         if len(seg) < n_fft:
             seg = np.pad(seg, (0, n_fft - len(seg)))
-        spec = np.abs(np.fft.rfft(seg * np.hanning(n_fft)))
-        # linear re-binning (empty bins stay 0)
-        for b in range(n_bins):
-            mask = (freqs >= lin_edges[b]) & (freqs < lin_edges[b + 1])
-            if mask.any():
-                linear[i, b] = np.sqrt(np.mean(spec[mask] ** 2) + 1e-12)
-        # log re-binning (narrow low bins may contain no FFT bins)
-        for b in range(n_bins):
-            mask = (freqs >= log_bins[b]) & (freqs < log_bins[b + 1])
-            if mask.any():
-                log[i, b] = np.sqrt(np.mean(spec[mask] ** 2) + 1e-12)
+        spec = np.abs(np.fft.rfft(seg * win))
+        power = spec.astype(np.float64) ** 2
+        counts_lin = np.bincount(lin_idx, minlength=n_bins)
+        energy_lin = np.bincount(lin_idx, weights=power, minlength=n_bins)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            mean_lin = np.where(counts_lin > 0, energy_lin / np.maximum(counts_lin, 1), 0.0)
+        linear[i] = np.sqrt(mean_lin + 1e-12).astype(np.float32)
+        counts_log = np.bincount(log_idx, minlength=n_bins)
+        energy_log = np.bincount(log_idx, weights=power, minlength=n_bins)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            mean_log = np.where(counts_log > 0, energy_log / np.maximum(counts_log, 1), 0.0)
+        log[i] = np.sqrt(mean_log + 1e-12).astype(np.float32)
+
     lin_centers = (lin_edges[:-1] + lin_edges[1:]) / 2
     log_centers = np.sqrt(log_bins[:-1] * log_bins[1:])
     return linear, log, lin_centers, log_centers
