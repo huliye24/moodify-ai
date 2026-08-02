@@ -1,0 +1,50 @@
+package com.moodify.app.ui.screens
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBackIos
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.moodify.app.ui.components.GradientButton
+import com.moodify.app.ui.theme.*
+
+@Composable
+fun PublishWorkScreen(onBack: () -> Unit, onPublished: () -> Unit) {
+    var title by remember { mutableStateOf("") }; var intro by remember { mutableStateOf("") }; var visibility by remember { mutableIntStateOf(0) }; var copyright by remember { mutableStateOf(true) }; var recommend by remember { mutableStateOf(true) }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
+        Spacer(Modifier.height(12.dp)); Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBackIos, "返回", tint = MoodifyNavy) }; Text("发布作品", Modifier.weight(1f), color = MoodifyNavy, fontSize = 23.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center); TextButton(onClick = onBack) { Text("存为草稿", color = MoodifyPurple) } }
+        Spacer(Modifier.height(10.dp)); AudioCard(); Spacer(Modifier.height(14.dp))
+        Section("作品封面") { Row(verticalAlignment = Alignment.CenterVertically) { Cover(Modifier.size(112.dp)); OutlinedCard(onClick = {}, modifier = Modifier.padding(start = 16.dp).weight(1f).height(92.dp), shape = RoundedCornerShape(16.dp)) { Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) { Icon(Icons.Outlined.AddPhotoAlternate, null, tint = MoodifyNavy); Text("更换封面", color = MoodifyNavy, fontSize = 13.sp, fontWeight = FontWeight.SemiBold); Text("支持 JPG / PNG，建议 3000×3000px", color = MoodifyMuted, fontSize = 9.sp) } } } }
+        Spacer(Modifier.height(14.dp)); Section("作品信息") { Field("作品名称", title, "输入作品名称（必填）", 80) { title = it }; Field("创作者名称", "Moodify Creator", "创作者名称", 40) {}; Field("简介", intro, "介绍你的作品、灵感来源或想表达的内容…", 300, true) { intro = it }; Text("标签", color = MoodifyNavy, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)); Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) { listOf("流行 ×", "电子 ×", "氛围 ×", "AI人声 ×", "+ 标签").forEach { Tag(it) } } }
+        Spacer(Modifier.height(14.dp)); Section("可见范围") { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) { Choice(Icons.Outlined.Public, "公开发布", "所有人可见", visibility == 0, Modifier.weight(1f)) { visibility = 0 }; Choice(Icons.Outlined.Lock, "仅自己可见", "只有自己可见", visibility == 1, Modifier.weight(1f)) { visibility = 1 }; Choice(Icons.Outlined.Schedule, "定时发布", "设定发布时间", visibility == 2, Modifier.weight(1f)) { visibility = 2 } } }
+        Spacer(Modifier.height(14.dp)); Section("版权与声明") { Toggle(Icons.Outlined.CheckCircle, "确认拥有上传内容的发布权", "本人创作或已获得合法授权", copyright) { copyright = it }; Toggle(Icons.Outlined.CheckCircle, "允许平台推荐", "推荐给更多 Moodify 用户", recommend) { recommend = it }; Setting(Icons.Outlined.VerifiedUser, "申请原创证明（可选）", "去申请") }
+        Spacer(Modifier.height(14.dp)); Section("发布设置") { Setting(Icons.Outlined.MusicNote, "分类", "电子音乐"); Setting(Icons.Outlined.Image, "封面风格", "梦幻 / 紫色系"); Setting(Icons.Outlined.CalendarMonth, "发布日期", if (visibility == 2) "选择时间" else "立即发布") }
+        Spacer(Modifier.height(18.dp)); GradientButton("立即发布", onPublished); TextButton(onClick = {}) { Text("预览作品页", color = MoodifyPurple, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }; Spacer(Modifier.height(20.dp))
+    }
+}
+
+@Composable private fun AudioCard() { Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(4.dp)) { Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Cover(Modifier.size(72.dp)); Column(Modifier.padding(start = 13.dp).weight(1f)) { Text("Dreamscape", color = MoodifyNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold); Text("Moodify Creator", color = MoodifyMuted, fontSize = 11.sp); Text("04:18  ·  WAV  ·  44.1 kHz", color = MoodifyMuted, fontSize = 10.sp); Wave(Modifier.fillMaxWidth().height(22.dp).padding(top = 5.dp)) }; FilledIconButton(onClick = {}, colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFFF2EEFF))) { Icon(Icons.Outlined.PlayArrow, null, tint = MoodifyPurple) } } } }
+@Composable private fun Cover(modifier: Modifier) { Box(modifier.background(Brush.linearGradient(listOf(Color(0xFF342386), Color(0xFF8B58DC), Color(0xFFF0A7E4))), RoundedCornerShape(13.dp)), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Landscape, null, tint = Color.White.copy(.8f), modifier = Modifier.size(42.dp)) } }
+@Composable private fun Section(title: String, content: @Composable ColumnScope.() -> Unit) { Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(3.dp)) { Column(Modifier.padding(15.dp)) { Text(title, color = MoodifyNavy, fontSize = 17.sp, fontWeight = FontWeight.Bold); Spacer(Modifier.height(9.dp)); content() } } }
+@Composable private fun Field(label: String, value: String, hint: String, limit: Int, tall: Boolean = false, onChange: (String) -> Unit) { Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.Top) { Text(label, color = MoodifyNavy, fontSize = 12.sp, modifier = Modifier.width(82.dp).padding(top = 14.dp)); OutlinedTextField(value, { if (it.length <= limit) onChange(it) }, modifier = Modifier.weight(1f).then(if (tall) Modifier.height(76.dp) else Modifier), placeholder = { Text(hint, fontSize = 10.sp) }, suffix = { Text("${value.length}/$limit", fontSize = 8.sp, color = MoodifyMuted) }, shape = RoundedCornerShape(12.dp), textStyle = LocalTextStyle.current.copy(fontSize = 12.sp), singleLine = !tall) } }
+@Composable private fun Tag(text: String) { Surface(color = if (text.startsWith("+")) Color.White else Color(0xFFF1EDFF), shape = RoundedCornerShape(10.dp), border = androidx.compose.foundation.BorderStroke(1.dp, if (text.startsWith("+")) MoodifyOutline else Color.Transparent)) { Text(text, color = if (text.startsWith("+")) MoodifyMuted else MoodifyPurple, fontSize = 9.sp, modifier = Modifier.padding(horizontal = 7.dp, vertical = 6.dp)) } }
+@Composable private fun Choice(icon: ImageVector, title: String, subtitle: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) { OutlinedCard(onClick = onClick, modifier = modifier.height(74.dp), shape = RoundedCornerShape(13.dp), border = androidx.compose.foundation.BorderStroke(if (selected) 1.5.dp else 1.dp, if (selected) MoodifyPurple else MoodifyOutline)) { Column(Modifier.fillMaxSize().padding(8.dp), verticalArrangement = Arrangement.Center) { Icon(icon, null, tint = if (selected) MoodifyPurple else MoodifyMuted, modifier = Modifier.size(19.dp)); Text(title, color = MoodifyNavy, fontSize = 10.sp, fontWeight = FontWeight.SemiBold); Text(subtitle, color = MoodifyMuted, fontSize = 8.sp) } } }
+@Composable private fun Toggle(icon: ImageVector, title: String, subtitle: String, checked: Boolean, onChange: (Boolean) -> Unit) { Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = MoodifyGreen); Column(Modifier.padding(start = 9.dp).weight(1f)) { Text(title, color = MoodifyNavy, fontSize = 12.sp); Text(subtitle, color = MoodifyMuted, fontSize = 9.sp) }; Switch(checked, onChange, colors = SwitchDefaults.colors(checkedTrackColor = MoodifyPurple)) } }
+@Composable private fun Setting(icon: ImageVector, title: String, value: String) { Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = MoodifyPurple, modifier = Modifier.size(20.dp)); Text(title, Modifier.padding(start = 10.dp).weight(1f), color = MoodifyNavy, fontSize = 12.sp); Text(value, color = MoodifyMuted, fontSize = 11.sp); Icon(Icons.Outlined.ChevronRight, null, tint = MoodifyMuted, modifier = Modifier.size(18.dp)) } }
+@Composable private fun Wave(modifier: Modifier) { Canvas(modifier) { repeat(38) { i -> val x = size.width * i / 37; val h = size.height * (.2f + ((i * 17) % 11) / 15f); drawLine(MoodifyPurple, Offset(x, size.height / 2 - h / 2), Offset(x, size.height / 2 + h / 2), 1.dp.toPx(), StrokeCap.Round) } } }
