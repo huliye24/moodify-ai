@@ -25,7 +25,7 @@ import com.moodify.app.ui.components.MoodifyMark
 import com.moodify.app.ui.theme.*
 
 @Composable
-fun HomeScreen(onStartProcessing: () -> Unit, onOpenDrawer: () -> Unit = {}, onOpenSearch: () -> Unit = {}, onOpenNotifications: () -> Unit = {}) {
+fun HomeScreen(onOpenDrawer: () -> Unit = {}, onOpenSearch: () -> Unit = {}, onOpenNotifications: () -> Unit = {}) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
         Spacer(Modifier.height(18.dp))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -37,11 +37,7 @@ fun HomeScreen(onStartProcessing: () -> Unit, onOpenDrawer: () -> Unit = {}, onO
         Text("发现 AI 音乐", color = MoodifyNavy, fontSize = 27.sp, fontWeight = FontWeight.Bold)
         Text("好听的音乐，由 AI 创作", color = MoodifyMuted, fontSize = 14.sp)
         Spacer(Modifier.height(16.dp)); FeaturedTrack(); Spacer(Modifier.height(14.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ActionCard(Icons.Outlined.CloudUpload, "上传作品", "分享你的 AI 音乐", true, Modifier.weight(1f), onStartProcessing)
-            ActionCard(Icons.Outlined.IosShare, "分享主页", "邀请更多听众", false, Modifier.weight(1f)) {}
-        }
-        Spacer(Modifier.height(14.dp)); PopularWorks(); Spacer(Modifier.height(14.dp)); ContinueListening(); Spacer(Modifier.height(14.dp)); PopularCreators(); Spacer(Modifier.height(20.dp))
+        PopularWorks(); Spacer(Modifier.height(14.dp)); ContinueListening(); Spacer(Modifier.height(14.dp)); PopularCreators(); Spacer(Modifier.height(20.dp))
     }
 }
 
@@ -58,12 +54,6 @@ fun HomeScreen(onStartProcessing: () -> Unit, onOpenDrawer: () -> Unit = {}, onO
             Text("泫榛  ✦", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold); Text("梦境般的旋律，带你遨游星海", color = Color.White.copy(.8f), fontSize = 13.sp, modifier = Modifier.padding(top = 5.dp))
             Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.PlayArrow, null, tint = Color.White, modifier = Modifier.size(17.dp)); Text("128.6万     ♡ 1.2万     ▢ 342", color = Color.White.copy(.85f), fontSize = 11.sp); Spacer(Modifier.weight(1f)); FilledIconButton(onClick = {}, colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color.White), modifier = Modifier.size(54.dp)) { Icon(Icons.Outlined.PlayArrow, "播放", tint = MoodifyPurple, modifier = Modifier.size(30.dp)) } }
         }
-    }
-}
-
-@Composable private fun ActionCard(icon: ImageVector, title: String, subtitle: String, primary: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Card(onClick = onClick, modifier = modifier.height(104.dp), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = if (primary) MoodifyBlue else Color.White), elevation = CardDefaults.cardElevation(4.dp)) {
-        Row(Modifier.fillMaxSize().padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(48.dp).background(if (primary) Color.White else Color(0xFFF4F5FF), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) { Icon(icon, null, tint = MoodifyBlue, modifier = Modifier.size(29.dp)) }; Column(Modifier.padding(start = 12.dp).weight(1f)) { Text(title, color = if (primary) Color.White else MoodifyNavy, fontSize = 16.sp, fontWeight = FontWeight.Bold); Text(subtitle, color = if (primary) Color.White.copy(.8f) else MoodifyMuted, fontSize = 11.sp) }; Icon(Icons.Outlined.ChevronRight, null, tint = if (primary) Color.White else MoodifyMuted) }
     }
 }
 

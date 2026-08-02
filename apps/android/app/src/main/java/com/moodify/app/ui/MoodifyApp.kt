@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -32,6 +30,7 @@ import com.moodify.app.ui.screens.CollaborationHubScreen
 import com.moodify.app.ui.screens.UploadFlowScreen
 import com.moodify.app.ui.screens.ProfileScreen
 import com.moodify.app.ui.screens.ProcessingScreen
+import com.moodify.app.ui.screens.ProcessingHubScreen
 import com.moodify.app.ui.screens.PublishWorkScreen
 import com.moodify.app.ui.screens.SearchScreen
 import com.moodify.app.ui.screens.WorkDetailScreen
@@ -45,7 +44,6 @@ fun MoodifyApp() {
     val destinations = listOf(
         MainDestination("首页", Icons.Outlined.Home),
         MainDestination("处理", Icons.Outlined.GraphicEq),
-        MainDestination("作品", Icons.Outlined.MusicNote),
         MainDestination("我的", Icons.Outlined.PersonOutline),
     )
     var selected by remember { mutableIntStateOf(0) }
@@ -59,23 +57,44 @@ fun MoodifyApp() {
     var dataCenterOpen by remember { mutableStateOf(false) }
     var collaborationOpen by remember { mutableStateOf(false) }
     var uploadOpen by remember { mutableStateOf(false) }
+    var worksOpen by remember { mutableStateOf(false) }
+    var startUploadPage by remember { mutableIntStateOf(0) }
     val drawerState = androidx.compose.material3.rememberDrawerState(androidx.compose.material3.DrawerValue.Closed)
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
+    fun closeOverlays() {
+        processingOpen = false
+        detailOpen = false
+        publishOpen = false
+        searchOpen = false
+        creatorCenterOpen = false
+        notificationOpen = false
+        copyrightCenterOpen = false
+        dataCenterOpen = false
+        collaborationOpen = false
+        uploadOpen = false
+        worksOpen = false
+    }
+
     androidx.compose.material3.ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !creatorCenterOpen && !notificationOpen && !copyrightCenterOpen && !dataCenterOpen && !collaborationOpen && !uploadOpen,
+        gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !creatorCenterOpen && !notificationOpen && !copyrightCenterOpen && !dataCenterOpen && !collaborationOpen && !uploadOpen && !worksOpen,
         drawerContent = {
-            MoodifyDrawerContent(selected) { index ->
-                creatorCenterOpen = index == 4
-                copyrightCenterOpen = index == 5
-                dataCenterOpen = index == 6
-                collaborationOpen = index == 7
-                selected = if (index >= 4) 3 else index
-                processingOpen = index == 1
-                detailOpen = false
-                publishOpen = false
-                searchOpen = false
+            val drawerHighlight = when {
+                worksOpen -> 1
+                selected == 1 -> 2
+                else -> selected
+            }
+            MoodifyDrawerContent(drawerHighlight) { index ->
+                when (index) {
+                    0 -> { closeOverlays(); selected = 0 }
+                    1 -> { closeOverlays(); worksOpen = true }
+                    2 -> { closeOverlays(); selected = 1 }
+                    4 -> { closeOverlays(); creatorCenterOpen = true; selected = 2 }
+                    5 -> { closeOverlays(); dataCenterOpen = true; selected = 2 }
+                    6 -> { closeOverlays(); copyrightCenterOpen = true; selected = 2 }
+                    7 -> { closeOverlays(); collaborationOpen = true; selected = 2 }
+                }
                 scope.launch { drawerState.close() }
             }
         },
@@ -88,17 +107,8 @@ fun MoodifyApp() {
                     NavigationBarItem(
                         selected = selected == index,
                         onClick = {
+                            closeOverlays()
                             selected = index
-                            processingOpen = index == 1
-                            detailOpen = false
-                            publishOpen = false
-                            searchOpen = false
-                            creatorCenterOpen = false
-                            notificationOpen = false
-                            copyrightCenterOpen = false
-                            dataCenterOpen = false
-                            collaborationOpen = false
-                            uploadOpen = false
                         },
                         icon = { Icon(item.icon, contentDescription = item.label) },
                         label = { Text(item.label) },
@@ -109,28 +119,27 @@ fun MoodifyApp() {
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
-                uploadOpen -> UploadFlowScreen(onExit = { uploadOpen = false }, onProcess = { uploadOpen = false; processingOpen = true; selected = 1 }, onPublish = { uploadOpen = false; detailOpen = true; selected = 2 }, onLibrary = { uploadOpen = false; selected = 2 })
-                collaborationOpen -> CollaborationHubScreen(onExit = { collaborationOpen = false; selected = 3 })
-                dataCenterOpen -> DataCenterScreen(onBack = { dataCenterOpen = false; selected = 3 })
-                copyrightCenterOpen -> CopyrightCenterScreen(onBack = { copyrightCenterOpen = false; selected = 3 }, onContinuePublish = { copyrightCenterOpen = false; detailOpen = true; selected = 2 })
+                uploadOpen -> UploadFlowScreen(startPage = startUploadPage, onExit = { uploadOpen = false }, onProcess = { uploadOpen = false; processingOpen = true }, onPublish = { uploadOpen = false; publishOpen = true }, onLibrary = { uploadOpen = false; worksOpen = true })
+                worksOpen -> WorksScreen(onBack = { worksOpen = false }, onOpenDetail = { worksOpen = false; detailOpen = true })
+                collaborationOpen -> CollaborationHubScreen(onExit = { collaborationOpen = false; selected = 2 })
+                dataCenterOpen -> DataCenterScreen(onBack = { dataCenterOpen = false; selected = 2 })
+                copyrightCenterOpen -> CopyrightCenterScreen(onBack = { copyrightCenterOpen = false; selected = 2 }, onContinuePublish = { copyrightCenterOpen = false; detailOpen = true })
                 notificationOpen -> NotificationCenterScreen(onBack = { notificationOpen = false })
-                creatorCenterOpen -> CreatorCenterScreen(onBack = { creatorCenterOpen = false; selected = 3 }, onUpload = { creatorCenterOpen = false; uploadOpen = true })
+                creatorCenterOpen -> CreatorCenterScreen(onBack = { creatorCenterOpen = false; selected = 2 }, onUpload = { creatorCenterOpen = false; uploadOpen = true })
                 searchOpen -> SearchScreen(onCancel = { searchOpen = false })
                 publishOpen -> PublishWorkScreen(onBack = { publishOpen = false }, onPublished = { publishOpen = false })
-                detailOpen -> WorkDetailScreen(onBack = { detailOpen = false }, onProcessAgain = {
-                    detailOpen = false
-                    processingOpen = true
-                    selected = 1
-                }, onPublish = { publishOpen = true })
-                processingOpen -> ProcessingScreen(onBackHome = {
-                    processingOpen = false
-                    detailOpen = true
-                    selected = 2
-                })
-                selected == 0 -> HomeScreen(onStartProcessing = {
-                    uploadOpen = true
-                }, onOpenDrawer = { scope.launch { drawerState.open() } }, onOpenSearch = { searchOpen = true }, onOpenNotifications = { notificationOpen = true })
-                selected == 2 -> WorksScreen(onOpenDetail = { detailOpen = true })
+                detailOpen -> WorkDetailScreen(onBack = { detailOpen = false }, onProcessAgain = { detailOpen = false; processingOpen = true }, onPublish = { publishOpen = true })
+                processingOpen -> ProcessingScreen(onBackHome = { processingOpen = false; worksOpen = true })
+                selected == 0 -> HomeScreen(onOpenDrawer = { scope.launch { drawerState.open() } }, onOpenSearch = { searchOpen = true }, onOpenNotifications = { notificationOpen = true })
+                selected == 1 -> ProcessingHubScreen(
+                    onPickAudio = { startUploadPage = 0; uploadOpen = true },
+                    onWechatImport = { startUploadPage = 1; uploadOpen = true },
+                    onCloudImport = { startUploadPage = 0; uploadOpen = true },
+                    onStandardProcess = { startUploadPage = 0; uploadOpen = true },
+                    onFreeSave = { worksOpen = true },
+                    onOpenRecentTask = { processingOpen = true },
+                    onOpenDrawer = { scope.launch { drawerState.open() } },
+                )
                 else -> ProfileScreen()
             }
         }
