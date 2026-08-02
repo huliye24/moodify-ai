@@ -29,6 +29,9 @@ listening_test/
 *.html
 *.bak
 
+# Product UI source (required by moodify_runtime.operator_api)
+!moodify_runtime/operator_console.html
+
 # Keep baseline test audio (used by tests and calibration)
 !moodify-core-package/tests/baseline/test_audio/*.wav
 
@@ -107,6 +110,13 @@ data/
 .pytest_cache/
 *.pyc
 __pycache__/
+.venv-basic-pitch/
 
 # ── Tidal runtime artifacts ──
 outputs/tidal/
+
+# ── Android build artifacts ──
+apps/android/.gradle/
+apps/android/app/build/
+apps/android/.kotlin/
+apps/android/local.properties
