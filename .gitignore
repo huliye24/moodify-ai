@@ -125,3 +125,7 @@ apps/android/local.properties
 !apps/android/app/src/test/java/com/moodify/app/data/
 !apps/android/app/src/main/java/com/moodify/app/data/
 !apps/android/app/src/main/java/com/moodify/app/ui/connection/
+
+
+# Task-package acceptance docs (tracked deliberately)
+!outputs/deepseek_validation/**
