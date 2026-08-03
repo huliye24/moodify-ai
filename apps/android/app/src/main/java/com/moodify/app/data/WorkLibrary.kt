@@ -14,6 +14,8 @@ data class ProcessedWork(
     val gatePassed: Boolean,
     val createdAt: Long,
     val issues: List<String>,
+    val artifactId: String? = null,
+    val uploadId: String? = null,
 )
 
 /**
@@ -34,6 +36,8 @@ class WorkLibrary(context: Context) {
             gatePassed = summary.gatePassed,
             createdAt = System.currentTimeMillis(),
             issues = summary.issues,
+            artifactId = summary.artifactId,
+            uploadId = summary.uploadId,
         ))
         save(all)
     }
@@ -57,6 +61,8 @@ class WorkLibrary(context: Context) {
                             val issues = o.optJSONArray("issues") ?: return@buildList
                             for (j in 0 until issues.length()) add(issues.optString(j))
                         },
+                        artifactId = o.optString("artifact_id").ifEmpty { null },
+                        uploadId = o.optString("upload_id").ifEmpty { null },
                     ))
                 }
             }
@@ -80,7 +86,9 @@ class WorkLibrary(context: Context) {
                 .put("mrs_delta", w.mrsDelta ?: JSONObject.NULL)
                 .put("gate_passed", w.gatePassed)
                 .put("created_at", w.createdAt)
-                .put("issues", JSONArray().apply { w.issues.forEach(::put) }))
+                .put("issues", JSONArray().apply { w.issues.forEach(::put) })
+                .put("artifact_id", w.artifactId ?: JSONObject.NULL)
+                .put("upload_id", w.uploadId ?: JSONObject.NULL))
         }
         prefs.edit().putString("works", arr.toString()).apply()
     }

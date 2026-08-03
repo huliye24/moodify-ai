@@ -529,6 +529,7 @@ def _job_summary(job: dict[str, Any]) -> dict[str, Any]:
     result = job.get("result") or {}
     return {
         "job_id": job["job_id"],
+        "upload_id": job["upload_id"],
         "filename": upload["filename"] if upload else "",
         "preset": result.get("preset", ""),
         "mrs_before": result.get("mrs_before"),
@@ -711,6 +712,7 @@ async def v1_jobs_result(job_id: str, request: Request):
     artifacts = _demo_store.get_artifact_for_job(job_id)
     return {
         "job_id": job_id,
+        "upload_id": summary["upload_id"],
         "filename": summary["filename"],
         "preset": summary["preset"],
         "mrs_before": summary["mrs_before"],
@@ -756,3 +758,18 @@ async def v1_artifacts_download(artifact_id: str, request: Request):
     if not path.exists():
         return _v1_error("SERVER_ERROR", "artifact file missing", _request_id(request))
     return FileResponse(path, media_type="audio/wav", filename=artifact["filename"])
+
+
+@router.get("/uploads/{upload_id}/download")
+async def v1_uploads_download(upload_id: str, request: Request):
+    """Download the original (unprocessed) audio for A/B comparison (demo extension)."""
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    upload = _demo_store.get_upload(upload_id)
+    if upload is None:
+        return _v1_error("NOT_FOUND", "upload not found", _request_id(request))
+    path = Path(upload["path"])
+    if not path.exists():
+        return _v1_error("SERVER_ERROR", "upload file missing", _request_id(request))
+    return FileResponse(path, media_type="audio/wav", filename=upload["filename"])

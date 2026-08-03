@@ -99,7 +99,7 @@ def test_capabilities(client: TestClient) -> None:
     assert body["api_version"] == "0.1.0"
     assert body["endpoints"]["health"] == "live"
     assert body["endpoints"]["pair"] == "live"
-    assert body["endpoints"]["projects_create"] == "frozen"
+    assert body["endpoints"]["projects_create"] == "live"
     assert "presets" in body
     assert body["max_upload_bytes"] > 0
     assert body["auth"] == "bearer-token"

@@ -139,6 +139,15 @@ def test_full_flow_end_to_end(client: TestClient, sample_audio: Path,
     assert summary["quality_gate"] is not None
     assert summary["output_filename"].endswith(".wav")
     assert summary["artifact_id"].startswith("art-")
+    assert summary["upload_id"].startswith("up-")
+
+    # 4b. original audio download endpoint (A/B comparison)
+    orig = client.get(
+        f"/api/v1/uploads/{summary['upload_id']}/download", headers=_auth(token)
+    )
+    assert orig.status_code == 200, orig.text
+    assert orig.headers["content-type"].startswith("audio/")
+    assert len(orig.content) > 1000
 
     # 5. artifact metadata matches the real output file
     art = client.get(f"/api/v1/artifacts/{summary['artifact_id']}", headers=_auth(token))

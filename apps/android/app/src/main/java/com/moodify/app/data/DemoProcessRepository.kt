@@ -46,6 +46,7 @@ data class DemoJobStatus(
 /** Real processing summary from GET /api/v1/jobs/{id}/result. */
 data class DemoResultSummary(
     val jobId: String,
+    val uploadId: String?,
     val filename: String,
     val preset: String,
     val mrsBefore: Double?,
@@ -54,6 +55,7 @@ data class DemoResultSummary(
     val gatePassed: Boolean,
     val issues: List<String>,
     val outputFilename: String,
+    val artifactId: String?,
 ) {
     companion object {
         fun fromJson(json: JSONObject): DemoResultSummary {
@@ -61,6 +63,7 @@ data class DemoResultSummary(
             val issues = json.optJSONArray("issues")
             return DemoResultSummary(
                 jobId = json.getString("job_id"),
+                uploadId = json.optString("upload_id").ifEmpty { null },
                 filename = json.optString("filename"),
                 preset = json.optString("preset"),
                 mrsBefore = if (json.isNull("mrs_before")) null else json.optDouble("mrs_before"),
@@ -71,6 +74,7 @@ data class DemoResultSummary(
                     for (i in 0 until (issues?.length() ?: 0)) add(issues!!.optString(i))
                 },
                 outputFilename = json.optString("output_filename"),
+                artifactId = json.optString("artifact_id").ifEmpty { null },
             )
         }
     }

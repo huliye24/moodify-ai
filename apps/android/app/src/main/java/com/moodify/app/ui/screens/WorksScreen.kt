@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBackIos
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moodify.app.data.WorkLibrary
 import com.moodify.app.data.ProcessedWork
 import com.moodify.app.ui.components.MoodifyMark
@@ -32,6 +34,7 @@ import java.util.Locale
 private data class WorkItem(
     val title: String, val duration: String, val status: String, val date: String,
     val colors: List<Color>, val tags: List<Pair<ImageVector, String>>, val progress: Float? = null,
+    val artifactId: String? = null, val uploadId: String? = null,
 )
 
 private val demoWorks = listOf(
@@ -55,6 +58,8 @@ private fun realWorkItem(w: ProcessedWork): WorkItem = WorkItem(
         add(Icons.Outlined.GraphicEq to (w.mrsBefore?.let { "MRS %.0f→%.0f".format(it, w.mrsAfter ?: 0.0) } ?: "MRS 已提升"))
     },
     progress = null,
+    artifactId = w.artifactId,
+    uploadId = w.uploadId,
 )
 
 @Composable
@@ -62,7 +67,9 @@ fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
     val context = LocalContext.current
     val realWorks = remember { WorkLibrary(context).all() }
     val works = realWorks.map(::realWorkItem) + demoWorks
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
+    val playbackState by com.moodify.app.data.PlaybackManager.state.collectAsStateWithLifecycle()
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = if (playbackState.url != null) 88.dp else 0.dp)) {
         Spacer(Modifier.height(24.dp))
         if (onBack == null) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
@@ -85,16 +92,26 @@ fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
             }
         }
         Spacer(Modifier.height(12.dp))
-        works.forEach { WorkCard(it, onOpenDetail); Spacer(Modifier.height(14.dp)) }
+        works.forEach { item ->
+            WorkCard(item, onOpenDetail, onPlay = item.artifactId?.let { artId ->
+                { com.moodify.app.data.PlaybackManager.play("/artifacts/$artId/download", item.title) }
+            })
+            Spacer(Modifier.height(14.dp))
+        }
         OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(27.dp), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyBlue)) {
             Icon(Icons.Outlined.Add, null, tint = MoodifyBlue); Spacer(Modifier.width(8.dp)); Text("导入作品", color = MoodifyBlue, fontSize = 16.sp)
         }
+        Spacer(Modifier.height(14.dp))
         Spacer(Modifier.height(20.dp))
+    }
+    com.moodify.app.ui.components.PlaybackBar(
+        Modifier.align(androidx.compose.ui.Alignment.BottomCenter).padding(horizontal = 12.dp, vertical = 8.dp)
+    )
     }
 }
 
 @Composable
-private fun WorkCard(item: WorkItem, onOpenDetail: () -> Unit) {
+private fun WorkCard(item: WorkItem, onOpenDetail: () -> Unit, onPlay: (() -> Unit)? = null) {
     Card(onClick = onOpenDetail, modifier = Modifier.fillMaxWidth().shadow(12.dp, RoundedCornerShape(22.dp), ambientColor = Color(0x160B214F), spotColor = Color(0x160B214F)), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
         Row(Modifier.padding(16.dp)) {
             Box(Modifier.size(82.dp).background(Brush.linearGradient(item.colors), RoundedCornerShape(14.dp))) {
@@ -104,7 +121,7 @@ private fun WorkCard(item: WorkItem, onOpenDetail: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(item.title, color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                    IconButton(onClick = {}, modifier = Modifier.size(38.dp)) { Icon(if (item.progress == null) Icons.Outlined.PlayArrow else Icons.Outlined.Pause, null, tint = MoodifyPurple) }
+                    IconButton(onClick = { onPlay?.invoke() }, modifier = Modifier.size(38.dp), enabled = onPlay != null) { Icon(Icons.Outlined.PlayArrow, null, tint = if (onPlay != null) MoodifyPurple else MoodifyMuted.copy(alpha = 0.4f)) }
                 }
                 Text("${item.duration}  ·  ${item.status}  ·  ${item.date}", color = MoodifyMuted, fontSize = 12.sp)
                 item.progress?.let { Spacer(Modifier.height(10.dp)); LinearProgressIndicator(progress = { it }, modifier = Modifier.fillMaxWidth().height(4.dp), color = MoodifyBlue, trackColor = MoodifyOutline) }

@@ -82,6 +82,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
     var cwcAuthRequest by remember { mutableStateOf<CwcAuthRequest?>(null) }
     var startupChecked by remember { mutableStateOf(false) }
     val appContext = androidx.compose.ui.platform.LocalContext.current
+    com.moodify.app.data.PlaybackManager.init(appContext)
     val cwcRepo = remember(appContext) { CwcRepository(appContext) }
     val giftCode = remember { pendingCwcCode ?: "CWC-XZ7M-42KP" }
     val drawerState = androidx.compose.material3.rememberDrawerState(androidx.compose.material3.DrawerValue.Closed)
@@ -215,7 +216,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
                 creatorCenterOpen -> CreatorCenterScreen(onBack = { creatorCenterOpen = false; selected = 2 }, onUpload = { creatorCenterOpen = false; uploadOpen = true }, onOpenCwcCenter = { cwcCenterOpen = true })
                 searchOpen -> SearchScreen(onCancel = { searchOpen = false })
                 publishOpen -> PublishWorkScreen(onBack = { publishOpen = false }, onPublished = { publishOpen = false })
-                detailOpen -> WorkDetailScreen(onBack = { detailOpen = false }, onProcessAgain = { detailOpen = false; processingOpen = true }, onPublish = { publishOpen = true })
+                detailOpen -> WorkDetailScreen(work = remember { com.moodify.app.data.WorkLibrary(appContext).all().firstOrNull() }.let { it }, onBack = { detailOpen = false }, onProcessAgain = { detailOpen = false; processingOpen = true }, onPublish = { publishOpen = true })
                 processingOpen -> ProcessingScreen(uri = processingUris.firstOrNull(), onBackHome = { processingOpen = false; worksOpen = true }, onDone = { processingOpen = false; worksOpen = true })
                 selected == 0 -> HomeScreen(onOpenDrawer = { scope.launch { drawerState.open() } }, onOpenSearch = { searchOpen = true }, onOpenNotifications = { notificationOpen = true })
                 selected == 1 -> ProcessingHubScreen(
