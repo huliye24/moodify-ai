@@ -52,6 +52,8 @@ fun HelpFeedbackScreen(onBack: () -> Unit) = SupportPage("帮助与反馈", onBa
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("设置", onBack, Icons.Outlined.Settings) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var showResetDialog by remember { mutableStateOf(false) }
     Section(null) { InfoRow(Icons.Outlined.Person,"泫榛","@moodify_xzhen · Pro") }
     Section("账号与安全") { SimpleRow(Icons.Outlined.PhoneAndroid,"手机号/邮箱","138****8888"); SimpleRow(Icons.Outlined.Lock,"密码与登录",""); SimpleRow(Icons.Outlined.Badge,"实名认证","已认证"); SimpleRow(Icons.Outlined.Devices,"设备管理","3 台设备") }
     var notices by remember { mutableStateOf(listOf(true,true,true,true)) }
@@ -59,7 +61,29 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("设�
     Section("隐私与权限") { SimpleRow(Icons.Outlined.PersonOutline,"主页可见性","所有人可见"); SimpleRow(Icons.Outlined.Public,"作品公开设置","公开"); SimpleRow(Icons.Outlined.Download,"下载权限","仅自己"); SimpleRow(Icons.Outlined.Block,"黑名单管理","") }
     Section("偏好设置") { SimpleRow(Icons.Outlined.MusicNote,"默认导出格式","MP3"); ToggleRow("自动生成封面",true){}; ToggleRow("后台处理",true){}; SimpleRow(Icons.Outlined.Language,"语言","简体中文"); ToggleRow("深色模式",false){} }
     Section("存储与数据") { SimpleRow(Icons.Outlined.Cloud,"云端空间","8.24 GB / 50 GB"); SimpleRow(Icons.Outlined.DeleteOutline,"清理缓存","128 MB"); SimpleRow(Icons.Outlined.Sync,"数据同步","刚刚") }
+    Section("演示") {
+        Card(onClick = { showResetDialog = true }, modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+            SimpleRow(Icons.Outlined.Refresh,"重置演示会话","清除激活/作品/配对，回到开场故事")
+        }
+    }
     Card(onClick=onAbout,modifier=Modifier.fillMaxWidth(),colors=CardDefaults.cardColors(containerColor=Color.White)){SimpleRow(Icons.Outlined.Info,"关于 Moodify","")}
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("重置演示会话？") },
+            text = { Text("将清除创作者通行证激活、真实处理作品与电脑端配对，重新进入开场故事。") },
+            confirmButton = {
+                TextButton(onClick = {
+                    com.moodify.app.data.CwcRepository(context).resetDemoSession()
+                    com.moodify.app.data.WorkLibrary(context).clear()
+                    com.moodify.app.data.TokenStore(context).clear()
+                    com.moodify.app.data.BaseUrlStore(context).baseUrl = com.moodify.app.data.BaseUrlPolicy.DEFAULT
+                    showResetDialog = false
+                }) { Text("重置", color = Color(0xFFE05B5B)) }
+            },
+            dismissButton = { TextButton(onClick = { showResetDialog = false }) { Text("取消", color = MoodifyMuted) } },
+        )
+    }
 }
 
 @Composable private fun SupportPage(title:String,onBack:()->Unit,end:ImageVector,content:@Composable ColumnScope.()->Unit){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal=18.dp)){Spacer(Modifier.height(10.dp));Row(verticalAlignment=Alignment.CenterVertically){IconButton(onClick=onBack){Icon(Icons.AutoMirrored.Outlined.ArrowBackIos,"返回")};Text(title,Modifier.weight(1f),color=MoodifyNavy,fontSize=21.sp,fontWeight=FontWeight.Bold,textAlign=androidx.compose.ui.text.style.TextAlign.Center);IconButton(onClick={}){Icon(end,null)}};Spacer(Modifier.height(10.dp));content();Spacer(Modifier.height(24.dp))}}

@@ -33,14 +33,16 @@ Security rules:
 
 from __future__ import annotations
 
+import hashlib
 import secrets
 import threading
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, File, Form, Request, UploadFile
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from moodify.v01_presets import list_presets
@@ -277,12 +279,12 @@ async def v1_capabilities(request: Request) -> dict[str, Any]:
             "pair": "live",
             "pair_revoke": "live",
             "capabilities": "live",
-            "projects_create": "frozen",
-            "projects_get": "frozen",
-            "uploads_create": "frozen",
-            "jobs_get": "frozen",
-            "jobs_cancel": "frozen",
-            "artifacts_get": "frozen",
+            "projects_create": "live",
+            "projects_get": "live",
+            "uploads_create": "live",
+            "jobs_get": "live",
+            "jobs_cancel": "live",
+            "artifacts_get": "live",
         },
         "presets": sorted(list_presets()),
         "max_upload_bytes": 50 * 1024 * 1024,
@@ -292,59 +294,465 @@ async def v1_capabilities(request: Request) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# Schema-frozen endpoints (NOT_IMPLEMENTED until ANDROID-004/005)
+# Demo-grade implementations (DSK-MFY-DEMO-001)
+# ---------------------------------------------------------------------------
+#
+# These follow the frozen schemas and error contract from ANDROID-003, but the
+# semantics are single-machine demo: memory-backed job registry + files under
+# ./data/demo. Restarting the service clears tokens and jobs alike.
+
+_DEMO_DATA_DIR = Path("data/demo")
+_DEMO_UPLOAD_DIR = _DEMO_DATA_DIR / "uploads"
+_DEMO_OUTPUT_DIR = _DEMO_DATA_DIR / "outputs"
+
+_STAGE_PROGRESS: dict[str, tuple[float, float]] = {
+    "scan": (0.05, 0.15),
+    "analyze": (0.15, 0.35),
+    "diagnose": (0.35, 0.45),
+    "process": (0.45, 0.65),
+    "validate": (0.65, 0.80),
+    "report": (0.80, 0.90),
+    "generate": (0.90, 1.0),
+}
+
+
+class _DemoStore:
+    """Memory-backed projects/uploads/jobs/artifacts registry (demo semantics)."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._projects: dict[str, dict[str, Any]] = {}
+        self._uploads: dict[str, dict[str, Any]] = {}
+        self._jobs: dict[str, dict[str, Any]] = {}
+        self._artifacts: dict[str, dict[str, Any]] = {}
+
+    # -- projects -----------------------------------------------------------
+    def create_project(self, title: str, source_audio_ids: list[str]) -> dict[str, Any]:
+        now = _iso_now()
+        project_id = f"prj-{uuid.uuid4().hex[:12]}"
+        record = {
+            "project_id": project_id,
+            "title": title,
+            "status": "active",
+            "source_audio_ids": source_audio_ids,
+            "created_at": now,
+            "updated_at": now,
+        }
+        with self._lock:
+            self._projects[project_id] = record
+        return record
+
+    def get_project(self, project_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            return self._projects.get(project_id)
+
+    # -- uploads ------------------------------------------------------------
+    def create_upload(self, project_id: str, filename: str,
+                      total_bytes: int, path: Path) -> dict[str, Any]:
+        now = _iso_now()
+        upload_id = f"up-{uuid.uuid4().hex[:12]}"
+        record = {
+            "upload_id": upload_id,
+            "project_id": project_id,
+            "filename": filename,
+            "status": "received",
+            "received_bytes": total_bytes,
+            "total_bytes": total_bytes,
+            "path": str(path),
+            "created_at": now,
+        }
+        with self._lock:
+            self._uploads[upload_id] = record
+        return record
+
+    def get_upload(self, upload_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            return self._uploads.get(upload_id)
+
+    # -- jobs ---------------------------------------------------------------
+    def create_job(self, project_id: str, upload_id: str) -> dict[str, Any]:
+        now = _iso_now()
+        job_id = f"job-{uuid.uuid4().hex[:12]}"
+        record = {
+            "job_id": job_id,
+            "project_id": project_id,
+            "upload_id": upload_id,
+            "status": "queued",
+            "progress": 0.0,
+            "stage": "queued",
+            "error_code": None,
+            "created_at": now,
+            "updated_at": now,
+        }
+        with self._lock:
+            self._jobs[job_id] = record
+        return record
+
+    def get_job(self, job_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            return self._jobs.get(job_id)
+
+    def update_job(self, job_id: str, *, status: str | None = None,
+                   stage: str | None = None, progress: float | None = None,
+                   error_code: str | None = None) -> None:
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is None:
+                return
+            if status is not None:
+                job["status"] = status
+            if stage is not None:
+                job["stage"] = stage
+            if progress is not None:
+                job["progress"] = progress
+            if error_code is not None:
+                job["error_code"] = error_code
+            job["updated_at"] = _iso_now()
+
+    def cancel_job(self, job_id: str) -> bool:
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is None or job["status"] in ("done", "failed", "cancelled"):
+                return False
+            job["status"] = "cancelled"
+            job["stage"] = "cancelled"
+            job["updated_at"] = _iso_now()
+            return True
+
+    def set_job_result(self, job_id: str, summary: dict[str, Any]) -> None:
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is not None:
+                job["result"] = summary
+
+    def get_artifact_for_job(self, job_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            for artifact in self._artifacts.values():
+                if artifact["job_id"] == job_id:
+                    return artifact
+        return None
+
+    # -- artifacts ----------------------------------------------------------
+    def add_artifact(self, job_id: str, kind: str, filename: str,
+                     size_bytes: int, path: Path) -> dict[str, Any]:
+        now = _iso_now()
+        artifact_id = f"art-{uuid.uuid4().hex[:12]}"
+        record = {
+            "artifact_id": artifact_id,
+            "job_id": job_id,
+            "kind": kind,
+            "filename": filename,
+            "size_bytes": size_bytes,
+            "sha256": _sha256_file(path),
+            "path": str(path),
+            "created_at": now,
+        }
+        with self._lock:
+            self._artifacts[artifact_id] = record
+        return record
+
+    def get_artifact(self, artifact_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            return self._artifacts.get(artifact_id)
+
+
+_demo_store = _DemoStore()
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _require_token(request: Request) -> dict[str, Any] | JSONResponse:
+    token = _bearer_token(request)
+    if token is None:
+        return _v1_error("UNAUTHORIZED", "missing bearer token", _request_id(request))
+    record = _pair_store.validate(token)
+    if record is None:
+        return _v1_error("UNAUTHORIZED", "unknown or revoked token", _request_id(request))
+    return record
+
+
+def _run_job_worker(job_id: str, input_path: str) -> None:
+    """Run the real v01 pipeline in a background thread, mirroring progress."""
+    from moodify.v01_pipeline import process_audio
+
+    def on_stage(stage: str, progress: float) -> None:
+        _demo_store.update_job(job_id, status="processing", stage=stage, progress=progress)
+
+    _demo_store.update_job(job_id, status="processing", stage="scan", progress=0.05)
+    try:
+        result = process_audio(
+            input_path,
+            preset="clean_master",
+            output_dir=str(_DEMO_OUTPUT_DIR),
+            on_stage=on_stage,
+        )
+        if not result.success:
+            _demo_store.update_job(
+                job_id, status="failed", stage="failed",
+                progress=1.0, error_code=f"PROCESS_FAILED: {result.error}",
+            )
+            return
+        output_path = Path(result.output_path)
+        artifact = _demo_store.add_artifact(
+            job_id, "processed_audio", output_path.name,
+            output_path.stat().st_size, output_path,
+        )
+        gate = result.quality_gate.to_dict() if result.quality_gate else {}
+        _demo_store.set_job_result(job_id, {
+            "preset": result.preset,
+            "mrs_before": gate.get("mrs_before"),
+            "mrs_after": gate.get("mrs_after"),
+            "mrs_delta": gate.get("mrs_delta"),
+            "quality_gate": gate,
+            "issues": list(result.diagnosis.issues)[:3] if result.diagnosis else [],
+            "stage_timings": result.stage_timings,
+            "output_filename": output_path.name,
+            "artifact_id": artifact["artifact_id"],
+        })
+        _demo_store.update_job(job_id, status="done", stage="done", progress=1.0)
+    except Exception as exc:
+        _demo_store.update_job(
+            job_id, status="failed", stage="failed",
+            progress=1.0, error_code=f"SERVER_ERROR: {exc}",
+        )
+
+
+def _job_summary(job: dict[str, Any]) -> dict[str, Any]:
+    """Result summary for the app's work library (real metrics from the run)."""
+    upload = _demo_store.get_upload(job["upload_id"])
+    result = job.get("result") or {}
+    return {
+        "job_id": job["job_id"],
+        "filename": upload["filename"] if upload else "",
+        "preset": result.get("preset", ""),
+        "mrs_before": result.get("mrs_before"),
+        "mrs_after": result.get("mrs_after"),
+        "mrs_delta": result.get("mrs_delta"),
+        "quality_gate": result.get("quality_gate"),
+        "issues": result.get("issues", []),
+        "stage_timings": result.get("stage_timings", {}),
+        "output_filename": result.get("output_filename", ""),
+        "artifact_id": result.get("artifact_id"),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Demo-grade endpoints (replace NOT_IMPLEMENTED)
 # ---------------------------------------------------------------------------
 
 
+@router.post("/uploads")
+async def v1_uploads_create(
+    request: Request,
+    project_id: str = Form(None),
+    filename: str = Form(None),
+    size_bytes: int = Form(None),
+    sha256: str = Form(None),
+    file: UploadFile = File(None),
+):
+    """Receive a real audio file (multipart), verify sha256, store it."""
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+
+    if not project_id or not filename or size_bytes is None or not sha256 or file is None:
+        return _v1_error("VALIDATION", "project_id/filename/size_bytes/sha256/file required", _request_id(request))
+
+    _DEMO_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    target = _DEMO_UPLOAD_DIR / f"{uuid.uuid4().hex[:12]}_{Path(filename).name}"
+    digest = hashlib.sha256()
+    total = 0
+    with target.open("wb") as out:
+        while True:
+            chunk = await file.read(1 << 20)
+            if not chunk:
+                break
+            out.write(chunk)
+            digest.update(chunk)
+            total += len(chunk)
+            if total > 50 * 1024 * 1024:
+                target.unlink(missing_ok=True)
+                return _v1_error("VALIDATION", "file exceeds max_upload_bytes", _request_id(request))
+    if total != size_bytes:
+        target.unlink(missing_ok=True)
+        return _v1_error("VALIDATION", "size_bytes mismatch", _request_id(request))
+    if digest.hexdigest() != sha256:
+        target.unlink(missing_ok=True)
+        return _v1_error("VALIDATION", "sha256 mismatch", _request_id(request))
+
+    upload = _demo_store.create_upload(project_id, filename, total, target)
+    return {
+        "upload_id": upload["upload_id"],
+        "project_id": upload["project_id"],
+        "filename": upload["filename"],
+        "status": upload["status"],
+        "received_bytes": upload["received_bytes"],
+        "total_bytes": upload["total_bytes"],
+        "created_at": upload["created_at"],
+    }
+
+
 @router.post("/projects")
-async def v1_projects_create(request: Request) -> JSONResponse:
-    return _v1_error(
-        "NOT_IMPLEMENTED",
-        "project creation lands in DSK-MFY-ANDROID-004",
-        _request_id(request),
-    )
+async def v1_projects_create(request: Request):
+    """Create a project and auto-start the first job (demo semantics)."""
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    try:
+        payload = await request.json()
+    except Exception:
+        return _v1_error("VALIDATION", "body must be JSON", _request_id(request))
+    title = payload.get("title")
+    source_audio_ids = payload.get("source_audio_ids")
+    if not isinstance(title, str) or not title.strip():
+        return _v1_error("VALIDATION", "title is required", _request_id(request))
+    if not isinstance(source_audio_ids, list) or not source_audio_ids:
+        return _v1_error("VALIDATION", "source_audio_ids is required", _request_id(request))
+    upload = _demo_store.get_upload(source_audio_ids[0])
+    if upload is None:
+        return _v1_error("NOT_FOUND", "source upload not found", _request_id(request))
+
+    project = _demo_store.create_project(title.strip(), source_audio_ids)
+    job = _demo_store.create_job(project["project_id"], upload["upload_id"])
+    threading.Thread(
+        target=_run_job_worker,
+        args=(job["job_id"], upload["path"]),
+        daemon=True,
+    ).start()
+    return {
+        "project_id": project["project_id"],
+        "title": project["title"],
+        "status": project["status"],
+        "created_at": project["created_at"],
+        "updated_at": project["updated_at"],
+        "job_id": job["job_id"],
+    }
 
 
 @router.get("/projects/{project_id}")
-async def v1_projects_get(project_id: str, request: Request) -> JSONResponse:
-    return _v1_error(
-        "NOT_IMPLEMENTED",
-        "project detail lands in DSK-MFY-ANDROID-004",
-        _request_id(request),
-    )
-
-
-@router.post("/uploads")
-async def v1_uploads_create(request: Request) -> JSONResponse:
-    return _v1_error(
-        "NOT_IMPLEMENTED",
-        "uploads land in DSK-MFY-ANDROID-004",
-        _request_id(request),
-    )
+async def v1_projects_get(project_id: str, request: Request):
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    project = _demo_store.get_project(project_id)
+    if project is None:
+        return _v1_error("NOT_FOUND", "project not found", _request_id(request))
+    return {
+        "project_id": project["project_id"],
+        "title": project["title"],
+        "status": project["status"],
+        "created_at": project["created_at"],
+        "updated_at": project["updated_at"],
+    }
 
 
 @router.get("/jobs/{job_id}")
-async def v1_jobs_get(job_id: str, request: Request) -> JSONResponse:
-    return _v1_error(
-        "NOT_IMPLEMENTED",
-        "job status lands in DSK-MFY-ANDROID-004",
-        _request_id(request),
-    )
+async def v1_jobs_get(job_id: str, request: Request):
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    job = _demo_store.get_job(job_id)
+    if job is None:
+        return _v1_error("NOT_FOUND", "job not found", _request_id(request))
+    return {
+        "job_id": job["job_id"],
+        "project_id": job["project_id"],
+        "upload_id": job["upload_id"],
+        "status": job["status"],
+        "progress": job["progress"],
+        "stage": job["stage"],
+        "error_code": job["error_code"],
+        "created_at": job["created_at"],
+        "updated_at": job["updated_at"],
+    }
 
 
 @router.post("/jobs/{job_id}/cancel")
-async def v1_jobs_cancel(job_id: str, request: Request) -> JSONResponse:
-    return _v1_error(
-        "NOT_IMPLEMENTED",
-        "job cancel lands in DSK-MFY-ANDROID-004",
-        _request_id(request),
-    )
+async def v1_jobs_cancel(job_id: str, request: Request):
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    job = _demo_store.get_job(job_id)
+    if job is None:
+        return _v1_error("NOT_FOUND", "job not found", _request_id(request))
+    _demo_store.cancel_job(job_id)
+    updated = _demo_store.get_job(job_id)
+    return {
+        "job_id": updated["job_id"],
+        "project_id": updated["project_id"],
+        "upload_id": updated["upload_id"],
+        "status": updated["status"],
+        "progress": updated["progress"],
+        "stage": updated["stage"],
+        "error_code": updated["error_code"],
+        "created_at": updated["created_at"],
+        "updated_at": updated["updated_at"],
+    }
+
+
+@router.get("/jobs/{job_id}/result")
+async def v1_jobs_result(job_id: str, request: Request):
+    """Real processing summary for the app work library (demo extension)."""
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    job = _demo_store.get_job(job_id)
+    if job is None:
+        return _v1_error("NOT_FOUND", "job not found", _request_id(request))
+    if job["status"] != "done":
+        return _v1_error("VALIDATION", "job not finished", _request_id(request))
+    summary = _job_summary(job)
+    artifacts = _demo_store.get_artifact_for_job(job_id)
+    return {
+        "job_id": job_id,
+        "filename": summary["filename"],
+        "preset": summary["preset"],
+        "mrs_before": summary["mrs_before"],
+        "mrs_after": summary["mrs_after"],
+        "mrs_delta": summary["mrs_delta"],
+        "quality_gate": summary["quality_gate"],
+        "issues": summary["issues"],
+        "stage_timings": summary["stage_timings"],
+        "output_filename": summary["output_filename"],
+        "artifact_id": artifacts["artifact_id"] if artifacts else None,
+    }
 
 
 @router.get("/artifacts/{artifact_id}")
-async def v1_artifacts_get(artifact_id: str, request: Request) -> JSONResponse:
-    return _v1_error(
-        "NOT_IMPLEMENTED",
-        "artifacts land in DSK-MFY-ANDROID-005",
-        _request_id(request),
-    )
+async def v1_artifacts_get(artifact_id: str, request: Request):
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    artifact = _demo_store.get_artifact(artifact_id)
+    if artifact is None:
+        return _v1_error("NOT_FOUND", "artifact not found", _request_id(request))
+    return {
+        "artifact_id": artifact["artifact_id"],
+        "job_id": artifact["job_id"],
+        "kind": artifact["kind"],
+        "filename": artifact["filename"],
+        "size_bytes": artifact["size_bytes"],
+        "sha256": artifact["sha256"],
+        "created_at": artifact["created_at"],
+    }
+
+
+@router.get("/artifacts/{artifact_id}/download")
+async def v1_artifacts_download(artifact_id: str, request: Request):
+    """Download the processed audio (demo extension)."""
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    artifact = _demo_store.get_artifact(artifact_id)
+    if artifact is None:
+        return _v1_error("NOT_FOUND", "artifact not found", _request_id(request))
+    path = Path(artifact["path"])
+    if not path.exists():
+        return _v1_error("SERVER_ERROR", "artifact file missing", _request_id(request))
+    return FileResponse(path, media_type="audio/wav", filename=artifact["filename"])

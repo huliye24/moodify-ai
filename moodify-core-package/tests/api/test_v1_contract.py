@@ -105,26 +105,29 @@ def test_capabilities(client: TestClient) -> None:
     assert body["auth"] == "bearer-token"
 
 
-def test_frozen_endpoints_return_not_implemented(client: TestClient) -> None:
+def test_business_endpoints_require_auth(client: TestClient) -> None:
+    """projects/uploads/jobs/artifacts are live (DSK-MFY-DEMO-001) and gated."""
     cases = [
         ("post", "/api/v1/projects", {}),
         ("get", "/api/v1/projects/p1", None),
         ("post", "/api/v1/uploads", {}),
         ("get", "/api/v1/jobs/j1", None),
         ("post", "/api/v1/jobs/j1/cancel", None),
+        ("get", "/api/v1/jobs/j1/result", None),
         ("get", "/api/v1/artifacts/a1", None),
+        ("get", "/api/v1/artifacts/a1/download", None),
     ]
     for method, path, body in cases:
         resp = client.request(method, path, json=body)
-        assert resp.status_code == 501, f"{method} {path}: {resp.status_code}"
+        assert resp.status_code == 401, f"{method} {path}: {resp.status_code}"
         err = resp.json()["error"]
-        assert err["code"] == "NOT_IMPLEMENTED"
+        assert err["code"] == "UNAUTHORIZED"
         assert err["request_id"]
 
 
 def test_error_body_has_no_traceback(client: TestClient) -> None:
     resp = client.post("/api/v1/projects", json={})
-    assert resp.status_code == 501
+    assert resp.status_code == 401
     assert "Traceback" not in resp.text
     assert "File \"" not in resp.text
 

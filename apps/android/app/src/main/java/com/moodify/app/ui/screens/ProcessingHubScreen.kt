@@ -74,7 +74,7 @@ private fun PickAudioCard(onPick: () -> Unit) {
                 Icon(Icons.Outlined.FileUpload, null, tint = Color.White, modifier = Modifier.size(38.dp))
             }
             Text("选择音频文件", color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp))
-            Text("支持 WAV / MP3 / FLAC / AAC / M4A，单个不超过 200MB", color = MoodifyMuted, fontSize = 10.sp, modifier = Modifier.padding(top = 9.dp))
+            Text("支持 WAV / MP3 / FLAC / AAC / M4A，单个不超过 50MB", color = MoodifyMuted, fontSize = 10.sp, modifier = Modifier.padding(top = 9.dp))
         }
     }
 }

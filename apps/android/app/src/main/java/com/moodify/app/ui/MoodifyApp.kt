@@ -1,5 +1,6 @@
 package com.moodify.app.ui
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -74,6 +75,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
     var helpOpen by remember { mutableStateOf(false) }
     var aboutOpen by remember { mutableStateOf(false) }
     var startUploadPage by remember { mutableIntStateOf(0) }
+    var processingUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var cwcIntroOpen by remember { mutableStateOf(false) }
     var cwcGiftOpen by remember { mutableStateOf(false) }
     var cwcCenterOpen by remember { mutableStateOf(false) }
@@ -204,7 +206,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
                 settingsOpen -> SettingsScreen(onBack = { settingsOpen = false }, onAbout = { settingsOpen = false; aboutOpen = true })
                 helpOpen -> HelpFeedbackScreen(onBack = { helpOpen = false })
                 aboutOpen -> AboutScreen(onBack = { aboutOpen = false })
-                uploadOpen -> UploadFlowScreen(startPage = startUploadPage, onExit = { uploadOpen = false }, onProcess = { uploadOpen = false; processingOpen = true }, onPublish = { uploadOpen = false; publishOpen = true }, onLibrary = { uploadOpen = false; worksOpen = true })
+                uploadOpen -> UploadFlowScreen(startPage = startUploadPage, onExit = { uploadOpen = false }, onProcess = { uris -> processingUris = uris; uploadOpen = false; processingOpen = true }, onLibrary = { uploadOpen = false; worksOpen = true })
                 worksOpen -> WorksScreen(onBack = { worksOpen = false }, onOpenDetail = { worksOpen = false; detailOpen = true })
                 collaborationOpen -> CollaborationHubScreen(onExit = { collaborationOpen = false; selected = 2 })
                 dataCenterOpen -> DataCenterScreen(onBack = { dataCenterOpen = false; selected = 2 })
@@ -214,7 +216,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
                 searchOpen -> SearchScreen(onCancel = { searchOpen = false })
                 publishOpen -> PublishWorkScreen(onBack = { publishOpen = false }, onPublished = { publishOpen = false })
                 detailOpen -> WorkDetailScreen(onBack = { detailOpen = false }, onProcessAgain = { detailOpen = false; processingOpen = true }, onPublish = { publishOpen = true })
-                processingOpen -> ProcessingScreen(onBackHome = { processingOpen = false; worksOpen = true })
+                processingOpen -> ProcessingScreen(uri = processingUris.firstOrNull(), onBackHome = { processingOpen = false; worksOpen = true }, onDone = { processingOpen = false; worksOpen = true })
                 selected == 0 -> HomeScreen(onOpenDrawer = { scope.launch { drawerState.open() } }, onOpenSearch = { searchOpen = true }, onOpenNotifications = { notificationOpen = true })
                 selected == 1 -> ProcessingHubScreen(
                     onPickAudio = { startUploadPage = 0; uploadOpen = true },

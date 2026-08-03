@@ -10,7 +10,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from moodify.audio_io import load_audio
 from moodify.processing.pedalboard_chain import MoodifyDSPChain
@@ -29,13 +29,16 @@ from moodify.v01_presets import get_preset, list_presets
 
 def process_audio(input_path: str,
                   preset: str = "clean_master",
-                  output_dir: str = "outputs") -> ProcessResult:
+                  output_dir: str = "outputs",
+                  on_stage: Callable[[str, float], None] | None = None) -> ProcessResult:
     """Run the complete v0.1.0 pipeline on one audio file.
 
     Args:
         input_path: path to WAV/MP3/FLAC file
         preset: key from v01_presets.PRESETS or "auto"
         output_dir: output directory
+        on_stage: optional callback(stage_name, progress) fired at each
+            pipeline stage boundary (S/A/D/P/V/R/G), progress in [0, 1]
 
     Returns:
         ProcessResult with metrics, diagnosis, and output path
@@ -43,10 +46,16 @@ def process_audio(input_path: str,
     t0 = time.perf_counter()
     stage_timings: dict[str, float] = {}
 
+    def _emit(stage: str, progress: float) -> None:
+        if on_stage is not None:
+            on_stage(stage, round(progress, 3))
+
     # S: Scan audio
+    _emit("scan", 0.05)
     scan_t0 = time.perf_counter()
     scan = scan_audio(input_path)
     stage_timings["S_scan_s"] = _elapsed(scan_t0)
+    _emit("scan", 0.15)
     if not scan.exists:
         return ProcessResult(input_path=input_path, success=False,
                              scan=scan, stage_timings=stage_timings,
@@ -72,36 +81,45 @@ def process_audio(input_path: str,
 
     try:
         # A: Analyze features
+        _emit("analyze", 0.15)
         analyze_t0 = time.perf_counter()
         metrics = analyze(input_path, output_dir, label="before")
         stage_timings["A_analyze_s"] = _elapsed(analyze_t0)
+        _emit("analyze", 0.35)
 
         # D: Diagnose audio
+        _emit("diagnose", 0.35)
         diagnose_t0 = time.perf_counter()
         report = diagnose(metrics)
         selected_preset = _select_preset(requested_preset, report)
         preset_info = get_preset(selected_preset)
         stage_timings["D_diagnose_s"] = _elapsed(diagnose_t0)
+        _emit("diagnose", 0.45)
 
         # P: Process audio
+        _emit("process", 0.45)
         process_t0 = time.perf_counter()
         audio, sr = load_audio(input_path, always_2d=False)
         chain = MoodifyDSPChain(preset_info["params"])
         processed = chain.process(audio, sr)
         processed = _post_process_safety(processed)
         stage_timings["P_process_s"] = _elapsed(process_t0)
+        _emit("process", 0.65)
 
         # V: Validate output
+        _emit("validate", 0.65)
         validate_t0 = time.perf_counter()
         output_path = export(processed, sr, input_path, selected_preset, output_dir)
         metrics_after = analyze(output_path, output_dir, label="after")
         quality_gate = _quality_gate(metrics, metrics_after)
         stage_timings["V_validate_s"] = _elapsed(validate_t0)
+        _emit("validate", 0.80)
 
         elapsed = time.perf_counter() - t0
         stage_timings["total_s"] = round(elapsed, 3)
 
         # R: Report output
+        _emit("report", 0.80)
         report_t0 = time.perf_counter()
         pdf_report_path = _save_pdf_report(
             scan=scan,
@@ -114,8 +132,10 @@ def process_audio(input_path: str,
             stage_timings=stage_timings,
         )
         stage_timings["R_report_s"] = _elapsed(report_t0)
+        _emit("report", 0.90)
 
         # G: Generate delivery bundle
+        _emit("generate", 0.90)
         generate_t0 = time.perf_counter()
         stage_timings["G_generate_s"] = 0.0
         stage_timings["total_s"] = _elapsed(t0)
@@ -158,6 +178,7 @@ def process_audio(input_path: str,
 
         stage_timings["G_generate_s"] = _elapsed(generate_t0)
         stage_timings["total_s"] = _elapsed(t0)
+        _emit("generate", 1.0)
 
         return ProcessResult(
             input_path=input_path,

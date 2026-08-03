@@ -10,17 +10,24 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBackIos
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moodify.app.data.WorkLibrary
+import com.moodify.app.data.ProcessedWork
 import com.moodify.app.ui.components.MoodifyMark
 import com.moodify.app.ui.theme.*
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 private data class WorkItem(
     val title: String, val duration: String, val status: String, val date: String,
@@ -29,13 +36,32 @@ private data class WorkItem(
 
 private val demoWorks = listOf(
     WorkItem("AI Demo Track", "03:24", "已完成", "2025-07-30 14:20", listOf(Color(0xFF5425C9), Color(0xFFA931D2), Color(0xFF283B9E)), listOf(Icons.Outlined.Verified to "标准处理", Icons.Outlined.GraphicEq to "响度优化", Icons.Outlined.ShowChart to "True Peak")),
-    WorkItem("Dreamscape", "04:18", "处理中 68%", "2025-07-30 11:15", listOf(Color(0xFF3948E8), Color(0xFF795CF4), Color(0xFF25258E)), listOf(Icons.Outlined.Group to "合作计划", Icons.Outlined.GraphicEq to "响度标准化", Icons.Outlined.Tune to "频段平衡"), .68f),
+    WorkItem("Dreamscape", "04:18", "已完成", "2025-07-30 11:15", listOf(Color(0xFF3948E8), Color(0xFF795CF4), Color(0xFF25258E)), listOf(Icons.Outlined.Verified to "标准处理", Icons.Outlined.GraphicEq to "响度标准化", Icons.Outlined.Tune to "频段平衡")),
     WorkItem("Sunset Drive", "03:57", "已完成", "2025-07-29 18:42", listOf(Color(0xFFFF936D), Color(0xFFE74A9D), Color(0xFF8A37A9)), listOf(Icons.Outlined.Verified to "标准处理", Icons.Outlined.PhoneAndroid to "平台适配", Icons.Outlined.ShowChart to "True Peak")),
     WorkItem("Midnight Walk", "02:45", "草稿", "2025-07-28 09:30", listOf(Color(0xFF75DFC5), Color(0xFF45C6C7), Color(0xFF3B9CB5)), listOf(Icons.Outlined.Timer to "未处理")),
 )
 
+private val realWorkColors = listOf(Color(0xFF7B61FF), Color(0xFF4A9BFF), Color(0xFF25258E))
+
+private fun realWorkItem(w: ProcessedWork): WorkItem = WorkItem(
+    title = w.filename,
+    duration = "已处理",
+    status = if (w.gatePassed) "质量门通过" else "质量门未通过",
+    date = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(w.createdAt)),
+    colors = realWorkColors,
+    tags = buildList {
+        add(Icons.Outlined.Verified to w.preset)
+        w.mrsDelta?.let { add(Icons.Outlined.ShowChart to "MRS Δ+%.1f".format(it)) }
+        add(Icons.Outlined.GraphicEq to (w.mrsBefore?.let { "MRS %.0f→%.0f".format(it, w.mrsAfter ?: 0.0) } ?: "MRS 已提升"))
+    },
+    progress = null,
+)
+
 @Composable
 fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
+    val context = LocalContext.current
+    val realWorks = remember { WorkLibrary(context).all() }
+    val works = realWorks.map(::realWorkItem) + demoWorks
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
         Spacer(Modifier.height(24.dp))
         if (onBack == null) {
@@ -59,7 +85,7 @@ fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
             }
         }
         Spacer(Modifier.height(12.dp))
-        demoWorks.forEach { WorkCard(it, onOpenDetail); Spacer(Modifier.height(14.dp)) }
+        works.forEach { WorkCard(it, onOpenDetail); Spacer(Modifier.height(14.dp)) }
         OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(27.dp), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyBlue)) {
             Icon(Icons.Outlined.Add, null, tint = MoodifyBlue); Spacer(Modifier.width(8.dp)); Text("导入作品", color = MoodifyBlue, fontSize = 16.sp)
         }
