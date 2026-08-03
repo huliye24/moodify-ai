@@ -3,6 +3,7 @@ package com.moodify.app.ui
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -80,6 +81,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
     var cwcGiftOpen by remember { mutableStateOf(false) }
     var cwcCenterOpen by remember { mutableStateOf(false) }
     var cwcAuthRequest by remember { mutableStateOf<CwcAuthRequest?>(null) }
+    var nowPlayingOpen by remember { mutableStateOf(false) }
     var startupChecked by remember { mutableStateOf(false) }
     val appContext = androidx.compose.ui.platform.LocalContext.current
     com.moodify.app.data.PlaybackManager.init(appContext)
@@ -96,12 +98,13 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
         startupChecked = true
     }
 
-    val backEnabled = processingOpen || detailOpen || publishOpen || searchOpen ||
+    val backEnabled = nowPlayingOpen || processingOpen || detailOpen || publishOpen || searchOpen ||
         creatorCenterOpen || notificationOpen || copyrightCenterOpen || dataCenterOpen ||
         collaborationOpen || uploadOpen || worksOpen || settingsOpen || helpOpen || aboutOpen ||
         cwcIntroOpen || cwcGiftOpen || cwcCenterOpen || cwcAuthRequest != null
     BackHandler(enabled = backEnabled) {
         when {
+            nowPlayingOpen -> nowPlayingOpen = false
             cwcAuthRequest != null -> cwcAuthRequest = null
             cwcGiftOpen -> cwcGiftOpen = false
             cwcIntroOpen -> cwcIntroOpen = false
@@ -173,18 +176,21 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             // CWC full-screen pages must not be covered by the 3-tab bar.
-            if (cwcAuthRequest == null && !cwcGiftOpen && !cwcIntroOpen && !cwcCenterOpen) {
-                NavigationBar(tonalElevation = 0.dp) {
-                    destinations.forEachIndexed { index, item ->
-                        NavigationBarItem(
-                            selected = selected == index,
-                            onClick = {
-                                closeOverlays()
-                                selected = index
-                            },
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) },
-                        )
+            if (cwcAuthRequest == null && !cwcGiftOpen && !cwcIntroOpen && !cwcCenterOpen && !nowPlayingOpen) {
+                Column {
+                    com.moodify.app.ui.components.MiniPlayer(onOpen = { nowPlayingOpen = true })
+                    NavigationBar(tonalElevation = 0.dp) {
+                        destinations.forEachIndexed { index, item ->
+                            NavigationBarItem(
+                                selected = selected == index,
+                                onClick = {
+                                    closeOverlays()
+                                    selected = index
+                                },
+                                icon = { Icon(item.icon, contentDescription = item.label) },
+                                label = { Text(item.label) },
+                            )
+                        }
                     }
                 }
             }
@@ -192,6 +198,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
     ) { padding ->
         Box(Modifier.padding(padding)) {
             when {
+                nowPlayingOpen -> com.moodify.app.ui.screens.NowPlayingScreen(onClose = { nowPlayingOpen = false })
                 cwcAuthRequest != null -> CwcAuthScreen(
                     mode = cwcAuthRequest!!.mode,
                     prefilledCode = cwcAuthRequest!!.prefilledCode,

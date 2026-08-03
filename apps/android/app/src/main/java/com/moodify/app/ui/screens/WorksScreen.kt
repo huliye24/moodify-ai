@@ -46,6 +46,34 @@ private val demoWorks = listOf(
 
 private val realWorkColors = listOf(Color(0xFF7B61FF), Color(0xFF4A9BFF), Color(0xFF25258E))
 
+/** Queue with [original, processed] adjacent per work for one-tap A/B. */
+private fun buildQueue(works: List<ProcessedWork>): List<com.moodify.app.data.QueueItem> {
+    val items = mutableListOf<com.moodify.app.data.QueueItem>()
+    works.forEach { w ->
+        w.uploadId?.let {
+            items.add(com.moodify.app.data.QueueItem(
+                title = w.filename,
+                subtitle = "原始音频",
+                path = "/uploads/$it/download",
+                isOriginal = true,
+                preset = w.preset,
+            ))
+        }
+        w.artifactId?.let {
+            items.add(com.moodify.app.data.QueueItem(
+                title = w.filename,
+                subtitle = "AI 处理完成",
+                path = "/artifacts/$it/download",
+                isOriginal = false,
+                preset = w.preset,
+                mrsDelta = w.mrsDelta,
+                gatePassed = w.gatePassed,
+            ))
+        }
+    }
+    return items
+}
+
 private fun realWorkItem(w: ProcessedWork): WorkItem = WorkItem(
     title = w.filename,
     duration = "已处理",
@@ -61,6 +89,12 @@ private fun realWorkItem(w: ProcessedWork): WorkItem = WorkItem(
     artifactId = w.artifactId,
     uploadId = w.uploadId,
 )
+
+private fun playFromWorks(works: List<ProcessedWork>, item: WorkItem) {
+    val queue = buildQueue(works)
+    val idx = queue.indexOfFirst { !it.isOriginal && it.title == item.title }
+    com.moodify.app.data.PlaybackManager.playQueue(queue, if (idx >= 0) idx else 0)
+}
 
 @Composable
 fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
@@ -93,8 +127,8 @@ fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
         }
         Spacer(Modifier.height(12.dp))
         works.forEach { item ->
-            WorkCard(item, onOpenDetail, onPlay = item.artifactId?.let { artId ->
-                { com.moodify.app.data.PlaybackManager.play("/artifacts/$artId/download", item.title) }
+            WorkCard(item, onOpenDetail, onPlay = item.artifactId?.let {
+                { playFromWorks(realWorks, item) }
             })
             Spacer(Modifier.height(14.dp))
         }

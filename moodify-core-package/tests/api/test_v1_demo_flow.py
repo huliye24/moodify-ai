@@ -171,6 +171,38 @@ def test_full_flow_end_to_end(client: TestClient, sample_audio: Path,
     assert detail.json()["title"] == "Demo Flow 演示"
 
 
+def test_catalog_lists_and_downloads(client: TestClient, paired: str) -> None:
+    # seed one catalog song
+    cat = Path("data/demo/catalog")
+    cat.mkdir(parents=True, exist_ok=True)
+    seed = cat / "catalog_seed.wav"
+    seed.write_bytes(_SAMPLE_SEED)
+    try:
+        resp = client.get("/api/v1/catalog", headers=_auth(paired))
+        assert resp.status_code == 200
+        songs = resp.json()["songs"]
+        seed_song = next((s for s in songs if s["song_id"] == "song-catalog_seed"), None)
+        assert seed_song is not None, songs
+        assert seed_song["artist"] == "泫榛"
+        assert seed_song["duration_s"] is not None
+
+        dl = client.get(f"/api/v1/catalog/{seed_song['song_id']}/download", headers=_auth(paired))
+        assert dl.status_code == 200
+        assert len(dl.content) > 0
+
+        missing = client.get("/api/v1/catalog/song-nope/download", headers=_auth(paired))
+        assert missing.status_code == 404
+        assert missing.json()["error"]["code"] == "NOT_FOUND"
+
+        noauth = client.get("/api/v1/catalog")
+        assert noauth.status_code == 401
+    finally:
+        seed.unlink(missing_ok=True)
+
+
+_SAMPLE_SEED = b"RIFF\x24\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80\x3e\x00\x00\x00\x7d\x00\x00\x02\x00\x10\x00data\x00\x00\x00\x00"
+
+
 def test_upload_requires_token(client: TestClient, sample_audio: Path) -> None:
     resp = _upload(client, "", sample_audio)
     assert resp.status_code == 401

@@ -68,6 +68,9 @@ class MoodifyApiClient(
             DemoResultSummary.fromJson(JSONObject(body))
         }
 
+    fun requestCatalog(token: String): String =
+        request("GET", "/catalog", null, token = token) { it }
+
     /**
      * Multipart upload of a real audio file. Returns the upload_id.
      * Uses a longer read timeout since 50 MB over USB/LAN can take a while.

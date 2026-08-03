@@ -773,3 +773,64 @@ async def v1_uploads_download(upload_id: str, request: Request):
     if not path.exists():
         return _v1_error("SERVER_ERROR", "upload file missing", _request_id(request))
     return FileResponse(path, media_type="audio/wav", filename=upload["filename"])
+
+
+# ---------------------------------------------------------------------------
+# Platform catalog (DSK-MFY-PLAYER-001): songs browsable on the home screen
+# ---------------------------------------------------------------------------
+
+_CATALOG_DIR = Path("data/demo/catalog")
+_AUDIO_EXTS = {".wav", ".mp3", ".flac", ".m4a"}
+
+
+def _catalog_songs() -> list[dict[str, Any]]:
+    """Scan the catalog folder; wav duration read from header, others unknown."""
+    if not _CATALOG_DIR.exists():
+        return []
+    songs: list[dict[str, Any]] = []
+    for path in sorted(_CATALOG_DIR.iterdir()):
+        if path.is_file() and path.suffix.lower() in _AUDIO_EXTS:
+            duration = _wav_duration(path) if path.suffix.lower() == ".wav" else None
+            songs.append({
+                "song_id": f"song-{path.stem}",
+                "title": path.stem,
+                "artist": "泫榛",
+                "filename": path.name,
+                "duration_s": duration,
+                "preset": "clean_master",
+            })
+    return songs
+
+
+def _wav_duration(path: Path) -> int | None:
+    try:
+        import wave
+        with wave.open(str(path), "rb") as w:
+            return int(w.getnframes() / max(w.getframerate(), 1))
+    except Exception:
+        return None
+
+
+@router.get("/catalog")
+async def v1_catalog(request: Request):
+    """Platform song catalog for the home screen (demo folder scanned)."""
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    return {"songs": _catalog_songs(), "source": "demo-catalog"}
+
+
+@router.get("/catalog/{song_id}/download")
+async def v1_catalog_download(song_id: str, request: Request):
+    """Stream a catalog song."""
+    auth = _require_token(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    songs = _catalog_songs()
+    song = next((s for s in songs if s["song_id"] == song_id), None)
+    if song is None:
+        return _v1_error("NOT_FOUND", "song not found", _request_id(request))
+    path = _CATALOG_DIR / song["filename"]
+    if not path.exists():
+        return _v1_error("SERVER_ERROR", "song file missing", _request_id(request))
+    return FileResponse(path, media_type="audio/wav", filename=song["filename"])

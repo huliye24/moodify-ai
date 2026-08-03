@@ -24,8 +24,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moodify.app.data.ProcessedWork
 import com.moodify.app.data.PlaybackManager
+import com.moodify.app.data.ProcessedWork
+import com.moodify.app.data.QueueItem
 import com.moodify.app.ui.components.GradientButton
 import com.moodify.app.ui.components.PlaybackBar
 import com.moodify.app.ui.theme.*
@@ -35,6 +36,7 @@ fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: (
     val context = LocalContext.current
     val title = work?.filename ?: "AI Demo Track"
     var playOriginal by remember { mutableStateOf(false) }
+    val abQueue = remember(work) { buildAbQueue(work, title) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
         Spacer(Modifier.height(16.dp))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -55,11 +57,11 @@ fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: (
             Spacer(Modifier.height(14.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                 CompareButton("处理前", playOriginal && work?.uploadId != null, Modifier.weight(1f)) {
-                    work?.uploadId?.let { playOriginal = true; PlaybackManager.play("/uploads/$it/download", "$title（处理前）") }
+                    if (work?.uploadId != null) { playOriginal = true; PlaybackManager.playQueue(abQueue, 0) }
                 }
                 Spacer(Modifier.width(10.dp))
                 CompareButton("处理后", !playOriginal && work?.artifactId != null, Modifier.weight(1f)) {
-                    work?.artifactId?.let { playOriginal = false; PlaybackManager.play("/artifacts/$it/download", "$title（处理后）") }
+                    if (work?.artifactId != null) { playOriginal = false; PlaybackManager.playQueue(abQueue, 1) }
                 }
             }
             Spacer(Modifier.height(12.dp))
@@ -91,6 +93,16 @@ fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: (
         Spacer(Modifier.height(14.dp))
         DetailCard { Text("导出与发布", color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold); Spacer(Modifier.height(12.dp)); Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { ExportAction(Icons.Outlined.FileDownload, "导出音频", "WAV / MP3", Modifier.weight(1f)) {}; ExportAction(Icons.Outlined.AudioFile, "下载曲谱", "PDF 格式", Modifier.weight(1f)) {}; ExportAction(Icons.Outlined.Publish, "发布作品", "分享给听众", Modifier.weight(1f), onPublish) } }
         Spacer(Modifier.height(18.dp)); GradientButton("再次处理", onProcessAgain); TextButton(onClick = {}) { Text("查看完整报告", color = MoodifyBlue, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }; Spacer(Modifier.height(18.dp))
+    }
+}
+
+private fun buildAbQueue(work: ProcessedWork?, title: String): List<QueueItem> = buildList {
+    if (work == null) return@buildList
+    work.uploadId?.let {
+        add(QueueItem("$title（处理前）", "原始音频", "/uploads/$it/download", isOriginal = true, preset = work.preset))
+    }
+    work.artifactId?.let {
+        add(QueueItem(title, "AI 处理完成", "/artifacts/$it/download", isOriginal = false, preset = work.preset, mrsDelta = work.mrsDelta, gatePassed = work.gatePassed))
     }
 }
 

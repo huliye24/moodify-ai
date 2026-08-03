@@ -80,6 +80,25 @@ data class DemoResultSummary(
     }
 }
 
+/** One platform song from GET /api/v1/catalog. */
+data class CatalogSong(
+    val songId: String,
+    val title: String,
+    val artist: String,
+    val durationS: Int?,
+    val preset: String,
+) {
+    companion object {
+        fun fromJson(json: JSONObject): CatalogSong = CatalogSong(
+            songId = json.getString("song_id"),
+            title = json.optString("title"),
+            artist = json.optString("artist"),
+            durationS = if (json.isNull("duration_s")) null else json.optInt("duration_s"),
+            preset = json.optString("preset"),
+        )
+    }
+}
+
 /**
  * Real end-to-end demo processing flow:
  * pick audio -> upload -> create project (auto-starts job) -> poll progress.
@@ -150,6 +169,18 @@ class DemoProcessRepository(
     suspend fun result(jobId: String): DemoResultSummary =
         withContext(Dispatchers.IO) {
             client.getJobResult(jobId, requireToken())
+        }
+
+    /** Platform catalog for the home screen. */
+    suspend fun catalog(): List<CatalogSong> =
+        withContext(Dispatchers.IO) {
+            val body = client.requestCatalog(requireToken())
+            val arr = JSONObject(body).optJSONArray("songs") ?: JSONObject.NULL.let { null }
+            buildList {
+                for (i in 0 until (arr?.length() ?: 0)) {
+                    add(CatalogSong.fromJson(arr!!.getJSONObject(i)))
+                }
+            }
         }
 
     private fun sha256Hex(bytes: ByteArray): String =
