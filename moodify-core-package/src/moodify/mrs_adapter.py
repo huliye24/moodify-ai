@@ -12,7 +12,10 @@ Consumers MUST check QualityGate.mrs_version before interpreting MRS values:
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from moodify.v01_types import QualityGate
 
 logger = logging.getLogger(__name__)
 
@@ -207,7 +210,6 @@ def _mrs_proxy_inline(wav_path: str) -> float:
 
         rms_air_val = _band_rms(8000, 16000)
         rms_presence_val = _band_rms(2000, 5000)
-        rms_bass_val = _band_rms(60, 250)
 
         # Same formula as v01_pipeline._mrs_proxy()
         def _clamp(v: float, lo: float = 0.0, hi: float = 1.0) -> float:

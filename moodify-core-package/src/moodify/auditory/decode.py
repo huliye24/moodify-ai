@@ -30,15 +30,28 @@ class DecodedAudio:
     probe: FileProbe
 
 
+def _win_exe(name: str) -> str | None:
+    """Windows 常见安装位兜底（winget links / scoop shims / Program Files）。"""
+    import os
+    for probe in (
+        os.path.expandvars(rf"%LOCALAPPDATA%\Microsoft\WinGet\Links\{name}.exe"),
+        os.path.expanduser(rf"~\scoop\shims\{name}.exe"),
+        rf"C:\Program Files\ffmpeg\bin\{name}.exe",
+    ):
+        if os.path.isfile(probe):
+            return probe
+    return None
+
+
 def _which_ffmpeg() -> str:
-    exe = shutil.which("ffmpeg")
+    exe = shutil.which("ffmpeg") or _win_exe("ffmpeg")
     if exe is None:
         raise FfmpegNotFound("ffmpeg not found on PATH")
     return exe
 
 
 def _which_ffprobe() -> str:
-    exe = shutil.which("ffprobe")
+    exe = shutil.which("ffprobe") or _win_exe("ffprobe")
     if exe is None:
         raise FfprobeNotFound("ffprobe not found on PATH")
     return exe

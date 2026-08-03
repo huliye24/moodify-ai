@@ -10,6 +10,7 @@ import json
 import os
 import time
 from pathlib import Path
+from typing import Any
 
 from moodify.audio_io import load_audio
 from moodify.processing.pedalboard_chain import MoodifyDSPChain

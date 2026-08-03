@@ -1,6 +1,6 @@
 """v01_diagnostics.py — Generate a human-readable diagnosis from AudioMetrics."""
 
-from moodify.v01_types import AudioMetrics, DiagnosisReport
+from moodify.v01_types import AudioMetrics, DiagnosisReport, ProblemEntry, ProblemVector
 
 
 def diagnose(metrics: AudioMetrics) -> DiagnosisReport:
@@ -135,8 +135,6 @@ def to_problem_vector(report: DiagnosisReport) -> "ProblemVector":
     MHP-853 / MHP-866: Maps 13 problem IDs across 4 categories.
     Confidence is computed from threshold distance.
     """
-    from moodify.v01_types import ProblemEntry, ProblemVector
-
     m = report.metrics
     entries: list[ProblemEntry] = []
 

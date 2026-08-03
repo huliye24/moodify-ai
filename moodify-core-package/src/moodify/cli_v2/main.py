@@ -603,7 +603,6 @@ def cmd_case_learning_commit(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def cmd_learning_dataset_export(args: argparse.Namespace) -> dict[str, Any]:
-    import json as _json
 
     from moodify.learning.exports import export_learning_records, validate_export_bundle
     from moodify.learning.store import CaseLearningStore

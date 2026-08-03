@@ -33,8 +33,19 @@ class SpectrogramRun:
 
 
 def _ffmpeg() -> str:
+    import os
     import shutil
     exe = shutil.which("ffmpeg")
+    if exe is None:
+        # Windows 常见安装位（winget links / scoop shims / Program Files），
+        # 不在 PATH 时兜底查找，避免环境缺口导致扫描不可用。
+        for probe in (
+            os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\WinGet\Links\ffmpeg.exe"),
+            os.path.expanduser(r"~\scoop\shims\ffmpeg.exe"),
+            r"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
+        ):
+            if os.path.isfile(probe):
+                return probe
     if exe is None:
         raise FfmpegNotFound("ffmpeg not found on PATH")
     return exe

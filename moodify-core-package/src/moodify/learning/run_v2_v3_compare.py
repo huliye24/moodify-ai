@@ -105,7 +105,8 @@ def main() -> int:
     for b in bands:
         v2 = summary["CANDIDATE-V2-FINAL"]["normalized_band_deltas"].get(b)
         v3 = summary["CANDIDATE-V3-DEEPEAR"]["normalized_band_deltas"].get(b)
-        fmt = lambda v: f"{v:+.4f}" if isinstance(v, (int, float)) else "-"
+        def fmt(v):
+            return f"{v:+.4f}" if isinstance(v, (int, float)) else "-"
         print(f"{b:<24}{fmt(v2):>10}{fmt(v3):>10}")
 
     (BASE / "v2v3_summary.json").write_text(
