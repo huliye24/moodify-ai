@@ -21,7 +21,7 @@ class TestRuntimeConfig:
     def test_to_dict_roundtrip(self):
         c = RuntimeConfig(project_root=Path("/tmp"))
         d = c.to_dict()
-        assert d["project_root"] == "/tmp"
+        assert Path(d["project_root"]) == Path("/tmp")
         assert isinstance(d["presets"], list)
 
     def test_from_dict(self):

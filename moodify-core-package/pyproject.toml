@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "moodify"
-version = "0.1.0"
-description = "Moodify v0.1.0 — AI 音乐二次处理与情绪声波工程系统"
+version = "2.0.0"
+description = "Moodify Studio Workspace v2 — AI 音乐二次处理与情绪声波工程系统"
 authors = [{name = "文川院 / Moodify 声音实验室"}]
 license = {text = "Apache-2.0"}
 readme = "README.md"
@@ -37,6 +37,11 @@ dependencies = [
 [project.optional-dependencies]
 dsp = ["pedalboard>=0.9.0"]
 separation = ["demucs", "torch>=2.0"]
+transcription = [
+    "numpy>=1.24,<2", "scipy>=1.11,<1.14", "librosa>=0.10,<0.11",
+    "mir_eval>=0.8,<0.9", "pretty_midi>=0.2.10,<0.3", "resampy>=0.4,<0.4.3",
+    "scikit-learn>=1.3,<1.6", "onnxruntime>=1.16,<2; platform_system == 'Windows'",
+]
 api = ["fastapi>=0.100.0", "uvicorn", "python-multipart"]
 dev = ["pytest>=7.0", "httpx>=0.24.0", "matplotlib>=3.5"]
 full = ["moodify[dsp,separation,api,dev]"]
@@ -50,14 +55,19 @@ where = ["src"]
 [tool.ruff]
 target-version = "py310"
 
+[tool.ruff.lint]
+# E701/E702（单行多语句）为风格规则，基线代码大量使用且不影响正确性，
+# 本机 ruff 0.15 新默认启用导致全量报错；显式豁免以保持基线稳定。
+ignore = ["E701", "E702"]
+
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", ".."]
 markers = [
-    "v01: v0.1.0 mainline tests",
+    "v01: legacy v0.1.0 mainline tests",
     "legacy: old system tests kept for compatibility",
-    "experimental: future or research modules not required by v0.1.0",
+    "experimental: future or research modules not required by Workspace v2 MVP",
 ]

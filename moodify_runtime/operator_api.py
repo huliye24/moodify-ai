@@ -20,6 +20,7 @@ from .config import load_config
 from .craft_memory import list_craft_records, writeback_delivery_to_craft_record
 from .operator_console import (
     attach_run_report_to_job,
+    authorize_operator_job_source,
     build_operator_report_bundle,
     check_storage_health,
     compact_operator_jobs,
@@ -204,9 +205,34 @@ def _get_app():
                 raise HTTPException(status_code=400, detail=str(e))
 
         @app.post("/operator/jobs/{job_id}/run")
-        async def api_run_job(job_id: str, dry_run: bool = True):
+        async def api_run_job(
+            job_id: str,
+            dry_run: bool = True,
+            rights_manifest: Optional[str] = None,
+            rights_asset_id: str = "",
+        ):
             cfg = load_config()
-            return run_operator_job(cfg, job_id=job_id, dry_run=dry_run)
+            return run_operator_job(
+                cfg,
+                job_id=job_id,
+                dry_run=dry_run,
+                rights_manifest=rights_manifest,
+                rights_asset_id=rights_asset_id,
+            )
+
+        @app.post("/operator/jobs/{job_id}/authorize-rights")
+        async def api_authorize_rights(
+            job_id: str,
+            rights_manifest: str,
+            rights_asset_id: str,
+        ):
+            cfg = load_config()
+            try:
+                return authorize_operator_job_source(
+                    cfg, job_id, rights_manifest, rights_asset_id
+                )
+            except (KeyError, ValueError) as e:
+                raise HTTPException(status_code=400, detail=str(e))
 
         @app.post("/operator/jobs/{job_id}/attach-run")
         async def api_attach_run(
@@ -256,6 +282,8 @@ def _get_app():
             operator_decision: str = "approved",
             notes: str = "",
             override: bool = False,
+            human_approved: bool = False,
+            approved_by: str = "",
         ):
             cfg = load_config()
             try:
@@ -266,6 +294,8 @@ def _get_app():
                     operator_decision=operator_decision,
                     notes=notes,
                     override=override,
+                    human_approved=human_approved,
+                    approved_by=approved_by,
                 )
             except (KeyError, ValueError) as e:
                 raise HTTPException(status_code=400, detail=str(e))

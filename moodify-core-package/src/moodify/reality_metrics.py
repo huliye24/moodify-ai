@@ -11,7 +11,8 @@ from typing import Optional
 import numpy as np
 import soundfile as sf
 
-from moodify.bands import BAND_6_EDGES as BANDS_6
+from moodify.bands import DEFAULT_EDGES as BANDS
+from moodify.mrs_robust import select_reference_stats
 
 
 def load_audio(path: str, always_2d: bool = True) -> tuple[np.ndarray, int]:
@@ -61,7 +62,7 @@ def _spectrum_features(mono: np.ndarray, sr: int) -> dict:
     total = np.sum(fft ** 2) + EPS
 
     bands = {}
-    for name, f1, f2 in BANDS_6:
+    for name, f1, f2 in BANDS:
         mask = (freqs >= f1) & (freqs <= f2)
         bands[name] = np.sum(fft[mask] ** 2) / total
 
@@ -83,6 +84,7 @@ def _spectrum_features(mono: np.ndarray, sr: int) -> dict:
         "band_low_mid": float(bands["low_mid"]),
         "band_mid": float(bands["mid"]),
         "band_presence": float(bands["presence"]),
+        "band_brilliance": float(bands.get("brilliance", 0.0)),
         "band_air": float(bands["air"]),
     }
 
@@ -355,7 +357,7 @@ def build_reference_stats(features_list: list[dict]) -> dict:
         mu[k] = float(np.mean(vals))
         sigma[k] = float(max(np.std(vals), 0.01))
 
-    return {"mu": mu, "sigma": sigma}
+    return {"mu": mu, "sigma": sigma, "n": len(flat_list), "method": "standard"}
 
 
 # ── Distance computation ───────────────────────────────────
@@ -363,7 +365,7 @@ def build_reference_stats(features_list: list[dict]) -> dict:
 FEATURE_GROUPS = {
     "spectrum": ["centroid_norm", "rolloff_norm", "flatness",
                  "band_sub", "band_bass", "band_low_mid", "band_mid",
-                 "band_presence", "band_air"],
+                 "band_presence", "band_brilliance", "band_air"],
     "dynamic": ["crest_factor", "dynamic_range", "short_time_rms_std"],
     "transient": ["spectral_flux_mean", "spectral_flux_std", "short_time_energy_change"],
     "space": ["lr_correlation", "mid_side_ratio", "stereo_width", "phase_anomaly"],
@@ -376,8 +378,9 @@ FEATURE_GROUPS = {
 
 def calculate_reality_distance(features: dict, ref_stats: dict) -> dict:
     """Compute component distances to reference distribution."""
-    mu = ref_stats.get("mu", {})
-    sigma = ref_stats.get("sigma", {})
+    use_robust = ref_stats.get("method") == "mad"
+    mu = ref_stats.get("median", {}) if use_robust else ref_stats.get("mu", {})
+    sigma = ref_stats.get("mad", {}) if use_robust else ref_stats.get("sigma", {})
 
     components = {}
     for group, keys in FEATURE_GROUPS.items():
@@ -394,14 +397,20 @@ def calculate_reality_distance(features: dict, ref_stats: dict) -> dict:
     return components
 
 
-def calculate_mrs(audio_path: str, ref_stats: dict,
-                  weights: Optional[dict] = None) -> dict:
+def calculate_mrs(
+    audio_path: str,
+    ref_stats: dict,
+    weights: Optional[dict] = None,
+    reference_by_genre: dict[str, dict] | None = None,
+    genre: str | None = None,
+) -> dict:
     """Calculate MRS for a single audio file."""
     if weights is None:
         weights = DEFAULT_WEIGHTS
 
+    selected_ref = select_reference_stats(ref_stats, reference_by_genre, genre)
     features = extract_reality_features(audio_path)
-    distances = calculate_reality_distance(features, ref_stats)
+    distances = calculate_reality_distance(features, dict(selected_ref))
 
     total_distance = 0.0
     for group, w in weights.items():
@@ -414,16 +423,24 @@ def calculate_mrs(audio_path: str, ref_stats: dict,
         "distance_total": round(total_distance, 4),
         "components": {k: round(v, 4) for k, v in distances.items()},
         "features": features,
-        "reference_n": ref_stats.get("n", 0),
+        "reference_n": selected_ref.get("n", 0),
+        "reference_genre": genre if selected_ref is not ref_stats else None,
+        "reference_method": selected_ref.get("method", "standard"),
     }
 
 
 def compare_mrs(before_path: str, after_path: str, ref_stats: dict,
                 weights: Optional[dict] = None,
-                label: str = "") -> dict:
+                label: str = "",
+                reference_by_genre: dict[str, dict] | None = None,
+                genre: str | None = None) -> dict:
     """Compare MRS of before vs after_matched audio."""
-    mrs_before = calculate_mrs(before_path, ref_stats, weights)
-    mrs_after = calculate_mrs(after_path, ref_stats, weights)
+    mrs_before = calculate_mrs(
+        before_path, ref_stats, weights, reference_by_genre, genre
+    )
+    mrs_after = calculate_mrs(
+        after_path, ref_stats, weights, reference_by_genre, genre
+    )
 
     delta_mrs = round(mrs_after["mrs"] - mrs_before["mrs"], 2)
 

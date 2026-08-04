@@ -269,7 +269,7 @@ def _load_genre_thresholds(genre: str = "") -> Dict[str, Any]:
     }
     try:
         config_path = Path(__file__).resolve().parent.parent / "configs" / "mrs_thresholds.yaml"
-        with open(config_path) as fh:
+        with open(config_path, encoding="utf-8") as fh:
             cfg = _yaml.safe_load(fh) or {}
     except Exception:
         return defaults
@@ -533,6 +533,8 @@ def create_delivery_record(
     operator_decision: str = "approved",
     notes: str = "",
     override: bool = False,
+    human_approved: bool = False,
+    approved_by: str = "",
 ) -> Dict[str, Any]:
     """Create a delivery record and update the job to 'delivered'.
 
@@ -543,7 +545,7 @@ def create_delivery_record(
 
     Returns the delivery record dict.
     """
-    get_operator_job(cfg, job_id)
+    job = get_operator_job(cfg, job_id)
     detail_dir = _operator_detail_dir(cfg)
     detail_path = detail_dir / f"{job_id}.json"
     detail: Dict[str, Any] = {}
@@ -578,6 +580,16 @@ def create_delivery_record(
             f"set override=True with a reason in notes to force delivery"
         )
 
+    from .hardening_gates import mrs_can_release
+
+    human_allowed, human_reason = mrs_can_release(human_approved=human_approved)
+    if not human_allowed:
+        raise ValueError(human_reason)
+    if not approved_by.strip():
+        raise ValueError("approved_by is required for human listening approval")
+    if not job.get("rights_manifest") or not job.get("rights_asset_id"):
+        raise ValueError("job has no verified rights evidence; delivery is blocked")
+
     # Determine archive path
     archive_path = detail.get("report_path", "")
     if archive_path:
@@ -596,7 +608,14 @@ def create_delivery_record(
         notes=notes,
     )
 
-    append_jsonl(_operator_deliveries_path(cfg), record.to_dict())
+    record_payload = record.to_dict()
+    record_payload.update({
+        "human_approved": True,
+        "approved_by": approved_by.strip(),
+        "rights_manifest": job["rights_manifest"],
+        "rights_asset_id": job["rights_asset_id"],
+    })
+    append_jsonl(_operator_deliveries_path(cfg), record_payload)
 
     # Update job status
     _update_job(
@@ -609,7 +628,7 @@ def create_delivery_record(
         },
     )
 
-    return record.to_dict()
+    return record_payload
 
 
 def get_delivery_record(
@@ -715,10 +734,39 @@ def plan_operator_runtime(
     }
 
 
+def authorize_operator_job_source(
+    cfg: RuntimeConfig,
+    job_id: str,
+    rights_manifest: str | Path,
+    rights_asset_id: str,
+) -> Dict[str, Any]:
+    """Validate and persist rights evidence for one exact Operator Job source."""
+    from .hardening_gates import authorize_audio_source
+
+    job = get_operator_job(cfg, job_id)
+    source_path = Path(job["source_audio"])
+    if not source_path.is_absolute():
+        source_path = cfg.resolved().project_root / source_path
+    allowed, reason = authorize_audio_source(
+        rights_manifest, rights_asset_id, source_path
+    )
+    if not allowed:
+        raise ValueError(reason)
+    evidence = {
+        "rights_manifest": str(Path(rights_manifest)),
+        "rights_asset_id": rights_asset_id,
+        "rights_verified_at": utc_now_iso(),
+    }
+    _update_job(cfg, job_id, evidence)
+    return {"job_id": job_id, **evidence}
+
+
 def run_operator_job(
     cfg: RuntimeConfig,
     job_id: str,
     dry_run: bool = False,
+    rights_manifest: str | Path | None = None,
+    rights_asset_id: str = "",
 ) -> Dict[str, Any]:
     """Execute the runtime for an Operator Job's queued tasks.
 
@@ -736,13 +784,15 @@ def run_operator_job(
     from .runner import run_daily, select_pending_tasks
 
     cfg = cfg.resolved()
-    get_operator_job(cfg, job_id)
+    job = get_operator_job(cfg, job_id)
 
-    # Pre-flight: check that the queue has pending tasks
+    # Pre-flight: check that the queue has pending tasks for this job
+    job_reason_prefix = f"operator_job:{job_id}:"
     if not dry_run:
         queue_rows = load_queue(cfg)
         pending = select_pending_tasks(queue_rows)
-        if not pending:
+        job_pending = [t for t in pending if str(t.get("reason", "")).startswith(job_reason_prefix)]
+        if not job_pending:
             now = utc_now_iso()
             _update_job(
                 cfg, job_id,
@@ -751,15 +801,42 @@ def run_operator_job(
                     "current_step": "runtime_failed",
                     "run_started_at": now,
                     "run_finished_at": now,
-                    "last_error": "No pending tasks in queue. Run plan-runtime first.",
+                    "last_error": f"No pending tasks for this job in queue. Run plan-runtime first.",
                 },
             )
             return {
                 "job_id": job_id,
                 "status": "failed",
-                "error": "No pending tasks in queue. Run plan-runtime first.",
+                "error": f"No pending tasks for this job in queue. Run plan-runtime first.",
                 "dry_run": False,
             }
+
+        if not rights_manifest or not rights_asset_id:
+            now = utc_now_iso()
+            error = "Explicit rights_manifest and rights_asset_id are required for live processing."
+            _update_job(cfg, job_id, {
+                "status": "failed",
+                "current_step": "rights_gate_blocked",
+                "run_started_at": now,
+                "run_finished_at": now,
+                "last_error": error,
+            })
+            return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
+        try:
+            authorize_operator_job_source(
+                cfg, job_id, rights_manifest, rights_asset_id
+            )
+        except ValueError as exc:
+            now = utc_now_iso()
+            error = f"Rights gate blocked processing: {exc}"
+            _update_job(cfg, job_id, {
+                "status": "failed",
+                "current_step": "rights_gate_blocked",
+                "run_started_at": now,
+                "run_finished_at": now,
+                "last_error": error,
+            })
+            return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
 
     now = utc_now_iso()
     _update_job(
@@ -773,7 +850,13 @@ def run_operator_job(
     )
 
     try:
-        result = run_daily(cfg, dry_run=dry_run)
+        result = run_daily(
+            cfg,
+            dry_run=dry_run,
+            rights_manifest=str(rights_manifest) if rights_manifest else None,
+            rights_asset_id=rights_asset_id,
+            task_filter=lambda t: str(t.get("reason", "")).startswith(job_reason_prefix),
+        )
     except Exception as exc:
         _update_job(
             cfg,

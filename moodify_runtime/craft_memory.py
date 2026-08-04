@@ -28,10 +28,8 @@ def _to_float(x: Any) -> Optional[float]:
 def seed_craft_memory(cfg: RuntimeConfig, run_id: Optional[str] = None, top_k: int = 10) -> Dict[str, Any]:
     cfg = cfg.resolved()
     if run_id is None:
-        runs = sorted([p for p in cfg.output_root.iterdir() if p.is_dir()]) if cfg.output_root.exists() else []
-        if not runs:
-            raise FileNotFoundError(f"No run directories in {cfg.output_root}")
-        run_dir = runs[-1]
+        from .utils import find_latest_run_dir
+        run_dir = find_latest_run_dir(cfg.output_root)
         run_id = run_dir.name
     else:
         run_dir = cfg.output_root / run_id

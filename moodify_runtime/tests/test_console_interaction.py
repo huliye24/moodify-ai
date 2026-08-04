@@ -10,6 +10,7 @@ import os
 from fastapi.testclient import TestClient
 
 from moodify_runtime.tests.test_operator_console import _write_manifest
+from moodify_runtime.tests.test_api_jobs import _authorize_api_job
 
 
 def _cfg_path(tmp_path):
@@ -87,6 +88,7 @@ def test_delivery_view_has_api_data(tmp_path):
     cr = client.post("/operator/jobs", params={"source_audio": "input/s.wav",
                      "processing_depth": "quick_scan"})
     job_id = cr.json()["job_id"]
+    _authorize_api_job(client, tmp_path, job_id)
 
     run_dir = tmp_path / "outputs" / "console_dlv"
     _write_manifest(run_dir, [{
@@ -105,7 +107,11 @@ def test_delivery_view_has_api_data(tmp_path):
     detail = client.post(f"/operator/jobs/{job_id}/attach-run",
                          params={"run_id": "console_dlv", "report_path": str(rp)})
     cand_id = detail.json()["candidate_versions"][0]["candidate_id"]
-    client.post(f"/operator/jobs/{job_id}/deliver", params={"candidate_id": cand_id})
+    client.post(f"/operator/jobs/{job_id}/deliver", params={
+        "candidate_id": cand_id,
+        "human_approved": True,
+        "approved_by": "test-reviewer",
+    })
 
     dr = client.get("/operator/deliveries")
     assert len(dr.json()["deliveries"]) >= 1

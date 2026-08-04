@@ -9,4 +9,22 @@ from moodify.processing.operators import (
 from moodify.processing.pedalboard_chain import (
     MoodifyDSPChain, create_chain_from_code,
 )
+from moodify.processing.rbj_eq import (
+    COEFF_FUNCTIONS,
+    apply_rbj_eq,
+    compute_freq_response,
+    cascade_freq_response,
+    rbj_low_shelf_coeffs,
+    rbj_high_shelf_coeffs,
+    rbj_peaking_coeffs,
+    rbj_highpass_coeffs,
+    rbj_lowpass_coeffs,
+)
 from moodify.processing.spectral_chain import SpectralDSPChain
+from moodify.processing.limiter import (
+    LimiterAudit,
+    apply_limiter_tp,
+    apply_limiter_legacy,
+    measure_true_peak,
+    measure_low_freq_thd,
+)

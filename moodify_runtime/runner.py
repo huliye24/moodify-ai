@@ -3,15 +3,17 @@ from __future__ import annotations
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from .config import RuntimeConfig
+from .hardening_gates import authorize_audio_source
 from .metrics import compare_before_after
 from .queue import load_queue, rewrite_queue
 from .utils import (
     LineLogger,
     LockFile,
-    append_csv,
+    atomic_append_csv,
+    atomic_write_json,
     check_disk_space,
     cleanup_old_runs,
     local_stamp,
@@ -20,7 +22,6 @@ from .utils import (
     run_command,
     shutdown_requested,
     utc_now_iso,
-    write_json,
 )
 
 MANIFEST_FIELDS = [
@@ -68,6 +69,9 @@ def run_daily(
     limit: int = 0,
     dry_run: bool = False,
     run_id: Optional[str] = None,
+    rights_manifest: Optional[str] = None,
+    rights_asset_id: str = "",
+    task_filter: Optional[Callable[[Dict[str, Any]], bool]] = None,
 ) -> Dict[str, Any]:
     cfg = cfg.resolved()
     run_id = run_id or local_stamp()
@@ -84,6 +88,7 @@ def run_daily(
         "queue_path": str(cfg.queue_path),
         "success": 0,
         "failed": 0,
+        "rights_blocked": 0,
         "dry_run_tasks": 0,
         "total_selected": 0,
         "tasks": [],
@@ -106,6 +111,8 @@ def run_daily(
 
         queue_rows = load_queue(cfg)
         tasks = select_pending_tasks(queue_rows, limit=limit)
+        if task_filter is not None:
+            tasks = [t for t in tasks if task_filter(t)]
         summary["total_selected"] = len(tasks)
         logger.write(f"selected_tasks={len(tasks)}")
 
@@ -128,7 +135,6 @@ def run_daily(
             task = dict(task)
             task["run_id"] = run_id
             task["started_at"] = utc_now_iso()
-            task["attempts"] = int(task.get("attempts") or 0) + 1
 
             input_path = Path(task["input_path"])
             preset = task["preset"]
@@ -136,6 +142,67 @@ def run_daily(
             task_output_dir = run_dir / sample_id / preset
             task_output_dir.mkdir(parents=True, exist_ok=True)
             task["output_dir"] = str(task_output_dir)
+
+            if dry_run:
+                logger.write(
+                    f"[DRY-RUN] task={task['task_id']} input={input_path} preset={preset}"
+                )
+                for i, template in enumerate(cfg.command_templates):
+                    try:
+                        context = {
+                            "python": cfg.python,
+                            "project_root": cfg.project_root,
+                            "input": input_path,
+                            "output_dir": task_output_dir,
+                            "preset": preset,
+                            "sample_id": sample_id,
+                            "task_id": task["task_id"],
+                            "run_id": run_id,
+                        }
+                        argv = render_template_to_argv(template, context)
+                        logger.write(f"[DRY-RUN] template#{i}: {quote_cmd(argv)}")
+                    except Exception as e:
+                        logger.write(f"[DRY-RUN] template#{i} invalid: {e}")
+                task["status"] = "pending"
+                summary["dry_run_tasks"] += 1
+                continue
+
+            # ── Rights gate: fail-closed per-task authorization ──────
+            if rights_manifest:
+                ok, reason = authorize_audio_source(
+                    rights_manifest, rights_asset_id, input_path
+                )
+                if not ok:
+                    task["status"] = "rights_blocked"
+                    task["last_error"] = f"rights: {reason}"
+                    task["finished_at"] = utc_now_iso()
+                    summary["rights_blocked"] += 1
+                    queue_rows = replace_task(queue_rows, task)
+                    rewrite_queue(cfg, queue_rows)
+                    logger.write(f"RIGHTS_BLOCKED task={task['task_id']} reason={reason}")
+                    summary["tasks"].append({
+                        "run_id": run_id,
+                        "task_id": task["task_id"],
+                        "sample_id": sample_id,
+                        "input_path": str(input_path),
+                        "preset": preset,
+                        "status": "rights_blocked",
+                        "return_code": "",
+                        "elapsed_seconds": "",
+                        "output_dir": str(task_output_dir),
+                        "template_index": "",
+                        "pseudo_mrs_before": "",
+                        "pseudo_mrs_after": "",
+                        "pseudo_delta_mrs": "",
+                        "mrs_open_v031_before": "",
+                        "mrs_open_v031_after": "",
+                        "delta_mrs_open_v031": "",
+                        "mrs_open_flags": "",
+                        "error": f"rights: {reason}",
+                    })
+                    continue
+
+            task["attempts"] = int(task.get("attempts") or 0) + 1
 
             context = {
                 "python": cfg.python,
@@ -147,20 +214,6 @@ def run_daily(
                 "task_id": task["task_id"],
                 "run_id": run_id,
             }
-
-            if dry_run:
-                logger.write(
-                    f"[DRY-RUN] task={task['task_id']} input={input_path} preset={preset}"
-                )
-                for i, template in enumerate(cfg.command_templates):
-                    try:
-                        argv = render_template_to_argv(template, context)
-                        logger.write(f"[DRY-RUN] template#{i}: {quote_cmd(argv)}")
-                    except Exception as e:
-                        logger.write(f"[DRY-RUN] template#{i} invalid: {e}")
-                task["status"] = "pending"
-                summary["dry_run_tasks"] += 1
-                continue
 
             # --- Retry loop ---
             task_ok = False
@@ -230,7 +283,7 @@ def run_daily(
 
             # --- Metrics ---
             metrics = compare_before_after(input_path, task_output_dir)
-            write_json(task_output_dir / "metrics_before_after.json", metrics)
+            atomic_write_json(task_output_dir / "metrics_before_after.json", metrics)
 
             # --- Record result ---
             if task_ok:
@@ -276,11 +329,11 @@ def run_daily(
                 "mrs_open_flags": ",".join(metrics.get("mrs_open_flags", [])) if metrics.get("mrs_open_flags") else "",
                 "error": task.get("last_error") or "",
             }
-            append_csv(run_dir / "manifest.csv", manifest_row, MANIFEST_FIELDS)
+            atomic_append_csv(run_dir / "manifest.csv", manifest_row, MANIFEST_FIELDS)
             summary["tasks"].append(manifest_row)
 
             # Incremental summary
-            write_json(run_dir / "summary.json", summary)
+            atomic_write_json(run_dir / "summary.json", summary)
 
             # Disk check after each task
             ok, free_gb = check_disk_space(cfg.output_root, min_disk)
@@ -299,7 +352,7 @@ def run_daily(
         if shutdown_requested():
             summary["shutdown_requested"] = True
         summary["finished_at"] = utc_now_iso()
-        write_json(run_dir / "summary.json", summary)
+        atomic_write_json(run_dir / "summary.json", summary)
 
         keep_last = int(cfg.keep_last_n_runs)
         cleanup_old_runs(cfg.output_root, keep_last, logger)
@@ -313,7 +366,7 @@ def run_daily(
     except Exception as e:
         summary["finished_at"] = utc_now_iso()
         summary["fatal_error"] = f"{type(e).__name__}: {e}"
-        write_json(run_dir / "summary.json", summary)
+        atomic_write_json(run_dir / "summary.json", summary)
         logger.write(f"FATAL {type(e).__name__}: {e}")
         return summary
     finally:

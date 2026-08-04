@@ -1,6 +1,7 @@
 package com.moodify.app.data
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -39,6 +40,7 @@ data class PlaybackState(
  * Moodify backend with the pair token attached (the API requires Bearer
  * auth on every endpoint). Queue-aware for continuous playback.
  */
+@OptIn(androidx.media3.common.util.UnstableApi::class)
 object PlaybackManager {
 
     private var player: ExoPlayer? = null

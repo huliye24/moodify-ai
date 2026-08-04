@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import multiprocessing
 import os
+import sys
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -38,7 +39,7 @@ class WorkerLease:
         if self.released:
             return True
         if not self.heartbeat_at and not self.acquired_at:
-            return False
+            return True  # fail-closed: no proof of freshness → expired
         ts = self.heartbeat_at or self.acquired_at
         from datetime import datetime, timezone
         try:
@@ -46,7 +47,7 @@ class WorkerLease:
             age = (datetime.now(timezone.utc) - dt).total_seconds()
             return age > self.ttl_seconds
         except Exception:
-            return False
+            return True  # fail-closed: corrupt timestamp → expired, reclaimable
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -71,31 +72,25 @@ def acquire_worker_lease(
 
 
 def release_worker_lease(lease_id: str, lease_store: Path) -> bool:
-    """Release a lease. Updates the JSONL record."""
+    """Release a lease. Updates the JSONL record atomically."""
+    from .utils import atomic_write_jsonl
     leases = read_jsonl(lease_store)
     for l in leases:
         if l.get("lease_id") == lease_id:
             l["released"] = True
             l["released_at"] = utc_now_iso()
-    # Rewrite
-    import json
-    lease_store.write_text(
-        "\n".join(json.dumps(l, ensure_ascii=False) for l in leases) + "\n",
-        encoding="utf-8",
-    )
+    atomic_write_jsonl(lease_store, leases)
     return True
 
 
 def heartbeat_worker_lease(lease_id: str, lease_store: Path) -> bool:
-    """Update heartbeat timestamp on a lease."""
+    """Update heartbeat timestamp on a lease atomically."""
+    from .utils import atomic_write_jsonl
     leases = read_jsonl(lease_store)
     for l in leases:
         if l.get("lease_id") == lease_id:
             l["heartbeat_at"] = utc_now_iso()
-    lease_store.write_text(
-        "\n".join(json.dumps(l, ensure_ascii=False) for l in leases) + "\n",
-        encoding="utf-8",
-    )
+    atomic_write_jsonl(lease_store, leases)
     return True
 
 
@@ -116,13 +111,21 @@ def find_expired_leases(lease_store: Path) -> List[WorkerLease]:
 
 def _run_one_task(idx_cmd: Tuple[int, List[str]], timeout_per_task: float = 300.0) -> Dict[str, Any]:
     """Module-level (picklable) single-task runner for multiprocessing."""
+    import shutil
     import subprocess as _subprocess
     idx, cmd = idx_cmd
+    original_cmd = list(cmd)
+    cmd = list(cmd)
+    if cmd and cmd[0] in {"python", "python3"} and shutil.which(cmd[0]) is None:
+        cmd[0] = sys.executable
+    elif cmd and cmd[0] == "echo" and shutil.which("echo") is None:
+        message = " ".join(cmd[1:])
+        cmd = [sys.executable, "-c", f"print({message!r})"]
     try:
         proc = _subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_per_task)
         return {
             "index": idx,
-            "command": " ".join(cmd[:3]) + "...",
+            "command": " ".join(original_cmd[:3]) + "...",
             "exit_code": proc.returncode,
             "ok": proc.returncode == 0,
             "stdout_tail": proc.stdout[-200:] if proc.stdout else "",
@@ -130,9 +133,9 @@ def _run_one_task(idx_cmd: Tuple[int, List[str]], timeout_per_task: float = 300.
             "pid": os.getpid(),
         }
     except _subprocess.TimeoutExpired:
-        return {"index": idx, "command": " ".join(cmd[:3]) + "...", "ok": False, "error": "timeout", "pid": os.getpid()}
+        return {"index": idx, "command": " ".join(original_cmd[:3]) + "...", "ok": False, "error": "timeout", "pid": os.getpid()}
     except Exception as e:
-        return {"index": idx, "command": " ".join(cmd[:3]) + "...", "ok": False, "error": str(e), "pid": os.getpid()}
+        return {"index": idx, "command": " ".join(original_cmd[:3]) + "...", "ok": False, "error": str(e), "pid": os.getpid()}
 
 
 def run_parallel_tasks(
@@ -234,7 +237,7 @@ def probe_failure_isolation(
     Injects a failing command at fail_index. All other commands should still succeed.
     """
     if fail_index >= 0 and fail_index < len(commands):
-        commands[fail_index] = ["python3", "-c", "import sys; sys.exit(1)"]
+        commands[fail_index] = [sys.executable, "-c", "import sys; sys.exit(1)"]
 
     results = run_parallel_tasks(commands, max_workers=len(commands))
 

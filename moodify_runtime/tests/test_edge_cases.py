@@ -14,6 +14,7 @@ from moodify_runtime.operator_console import (
     get_operator_job,
     run_operator_job,
 )
+from moodify_runtime.tests.gate_helpers import create_test_delivery
 from moodify_runtime.scheduler import (
     list_scheduler_costs,
     record_compute_run,
@@ -60,13 +61,13 @@ def test_double_delivery_same_candidate(tmp_path):
     detail = attach_run_report_to_job(cfg, job_id=job["job_id"], run_id="double_dlv", report_path=rp)
     cand_id = detail["candidate_versions"][0]["candidate_id"]
 
-    d1 = create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id)
-    d2 = create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id, operator_decision="approved", override=True)
+    d1 = create_test_delivery(cfg, job, cand_id)
+    d2 = create_test_delivery(cfg, job, cand_id, operator_decision="approved", override=True)
     assert d1["delivery_id"] != d2["delivery_id"]
 
 
-def test_writeback_without_delivery_still_works(tmp_path):
-    """Craft writeback should work on any job with detail, not just delivered ones."""
+def test_writeback_without_delivery_is_blocked(tmp_path):
+    """Craft writeback must not bypass delivery and human approval."""
     cfg = RuntimeConfig(
         project_root=tmp_path, output_root=tmp_path / "outputs", report_dir=tmp_path / "reports",
         operator_jobs_path=tmp_path / "operator_jobs.jsonl",
@@ -91,8 +92,12 @@ def test_writeback_without_delivery_still_works(tmp_path):
     cand_id = detail["candidate_versions"][0]["candidate_id"]
 
     # Writeback without delivery — should succeed
-    craft = writeback_delivery_to_craft_record(cfg, job_id=job["job_id"], candidate_id=cand_id, adoption_status="experimental")
-    assert craft["craft_id"].startswith("CRFT_")
+    import pytest
+    with pytest.raises(ValueError, match="delivery record"):
+        writeback_delivery_to_craft_record(
+            cfg, job_id=job["job_id"], candidate_id=cand_id,
+            adoption_status="experimental"
+        )
     job = get_operator_job(cfg, job["job_id"])
     assert job["status"] == "gate_review"  # not delivered
 
@@ -281,7 +286,7 @@ def test_run_operator_job_dry_run_preserves_status(tmp_path):
     )
     # Need an actual audio file for plan + dry-run
     from pathlib import Path
-    src = Path("/home/ubuntu/moodify-mainline/moodify-core-package/tests/baseline/test_audio/piano.wav")
+    src = Path(__file__).resolve().parents[2] / "moodify-core-package" / "tests" / "baseline" / "test_audio" / "piano.wav"
     input_dir = tmp_path / "input"
     input_dir.mkdir(parents=True)
     (input_dir / "piano.wav").write_bytes(src.read_bytes())

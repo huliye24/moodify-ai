@@ -5,6 +5,7 @@ Excluded from normal CI. Run with: pytest -m slow
 """
 
 import csv
+import sys
 
 import pytest
 
@@ -17,15 +18,14 @@ from moodify_runtime.operator_console import (
     plan_operator_runtime,
     run_operator_job,
 )
+from moodify_runtime.tests.gate_helpers import authorize_test_job
 
-BASELINE = __import__("pathlib").Path(
-    "/home/ubuntu/moodify-mainline/moodify-core-package/tests/baseline/test_audio"
-)
+BASELINE = __import__("pathlib").Path(__file__).resolve().parents[2] / "moodify-core-package" / "tests" / "baseline" / "test_audio"
 
 # Moodify CLI matches: python3 -m moodify.cli process <audio> --output-dir <dir> --preset <name>
 CORRECT_TEMPLATES = [
-    "python3 -m moodify.cli process {input} --output-dir {output_dir} --preset {preset}",
-    "python3 -m moodify.cli process {input} --output-dir {output_dir} --preset {preset} --json",
+    "{python} -m moodify.cli process {input} --output-dir {output_dir} --preset {preset}",
+    "{python} -m moodify.cli process {input} --output-dir {output_dir} --preset {preset} --json",
 ]
 
 
@@ -41,7 +41,7 @@ def _make_cfg(tmp_path, input_dir, **overrides):
         queue_path=tmp_path / "queue.jsonl",
         operator_jobs_path=tmp_path / "operator_jobs.jsonl",
         operator_detail_dir=tmp_path / "operator_details",
-        python="python3",
+        python=sys.executable,
         timeout_seconds_per_task=120,
         sleep_seconds_between_tasks=0.5,
         max_retries_per_task=0,
@@ -73,6 +73,7 @@ def test_full_pipeline_with_real_audio(tmp_path):
         cfg, source_audio=str(input_dir / "piano.wav"),
         processing_depth="quick_scan", project_label="real-audio-test",
     )
+    rights_manifest, rights_asset_id = authorize_test_job(cfg, job)
     assert job["job_id"].startswith("JOB_")
 
     # 2. Plan runtime
@@ -80,7 +81,13 @@ def test_full_pipeline_with_real_audio(tmp_path):
     assert plan["queue"]["added"] >= 1, f"No queue tasks: {plan}"
 
     # 3. Run with --live
-    result = run_operator_job(cfg, job_id=job["job_id"], dry_run=False)
+    result = run_operator_job(
+        cfg,
+        job_id=job["job_id"],
+        dry_run=False,
+        rights_manifest=rights_manifest,
+        rights_asset_id=rights_asset_id,
+    )
     assert result["status"] == "completed", (
         f"Real run failed: {result.get('error', 'unknown')}"
     )

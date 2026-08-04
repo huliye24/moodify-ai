@@ -46,7 +46,7 @@ def _load_cfg(path: Optional[str] = None) -> dict:
     p = path or DEFAULT_CFG
     if not os.path.exists(p):
         raise FileNotFoundError(f"MRS config not found: {p}")
-    with open(p) as f:
+    with open(p, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 

@@ -7,6 +7,8 @@ restart crashed subprocesses before we invest in a full production supervisor in
 from __future__ import annotations
 
 import subprocess
+import shutil
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -63,8 +65,19 @@ def run_supervised(
     - Checkpoint state (that's MHP-097)
     - Handle SIGTERM/SIGKILL escalation (that's Build NEM)
     """
+    normalized_command = list(command)
+    if normalized_command and normalized_command[0] in {"python", "python3"}:
+        if shutil.which(normalized_command[0]) is None:
+            normalized_command[0] = sys.executable
+    elif normalized_command and normalized_command[0] == "echo" and shutil.which("echo") is None:
+        message = " ".join(normalized_command[1:])
+        normalized_command = [sys.executable, "-c", f"print({message!r})"]
+    elif normalized_command and normalized_command[0] == "sleep" and shutil.which("sleep") is None:
+        seconds = float(normalized_command[1]) if len(normalized_command) > 1 else 0.0
+        normalized_command = [sys.executable, "-c", f"import time; time.sleep({seconds!r})"]
+
     result = SupervisedRun(
-        command=command,
+        command=list(command),
         timeout=timeout,
         max_retries=max_retries,
         retry_delay=retry_delay,
@@ -75,7 +88,7 @@ def run_supervised(
         result.attempts = attempt
         try:
             proc = subprocess.run(
-                command,
+                normalized_command,
                 capture_output=True,
                 text=True,
                 timeout=timeout,

@@ -10,6 +10,7 @@ from moodify_runtime.operator_console import (
     create_delivery_record,
     get_operator_job,
 )
+from moodify_runtime.tests.gate_helpers import create_test_delivery
 from moodify_runtime.cli import main
 from moodify_runtime.utils import read_jsonl
 
@@ -134,7 +135,7 @@ def test_report_bundle_includes_delivery_when_delivered(tmp_path):
     cand_id = detail["candidate_versions"][0]["candidate_id"]
 
     # Deliver
-    create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id)
+    create_test_delivery(cfg, job, cand_id)
 
     # Build report
     build_operator_report_bundle(cfg, job_id=job["job_id"])

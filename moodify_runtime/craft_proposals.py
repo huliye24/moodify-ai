@@ -61,6 +61,7 @@ def write_automated_proposal(
         proposal_id = f"PROP_{uuid.uuid4().hex[:12].upper()}"
         proposal = {
             "proposal_id": proposal_id,
+            "schema_version": "1.0.0",
             "status": DEFAULT_PROPOSAL_STATUS,
             "source": source,
             "source_run_id": source_run_id,
@@ -179,6 +180,7 @@ def promote_proposal_to_craft(
 
     craft_record = {
         "craft_id": craft_id,
+        "schema_version": "1.0.0",
         "adoption_status": "candidate",
         "source": proposal["source"],
         "source_proposal_id": proposal_id,

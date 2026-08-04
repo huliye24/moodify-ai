@@ -152,18 +152,20 @@ def run_preset_experiment(
     Returns a list of results, one per preset.
     """
     import subprocess
+    import sys
+    import tempfile
     from pathlib import Path
 
     results = []
     sample_id = Path(sample_path).stem
 
     for preset in preset_names:
-        out_dir = Path(output_dir) / sample_id / preset if output_dir else Path(f"/tmp/craft_exp/{sample_id}/{preset}")
+        out_dir = (Path(output_dir) if output_dir else Path(tempfile.gettempdir()) / "craft_exp") / sample_id / preset
         out_dir.mkdir(parents=True, exist_ok=True)
 
         try:
             proc = subprocess.run(
-                ["python3", "-m", "moodify.cli", "process", sample_path,
+                [sys.executable, "-m", "moodify.cli", "process", sample_path,
                  "--output-dir", str(out_dir), "--preset", preset],
                 capture_output=True, text=True, timeout=120,
             )

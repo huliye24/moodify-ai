@@ -38,6 +38,24 @@ def _api_client(tmp_path, extra=None):
     return TestClient(app)
 
 
+def _authorize_api_job(client, tmp_path, job_id, source_audio="input/s.wav"):
+    rights = tmp_path / f"rights_{job_id}.json"
+    rights.write_text(json.dumps({
+        "schema_version": "1.0.0",
+        "gate_id": "TEST",
+        "assets": [{
+            "asset_id": "TEST-ASSET",
+            "source_path": str((tmp_path / source_audio).resolve()),
+            "status": "ready",
+        }],
+    }), encoding="utf-8")
+    response = client.post(f"/operator/jobs/{job_id}/authorize-rights", params={
+        "rights_manifest": str(rights),
+        "rights_asset_id": "TEST-ASSET",
+    })
+    assert response.status_code == 200, response.text
+
+
 def _write_manifest(run_dir, rows):
     import csv
     fields = [
@@ -141,7 +159,7 @@ def test_run_job_dry_run(tmp_path):
     client = _api_client(tmp_path)
     # Need an actual file to plan runtime first
     from pathlib import Path
-    test_wav = Path("/home/ubuntu/moodify-mainline/moodify-core-package/tests/baseline/test_audio/piano.wav")
+    test_wav = Path(__file__).resolve().parents[2] / "moodify-core-package" / "tests" / "baseline" / "test_audio" / "piano.wav"
     input_dir = tmp_path / "input"
     input_dir.mkdir(parents=True)
     (input_dir / "piano.wav").write_bytes(test_wav.read_bytes())
@@ -214,7 +232,7 @@ def test_build_report(tmp_path):
         "input_path": "input/s.wav", "preset": "warm_vocal",
         "status": "done", "return_code": "0", "elapsed_seconds": "3.0",
         "output_dir": "outputs/api_rpt/SMP_B/warm_vocal", "template_index": "0",
-        "pseudo_mrs_before": "", "pseudo_mrs_after": "", "pseudo_delta_mrs": "",
+        "pseudo_mrs_before": "10", "pseudo_mrs_after": "15", "pseudo_delta_mrs": "5",
         "mrs_open_v031_before": "", "mrs_open_v031_after": "", "delta_mrs_open_v031": "",
         "mrs_open_flags": "", "error": "",
     }])
@@ -248,6 +266,7 @@ def test_deliver_candidate(tmp_path):
     client = _api_client(tmp_path)
     create_r = client.post("/operator/jobs", params={"source_audio": "input/s.wav", "processing_depth": "quick_scan"})
     job_id = create_r.json()["job_id"]
+    _authorize_api_job(client, tmp_path, job_id)
 
     run_dir = tmp_path / "outputs" / "api_dlv"
     _write_manifest(run_dir, [{
@@ -268,10 +287,19 @@ def test_deliver_candidate(tmp_path):
     })
     cand_id = detail_r.json()["candidate_versions"][0]["candidate_id"]
 
+    blocked = client.post(f"/operator/jobs/{job_id}/deliver", params={
+        "candidate_id": cand_id,
+        "operator_decision": "approved",
+    })
+    assert blocked.status_code == 400
+    assert "human listening approval required" in blocked.text
+
     r = client.post(f"/operator/jobs/{job_id}/deliver", params={
         "candidate_id": cand_id,
         "operator_decision": "approved",
         "notes": "api test delivery",
+        "human_approved": True,
+        "approved_by": "test-reviewer",
     })
     assert r.status_code == 200
     data = r.json()
@@ -309,6 +337,7 @@ def test_writeback_craft(tmp_path):
     client = _api_client(tmp_path)
     create_r = client.post("/operator/jobs", params={"source_audio": "input/s.wav", "processing_depth": "quick_scan"})
     job_id = create_r.json()["job_id"]
+    _authorize_api_job(client, tmp_path, job_id)
 
     run_dir = tmp_path / "outputs" / "api_craft"
     _write_manifest(run_dir, [{
@@ -316,7 +345,7 @@ def test_writeback_craft(tmp_path):
         "input_path": "input/s.wav", "preset": "wide_space",
         "status": "done", "return_code": "0", "elapsed_seconds": "1.0",
         "output_dir": "outputs/api_craft/SMP_CRFT/wide_space", "template_index": "0",
-        "pseudo_mrs_before": "", "pseudo_mrs_after": "", "pseudo_delta_mrs": "",
+        "pseudo_mrs_before": "10", "pseudo_mrs_after": "15", "pseudo_delta_mrs": "5",
         "mrs_open_v031_before": "", "mrs_open_v031_after": "", "delta_mrs_open_v031": "",
         "mrs_open_flags": "", "error": "",
     }])
@@ -328,6 +357,20 @@ def test_writeback_craft(tmp_path):
         "run_id": "api_craft", "report_path": str(report_p),
     })
     cand_id = detail_r.json()["candidate_versions"][0]["candidate_id"]
+
+    blocked = client.post(f"/operator/jobs/{job_id}/writeback-craft", params={
+        "candidate_id": cand_id,
+        "adoption_status": "candidate",
+    })
+    assert blocked.status_code == 400
+
+    delivered = client.post(f"/operator/jobs/{job_id}/deliver", params={
+        "candidate_id": cand_id,
+        "operator_decision": "approved",
+        "human_approved": True,
+        "approved_by": "test-reviewer",
+    })
+    assert delivered.status_code == 200, delivered.text
 
     r = client.post(f"/operator/jobs/{job_id}/writeback-craft", params={
         "candidate_id": cand_id,

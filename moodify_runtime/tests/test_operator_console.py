@@ -3,11 +3,27 @@ import pytest
 from moodify_runtime.config import RuntimeConfig
 from moodify_runtime.operator_console import (
     PROCESSING_DEPTHS,
+    authorize_operator_job_source,
     create_operator_job,
     decide_candidate_gate,
     list_operator_jobs,
 )
 from moodify_runtime.cli import main
+
+
+def _authorize_job(cfg, tmp_path, job):
+    import json
+    rights = tmp_path / f"rights_{job['job_id']}.json"
+    rights.write_text(json.dumps({
+        "schema_version": "1.0.0",
+        "gate_id": "TEST",
+        "assets": [{
+            "asset_id": "TEST-ASSET",
+            "source_path": str((tmp_path / job["source_audio"]).resolve()),
+            "status": "ready",
+        }],
+    }), encoding="utf-8")
+    authorize_operator_job_source(cfg, job["job_id"], rights, "TEST-ASSET")
 
 
 def test_create_and_list_operator_jobs(tmp_path):
@@ -170,6 +186,7 @@ def test_attach_run_report_to_job_builds_detail(tmp_path):
         operator_detail_dir=tmp_path / "operator_details",
     )
     job = create_operator_job(cfg, source_audio="input/song.wav", processing_depth="deep_process")
+    _authorize_job(cfg, tmp_path, job)
     run_dir = tmp_path / "outputs" / "run_001"
     _write_manifest(
         run_dir,
@@ -319,6 +336,7 @@ def test_create_delivery_record_for_approved_candidate(tmp_path):
         operator_deliveries_path=tmp_path / "operator_deliveries.jsonl",
     )
     job = create_operator_job(cfg, source_audio="input/song.wav", processing_depth="deep_process")
+    _authorize_job(cfg, tmp_path, job)
     run_dir = tmp_path / "outputs" / "run_dlv"
     _write_manifest(
         run_dir,
@@ -363,6 +381,8 @@ def test_create_delivery_record_for_approved_candidate(tmp_path):
         candidate_id=cand_id,
         operator_decision="approved",
         notes="operator signed off",
+        human_approved=True,
+        approved_by="test-reviewer",
     )
     assert delivery["delivery_id"].startswith("DLV_")
     assert delivery["job_id"] == job["job_id"]
@@ -405,6 +425,7 @@ def test_delivery_override_allows_reprocess(tmp_path):
         operator_deliveries_path=tmp_path / "operator_deliveries.jsonl",
     )
     job = create_operator_job(cfg, source_audio="input/song.wav", processing_depth="deep_process")
+    _authorize_job(cfg, tmp_path, job)
     run_dir = tmp_path / "outputs" / "run_ovr"
     _write_manifest(
         run_dir,
@@ -454,6 +475,8 @@ def test_delivery_override_allows_reprocess(tmp_path):
         candidate_id=cand_id,
         override=True,
         notes="manual override after review",
+        human_approved=True,
+        approved_by="test-reviewer",
     )
     assert delivery["delivery_id"].startswith("DLV_")
 
@@ -478,6 +501,7 @@ def test_list_delivery_records(tmp_path):
     deliveries = []
     for i in range(2):
         job = create_operator_job(cfg, source_audio=f"input/song_{i}.wav", processing_depth="deep_process")
+        _authorize_job(cfg, tmp_path, job)
         run_dir = tmp_path / "outputs" / f"run_lst_{i}"
         _write_manifest(
             run_dir,
@@ -514,7 +538,13 @@ def test_list_delivery_records(tmp_path):
         detail = jmod.loads((detail_dir / f"{job['job_id']}.json").read_text())
         cand_id = detail["candidate_versions"][0]["candidate_id"]
 
-        deliveries.append(create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id))
+        deliveries.append(create_delivery_record(
+            cfg,
+            job_id=job["job_id"],
+            candidate_id=cand_id,
+            human_approved=True,
+            approved_by="test-reviewer",
+        ))
 
     records = list_delivery_records(cfg)
     assert len(records) == 2
@@ -580,9 +610,25 @@ def test_operator_deliver_cli(tmp_path, capsys):
     detail = jmod.loads(capsys.readouterr().out)
     cand_id = detail["detail"]["candidate_versions"][0]["candidate_id"]
 
+    rights_path = tmp_path / "rights_cli.json"
+    rights_path.write_text(jmod.dumps({
+        "schema_version": "1.0.0",
+        "gate_id": "TEST",
+        "assets": [{
+            "asset_id": "TEST-ASSET",
+            "source_path": str((tmp_path / "input/song.wav").resolve()),
+            "status": "ready",
+        }],
+    }), encoding="utf-8")
+    assert main(["--config", str(config_path), "operator-authorize-rights",
+                 "--job-id", job_id, "--rights-manifest", str(rights_path),
+                 "--rights-asset-id", "TEST-ASSET"]) == 0
+    _ = capsys.readouterr().out
+
     # Deliver
     assert main(["--config", str(config_path), "operator-deliver",
-                 "--job-id", job_id, "--candidate-id", cand_id]) == 0
+                 "--job-id", job_id, "--candidate-id", cand_id,
+                 "--human-approved", "--approved-by", "test-reviewer"]) == 0
     delivered = jmod.loads(capsys.readouterr().out)
     assert delivered["job_id"] == job_id
     assert delivered["delivery_id"].startswith("DLV_")

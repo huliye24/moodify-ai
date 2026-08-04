@@ -17,12 +17,14 @@ class AudioMetrics:
     channels: int = 2
 
     # Spectrum (dB)
+    band_spec: str = "7"        # which band definition was used (AEP-ACU-004)
     rms_total: float = 0.0
     rms_sub: float = 0.0        # 20–60 Hz
     rms_bass: float = 0.0       # 60–250 Hz
     rms_low_mid: float = 0.0    # 250–500 Hz
     rms_mid: float = 0.0        # 500–2000 Hz
     rms_presence: float = 0.0   # 2000–5000 Hz
+    rms_brilliance: float = 0.0 # 5000–8000 Hz (AEP-ACU-004)
     rms_air: float = 0.0        # 8000–16000 Hz
 
     # Dynamics
@@ -45,6 +47,7 @@ class AudioMetrics:
                 "low_mid": round(self.rms_low_mid, 1),
                 "mid": round(self.rms_mid, 1),
                 "presence": round(self.rms_presence, 1),
+                "brilliance": round(self.rms_brilliance, 1),
                 "air": round(self.rms_air, 1),
             },
             "dynamics": {

@@ -148,8 +148,10 @@ def send_tidal_signal(sig: int = signal.SIGTERM) -> Dict[str, Any]:
         return {"ok": False, "error": "Tidal not running"}
     try:
         os.kill(state.pid, sig)
-        sig_name = {signal.SIGTERM: "SIGTERM", signal.SIGINT: "SIGINT",
-                     signal.SIGUSR1: "SIGUSR1"}.get(sig, str(sig))
+        sig_names = {signal.SIGTERM: "SIGTERM", signal.SIGINT: "SIGINT"}
+        if hasattr(signal, "SIGUSR1"):
+            sig_names[signal.SIGUSR1] = "SIGUSR1"
+        sig_name = sig_names.get(sig, str(sig))
         return {"ok": True, "signal": sig_name, "pid": state.pid}
     except OSError as e:
         return {"ok": False, "error": str(e)}
@@ -388,7 +390,8 @@ def emergency_pause(reason: str, triggered_by: str = "operator",
                         auto_resume=auto_resume,
                         auto_resume_after_s=auto_resume_after_s)
     # Signal the process
-    send_tidal_signal(signal.SIGUSR1)
+    pause_signal = getattr(signal, "SIGUSR1", signal.SIGTERM)
+    send_tidal_signal(pause_signal)
     # Write pause marker
     request_tidal_pause(reason=reason)
     # Create alert

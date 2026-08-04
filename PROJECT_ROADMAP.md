@@ -1,6 +1,164 @@
 # Moodify — Project Roadmap
 
-**Updated**: 2026-06-05
+## Strategic anchor — 2026-07-30
+
+Moodify will evolve from the sealed Workspace v2 baseline into headless
+music-processing infrastructure for music companies. Development remains
+focused on audio production; creator communication, talent evaluation,
+artistic positioning, signing, release, and artist operations are outside the
+Moodify boundary and belong to the operating company.
+
+Canonical definition:
+`docs/strategy/MOODIFY_MUSIC_PROCESSING_INFRASTRUCTURE.md`
+
+Cross-version engineering standard:
+`docs/strategy/MOODIFY_ENGINEERING_THICKNESS_STANDARD.md`
+
+Development constitution:
+`docs/strategy/MOODIFY_CIVILIZATIONAL_DEVELOPMENT_MODEL.md`
+
+## Annual release model
+
+Moodify targets one formally sealed stable release per calendar year. Internal
+experiments, alpha builds, betas, release candidates, and service packs may be
+created as needed, but they do not replace the annual release gate.
+
+```text
+Q1 audit/foundation
+-> Q2 build/instrument
+-> Q3 validate/accumulate
+-> Q4 harden/seal
+-> Moodify YYYY Annual Stable
+```
+
+The default operating cadence is four focused hours per day. Each day advances
+one atomic, independently reviewable task and reserves time for verification,
+evidence, inheritance, and handoff. Delivery dates must not be protected by
+weakening the annual stability, compatibility, or evidence gates.
+
+## Permanent accumulation track
+
+Every roadmap phase must produce three parallel outputs:
+
+```text
+production result + reproducible evidence + inherited capability
+```
+
+A phase is not complete merely because its feature set works. It must also
+preserve failure cases, decision reasons, standard evolution, craft evidence,
+and a reproducible starting point for the next phase. Code and model upgrades
+must not silently break the readability or reproducibility of prior projects.
+
+Mandatory cross-phase gates:
+
+- `G-Result`: a concrete result exists;
+- `G-Evidence`: the result can be audited and reproduced;
+- `G-Boundary`: limitations and failure conditions are explicit;
+- `G-Inheritance`: the work updates product history, failure knowledge,
+  standards, or craft memory;
+- `G-Succession`: another operator can continue from the recorded state.
+
+## Post-MVP execution path
+
+### Phase 1 — Prove the production result
+
+Goal: prove that the current processing line produces reliable, audible, and
+repeatable improvements on real production material.
+
+- expand real-song, genre, vocal, and failure-case calibration sets;
+- run loudness-matched professional listening tests;
+- calibrate MRS and technical gates against human engineering judgment;
+- measure pass rate, rework rate, processing time, cost, and failure recovery;
+- require reproducible evidence bundles for every accepted production result.
+- establish the first Product History, Failure/Boundary, Standard Evolution,
+  and Craft Evidence ledgers using lightweight repository-native records;
+- repair summary-to-source inconsistencies before using aggregate statistics;
+- retain rejected candidates and human rejection reasons as first-class evidence.
+
+Exit gate: the same ProductionSpec can be executed repeatedly within defined
+quality tolerances, and professional reviewers prefer or approve the result at
+a documented rate. Every accepted result has an evidence bundle and every
+rejected result contributes a reusable failure or boundary record.
+
+### Phase 2 — Stabilize the company-to-Moodify contract
+
+Goal: remove informal human interpretation from the Moodify execution layer.
+
+- define a versioned `ProductionSpec` and `ProductionResult` schema;
+- map the existing `CreativeBrief` to `ProductionSpec` without breaking v2;
+- formalize preserve, avoid, reference-dimension, platform, depth, budget, and
+  acceptance constraints;
+- make API and queue execution the primary integration path;
+- keep the Operator Console limited to operations, validation, and incidents.
+
+Exit gate: 荣景文川 can submit, inspect, approve, archive, and reproduce a job
+through stable contracts without Moodify directly contacting the creator.
+
+### Phase 3 — Deepen the audio production line
+
+Goal: move from full-mix post-processing toward professional, controllable
+music production processing.
+
+- stem-aware diagnosis and processing;
+- vocal, drum, bass, instrument, space, dynamics, mix-balance, and mastering
+  craft chains;
+- reference audio analysis by explicit dimensions rather than global imitation;
+- multi-candidate search with side-effect and preservation checks;
+- delivery profiles for release masters and required derivative formats.
+
+Exit gate: multiple production classes can be completed under explicit quality
+and preservation standards with traceable candidate selection.
+
+### Phase 4 — Accumulate industrial craft memory
+
+Goal: turn every company project into reusable production knowledge.
+
+- persist input condition, target, craft chain, metric change, side effects,
+  reviewer decision, and final selection;
+- version craft records and separate evidence from recommendations;
+- recommend treatment plans from comparable accepted cases;
+- prevent unreviewed or low-confidence results from contaminating craft memory;
+- establish rollback, audit, data-rights, and project-isolation rules.
+
+Exit gate: accumulated evidence improves treatment selection or reduces rework
+without weakening human artistic control.
+
+### Phase 5 — Industrialize runtime and capacity
+
+Goal: make the processing capability dependable as company infrastructure.
+
+- batch and long-running jobs, scheduling, retries, circuit breaking, and
+  disaster recovery;
+- compute and storage cost accounting per job and candidate;
+- engine and model replaceability behind stable contracts;
+- security, rights isolation, retention, observability, and compatibility;
+- deployment targets and service levels based on measured production demand.
+
+Exit gate: the system meets agreed reliability, traceability, cost, and recovery
+targets for sustained company production workloads.
+
+## Roadmap exclusions
+
+The following are not Moodify roadmap items: creator community, consumer
+onboarding, talent scoring, signing recommendation, artist positioning,
+distribution, promotion, fan operations, stage operations, or commercial artist
+management. These may exist in 荣景文川 systems, but must integrate with
+Moodify only through explicit production contracts.
+
+## Current baseline — 2026-07-26
+
+- **Release baseline**: `v2.0.0-mvp`
+- **Workspace v2**: 34/34 steps complete and sealed
+- **Acceptance**: 179/179 Workspace v2 tests passing
+- **Product loop**: project → brief → diagnosis/design → processing → Judge →
+  human approval → Final archive
+- **Next work**: post-MVP calibration, real-listener evaluation, and deployment
+  are follow-up programs; they do not reopen the sealed Workspace v2 MVP.
+
+The dated roadmap below is retained as historical planning context. Its
+`proposed` rows are not the source of truth for the v2 MVP baseline.
+
+**Historical snapshot updated**: 2026-06-05
 **Current Node**: ECHAIN-MOODIFY-DEEPSEEK-API-015 (E-Chain 014 SEALED ✅)
 **Previous Node**: ECHAIN-MOODIFY-DATA-LOOP-014 (SEALED ✅)
 **Protocol**: NEM-18 = Build-6 + Validate-6 + Harden-6

@@ -34,10 +34,8 @@ def _fmt_float(x: Any, digits: int = 1) -> str:
 def generate_daily_report(cfg: RuntimeConfig, run_id: Optional[str] = None) -> Dict[str, Any]:
     cfg = cfg.resolved()
     if run_id is None:
-        runs = sorted([p for p in cfg.output_root.iterdir() if p.is_dir()]) if cfg.output_root.exists() else []
-        if not runs:
-            raise FileNotFoundError(f"No run directories in {cfg.output_root}")
-        run_dir = runs[-1]
+        from .utils import find_latest_run_dir
+        run_dir = find_latest_run_dir(cfg.output_root)
         run_id = run_dir.name
     else:
         run_dir = cfg.output_root / run_id

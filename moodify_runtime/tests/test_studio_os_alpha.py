@@ -14,6 +14,7 @@ from moodify_runtime.operator_console import (
     list_operator_jobs,
     plan_operator_runtime,
 )
+from moodify_runtime.tests.gate_helpers import create_test_delivery
 from moodify_runtime.studio import (
     create_client,
     create_order,
@@ -36,9 +37,7 @@ from moodify_runtime.mrs_calibration import (
 
 from moodify_runtime.tests.test_operator_console import _write_manifest
 
-BASELINE = __import__("pathlib").Path(
-    "/home/ubuntu/moodify-mainline/moodify-core-package/tests/baseline/test_audio"
-)
+BASELINE = __import__("pathlib").Path(__file__).resolve().parents[2] / "moodify-core-package" / "tests" / "baseline" / "test_audio"
 
 
 def test_studio_os_alpha_end_to_end(tmp_path):
@@ -114,8 +113,9 @@ def test_studio_os_alpha_end_to_end(tmp_path):
 
     # ── 6. Delivery ──
     cand_id = detail["candidate_versions"][0]["candidate_id"]
-    delivery = create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id,
-                                      operator_decision="approved", notes="alpha delivery")
+    delivery = create_test_delivery(
+        cfg, job, cand_id, operator_decision="approved", notes="alpha delivery"
+    )
     assert delivery["delivery_id"].startswith("DLV_")
     assert get_operator_job(cfg, job["job_id"])["status"] == "delivered"
 

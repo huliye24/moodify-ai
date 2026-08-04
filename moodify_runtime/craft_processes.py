@@ -648,6 +648,9 @@ def _biquad_highpass(
 
 def _soft_clip(samples: np.ndarray, threshold: float) -> np.ndarray:
     """Apply tanh-based soft clipping above threshold."""
+    if threshold >= 1.0:
+        return np.clip(samples, -1.0, 1.0)
+    threshold = max(0.0, threshold)
     out = samples.copy()
     mask = np.abs(out) > threshold
     over = out[mask]

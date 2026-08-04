@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -37,6 +38,8 @@ import com.moodify.app.ui.screens.ProcessingHubScreen
 import com.moodify.app.ui.screens.PublishWorkScreen
 import com.moodify.app.data.CwcRepository
 import com.moodify.app.model.AuthMode
+import com.moodify.app.ui.components.MiniPlayer
+import com.moodify.app.ui.components.MiniPlayerVisibility
 import com.moodify.app.ui.screens.SearchScreen
 import com.moodify.app.ui.screens.SettingsScreen
 import com.moodify.app.ui.screens.HelpFeedbackScreen
@@ -82,6 +85,7 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
     var cwcCenterOpen by remember { mutableStateOf(false) }
     var cwcAuthRequest by remember { mutableStateOf<CwcAuthRequest?>(null) }
     var nowPlayingOpen by remember { mutableStateOf(false) }
+    var miniPlayerVisibility by rememberSaveable { mutableStateOf(MiniPlayerVisibility.VISIBLE) }
     var startupChecked by remember { mutableStateOf(false) }
     val appContext = androidx.compose.ui.platform.LocalContext.current
     com.moodify.app.data.PlaybackManager.init(appContext)
@@ -178,7 +182,11 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
             // CWC full-screen pages must not be covered by the 3-tab bar.
             if (cwcAuthRequest == null && !cwcGiftOpen && !cwcIntroOpen && !cwcCenterOpen && !nowPlayingOpen) {
                 Column {
-                    com.moodify.app.ui.components.MiniPlayer(onOpen = { nowPlayingOpen = true })
+                    MiniPlayer(
+                        visibility = miniPlayerVisibility,
+                        onVisibilityChange = { miniPlayerVisibility = it },
+                        onOpen = { nowPlayingOpen = true },
+                    )
                     NavigationBar(tonalElevation = 0.dp) {
                         destinations.forEachIndexed { index, item ->
                             NavigationBarItem(

@@ -11,9 +11,15 @@ from __future__ import annotations
 
 import numpy as np
 
+from moodify.processing.rbj_eq import (
+    apply_rbj_eq,
+)
+
 
 # ============================================================
-#  EQ — 参数均衡器 (FFT-based, correct shelf/peak)
+#  EQ — 参数均衡器
+#     mode="rbj" (default) → RBJ biquad (AEP-ACU-002)
+#     mode="legacy_fft"    → 旧 FFT sigmoid/Gaussian (deprecated)
 # ============================================================
 
 def _resolve_eq_params(bands: dict[str, float] | None,
@@ -42,61 +48,102 @@ def apply_eq(audio: np.ndarray, sr: int,
              low_shelf_gain_db: float = 0.0, low_shelf_freq: float = 200.0,
              high_shelf_gain_db: float = 0.0, high_shelf_freq: float = 6000.0,
              peak_freq: float = 1000.0, peak_gain_db: float = 0.0,
-             peak_q: float = 1.0) -> np.ndarray:
-    """频域 EQ：low shelf + peaking + high shelf. FFT-based, block-wise overlap-add."""
+             peak_q: float = 1.0,
+             mode: str = "rbj") -> np.ndarray:
+    """参数均衡器：low shelf + peaking + high shelf.
+
+    mode="rbj" (default):  RBJ biquad standard filters (AEP-ACU-002).
+    mode="legacy_fft":     旧 FFT sigmoid/Gaussian EQ (deprecated, 保留用于 A/B 测试).
+    """
     low_shelf_gain_db, low_shelf_freq, high_shelf_gain_db, high_shelf_freq, \
         peak_freq, peak_gain_db, peak_q = _resolve_eq_params(
         bands, low_shelf_gain_db, low_shelf_freq,
         high_shelf_gain_db, high_shelf_freq, peak_freq, peak_gain_db, peak_q)
 
-    result = audio.copy()
-    is_stereo = result.ndim > 1
+    # 零增益快速路径
     if (abs(low_shelf_gain_db) < 0.1 and abs(high_shelf_gain_db) < 0.1
             and abs(peak_gain_db) < 0.1):
-        return result
+        return audio.copy()
 
-    # 对每声道逐块 FFT 处理（大文件分块避免内存爆炸）
-    block_s = 4.0  # 4 秒块
+    if mode == "rbj":
+        return _apply_eq_rbj(
+            audio, sr,
+            low_shelf_gain_db, low_shelf_freq,
+            high_shelf_gain_db, high_shelf_freq,
+            peak_freq, peak_gain_db, peak_q,
+        )
+    elif mode == "legacy_fft":
+        return _apply_eq_legacy_fft(
+            audio, sr,
+            low_shelf_gain_db, low_shelf_freq,
+            high_shelf_gain_db, high_shelf_freq,
+            peak_freq, peak_gain_db, peak_q,
+        )
+    else:
+        raise ValueError(f"Unknown EQ mode: {mode!r}. Must be 'rbj' or 'legacy_fft'.")
+
+
+def _apply_eq_rbj(audio, sr,
+                  ls_gain, ls_freq, hs_gain, hs_freq,
+                  pk_freq, pk_gain, pk_q):
+    """RBJ biquad EQ path (AEP-ACU-002)."""
+    filters = []
+    if abs(ls_gain) >= 0.1:
+        filters.append({"type": "low_shelf", "freq_hz": ls_freq,
+                         "gain_db": ls_gain, "q": 0.707})
+    if abs(pk_gain) >= 0.1:
+        filters.append({"type": "peaking", "freq_hz": pk_freq,
+                         "gain_db": pk_gain, "q": pk_q})
+    if abs(hs_gain) >= 0.1:
+        filters.append({"type": "high_shelf", "freq_hz": hs_freq,
+                         "gain_db": hs_gain, "q": 0.707})
+    return apply_rbj_eq(audio, float(sr), filters)
+
+
+def _apply_eq_legacy_fft(audio, sr,
+                         ls_gain, ls_freq, hs_gain, hs_freq,
+                         pk_freq, pk_gain, pk_q):
+    """[DEPRECATED] 旧 FFT sigmoid/Gaussian EQ — 保留用于 A/B 测试.
+
+    .. deprecated::
+        自 AEP-ACU-002 (2026-07-03) 起废弃。
+        新代码请使用 mode="rbj" (default)。
+    """
+    import warnings
+    warnings.warn(
+        "Legacy FFT EQ is deprecated. Use mode='rbj' instead.",
+        DeprecationWarning, stacklevel=2,
+    )
+    result = audio.copy()
+    is_stereo = result.ndim > 1
+
+    block_s = 4.0
     block_len = int(block_s * sr)
-    overlap = block_len // 4  # 25% overlap for smooth transitions
+    overlap = block_len // 4
 
     def _process_channel(signal):
         n = len(signal)
         out = np.zeros(n)
-
         pos = 0
         while pos < n:
             end = min(pos + block_len, n)
             chunk = signal[pos:end]
             chunk_len = len(chunk)
-
-            # FFT
             X = np.fft.rfft(chunk, n=block_len * 2)
             freqs = np.fft.rfftfreq(block_len * 2, 1.0 / sr)
-
-            # 构造幅频响应曲线
             response = np.ones(len(freqs))
-            response = _apply_shelf_freq(response, freqs, low_shelf_freq,
-                                         low_shelf_gain_db, "low")
-            response = _apply_shelf_freq(response, freqs, high_shelf_freq,
-                                         high_shelf_gain_db, "high")
-            response = _apply_peak_freq(response, freqs, peak_freq,
-                                        peak_gain_db, peak_q)
-
-            # 应用响应
+            response = _apply_shelf_freq_legacy(response, freqs, ls_freq, ls_gain, "low")
+            response = _apply_shelf_freq_legacy(response, freqs, hs_freq, hs_gain, "high")
+            response = _apply_peak_freq_legacy(response, freqs, pk_freq, pk_gain, pk_q)
             Y = X * response
             y_chunk = np.fft.irfft(Y, n=block_len * 2)[:chunk_len]
-
-            # 重叠相加
             fade = np.ones(chunk_len)
             if pos > 0:
                 fade[:overlap] = np.linspace(0, 1, overlap)
             if end < n:
                 fade[-overlap:] = np.linspace(1, 0, overlap)
             out[pos:end] += y_chunk * fade
-
             pos += block_len - overlap
-
         return out
 
     if is_stereo:
@@ -105,21 +152,17 @@ def apply_eq(audio: np.ndarray, sr: int,
     else:
         result = _process_channel(result)
 
-    # 防止削波
     peak = np.max(np.abs(result))
     if peak > 0.98:
         result *= 0.98 / peak
-
     return result
 
 
-def _apply_shelf_freq(response, freqs, freq, gain_db, stype):
-    """在频域响应上施加 shelf 曲线。"""
+def _apply_shelf_freq_legacy(response, freqs, freq, gain_db, stype):
+    """[DEPRECATED] 在频域响应上施加 sigmoid shelf 曲线。"""
     if abs(gain_db) < 0.1:
         return response
     gain_lin = 10.0 ** (gain_db / 20.0)
-    # 平滑过渡：用 sigmoid 在 freq 附近过渡
-    # transition width: 1 octave
     if stype == "low":
         curve = 1.0 + (gain_lin - 1.0) * (1.0 / (1.0 + np.exp((freqs - freq) / (freq * 0.3))))
     else:  # high
@@ -127,13 +170,12 @@ def _apply_shelf_freq(response, freqs, freq, gain_db, stype):
     return response * curve
 
 
-def _apply_peak_freq(response, freqs, freq, gain_db, q):
-    """在频域响应上施加 peaking 曲线。"""
+def _apply_peak_freq_legacy(response, freqs, freq, gain_db, q):
+    """[DEPRECATED] 在频域响应上施加 Gaussian peaking 曲线。"""
     if abs(gain_db) < 0.1:
         return response
     gain_lin = 10.0 ** (gain_db / 20.0)
     bw = freq / max(q, 0.1)
-    # Gaussian-shaped peak
     curve = 1.0 + (gain_lin - 1.0) * np.exp(-((freqs - freq) / bw) ** 2)
     return response * curve
 
@@ -259,11 +301,22 @@ def apply_reverb(audio: np.ndarray, sr: int,
     return result
 
 
-def _schroeder_reverb(signal: np.ndarray, sr: int, rt60: float) -> np.ndarray:
-    """简化 Schroeder 混响器。"""
-    # 梳状滤波器延迟长度（素数，避免共振）
+def _schroeder_reverb_legacy(signal: np.ndarray, sr: int, rt60: float) -> np.ndarray:
+    """[DEPRECATED] 旧版 Schroeder 混响器 — 非标准交叉耦合反馈 + 缺少全通级.
+
+    .. deprecated::
+        自 AEP-ACU-001 (2026-07-02) 起废弃。
+        保留用于 A/B 对比和回归测试。
+        新代码请使用 :func:`_schroeder_reverb`。
+    """
+    import warnings
+    warnings.warn(
+        "_schroeder_reverb_legacy is deprecated. Use _schroeder_reverb instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     comb_delays = [int(sr * d) for d in [0.0297, 0.0371, 0.0411, 0.0437]]
-    comb_gains  = [10.0 ** (-3.0 * d / rt60) for d in [0.0297, 0.0371, 0.0411, 0.0437]]
+    comb_gains = [10.0 ** (-3.0 * d / rt60) for d in [0.0297, 0.0371, 0.0411, 0.0437]]
 
     output = np.zeros(len(signal) + max(comb_delays) + 2000)
     for delay, gain in zip(comb_delays, comb_gains):
@@ -273,6 +326,118 @@ def _schroeder_reverb(signal: np.ndarray, sr: int, rt60: float) -> np.ndarray:
                 output[n + delay] += output[n] * gain * 0.5
 
     return output[:len(signal) + 2000]
+
+
+def _feedback_comb_filter(
+    signal: np.ndarray, sr: int, delay_s: float, rt60: float,
+) -> np.ndarray:
+    """标准反馈梳状滤波器: y[n] = x[n] + g * y[n-D].
+
+    Args:
+        signal: 输入信号 (1D).
+        sr: 采样率.
+        delay_s: 延迟时间 (秒). 通常 30-45 ms.
+        rt60: RT60 混响时间 (秒). 用于计算反馈增益.
+
+    Returns:
+        梳状滤波器输出, 长度 = len(signal) + delay_samples (含混响尾音).
+    """
+    delay_samples = int(sr * delay_s)
+    if delay_samples < 1:
+        delay_samples = 1
+    # g = 10^(-3 * delay / rt60) — 确保 rt60 秒后衰减 60 dB
+    gain = 10.0 ** (-3.0 * delay_s / max(rt60, 0.01))
+    gain = float(np.clip(gain, 0.0, 0.999))
+
+    n_in = len(signal)
+    n_out = n_in + delay_samples
+    y = np.zeros(n_out, dtype=signal.dtype)
+
+    for n in range(n_out):
+        # feedforward: x[n] (past input → 0)
+        x_n = signal[n] if n < n_in else 0.0
+        # feedback: g * y[n-D]
+        fb = gain * y[n - delay_samples] if n >= delay_samples else 0.0
+        y[n] = x_n + fb
+
+    return y
+
+
+def _allpass_filter(
+    signal: np.ndarray, sr: int, delay_s: float, gain: float = 0.7,
+) -> np.ndarray:
+    """全通滤波器: y[n] = -g*x[n] + x[n-D] + g*y[n-D].
+
+    幅频响应为常数 1 (理论)。改变相位和时域扩散。
+
+    Args:
+        signal: 输入信号 (1D).
+        sr: 采样率.
+        delay_s: 延迟时间 (秒). 通常 1-5 ms.
+        gain: 反馈/前馈增益系数 (0 < g < 1). 推荐 0.5-0.7.
+
+    Returns:
+        与输入同长度的全通滤波器输出.
+    """
+    delay_samples = int(sr * delay_s)
+    if delay_samples < 1:
+        delay_samples = 1
+    g = float(np.clip(gain, 0.0, 0.999))
+
+    n_in = len(signal)
+    output = np.zeros(n_in, dtype=signal.dtype)
+
+    for n in range(n_in):
+        # 前馈: -g * x[n] + x[n-D]
+        feedforward = -g * signal[n]
+        if n >= delay_samples:
+            feedforward += signal[n - delay_samples]
+        # 反馈: + g * y[n-D]
+        feedback = 0.0
+        if n >= delay_samples:
+            feedback = g * output[n - delay_samples]
+        output[n] = feedforward + feedback
+
+    return output
+
+
+def _schroeder_reverb(signal: np.ndarray, sr: int, rt60: float) -> np.ndarray:
+    """Schroeder 型人工混响 — 标准反馈梳状 + 全通级 (AEP-ACU-001 合规修复).
+
+    架构: parallel comb filters → serial all-pass stages
+
+    参照: Schroeder, M. R. (1962). "Natural Sounding Artificial
+    Reverberation." *JAES*, 10(3), 219-223.
+
+    Args:
+        signal: 输入信号 (1D).
+        sr: 采样率 (Hz).
+        rt60: RT60 混响时间 (秒).
+
+    Returns:
+        混响信号 (长度 = len(signal) + 约 50 ms 的尾音扩展).
+    """
+    # ── 4 并联反馈梳状滤波器 ──
+    # 延迟长度基于质数 (避免谐波共振)
+    comb_delays_s = [0.0297, 0.0371, 0.0411, 0.0437]
+
+    # 并行处理：每个 comb 的输入都是从预延迟信号分出的同一路
+    comb_outputs = []
+    for d in comb_delays_s:
+        comb_out = _feedback_comb_filter(signal, sr, d, rt60)
+        comb_outputs.append(comb_out)
+
+    # 求和所有 comb 输出
+    max_len = max(len(co) for co in comb_outputs)
+    summed = np.zeros(max_len, dtype=signal.dtype)
+    for co in comb_outputs:
+        summed[:len(co)] += co
+
+    # ── 2 串联全通滤波器 ──
+    ap1 = _allpass_filter(summed, sr, delay_s=0.0050, gain=0.70)
+    ap2 = _allpass_filter(ap1, sr, delay_s=0.0017, gain=0.70)
+
+    return ap2
 
 
 # ============================================================
@@ -303,18 +468,45 @@ def apply_stereo_enhancer(audio: np.ndarray, sr: int,
 
 
 # ============================================================
-#  Limiter — 峰值限制器
+#  Limiter — True-Peak 限制器 (AEP-ACU-005)
 # ============================================================
 
 def apply_limiter(audio: np.ndarray, sr: int,
                   ceiling_db: float = -1.0,
-                  release_ms: float = 50.0) -> np.ndarray:
-    """
-    砖墙限幅器。防止削波。
+                  release_ms: float = 50.0,
+                  attack_ms: float = 1.0,
+                  mode: str = "true_peak") -> np.ndarray:
+    """True-peak brickwall limiter with non-zero attack (AEP-ACU-005).
 
-    ceiling_db : 输出上限 (dBFS)
+    mode="true_peak" (default): 4x oversampling + attack/release envelope.
+    mode="legacy":             旧版零 attack sample-peak limiter (deprecated).
     """
-    result = audio.copy()
+    if mode == "legacy":
+        return _apply_limiter_legacy(audio, sr, ceiling_db, release_ms)
+
+    from moodify.processing.limiter import apply_limiter_tp
+    result, _audit = apply_limiter_tp(
+        audio, sr,
+        ceiling_dbtp=ceiling_db,
+        attack_ms=attack_ms,
+        release_ms=release_ms,
+    )
+    return result
+
+
+def _apply_limiter_legacy(audio: np.ndarray, sr: int,
+                          ceiling_db: float = -1.0,
+                          release_ms: float = 50.0) -> np.ndarray:
+    """[DEPRECATED] Legacy zero-attack sample-peak limiter.
+
+    Preserved for A/B testing. Use apply_limiter(mode=\"true_peak\").
+    """
+    import warnings
+    warnings.warn(
+        "Legacy limiter (zero-attack) is deprecated. Use mode='true_peak'.",
+        DeprecationWarning, stacklevel=2,
+    )
+    result = audio.copy().astype(np.float64)
     ceiling = 10.0 ** (ceiling_db / 20.0)
     release_coeff = np.exp(-1.0 / (release_ms * sr / 1000.0))
 
@@ -324,14 +516,14 @@ def apply_limiter(audio: np.ndarray, sr: int,
     else:
         env = np.abs(result)
 
-    gain = np.ones(len(env))
+    gain = np.ones(len(env), dtype=np.float64)
     gr_smooth = 1.0
     for n in range(len(env)):
-        target_gain = min(1.0, ceiling / (env[n] + 1e-12))
+        target_gain = min(1.0, ceiling / max(env[n], 1e-15))
         if target_gain < gr_smooth:
-            gr_smooth = target_gain  # attack instant
+            gr_smooth = target_gain  # zero attack
         else:
-            gr_smooth = release_coeff * gr_smooth + (1 - release_coeff) * target_gain
+            gr_smooth = release_coeff * gr_smooth + (1.0 - release_coeff) * target_gain
         gain[n] = gr_smooth
 
     if is_stereo:
@@ -340,7 +532,7 @@ def apply_limiter(audio: np.ndarray, sr: int,
     else:
         result *= gain
 
-    return result
+    return np.clip(result, -1.0, 1.0).astype(audio.dtype)
 
 
 # ============================================================
@@ -349,10 +541,12 @@ def apply_limiter(audio: np.ndarray, sr: int,
 
 OPERATOR_REGISTRY = {
     "eq":                apply_eq,
+    "eq_legacy_fft":     lambda audio, sr, **kw: apply_eq(audio, sr, mode="legacy_fft", **kw),
     "compressor":        apply_compressor,
     "reverb":            apply_reverb,
     "stereo_enhancer":   apply_stereo_enhancer,
     "limiter":           apply_limiter,
+    "limiter_legacy":    lambda audio, sr, **kw: apply_limiter(audio, sr, mode="legacy", **kw),
 }
 
 

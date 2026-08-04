@@ -843,3 +843,31 @@ class TestRepeatedIdenticalPromotion:
 
         rows = (craft_dir / "craft_records.jsonl").read_text(encoding="utf-8").strip().splitlines()
         assert len(rows) == 1
+
+
+# Phase 2B deepening — schema_version embedding
+
+class TestSchemaVersionEmbedding:
+    def test_proposal_has_schema_version(self, craft_dir, sample_entry):
+        from moodify_runtime.craft_proposals import write_automated_proposal
+        results = write_automated_proposal(craft_dir, source='test', source_run_id='R1', entries=[sample_entry])
+        assert results[0].get('schema_version') == '1.0.0'
+
+    def test_promoted_craft_has_schema_version(self, craft_dir, sample_entry, valid_promotion_evidence):
+        from moodify_runtime.craft_proposals import write_automated_proposal, promote_proposal_to_craft
+        results = write_automated_proposal(craft_dir, source='test', source_run_id='R1', entries=[sample_entry])
+        evidence = dict(valid_promotion_evidence, source_run_id='R1')
+        promote_proposal_to_craft(craft_dir, results[0]['proposal_id'], evidence)
+        import json
+        rows = (craft_dir / 'craft_records.jsonl').read_text(encoding='utf-8').strip().splitlines()
+        craft = json.loads(rows[0])
+        assert craft.get('schema_version') == '1.0.0'
+
+    def test_proposal_loadable_by_historical_compatibility(self, craft_dir, sample_entry):
+        from moodify_runtime.craft_proposals import write_automated_proposal
+        from moodify_runtime.historical_compatibility import load_historical_record
+        results = write_automated_proposal(craft_dir, source='test', source_run_id='R1', entries=[sample_entry])
+        path = craft_dir / 'proposals' / f'proposal_{results[0]["proposal_id"]}.json'
+        load_result = load_historical_record(str(path), 'proposal')
+        assert load_result.success
+        assert load_result.schema_version == '1.0.0'

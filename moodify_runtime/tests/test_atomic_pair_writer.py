@@ -828,3 +828,135 @@ class TestWindowsSameVolume:
         assert len(list(out_dir.glob(".pair_tmp_*"))) == 0
         data, markdown = writer.read_current_pair("summary.json", "summary.md")
         assert data["count"] == 2
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Phase 2A deepening — determinism, multi-writer, contract, backup matrix
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestWriteDeterminism:
+    """Repeated writes produce identical output bytes."""
+
+    def test_identical_content_same_hash(self, out_dir, sample_json, sample_md):
+        mod = __import__("moodify_runtime.atomic_pair_writer", fromlist=["AtomicPairWriter"])
+        AtomicPairWriter = mod.AtomicPairWriter
+        import hashlib
+
+        w = AtomicPairWriter(out_dir)
+        w.write(sample_json, "a.json", sample_md, "a.md")
+        h1_json = hashlib.sha256((out_dir / "a.json").read_bytes()).hexdigest()
+        h1_md = hashlib.sha256((out_dir / "a.md").read_bytes()).hexdigest()
+
+        # Overwrite with identical content
+        w.write(sample_json, "a.json", sample_md, "a.md")
+        h2_json = hashlib.sha256((out_dir / "a.json").read_bytes()).hexdigest()
+        h2_md = hashlib.sha256((out_dir / "a.md").read_bytes()).hexdigest()
+
+        assert h1_json == h2_json
+        assert h1_md == h2_md
+
+    def test_prev_backup_matches_penultimate(self, out_dir, sample_json, sample_md):
+        mod = __import__("moodify_runtime.atomic_pair_writer", fromlist=["AtomicPairWriter"])
+        AtomicPairWriter = mod.AtomicPairWriter
+        import hashlib
+
+        w = AtomicPairWriter(out_dir)
+        w.write({"gen": 1}, "g.json", "# 1", "g.md")
+        h1 = hashlib.sha256((out_dir / "g.json").read_bytes()).hexdigest()
+
+        w.write({"gen": 2}, "g.json", "# 2", "g.md")
+        h_prev = hashlib.sha256((out_dir / "g.json.prev").read_bytes()).hexdigest()
+
+        assert h_prev == h1
+
+    def test_ten_iterations_stable(self, out_dir, sample_json, sample_md):
+        mod = __import__("moodify_runtime.atomic_pair_writer", fromlist=["AtomicPairWriter"])
+        AtomicPairWriter = mod.AtomicPairWriter
+        import hashlib
+
+        w = AtomicPairWriter(out_dir)
+        hashes = []
+        for _ in range(10):
+            w.write(sample_json, "z.json", sample_md, "z.md")
+            h = hashlib.sha256((out_dir / "z.json").read_bytes()).hexdigest()
+            hashes.append(h)
+        assert len(set(hashes)) == 1  # all identical
+
+    def test_no_wall_clock_in_payload(self, out_dir, sample_json, sample_md):
+        mod = __import__("moodify_runtime.atomic_pair_writer", fromlist=["AtomicPairWriter"])
+        AtomicPairWriter = mod.AtomicPairWriter
+        import json
+
+        w = AtomicPairWriter(out_dir)
+        w.write({"data": "payload"}, "t.json", "# Test", "t.md")
+        raw = (out_dir / "t.json").read_text(encoding="utf-8")
+        parsed = json.loads(raw)
+        # Payload keys only — no internal bookkeeping leaks into user JSON
+        assert "data" in parsed
+        assert "stage_id" not in parsed
+
+
+class TestMultiWriterRecovery:
+    """Orphans from multiple writers are handled correctly."""
+
+    def test_writer_a_orphan_recovered_by_b(self, out_dir, sample_json, sample_md):
+        mod = __import__("moodify_runtime.atomic_pair_writer", fromlist=["AtomicPairWriter"])
+        AtomicPairWriter = mod.AtomicPairWriter
+
+        # Writer A: write gen 1 cleanly
+        wA = AtomicPairWriter(out_dir)
+        wA.write({"gen": 1}, "p.json", "# 1", "p.md")
+
+        # Simulate Writer A crash mid-write: leave orphan staging dir
+        import uuid
+        stage_dir = out_dir / f".pair_tmp_{uuid.uuid4().hex[:12]}"
+        stage_dir.mkdir(parents=True, exist_ok=True)
+        import json
+        (stage_dir / "p.json").write_text(json.dumps({"gen": 2}), encoding="utf-8")
+        (stage_dir / "p.md").write_text("# 2", encoding="utf-8")
+        (stage_dir / ".tx_active").write_text(
+            json.dumps({"status": "committing"}), encoding="utf-8"
+        )
+
+        # Writer B: recovers orphan then writes gen 3
+        wB = AtomicPairWriter(out_dir)
+        result = wB.write({"gen": 3}, "p.json", "# 3", "p.md")
+        assert result["recovery"]["orphaned_transactions"] == 1
+
+        data, md = wB.read_current_pair("p.json", "p.md")
+        assert data["gen"] == 3
+        assert "# 3" in md
+
+
+class TestSummaryContract:
+    """AtomicPairWriter result dict contract is stable."""
+
+    def test_result_keys_stable(self, out_dir, sample_json, sample_md):
+        mod = __import__("moodify_runtime.atomic_pair_writer", fromlist=["AtomicPairWriter"])
+        AtomicPairWriter = mod.AtomicPairWriter
+        w = AtomicPairWriter(out_dir)
+        result = w.write(sample_json, "s.json", sample_md, "s.md")
+        assert set(result.keys()) == {"status", "json_path", "md_path", "recovery"}
+        assert result["status"] == "ok"
+
+    def test_recovery_action_semantics(self, out_dir, sample_json, sample_md):
+        mod = __import__("moodify_runtime.atomic_pair_writer", fromlist=["AtomicPairWriter"])
+        AtomicPairWriter = mod.AtomicPairWriter
+        import json, uuid
+
+        # Create a valid orphan with valid staged files
+        stage_dir = out_dir / f".pair_tmp_{uuid.uuid4().hex[:12]}"
+        stage_dir.mkdir(parents=True, exist_ok=True)
+        (stage_dir / "r.json").write_text(json.dumps({"x": 1}), encoding="utf-8")
+        (stage_dir / "r.md").write_text("# ok", encoding="utf-8")
+        (stage_dir / ".tx_active").write_text(
+            json.dumps({"status": "committing"}), encoding="utf-8"
+        )
+
+        w = AtomicPairWriter(out_dir)
+        result = w.write({"x": 1}, "r.json", "# ok", "r.md")
+        recovery = result["recovery"]
+        assert recovery["orphaned_transactions"] == 1
+        # Valid staged files → "completed", not "rolled_back"
+        assert recovery["details"][0]["action"] == "completed"

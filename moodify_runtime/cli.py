@@ -36,6 +36,7 @@ from .scheduler import (
 )
 from .operator_console import (
     attach_run_report_to_job,
+    authorize_operator_job_source,
     build_operator_report_bundle,
     create_delivery_record,
     create_operator_job,
@@ -92,6 +93,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--limit", type=int, default=0)
     sp.add_argument("--dry-run", action="store_true")
     sp.add_argument("--run-id", default=None)
+    sp.add_argument("--rights-manifest", default=None)
+    sp.add_argument("--rights-asset-id", default="")
 
     sp = sub.add_parser("report", help="生成每日 Markdown 报告")
     sp.add_argument("--run-id", default=None)
@@ -136,6 +139,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--decision", default="approved")
     sp.add_argument("--notes", default="")
     sp.add_argument("--override", action="store_true", help="Force delivery for reprocess/reject candidates")
+    sp.add_argument("--human-approved", action="store_true", help="Record explicit professional listening approval")
+    sp.add_argument("--approved-by", default="", help="Identity of the human approver")
 
     sp = sub.add_parser("operator-delivery-get", help="Read delivery record for a job")
     sp.add_argument("--job-id", required=True)
@@ -145,6 +150,11 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("operator-plan-runtime", help="Create runtime queue tasks from an Operator Job")
     sp.add_argument("--job-id", required=True)
 
+    sp = sub.add_parser("operator-authorize-rights", help="Attach verified rights evidence to an Operator Job")
+    sp.add_argument("--job-id", required=True)
+    sp.add_argument("--rights-manifest", required=True)
+    sp.add_argument("--rights-asset-id", required=True)
+
     sp = sub.add_parser("operator-show-plan", help="Show planned commands for an Operator Job (dry-run)")
     sp.add_argument("--job-id", required=True)
 
@@ -152,6 +162,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--job-id", required=True)
     sp.add_argument("--dry-run", action="store_true", default=True, help="Plan only, no execution (default)")
     sp.add_argument("--live", dest="dry_run", action="store_false", help="Execute for real")
+    sp.add_argument("--rights-manifest", default=None, help="Structured rights manifest required for --live")
+    sp.add_argument("--rights-asset-id", default="", help="Authorized asset ID required for --live")
 
     sp = sub.add_parser("operator-report", help="Build Operator Report Bundle for a job")
     sp.add_argument("--job-id", required=True)
@@ -192,6 +204,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--limit", type=int, default=0)
     sp.add_argument("--dry-run", action="store_true")
     sp.add_argument("--heartbeat-interval", type=int, default=15)
+    sp.add_argument("--rights-manifest", default=None)
+    sp.add_argument("--rights-asset-id", default="")
 
     # ── Studio ──
     sp = sub.add_parser("studio-project-list", help="List studio projects")
@@ -327,6 +341,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
     sp.add_argument("--output", default=None, help="Output WAV path")
     sp.add_argument("--keep-artifacts", action="store_true")
+    sp.add_argument("--rights-manifest", default=None)
+    sp.add_argument("--rights-asset-id", default="")
 
     sp = sub.add_parser("craft-inspect", help="Inspect a craft chain manifest")
     sp.add_argument("--manifest", required=True, help="Path to chain manifest JSON")
@@ -392,6 +408,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--max-new-tasks", type=int, default=0)
     sp.add_argument("--limit", type=int, default=0)
     sp.add_argument("--dry-run", action="store_true")
+    sp.add_argument("--rights-manifest", default=None)
+    sp.add_argument("--rights-asset-id", default="")
 
     return p
 
@@ -411,7 +429,8 @@ def main(argv=None) -> int:
         return 0
 
     if args.command == "run":
-        print_json(run_daily(cfg, limit=args.limit, dry_run=args.dry_run, run_id=args.run_id))
+        print_json(run_daily(cfg, limit=args.limit, dry_run=args.dry_run, run_id=args.run_id,
+                             rights_manifest=args.rights_manifest, rights_asset_id=args.rights_asset_id))
         return 0
 
     if args.command == "report":
@@ -529,6 +548,10 @@ def main(argv=None) -> int:
         cmd = ["python3", "-m", "moodify_runtime.cli", "run", "--dry-run" if args.dry_run else ""]
         if args.limit:
             cmd.extend(["--limit", str(args.limit)])
+        if args.rights_manifest:
+            cmd.extend(["--rights-manifest", str(args.rights_manifest)])
+        if args.rights_asset_id:
+            cmd.extend(["--rights-asset-id", str(args.rights_asset_id)])
         result = run_supervised([a for a in cmd if a], timeout=3600, max_retries=0)
         result_dict = result.to_dict()
         result_dict["heartbeat_active"] = hb.is_alive(max_age=60)
@@ -576,6 +599,8 @@ def main(argv=None) -> int:
             operator_decision=args.decision,
             notes=args.notes,
             override=args.override,
+            human_approved=args.human_approved,
+            approved_by=args.approved_by,
         ))
         return 0
 
@@ -591,12 +616,27 @@ def main(argv=None) -> int:
         print_json(plan_operator_runtime(cfg, job_id=args.job_id))
         return 0
 
+    if args.command == "operator-authorize-rights":
+        print_json(authorize_operator_job_source(
+            cfg,
+            job_id=args.job_id,
+            rights_manifest=args.rights_manifest,
+            rights_asset_id=args.rights_asset_id,
+        ))
+        return 0
+
     if args.command == "operator-show-plan":
         print_json(show_operator_runtime_plan(cfg, job_id=args.job_id))
         return 0
 
     if args.command == "operator-run":
-        print_json(run_operator_job(cfg, job_id=args.job_id, dry_run=args.dry_run))
+        print_json(run_operator_job(
+            cfg,
+            job_id=args.job_id,
+            dry_run=args.dry_run,
+            rights_manifest=args.rights_manifest,
+            rights_asset_id=args.rights_asset_id,
+        ))
         return 0
 
     if args.command == "operator-report":
@@ -755,6 +795,12 @@ def main(argv=None) -> int:
 
     if args.command == "craft-run":
         from .craft_chain import CraftChainExecutor, preset_to_chain
+        from .hardening_gates import authorize_audio_source
+        if args.rights_manifest:
+            ok, reason = authorize_audio_source(args.rights_manifest, args.rights_asset_id, args.wav)
+            if not ok:
+                print_json({"status": "rights_blocked", "error": f"rights: {reason}"})
+                return 1
         steps = preset_to_chain(args.preset)
         executor = CraftChainExecutor(keep_artifacts=args.keep_artifacts)
         result = executor.execute(args.wav, steps, output_path=args.output)
@@ -829,7 +875,8 @@ def main(argv=None) -> int:
             "next": None,
         }
         result["plan"] = plan_queue(cfg, presets=presets, max_new_tasks=args.max_new_tasks)
-        result["run"] = run_daily(cfg, limit=args.limit, dry_run=args.dry_run)
+        result["run"] = run_daily(cfg, limit=args.limit, dry_run=args.dry_run,
+                                 rights_manifest=args.rights_manifest, rights_asset_id=args.rights_asset_id)
         if not args.dry_run:
             result["report"] = generate_daily_report(cfg)
             result["craft"] = seed_craft_memory(cfg)

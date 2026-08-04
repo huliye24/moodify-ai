@@ -6,6 +6,7 @@ Verifies that uvicorn, CLI, and the Console HTML load together.
 import json
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -57,7 +58,7 @@ def live_server(tmp_path):
     env["MOODIFY_RUNTIME_CONFIG"] = cfg_path
 
     proc = subprocess.Popen(
-        ["python3", "-m", "uvicorn", API_MODULE,
+        [sys.executable, "-m", "uvicorn", API_MODULE,
          "--host", "127.0.0.1", "--port", str(port),
          "--log-level", "error"],
         env=env,
@@ -231,7 +232,29 @@ def test_api_job_create_attach_deliver_cycle(live_server, tmp_path):
 
     # 3. Deliver
     cand_id = detail["candidate_versions"][0]["candidate_id"]
-    dlv_params = urllib.parse.urlencode({"candidate_id": cand_id})
+    rights_path = Path(tmp_path) / "rights_lifecycle.json"
+    rights_path.write_text(json.dumps({
+        "schema_version": "1.0.0",
+        "gate_id": "TEST",
+        "assets": [{
+            "asset_id": "TEST-ASSET",
+            "source_path": str((Path(tmp_path) / "input/lifecycle.wav").resolve()),
+            "status": "ready",
+        }],
+    }), encoding="utf-8")
+    auth_params = urllib.parse.urlencode({
+        "rights_manifest": str(rights_path),
+        "rights_asset_id": "TEST-ASSET",
+    })
+    urllib.request.urlopen(
+        f"{live_server}/operator/jobs/{job_id}/authorize-rights?{auth_params}",
+        data=b"", timeout=5,
+    ).read()
+    dlv_params = urllib.parse.urlencode({
+        "candidate_id": cand_id,
+        "human_approved": "true",
+        "approved_by": "test-reviewer",
+    })
     r3 = urllib.request.urlopen(
         f"{live_server}/operator/jobs/{job_id}/deliver?{dlv_params}",
         data=b"", timeout=5)

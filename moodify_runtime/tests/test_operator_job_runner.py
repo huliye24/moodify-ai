@@ -12,9 +12,7 @@ from moodify_runtime.operator_console import (
 )
 from moodify_runtime.cli import main
 
-BASELINE = __import__("pathlib").Path(
-    "/home/ubuntu/moodify-mainline/moodify-core-package/tests/baseline/test_audio"
-)
+BASELINE = __import__("pathlib").Path(__file__).resolve().parents[2] / "moodify-core-package" / "tests" / "baseline" / "test_audio"
 
 
 def test_plan_operator_runtime_with_single_file(tmp_path):
@@ -239,6 +237,31 @@ def test_run_operator_job_fails_on_empty_queue(tmp_path):
     updated = get_operator_job(cfg, job["job_id"])
     assert updated["status"] == "failed"
     assert "No pending tasks" in (updated.get("last_error") or "")
+
+
+def test_live_operator_job_fails_closed_without_rights_evidence(tmp_path):
+    cfg = RuntimeConfig(
+        project_root=tmp_path,
+        data_root=tmp_path / "data",
+        input_dirs=[tmp_path / "input"],
+        output_root=tmp_path / "outputs",
+        registry_path=tmp_path / "registry.jsonl",
+        queue_path=tmp_path / "queue.jsonl",
+        operator_jobs_path=tmp_path / "operator_jobs.jsonl",
+        operator_detail_dir=tmp_path / "operator_details",
+    )
+    source = tmp_path / "input" / "piano.wav"
+    source.parent.mkdir(parents=True)
+    source.write_bytes((BASELINE / "piano.wav").read_bytes())
+    job = create_operator_job(cfg, source_audio=str(source), processing_depth="quick_scan")
+    plan_operator_runtime(cfg, job_id=job["job_id"])
+
+    result = run_operator_job(cfg, job_id=job["job_id"], dry_run=False)
+
+    assert result["status"] == "failed"
+    assert "rights_manifest" in result["error"]
+    updated = get_operator_job(cfg, job["job_id"])
+    assert updated["current_step"] == "rights_gate_blocked"
 
 
 def test_run_operator_job_records_timestamps(tmp_path):

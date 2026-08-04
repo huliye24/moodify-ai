@@ -4,6 +4,15 @@ Version: v0.1
 Date: 2026-06-04
 Status: active product direction
 
+> **2026-07-30 scope clarification:** This document remains valid for the
+> industrial workflow, acoustic processing, evidence, and craft-library
+> principles. Product ownership and surface priority are now governed by
+> `MOODIFY_MUSIC_PROCESSING_INFRASTRUCTURE.md`. Moodify is headless
+> music-processing infrastructure for music companies; creator contact,
+> talent/artistic judgment, signing, and artist operations are outside scope.
+> The Operator Console is an internal operations and validation surface, while
+> the versioned production contract and API are the primary product boundary.
+
 ## One Sentence
 
 Moodify is an enterprise acoustic industrial system for the AI music era. It uses deep acoustic scanning, long-running cloud processing, MRS reality scoring, quality gates, reports, and craft-library accumulation to move AI music from simulated sound toward more real sound.
@@ -45,6 +54,66 @@ create job
 
 The product is not a button. It is a production line.
 
+## Two Curves: Why Post-Processing Is the Gate, Not the Goal
+
+> **2026-08-01 strategy note:** the following argument was added to name the
+> market-timing logic behind the industrial shift.
+
+AI music post-processing is a shrinking market by construction: the defects
+that post-processing fixes are defects of AI music models, and those defects
+shrink as the models improve. Demand for "fix the synthetic sound" follows the
+model capability curve downward.
+
+Two opposite curves:
+
+```text
+AI music model capability -> post-processing demand (shrinking)
+AI music model capability -> measurement demand      (growing)
+```
+
+The second curve inverts the first: the closer synthetic audio gets to real
+sound, the harder — and the more valuable — it becomes to measure and prove
+whether a master is real or simulated. MRS reality scoring, spectral
+evidence, listening tests, and calibration reports sit on the growing side.
+
+Moodify therefore thickens on the other side — and the other side is a
+**data asset**.
+
+Every job is a data-collection instrument: acoustic scans, MRS scores, gate
+decisions, reports, craft records, and — whenever human review happens —
+ground-truth labels. The asset compounds on two axes:
+
+1. **Volume**: more jobs → more samples, more scores, more failure cases.
+2. **Quality per unit**: the data improves, not just grows — listening
+   review labels ground truth, calibration converges MRS, failure cases
+   sharpen gates, craft memory learns what works on what material.
+
+Three downstream products of this asset:
+
+1. **Measurement authority** — MRS reality scoring, spectral evidence,
+   listening tests, calibration reports: a trusted gauge is only as credible
+   as its calibration data, so the gauge and the data are the same moat.
+2. **Craft-library compounding** — craft memory, proposals, failure cases:
+   the library is the data made executable.
+3. **Evidence and traceability** — production-case control, quality gates,
+   reports, and delivery records: audit value that is independent of model
+   capability.
+
+Why the asset gets rarer, not commoner, as models improve: each new model
+generation redefines what AI music sounds like, so the longitudinal record of
+real-versus-simulated across generations — and of what fixes worked — cannot
+be reconstructed by anyone who was not collecting it continuously. Model
+companies own model data; Moodify owns post-production outcome data.
+
+Post-processing stays. It is the entry gate that acquires customers and feeds
+the data engine. But the value center must keep migrating toward the data
+asset — before the gate closes.
+
+Risk: the asset compounds only if data discipline holds — labeled ground
+truth, calibration rigor, retained raw evidence. Scattered files do not
+compound; a structured data pipeline does. Measurement credibility is
+downstream of the same data (see Cold Boundaries).
+
 ## Primary Customer
 
 The first customer is the internal operator.
@@ -61,9 +130,13 @@ The unit of adoption is not a casual user. The unit of adoption is a studio.
 
 ## Product Surface
 
-The Electron / desktop surface should be treated as:
+The Electron / desktop surface should be treated internally as:
 
 > Moodify Industrial Operator Console
+
+It is an internal operations, validation, and incident-response surface. It is
+not a creator-facing product and is not the primary company integration
+contract.
 
 It is responsible for:
 
@@ -168,6 +241,15 @@ The next direction is:
 | v0.4 | Cloud GPU System | scheduling, deep processing, parallel jobs, cost accounting |
 | v0.5 | Craft Library System | preset versioning, sample writeback, recommended processing plans |
 | v1.0 | Moodify Studio OS | studio-grade acoustic industrial operating system |
+
+> **2026-08-01 data-asset anchor:** the data asset is the compounding side of
+> the product (see Two Curves). Every version above must treat each job as a
+> data-collection instrument whose structured output — acoustic scans, MRS
+> scores, gate decisions, review labels, craft records — flows into one
+> schema'd data pipeline instead of scattered files. The pipeline is the
+> prerequisite for MRS calibration credibility, craft-library compounding,
+> and cross-generation measurement authority; it is scheduled as its own
+> milestone (DSK-MFY-DATA-ASSET) rather than a side effect of other work.
 
 ## Cold Boundaries
 

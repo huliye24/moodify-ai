@@ -218,10 +218,12 @@ def _write_markdown(path: Path, summary: dict[str, Any]) -> None:
         lines.append(f"| {preset} | {item['count']} | {_fmt(item['median_mrs'])} | {_fmt(item['mean_mrs'])} | {_fmt(item['median_delta'])} | {_fmt(item['mean_delta'])} |")
     lines += ["", "## Top 10", "", "| Rank | Sample | Preset | MRS | Delta | Flags |", "|---:|---|---|---:|---:|---|"]
     for idx, record in enumerate(summary["top_records"], 1):
-        lines.append(f"| {idx} | {record['sample_id']} | {record['preset']} | {_fmt(record['mrs_score'])} | {_fmt(record['mrs_delta'])} | {','.join(record.get('penalty_flags') or []) or "-"} |")
+        flags = ",".join(record.get("penalty_flags") or []) or "-"
+        lines.append(f"| {idx} | {record['sample_id']} | {record['preset']} | {_fmt(record['mrs_score'])} | {_fmt(record['mrs_delta'])} | {flags} |")
     lines += ["", "## Bottom 10", "", "| Rank | Sample | Preset | MRS | Delta | Flags |", "|---:|---|---|---:|---:|---|"]
     for idx, record in enumerate(summary["bottom_records"], 1):
-        lines.append(f"| {idx} | {record['sample_id']} | {record['preset']} | {_fmt(record['mrs_score'])} | {_fmt(record['mrs_delta'])} | {','.join(record.get('penalty_flags') or []) or "-"} |")
+        flags = ",".join(record.get("penalty_flags") or []) or "-"
+        lines.append(f"| {idx} | {record['sample_id']} | {record['preset']} | {_fmt(record['mrs_score'])} | {_fmt(record['mrs_delta'])} | {flags} |")
     lines += ["", "## Penalty Flags", ""]
     if summary["penalty_flags"]:
         lines += ["| Flag | Count |", "|---|---:|"]

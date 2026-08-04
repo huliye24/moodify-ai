@@ -151,21 +151,19 @@ class DataLoopRunner:
         out = self._output_dir
         out.mkdir(parents=True, exist_ok=True)
 
-        # NightMetricRecord
-        (out / "night_metric_record.json").write_text(
-            json.dumps(record, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        # NightMetricRecord — single-file atomic write
+        from .utils import atomic_write_json
+        atomic_write_json(out / "night_metric_record.json", record)
 
-        # Recommendation bundle
-        (out / "recommendation_bundle.json").write_text(
-            json.dumps(bundle.to_dict(), ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
+        # Recommendation bundle + report — co-generated atomic pair
+        from .atomic_pair_writer import AtomicPairWriter
+        writer = AtomicPairWriter(out)
+        writer.write(
+            json_data=bundle.to_dict(),
+            json_filename="recommendation_bundle.json",
+            md_content=DataLoopRunner._format_report(record, bundle),
+            md_filename="data_loop_report.md",
         )
-
-        # Human-readable report
-        report = DataLoopRunner._format_report(record, bundle)
-        (out / "data_loop_report.md").write_text(report, encoding="utf-8")
 
     # ------------------------------------------------------------------
     # Writeback hooks (MHP-823, MHP-824)

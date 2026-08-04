@@ -148,9 +148,43 @@ def atomic_write_jsonl(path: Path, rows: List[Dict[str, Any]]) -> None:
             f.write(json.dumps(row, ensure_ascii=False, sort_keys=False) + "\n")
     tmp.replace(path)
 
+
 # ---------------------------------------------------------------------------
 # File identity
 # ---------------------------------------------------------------------------
+import csv
+import io
+
+
+def read_csv_rows(path: Path) -> List[Dict[str, str]]:
+    """Read CSV file as list of dicts. Returns empty list if file missing."""
+    if not path.is_file():
+        return []
+    with path.open("r", encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def atomic_append_csv(
+    path: Path, row: Dict[str, Any], fieldnames: List[str]
+) -> None:
+    """Append a row to a CSV atomically via temp file + rename.
+
+    Reads existing rows, appends the new row, and writes the full file
+    through a temp file so a crash never leaves a partial row.
+    """
+    ensure_parent(path)
+    existing = read_csv_rows(path)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    fieldnames_sorted = list(fieldnames) if fieldnames else (
+        list(existing[0].keys()) if existing else []
+    )
+    with tmp.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames_sorted)
+        writer.writeheader()
+        for r in existing:
+            writer.writerow(r)
+        writer.writerow({k: str(row.get(k, "")) for k in fieldnames_sorted})
+    tmp.replace(path)
 
 
 def file_sha1(path: Path, max_bytes: Optional[int] = None) -> str:
@@ -342,3 +376,30 @@ def append_csv(path: Path, row: Dict[str, Any], fieldnames: List[str]) -> None:
         if not exists:
             writer.writeheader()
         writer.writerow({k: row.get(k, "") for k in fieldnames})
+
+
+# ---------------------------------------------------------------------------
+# Run directory discovery
+# ---------------------------------------------------------------------------
+
+
+def find_latest_run_dir(output_root: Path) -> Path:
+    """Return the most recent run directory that contains a manifest.csv.
+
+    Directories are sorted by name descending. Unvalidated directories
+    (no manifest.csv) are skipped. Raises FileNotFoundError when no
+    valid run directory exists.
+    """
+    if not output_root.is_dir():
+        raise FileNotFoundError(f"Output root is not a directory: {output_root}")
+    candidates = sorted(
+        (p for p in output_root.iterdir() if p.is_dir()),
+        key=lambda p: p.name,
+        reverse=True,
+    )
+    for candidate in candidates:
+        if (candidate / "manifest.csv").is_file():
+            return candidate
+    raise FileNotFoundError(
+        f"No run directory with manifest.csv found in {output_root}"
+    )

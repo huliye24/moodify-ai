@@ -130,7 +130,7 @@ def test_failure_case_library_writes_and_queries(tmp_path):
 
 def test_preset_experiment_runner(tmp_path):
     """Smoke test: run_preset_experiment on a real WAV through 2 presets."""
-    baseline = Path("/home/ubuntu/moodify-mainline/moodify-core-package/tests/baseline/test_audio/piano.wav")
+    baseline = Path(__file__).resolve().parents[2] / "moodify-core-package" / "tests" / "baseline" / "test_audio" / "piano.wav"
     if not baseline.exists():
         pytest.skip("baseline wav not available")
 

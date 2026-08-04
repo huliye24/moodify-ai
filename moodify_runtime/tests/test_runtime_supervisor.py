@@ -65,7 +65,7 @@ def test_supervised_retry_eventually_succeeds():
     script = tmp / "flaky.py"
     script.write_text(f"""
 import sys
-p = __import__('pathlib').Path('{state_file}')
+p = __import__('pathlib').Path({str(state_file)!r})
 count = 0
 if p.exists():
     count = int(p.read_text())

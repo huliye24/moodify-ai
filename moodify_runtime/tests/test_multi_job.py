@@ -8,6 +8,7 @@ from moodify_runtime.operator_console import (
     get_operator_job,
     list_operator_jobs,
 )
+from moodify_runtime.tests.gate_helpers import create_test_delivery
 from moodify_runtime.studio import (
     create_client,
     create_order,
@@ -108,7 +109,7 @@ def test_deliver_three_jobs_to_same_order(tmp_path):
         }]
         cands = _attach_and_get_candidates(cfg, job["job_id"], run_id, rows)
         cand_id = cands[0]["candidate_id"]
-        create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id)
+        create_test_delivery(cfg, job, cand_id)
         link_job_to_order(cfg, order_id=order["order_id"], job_id=job["job_id"])
         delivered_ids.append(job["job_id"])
 
@@ -138,6 +139,7 @@ def test_writeback_multiple_craft_records(tmp_path):
             "mrs_open_flags": "", "error": "",
         }]
         cands = _attach_and_get_candidates(cfg, job["job_id"], run_id, rows)
+        create_test_delivery(cfg, job, cands[0]["candidate_id"])
         writeback_delivery_to_craft_record(cfg, job_id=job["job_id"],
                                            candidate_id=cands[0]["candidate_id"],
                                            adoption_status="candidate")
@@ -178,7 +180,7 @@ def test_sequential_job_lifecycle_loop(tmp_path):
         statuses.append(("attached", j["status"]))
 
         cand_id = cands[0]["candidate_id"]
-        create_delivery_record(cfg, job_id=job["job_id"], candidate_id=cand_id)
+        create_test_delivery(cfg, job, cand_id)
         j = get_operator_job(cfg, job["job_id"])
         assert j["status"] == "delivered", f"Job {i}: {j['status']}"
 
@@ -222,8 +224,7 @@ def test_concurrent_job_status_transitions(tmp_path):
         cands = _attach_and_get_candidates(cfg, job_records[i]["job_id"], run_id, rows)
         j = get_operator_job(cfg, job_records[i]["job_id"])
         assert j["status"] in ("gate_review", "reprocess"), f"Job {i}: {j['status']}"
-        create_delivery_record(cfg, job_id=job_records[i]["job_id"],
-                               candidate_id=cands[0]["candidate_id"])
+        create_test_delivery(cfg, job_records[i], cands[0]["candidate_id"])
 
     # Verify all 10 are delivered
     all_jobs = list_operator_jobs(cfg)

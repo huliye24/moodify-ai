@@ -713,3 +713,123 @@ class TestDeterministicAcrossSubprocess:
 
         assert mr.target_hash == subprocess_hash, \
             "migration must be deterministic across process restarts"
+
+
+# Phase 2C deepening — production consumer lineage, registry drift
+
+class TestProductionConsumerLineage:
+    def test_delivery_roundtrip_via_historical_load(self, tmp_path):
+        from moodify_runtime.historical_compatibility import load_historical_record, build_delivery_record_fixture
+        rec = build_delivery_record_fixture()
+        p = tmp_path / 'delivery.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r = load_historical_record(p, 'delivery')
+        assert r.success
+        assert r.schema_version == '1.0.0'
+
+    def test_approval_roundtrip(self, tmp_path):
+        from moodify_runtime.historical_compatibility import load_historical_record, build_approval_record_fixture
+        rec = build_approval_record_fixture()
+        p = tmp_path / 'approval.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r = load_historical_record(p, 'approval')
+        assert r.success
+        assert r.schema_version == '1.0.0'
+
+    def test_workspace_project_roundtrip(self, tmp_path):
+        from moodify_runtime.historical_compatibility import load_historical_record, build_v2_workspace_project_fixture
+        rec = build_v2_workspace_project_fixture()
+        p = tmp_path / 'proj.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r = load_historical_record(p, 'workspace_project')
+        assert r.success
+        assert r.schema_version == '2.0.0'
+
+    def test_workspace_brief_roundtrip(self, tmp_path):
+        from moodify_runtime.historical_compatibility import load_historical_record, build_v2_workspace_brief_fixture
+        rec = build_v2_workspace_brief_fixture()
+        p = tmp_path / 'brief.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r = load_historical_record(p, 'workspace_brief')
+        assert r.success
+        assert r.schema_version == '2.0.0'
+
+    def test_rights_manifest_roundtrip(self, tmp_path):
+        from moodify_runtime.historical_compatibility import load_historical_record, build_rights_manifest_fixture
+        rec = build_rights_manifest_fixture()
+        p = tmp_path / 'rm.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r = load_historical_record(p, 'rights_manifest')
+        assert r.success
+        assert r.schema_version == '1.0.0'
+
+    def test_treatment_summary_roundtrip(self, tmp_path):
+        from moodify_runtime.historical_compatibility import load_historical_record, build_treatment_summary_fixture
+        rec = build_treatment_summary_fixture()
+        p = tmp_path / 'ts.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r = load_historical_record(p, 'treatment_summary')
+        assert r.success
+        assert r.schema_version == '0.1.0'
+
+
+class TestRegistryDrift:
+    def test_every_migration_target_is_supported(self):
+        from moodify_runtime.schema_registry import SUPPORTED_SCHEMA_VERSIONS
+        manual_map = {'treatment': {'0.2.0'}}
+        for rtype, targets in manual_map.items():
+            supported = SUPPORTED_SCHEMA_VERSIONS.get(rtype, set())
+            for tgt in targets:
+                assert tgt in supported
+
+    def test_required_fields_cover_all_types(self):
+        from moodify_runtime.historical_compatibility import _REQUIRED_FIELDS
+        from moodify_runtime.schema_registry import RECORD_TYPES
+        req_set = set(_REQUIRED_FIELDS.keys())
+        type_set = set(RECORD_TYPES)
+        missing = type_set - req_set
+        assert not missing, f'record types without required fields: {missing}'
+
+    def test_all_supported_versions_have_current(self):
+        from moodify_runtime.schema_registry import SUPPORTED_SCHEMA_VERSIONS, CURRENT_SCHEMA_VERSIONS
+        for rtype, versions in SUPPORTED_SCHEMA_VERSIONS.items():
+            current = CURRENT_SCHEMA_VERSIONS.get(rtype)
+            assert current is not None, f'{rtype} has no current'
+            assert current in versions, f'{rtype} current {current} not supported'
+
+
+class TestMigrationChainIdempotency:
+    def test_double_migration_lineage_grows(self, tmp_path):
+        from moodify_runtime.historical_compatibility import (
+            migrate_historical_record, build_v01_treatment_fixture,
+        )
+        rec = build_v01_treatment_fixture()
+        p = tmp_path / 't.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r1 = migrate_historical_record(p, 'treatment', tmp_path / 'm1')
+        r2 = migrate_historical_record(r1.target_path, 'treatment', tmp_path / 'm2')
+        import json as j
+        data2 = j.loads(open(r2.target_path, encoding='utf-8').read())
+        lineage = data2.get('_migration_lineage', [])
+        assert len(lineage) >= 2
+
+    def test_re_migrate_current_version_no_mutation(self, tmp_path):
+        from moodify_runtime.historical_compatibility import (
+            migrate_historical_record, build_v01_treatment_fixture,
+        )
+        rec = build_v01_treatment_fixture()
+        p = tmp_path / 't.json'
+        import json
+        p.write_text(json.dumps(rec, indent=2) + chr(10), encoding='utf-8')
+        r1 = migrate_historical_record(p, 'treatment', tmp_path / 'm1')
+        r2 = migrate_historical_record(r1.target_path, 'treatment', tmp_path / 'm2')
+        assert r2.warnings
+        assert r2.source_hash != r2.target_hash
+        assert r2.success

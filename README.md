@@ -1,5 +1,112 @@
 # Moodify
 
+> 当前正式方向：v0.4 Research/Production Baseline。
+
+Moodify 聚焦 **AI 生成音乐的后生成处理、质量分析、结构恢复和资产化**。它的目标不是自动化传统混音或廉价替代混音师，而是在限定任务上，通过可测量实验验证 WSE 分析深度、MSE 结构理解和 PPE 稳定生产相对于传统人工工作流的优势。当前没有证据支持“已经超过专业混音师”的总体结论。
+
+## Moodify 不是什么 / 是什么
+
+- 不是 AI 音乐生成器、一键母带、消费者 App 或自动自学习系统。
+- 是面向音乐公司的本地优先研究—生产基础设施：生成候选、保存证据、由人工或受控规则选择，并把已验证经验形成版本化规则。
+
+## 当前狭窄领域与三层架构
+
+| 层 | 问题 | 当前状态 |
+|---|---|---|
+| WSE — Wave-Spectral Evolution | 声音发生了什么？ | 基础 level/spectral/stereo/residual 指标已部分实现；标准化与置信度待统一 |
+| MSE — Musical-Structural Engineering | 音乐结构是什么？ | 结构 schema 已有；稳定 BPM/key/section/lyrics/MIDI 管线仍属 Planned/Experimental |
+| PPE — Production Process Engineering | 怎样稳定地把它生产出来？ | Runtime/Workspace 已有；不可变 case ledger 已完成首个本地里程碑，尚待接主链 |
+
+```mermaid
+flowchart LR
+  PC["Production Case"] --> MR["Measurement Record"]
+  MR --> CG["Candidate Generation"]
+  CG --> CE["Candidate Evaluation"]
+  CE --> S["Human or rule-based selection"]
+  S --> T["Theory Update"]
+  T --> R["Moodify Rule Update"]
+  R --> N["Next Production Case"]
+```
+
+## 当前可以运行
+
+- `moodify-core-package`：音频载入、基础分析、预设处理、输出、报告及 Workspace 服务；
+- `moodify_runtime`：作业/队列、报告、内部 API/控制台和运行治理；
+- `moodify-bridge`（Python 3.12）：不可变 Production Case、SHA-256 资产、DuckDB/Parquet/YAML 证据、规则人批、Golden Case 回归和 Markdown/HTML 报告。
+
+快速开始（证据管线）：
+
+```powershell
+cd moodify-bridge
+py -3.12 -m pip install -e ".[dev]"
+py -3.12 -m moodify_bridge case create demo/case.yaml --root .demo-ledger
+py -3.12 -m moodify_bridge regression run 11111111-1111-4111-8111-111111111111 demo/case.yaml --root .demo-ledger
+```
+
+## 尚未验证的研究目标
+
+发行质量、完整结构恢复、跨曲风稳定性、相对人工优势和批量成本优势均尚未验证。缺失数据必须是 `null`/warning，不能用占位算法补齐。
+
+## v0.4 文档入口
+
+- [项目审计](docs/audit/PROJECT_AUDIT_2026_08.md)
+- [战略定位](docs/strategy/MOODIFY_POSITIONING_v0.4.md)
+- [系统架构](docs/architecture/MOODIFY_SYSTEM_ARCHITECTURE_v0.4.md)
+- [Production Learning Loop](docs/architecture/PRODUCTION_LEARNING_LOOP.md)
+- [90 天计划](docs/roadmap/MOODIFY_90_DAY_PLAN_2026_08_TO_2026_10.md)
+- [Backlog](docs/roadmap/BACKLOG.md)
+- [人类对照评价框架](docs/metrics/HUMAN_VS_MOODIFY_EVALUATION_FRAMEWORK.md)
+
+以下内容保留为历史实现与兼容说明；如与 v0.4 文档冲突，以以上入口为准。
+
+## Current Product Definition
+
+> Moodify is headless music-processing infrastructure for music companies. It
+> converts structured production decisions into reproducible, reviewable, and
+> reusable professional audio workflows.
+
+Moodify owns acoustic diagnosis, processing plans, candidate generation,
+technical quality gates, version lineage, delivery evidence, and craft-memory
+writeback. The music company owns creator communication, talent judgment,
+artistic direction, final selection, signing, release, and artist operations.
+
+The Workspace and operator console are internal validation and operations
+surfaces, not a creator-facing product. The canonical scope and boundary are in
+`docs/strategy/MOODIFY_MUSIC_PROCESSING_INFRASTRUCTURE.md`.
+
+Moodify follows a permanent engineering-thickness rule: every production task
+must leave a result, reproducible evidence, and inherited capability. The
+cross-version standard is
+`docs/strategy/MOODIFY_ENGINEERING_THICKNESS_STANDARD.md`.
+
+Moodify is developed as long-lived industrial software, not as a consumer app.
+The project works on a 2026-2046 horizon, seals one stable release per year, and
+uses a sustainable four-hour daily cadence centered on one atomic task plus
+verification, evidence, and inheritance. See
+`docs/strategy/MOODIFY_CIVILIZATIONAL_DEVELOPMENT_MODEL.md`.
+
+Every new AI-assisted engineering session should restore the project's tacit
+engineering context before implementation. The governing protocol is
+`docs/standards/MOODIFY_ENGINEERING_CONTEXT_BOOTSTRAP_PROTOCOL.md`; its
+copy-paste startup command is
+`docs/prompts/MOODIFY_PROJECT_STARTUP_COMMAND.txt`.
+
+## 2026-07-26 Workspace v2 MVP
+
+Moodify Studio Workspace v2 is sealed as `v2.0.0-mvp`. The MVP provides the
+project, brief, workflow-thread, treatment-plan, version, Judge, human approval,
+and final-archive loop. The operator API includes the eight-view internal
+console shell required by the runtime.
+
+Primary validation commands:
+
+```powershell
+python -m pytest moodify-core-package/tests -q
+python -m pytest moodify_runtime/tests -q
+```
+
+The older v0.1/v0.2 status sections below are retained as architecture history.
+
 ## 2026-06-04 Direction Update
 
 Moodify is now directed as an enterprise acoustic industrial system, not a consumer one-click music app.

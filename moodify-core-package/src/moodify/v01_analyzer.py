@@ -8,20 +8,22 @@ from __future__ import annotations
 import math
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from moodify.audio_io import load_audio
 from moodify.bands import (
-    BAND_6_COLORS as BAND_COLORS,
-    BAND_6_DISPLAYS as BAND_DISPLAYS,
-    BAND_6_EDGES as BAND_EDGES,
+    get_band_edges,
 )
 from moodify.v01_types import AudioMetrics
 
+if TYPE_CHECKING:
+    from moodify.v01_types import FeatureVector
+
 
 def analyze(input_path: str, output_dir: str = "outputs",
-            label: str = "") -> AudioMetrics:
+            label: str = "", band_spec: str = "7") -> AudioMetrics:
     """Load audio and compute basic metrics.
 
     Args:
@@ -43,7 +45,7 @@ def analyze(input_path: str, output_dir: str = "outputs",
     mono = mono.astype(np.float32)
     duration_s = len(mono) / sr
 
-    rms = _compute_band_rms(mono, sr)
+    rms = _compute_band_rms(mono, sr, band_edges=get_band_edges(band_spec))
     peak = float(20.0 * math.log10(np.max(np.abs(mono)) + 1e-12))
     crest = float(np.max(np.abs(mono)) / (np.sqrt(np.mean(mono ** 2)) + 1e-12))
 
@@ -63,8 +65,10 @@ def analyze(input_path: str, output_dir: str = "outputs",
         rms_bass=float(rms["bass"]),
         rms_low_mid=float(rms["low_mid"]),
         rms_mid=float(rms["mid"]),
-        rms_presence=float(rms["presence"]),
-        rms_air=float(rms["air"]),
+        rms_presence=float(rms.get("presence", 0.0)),
+        rms_brilliance=float(rms.get("brilliance", 0.0)),
+        rms_air=float(rms.get("air", 0.0)),
+        band_spec=band_spec,
         peak_db=round(peak, 1),
         crest_factor=round(crest, 2),
         dynamic_range_db=round(dyn_range, 1),
@@ -78,7 +82,11 @@ def analyze(input_path: str, output_dir: str = "outputs",
 
 # ── internal helpers ────────────────────────────────────
 
-def _compute_band_rms(mono: np.ndarray, sr: int) -> dict[str, float]:
+def _compute_band_rms(
+    mono: np.ndarray,
+    sr: int,
+    band_edges: list[tuple[str, float, float]] | None = None,
+) -> dict[str, float]:
     """Compute RMS energy per frequency band via FFT."""
     n = len(mono)
     fft = np.abs(np.fft.rfft(mono * np.hanning(n)))
@@ -87,7 +95,7 @@ def _compute_band_rms(mono: np.ndarray, sr: int) -> dict[str, float]:
     total_energy = np.sum(fft ** 2) + 1e-12
     result = {"total": 20.0 * math.log10(np.sqrt(np.mean(fft ** 2)) + 1e-12)}
 
-    for name, f1, f2 in BAND_EDGES:
+    for name, f1, f2 in band_edges or get_band_edges():
         mask = (freqs >= f1) & (freqs <= f2)
         band_energy = np.sum(fft[mask] ** 2)
         ratio = band_energy / total_energy
@@ -148,15 +156,26 @@ def _save_spectrum_png(metrics: AudioMetrics, output_dir: str,
     stem = Path(metrics.file_path).stem
     out_path = spectrum_png_path(metrics.file_path, output_dir, label=label)
 
-    bands = list(BAND_DISPLAYS)
+    # Use band names matching the values we have
+    if metrics.band_spec == "7":
+        from moodify.bands import BAND_7_DISPLAYS, BAND_7_COLORS
+        band_names = list(BAND_7_DISPLAYS)
+        colors = list(BAND_7_COLORS)
+    else:
+        from moodify.bands import BAND_6_DISPLAYS, BAND_6_COLORS
+        band_names = list(BAND_6_DISPLAYS)
+        colors = list(BAND_6_COLORS)
+
     values = [
         metrics.rms_sub, metrics.rms_bass, metrics.rms_low_mid,
-        metrics.rms_mid, metrics.rms_presence, metrics.rms_air,
+        metrics.rms_mid, metrics.rms_presence,
     ]
-    colors = list(BAND_COLORS)
+    if metrics.band_spec == "7":
+        values.append(metrics.rms_brilliance)
+    values.append(metrics.rms_air)
 
     fig, ax = plt.subplots(figsize=(10, 5))
-    bars = ax.bar(bands, values, color=colors, edgecolor="white", linewidth=0.5)
+    bars = ax.bar(band_names, values, color=colors, edgecolor="white", linewidth=0.5)
     ax.axhline(y=0, color="gray", linestyle="--", linewidth=0.8)
     ax.set_ylabel("dB (relative to total RMS)")
     title_label = f" ({label})" if label else ""

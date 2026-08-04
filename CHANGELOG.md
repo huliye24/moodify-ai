@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.0.0-mvp (2026-07-26) — Workspace v2 MVP sealed
+
+### Workspace v2
+- Completed all 34 implementation and acceptance steps.
+- Added project, brief, thread, treatment-plan, audio-version, approval, Judge,
+  failure-recovery, comparison, archive, API, and Workspace UI coverage.
+- Verified the Workspace v2 acceptance suite at 179/179 passing.
+
+### Repository closeout
+- Restored the required eight-view operator console source artifact.
+- Fixed MT-002 MRS manifest report generation syntax.
+- Made the core pytest configuration resolve the repository-level runtime package.
+- Synchronized package and release metadata with the `v2.0.0-mvp` baseline.
+
+The v0.1 and v0.2 entries below are retained as release history.
+
 ## v0.2.0-alpha (2026-06-04) — NEM-18: Studio OS Alpha Complete
 
 ### NEM-18 Protocol: Build-6 + Validate-6 + Harden-6

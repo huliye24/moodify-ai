@@ -1,7 +1,7 @@
 Metadata-Version: 2.4
 Name: moodify
-Version: 0.1.0
-Summary: Moodify v0.1.0 — AI 音乐二次处理与情绪声波工程系统
+Version: 2.0.0
+Summary: Moodify Studio Workspace v2 — AI 音乐二次处理与情绪声波工程系统
 Author: 文川院 / Moodify 声音实验室
 License: Apache-2.0
 Classifier: Development Status :: 3 - Alpha
@@ -23,11 +23,21 @@ Requires-Dist: pedalboard>=0.9.0
 Requires-Dist: fastapi>=0.100.0
 Requires-Dist: uvicorn>=0.20.0
 Requires-Dist: python-multipart>=0.0.5
+Requires-Dist: PyYAML>=6.0
 Provides-Extra: dsp
 Requires-Dist: pedalboard>=0.9.0; extra == "dsp"
 Provides-Extra: separation
 Requires-Dist: demucs; extra == "separation"
 Requires-Dist: torch>=2.0; extra == "separation"
+Provides-Extra: transcription
+Requires-Dist: numpy<2,>=1.24; extra == "transcription"
+Requires-Dist: scipy<1.14,>=1.11; extra == "transcription"
+Requires-Dist: librosa<0.11,>=0.10; extra == "transcription"
+Requires-Dist: mir_eval<0.9,>=0.8; extra == "transcription"
+Requires-Dist: pretty_midi<0.3,>=0.2.10; extra == "transcription"
+Requires-Dist: resampy<0.4.3,>=0.4; extra == "transcription"
+Requires-Dist: scikit-learn<1.6,>=1.3; extra == "transcription"
+Requires-Dist: onnxruntime<2,>=1.16; platform_system == "Windows" and extra == "transcription"
 Provides-Extra: api
 Requires-Dist: fastapi>=0.100.0; extra == "api"
 Requires-Dist: uvicorn; extra == "api"

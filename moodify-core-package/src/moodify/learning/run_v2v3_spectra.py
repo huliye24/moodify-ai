@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import numpy as np
 
 from moodify.auditory.comparison import build_delta_spectrograms
 from moodify.auditory.profiles import get_profile

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -35,7 +36,7 @@ class RuntimeConfig:
     max_retries_per_task: int = 2
     keep_last_n_runs: int = 10
     min_free_disk_gb: float = 1.0
-    python: str = "python3"
+    python: str = field(default_factory=lambda: sys.executable)
     stop_on_first_success_template: bool = True
     audio_suffixes: List[str] = field(default_factory=lambda: list(DEFAULT_AUDIO_SUFFIXES))
     command_templates: List[str] = field(default_factory=lambda: [
