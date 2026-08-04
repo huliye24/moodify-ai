@@ -1,0 +1,241 @@
+ M .idea/moodify.iml
+ M CHANGELOG.md
+ M PROJECT_ROADMAP.md
+ M README.md
+ M apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt
+ M apps/android/app/src/main/java/com/moodify/app/ui/MoodifyApp.kt
+ M apps/android/app/src/main/java/com/moodify/app/ui/components/MiniPlayer.kt
+ M docs/strategy/MOODIFY_INDUSTRIAL_DIRECTION.md
+ M moodify-core-package/MOODIFY_INTENT.md
+ M moodify-core-package/pyproject.toml
+ M moodify-core-package/src/moodify.egg-info/PKG-INFO
+ M moodify-core-package/src/moodify.egg-info/SOURCES.txt
+ M moodify-core-package/src/moodify.egg-info/requires.txt
+ M moodify-core-package/src/moodify/bands.py
+ M moodify-core-package/src/moodify/learning/run_v2v3_spectra.py
+ M moodify-core-package/src/moodify/processing/__init__.py
+ M moodify-core-package/src/moodify/processing/operators.py
+ M moodify-core-package/src/moodify/processing/spectral_chain.py
+ M moodify-core-package/src/moodify/reality_metrics.py
+ M moodify-core-package/src/moodify/v01_analyzer.py
+ M moodify-core-package/src/moodify/v01_delivery.py
+ M moodify-core-package/src/moodify/v01_types.py
+ M moodify-core-package/tests/v2/test_analyst_service.py
+ M moodify_runtime/cli.py
+ M moodify_runtime/cloud_worker.py
+ M moodify_runtime/config.py
+ M moodify_runtime/craft_memory.py
+ M moodify_runtime/craft_presets.py
+ M moodify_runtime/craft_processes.py
+ M moodify_runtime/craft_proposals.py
+ M moodify_runtime/data_loop_runner.py
+ M moodify_runtime/operator_api.py
+ M moodify_runtime/operator_console.py
+ M moodify_runtime/report.py
+ M moodify_runtime/runner.py
+ M moodify_runtime/supervisor.py
+ M moodify_runtime/tests/test_api_jobs.py
+ M moodify_runtime/tests/test_atomic_pair_writer.py
+ M moodify_runtime/tests/test_config.py
+ M moodify_runtime/tests/test_console_interaction.py
+ M moodify_runtime/tests/test_craft.py
+ M moodify_runtime/tests/test_craft_proposals.py
+ M moodify_runtime/tests/test_edge_cases.py
+ M moodify_runtime/tests/test_full_stack_smoke.py
+ M moodify_runtime/tests/test_historical_compatibility.py
+ M moodify_runtime/tests/test_multi_job.py
+ M moodify_runtime/tests/test_operator_console.py
+ M moodify_runtime/tests/test_operator_job_runner.py
+ M moodify_runtime/tests/test_operator_report_bundle.py
+ M moodify_runtime/tests/test_real_audio.py
+ M moodify_runtime/tests/test_runtime_supervisor.py
+ M moodify_runtime/tests/test_studio_os_alpha.py
+ M moodify_runtime/tidal_operations.py
+ M moodify_runtime/utils.py
+ M scripts/mt002_mrs_score_manifest.py
+ M treatment_records/summary.json
+ M treatment_records/summary.md
+ M workers/mrs_formula_v02.py
+?? .codex-work/
+?? .github/workflows/moodify-temporal-texture.yml
+?? .idea/go.imports.xml
+?? .moodify/
+?? Moodify_Deep_Ear_Diagnostic_Pack_v0.1.1/
+?? RJWC_VideoPack_System/
+?? android-studio-quail2-windows.exe
+?? apps/android/app/src/androidTest/
+?? apps/android/app/src/main/java/com/moodify/app/ui/components/MiniPlayerGestureLogic.kt
+?? apps/android/app/src/test/java/com/moodify/app/ui/
+?? apps/tools/
+?? artifacts/
+?? configs/deepseek_worker.example.env
+?? deliverables/
+?? docs/DEEPSEEK_HANDOFF_ANDROID_UI.md
+?? docs/DEEPSEEK_TASK_CWC_CREATOR_PASS.md
+?? docs/architecture/
+?? docs/audit/
+?? docs/audits/
+?? docs/decisions/
+?? docs/engineer/2026-07-31/
+?? docs/engineering/
+?? "docs/experiments/Moodify MRS \346\200\247\350\203\275\347\224\273\345\203\217\345\256\236\351\252\214 v0.1.md"
+?? "docs/experiments/Moodify MRS \346\200\247\350\203\275\347\224\273\345\203\217\345\256\236\351\252\214 v0.1.pdf"
+?? docs/experiments/experiment-plan-v2.md
+?? "docs/experiments/\346\210\230\347\225\245-\345\256\236\351\252\214\345\217\214\347\272\277\346\216\250\350\277\233\347\263\273\347\273\237\357\274\232AI \345\216\237\347\224\237\345\267\245\347\250\213\351\241\271\347\233\256\347\232\204\351\225\277\346\234\237\346\216\250\350\277\233\346\226\271\346\263\225\350\256\272.md"
+?? "docs/experiments/\346\210\230\347\225\245-\345\256\236\351\252\214\345\217\214\347\272\277\346\216\250\350\277\233\347\263\273\347\273\237\357\274\232AI \345\216\237\347\224\237\345\267\245\347\250\213\351\241\271\347\233\256\347\232\204\351\225\277\346\234\237\346\216\250\350\277\233\346\226\271\346\263\225\350\256\272.pdf"
+?? "docs/experiments/\346\216\250\347\220\206\351\227\270\351\227\250\345\256\236\351\252\214\346\263\225\357\274\232AI \346\227\266\344\273\243\347\232\204\351\200\232\347\224\250\345\256\236\351\252\214\347\273\204\347\273\207\346\226\271\346\263\225\350\256\272.md"
+?? "docs/experiments/\346\216\250\347\220\206\351\227\270\351\227\250\345\256\236\351\252\214\346\263\225\357\274\232AI \346\227\266\344\273\243\347\232\204\351\200\232\347\224\250\345\256\236\351\252\214\347\273\204\347\273\207\346\226\271\346\263\225\350\256\272.pdf"
+?? "docs/experiments/\346\224\257\347\272\277\344\273\273\345\212\241/"
+?? "docs/experiments/\350\276\271\347\274\230\346\216\242\347\264\242/"
+?? docs/metrics/
+?? docs/product/MOODIFY_WEEKLY_EXECUTION_2026-08-03.md
+?? docs/product/daily/
+?? docs/prompts/
+?? docs/roadmap/
+?? docs/standards/
+?? docs/strategy/DOC-MFY-001/
+?? docs/strategy/DOC-MFY-002/
+?? docs/strategy/DOC-MFY-003/
+?? docs/strategy/MOODIFY_CIVILIZATIONAL_DEVELOPMENT_MODEL.md
+?? docs/strategy/MOODIFY_ENGINEERING_THICKNESS_STANDARD.md
+?? docs/strategy/MOODIFY_FINANCING_BUSINESS_PLAN_OUTLINE.md
+?? docs/strategy/MOODIFY_MUSIC_PROCESSING_INFRASTRUCTURE.md
+?? docs/strategy/MOODIFY_ONE_POINT_PRINCIPLE.md
+?? docs/strategy/MOODIFY_POSITIONING_v0.4.md
+?? docs/tasks/codex/MFY-SOX-REFINE-002.md
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-001/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-002/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-003/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-004/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-005/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-006/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-007/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-008/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-009/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-010/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-011/
+?? docs/tasks/deepseek/DSK-MFY-ANDROID-012/
+?? docs/tasks/deepseek/DSK-MFY-CAPABILITY-ACCRETION-017/
+?? docs/tasks/deepseek/DSK-MFY-CAPABILITY-ACCRETION-018/
+?? docs/tasks/deepseek/DSK-MFY-CAPABILITY-ACCRETION-019/
+?? docs/tasks/deepseek/DSK-MFY-CAPABILITY-ACCRETION-020/
+?? docs/tasks/deepseek/DSK-MFY-CAPABILITY-ACCRETION-021/
+?? docs/tasks/deepseek/DSK-MFY-CLI-NATIVE-REFACTOR-015/
+?? docs/tasks/deepseek/DSK-MFY-DATA-ASSET-001/
+?? docs/tasks/deepseek/DSK-MFY-DATA-ASSET-013/
+?? docs/tasks/deepseek/DSK-MFY-DAW-BACKENDS-014/
+?? docs/tasks/deepseek/DSK-MFY-DAY2-CLOSURE-003/
+?? docs/tasks/deepseek/DSK-MFY-DECISION-INTELLIGENCE-011/
+?? docs/tasks/deepseek/DSK-MFY-IDENTITY-CORE-010/
+?? docs/tasks/deepseek/DSK-MFY-KNOWLEDGE-LAYERS-022/
+?? docs/tasks/deepseek/DSK-MFY-LYRICS-INTENT-007/
+?? docs/tasks/deepseek/DSK-MFY-ONE-POINT-006/
+?? docs/tasks/deepseek/DSK-MFY-ORDER-BEAUTY-022/
+?? docs/tasks/deepseek/DSK-MFY-ORDER-BEAUTY-023/
+?? docs/tasks/deepseek/DSK-MFY-ORDER-BEAUTY-024/
+?? docs/tasks/deepseek/DSK-MFY-ORDER-BEAUTY-025/
+?? docs/tasks/deepseek/DSK-MFY-PIPELINE-016/
+?? docs/tasks/deepseek/DSK-MFY-PPE-HARDENING-005/
+?? docs/tasks/deepseek/DSK-MFY-RUNTIME-INTEGRATION-001/
+?? docs/tasks/deepseek/DSK-MFY-SCORE-ENGINE-009/
+?? docs/tasks/deepseek/DSK-MFY-SPECTRAL-EVIDENCE-012/
+?? docs/tasks/deepseek/DSK-MFY-STEM-MIDI-008/
+?? docs/tasks/deepseek/DSK-MFY-STUDIO-PREP-004/
+?? docs/tasks/deepseek/DSK-MFY-THICKNESS-001/
+?? docs/ui-sketches/
+?? docs/xuanzhen/mrs_open_benchmark_standard.md
+?? docs/xuanzhen/mrs_open_benchmark_standard.pdf
+?? "docs/xuanzhen/\350\215\243\346\231\257\346\226\207\345\267\235\351\237\263\344\271\220\345\267\245\344\275\234\345\256\244\345\225\206\344\270\232\346\250\241\345\236\213_\345\225\206\345\255\246\351\231\242\347\211\210.md"
+?? "docs/xuanzhen/\350\215\243\346\231\257\346\226\207\345\267\235\351\237\263\344\271\220\345\267\245\344\275\234\345\256\244\345\225\206\344\270\232\346\250\241\345\236\213_\345\225\206\345\255\246\351\231\242\347\211\210.pdf"
+?? local_audio_assets/
+?? models/
+?? moodify-bridge/
+?? moodify-core-package/capability_registry.json
+?? moodify-core-package/docs/
+?? moodify-core-package/src/moodify/__main__.py
+?? moodify-core-package/src/moodify/adapters/
+?? moodify-core-package/src/moodify/app/
+?? moodify-core-package/src/moodify/capability_registry/
+?? moodify-core-package/src/moodify/cli_daw/
+?? moodify-core-package/src/moodify/cli_v2/__init__.py
+?? moodify-core-package/src/moodify/cli_v2/__main__.py
+?? moodify-core-package/src/moodify/craft_slider.py
+?? moodify-core-package/src/moodify/domain/canonical_project.py
+?? moodify-core-package/src/moodify/features/
+?? moodify-core-package/src/moodify/mrs_robust.py
+?? moodify-core-package/src/moodify/perception/
+?? moodify-core-package/src/moodify/ports/
+?? moodify-core-package/src/moodify/processing/limiter.py
+?? moodify-core-package/src/moodify/processing/rbj_eq.py
+?? moodify-core-package/src/moodify/processing/tight_focus.py
+?? moodify-core-package/src/moodify/score_engine/
+?? moodify-core-package/src/moodify/system_depth.py
+?? moodify-core-package/src/moodify/transcription.py
+?? moodify-core-package/src/moodify/transcription_pipeline/
+?? moodify-core-package/tests/architecture/
+?? moodify-core-package/tests/capability_registry/
+?? moodify-core-package/tests/cli_v2/
+?? moodify-core-package/tests/score_engine/
+?? moodify-core-package/tests/test_band_compatibility.py
+?? moodify-core-package/tests/test_chroma.py
+?? moodify-core-package/tests/test_hpss_residual.py
+?? moodify-core-package/tests/test_mrs_robust.py
+?? moodify-core-package/tests/test_production_runtime.py
+?? moodify-core-package/tests/test_rbj_eq.py
+?? moodify-core-package/tests/test_reverb_filters.py
+?? moodify-core-package/tests/test_system_depth.py
+?? moodify-core-package/tests/test_transcription.py
+?? moodify-core-package/tests/test_transcription_stems.py
+?? moodify-core-package/tests/v2/test_domain_public_contract.py
+?? moodify-core-package/tools/
+?? moodify_runtime/backfill_loader.py
+?? moodify_runtime/benchmark_builder.py
+?? moodify_runtime/comparison_report.py
+?? moodify_runtime/craft_evidence.py
+?? moodify_runtime/data_asset.py
+?? moodify_runtime/fusion_scorer.py
+?? moodify_runtime/hardening_gates.py
+?? moodify_runtime/learning_store.py
+?? moodify_runtime/learning_surface.py
+?? moodify_runtime/mainline_registry.py
+?? moodify_runtime/mrs_surface.py
+?? moodify_runtime/operator_console.html
+?? moodify_runtime/significance_evaluator.py
+?? moodify_runtime/tests/gate_helpers.py
+?? moodify_runtime/tests/test_atomic_run_outputs.py
+?? moodify_runtime/tests/test_data_asset.py
+?? moodify_runtime/tests/test_fail_open_closure.py
+?? moodify_runtime/tests/test_institutional_memory.py
+?? moodify_runtime/tests/test_runner_rights_gate.py
+?? moodify_runtime/trend_analyzer.py
+?? moodify_runtime/xclp_gate.py
+?? output/
+?? pre-music/
+?? project_analytics/
+?? reports/aep_worker/
+?? schemas/job_data_record.schema.json
+?? science/
+?? scratch/
+?? scripts/check_cloud_data.py
+?? scripts/data_asset_backfill.py
+?? scripts/deepseek_worker_client.py
+?? scripts/download_cloud_data.py
+?? scripts/golden_runtime_exercise.py
+?? scripts/install_moodify_toolchain.ps1
+?? scripts/install_transcription.ps1
+?? scripts/moodify_deep_ear.py
+?? scripts/verify_exported_master.py
+?? scripts/xclp_moodify_report.py
+?? tests/
+?? tmp/
+?? tools/
+?? video/
+?? "\345\256\236\351\252\214\345\233\276\345\272\223/"
+?? "\346\212\225\350\265\204ppt/"
+?? "\347\240\224\347\251\266\350\256\272\346\226\207/"
+?? "\350\241\245\344\270\201\345\214\205/"
+f0b621a feat(player): global mini player, now-playing page, home screen listening
+ef32c1e feat(android): Media3 playback — processed/original A/B in works library
+468e177 feat(demo): investor demo build — real end-to-end processing pipeline
+d2b8b6a fix(quality-gate): 修复 D1-04 冒烟发现的质量门三缺口
+627e4c4 docs(codex): Audacity curve-refine command beyond V2

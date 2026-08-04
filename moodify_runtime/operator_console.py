@@ -285,6 +285,20 @@ def _load_genre_thresholds(genre: str = "") -> Dict[str, Any]:
     return result
 
 
+def _over_dark_decision(over_dark_triggered: bool, over_dark_level: str) -> tuple[Optional[str], Optional[str]]:
+    """Over-dark gate: graduated level overrides the legacy binary flag.
+
+    Returns (decision_override, reason); both None when no over-dark condition.
+    """
+    if over_dark_level == "severe":
+        return "reject", "over_dark_severe"
+    if over_dark_level == "mild":
+        return "reprocess", "over_dark_mild"
+    if over_dark_triggered:
+        return "reprocess", "over_dark_triggered"
+    return None, None
+
+
 def decide_candidate_gate(
     candidate_id: str,
     job_id: str,
@@ -327,17 +341,15 @@ def decide_candidate_gate(
             decision = "reprocess"
 
     # ── Over-dark: graduated level overrides binary flag ──
-    if over_dark_level == "severe":
-        reasons.append("over_dark_severe")
-        decision = "reject"
-    elif over_dark_level == "mild":
-        reasons.append("over_dark_mild")
-        if decision == "approve":
-            decision = "reprocess"
-    elif over_dark_triggered:
-        # Legacy binary flag: conservatively reprocess
-        reasons.append("over_dark_triggered")
-        if decision == "approve":
+    over_dark_decision, over_dark_reason = _over_dark_decision(
+        over_dark_triggered, over_dark_level
+    )
+    if over_dark_reason:
+        reasons.append(over_dark_reason)
+        if over_dark_decision == "reject":
+            decision = "reject"
+        elif over_dark_decision == "reprocess" and decision == "approve":
+            # Legacy binary flag: conservatively reprocess
             decision = "reprocess"
 
     if transient_damage is not None and transient_damage > transient_threshold:
@@ -761,6 +773,119 @@ def authorize_operator_job_source(
     return {"job_id": job_id, **evidence}
 
 
+def _fail_operator_job(
+    cfg: RuntimeConfig,
+    job_id: str,
+    error: str,
+    step: str,
+    mark_started_at: bool = False,
+) -> None:
+    """Record a failed job state. mark_started_at keeps pre-flight failures
+    timestamped with run_started_at, matching historical job records."""
+    now = utc_now_iso()
+    updates: Dict[str, Any] = {
+        "status": "failed",
+        "current_step": step,
+        "run_finished_at": now,
+        "last_error": error,
+    }
+    if mark_started_at:
+        updates["run_started_at"] = now
+    _update_job(cfg, job_id, updates)
+
+
+def _preflight_operator_job(
+    cfg: RuntimeConfig,
+    job_id: str,
+    dry_run: bool,
+    rights_manifest: str | Path | None,
+    rights_asset_id: str,
+    job_reason_prefix: str,
+) -> Optional[Dict[str, Any]]:
+    """Pre-flight gates: queue has pending tasks, explicit rights evidence.
+
+    Returns a failure response dict, or None when all gates pass.
+    """
+    from .queue import load_queue
+    from .runner import select_pending_tasks
+
+    if dry_run:
+        return None
+
+    queue_rows = load_queue(cfg)
+    pending = select_pending_tasks(queue_rows)
+    job_pending = [t for t in pending if str(t.get("reason", "")).startswith(job_reason_prefix)]
+    if not job_pending:
+        error = f"No pending tasks for this job in queue. Run plan-runtime first."
+        _fail_operator_job(cfg, job_id, error, "runtime_failed", mark_started_at=True)
+        return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
+
+    if not rights_manifest or not rights_asset_id:
+        error = "Explicit rights_manifest and rights_asset_id are required for live processing."
+        _fail_operator_job(cfg, job_id, error, "rights_gate_blocked", mark_started_at=True)
+        return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
+
+    try:
+        authorize_operator_job_source(cfg, job_id, rights_manifest, rights_asset_id)
+    except ValueError as exc:
+        error = f"Rights gate blocked processing: {exc}"
+        _fail_operator_job(cfg, job_id, error, "rights_gate_blocked", mark_started_at=True)
+        return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
+
+    return None
+
+
+def _handle_operator_run_outcome(
+    cfg: RuntimeConfig,
+    job_id: str,
+    result: Dict[str, Any],
+    dry_run: bool,
+) -> Dict[str, Any]:
+    """Post-run handling: dry-run plan return, fatal error, manifest
+    verification, and evidence attach-back."""
+    if dry_run:
+        _update_job(
+            cfg, job_id,
+            {"status": "waiting", "current_step": "intake", "run_finished_at": utc_now_iso()},
+        )
+        return {
+            "job_id": job_id,
+            "status": "dry_run_complete",
+            "dry_run": True,
+            "run": result,
+        }
+
+    run_id = result.get("run_id", "")
+    if result.get("fatal_error"):
+        _fail_operator_job(cfg, job_id, result.get("fatal_error", "")[-1000:], "runtime_failed")
+        return {
+            "job_id": job_id,
+            "status": "failed",
+            "error": result.get("fatal_error"),
+            "run": result,
+        }
+
+    # Verify manifest exists after a real run
+    run_dir = cfg.output_root / run_id
+    manifest_path = run_dir / "manifest.csv"
+    if not manifest_path.exists():
+        error = f"manifest.csv not found at {manifest_path}"
+        _fail_operator_job(cfg, job_id, error, "runtime_failed")
+        return {"job_id": job_id, "status": "failed", "error": error, "run": result}
+
+    # Attach run evidence back to the job
+    detail = attach_run_report_to_job(cfg, job_id=job_id, run_id=run_id)
+
+    _update_job(cfg, job_id, {"run_finished_at": utc_now_iso()})
+
+    return {
+        "job_id": job_id,
+        "status": "completed",
+        "run_id": run_id,
+        "detail_summary": detail.get("summary", {}),
+    }
+
+
 def run_operator_job(
     cfg: RuntimeConfig,
     job_id: str,
@@ -780,72 +905,26 @@ def run_operator_job(
     - Verifies manifest.csv exists after a real run.
     - Records run_started_at / run_finished_at timestamps on the job.
     """
-    from .queue import load_queue
-    from .runner import run_daily, select_pending_tasks
+    from .runner import run_daily
 
     cfg = cfg.resolved()
-    job = get_operator_job(cfg, job_id)
-
-    # Pre-flight: check that the queue has pending tasks for this job
+    get_operator_job(cfg, job_id)
     job_reason_prefix = f"operator_job:{job_id}:"
-    if not dry_run:
-        queue_rows = load_queue(cfg)
-        pending = select_pending_tasks(queue_rows)
-        job_pending = [t for t in pending if str(t.get("reason", "")).startswith(job_reason_prefix)]
-        if not job_pending:
-            now = utc_now_iso()
-            _update_job(
-                cfg, job_id,
-                {
-                    "status": "failed",
-                    "current_step": "runtime_failed",
-                    "run_started_at": now,
-                    "run_finished_at": now,
-                    "last_error": f"No pending tasks for this job in queue. Run plan-runtime first.",
-                },
-            )
-            return {
-                "job_id": job_id,
-                "status": "failed",
-                "error": f"No pending tasks for this job in queue. Run plan-runtime first.",
-                "dry_run": False,
-            }
 
-        if not rights_manifest or not rights_asset_id:
-            now = utc_now_iso()
-            error = "Explicit rights_manifest and rights_asset_id are required for live processing."
-            _update_job(cfg, job_id, {
-                "status": "failed",
-                "current_step": "rights_gate_blocked",
-                "run_started_at": now,
-                "run_finished_at": now,
-                "last_error": error,
-            })
-            return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
-        try:
-            authorize_operator_job_source(
-                cfg, job_id, rights_manifest, rights_asset_id
-            )
-        except ValueError as exc:
-            now = utc_now_iso()
-            error = f"Rights gate blocked processing: {exc}"
-            _update_job(cfg, job_id, {
-                "status": "failed",
-                "current_step": "rights_gate_blocked",
-                "run_started_at": now,
-                "run_finished_at": now,
-                "last_error": error,
-            })
-            return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
+    # Pre-flight: queue + rights gates (real mode only)
+    preflight = _preflight_operator_job(
+        cfg, job_id, dry_run, rights_manifest, rights_asset_id, job_reason_prefix
+    )
+    if preflight:
+        return preflight
 
-    now = utc_now_iso()
     _update_job(
         cfg,
         job_id,
         {
             "status": "running",
             "current_step": "runtime_executing",
-            "run_started_at": now,
+            "run_started_at": utc_now_iso(),
         },
     )
 
@@ -858,16 +937,7 @@ def run_operator_job(
             task_filter=lambda t: str(t.get("reason", "")).startswith(job_reason_prefix),
         )
     except Exception as exc:
-        _update_job(
-            cfg,
-            job_id,
-            {
-                "status": "failed",
-                "current_step": "runtime_failed",
-                "run_finished_at": utc_now_iso(),
-                "last_error": f"{type(exc).__name__}: {exc}",
-            },
-        )
+        _fail_operator_job(cfg, job_id, f"{type(exc).__name__}: {exc}", "runtime_failed")
         return {
             "job_id": job_id,
             "status": "failed",
@@ -875,71 +945,7 @@ def run_operator_job(
             "dry_run": dry_run,
         }
 
-    # On dry-run, don't attach anything — just return the plan
-    if dry_run:
-        _update_job(cfg, job_id, {"status": "waiting", "current_step": "intake", "run_finished_at": utc_now_iso()})
-        return {
-            "job_id": job_id,
-            "status": "dry_run_complete",
-            "dry_run": True,
-            "run": result,
-        }
-
-    run_id = result.get("run_id", "")
-    if result.get("fatal_error"):
-        _update_job(
-            cfg,
-            job_id,
-            {
-                "status": "failed",
-                "current_step": "runtime_failed",
-                "run_finished_at": utc_now_iso(),
-                "last_error": result.get("fatal_error", "")[-1000:],
-            },
-        )
-        return {
-            "job_id": job_id,
-            "status": "failed",
-            "error": result.get("fatal_error"),
-            "run": result,
-        }
-
-    # Verify manifest exists after a real run
-    run_dir = cfg.output_root / run_id
-    manifest_path = run_dir / "manifest.csv"
-    if not manifest_path.exists():
-        _update_job(
-            cfg,
-            job_id,
-            {
-                "status": "failed",
-                "current_step": "runtime_failed",
-                "run_finished_at": utc_now_iso(),
-                "last_error": f"manifest.csv not found at {manifest_path}",
-            },
-        )
-        return {
-            "job_id": job_id,
-            "status": "failed",
-            "error": f"manifest.csv not found at {manifest_path}",
-            "run": result,
-        }
-
-    # Attach run evidence back to the job
-    detail = attach_run_report_to_job(
-        cfg,
-        job_id=job_id,
-        run_id=run_id,
-    )
-
-    _update_job(cfg, job_id, {"run_finished_at": utc_now_iso()})
-
-    return {
-        "job_id": job_id,
-        "status": "completed",
-        "run_id": run_id,
-        "detail_summary": detail.get("summary", {}),
-    }
+    return _handle_operator_run_outcome(cfg, job_id, result, dry_run)
 
 
 def show_operator_runtime_plan(
@@ -1003,67 +1009,34 @@ def _operator_report_dir(cfg: RuntimeConfig, job_id: str) -> Path:
     return cfg.operator_report_dir / job_id
 
 
-def build_operator_report_bundle(
-    cfg: RuntimeConfig,
-    job_id: str,
-) -> Dict[str, Any]:
-    """Build a standard Operator Report Bundle for a completed job.
-
-    Writes the following files under reports/operator_runs/{job_id}/:
-
-        summary.md          — human-readable summary
-        summary.json        — machine-readable summary
-        candidate_versions.jsonl
-        score_results.jsonl
-        gate_decisions.jsonl
-        delivery.md         — placeholder if not yet delivered
-        manifest.csv        — flat summary of all candidates
-
-    Returns a dict with report_path and file listing.
-    """
-    import csv
-
-    cfg = cfg.resolved()
-    job = get_operator_job(cfg, job_id)
-
-    # Load detail
+def _load_job_detail(job: Dict[str, Any]) -> Dict[str, Any]:
+    """Load job detail JSON when present; missing detail yields {}."""
     dp = job.get("detail_path")
     detail_path = Path(dp) if dp else None
-    detail: Dict[str, Any] = {}
-    if detail_path and detail_path.exists():
-        detail = read_json(detail_path, default={}) or {}
+    if not (detail_path and detail_path.exists()):
+        return {}
+    return read_json(detail_path, default={}) or {}
 
-    report_dir = _operator_report_dir(cfg, job_id)
-    report_dir.mkdir(parents=True, exist_ok=True)
 
-    candidates = detail.get("candidate_versions", [])
-    scores = detail.get("score_results", [])
-    gates = detail.get("gate_decisions", [])
-    summary = detail.get("summary", {})
-
-    # ── candidate_versions.jsonl ──
-    atomic_write_jsonl(report_dir / "candidate_versions.jsonl", candidates)
-
-    # ── score_results.jsonl ──
-    atomic_write_jsonl(report_dir / "score_results.jsonl", scores)
-
-    # ── gate_decisions.jsonl ──
-    atomic_write_jsonl(report_dir / "gate_decisions.jsonl", gates)
-
-    # ── summary.json ──
-    bundle_summary = {
+def _build_bundle_summary(job: Dict[str, Any], detail_summary: Dict[str, Any],
+                          job_id: str) -> Dict[str, Any]:
+    """Machine-readable bundle summary (identical schema to prior output)."""
+    return {
         "job_id": job_id,
         "generated_at": utc_now_iso(),
         "processing_depth": job.get("processing_depth"),
         "project_label": job.get("project_label"),
-        "candidate_count": summary.get("candidate_count", 0),
-        "gate_counts": summary.get("gate_counts", {}),
-        "required_mrs_delta": summary.get("required_mrs_delta", 0.0),
+        "candidate_count": detail_summary.get("candidate_count", 0),
+        "gate_counts": detail_summary.get("gate_counts", {}),
+        "required_mrs_delta": detail_summary.get("required_mrs_delta", 0.0),
     }
-    atomic_write_json(report_dir / "summary.json", bundle_summary)
 
-    # ── summary.md ──
-    gate_counts = summary.get("gate_counts", {})
+
+def _write_summary_md(report_dir: Path, job_id: str, job: Dict[str, Any],
+                      bundle_summary: Dict[str, Any], gates: List[Dict[str, Any]],
+                      scores: List[Dict[str, Any]], detail_summary: Dict[str, Any]) -> None:
+    """Human-readable summary.md (byte-identical layout to prior output)."""
+    gate_counts = detail_summary.get("gate_counts", {})
     md_parts = [
         f"# Operator Report — {job_id}",
         "",
@@ -1073,11 +1046,11 @@ def build_operator_report_bundle(
         "",
         "## Candidate Summary",
         "",
-        f"- Total candidates: {summary.get('candidate_count', 0)}",
+        f"- Total candidates: {detail_summary.get('candidate_count', 0)}",
         f"- Approved: {gate_counts.get('approve', 0)}",
         f"- Reprocess: {gate_counts.get('reprocess', 0)}",
         f"- Rejected: {gate_counts.get('reject', 0)}",
-        f"- Required MRS Δ: {summary.get('required_mrs_delta', 0.0)}",
+        f"- Required MRS Δ: {detail_summary.get('required_mrs_delta', 0.0)}",
         "",
         "## Gate Decisions",
         "",
@@ -1111,27 +1084,35 @@ def build_operator_report_bundle(
     ]
     (report_dir / "summary.md").write_text("\n".join(md_parts), encoding="utf-8")
 
-    # ── delivery.md ──
-    delivery_path = report_dir / "delivery.md"
-    if job.get("status") == "delivered":
-        delivery_record = get_delivery_record(cfg, job_id)
-        dl_md = [
-            "# Delivery Record",
-            "",
-            f"**Delivery ID:** {delivery_record.get('delivery_id', '-')}",
-            f"**Candidate:** {delivery_record.get('candidate_id', '-')}",
-            f"**Operator Decision:** {delivery_record.get('operator_decision', '-')}",
-            f"**Delivered At:** {delivery_record.get('delivered_at', '-')}",
-            f"**Notes:** {delivery_record.get('notes', '-')}",
-            f"**Final Audio:** {delivery_record.get('final_audio_path', '-')}",
-            f"**Archive Path:** {delivery_record.get('archive_path', '-')}",
-            "",
-        ]
-        delivery_path.write_text("\n".join(dl_md), encoding="utf-8")
-    else:
-        delivery_path.write_text("# Delivery\n\nNot yet delivered.\n", encoding="utf-8")
 
-    # ── manifest.csv ──
+def _write_delivery_md(cfg: RuntimeConfig, report_dir: Path, job: Dict[str, Any],
+                       job_id: str) -> None:
+    """delivery.md — delivery record when delivered, placeholder otherwise."""
+    delivery_path = report_dir / "delivery.md"
+    if job.get("status") != "delivered":
+        delivery_path.write_text("# Delivery\n\nNot yet delivered.\n", encoding="utf-8")
+        return
+    delivery_record = get_delivery_record(cfg, job_id)
+    dl_md = [
+        "# Delivery Record",
+        "",
+        f"**Delivery ID:** {delivery_record.get('delivery_id', '-')}",
+        f"**Candidate:** {delivery_record.get('candidate_id', '-')}",
+        f"**Operator Decision:** {delivery_record.get('operator_decision', '-')}",
+        f"**Delivered At:** {delivery_record.get('delivered_at', '-')}",
+        f"**Notes:** {delivery_record.get('notes', '-')}",
+        f"**Final Audio:** {delivery_record.get('final_audio_path', '-')}",
+        f"**Archive Path:** {delivery_record.get('archive_path', '-')}",
+        "",
+    ]
+    delivery_path.write_text("\n".join(dl_md), encoding="utf-8")
+
+
+def _write_manifest_csv(report_dir: Path, candidates: List[Dict[str, Any]],
+                        scores: List[Dict[str, Any]], gates: List[Dict[str, Any]]) -> None:
+    """manifest.csv — flat summary of all candidates."""
+    import csv
+
     manifest_fields = [
         "candidate_id", "preset", "output_path", "mrs_score",
         "mrs_score_delta", "over_dark", "gate_decision",
@@ -1152,6 +1133,53 @@ def build_operator_report_bundle(
                 "over_dark": str(s.get("over_dark_triggered", False)),
                 "gate_decision": g.get("decision", ""),
             })
+
+
+def build_operator_report_bundle(
+    cfg: RuntimeConfig,
+    job_id: str,
+) -> Dict[str, Any]:
+    """Build a standard Operator Report Bundle for a completed job.
+
+    Writes the following files under reports/operator_runs/{job_id}/:
+
+        summary.md          — human-readable summary
+        summary.json        — machine-readable summary
+        candidate_versions.jsonl
+        score_results.jsonl
+        gate_decisions.jsonl
+        delivery.md         — placeholder if not yet delivered
+        manifest.csv        — flat summary of all candidates
+
+    Returns a dict with report_path and file listing.
+    """
+    cfg = cfg.resolved()
+    job = get_operator_job(cfg, job_id)
+    detail = _load_job_detail(job)
+
+    report_dir = _operator_report_dir(cfg, job_id)
+    report_dir.mkdir(parents=True, exist_ok=True)
+
+    candidates = detail.get("candidate_versions", [])
+    scores = detail.get("score_results", [])
+    gates = detail.get("gate_decisions", [])
+    detail_summary = detail.get("summary", {})
+
+    # ── candidate_versions.jsonl / score_results.jsonl / gate_decisions.jsonl ──
+    atomic_write_jsonl(report_dir / "candidate_versions.jsonl", candidates)
+    atomic_write_jsonl(report_dir / "score_results.jsonl", scores)
+    atomic_write_jsonl(report_dir / "gate_decisions.jsonl", gates)
+
+    # ── summary.json + summary.md ──
+    bundle_summary = _build_bundle_summary(job, detail_summary, job_id)
+    atomic_write_json(report_dir / "summary.json", bundle_summary)
+    _write_summary_md(report_dir, job_id, job, bundle_summary, gates, scores, detail_summary)
+
+    # ── delivery.md ──
+    _write_delivery_md(cfg, report_dir, job, job_id)
+
+    # ── manifest.csv ──
+    _write_manifest_csv(report_dir, candidates, scores, gates)
 
     # Update job
     _update_job(cfg, job_id, {"report_path": str(report_dir)})

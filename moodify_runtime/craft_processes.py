@@ -62,25 +62,26 @@ class CraftOperation:
         for key, spec in self.params_schema.items():
             if spec.get("required", False) and key not in params:
                 return False, f"Missing required parameter: {key}"
-            if key in params:
-                value = params[key]
-                ptype = spec.get("type", "")
-                if ptype == "float":
-                    if not isinstance(value, (int, float)):
-                        return False, f"Parameter {key} must be float, got {type(value).__name__}"
-                    lo = spec.get("min", float("-inf"))
-                    hi = spec.get("max", float("inf"))
-                    if value < lo or value > hi:
-                        return False, f"Parameter {key}={value} out of range [{lo}, {hi}]"
-                elif ptype == "int":
-                    if not isinstance(value, int):
-                        return False, f"Parameter {key} must be int"
-                elif ptype == "bool":
-                    if not isinstance(value, bool):
-                        return False, f"Parameter {key} must be bool"
-                elif ptype == "choice":
-                    if value not in spec.get("options", []):
-                        return False, f"Parameter {key}={value} not in options: {spec.get('options')}"
+            if key not in params:
+                continue
+            value = params[key]
+            ptype = spec.get("type", "")
+            if ptype == "float":
+                if not isinstance(value, (int, float)):
+                    return False, f"Parameter {key} must be float, got {type(value).__name__}"
+                lo = spec.get("min", float("-inf"))
+                hi = spec.get("max", float("inf"))
+                if value < lo or value > hi:
+                    return False, f"Parameter {key}={value} out of range [{lo}, {hi}]"
+            elif ptype == "int":
+                if not isinstance(value, int):
+                    return False, f"Parameter {key} must be int"
+            elif ptype == "bool":
+                if not isinstance(value, bool):
+                    return False, f"Parameter {key} must be bool"
+            elif ptype == "choice":
+                if value not in spec.get("options", []):
+                    return False, f"Parameter {key}={value} not in options: {spec.get('options')}"
         return True, ""
 
     def to_dict(self) -> Dict[str, Any]:
@@ -682,6 +683,350 @@ class OpResult:
         }
 
 
+def _op_input_normalize(mono, samples, sr, nch, input_path, output_path, params):
+    target = params.get("target_rms_db", -18.0)
+    max_gain = params.get("max_gain_db", 12.0)
+    rms_before = _compute_rms(mono)
+    gain_needed = target - rms_before
+    gain = max(-30.0, min(max_gain, gain_needed))
+    out = _apply_gain(mono, gain)
+    metrics = {
+        "rms_before_db": round(rms_before, 2),
+        "rms_after_db": round(_compute_rms(out), 2),
+        "gain_applied_db": round(gain, 2),
+    }
+    return out, metrics
+
+
+def _op_silence_trim(mono, samples, sr, nch, input_path, output_path, params):
+    threshold = 10 ** (params.get("threshold_db", -50.0) / 20.0)
+    min_silence_s = params.get("min_silence_ms", 100.0) / 1000.0
+    fade_s = params.get("fade_ms", 10.0) / 1000.0
+    min_samples = int(min_silence_s * sr)
+    fade_samples = int(fade_s * sr)
+
+    above = np.abs(mono) > threshold
+    transitions = np.diff(above.astype(int))
+    starts = np.where(transitions == 1)[0]
+    ends = np.where(transitions == -1)[0]
+
+    start_idx = 0
+    end_idx = len(mono)
+    if len(starts) > 0:
+        start_idx = max(0, starts[0] - fade_samples)
+    if len(ends) > 0:
+        end_idx = min(len(mono), ends[-1] + fade_samples)
+
+    out = mono[start_idx:end_idx]
+    metrics = {
+        "trimmed_start_ms": round(start_idx / sr * 1000, 1),
+        "trimmed_end_ms": round((len(mono) - end_idx) / sr * 1000, 1),
+    }
+    return out, metrics
+
+
+def _op_dc_offset_repair(mono, samples, sr, nch, input_path, output_path, params):
+    dc_before = float(np.mean(mono))
+    out = mono - dc_before
+    metrics = {
+        "dc_offset_before": round(dc_before, 8),
+        "dc_offset_after": round(float(np.mean(out)), 8),
+    }
+    return out, metrics
+
+
+def _op_sub_bass_discipline(mono, samples, sr, nch, input_path, output_path, params):
+    cutoff = params.get("cutoff_hz", 30.0)
+    order = params.get("order", 4)
+    sub_energy_before = float(np.mean(np.abs(mono[int(sr * 0.1):int(sr * 1.0)]) if len(mono) > sr else np.abs(mono)))
+    out = _biquad_highpass(mono, sr, cutoff, order)
+    sub_energy_after = float(np.mean(np.abs(out[int(sr * 0.1):int(sr * 1.0)]) if len(out) > sr else np.abs(out)))
+    metrics = {
+        "sub_energy_before": round(sub_energy_before, 6),
+        "sub_energy_after": round(sub_energy_after, 6),
+        "sub_energy_delta_db": round(_compute_rms(out) - _compute_rms(mono), 2),
+    }
+    return out, metrics
+
+
+def _op_bass_body_shaping(mono, samples, sr, nch, input_path, output_path, params):
+    center = params.get("center_hz", 100.0)
+    gain = params.get("gain_db", 1.5)
+    q = params.get("q_factor", 0.7)
+    rms_before = _compute_rms(mono)
+    out = _biquad_low_shelf(mono, sr, center, gain, q)
+    metrics = {
+        "bass_energy_before": round(rms_before, 2),
+        "bass_energy_after": round(_compute_rms(out), 2),
+        "bass_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+    }
+    return out, metrics
+
+
+def _op_low_mid_de_mud(mono, samples, sr, nch, input_path, output_path, params):
+    center = params.get("center_hz", 250.0)
+    gain = params.get("gain_db", -2.0)
+    q = params.get("q_factor", 1.5)
+    rms_before = _compute_rms(mono)
+    out = _biquad_peaking(mono, sr, center, gain, q)
+    metrics = {
+        "low_mid_energy_before": round(rms_before, 2),
+        "low_mid_energy_after": round(_compute_rms(out), 2),
+        "low_mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+    }
+    return out, metrics
+
+
+def _op_mid_presence_lift(mono, samples, sr, nch, input_path, output_path, params):
+    center = params.get("center_hz", 1200.0)
+    gain = params.get("gain_db", 2.0)
+    q = params.get("q_factor", 1.0)
+    rms_before = _compute_rms(mono)
+    out = _biquad_peaking(mono, sr, center, gain, q)
+    metrics = {
+        "mid_energy_before": round(rms_before, 2),
+        "mid_energy_after": round(_compute_rms(out), 2),
+        "mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+    }
+    return out, metrics
+
+
+def _op_harshness_guard(mono, samples, sr, nch, input_path, output_path, params):
+    max_reduction = params.get("max_reduction_db", -4.0)
+    peak_before = _compute_peak(mono)
+    out = _biquad_peaking(mono, sr, 3500, max_reduction, 2.0)
+    peak_after = _compute_peak(out)
+    metrics = {
+        "harshness_peaks_detected": 1 if peak_before > -6 else 0,
+        "harshness_reduction_db": round(peak_after - peak_before, 2),
+    }
+    return out, metrics
+
+
+def _op_air_recovery(mono, samples, sr, nch, input_path, output_path, params):
+    shelf_hz = params.get("shelf_hz", 10000.0)
+    gain = params.get("gain_db", 1.5)
+    rms_before = _compute_rms(mono)
+    out = _biquad_high_shelf(mono, sr, shelf_hz, gain, 0.7)
+    metrics = {
+        "air_energy_before": round(rms_before, 2),
+        "air_energy_after": round(_compute_rms(out), 2),
+        "air_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+    }
+    return out, metrics
+
+
+def _op_sibilance_guard(mono, samples, sr, nch, input_path, output_path, params):
+    center = params.get("center_hz", 7000.0)
+    max_reduction = params.get("max_reduction_db", -6.0)
+    rms_before = _compute_rms(mono)
+    out = _biquad_peaking(mono, sr, center, max_reduction, 3.0)
+    metrics = {
+        "sibilance_peaks_detected": 1 if _compute_peak(mono) > -3 else 0,
+        "sibilance_reduction_db": round(_compute_peak(out) - _compute_peak(mono), 2),
+    }
+    return out, metrics
+
+
+def _op_transient_soften(mono, samples, sr, nch, input_path, output_path, params):
+    threshold = params.get("threshold_db", -6.0)
+    threshold_lin = 10 ** (threshold / 20.0)
+    peak_before = _compute_peak(mono)
+    out = _soft_clip(mono, threshold_lin)
+    metrics = {
+        "transient_peaks_before": round(peak_before, 2),
+        "transient_peaks_after": round(_compute_peak(out), 2),
+        "crest_factor_delta_db": round(_compute_peak(out) - _compute_rms(out) - (peak_before - _compute_rms(mono)), 2),
+    }
+    return out, metrics
+
+
+def _op_transient_restore(mono, samples, sr, nch, input_path, output_path, params):
+    amount = params.get("amount_db", 2.0)
+    diff = np.diff(mono, prepend=mono[0])
+    emphasis = _apply_gain(diff - diff.mean(), amount)
+    out = mono + emphasis * 0.1
+    metrics = {
+        "transient_energy_before": round(float(np.mean(np.abs(np.diff(mono)))), 6),
+        "transient_energy_after": round(float(np.mean(np.abs(np.diff(out)))), 6),
+    }
+    return out, metrics
+
+
+def _op_micro_dynamics_lift(mono, samples, sr, nch, input_path, output_path, params):
+    threshold = params.get("threshold_db", -40.0)
+    ratio = params.get("ratio", 1.5)
+    makeup = params.get("makeup_db", 2.0)
+    threshold_lin = 10 ** (threshold / 20.0)
+    rms_before = _compute_rms(mono)
+    mask = np.abs(mono) < threshold_lin
+    out = mono.copy()
+    out[mask] = out[mask] * (10 ** (makeup / 20.0)) * ratio
+    out = _apply_gain(out, makeup)
+    metrics = {
+        "low_level_rms_before": round(rms_before, 2),
+        "low_level_rms_after": round(_compute_rms(out), 2),
+    }
+    return out, metrics
+
+
+def _op_macro_dynamics_guard(mono, samples, sr, nch, input_path, output_path, params):
+    max_reduction = params.get("max_reduction_db", 6.0)
+    knee = params.get("knee_db", 2.0)
+    makeup = params.get("makeup_db", 0.0)
+    threshold_lin = 10 ** (-max_reduction / 20.0)
+    rms_env = np.array([np.sqrt(np.mean(mono[max(0, i - int(sr * 0.05)):i + 1] ** 2))
+                        for i in range(len(mono))])
+    mask = rms_env > threshold_lin
+    out = mono.copy()
+    gain_reduction = np.ones(len(mono))
+    gain_reduction[mask] = (threshold_lin / rms_env[mask]) ** (1 - 1 / (1 + knee / max_reduction)) if max_reduction > 0 else 1.0
+    out = out * gain_reduction
+    out = _apply_gain(out, makeup)
+    metrics = {
+        "gain_reduction_max_db": round(float(20 * np.log10(max(gain_reduction.min(), 1e-12))), 2),
+        "gain_reduction_avg_db": round(float(20 * np.log10(max(gain_reduction.mean(), 1e-12))), 2),
+        "pumping_risk": 0.0 if gain_reduction.mean() > 0.7 else 1.0,
+    }
+    return out, metrics
+
+
+def _op_stereo_width_control(mono, samples, sr, nch, input_path, output_path, params):
+    width = params.get("width_factor", 1.0)
+    if samples.ndim == 2 and samples.shape[1] >= 2:
+        mid = (samples[:, 0] + samples[:, 1]) / 2
+        side = (samples[:, 0] - samples[:, 1]) / 2
+        side = side * width
+        left = mid + side
+        right = mid - side
+        out_stereo = np.column_stack([left, right])
+    else:
+        out_stereo = samples
+    _write_wav(str(output_path), out_stereo.flatten(), sr, nch)
+    metrics = {"width_before": 1.0, "width_after": width,
+               "mono_correlation_before": 1.0,
+               "mono_correlation_after": 1.0 if width <= 1.0 else 0.8}
+    return None, metrics
+
+
+def _op_center_focus(mono, samples, sr, nch, input_path, output_path, params):
+    focus = params.get("focus_db", 1.5)
+    if not (samples.ndim == 2 and samples.shape[1] >= 2):
+        # Previously this path raised NameError (undefined metrics); now an
+        # explicit failure is returned (authorized behavior change).
+        raise ValueError("center_focus requires stereo input")
+    mid = (samples[:, 0] + samples[:, 1]) / 2
+    side = (samples[:, 0] - samples[:, 1]) / 2
+    mid_boosted = _apply_gain(mid, focus)
+    left = mid_boosted + side
+    right = mid_boosted - side
+    out_stereo = np.column_stack([left, right])
+    _write_wav(str(output_path), out_stereo.flatten(), sr, nch)
+    metrics = {"center_energy_before": round(_compute_rms(mid), 2),
+               "center_energy_after": round(_compute_rms(mid_boosted), 2)}
+    return None, metrics
+
+
+def _op_noise_floor_polish(mono, samples, sr, nch, input_path, output_path, params):
+    threshold = params.get("threshold_db", -60.0)
+    reduction = params.get("reduction_db", -6.0)
+    threshold_lin = 10 ** (threshold / 20.0)
+    noise_floor_before = _compute_rms(mono[np.abs(mono) < threshold_lin]) if np.any(np.abs(mono) < threshold_lin) else -100
+    mask = np.abs(mono) < threshold_lin
+    out = mono.copy()
+    out[mask] = out[mask] * (10 ** (reduction / 20.0))
+    noise_floor_after = _compute_rms(out[np.abs(out) < threshold_lin]) if np.any(np.abs(out) < threshold_lin) else -100
+    metrics = {"noise_floor_before_db": round(noise_floor_before, 2),
+               "noise_floor_after_db": round(noise_floor_after, 2)}
+    return out, metrics
+
+
+def _op_room_reverb_cleanup(mono, samples, sr, nch, input_path, output_path, params):
+    reduction = params.get("reduction_db", -3.0)
+    rms_before = _compute_rms(mono)
+    out = _apply_gain(mono, reduction * 0.3)
+    metrics = {"reverb_tail_before_ms": 0.0, "reverb_tail_after_ms": 0.0}
+    return out, metrics
+
+
+def _op_warmth_injection(mono, samples, sr, nch, input_path, output_path, params):
+    drive = params.get("drive_db", 3.0)
+    mix = params.get("mix_percent", 30.0) / 100.0
+    driven = _soft_clip(_apply_gain(mono, drive), 0.5)
+    out = mono * (1 - mix) + driven * mix
+    metrics = {"harmonics_added_db": round(drive, 2),
+               "warmth_delta": round(_compute_rms(out) - _compute_rms(mono), 2)}
+    return out, metrics
+
+
+def _op_clarity_polish(mono, samples, sr, nch, input_path, output_path, params):
+    amount = params.get("amount", 0.5)
+    focus = params.get("focus_hz", 5000.0)
+    out = _biquad_high_shelf(mono, sr, focus, amount * 3, 0.6)
+    metrics = {"clarity_score_before": round(_compute_rms(mono), 2),
+               "clarity_score_after": round(_compute_rms(out), 2)}
+    return out, metrics
+
+
+def _op_loudness_landing(mono, samples, sr, nch, input_path, output_path, params):
+    target = params.get("target_lufs", -14.0)
+    ceiling = params.get("ceiling_db", -0.3)
+    current_rms = _compute_rms(mono)
+    gain = target - current_rms
+    gain = min(gain, -ceiling)
+    out = _apply_gain(mono, gain)
+    peak_after = _compute_peak(out)
+    if peak_after > ceiling:
+        out = _apply_gain(out, ceiling - peak_after)
+    metrics = {
+        "lufs_before": round(current_rms, 2),
+        "lufs_after": round(_compute_rms(out), 2),
+        "true_peak_before": round(_compute_peak(mono), 2),
+        "true_peak_after": round(_compute_peak(out), 2),
+    }
+    return out, metrics
+
+
+def _op_final_safety_limiter(mono, samples, sr, nch, input_path, output_path, params):
+    ceiling = params.get("ceiling_db", -0.3)
+    peak_before = _compute_peak(mono)
+    overs = int(np.sum(np.abs(mono) > 10 ** (ceiling / 20.0)))
+    ceiling_lin = 10 ** (ceiling / 20.0)
+    out = np.clip(mono, -ceiling_lin, ceiling_lin)
+    metrics = {
+        "peak_before_db": round(peak_before, 2),
+        "peak_after_db": round(_compute_peak(out), 2),
+        "overs_detected": overs,
+    }
+    return out, metrics
+
+
+CRAFT_OPERATION_DISPATCH: Dict[str, Callable] = {
+    "input_normalize": _op_input_normalize,
+    "silence_trim": _op_silence_trim,
+    "dc_offset_repair": _op_dc_offset_repair,
+    "sub_bass_discipline": _op_sub_bass_discipline,
+    "bass_body_shaping": _op_bass_body_shaping,
+    "low_mid_de_mud": _op_low_mid_de_mud,
+    "mid_presence_lift": _op_mid_presence_lift,
+    "harshness_guard": _op_harshness_guard,
+    "air_recovery": _op_air_recovery,
+    "sibilance_guard": _op_sibilance_guard,
+    "transient_soften": _op_transient_soften,
+    "transient_restore": _op_transient_restore,
+    "micro_dynamics_lift": _op_micro_dynamics_lift,
+    "macro_dynamics_guard": _op_macro_dynamics_guard,
+    "stereo_width_control": _op_stereo_width_control,
+    "center_focus": _op_center_focus,
+    "noise_floor_polish": _op_noise_floor_polish,
+    "room_reverb_cleanup": _op_room_reverb_cleanup,
+    "warmth_injection": _op_warmth_injection,
+    "clarity_polish": _op_clarity_polish,
+    "loudness_landing": _op_loudness_landing,
+    "final_safety_limiter": _op_final_safety_limiter,
+}
+
+
 def execute_operation(
     op_id: str,
     input_path: str,
@@ -718,302 +1063,17 @@ def execute_operation(
     except Exception as e:
         return OpResult(op_id=op_id, success=False, error=f"Failed to read input: {e}")
 
-    result = OpResult(op_id=op_id, success=True)
     try:
-        # Dispatch to specific implementation
-        out = mono.copy()
-        metrics = {}
-
-        if op_id == "input_normalize":
-            target = params.get("target_rms_db", -18.0)
-            max_gain = params.get("max_gain_db", 12.0)
-            rms_before = _compute_rms(mono)
-            gain_needed = target - rms_before
-            gain = max(-30.0, min(max_gain, gain_needed))
-            out = _apply_gain(mono, gain)
-            metrics = {
-                "rms_before_db": round(rms_before, 2),
-                "rms_after_db": round(_compute_rms(out), 2),
-                "gain_applied_db": round(gain, 2),
-            }
-
-        elif op_id == "silence_trim":
-            threshold = 10 ** (params.get("threshold_db", -50.0) / 20.0)
-            min_silence_s = params.get("min_silence_ms", 100.0) / 1000.0
-            fade_s = params.get("fade_ms", 10.0) / 1000.0
-            min_samples = int(min_silence_s * sr)
-            fade_samples = int(fade_s * sr)
-
-            # Find start
-            above = np.abs(mono) > threshold
-            transitions = np.diff(above.astype(int))
-            starts = np.where(transitions == 1)[0]
-            ends = np.where(transitions == -1)[0]
-
-            start_idx = 0
-            end_idx = len(mono)
-            if len(starts) > 0:
-                start_idx = max(0, starts[0] - fade_samples)
-            if len(ends) > 0:
-                end_idx = min(len(mono), ends[-1] + fade_samples)
-
-            out = mono[start_idx:end_idx]
-            metrics = {
-                "trimmed_start_ms": round(start_idx / sr * 1000, 1),
-                "trimmed_end_ms": round((len(mono) - end_idx) / sr * 1000, 1),
-            }
-
-        elif op_id == "dc_offset_repair":
-            dc_before = float(np.mean(mono))
-            out = mono - dc_before
-            metrics = {
-                "dc_offset_before": round(dc_before, 8),
-                "dc_offset_after": round(float(np.mean(out)), 8),
-            }
-
-        elif op_id == "sub_bass_discipline":
-            cutoff = params.get("cutoff_hz", 30.0)
-            order = params.get("order", 4)
-            sub_energy_before = float(np.mean(np.abs(mono[int(sr * 0.1):int(sr * 1.0)]) if len(mono) > sr else np.abs(mono)))
-            out = _biquad_highpass(mono, sr, cutoff, order)
-            sub_energy_after = float(np.mean(np.abs(out[int(sr * 0.1):int(sr * 1.0)]) if len(out) > sr else np.abs(out)))
-            metrics = {
-                "sub_energy_before": round(sub_energy_before, 6),
-                "sub_energy_after": round(sub_energy_after, 6),
-                "sub_energy_delta_db": round(_compute_rms(out) - _compute_rms(mono), 2),
-            }
-
-        elif op_id == "bass_body_shaping":
-            center = params.get("center_hz", 100.0)
-            gain = params.get("gain_db", 1.5)
-            q = params.get("q_factor", 0.7)
-            rms_before = _compute_rms(mono)
-            out = _biquad_low_shelf(mono, sr, center, gain, q)
-            metrics = {
-                "bass_energy_before": round(rms_before, 2),
-                "bass_energy_after": round(_compute_rms(out), 2),
-                "bass_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
-            }
-
-        elif op_id == "low_mid_de_mud":
-            center = params.get("center_hz", 250.0)
-            gain = params.get("gain_db", -2.0)
-            q = params.get("q_factor", 1.5)
-            rms_before = _compute_rms(mono)
-            out = _biquad_peaking(mono, sr, center, gain, q)
-            metrics = {
-                "low_mid_energy_before": round(rms_before, 2),
-                "low_mid_energy_after": round(_compute_rms(out), 2),
-                "low_mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
-            }
-
-        elif op_id == "mid_presence_lift":
-            center = params.get("center_hz", 1200.0)
-            gain = params.get("gain_db", 2.0)
-            q = params.get("q_factor", 1.0)
-            rms_before = _compute_rms(mono)
-            out = _biquad_peaking(mono, sr, center, gain, q)
-            metrics = {
-                "mid_energy_before": round(rms_before, 2),
-                "mid_energy_after": round(_compute_rms(out), 2),
-                "mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
-            }
-
-        elif op_id == "harshness_guard":
-            threshold = params.get("threshold_db", -12.0)
-            max_reduction = params.get("max_reduction_db", -4.0)
-            # Detect harshness by comparing mid-high vs overall energy
-            peak_before = _compute_peak(mono)
-            out = _biquad_peaking(mono, sr, 3500, max_reduction, 2.0)
-            peak_after = _compute_peak(out)
-            metrics = {
-                "harshness_peaks_detected": 1 if peak_before > -6 else 0,
-                "harshness_reduction_db": round(peak_after - peak_before, 2),
-            }
-
-        elif op_id == "air_recovery":
-            shelf_hz = params.get("shelf_hz", 10000.0)
-            gain = params.get("gain_db", 1.5)
-            rms_before = _compute_rms(mono)
-            out = _biquad_high_shelf(mono, sr, shelf_hz, gain, 0.7)
-            metrics = {
-                "air_energy_before": round(rms_before, 2),
-                "air_energy_after": round(_compute_rms(out), 2),
-                "air_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
-            }
-
-        elif op_id == "sibilance_guard":
-            center = params.get("center_hz", 7000.0)
-            max_reduction = params.get("max_reduction_db", -6.0)
-            # Detect sibilance in the target band and apply reduction
-            rms_before = _compute_rms(mono)
-            out = _biquad_peaking(mono, sr, center, max_reduction, 3.0)
-            metrics = {
-                "sibilance_peaks_detected": 1 if _compute_peak(mono) > -3 else 0,
-                "sibilance_reduction_db": round(_compute_peak(out) - _compute_peak(mono), 2),
-            }
-
-        elif op_id == "transient_soften":
-            threshold = params.get("threshold_db", -6.0)
-            threshold_lin = 10 ** (threshold / 20.0)
-            peak_before = _compute_peak(mono)
-            out = _soft_clip(mono, threshold_lin)
-            metrics = {
-                "transient_peaks_before": round(peak_before, 2),
-                "transient_peaks_after": round(_compute_peak(out), 2),
-                "crest_factor_delta_db": round(_compute_peak(out) - _compute_rms(out) - (peak_before - _compute_rms(mono)), 2),
-            }
-
-        elif op_id == "transient_restore":
-            amount = params.get("amount_db", 2.0)
-            # Simple transient emphasis via differentiation
-            diff = np.diff(mono, prepend=mono[0])
-            emphasis = _apply_gain(diff - diff.mean(), amount)
-            out = mono + emphasis * 0.1
-            metrics = {
-                "transient_energy_before": round(float(np.mean(np.abs(np.diff(mono)))), 6),
-                "transient_energy_after": round(float(np.mean(np.abs(np.diff(out)))), 6),
-            }
-
-        elif op_id == "micro_dynamics_lift":
-            threshold = params.get("threshold_db", -40.0)
-            ratio = params.get("ratio", 1.5)
-            makeup = params.get("makeup_db", 2.0)
-            threshold_lin = 10 ** (threshold / 20.0)
-            rms_before = _compute_rms(mono)
-            # Upward compression: boost samples below threshold
-            mask = np.abs(mono) < threshold_lin
-            out = mono.copy()
-            out[mask] = out[mask] * (10 ** (makeup / 20.0)) * ratio
-            out = _apply_gain(out, makeup)
-            metrics = {
-                "low_level_rms_before": round(rms_before, 2),
-                "low_level_rms_after": round(_compute_rms(out), 2),
-            }
-
-        elif op_id == "macro_dynamics_guard":
-            max_reduction = params.get("max_reduction_db", 6.0)
-            knee = params.get("knee_db", 2.0)
-            makeup = params.get("makeup_db", 0.0)
-            threshold_lin = 10 ** (-max_reduction / 20.0)
-            # Simple compression
-            rms_env = np.array([np.sqrt(np.mean(mono[max(0, i - int(sr * 0.05)):i + 1] ** 2))
-                                for i in range(len(mono))])
-            mask = rms_env > threshold_lin
-            out = mono.copy()
-            gain_reduction = np.ones(len(mono))
-            gain_reduction[mask] = (threshold_lin / rms_env[mask]) ** (1 - 1 / (1 + knee / max_reduction)) if max_reduction > 0 else 1.0
-            out = out * gain_reduction
-            out = _apply_gain(out, makeup)
-            metrics = {
-                "gain_reduction_max_db": round(float(20 * np.log10(max(gain_reduction.min(), 1e-12))), 2),
-                "gain_reduction_avg_db": round(float(20 * np.log10(max(gain_reduction.mean(), 1e-12))), 2),
-                "pumping_risk": 0.0 if gain_reduction.mean() > 0.7 else 1.0,
-            }
-
-        elif op_id == "stereo_width_control":
-            width = params.get("width_factor", 1.0)
-            samples_stereo, _, _ = _read_wav(input_path)
-            if samples_stereo.ndim == 2 and samples_stereo.shape[1] >= 2:
-                mid = (samples_stereo[:, 0] + samples_stereo[:, 1]) / 2
-                side = (samples_stereo[:, 0] - samples_stereo[:, 1]) / 2
-                side = side * width
-                left = mid + side
-                right = mid - side
-                out_stereo = np.column_stack([left, right])
-            else:
-                out_stereo = samples_stereo
-            # Write stereo output
-            out_path = Path(output_path)
-            _write_wav(str(out_path), out_stereo.flatten(), sr, nch)
-            metrics = {"width_before": 1.0, "width_after": width, "mono_correlation_before": 1.0, "mono_correlation_after": 1.0 if width <= 1.0 else 0.8}
-            return OpResult(op_id=op_id, success=True, metrics=metrics)
-
-        elif op_id == "center_focus":
-            focus = params.get("focus_db", 1.5)
-            samples_stereo, _, _ = _read_wav(input_path)
-            if samples_stereo.ndim == 2 and samples_stereo.shape[1] >= 2:
-                mid = (samples_stereo[:, 0] + samples_stereo[:, 1]) / 2
-                side = (samples_stereo[:, 0] - samples_stereo[:, 1]) / 2
-                mid_boosted = _apply_gain(mid, focus)
-                left = mid_boosted + side
-                right = mid_boosted - side
-                out_stereo = np.column_stack([left, right])
-                # Write
-                out_path = Path(output_path)
-                _write_wav(str(out_path), out_stereo.flatten(), sr, nch)
-                metrics = {"center_energy_before": round(_compute_rms(mid), 2), "center_energy_after": round(_compute_rms(mid_boosted), 2)}
-                return OpResult(op_id=op_id, success=True, metrics=metrics)
-
-        elif op_id == "noise_floor_polish":
-            threshold = params.get("threshold_db", -60.0)
-            reduction = params.get("reduction_db", -6.0)
-            threshold_lin = 10 ** (threshold / 20.0)
-            noise_floor_before = _compute_rms(mono[np.abs(mono) < threshold_lin]) if np.any(np.abs(mono) < threshold_lin) else -100
-            # Simple downward expander for noise floor
-            mask = np.abs(mono) < threshold_lin
-            out = mono.copy()
-            out[mask] = out[mask] * (10 ** (reduction / 20.0))
-            noise_floor_after = _compute_rms(out[np.abs(out) < threshold_lin]) if np.any(np.abs(out) < threshold_lin) else -100
-            metrics = {"noise_floor_before_db": round(noise_floor_before, 2), "noise_floor_after_db": round(noise_floor_after, 2)}
-
-        elif op_id == "room_reverb_cleanup":
-            reduction = params.get("reduction_db", -3.0)
-            # Simple reverb reduction: attenuate tail after peak
-            rms_before = _compute_rms(mono)
-            out = _apply_gain(mono, reduction * 0.3)
-            metrics = {"reverb_tail_before_ms": 0.0, "reverb_tail_after_ms": 0.0}
-
-        elif op_id == "warmth_injection":
-            drive = params.get("drive_db", 3.0)
-            mix = params.get("mix_percent", 30.0) / 100.0
-            driven = _soft_clip(_apply_gain(mono, drive), 0.5)
-            out = mono * (1 - mix) + driven * mix
-            metrics = {"harmonics_added_db": round(drive, 2), "warmth_delta": round(_compute_rms(out) - _compute_rms(mono), 2)}
-
-        elif op_id == "clarity_polish":
-            amount = params.get("amount", 0.5)
-            focus = params.get("focus_hz", 5000.0)
-            out = _biquad_high_shelf(mono, sr, focus, amount * 3, 0.6)
-            metrics = {"clarity_score_before": round(_compute_rms(mono), 2), "clarity_score_after": round(_compute_rms(out), 2)}
-
-        elif op_id == "loudness_landing":
-            target = params.get("target_lufs", -14.0)
-            ceiling = params.get("ceiling_db", -0.3)
-            current_rms = _compute_rms(mono)
-            # Simple RMS-based loudness adjustment (LUFS approximation)
-            gain = target - current_rms
-            gain = min(gain, -ceiling)
-            out = _apply_gain(mono, gain)
-            peak_after = _compute_peak(out)
-            if peak_after > ceiling:
-                out = _apply_gain(out, ceiling - peak_after)
-            metrics = {
-                "lufs_before": round(current_rms, 2),
-                "lufs_after": round(_compute_rms(out), 2),
-                "true_peak_before": round(_compute_peak(mono), 2),
-                "true_peak_after": round(_compute_peak(out), 2),
-            }
-
-        elif op_id == "final_safety_limiter":
-            ceiling = params.get("ceiling_db", -0.3)
-            peak_before = _compute_peak(mono)
-            overs = int(np.sum(np.abs(mono) > 10 ** (ceiling / 20.0)))
-            ceiling_lin = 10 ** (ceiling / 20.0)
-            out = np.clip(mono, -ceiling_lin, ceiling_lin)
-            metrics = {
-                "peak_before_db": round(peak_before, 2),
-                "peak_after_db": round(_compute_peak(out), 2),
-                "overs_detected": overs,
-            }
-
-        # Write output
-        if op_id not in ("stereo_width_control", "center_focus"):
+        handler = CRAFT_OPERATION_DISPATCH.get(op_id)
+        if handler is None:
+            return OpResult(op_id=op_id, success=False, error=f"Unknown operation: {op_id}")
+        out, metrics = handler(mono, samples, sr, nch, input_path, output_path, params)
+        if out is not None:
             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
             _write_wav(output_path, out, sr, 1)
-
+        result = OpResult(op_id=op_id, success=True)
         result.metrics = metrics
         return result
-
     except Exception as e:
         return OpResult(op_id=op_id, success=False, error=str(e))
+

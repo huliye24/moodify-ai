@@ -1,0 +1,2942 @@
+diff --git a/moodify-core-package/src/moodify/orchestration/workflow_engine.py b/moodify-core-package/src/moodify/orchestration/workflow_engine.py
+index 092dd7a..20a2cf1 100644
+--- a/moodify-core-package/src/moodify/orchestration/workflow_engine.py
++++ b/moodify-core-package/src/moodify/orchestration/workflow_engine.py
+@@ -326,7 +326,8 @@ class WorkflowOrchestrator:
+             self._validate_rag_params(rag_params, rag_strength, ctx.emotion_parsed)
+             return rag_params, rag_strength, rag_confidence
+ 
+-        except Exception:
++        except Exception as exc:
++            logger.debug(f"[try_rag] RAG unavailable, falling back to search: {exc!r}")
+             return None, None, 0.0
+ 
+     @staticmethod
+@@ -406,8 +407,13 @@ class WorkflowOrchestrator:
+                     ctx.best_strength = ctx.strengths[i]
+ 
+     def _finalize(self, ctx: PipelineContext) -> None:
+-        """后处理: LLM 诊断解读 + 写入处理历史。"""
+-        # 诊断解读
++        """后处理: LLM 诊断解读 + 写入处理历史 + 在线校准。"""
++        self._narrate_diagnosis(ctx)
++        self._save_history(ctx)
++        self._update_calibration(ctx)
++
++    def _narrate_diagnosis(self, ctx: PipelineContext) -> None:
++        """LLM 诊断解读 (非关键路径, 失败仅记录)."""
+         try:
+             from moodify.llm.client import DeepSeekClient
+             llm = DeepSeekClient()
+@@ -423,10 +429,11 @@ class WorkflowOrchestrator:
+                         eds=ctx.best_eds,
+                         emotion_name=ctx.emotion_target,
+                     )
+-        except Exception:
+-            logger.debug("[narrative] LLM diagnosis narration failed (non-critical)")
++        except Exception as exc:
++            logger.debug(f"[narrative] LLM diagnosis narration failed (non-critical): {exc!r}")
+ 
+-        # 历史记录
++    def _save_history(self, ctx: PipelineContext) -> None:
++        """写入处理历史 (非关键路径, 失败仅记录)."""
+         try:
+             from moodify.memory.history import ProcessingHistory, ProcessingRecord, diagnosis_to_vector
+             h = ProcessingHistory(self._output_dir)
+@@ -450,7 +457,8 @@ class WorkflowOrchestrator:
+         except Exception as e:
+             logger.warning(f"[history] save failed: {e}")
+ 
+-        # ── 在线校准: 自动对比 proxy vs real, 更新偏差估计 ──
++    def _update_calibration(self, ctx: PipelineContext) -> None:
++        """在线校准: 自动对比 proxy vs real, 更新偏差估计 (非关键路径)."""
+         try:
+             from moodify.calibration.online import update_calibration
+             from moodify.orchestration.state_transfer import StateTransferEngine
+@@ -469,9 +477,11 @@ class WorkflowOrchestrator:
+                     ws_after_5d=ws_after_5d,
+                     storage_dir=self._output_dir,
+                 )
+-                logger.debug(f"[calibration] updated for {ctx.emotion_parsed.get('emotion_code', 'GA')}: "
+-                            f"proxy={ctx.scores[ctx.best_idx] if ctx.scores and ctx.best_idx < len(ctx.scores) else 0:.0f} "
+-                            f"real_eds={ctx.best_eds:.0f}")
++                proxy = (ctx.scores[ctx.best_idx]
++                         if ctx.scores and ctx.best_idx < len(ctx.scores) else 0)
++                logger.debug(f"[calibration] updated for "
++                            f"{ctx.emotion_parsed.get('emotion_code', 'GA')}: "
++                            f"proxy={proxy:.0f} real_eds={ctx.best_eds:.0f}")
+         except Exception as e:
+             logger.warning(f"[calibration] update failed: {e}")
+ 
+@@ -481,8 +491,9 @@ class WorkflowOrchestrator:
+         if ctx.best_output and os.path.exists(ctx.best_output):
+             try:
+                 ws_after_obj = self._diagnose_audio(ctx.best_output)
+-            except Exception:
+-                pass  # re-diagnose best_output failed — ws_after_obj stays None
++            except Exception as exc:
++                logger.warning(f"[build_result] re-diagnose failed for {ctx.best_output}: {exc}")
++                ws_after_obj = None
+ 
+         total_elapsed = (time.perf_counter() - ctx.total_start) * 1000
+         success = all(
+@@ -538,14 +549,15 @@ class WorkflowOrchestrator:
+         gate = QualityGate.gate_1_diagnosis(ws, elapsed)
+ 
+         best_card = None
++        craft_warnings: list[str] = []
+         try:
+             from moodify.knowledge.craft_chain_match import CraftChainMatch, generate_craft_cards_from_data
+             cards = generate_craft_cards_from_data()
+             matcher = CraftChainMatch()
+             matches = matcher.match(defects, emotion_target, ws, cards, top_k=1)
+             best_card = matches[0].craft_card if matches else None
+-        except Exception:
+-            pass
++        except Exception as exc:
++            craft_warnings.append(f"[craft-match] failed: {exc}")
+ 
+         return PhaseResult(
+             phase=1, name="诊断",
+@@ -557,7 +569,7 @@ class WorkflowOrchestrator:
+                 "craft_card": best_card,
+                 "emotion_key": resolve_emotion(emotion_target),
+             },
+-            warnings=gate.warnings,
++            warnings=gate.warnings + craft_warnings,
+             elapsed_ms=elapsed,
+             gate_passed=gate.passed,
+         )
+@@ -621,23 +633,8 @@ class WorkflowOrchestrator:
+                 elapsed_ms=(time.perf_counter() - t0) * 1000,
+             )
+ 
+-        width = 1.0
+-        if craft_card is not None:
+-            try:
+-                params = craft_card.get_recommended_params()
+-                width = params.get("P12_reverb_width", 1.0)
+-            except Exception:
+-                pass
+-        else:
+-            try:
+-                from moodify.knowledge.craft_chains import get_recommended_params
+-                from moodify.knowledge.emotion_targets import resolve_emotion, KEY_TO_CODE
+-                resolved_key = resolve_emotion(emotion_target)
+-                resolved_code = KEY_TO_CODE.get(resolved_key, "GA")
+-                params = get_recommended_params(resolved_code)
+-                width = params.get("P12_reverb_width", 1.0)
+-            except Exception:
+-                pass
++        width, width_warnings = self._resolve_spatial_width(emotion_target, craft_card)
++        warnings += width_warnings
+ 
+         mid = (audio[:, 0] + audio[:, 1]) / 2.0
+         side = (audio[:, 0] - audio[:, 1]) / 2.0
+@@ -658,6 +655,28 @@ class WorkflowOrchestrator:
+             elapsed_ms=(time.perf_counter() - t0) * 1000,
+         )
+ 
++    @staticmethod
++    def _resolve_spatial_width(emotion_target: str, craft_card=None) -> tuple:
++        """Resolve stereo width from craft card or recommended params (default 1.0).
++
++        Returns (width, warnings). Resolution failure is an explicit warning,
++        never a silent fallback.
++        """
++        warnings: list[str] = []
++        try:
++            if craft_card is not None:
++                params = craft_card.get_recommended_params()
++                return params.get("P12_reverb_width", 1.0), warnings
++            from moodify.knowledge.craft_chains import get_recommended_params
++            from moodify.knowledge.emotion_targets import resolve_emotion, KEY_TO_CODE
++            resolved_key = resolve_emotion(emotion_target)
++            resolved_code = KEY_TO_CODE.get(resolved_key, "GA")
++            params = get_recommended_params(resolved_code)
++            return params.get("P12_reverb_width", 1.0), warnings
++        except Exception as exc:
++            warnings.append(f"[spatial] width resolution failed, using 1.0: {exc}")
++            return 1.0, warnings
++
+ 
+     # ── Phase 6 helpers ───────────────────────────────────
+ 
+diff --git a/moodify-core-package/src/moodify/v01_delivery.py b/moodify-core-package/src/moodify/v01_delivery.py
+index ca64b7d..b82633d 100644
+--- a/moodify-core-package/src/moodify/v01_delivery.py
++++ b/moodify-core-package/src/moodify/v01_delivery.py
+@@ -12,12 +12,15 @@ from __future__ import annotations
+ 
+ import hashlib
+ import json
++import logging
+ import os
+ import platform
+ import subprocess
+ import sys
+ from typing import Any
+ 
++logger = logging.getLogger(__name__)
++
+ 
+ MAP_CHAIN_VERSION = "0.2.0"
+ MAP_CHAIN_VERSION_FILENAME = "MAP_CHAIN_VERSION"
+@@ -109,8 +112,8 @@ def _git_hash() -> str:
+         )
+         if result.returncode == 0:
+             return result.stdout.strip()
+-    except Exception:
+-        pass
++    except Exception as exc:
++        logger.debug(f"[git_hash] unavailable, recording empty: {exc!r}")
+     return ""
+ 
+ 
+@@ -122,8 +125,8 @@ def _git_branch() -> str:
+         )
+         if result.returncode == 0:
+             return result.stdout.strip()
+-    except Exception:
+-        pass
++    except Exception as exc:
++        logger.debug(f"[git_branch] unavailable, recording empty: {exc!r}")
+     return ""
+ 
+ 
+@@ -138,8 +141,8 @@ def _installed_packages() -> dict[str, str]:
+         try:
+             mod = __import__(pkg)
+             versions[pkg] = getattr(mod, "__version__", "unknown")
+-        except ImportError:
+-            pass
++        except ImportError as exc:
++            logger.debug(f"[packages] {pkg} not installed, omitted: {exc!r}")
+     return versions
+ 
+ 
+diff --git a/moodify-core-package/src/moodify/v01_pipeline.py b/moodify-core-package/src/moodify/v01_pipeline.py
+index eebd70b..b75f8c9 100644
+--- a/moodify-core-package/src/moodify/v01_pipeline.py
++++ b/moodify-core-package/src/moodify/v01_pipeline.py
+@@ -7,11 +7,15 @@ The v1.x WorkflowOrchestrator (938 lines) is preserved for future use.
+ """
+ 
+ import json
++import logging
+ import os
+ import time
++from dataclasses import dataclass, field
+ from pathlib import Path
+ from typing import Any, Callable
+ 
++logger = logging.getLogger(__name__)
++
+ from moodify.audio_io import load_audio
+ from moodify.processing.pedalboard_chain import MoodifyDSPChain
+ from moodify.v01_types import (
+@@ -56,14 +60,9 @@ def process_audio(input_path: str,
+     scan = scan_audio(input_path)
+     stage_timings["S_scan_s"] = _elapsed(scan_t0)
+     _emit("scan", 0.15)
+-    if not scan.exists:
+-        return ProcessResult(input_path=input_path, success=False,
+-                             scan=scan, stage_timings=stage_timings,
+-                             error=f"File not found: {input_path}")
+-    if not scan.readable:
+-        return ProcessResult(input_path=input_path, success=False,
+-                             scan=scan, stage_timings=stage_timings,
+-                             error="Audio file is not readable.")
++    failure = _validate_input(scan, input_path, stage_timings)
++    if failure:
++        return failure
+ 
+     requested_preset = preset
+     if preset != "auto" and get_preset(preset) is None:
+@@ -139,7 +138,7 @@ def process_audio(input_path: str,
+         generate_t0 = time.perf_counter()
+         stage_timings["G_generate_s"] = 0.0
+         stage_timings["total_s"] = _elapsed(t0)
+-        report_path = _save_report(
++        report_path = _save_report(_ReportPayload(
+             scan=scan,
+             report=report,
+             output_path=output_path,
+@@ -151,7 +150,7 @@ def process_audio(input_path: str,
+             output_dir=output_dir,
+             stage_timings=stage_timings,
+             pdf_report_path=pdf_report_path,
+-        )
++        ))
+         delivery = DeliveryBundle(
+             output_audio=output_path,
+             json_report=report_path,
+@@ -208,6 +207,20 @@ def process_audio(input_path: str,
+         )
+ 
+ 
++def _validate_input(scan: ScanResult, input_path: str,
++                    stage_timings: dict) -> ProcessResult | None:
++    """Return a failure ProcessResult when the scan shows unusable input."""
++    if not scan.exists:
++        return ProcessResult(input_path=input_path, success=False,
++                             scan=scan, stage_timings=stage_timings,
++                             error=f"File not found: {input_path}")
++    if not scan.readable:
++        return ProcessResult(input_path=input_path, success=False,
++                             scan=scan, stage_timings=stage_timings,
++                             error="Audio file is not readable.")
++    return None
++
++
+ def scan_audio(input_path: str) -> ScanResult:
+     """Scan file availability and coarse audio readability.
+ 
+@@ -275,8 +288,8 @@ def scan_audio(input_path: str) -> ScanResult:
+             freqs = np.fft.rfftfreq(n, 1.0 / sr)
+             centroid = float(np.sum(freqs * fft) / (np.sum(fft) + 1e-12))
+             scan.spectral_centroid_hz = round(centroid, 0)
+-        except Exception:
+-            pass
++        except Exception as exc:
++            scan.warnings.append(f"Spectral centroid computation failed: {exc}")
+ 
+         # dc_offset: signal mean relative to full scale
+         scan.dc_offset = round(float(np.mean(mono)), 6)
+@@ -325,8 +338,8 @@ def _quality_gate(before, after) -> QualityGate:
+                 before_path=before_path,
+                 after_path=after_path,
+             )
+-        except Exception:
+-            pass  # fall back to inline proxy below
++        except Exception as exc:
++            logger.debug(f"[quality_gate] mrs_adapter failed, using inline proxy: {exc!r}")
+ 
+     # Inline proxy fallback (original v0.1 behavior)
+     warnings: list[str] = []
+@@ -409,17 +422,31 @@ def _risk_flags(deltas: dict, warnings: list[str], mrs_delta: float,
+     return flags
+ 
+ 
+-def _save_report(scan: ScanResult, report: DiagnosisReport, output_path: str,
+-                 preset: str, requested_preset: str, elapsed_s: float,
+-                 metrics_after, quality_gate: QualityGate, output_dir: str,
+-                 stage_timings: dict, pdf_report_path: str = "") -> str:
++@dataclass
++class _ReportPayload:
++    """Report-builder inputs bundled to keep the signature reviewable."""
++
++    scan: ScanResult
++    report: DiagnosisReport
++    output_path: str
++    preset: str
++    requested_preset: str
++    elapsed_s: float
++    metrics_after: Any
++    quality_gate: QualityGate
++    output_dir: str
++    stage_timings: dict
++    pdf_report_path: str = ""
++
++
++def _save_report(payload: _ReportPayload) -> str:
+     """Write a structured delivery JSON report next to the output file."""
+-    report_path = output_path.replace(".wav", "_report.json")
++    report_path = payload.output_path.replace(".wav", "_report.json")
+     before_spectrum = os.path.abspath(
+-        spectrum_png_path(scan.input_path, output_dir, label="before")
++        spectrum_png_path(payload.scan.input_path, payload.output_dir, label="before")
+     )
+     after_spectrum = os.path.abspath(
+-        spectrum_png_path(output_path, output_dir, label="after")
++        spectrum_png_path(payload.output_path, payload.output_dir, label="after")
+     )
+     data = {
+         "workflow": [
+@@ -431,25 +458,25 @@ def _save_report(scan: ScanResult, report: DiagnosisReport, output_path: str,
+             "R_report",
+             "G_generate",
+         ],
+-        "preset": preset,
+-        "requested_preset": requested_preset,
+-        "elapsed_s": round(elapsed_s, 1),
+-        "stage_timings": stage_timings,
+-        "scan": scan.to_dict(),
+-        "feature_analysis": report.metrics.to_dict(),
+-        "diagnosis_report": report.to_dict(),
+-        "validation_result": quality_gate.to_dict(),
+-        "quality_gate": quality_gate.to_dict(),
+-        "metrics_before": report.metrics.to_dict(),
+-        "metrics_after": metrics_after.to_dict(),
++        "preset": payload.preset,
++        "requested_preset": payload.requested_preset,
++        "elapsed_s": round(payload.elapsed_s, 1),
++        "stage_timings": payload.stage_timings,
++        "scan": payload.scan.to_dict(),
++        "feature_analysis": payload.report.metrics.to_dict(),
++        "diagnosis_report": payload.report.to_dict(),
++        "validation_result": payload.quality_gate.to_dict(),
++        "quality_gate": payload.quality_gate.to_dict(),
++        "metrics_before": payload.report.metrics.to_dict(),
++        "metrics_after": payload.metrics_after.to_dict(),
+         "delivery": {
+-            "output_audio": os.path.abspath(output_path),
++            "output_audio": os.path.abspath(payload.output_path),
+             "json_report": os.path.abspath(report_path),
+-            "pdf_report": pdf_report_path,
++            "pdf_report": payload.pdf_report_path,
+             "spectrum_before": before_spectrum,
+             "spectrum_after": after_spectrum,
+         },
+-        **report.to_dict(),
++        **payload.report.to_dict(),
+     }
+     with open(report_path, "w", encoding="utf-8") as f:
+         json.dump(data, f, ensure_ascii=False, indent=2)
+diff --git a/moodify_runtime/cli.py b/moodify_runtime/cli.py
+index 1999b2b..acf9e5e 100644
+--- a/moodify_runtime/cli.py
++++ b/moodify_runtime/cli.py
+@@ -70,14 +70,7 @@ def print_json(obj: Any) -> None:
+     print(json.dumps(obj, ensure_ascii=False, indent=2))
+ 
+ 
+-def build_parser() -> argparse.ArgumentParser:
+-    p = argparse.ArgumentParser(
+-        prog="moodify-runtime",
+-        description="Moodify Daily Run System: register, plan, run, report, craft memory."
+-    )
+-    p.add_argument("--config", default=None, help="配置文件路径，默认使用 configs/runtime_config.json 或内置默认值")
+-    sub = p.add_subparsers(dest="command", required=True)
+-
++def _add_core_commands(sub) -> None:
+     sp = sub.add_parser("register", help="扫描 input_dirs 并写入 input_registry.jsonl")
+     sp.add_argument("--source", default="unknown")
+     sp.add_argument("--genre", default="")
+@@ -109,7 +102,20 @@ def build_parser() -> argparse.ArgumentParser:
+     sp = sub.add_parser("next", help="给出下一轮实验建议")
+     sp.add_argument("--run-id", default=None)
+ 
++    sp = sub.add_parser("all", help="register → plan → run → report → craft")
++    sp.add_argument("--source", default="unknown")
++    sp.add_argument("--genre", default="")
++    sp.add_argument("--vocal-type", default="")
++    sp.add_argument("--notes", default="")
++    sp.add_argument("--presets", default=None)
++    sp.add_argument("--max-new-tasks", type=int, default=0)
++    sp.add_argument("--limit", type=int, default=0)
++    sp.add_argument("--dry-run", action="store_true")
++    sp.add_argument("--rights-manifest", default=None)
++    sp.add_argument("--rights-asset-id", default="")
+ 
++
++def _add_operator_commands(sub) -> None:
+     sp = sub.add_parser("operator-create", help="Create internal operator-console Job")
+     sp.add_argument("--source-audio", required=True)
+     sp.add_argument("--depth", default="quick_scan", choices=["quick_scan", "standard_process", "deep_process", "studio_process"])
+@@ -122,7 +128,6 @@ def build_parser() -> argparse.ArgumentParser:
+     sp = sub.add_parser("operator-list", help="List internal operator-console Jobs")
+     sp.add_argument("--status", default=None)
+ 
+-
+     sp = sub.add_parser("operator-attach-run", help="Attach runtime run/report evidence to an Operator Job")
+     sp.add_argument("--job-id", required=True)
+     sp.add_argument("--run-id", required=True)
+@@ -168,7 +173,8 @@ def build_parser() -> argparse.ArgumentParser:
+     sp = sub.add_parser("operator-report", help="Build Operator Report Bundle for a job")
+     sp.add_argument("--job-id", required=True)
+ 
+-    # ── Studio (MHP-036) ─────────────────────────────────
++
++def _add_studio_commands(sub) -> None:
+     sp = sub.add_parser("studio-client-create", help="Create a studio client")
+     sp.add_argument("--name", required=True)
+     sp.add_argument("--contact", default="")
+@@ -181,33 +187,6 @@ def build_parser() -> argparse.ArgumentParser:
+     sp.add_argument("--name", required=True)
+     sp.add_argument("--description", default="")
+ 
+-    # ── Craft (MHP-167) ──
+-    sp = sub.add_parser("craft-list", help="List craft records")
+-    sp.add_argument("--status", default=None, help="Filter by adoption status")
+-
+-    sp = sub.add_parser("craft-safety-check", help="Run preset safety gate check")
+-    sp.add_argument("--preset", default="warm_vocal")
+-    sp.add_argument("--over-dark", default="none", choices=["none","mild","severe"])
+-    sp.add_argument("--over-bright", default="none", choices=["none","mild","severe"])
+-    sp.add_argument("--transient", default="none", choices=["none","mild","severe"])
+-    sp.add_argument("--vocal", default="none", choices=["none","mild","severe"])
+-    sp.add_argument("--stereo", default="none", choices=["none","mild","severe"])
+-
+-    # ── Runtime Supervisor (MHP-113) ──
+-    sp = sub.add_parser("runtime-status", help="Show runtime health, heartbeat, active tasks")
+-    sp.add_argument("--json", action="store_true")
+-
+-    sp = sub.add_parser("runtime-health", help="Full health check (disk, memory, SLO)")
+-    sp.add_argument("--json", action="store_true")
+-
+-    sp = sub.add_parser("runtime-supervisor-start", help="Launch supervised runner daemon")
+-    sp.add_argument("--limit", type=int, default=0)
+-    sp.add_argument("--dry-run", action="store_true")
+-    sp.add_argument("--heartbeat-interval", type=int, default=15)
+-    sp.add_argument("--rights-manifest", default=None)
+-    sp.add_argument("--rights-asset-id", default="")
+-
+-    # ── Studio ──
+     sp = sub.add_parser("studio-project-list", help="List studio projects")
+     sp.add_argument("--client-id", default=None)
+ 
+@@ -239,7 +218,8 @@ def build_parser() -> argparse.ArgumentParser:
+     sp.add_argument("--target-type", default=None)
+     sp.add_argument("--target-id", default=None)
+ 
+-    # ── Scheduler (MHP-038) ──────────────────────────────
++
++def _add_scheduler_commands(sub) -> None:
+     sp = sub.add_parser("scheduler-schedule", help="Create a compute request for a job")
+     sp.add_argument("--job-id", required=True)
+     sp.add_argument("--compute-class", default="cpu_standard")
+@@ -263,7 +243,8 @@ def build_parser() -> argparse.ArgumentParser:
+     sp = sub.add_parser("scheduler-runs", help="List scheduler runs")
+     sp = sub.add_parser("scheduler-costs", help="List scheduler costs")
+ 
+-    # ── Calibration (MHP-039) ─────────────────────────────
++
++def _add_calibration_commands(sub) -> None:
+     sp = sub.add_parser("calibration-set-create", help="Create a calibration sample set")
+     sp.add_argument("--name", required=True)
+     sp.add_argument("--description", default="")
+@@ -293,7 +274,19 @@ def build_parser() -> argparse.ArgumentParser:
+ 
+     sp = sub.add_parser("calibration-thresholds", help="List calibration thresholds")
+ 
+-    # ── Craft (MHP-037) ───────────────────────────────────
++
++def _add_craft_commands(sub) -> None:
++    sp = sub.add_parser("craft-list", help="List craft records")
++    sp.add_argument("--status", default=None, help="Filter by adoption status")
++
++    sp = sub.add_parser("craft-safety-check", help="Run preset safety gate check")
++    sp.add_argument("--preset", default="warm_vocal")
++    sp.add_argument("--over-dark", default="none", choices=["none","mild","severe"])
++    sp.add_argument("--over-bright", default="none", choices=["none","mild","severe"])
++    sp.add_argument("--transient", default="none", choices=["none","mild","severe"])
++    sp.add_argument("--vocal", default="none", choices=["none","mild","severe"])
++    sp.add_argument("--stereo", default="none", choices=["none","mild","severe"])
++
+     sp = sub.add_parser("craft-writeback", help="Create craft record from delivered job")
+     sp.add_argument("--job-id", required=True)
+     sp.add_argument("--candidate-id", required=True)
+@@ -303,7 +296,40 @@ def build_parser() -> argparse.ArgumentParser:
+     sp = sub.add_parser("craft-records", help="List craft records")
+     sp.add_argument("--adoption-status", default=None)
+ 
+-    # ── PDF Report (MHP-665-667) ──────────────────────────
++    sp = sub.add_parser("craft-plan", help="Plan a craft chain for audio (dry-run)")
++    sp.add_argument("--wav", required=True, help="Path to input WAV file")
++    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
++    sp.add_argument("--genre", default="")
++    sp.add_argument("--ct-findings", default="")
++
++    sp = sub.add_parser("craft-run", help="Run a craft chain on audio")
++    sp.add_argument("--wav", required=True, help="Path to input WAV file")
++    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
++    sp.add_argument("--output", default=None, help="Output WAV path")
++    sp.add_argument("--keep-artifacts", action="store_true")
++    sp.add_argument("--rights-manifest", default=None)
++    sp.add_argument("--rights-asset-id", default="")
++
++    sp = sub.add_parser("craft-inspect", help="Inspect a craft chain manifest")
++    sp.add_argument("--manifest", required=True, help="Path to chain manifest JSON")
++
++
++def _add_runtime_commands(sub) -> None:
++    sp = sub.add_parser("runtime-status", help="Show runtime health, heartbeat, active tasks")
++    sp.add_argument("--json", action="store_true")
++
++    sp = sub.add_parser("runtime-health", help="Full health check (disk, memory, SLO)")
++    sp.add_argument("--json", action="store_true")
++
++    sp = sub.add_parser("runtime-supervisor-start", help="Launch supervised runner daemon")
++    sp.add_argument("--limit", type=int, default=0)
++    sp.add_argument("--dry-run", action="store_true")
++    sp.add_argument("--heartbeat-interval", type=int, default=15)
++    sp.add_argument("--rights-manifest", default=None)
++    sp.add_argument("--rights-asset-id", default="")
++
++
++def _add_pdf_commands(sub) -> None:
+     sp = sub.add_parser("pdf-report", help="PDF report commands")
+     pdf_sub = sp.add_subparsers(dest="pdf_action", required=True)
+ 
+@@ -329,32 +355,14 @@ def build_parser() -> argparse.ArgumentParser:
+     sp_inspect = pdf_sub.add_parser("inspect", help="Inspect a PDF report and its manifest")
+     sp_inspect.add_argument("--pdf-path", required=True, help="Path to PDF file")
+ 
+-    # ── Craft 22 commands (MHP-714-716) ────────────────────
+-    sp = sub.add_parser("craft-plan", help="Plan a craft chain for audio (dry-run)")
+-    sp.add_argument("--wav", required=True, help="Path to input WAV file")
+-    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
+-    sp.add_argument("--genre", default="")
+-    sp.add_argument("--ct-findings", default="")
+-
+-    sp = sub.add_parser("craft-run", help="Run a craft chain on audio")
+-    sp.add_argument("--wav", required=True, help="Path to input WAV file")
+-    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
+-    sp.add_argument("--output", default=None, help="Output WAV path")
+-    sp.add_argument("--keep-artifacts", action="store_true")
+-    sp.add_argument("--rights-manifest", default=None)
+-    sp.add_argument("--rights-asset-id", default="")
+ 
+-    sp = sub.add_parser("craft-inspect", help="Inspect a craft chain manifest")
+-    sp.add_argument("--manifest", required=True, help="Path to chain manifest JSON")
+-
+-    # ═══ Tidal Intelligence (ECHAIN-009) ═══
++def _add_tidal_commands(sub) -> None:
+     sp = sub.add_parser("tidal-intel", help="Run tidal intelligence smoke/report")
+     sp.add_argument("--run-id", default="", help="Run ID for report context")
+ 
+     sp = sub.add_parser("tidal-intel-brief", help="Generate morning brief markdown")
+     sp.add_argument("--run-id", default="", help="Run ID for report context")
+ 
+-    # ═══ Tidal Operations (ECHAIN-010) ═══
+     sp = sub.add_parser("tidal-ops", help="Run tidal operations smoke/report")
+     sp.add_argument("--run-id", default="", help="Run ID for report context")
+ 
+@@ -379,7 +387,8 @@ def build_parser() -> argparse.ArgumentParser:
+     sp = sub.add_parser("tidal-notes", help="Read operator notes")
+     sp.add_argument("--target", default="", help="Filter by target ID")
+ 
+-    # ═══ Data Loop (ECHAIN-MOODIFY-DATA-LOOP-014) ═══
++
++def _add_data_loop_commands(sub) -> None:
+     dl = sub.add_parser("data-loop", help="Data optimization loop commands")
+     dl_sub = dl.add_subparsers(dest="data_loop_action")
+ 
+@@ -398,27 +407,30 @@ def build_parser() -> argparse.ArgumentParser:
+     dl_report.add_argument("--bundle", required=True, help="Path to recommendation_bundle.json")
+     dl_report.add_argument("--output-dir", default="reports/data_loop", help="Output directory")
+ 
+-    # ── All-in-one ──
+-    sp = sub.add_parser("all", help="register → plan → run → report → craft")
+-    sp.add_argument("--source", default="unknown")
+-    sp.add_argument("--genre", default="")
+-    sp.add_argument("--vocal-type", default="")
+-    sp.add_argument("--notes", default="")
+-    sp.add_argument("--presets", default=None)
+-    sp.add_argument("--max-new-tasks", type=int, default=0)
+-    sp.add_argument("--limit", type=int, default=0)
+-    sp.add_argument("--dry-run", action="store_true")
+-    sp.add_argument("--rights-manifest", default=None)
+-    sp.add_argument("--rights-asset-id", default="")
+ 
+-    return p
++def build_parser() -> argparse.ArgumentParser:
++    p = argparse.ArgumentParser(
++        prog="moodify-runtime",
++        description="Moodify Daily Run System: register, plan, run, report, craft memory."
++    )
++    p.add_argument("--config", default=None, help="配置文件路径，默认使用 configs/runtime_config.json 或内置默认值")
++    sub = p.add_subparsers(dest="command", required=True)
+ 
++    _add_core_commands(sub)
++    _add_operator_commands(sub)
++    _add_studio_commands(sub)
++    _add_scheduler_commands(sub)
++    _add_calibration_commands(sub)
++    _add_craft_commands(sub)
++    _add_runtime_commands(sub)
++    _add_pdf_commands(sub)
++    _add_tidal_commands(sub)
++    _add_data_loop_commands(sub)
+ 
+-def main(argv=None) -> int:
+-    parser = build_parser()
+-    args = parser.parse_args(argv)
+-    cfg = load_config(args.config)
++    return p
+ 
++
++def _handle_core_commands(args, cfg) -> int:
+     if args.command == "register":
+         print_json(register_inputs(cfg, source=args.source, genre=args.genre, vocal_type=args.vocal_type, notes=args.notes))
+         return 0
+@@ -445,7 +457,34 @@ def main(argv=None) -> int:
+         print_json(analyze_failures(cfg, run_id=args.run_id))
+         return 0
+ 
+-    # ═══ Tidal Intelligence ═══
++    if args.command == "next":
++        print_json(suggest_next_plan(cfg, run_id=args.run_id))
++        return 0
++
++    if args.command == "all":
++        presets = args.presets.split(",") if args.presets else None
++        result = {
++            "register": register_inputs(cfg, source=args.source, genre=args.genre, vocal_type=args.vocal_type, notes=args.notes),
++            "plan": None,
++            "run": None,
++            "report": None,
++            "craft": None,
++            "next": None,
++        }
++        result["plan"] = plan_queue(cfg, presets=presets, max_new_tasks=args.max_new_tasks)
++        result["run"] = run_daily(cfg, limit=args.limit, dry_run=args.dry_run,
++                                 rights_manifest=args.rights_manifest, rights_asset_id=args.rights_asset_id)
++        if not args.dry_run:
++            result["report"] = generate_daily_report(cfg)
++            result["craft"] = seed_craft_memory(cfg)
++            result["next"] = suggest_next_plan(cfg)
++        print_json(result)
++        return 0
++
++    return 1
++
++
++def _handle_tidal_commands(args, cfg) -> int:
+     if args.command == "tidal-intel":
+         print_json(cli_intelligence_report(run_id=args.run_id))
+         return 0
+@@ -454,7 +493,6 @@ def main(argv=None) -> int:
+         print(cli_morning_brief(run_id=args.run_id))
+         return 0
+ 
+-    # ═══ Tidal Operations ═══
+     if args.command == "tidal-ops":
+         print_json(cli_operations_report(run_id=args.run_id))
+         return 0
+@@ -492,11 +530,10 @@ def main(argv=None) -> int:
+         print_json([n.to_dict() for n in notes])
+         return 0
+ 
+-    if args.command == "next":
+-        print_json(suggest_next_plan(cfg, run_id=args.run_id))
+-        return 0
++    return 1
+ 
+-    # ── Craft commands (MHP-167) ──
++
++def _handle_craft_commands(args, cfg) -> int:
+     if args.command == "craft-list":
+         from .craft_memory import list_craft_records
+         print_json(list_craft_records(cfg, adoption_status=getattr(args, 'status', None)))
+@@ -515,7 +552,54 @@ def main(argv=None) -> int:
+         print_json(r.to_dict())
+         return 0
+ 
+-    # ── Runtime Supervisor commands (MHP-113) ──
++    if args.command == "craft-writeback":
++        print_json(writeback_delivery_to_craft_record(cfg, job_id=args.job_id, candidate_id=args.candidate_id,
++                                                       adoption_status=args.adoption_status,
++                                                       operator_notes=args.operator_notes))
++        return 0
++
++    if args.command == "craft-records":
++        print_json({"records": list_craft_records(cfg, adoption_status=args.adoption_status)})
++        return 0
++
++    if args.command == "craft-plan":
++        from .craft_chain import ChainStep, CraftChainExecutor, preset_to_chain
++        steps = preset_to_chain(args.preset)
++        executor = CraftChainExecutor()
++        plan = executor.plan(steps, source=args.wav)
++        print_json(plan.to_dict())
++        return 0
++
++    if args.command == "craft-run":
++        from .craft_chain import CraftChainExecutor, preset_to_chain
++        from .hardening_gates import authorize_audio_source
++        if args.rights_manifest:
++            ok, reason = authorize_audio_source(args.rights_manifest, args.rights_asset_id, args.wav)
++            if not ok:
++                print_json({"status": "rights_blocked", "error": f"rights: {reason}"})
++                return 1
++        steps = preset_to_chain(args.preset)
++        executor = CraftChainExecutor(keep_artifacts=args.keep_artifacts)
++        result = executor.execute(args.wav, steps, output_path=args.output)
++        print_json(result.to_dict())
++        if not args.keep_artifacts:
++            executor.cleanup()
++        return 0 if result.success else 1
++
++    if args.command == "craft-inspect":
++        import json as _json
++        manifest_path = Path(args.manifest)
++        if manifest_path.exists():
++            data = _json.loads(manifest_path.read_text())
++            print_json(data)
++        else:
++            print_json({"error": f"Manifest not found: {args.manifest}"})
++        return 0
++
++    return 1
++
++
++def _handle_runtime_commands(args, cfg) -> int:
+     if args.command == "runtime-status":
+         from .runtime_state import Heartbeat
+         hb = Heartbeat(path=cfg.project_root / "runtime_heartbeat.json")
+@@ -558,6 +642,10 @@ def main(argv=None) -> int:
+         print_json(result_dict)
+         return 0
+ 
++    return 1
++
++
++def _handle_operator_commands(args, cfg) -> int:
+     if args.command == "operator-create":
+         print_json(create_operator_job(
+             cfg,
+@@ -575,7 +663,6 @@ def main(argv=None) -> int:
+         print_json({"jobs": list_operator_jobs(cfg, status=args.status)})
+         return 0
+ 
+-
+     if args.command == "operator-attach-run":
+         print_json(attach_run_report_to_job(
+             cfg,
+@@ -643,7 +730,10 @@ def main(argv=None) -> int:
+         print_json(build_operator_report_bundle(cfg, job_id=args.job_id))
+         return 0
+ 
+-    # ── Studio handlers ─────────────────────────────────
++    return 1
++
++
++def _handle_studio_commands(args, cfg) -> int:
+     if args.command == "studio-client-create":
+         print_json(create_client(cfg, name=args.name, contact=args.contact, notes=args.notes))
+         return 0
+@@ -677,8 +767,10 @@ def main(argv=None) -> int:
+     if args.command == "studio-note-list":
+         print_json({"notes": list_staff_notes(cfg, target_type=args.target_type, target_id=args.target_id)})
+         return 0
++    return 1
++
+ 
+-    # ── Scheduler handlers ───────────────────────────────
++def _handle_scheduler_commands(args, cfg) -> int:
+     if args.command == "scheduler-schedule":
+         print_json(schedule_job(cfg, job_id=args.job_id, compute_class=args.compute_class, priority=args.priority))
+         return 0
+@@ -699,8 +791,10 @@ def main(argv=None) -> int:
+     if args.command == "scheduler-costs":
+         print_json({"costs": list_scheduler_costs(cfg)})
+         return 0
++    return 1
++
+ 
+-    # ── Calibration handlers ─────────────────────────────
++def _handle_calibration_commands(args, cfg) -> int:
+     if args.command == "calibration-set-create":
+         print_json(create_calibration_sample_set(cfg, name=args.name, description=args.description))
+         return 0
+@@ -728,165 +822,130 @@ def main(argv=None) -> int:
+     if args.command == "calibration-thresholds":
+         print_json({"thresholds": list_calibration_thresholds(cfg)})
+         return 0
++    return 1
+ 
+-    # ── Craft handlers ────────────────────────────────────
+-    if args.command == "craft-writeback":
+-        print_json(writeback_delivery_to_craft_record(cfg, job_id=args.job_id, candidate_id=args.candidate_id,
+-                                                       adoption_status=args.adoption_status,
+-                                                       operator_notes=args.operator_notes))
+-        return 0
+-    if args.command == "craft-records":
+-        print_json({"records": list_craft_records(cfg, adoption_status=args.adoption_status)})
+-        return 0
+ 
+-    # ── PDF Report handlers ────────────────────────────────
+-    if args.command == "pdf-report":
+-        if args.pdf_action == "render-single":
+-            from .pdf_ct_builder import generate_single_scan_pdf
+-            output_dir = Path(args.output_dir) if args.output_dir else None
+-            manifest = generate_single_scan_pdf(
+-                wav_path=args.wav,
+-                output_dir=output_dir,
+-                sample_id=args.sample_id,
+-                genre=args.genre,
+-                preset=args.preset,
+-                mrs_before=args.mrs_before,
+-                mrs_after=args.mrs_after,
+-            )
+-            print_json(manifest.to_dict())
+-            return 0
+-
+-        if args.pdf_action == "render-comparison":
+-            from .pdf_ct_builder import generate_comparison_pdf
+-            output_dir = Path(args.output_dir) if args.output_dir else None
+-            manifest = generate_comparison_pdf(
+-                before_wav=args.before_wav,
+-                after_wav=args.after_wav,
+-                output_dir=output_dir,
+-                sample_id=args.sample_id,
+-                genre=args.genre,
+-                preset=args.preset,
+-                mrs_before=args.mrs_before,
+-                mrs_after=args.mrs_after,
+-            )
+-            print_json(manifest.to_dict())
+-            return 0
+-
+-        if args.pdf_action == "inspect":
+-            from .pdf_qa import run_full_qa
+-            pdf_path = args.pdf_path
+-            manifest_path = Path(pdf_path).with_suffix(".manifest.json")
+-            result = {"pdf_path": pdf_path, "qa": None, "manifest": None}
+-            result["qa"] = run_full_qa(pdf_path).to_dict()
+-            if manifest_path.exists():
+-                import json as _json
+-                result["manifest"] = _json.loads(manifest_path.read_text())
+-            print_json(result)
+-            return 0
+-
+-    # ── Craft 22 handlers ──────────────────────────────────
+-    if args.command == "craft-plan":
+-        from .craft_chain import ChainStep, CraftChainExecutor, preset_to_chain
+-        steps = preset_to_chain(args.preset)
+-        executor = CraftChainExecutor()
+-        plan = executor.plan(steps, source=args.wav)
+-        print_json(plan.to_dict())
++def _handle_pdf_commands(args, cfg) -> int:
++    if args.command != "pdf-report":
++        return 1
++    if args.pdf_action == "render-single":
++        from .pdf_ct_builder import generate_single_scan_pdf
++        output_dir = Path(args.output_dir) if args.output_dir else None
++        manifest = generate_single_scan_pdf(
++            wav_path=args.wav,
++            output_dir=output_dir,
++            sample_id=args.sample_id,
++            genre=args.genre,
++            preset=args.preset,
++            mrs_before=args.mrs_before,
++            mrs_after=args.mrs_after,
++        )
++        print_json(manifest.to_dict())
++        return 0
++
++    if args.pdf_action == "render-comparison":
++        from .pdf_ct_builder import generate_comparison_pdf
++        output_dir = Path(args.output_dir) if args.output_dir else None
++        manifest = generate_comparison_pdf(
++            before_wav=args.before_wav,
++            after_wav=args.after_wav,
++            output_dir=output_dir,
++            sample_id=args.sample_id,
++            genre=args.genre,
++            preset=args.preset,
++            mrs_before=args.mrs_before,
++            mrs_after=args.mrs_after,
++        )
++        print_json(manifest.to_dict())
+         return 0
+ 
+-    if args.command == "craft-run":
+-        from .craft_chain import CraftChainExecutor, preset_to_chain
+-        from .hardening_gates import authorize_audio_source
+-        if args.rights_manifest:
+-            ok, reason = authorize_audio_source(args.rights_manifest, args.rights_asset_id, args.wav)
+-            if not ok:
+-                print_json({"status": "rights_blocked", "error": f"rights: {reason}"})
+-                return 1
+-        steps = preset_to_chain(args.preset)
+-        executor = CraftChainExecutor(keep_artifacts=args.keep_artifacts)
+-        result = executor.execute(args.wav, steps, output_path=args.output)
+-        print_json(result.to_dict())
+-        if not args.keep_artifacts:
+-            executor.cleanup()
+-        return 0 if result.success else 1
+-
+-    if args.command == "craft-inspect":
+-        import json as _json
+-        manifest_path = Path(args.manifest)
++    if args.pdf_action == "inspect":
++        from .pdf_qa import run_full_qa
++        pdf_path = args.pdf_path
++        manifest_path = Path(pdf_path).with_suffix(".manifest.json")
++        result = {"pdf_path": pdf_path, "qa": None, "manifest": None}
++        result["qa"] = run_full_qa(pdf_path).to_dict()
+         if manifest_path.exists():
+-            data = _json.loads(manifest_path.read_text())
+-            print_json(data)
+-        else:
+-            print_json({"error": f"Manifest not found: {args.manifest}"})
++            import json as _json
++            result["manifest"] = _json.loads(manifest_path.read_text())
++        print_json(result)
+         return 0
+ 
+-    # ═══ Data Loop ═══
+-    if args.command == "data-loop":
+-        from .data_loop_runner import DataLoopRunner
+-
+-        if args.data_loop_action == "run":
+-            runner = DataLoopRunner(
+-                summary_path=args.summary,
+-                manifest_path=args.manifest,
+-                queue_path=args.queue,
+-                tidal_events_path=args.tidal_events,
+-                tidal_heartbeat_path=args.tidal_heartbeat,
+-                output_dir=args.output_dir,
+-                craft_memory_dir=args.craft_memory_dir,
+-            )
+-            result = runner.run(writeback=args.writeback)
+-            print_json(result.to_dict())
+-            decision = result.recommendation_bundle.get("summary", {}).get("decision", "?")
+-            return 0 if decision == "PASS" else 2
+-
+-        if args.data_loop_action == "report":
+-            from .data_loop_runner import DataLoopRunner
+-            record = json.loads(Path(args.record).read_text(encoding="utf-8"))
+-            bundle_data = json.loads(Path(args.bundle).read_text(encoding="utf-8"))
+-            # Reconstruct a temporary runner just to format the report
+-            from moodify_runtime.recommenders.base import Recommendation, RecommendationBundle
+-            from moodify_runtime.recommenders.operator_next_mhp import OperatorNextMhpWriter
+-
+-            # Build bundle from saved data
+-            recs = [
+-                Recommendation(**{k: v for k, v in r.items() if k in Recommendation.__dataclass_fields__})
+-                for r in bundle_data.get("recommendations", [])
+-            ]
+-            bundle = RecommendationBundle(
+-                run_id=bundle_data.get("run_id", ""),
+-                generated_at=bundle_data.get("generated_at", ""),
+-                recommendations=recs,
+-                summary=bundle_data.get("summary", {}),
+-            )
+-            report = DataLoopRunner._format_report(record, bundle)
+-            out = Path(args.output_dir)
+-            out.mkdir(parents=True, exist_ok=True)
+-            (out / "data_loop_report.md").write_text(report, encoding="utf-8")
+-            print_json({"report_written": str(out / "data_loop_report.md")})
+-            return 0
++    return 1
+ 
+-    if args.command == "all":
+-        presets = args.presets.split(",") if args.presets else None
+-        result = {
+-            "register": register_inputs(cfg, source=args.source, genre=args.genre, vocal_type=args.vocal_type, notes=args.notes),
+-            "plan": None,
+-            "run": None,
+-            "report": None,
+-            "craft": None,
+-            "next": None,
+-        }
+-        result["plan"] = plan_queue(cfg, presets=presets, max_new_tasks=args.max_new_tasks)
+-        result["run"] = run_daily(cfg, limit=args.limit, dry_run=args.dry_run,
+-                                 rights_manifest=args.rights_manifest, rights_asset_id=args.rights_asset_id)
+-        if not args.dry_run:
+-            result["report"] = generate_daily_report(cfg)
+-            result["craft"] = seed_craft_memory(cfg)
+-            result["next"] = suggest_next_plan(cfg)
+-        print_json(result)
++
++def _handle_data_loop_commands(args, cfg) -> int:
++    if args.command != "data-loop":
++        return 1
++    from .data_loop_runner import DataLoopRunner
++
++    if args.data_loop_action == "run":
++        runner = DataLoopRunner(
++            summary_path=args.summary,
++            manifest_path=args.manifest,
++            queue_path=args.queue,
++            tidal_events_path=args.tidal_events,
++            tidal_heartbeat_path=args.tidal_heartbeat,
++            output_dir=args.output_dir,
++            craft_memory_dir=args.craft_memory_dir,
++        )
++        result = runner.run(writeback=args.writeback)
++        print_json(result.to_dict())
++        decision = result.recommendation_bundle.get("summary", {}).get("decision", "?")
++        return 0 if decision == "PASS" else 2
++
++    if args.data_loop_action == "report":
++        record = json.loads(Path(args.record).read_text(encoding="utf-8"))
++        bundle_data = json.loads(Path(args.bundle).read_text(encoding="utf-8"))
++        from moodify_runtime.recommenders.base import Recommendation, RecommendationBundle
++        from moodify_runtime.recommenders.operator_next_mhp import OperatorNextMhpWriter
++
++        recs = [
++            Recommendation(**{k: v for k, v in r.items() if k in Recommendation.__dataclass_fields__})
++            for r in bundle_data.get("recommendations", [])
++        ]
++        bundle = RecommendationBundle(
++            run_id=bundle_data.get("run_id", ""),
++            generated_at=bundle_data.get("generated_at", ""),
++            recommendations=recs,
++            summary=bundle_data.get("summary", {}),
++        )
++        report = DataLoopRunner._format_report(record, bundle)
++        out = Path(args.output_dir)
++        out.mkdir(parents=True, exist_ok=True)
++        (out / "data_loop_report.md").write_text(report, encoding="utf-8")
++        print_json({"report_written": str(out / "data_loop_report.md")})
+         return 0
+ 
+-    parser.print_help()
+     return 1
+ 
+ 
++def main(argv=None) -> int:
++    parser = build_parser()
++    args = parser.parse_args(argv)
++    cfg = load_config(args.config)
++
++    command = args.command
++    if command.startswith("operator"):
++        return _handle_operator_commands(args, cfg)
++    if command.startswith("studio"):
++        return _handle_studio_commands(args, cfg)
++    if command.startswith("scheduler"):
++        return _handle_scheduler_commands(args, cfg)
++    if command.startswith("calibration"):
++        return _handle_calibration_commands(args, cfg)
++    if command.startswith("craft"):
++        return _handle_craft_commands(args, cfg)
++    if command.startswith("tidal"):
++        return _handle_tidal_commands(args, cfg)
++    if command.startswith("runtime"):
++        return _handle_runtime_commands(args, cfg)
++    if command == "pdf-report":
++        return _handle_pdf_commands(args, cfg)
++    if command == "data-loop":
++        return _handle_data_loop_commands(args, cfg)
++    return _handle_core_commands(args, cfg)
++
++
+ if __name__ == "__main__":
+     raise SystemExit(main())
+diff --git a/moodify_runtime/craft_processes.py b/moodify_runtime/craft_processes.py
+index a4525d1..809615c 100644
+--- a/moodify_runtime/craft_processes.py
++++ b/moodify_runtime/craft_processes.py
+@@ -62,25 +62,26 @@ class CraftOperation:
+         for key, spec in self.params_schema.items():
+             if spec.get("required", False) and key not in params:
+                 return False, f"Missing required parameter: {key}"
+-            if key in params:
+-                value = params[key]
+-                ptype = spec.get("type", "")
+-                if ptype == "float":
+-                    if not isinstance(value, (int, float)):
+-                        return False, f"Parameter {key} must be float, got {type(value).__name__}"
+-                    lo = spec.get("min", float("-inf"))
+-                    hi = spec.get("max", float("inf"))
+-                    if value < lo or value > hi:
+-                        return False, f"Parameter {key}={value} out of range [{lo}, {hi}]"
+-                elif ptype == "int":
+-                    if not isinstance(value, int):
+-                        return False, f"Parameter {key} must be int"
+-                elif ptype == "bool":
+-                    if not isinstance(value, bool):
+-                        return False, f"Parameter {key} must be bool"
+-                elif ptype == "choice":
+-                    if value not in spec.get("options", []):
+-                        return False, f"Parameter {key}={value} not in options: {spec.get('options')}"
++            if key not in params:
++                continue
++            value = params[key]
++            ptype = spec.get("type", "")
++            if ptype == "float":
++                if not isinstance(value, (int, float)):
++                    return False, f"Parameter {key} must be float, got {type(value).__name__}"
++                lo = spec.get("min", float("-inf"))
++                hi = spec.get("max", float("inf"))
++                if value < lo or value > hi:
++                    return False, f"Parameter {key}={value} out of range [{lo}, {hi}]"
++            elif ptype == "int":
++                if not isinstance(value, int):
++                    return False, f"Parameter {key} must be int"
++            elif ptype == "bool":
++                if not isinstance(value, bool):
++                    return False, f"Parameter {key} must be bool"
++            elif ptype == "choice":
++                if value not in spec.get("options", []):
++                    return False, f"Parameter {key}={value} not in options: {spec.get('options')}"
+         return True, ""
+ 
+     def to_dict(self) -> Dict[str, Any]:
+@@ -682,6 +683,350 @@ class OpResult:
+         }
+ 
+ 
++def _op_input_normalize(mono, samples, sr, nch, input_path, output_path, params):
++    target = params.get("target_rms_db", -18.0)
++    max_gain = params.get("max_gain_db", 12.0)
++    rms_before = _compute_rms(mono)
++    gain_needed = target - rms_before
++    gain = max(-30.0, min(max_gain, gain_needed))
++    out = _apply_gain(mono, gain)
++    metrics = {
++        "rms_before_db": round(rms_before, 2),
++        "rms_after_db": round(_compute_rms(out), 2),
++        "gain_applied_db": round(gain, 2),
++    }
++    return out, metrics
++
++
++def _op_silence_trim(mono, samples, sr, nch, input_path, output_path, params):
++    threshold = 10 ** (params.get("threshold_db", -50.0) / 20.0)
++    min_silence_s = params.get("min_silence_ms", 100.0) / 1000.0
++    fade_s = params.get("fade_ms", 10.0) / 1000.0
++    min_samples = int(min_silence_s * sr)
++    fade_samples = int(fade_s * sr)
++
++    above = np.abs(mono) > threshold
++    transitions = np.diff(above.astype(int))
++    starts = np.where(transitions == 1)[0]
++    ends = np.where(transitions == -1)[0]
++
++    start_idx = 0
++    end_idx = len(mono)
++    if len(starts) > 0:
++        start_idx = max(0, starts[0] - fade_samples)
++    if len(ends) > 0:
++        end_idx = min(len(mono), ends[-1] + fade_samples)
++
++    out = mono[start_idx:end_idx]
++    metrics = {
++        "trimmed_start_ms": round(start_idx / sr * 1000, 1),
++        "trimmed_end_ms": round((len(mono) - end_idx) / sr * 1000, 1),
++    }
++    return out, metrics
++
++
++def _op_dc_offset_repair(mono, samples, sr, nch, input_path, output_path, params):
++    dc_before = float(np.mean(mono))
++    out = mono - dc_before
++    metrics = {
++        "dc_offset_before": round(dc_before, 8),
++        "dc_offset_after": round(float(np.mean(out)), 8),
++    }
++    return out, metrics
++
++
++def _op_sub_bass_discipline(mono, samples, sr, nch, input_path, output_path, params):
++    cutoff = params.get("cutoff_hz", 30.0)
++    order = params.get("order", 4)
++    sub_energy_before = float(np.mean(np.abs(mono[int(sr * 0.1):int(sr * 1.0)]) if len(mono) > sr else np.abs(mono)))
++    out = _biquad_highpass(mono, sr, cutoff, order)
++    sub_energy_after = float(np.mean(np.abs(out[int(sr * 0.1):int(sr * 1.0)]) if len(out) > sr else np.abs(out)))
++    metrics = {
++        "sub_energy_before": round(sub_energy_before, 6),
++        "sub_energy_after": round(sub_energy_after, 6),
++        "sub_energy_delta_db": round(_compute_rms(out) - _compute_rms(mono), 2),
++    }
++    return out, metrics
++
++
++def _op_bass_body_shaping(mono, samples, sr, nch, input_path, output_path, params):
++    center = params.get("center_hz", 100.0)
++    gain = params.get("gain_db", 1.5)
++    q = params.get("q_factor", 0.7)
++    rms_before = _compute_rms(mono)
++    out = _biquad_low_shelf(mono, sr, center, gain, q)
++    metrics = {
++        "bass_energy_before": round(rms_before, 2),
++        "bass_energy_after": round(_compute_rms(out), 2),
++        "bass_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
++    }
++    return out, metrics
++
++
++def _op_low_mid_de_mud(mono, samples, sr, nch, input_path, output_path, params):
++    center = params.get("center_hz", 250.0)
++    gain = params.get("gain_db", -2.0)
++    q = params.get("q_factor", 1.5)
++    rms_before = _compute_rms(mono)
++    out = _biquad_peaking(mono, sr, center, gain, q)
++    metrics = {
++        "low_mid_energy_before": round(rms_before, 2),
++        "low_mid_energy_after": round(_compute_rms(out), 2),
++        "low_mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
++    }
++    return out, metrics
++
++
++def _op_mid_presence_lift(mono, samples, sr, nch, input_path, output_path, params):
++    center = params.get("center_hz", 1200.0)
++    gain = params.get("gain_db", 2.0)
++    q = params.get("q_factor", 1.0)
++    rms_before = _compute_rms(mono)
++    out = _biquad_peaking(mono, sr, center, gain, q)
++    metrics = {
++        "mid_energy_before": round(rms_before, 2),
++        "mid_energy_after": round(_compute_rms(out), 2),
++        "mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
++    }
++    return out, metrics
++
++
++def _op_harshness_guard(mono, samples, sr, nch, input_path, output_path, params):
++    max_reduction = params.get("max_reduction_db", -4.0)
++    peak_before = _compute_peak(mono)
++    out = _biquad_peaking(mono, sr, 3500, max_reduction, 2.0)
++    peak_after = _compute_peak(out)
++    metrics = {
++        "harshness_peaks_detected": 1 if peak_before > -6 else 0,
++        "harshness_reduction_db": round(peak_after - peak_before, 2),
++    }
++    return out, metrics
++
++
++def _op_air_recovery(mono, samples, sr, nch, input_path, output_path, params):
++    shelf_hz = params.get("shelf_hz", 10000.0)
++    gain = params.get("gain_db", 1.5)
++    rms_before = _compute_rms(mono)
++    out = _biquad_high_shelf(mono, sr, shelf_hz, gain, 0.7)
++    metrics = {
++        "air_energy_before": round(rms_before, 2),
++        "air_energy_after": round(_compute_rms(out), 2),
++        "air_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
++    }
++    return out, metrics
++
++
++def _op_sibilance_guard(mono, samples, sr, nch, input_path, output_path, params):
++    center = params.get("center_hz", 7000.0)
++    max_reduction = params.get("max_reduction_db", -6.0)
++    rms_before = _compute_rms(mono)
++    out = _biquad_peaking(mono, sr, center, max_reduction, 3.0)
++    metrics = {
++        "sibilance_peaks_detected": 1 if _compute_peak(mono) > -3 else 0,
++        "sibilance_reduction_db": round(_compute_peak(out) - _compute_peak(mono), 2),
++    }
++    return out, metrics
++
++
++def _op_transient_soften(mono, samples, sr, nch, input_path, output_path, params):
++    threshold = params.get("threshold_db", -6.0)
++    threshold_lin = 10 ** (threshold / 20.0)
++    peak_before = _compute_peak(mono)
++    out = _soft_clip(mono, threshold_lin)
++    metrics = {
++        "transient_peaks_before": round(peak_before, 2),
++        "transient_peaks_after": round(_compute_peak(out), 2),
++        "crest_factor_delta_db": round(_compute_peak(out) - _compute_rms(out) - (peak_before - _compute_rms(mono)), 2),
++    }
++    return out, metrics
++
++
++def _op_transient_restore(mono, samples, sr, nch, input_path, output_path, params):
++    amount = params.get("amount_db", 2.0)
++    diff = np.diff(mono, prepend=mono[0])
++    emphasis = _apply_gain(diff - diff.mean(), amount)
++    out = mono + emphasis * 0.1
++    metrics = {
++        "transient_energy_before": round(float(np.mean(np.abs(np.diff(mono)))), 6),
++        "transient_energy_after": round(float(np.mean(np.abs(np.diff(out)))), 6),
++    }
++    return out, metrics
++
++
++def _op_micro_dynamics_lift(mono, samples, sr, nch, input_path, output_path, params):
++    threshold = params.get("threshold_db", -40.0)
++    ratio = params.get("ratio", 1.5)
++    makeup = params.get("makeup_db", 2.0)
++    threshold_lin = 10 ** (threshold / 20.0)
++    rms_before = _compute_rms(mono)
++    mask = np.abs(mono) < threshold_lin
++    out = mono.copy()
++    out[mask] = out[mask] * (10 ** (makeup / 20.0)) * ratio
++    out = _apply_gain(out, makeup)
++    metrics = {
++        "low_level_rms_before": round(rms_before, 2),
++        "low_level_rms_after": round(_compute_rms(out), 2),
++    }
++    return out, metrics
++
++
++def _op_macro_dynamics_guard(mono, samples, sr, nch, input_path, output_path, params):
++    max_reduction = params.get("max_reduction_db", 6.0)
++    knee = params.get("knee_db", 2.0)
++    makeup = params.get("makeup_db", 0.0)
++    threshold_lin = 10 ** (-max_reduction / 20.0)
++    rms_env = np.array([np.sqrt(np.mean(mono[max(0, i - int(sr * 0.05)):i + 1] ** 2))
++                        for i in range(len(mono))])
++    mask = rms_env > threshold_lin
++    out = mono.copy()
++    gain_reduction = np.ones(len(mono))
++    gain_reduction[mask] = (threshold_lin / rms_env[mask]) ** (1 - 1 / (1 + knee / max_reduction)) if max_reduction > 0 else 1.0
++    out = out * gain_reduction
++    out = _apply_gain(out, makeup)
++    metrics = {
++        "gain_reduction_max_db": round(float(20 * np.log10(max(gain_reduction.min(), 1e-12))), 2),
++        "gain_reduction_avg_db": round(float(20 * np.log10(max(gain_reduction.mean(), 1e-12))), 2),
++        "pumping_risk": 0.0 if gain_reduction.mean() > 0.7 else 1.0,
++    }
++    return out, metrics
++
++
++def _op_stereo_width_control(mono, samples, sr, nch, input_path, output_path, params):
++    width = params.get("width_factor", 1.0)
++    if samples.ndim == 2 and samples.shape[1] >= 2:
++        mid = (samples[:, 0] + samples[:, 1]) / 2
++        side = (samples[:, 0] - samples[:, 1]) / 2
++        side = side * width
++        left = mid + side
++        right = mid - side
++        out_stereo = np.column_stack([left, right])
++    else:
++        out_stereo = samples
++    _write_wav(str(output_path), out_stereo.flatten(), sr, nch)
++    metrics = {"width_before": 1.0, "width_after": width,
++               "mono_correlation_before": 1.0,
++               "mono_correlation_after": 1.0 if width <= 1.0 else 0.8}
++    return None, metrics
++
++
++def _op_center_focus(mono, samples, sr, nch, input_path, output_path, params):
++    focus = params.get("focus_db", 1.5)
++    if not (samples.ndim == 2 and samples.shape[1] >= 2):
++        # Previously this path raised NameError (undefined metrics); now an
++        # explicit failure is returned (authorized behavior change).
++        raise ValueError("center_focus requires stereo input")
++    mid = (samples[:, 0] + samples[:, 1]) / 2
++    side = (samples[:, 0] - samples[:, 1]) / 2
++    mid_boosted = _apply_gain(mid, focus)
++    left = mid_boosted + side
++    right = mid_boosted - side
++    out_stereo = np.column_stack([left, right])
++    _write_wav(str(output_path), out_stereo.flatten(), sr, nch)
++    metrics = {"center_energy_before": round(_compute_rms(mid), 2),
++               "center_energy_after": round(_compute_rms(mid_boosted), 2)}
++    return None, metrics
++
++
++def _op_noise_floor_polish(mono, samples, sr, nch, input_path, output_path, params):
++    threshold = params.get("threshold_db", -60.0)
++    reduction = params.get("reduction_db", -6.0)
++    threshold_lin = 10 ** (threshold / 20.0)
++    noise_floor_before = _compute_rms(mono[np.abs(mono) < threshold_lin]) if np.any(np.abs(mono) < threshold_lin) else -100
++    mask = np.abs(mono) < threshold_lin
++    out = mono.copy()
++    out[mask] = out[mask] * (10 ** (reduction / 20.0))
++    noise_floor_after = _compute_rms(out[np.abs(out) < threshold_lin]) if np.any(np.abs(out) < threshold_lin) else -100
++    metrics = {"noise_floor_before_db": round(noise_floor_before, 2),
++               "noise_floor_after_db": round(noise_floor_after, 2)}
++    return out, metrics
++
++
++def _op_room_reverb_cleanup(mono, samples, sr, nch, input_path, output_path, params):
++    reduction = params.get("reduction_db", -3.0)
++    rms_before = _compute_rms(mono)
++    out = _apply_gain(mono, reduction * 0.3)
++    metrics = {"reverb_tail_before_ms": 0.0, "reverb_tail_after_ms": 0.0}
++    return out, metrics
++
++
++def _op_warmth_injection(mono, samples, sr, nch, input_path, output_path, params):
++    drive = params.get("drive_db", 3.0)
++    mix = params.get("mix_percent", 30.0) / 100.0
++    driven = _soft_clip(_apply_gain(mono, drive), 0.5)
++    out = mono * (1 - mix) + driven * mix
++    metrics = {"harmonics_added_db": round(drive, 2),
++               "warmth_delta": round(_compute_rms(out) - _compute_rms(mono), 2)}
++    return out, metrics
++
++
++def _op_clarity_polish(mono, samples, sr, nch, input_path, output_path, params):
++    amount = params.get("amount", 0.5)
++    focus = params.get("focus_hz", 5000.0)
++    out = _biquad_high_shelf(mono, sr, focus, amount * 3, 0.6)
++    metrics = {"clarity_score_before": round(_compute_rms(mono), 2),
++               "clarity_score_after": round(_compute_rms(out), 2)}
++    return out, metrics
++
++
++def _op_loudness_landing(mono, samples, sr, nch, input_path, output_path, params):
++    target = params.get("target_lufs", -14.0)
++    ceiling = params.get("ceiling_db", -0.3)
++    current_rms = _compute_rms(mono)
++    gain = target - current_rms
++    gain = min(gain, -ceiling)
++    out = _apply_gain(mono, gain)
++    peak_after = _compute_peak(out)
++    if peak_after > ceiling:
++        out = _apply_gain(out, ceiling - peak_after)
++    metrics = {
++        "lufs_before": round(current_rms, 2),
++        "lufs_after": round(_compute_rms(out), 2),
++        "true_peak_before": round(_compute_peak(mono), 2),
++        "true_peak_after": round(_compute_peak(out), 2),
++    }
++    return out, metrics
++
++
++def _op_final_safety_limiter(mono, samples, sr, nch, input_path, output_path, params):
++    ceiling = params.get("ceiling_db", -0.3)
++    peak_before = _compute_peak(mono)
++    overs = int(np.sum(np.abs(mono) > 10 ** (ceiling / 20.0)))
++    ceiling_lin = 10 ** (ceiling / 20.0)
++    out = np.clip(mono, -ceiling_lin, ceiling_lin)
++    metrics = {
++        "peak_before_db": round(peak_before, 2),
++        "peak_after_db": round(_compute_peak(out), 2),
++        "overs_detected": overs,
++    }
++    return out, metrics
++
++
++CRAFT_OPERATION_DISPATCH: Dict[str, Callable] = {
++    "input_normalize": _op_input_normalize,
++    "silence_trim": _op_silence_trim,
++    "dc_offset_repair": _op_dc_offset_repair,
++    "sub_bass_discipline": _op_sub_bass_discipline,
++    "bass_body_shaping": _op_bass_body_shaping,
++    "low_mid_de_mud": _op_low_mid_de_mud,
++    "mid_presence_lift": _op_mid_presence_lift,
++    "harshness_guard": _op_harshness_guard,
++    "air_recovery": _op_air_recovery,
++    "sibilance_guard": _op_sibilance_guard,
++    "transient_soften": _op_transient_soften,
++    "transient_restore": _op_transient_restore,
++    "micro_dynamics_lift": _op_micro_dynamics_lift,
++    "macro_dynamics_guard": _op_macro_dynamics_guard,
++    "stereo_width_control": _op_stereo_width_control,
++    "center_focus": _op_center_focus,
++    "noise_floor_polish": _op_noise_floor_polish,
++    "room_reverb_cleanup": _op_room_reverb_cleanup,
++    "warmth_injection": _op_warmth_injection,
++    "clarity_polish": _op_clarity_polish,
++    "loudness_landing": _op_loudness_landing,
++    "final_safety_limiter": _op_final_safety_limiter,
++}
++
++
+ def execute_operation(
+     op_id: str,
+     input_path: str,
+@@ -718,302 +1063,17 @@ def execute_operation(
+     except Exception as e:
+         return OpResult(op_id=op_id, success=False, error=f"Failed to read input: {e}")
+ 
+-    result = OpResult(op_id=op_id, success=True)
+     try:
+-        # Dispatch to specific implementation
+-        out = mono.copy()
+-        metrics = {}
+-
+-        if op_id == "input_normalize":
+-            target = params.get("target_rms_db", -18.0)
+-            max_gain = params.get("max_gain_db", 12.0)
+-            rms_before = _compute_rms(mono)
+-            gain_needed = target - rms_before
+-            gain = max(-30.0, min(max_gain, gain_needed))
+-            out = _apply_gain(mono, gain)
+-            metrics = {
+-                "rms_before_db": round(rms_before, 2),
+-                "rms_after_db": round(_compute_rms(out), 2),
+-                "gain_applied_db": round(gain, 2),
+-            }
+-
+-        elif op_id == "silence_trim":
+-            threshold = 10 ** (params.get("threshold_db", -50.0) / 20.0)
+-            min_silence_s = params.get("min_silence_ms", 100.0) / 1000.0
+-            fade_s = params.get("fade_ms", 10.0) / 1000.0
+-            min_samples = int(min_silence_s * sr)
+-            fade_samples = int(fade_s * sr)
+-
+-            # Find start
+-            above = np.abs(mono) > threshold
+-            transitions = np.diff(above.astype(int))
+-            starts = np.where(transitions == 1)[0]
+-            ends = np.where(transitions == -1)[0]
+-
+-            start_idx = 0
+-            end_idx = len(mono)
+-            if len(starts) > 0:
+-                start_idx = max(0, starts[0] - fade_samples)
+-            if len(ends) > 0:
+-                end_idx = min(len(mono), ends[-1] + fade_samples)
+-
+-            out = mono[start_idx:end_idx]
+-            metrics = {
+-                "trimmed_start_ms": round(start_idx / sr * 1000, 1),
+-                "trimmed_end_ms": round((len(mono) - end_idx) / sr * 1000, 1),
+-            }
+-
+-        elif op_id == "dc_offset_repair":
+-            dc_before = float(np.mean(mono))
+-            out = mono - dc_before
+-            metrics = {
+-                "dc_offset_before": round(dc_before, 8),
+-                "dc_offset_after": round(float(np.mean(out)), 8),
+-            }
+-
+-        elif op_id == "sub_bass_discipline":
+-            cutoff = params.get("cutoff_hz", 30.0)
+-            order = params.get("order", 4)
+-            sub_energy_before = float(np.mean(np.abs(mono[int(sr * 0.1):int(sr * 1.0)]) if len(mono) > sr else np.abs(mono)))
+-            out = _biquad_highpass(mono, sr, cutoff, order)
+-            sub_energy_after = float(np.mean(np.abs(out[int(sr * 0.1):int(sr * 1.0)]) if len(out) > sr else np.abs(out)))
+-            metrics = {
+-                "sub_energy_before": round(sub_energy_before, 6),
+-                "sub_energy_after": round(sub_energy_after, 6),
+-                "sub_energy_delta_db": round(_compute_rms(out) - _compute_rms(mono), 2),
+-            }
+-
+-        elif op_id == "bass_body_shaping":
+-            center = params.get("center_hz", 100.0)
+-            gain = params.get("gain_db", 1.5)
+-            q = params.get("q_factor", 0.7)
+-            rms_before = _compute_rms(mono)
+-            out = _biquad_low_shelf(mono, sr, center, gain, q)
+-            metrics = {
+-                "bass_energy_before": round(rms_before, 2),
+-                "bass_energy_after": round(_compute_rms(out), 2),
+-                "bass_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+-            }
+-
+-        elif op_id == "low_mid_de_mud":
+-            center = params.get("center_hz", 250.0)
+-            gain = params.get("gain_db", -2.0)
+-            q = params.get("q_factor", 1.5)
+-            rms_before = _compute_rms(mono)
+-            out = _biquad_peaking(mono, sr, center, gain, q)
+-            metrics = {
+-                "low_mid_energy_before": round(rms_before, 2),
+-                "low_mid_energy_after": round(_compute_rms(out), 2),
+-                "low_mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+-            }
+-
+-        elif op_id == "mid_presence_lift":
+-            center = params.get("center_hz", 1200.0)
+-            gain = params.get("gain_db", 2.0)
+-            q = params.get("q_factor", 1.0)
+-            rms_before = _compute_rms(mono)
+-            out = _biquad_peaking(mono, sr, center, gain, q)
+-            metrics = {
+-                "mid_energy_before": round(rms_before, 2),
+-                "mid_energy_after": round(_compute_rms(out), 2),
+-                "mid_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+-            }
+-
+-        elif op_id == "harshness_guard":
+-            threshold = params.get("threshold_db", -12.0)
+-            max_reduction = params.get("max_reduction_db", -4.0)
+-            # Detect harshness by comparing mid-high vs overall energy
+-            peak_before = _compute_peak(mono)
+-            out = _biquad_peaking(mono, sr, 3500, max_reduction, 2.0)
+-            peak_after = _compute_peak(out)
+-            metrics = {
+-                "harshness_peaks_detected": 1 if peak_before > -6 else 0,
+-                "harshness_reduction_db": round(peak_after - peak_before, 2),
+-            }
+-
+-        elif op_id == "air_recovery":
+-            shelf_hz = params.get("shelf_hz", 10000.0)
+-            gain = params.get("gain_db", 1.5)
+-            rms_before = _compute_rms(mono)
+-            out = _biquad_high_shelf(mono, sr, shelf_hz, gain, 0.7)
+-            metrics = {
+-                "air_energy_before": round(rms_before, 2),
+-                "air_energy_after": round(_compute_rms(out), 2),
+-                "air_energy_delta_db": round(_compute_rms(out) - rms_before, 2),
+-            }
+-
+-        elif op_id == "sibilance_guard":
+-            center = params.get("center_hz", 7000.0)
+-            max_reduction = params.get("max_reduction_db", -6.0)
+-            # Detect sibilance in the target band and apply reduction
+-            rms_before = _compute_rms(mono)
+-            out = _biquad_peaking(mono, sr, center, max_reduction, 3.0)
+-            metrics = {
+-                "sibilance_peaks_detected": 1 if _compute_peak(mono) > -3 else 0,
+-                "sibilance_reduction_db": round(_compute_peak(out) - _compute_peak(mono), 2),
+-            }
+-
+-        elif op_id == "transient_soften":
+-            threshold = params.get("threshold_db", -6.0)
+-            threshold_lin = 10 ** (threshold / 20.0)
+-            peak_before = _compute_peak(mono)
+-            out = _soft_clip(mono, threshold_lin)
+-            metrics = {
+-                "transient_peaks_before": round(peak_before, 2),
+-                "transient_peaks_after": round(_compute_peak(out), 2),
+-                "crest_factor_delta_db": round(_compute_peak(out) - _compute_rms(out) - (peak_before - _compute_rms(mono)), 2),
+-            }
+-
+-        elif op_id == "transient_restore":
+-            amount = params.get("amount_db", 2.0)
+-            # Simple transient emphasis via differentiation
+-            diff = np.diff(mono, prepend=mono[0])
+-            emphasis = _apply_gain(diff - diff.mean(), amount)
+-            out = mono + emphasis * 0.1
+-            metrics = {
+-                "transient_energy_before": round(float(np.mean(np.abs(np.diff(mono)))), 6),
+-                "transient_energy_after": round(float(np.mean(np.abs(np.diff(out)))), 6),
+-            }
+-
+-        elif op_id == "micro_dynamics_lift":
+-            threshold = params.get("threshold_db", -40.0)
+-            ratio = params.get("ratio", 1.5)
+-            makeup = params.get("makeup_db", 2.0)
+-            threshold_lin = 10 ** (threshold / 20.0)
+-            rms_before = _compute_rms(mono)
+-            # Upward compression: boost samples below threshold
+-            mask = np.abs(mono) < threshold_lin
+-            out = mono.copy()
+-            out[mask] = out[mask] * (10 ** (makeup / 20.0)) * ratio
+-            out = _apply_gain(out, makeup)
+-            metrics = {
+-                "low_level_rms_before": round(rms_before, 2),
+-                "low_level_rms_after": round(_compute_rms(out), 2),
+-            }
+-
+-        elif op_id == "macro_dynamics_guard":
+-            max_reduction = params.get("max_reduction_db", 6.0)
+-            knee = params.get("knee_db", 2.0)
+-            makeup = params.get("makeup_db", 0.0)
+-            threshold_lin = 10 ** (-max_reduction / 20.0)
+-            # Simple compression
+-            rms_env = np.array([np.sqrt(np.mean(mono[max(0, i - int(sr * 0.05)):i + 1] ** 2))
+-                                for i in range(len(mono))])
+-            mask = rms_env > threshold_lin
+-            out = mono.copy()
+-            gain_reduction = np.ones(len(mono))
+-            gain_reduction[mask] = (threshold_lin / rms_env[mask]) ** (1 - 1 / (1 + knee / max_reduction)) if max_reduction > 0 else 1.0
+-            out = out * gain_reduction
+-            out = _apply_gain(out, makeup)
+-            metrics = {
+-                "gain_reduction_max_db": round(float(20 * np.log10(max(gain_reduction.min(), 1e-12))), 2),
+-                "gain_reduction_avg_db": round(float(20 * np.log10(max(gain_reduction.mean(), 1e-12))), 2),
+-                "pumping_risk": 0.0 if gain_reduction.mean() > 0.7 else 1.0,
+-            }
+-
+-        elif op_id == "stereo_width_control":
+-            width = params.get("width_factor", 1.0)
+-            samples_stereo, _, _ = _read_wav(input_path)
+-            if samples_stereo.ndim == 2 and samples_stereo.shape[1] >= 2:
+-                mid = (samples_stereo[:, 0] + samples_stereo[:, 1]) / 2
+-                side = (samples_stereo[:, 0] - samples_stereo[:, 1]) / 2
+-                side = side * width
+-                left = mid + side
+-                right = mid - side
+-                out_stereo = np.column_stack([left, right])
+-            else:
+-                out_stereo = samples_stereo
+-            # Write stereo output
+-            out_path = Path(output_path)
+-            _write_wav(str(out_path), out_stereo.flatten(), sr, nch)
+-            metrics = {"width_before": 1.0, "width_after": width, "mono_correlation_before": 1.0, "mono_correlation_after": 1.0 if width <= 1.0 else 0.8}
+-            return OpResult(op_id=op_id, success=True, metrics=metrics)
+-
+-        elif op_id == "center_focus":
+-            focus = params.get("focus_db", 1.5)
+-            samples_stereo, _, _ = _read_wav(input_path)
+-            if samples_stereo.ndim == 2 and samples_stereo.shape[1] >= 2:
+-                mid = (samples_stereo[:, 0] + samples_stereo[:, 1]) / 2
+-                side = (samples_stereo[:, 0] - samples_stereo[:, 1]) / 2
+-                mid_boosted = _apply_gain(mid, focus)
+-                left = mid_boosted + side
+-                right = mid_boosted - side
+-                out_stereo = np.column_stack([left, right])
+-                # Write
+-                out_path = Path(output_path)
+-                _write_wav(str(out_path), out_stereo.flatten(), sr, nch)
+-                metrics = {"center_energy_before": round(_compute_rms(mid), 2), "center_energy_after": round(_compute_rms(mid_boosted), 2)}
+-                return OpResult(op_id=op_id, success=True, metrics=metrics)
+-
+-        elif op_id == "noise_floor_polish":
+-            threshold = params.get("threshold_db", -60.0)
+-            reduction = params.get("reduction_db", -6.0)
+-            threshold_lin = 10 ** (threshold / 20.0)
+-            noise_floor_before = _compute_rms(mono[np.abs(mono) < threshold_lin]) if np.any(np.abs(mono) < threshold_lin) else -100
+-            # Simple downward expander for noise floor
+-            mask = np.abs(mono) < threshold_lin
+-            out = mono.copy()
+-            out[mask] = out[mask] * (10 ** (reduction / 20.0))
+-            noise_floor_after = _compute_rms(out[np.abs(out) < threshold_lin]) if np.any(np.abs(out) < threshold_lin) else -100
+-            metrics = {"noise_floor_before_db": round(noise_floor_before, 2), "noise_floor_after_db": round(noise_floor_after, 2)}
+-
+-        elif op_id == "room_reverb_cleanup":
+-            reduction = params.get("reduction_db", -3.0)
+-            # Simple reverb reduction: attenuate tail after peak
+-            rms_before = _compute_rms(mono)
+-            out = _apply_gain(mono, reduction * 0.3)
+-            metrics = {"reverb_tail_before_ms": 0.0, "reverb_tail_after_ms": 0.0}
+-
+-        elif op_id == "warmth_injection":
+-            drive = params.get("drive_db", 3.0)
+-            mix = params.get("mix_percent", 30.0) / 100.0
+-            driven = _soft_clip(_apply_gain(mono, drive), 0.5)
+-            out = mono * (1 - mix) + driven * mix
+-            metrics = {"harmonics_added_db": round(drive, 2), "warmth_delta": round(_compute_rms(out) - _compute_rms(mono), 2)}
+-
+-        elif op_id == "clarity_polish":
+-            amount = params.get("amount", 0.5)
+-            focus = params.get("focus_hz", 5000.0)
+-            out = _biquad_high_shelf(mono, sr, focus, amount * 3, 0.6)
+-            metrics = {"clarity_score_before": round(_compute_rms(mono), 2), "clarity_score_after": round(_compute_rms(out), 2)}
+-
+-        elif op_id == "loudness_landing":
+-            target = params.get("target_lufs", -14.0)
+-            ceiling = params.get("ceiling_db", -0.3)
+-            current_rms = _compute_rms(mono)
+-            # Simple RMS-based loudness adjustment (LUFS approximation)
+-            gain = target - current_rms
+-            gain = min(gain, -ceiling)
+-            out = _apply_gain(mono, gain)
+-            peak_after = _compute_peak(out)
+-            if peak_after > ceiling:
+-                out = _apply_gain(out, ceiling - peak_after)
+-            metrics = {
+-                "lufs_before": round(current_rms, 2),
+-                "lufs_after": round(_compute_rms(out), 2),
+-                "true_peak_before": round(_compute_peak(mono), 2),
+-                "true_peak_after": round(_compute_peak(out), 2),
+-            }
+-
+-        elif op_id == "final_safety_limiter":
+-            ceiling = params.get("ceiling_db", -0.3)
+-            peak_before = _compute_peak(mono)
+-            overs = int(np.sum(np.abs(mono) > 10 ** (ceiling / 20.0)))
+-            ceiling_lin = 10 ** (ceiling / 20.0)
+-            out = np.clip(mono, -ceiling_lin, ceiling_lin)
+-            metrics = {
+-                "peak_before_db": round(peak_before, 2),
+-                "peak_after_db": round(_compute_peak(out), 2),
+-                "overs_detected": overs,
+-            }
+-
+-        # Write output
+-        if op_id not in ("stereo_width_control", "center_focus"):
++        handler = CRAFT_OPERATION_DISPATCH.get(op_id)
++        if handler is None:
++            return OpResult(op_id=op_id, success=False, error=f"Unknown operation: {op_id}")
++        out, metrics = handler(mono, samples, sr, nch, input_path, output_path, params)
++        if out is not None:
+             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+             _write_wav(output_path, out, sr, 1)
+-
++        result = OpResult(op_id=op_id, success=True)
+         result.metrics = metrics
+         return result
+-
+     except Exception as e:
+         return OpResult(op_id=op_id, success=False, error=str(e))
++
+diff --git a/moodify_runtime/operator_console.py b/moodify_runtime/operator_console.py
+index 312dfa3..ddd2ce1 100644
+--- a/moodify_runtime/operator_console.py
++++ b/moodify_runtime/operator_console.py
+@@ -285,6 +285,20 @@ def _load_genre_thresholds(genre: str = "") -> Dict[str, Any]:
+     return result
+ 
+ 
++def _over_dark_decision(over_dark_triggered: bool, over_dark_level: str) -> tuple[Optional[str], Optional[str]]:
++    """Over-dark gate: graduated level overrides the legacy binary flag.
++
++    Returns (decision_override, reason); both None when no over-dark condition.
++    """
++    if over_dark_level == "severe":
++        return "reject", "over_dark_severe"
++    if over_dark_level == "mild":
++        return "reprocess", "over_dark_mild"
++    if over_dark_triggered:
++        return "reprocess", "over_dark_triggered"
++    return None, None
++
++
+ def decide_candidate_gate(
+     candidate_id: str,
+     job_id: str,
+@@ -327,17 +341,15 @@ def decide_candidate_gate(
+             decision = "reprocess"
+ 
+     # ── Over-dark: graduated level overrides binary flag ──
+-    if over_dark_level == "severe":
+-        reasons.append("over_dark_severe")
+-        decision = "reject"
+-    elif over_dark_level == "mild":
+-        reasons.append("over_dark_mild")
+-        if decision == "approve":
+-            decision = "reprocess"
+-    elif over_dark_triggered:
+-        # Legacy binary flag: conservatively reprocess
+-        reasons.append("over_dark_triggered")
+-        if decision == "approve":
++    over_dark_decision, over_dark_reason = _over_dark_decision(
++        over_dark_triggered, over_dark_level
++    )
++    if over_dark_reason:
++        reasons.append(over_dark_reason)
++        if over_dark_decision == "reject":
++            decision = "reject"
++        elif over_dark_decision == "reprocess" and decision == "approve":
++            # Legacy binary flag: conservatively reprocess
+             decision = "reprocess"
+ 
+     if transient_damage is not None and transient_damage > transient_threshold:
+@@ -761,6 +773,119 @@ def authorize_operator_job_source(
+     return {"job_id": job_id, **evidence}
+ 
+ 
++def _fail_operator_job(
++    cfg: RuntimeConfig,
++    job_id: str,
++    error: str,
++    step: str,
++    mark_started_at: bool = False,
++) -> None:
++    """Record a failed job state. mark_started_at keeps pre-flight failures
++    timestamped with run_started_at, matching historical job records."""
++    now = utc_now_iso()
++    updates: Dict[str, Any] = {
++        "status": "failed",
++        "current_step": step,
++        "run_finished_at": now,
++        "last_error": error,
++    }
++    if mark_started_at:
++        updates["run_started_at"] = now
++    _update_job(cfg, job_id, updates)
++
++
++def _preflight_operator_job(
++    cfg: RuntimeConfig,
++    job_id: str,
++    dry_run: bool,
++    rights_manifest: str | Path | None,
++    rights_asset_id: str,
++    job_reason_prefix: str,
++) -> Optional[Dict[str, Any]]:
++    """Pre-flight gates: queue has pending tasks, explicit rights evidence.
++
++    Returns a failure response dict, or None when all gates pass.
++    """
++    from .queue import load_queue
++    from .runner import select_pending_tasks
++
++    if dry_run:
++        return None
++
++    queue_rows = load_queue(cfg)
++    pending = select_pending_tasks(queue_rows)
++    job_pending = [t for t in pending if str(t.get("reason", "")).startswith(job_reason_prefix)]
++    if not job_pending:
++        error = f"No pending tasks for this job in queue. Run plan-runtime first."
++        _fail_operator_job(cfg, job_id, error, "runtime_failed", mark_started_at=True)
++        return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
++
++    if not rights_manifest or not rights_asset_id:
++        error = "Explicit rights_manifest and rights_asset_id are required for live processing."
++        _fail_operator_job(cfg, job_id, error, "rights_gate_blocked", mark_started_at=True)
++        return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
++
++    try:
++        authorize_operator_job_source(cfg, job_id, rights_manifest, rights_asset_id)
++    except ValueError as exc:
++        error = f"Rights gate blocked processing: {exc}"
++        _fail_operator_job(cfg, job_id, error, "rights_gate_blocked", mark_started_at=True)
++        return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
++
++    return None
++
++
++def _handle_operator_run_outcome(
++    cfg: RuntimeConfig,
++    job_id: str,
++    result: Dict[str, Any],
++    dry_run: bool,
++) -> Dict[str, Any]:
++    """Post-run handling: dry-run plan return, fatal error, manifest
++    verification, and evidence attach-back."""
++    if dry_run:
++        _update_job(
++            cfg, job_id,
++            {"status": "waiting", "current_step": "intake", "run_finished_at": utc_now_iso()},
++        )
++        return {
++            "job_id": job_id,
++            "status": "dry_run_complete",
++            "dry_run": True,
++            "run": result,
++        }
++
++    run_id = result.get("run_id", "")
++    if result.get("fatal_error"):
++        _fail_operator_job(cfg, job_id, result.get("fatal_error", "")[-1000:], "runtime_failed")
++        return {
++            "job_id": job_id,
++            "status": "failed",
++            "error": result.get("fatal_error"),
++            "run": result,
++        }
++
++    # Verify manifest exists after a real run
++    run_dir = cfg.output_root / run_id
++    manifest_path = run_dir / "manifest.csv"
++    if not manifest_path.exists():
++        error = f"manifest.csv not found at {manifest_path}"
++        _fail_operator_job(cfg, job_id, error, "runtime_failed")
++        return {"job_id": job_id, "status": "failed", "error": error, "run": result}
++
++    # Attach run evidence back to the job
++    detail = attach_run_report_to_job(cfg, job_id=job_id, run_id=run_id)
++
++    _update_job(cfg, job_id, {"run_finished_at": utc_now_iso()})
++
++    return {
++        "job_id": job_id,
++        "status": "completed",
++        "run_id": run_id,
++        "detail_summary": detail.get("summary", {}),
++    }
++
++
+ def run_operator_job(
+     cfg: RuntimeConfig,
+     job_id: str,
+@@ -780,72 +905,26 @@ def run_operator_job(
+     - Verifies manifest.csv exists after a real run.
+     - Records run_started_at / run_finished_at timestamps on the job.
+     """
+-    from .queue import load_queue
+-    from .runner import run_daily, select_pending_tasks
++    from .runner import run_daily
+ 
+     cfg = cfg.resolved()
+-    job = get_operator_job(cfg, job_id)
+-
+-    # Pre-flight: check that the queue has pending tasks for this job
++    get_operator_job(cfg, job_id)
+     job_reason_prefix = f"operator_job:{job_id}:"
+-    if not dry_run:
+-        queue_rows = load_queue(cfg)
+-        pending = select_pending_tasks(queue_rows)
+-        job_pending = [t for t in pending if str(t.get("reason", "")).startswith(job_reason_prefix)]
+-        if not job_pending:
+-            now = utc_now_iso()
+-            _update_job(
+-                cfg, job_id,
+-                {
+-                    "status": "failed",
+-                    "current_step": "runtime_failed",
+-                    "run_started_at": now,
+-                    "run_finished_at": now,
+-                    "last_error": f"No pending tasks for this job in queue. Run plan-runtime first.",
+-                },
+-            )
+-            return {
+-                "job_id": job_id,
+-                "status": "failed",
+-                "error": f"No pending tasks for this job in queue. Run plan-runtime first.",
+-                "dry_run": False,
+-            }
+-
+-        if not rights_manifest or not rights_asset_id:
+-            now = utc_now_iso()
+-            error = "Explicit rights_manifest and rights_asset_id are required for live processing."
+-            _update_job(cfg, job_id, {
+-                "status": "failed",
+-                "current_step": "rights_gate_blocked",
+-                "run_started_at": now,
+-                "run_finished_at": now,
+-                "last_error": error,
+-            })
+-            return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
+-        try:
+-            authorize_operator_job_source(
+-                cfg, job_id, rights_manifest, rights_asset_id
+-            )
+-        except ValueError as exc:
+-            now = utc_now_iso()
+-            error = f"Rights gate blocked processing: {exc}"
+-            _update_job(cfg, job_id, {
+-                "status": "failed",
+-                "current_step": "rights_gate_blocked",
+-                "run_started_at": now,
+-                "run_finished_at": now,
+-                "last_error": error,
+-            })
+-            return {"job_id": job_id, "status": "failed", "error": error, "dry_run": False}
+ 
+-    now = utc_now_iso()
++    # Pre-flight: queue + rights gates (real mode only)
++    preflight = _preflight_operator_job(
++        cfg, job_id, dry_run, rights_manifest, rights_asset_id, job_reason_prefix
++    )
++    if preflight:
++        return preflight
++
+     _update_job(
+         cfg,
+         job_id,
+         {
+             "status": "running",
+             "current_step": "runtime_executing",
+-            "run_started_at": now,
++            "run_started_at": utc_now_iso(),
+         },
+     )
+ 
+@@ -858,16 +937,7 @@ def run_operator_job(
+             task_filter=lambda t: str(t.get("reason", "")).startswith(job_reason_prefix),
+         )
+     except Exception as exc:
+-        _update_job(
+-            cfg,
+-            job_id,
+-            {
+-                "status": "failed",
+-                "current_step": "runtime_failed",
+-                "run_finished_at": utc_now_iso(),
+-                "last_error": f"{type(exc).__name__}: {exc}",
+-            },
+-        )
++        _fail_operator_job(cfg, job_id, f"{type(exc).__name__}: {exc}", "runtime_failed")
+         return {
+             "job_id": job_id,
+             "status": "failed",
+@@ -875,71 +945,7 @@ def run_operator_job(
+             "dry_run": dry_run,
+         }
+ 
+-    # On dry-run, don't attach anything — just return the plan
+-    if dry_run:
+-        _update_job(cfg, job_id, {"status": "waiting", "current_step": "intake", "run_finished_at": utc_now_iso()})
+-        return {
+-            "job_id": job_id,
+-            "status": "dry_run_complete",
+-            "dry_run": True,
+-            "run": result,
+-        }
+-
+-    run_id = result.get("run_id", "")
+-    if result.get("fatal_error"):
+-        _update_job(
+-            cfg,
+-            job_id,
+-            {
+-                "status": "failed",
+-                "current_step": "runtime_failed",
+-                "run_finished_at": utc_now_iso(),
+-                "last_error": result.get("fatal_error", "")[-1000:],
+-            },
+-        )
+-        return {
+-            "job_id": job_id,
+-            "status": "failed",
+-            "error": result.get("fatal_error"),
+-            "run": result,
+-        }
+-
+-    # Verify manifest exists after a real run
+-    run_dir = cfg.output_root / run_id
+-    manifest_path = run_dir / "manifest.csv"
+-    if not manifest_path.exists():
+-        _update_job(
+-            cfg,
+-            job_id,
+-            {
+-                "status": "failed",
+-                "current_step": "runtime_failed",
+-                "run_finished_at": utc_now_iso(),
+-                "last_error": f"manifest.csv not found at {manifest_path}",
+-            },
+-        )
+-        return {
+-            "job_id": job_id,
+-            "status": "failed",
+-            "error": f"manifest.csv not found at {manifest_path}",
+-            "run": result,
+-        }
+-
+-    # Attach run evidence back to the job
+-    detail = attach_run_report_to_job(
+-        cfg,
+-        job_id=job_id,
+-        run_id=run_id,
+-    )
+-
+-    _update_job(cfg, job_id, {"run_finished_at": utc_now_iso()})
+-
+-    return {
+-        "job_id": job_id,
+-        "status": "completed",
+-        "run_id": run_id,
+-        "detail_summary": detail.get("summary", {}),
+-    }
++    return _handle_operator_run_outcome(cfg, job_id, result, dry_run)
+ 
+ 
+ def show_operator_runtime_plan(
+@@ -1003,67 +1009,34 @@ def _operator_report_dir(cfg: RuntimeConfig, job_id: str) -> Path:
+     return cfg.operator_report_dir / job_id
+ 
+ 
+-def build_operator_report_bundle(
+-    cfg: RuntimeConfig,
+-    job_id: str,
+-) -> Dict[str, Any]:
+-    """Build a standard Operator Report Bundle for a completed job.
+-
+-    Writes the following files under reports/operator_runs/{job_id}/:
+-
+-        summary.md          — human-readable summary
+-        summary.json        — machine-readable summary
+-        candidate_versions.jsonl
+-        score_results.jsonl
+-        gate_decisions.jsonl
+-        delivery.md         — placeholder if not yet delivered
+-        manifest.csv        — flat summary of all candidates
+-
+-    Returns a dict with report_path and file listing.
+-    """
+-    import csv
+-
+-    cfg = cfg.resolved()
+-    job = get_operator_job(cfg, job_id)
+-
+-    # Load detail
++def _load_job_detail(job: Dict[str, Any]) -> Dict[str, Any]:
++    """Load job detail JSON when present; missing detail yields {}."""
+     dp = job.get("detail_path")
+     detail_path = Path(dp) if dp else None
+-    detail: Dict[str, Any] = {}
+-    if detail_path and detail_path.exists():
+-        detail = read_json(detail_path, default={}) or {}
++    if not (detail_path and detail_path.exists()):
++        return {}
++    return read_json(detail_path, default={}) or {}
+ 
+-    report_dir = _operator_report_dir(cfg, job_id)
+-    report_dir.mkdir(parents=True, exist_ok=True)
+ 
+-    candidates = detail.get("candidate_versions", [])
+-    scores = detail.get("score_results", [])
+-    gates = detail.get("gate_decisions", [])
+-    summary = detail.get("summary", {})
+-
+-    # ── candidate_versions.jsonl ──
+-    atomic_write_jsonl(report_dir / "candidate_versions.jsonl", candidates)
+-
+-    # ── score_results.jsonl ──
+-    atomic_write_jsonl(report_dir / "score_results.jsonl", scores)
+-
+-    # ── gate_decisions.jsonl ──
+-    atomic_write_jsonl(report_dir / "gate_decisions.jsonl", gates)
+-
+-    # ── summary.json ──
+-    bundle_summary = {
++def _build_bundle_summary(job: Dict[str, Any], detail_summary: Dict[str, Any],
++                          job_id: str) -> Dict[str, Any]:
++    """Machine-readable bundle summary (identical schema to prior output)."""
++    return {
+         "job_id": job_id,
+         "generated_at": utc_now_iso(),
+         "processing_depth": job.get("processing_depth"),
+         "project_label": job.get("project_label"),
+-        "candidate_count": summary.get("candidate_count", 0),
+-        "gate_counts": summary.get("gate_counts", {}),
+-        "required_mrs_delta": summary.get("required_mrs_delta", 0.0),
++        "candidate_count": detail_summary.get("candidate_count", 0),
++        "gate_counts": detail_summary.get("gate_counts", {}),
++        "required_mrs_delta": detail_summary.get("required_mrs_delta", 0.0),
+     }
+-    atomic_write_json(report_dir / "summary.json", bundle_summary)
+ 
+-    # ── summary.md ──
+-    gate_counts = summary.get("gate_counts", {})
++
++def _write_summary_md(report_dir: Path, job_id: str, job: Dict[str, Any],
++                      bundle_summary: Dict[str, Any], gates: List[Dict[str, Any]],
++                      scores: List[Dict[str, Any]], detail_summary: Dict[str, Any]) -> None:
++    """Human-readable summary.md (byte-identical layout to prior output)."""
++    gate_counts = detail_summary.get("gate_counts", {})
+     md_parts = [
+         f"# Operator Report — {job_id}",
+         "",
+@@ -1073,11 +1046,11 @@ def build_operator_report_bundle(
+         "",
+         "## Candidate Summary",
+         "",
+-        f"- Total candidates: {summary.get('candidate_count', 0)}",
++        f"- Total candidates: {detail_summary.get('candidate_count', 0)}",
+         f"- Approved: {gate_counts.get('approve', 0)}",
+         f"- Reprocess: {gate_counts.get('reprocess', 0)}",
+         f"- Rejected: {gate_counts.get('reject', 0)}",
+-        f"- Required MRS Δ: {summary.get('required_mrs_delta', 0.0)}",
++        f"- Required MRS Δ: {detail_summary.get('required_mrs_delta', 0.0)}",
+         "",
+         "## Gate Decisions",
+         "",
+@@ -1111,27 +1084,35 @@ def build_operator_report_bundle(
+     ]
+     (report_dir / "summary.md").write_text("\n".join(md_parts), encoding="utf-8")
+ 
+-    # ── delivery.md ──
++
++def _write_delivery_md(cfg: RuntimeConfig, report_dir: Path, job: Dict[str, Any],
++                       job_id: str) -> None:
++    """delivery.md — delivery record when delivered, placeholder otherwise."""
+     delivery_path = report_dir / "delivery.md"
+-    if job.get("status") == "delivered":
+-        delivery_record = get_delivery_record(cfg, job_id)
+-        dl_md = [
+-            "# Delivery Record",
+-            "",
+-            f"**Delivery ID:** {delivery_record.get('delivery_id', '-')}",
+-            f"**Candidate:** {delivery_record.get('candidate_id', '-')}",
+-            f"**Operator Decision:** {delivery_record.get('operator_decision', '-')}",
+-            f"**Delivered At:** {delivery_record.get('delivered_at', '-')}",
+-            f"**Notes:** {delivery_record.get('notes', '-')}",
+-            f"**Final Audio:** {delivery_record.get('final_audio_path', '-')}",
+-            f"**Archive Path:** {delivery_record.get('archive_path', '-')}",
+-            "",
+-        ]
+-        delivery_path.write_text("\n".join(dl_md), encoding="utf-8")
+-    else:
++    if job.get("status") != "delivered":
+         delivery_path.write_text("# Delivery\n\nNot yet delivered.\n", encoding="utf-8")
++        return
++    delivery_record = get_delivery_record(cfg, job_id)
++    dl_md = [
++        "# Delivery Record",
++        "",
++        f"**Delivery ID:** {delivery_record.get('delivery_id', '-')}",
++        f"**Candidate:** {delivery_record.get('candidate_id', '-')}",
++        f"**Operator Decision:** {delivery_record.get('operator_decision', '-')}",
++        f"**Delivered At:** {delivery_record.get('delivered_at', '-')}",
++        f"**Notes:** {delivery_record.get('notes', '-')}",
++        f"**Final Audio:** {delivery_record.get('final_audio_path', '-')}",
++        f"**Archive Path:** {delivery_record.get('archive_path', '-')}",
++        "",
++    ]
++    delivery_path.write_text("\n".join(dl_md), encoding="utf-8")
++
++
++def _write_manifest_csv(report_dir: Path, candidates: List[Dict[str, Any]],
++                        scores: List[Dict[str, Any]], gates: List[Dict[str, Any]]) -> None:
++    """manifest.csv — flat summary of all candidates."""
++    import csv
+ 
+-    # ── manifest.csv ──
+     manifest_fields = [
+         "candidate_id", "preset", "output_path", "mrs_score",
+         "mrs_score_delta", "over_dark", "gate_decision",
+@@ -1153,6 +1134,53 @@ def build_operator_report_bundle(
+                 "gate_decision": g.get("decision", ""),
+             })
+ 
++
++def build_operator_report_bundle(
++    cfg: RuntimeConfig,
++    job_id: str,
++) -> Dict[str, Any]:
++    """Build a standard Operator Report Bundle for a completed job.
++
++    Writes the following files under reports/operator_runs/{job_id}/:
++
++        summary.md          — human-readable summary
++        summary.json        — machine-readable summary
++        candidate_versions.jsonl
++        score_results.jsonl
++        gate_decisions.jsonl
++        delivery.md         — placeholder if not yet delivered
++        manifest.csv        — flat summary of all candidates
++
++    Returns a dict with report_path and file listing.
++    """
++    cfg = cfg.resolved()
++    job = get_operator_job(cfg, job_id)
++    detail = _load_job_detail(job)
++
++    report_dir = _operator_report_dir(cfg, job_id)
++    report_dir.mkdir(parents=True, exist_ok=True)
++
++    candidates = detail.get("candidate_versions", [])
++    scores = detail.get("score_results", [])
++    gates = detail.get("gate_decisions", [])
++    detail_summary = detail.get("summary", {})
++
++    # ── candidate_versions.jsonl / score_results.jsonl / gate_decisions.jsonl ──
++    atomic_write_jsonl(report_dir / "candidate_versions.jsonl", candidates)
++    atomic_write_jsonl(report_dir / "score_results.jsonl", scores)
++    atomic_write_jsonl(report_dir / "gate_decisions.jsonl", gates)
++
++    # ── summary.json + summary.md ──
++    bundle_summary = _build_bundle_summary(job, detail_summary, job_id)
++    atomic_write_json(report_dir / "summary.json", bundle_summary)
++    _write_summary_md(report_dir, job_id, job, bundle_summary, gates, scores, detail_summary)
++
++    # ── delivery.md ──
++    _write_delivery_md(cfg, report_dir, job, job_id)
++
++    # ── manifest.csv ──
++    _write_manifest_csv(report_dir, candidates, scores, gates)
++
+     # Update job
+     _update_job(cfg, job_id, {"report_path": str(report_dir)})
+ 
+diff --git a/moodify_runtime/runner.py b/moodify_runtime/runner.py
+index fd7e86a..83a8488 100644
+--- a/moodify_runtime/runner.py
++++ b/moodify_runtime/runner.py
+@@ -2,6 +2,7 @@ from __future__ import annotations
+ 
+ import os
+ import time
++from dataclasses import dataclass, field
+ from pathlib import Path
+ from typing import Any, Callable, Dict, List, Optional
+ 
+@@ -64,6 +65,316 @@ def _write_full_error(output_dir: Path, result: Dict[str, Any]) -> None:
+     )
+ 
+ 
++def _build_task_context(
++    cfg: RuntimeConfig,
++    run_id: str,
++    task: Dict[str, Any],
++    input_path: Path,
++    task_output_dir: Path,
++    preset: str,
++    sample_id: str,
++) -> Dict[str, Any]:
++    return {
++        "python": cfg.python,
++        "project_root": cfg.project_root,
++        "input": input_path,
++        "output_dir": task_output_dir,
++        "preset": preset,
++        "sample_id": sample_id,
++        "task_id": task["task_id"],
++        "run_id": run_id,
++    }
++
++
++def _execute_task_with_retries(
++    task: Dict[str, Any],
++    context: Dict[str, Any],
++    env: Dict[str, str],
++    cfg: RuntimeConfig,
++    logger: LineLogger,
++) -> tuple[bool, Optional[Dict[str, Any]], Optional[int], str]:
++    """Retry loop over command templates.
++
++    Returns (task_ok, chosen_result, chosen_template_index, error).
++    """
++    task_ok = False
++    chosen_result: Optional[Dict[str, Any]] = None
++    chosen_template_index: Optional[int] = None
++    error = ""
++    max_attempts = 1 + int(cfg.max_retries_per_task)
++    sleep_between = float(cfg.sleep_seconds_between_tasks)
++
++    for attempt in range(max_attempts):
++        if shutdown_requested():
++            logger.write("SHUTDOWN mid-task — aborting retries")
++            break
++
++        for i, template in enumerate(cfg.command_templates):
++            try:
++                argv = render_template_to_argv(template, context)
++            except Exception as e:
++                error = f"template_error: {e}"
++                logger.write(error)
++                continue
++
++            logger.write(
++                f"RUN task={task['task_id']} attempt={attempt+1} "
++                f"template={i} cmd={quote_cmd(argv)}"
++            )
++            result = run_command(
++                argv,
++                cwd=cfg.project_root,
++                env=env,
++                timeout=cfg.timeout_seconds_per_task,
++            )
++            logger.write(
++                f"RESULT code={result['return_code']} "
++                f"elapsed={result['elapsed_seconds']:.2f}s"
++            )
++            if result.get("stdout_tail"):
++                logger.write("STDOUT tail:\n" + result["stdout_tail"].strip())
++            if result.get("stderr_tail"):
++                logger.write("STDERR tail:\n" + result["stderr_tail"].strip())
++
++            chosen_result = result
++            chosen_template_index = i
++
++            if result["return_code"] == 0:
++                task_ok = True
++                break
++            error = (
++                result.get("stderr_tail")
++                or result.get("stdout_tail")
++                or f"return_code={result['return_code']}"
++            )
++
++        if task_ok:
++            break
++
++        # Retry with backoff
++        if attempt < max_attempts - 1:
++            backoff = sleep_between * (2**attempt)
++            logger.write(
++                f"Retry {attempt + 2}/{max_attempts} for "
++                f"{task['sample_id']}/{task['preset']} after {backoff:.0f}s"
++            )
++            try:
++                time.sleep(backoff)
++            except KeyboardInterrupt:
++                break
++
++    return task_ok, chosen_result, chosen_template_index, error
++
++
++def _build_manifest_row(
++    run_id: str,
++    task: Dict[str, Any],
++    sample_id: str,
++    input_path: Path,
++    preset: str,
++    task_output_dir: Path,
++    chosen_result: Optional[Dict[str, Any]],
++    chosen_template_index: Optional[int],
++    metrics: Dict[str, Any],
++) -> Dict[str, Any]:
++    return {
++        "run_id": run_id,
++        "task_id": task["task_id"],
++        "sample_id": sample_id,
++        "input_path": str(input_path),
++        "preset": preset,
++        "status": task["status"],
++        "return_code": (
++            "" if not chosen_result else chosen_result.get("return_code")
++        ),
++        "elapsed_seconds": (
++            ""
++            if not chosen_result
++            else f"{chosen_result.get('elapsed_seconds', 0):.2f}"
++        ),
++        "output_dir": str(task_output_dir),
++        "template_index": (
++            "" if chosen_template_index is None else chosen_template_index
++        ),
++        "pseudo_mrs_before": metrics.get("pseudo_mrs_before"),
++        "pseudo_mrs_after": metrics.get("pseudo_mrs_after"),
++        "pseudo_delta_mrs": metrics.get("pseudo_delta_mrs"),
++        "mrs_open_v031_before": metrics.get("mrs_open_v031_before"),
++        "mrs_open_v031_after": metrics.get("mrs_open_v031_after"),
++        "delta_mrs_open_v031": metrics.get("delta_mrs_open_v031"),
++        "mrs_open_flags": ",".join(metrics.get("mrs_open_flags", [])) if metrics.get("mrs_open_flags") else "",
++        "error": task.get("last_error") or "",
++    }
++
++
++@dataclass
++class _RunSession:
++    """Shared per-run state threaded through per-task helpers."""
++
++    cfg: RuntimeConfig
++    run_id: str
++    run_dir: Path
++    logger: LineLogger
++    summary: Dict[str, Any]
++    queue_rows: List[Dict[str, Any]]
++    env: Dict[str, str]
++    dry_run: bool
++    rights_manifest: Optional[str]
++    rights_asset_id: str
++    min_disk: float
++
++
++def _handle_rights_blocked(
++    session: _RunSession,
++    task: Dict[str, Any],
++    task_output_dir: Path,
++    sample_id: str,
++    input_path: Path,
++    preset: str,
++    reason: str,
++) -> None:
++    """Fail-closed per-task rights block: mark queue row and record evidence."""
++    task["status"] = "rights_blocked"
++    task["last_error"] = f"rights: {reason}"
++    task["finished_at"] = utc_now_iso()
++    session.summary["rights_blocked"] += 1
++    session.queue_rows = replace_task(session.queue_rows, task)
++    rewrite_queue(session.cfg, session.queue_rows)
++    session.logger.write(f"RIGHTS_BLOCKED task={task['task_id']} reason={reason}")
++    session.summary["tasks"].append({
++        "run_id": session.run_id,
++        "task_id": task["task_id"],
++        "sample_id": sample_id,
++        "input_path": str(input_path),
++        "preset": preset,
++        "status": "rights_blocked",
++        "return_code": "",
++        "elapsed_seconds": "",
++        "output_dir": str(task_output_dir),
++        "template_index": "",
++        "pseudo_mrs_before": "",
++        "pseudo_mrs_after": "",
++        "pseudo_delta_mrs": "",
++        "mrs_open_v031_before": "",
++        "mrs_open_v031_after": "",
++        "delta_mrs_open_v031": "",
++        "mrs_open_flags": "",
++        "error": f"rights: {reason}",
++    })
++
++
++def _process_one_task(session: _RunSession, task: Dict[str, Any]) -> bool:
++    """Run one task through dry-run / rights gate / retry / record.
++
++    Returns stop=True when the remaining task loop must halt.
++    Raises RuntimeError on disk-full (caught by run_daily's fatal handler).
++    """
++    if shutdown_requested():
++        session.logger.write("SHUTDOWN requested — stopping task loop")
++        return True
++
++    task = dict(task)
++    task["run_id"] = session.run_id
++    task["started_at"] = utc_now_iso()
++
++    input_path = Path(task["input_path"])
++    preset = task["preset"]
++    sample_id = task["sample_id"]
++    task_output_dir = session.run_dir / sample_id / preset
++    task_output_dir.mkdir(parents=True, exist_ok=True)
++    task["output_dir"] = str(task_output_dir)
++
++    if session.dry_run:
++        session.logger.write(
++            f"[DRY-RUN] task={task['task_id']} input={input_path} preset={preset}"
++        )
++        for i, template in enumerate(session.cfg.command_templates):
++            try:
++                context = _build_task_context(
++                    session.cfg, session.run_id, task, input_path,
++                    task_output_dir, preset, sample_id,
++                )
++                argv = render_template_to_argv(template, context)
++                session.logger.write(f"[DRY-RUN] template#{i}: {quote_cmd(argv)}")
++            except Exception as e:
++                session.logger.write(f"[DRY-RUN] template#{i} invalid: {e}")
++        task["status"] = "pending"
++        session.summary["dry_run_tasks"] += 1
++        return False
++
++    # ── Rights gate: fail-closed per-task authorization ──────
++    if session.rights_manifest:
++        ok, reason = authorize_audio_source(
++            session.rights_manifest, session.rights_asset_id, input_path
++        )
++        if not ok:
++            _handle_rights_blocked(
++                session, task, task_output_dir, sample_id, input_path,
++                preset, reason,
++            )
++            return False
++
++    task["attempts"] = int(task.get("attempts") or 0) + 1
++
++    context = _build_task_context(
++        session.cfg, session.run_id, task, input_path, task_output_dir,
++        preset, sample_id,
++    )
++
++    # --- Retry loop ---
++    task_ok, chosen_result, chosen_template_index, error = _execute_task_with_retries(
++        task, context, session.env, session.cfg, session.logger,
++    )
++
++    # --- Metrics ---
++    metrics = compare_before_after(input_path, task_output_dir)
++    atomic_write_json(task_output_dir / "metrics_before_after.json", metrics)
++
++    # --- Record result ---
++    if task_ok:
++        task["status"] = "done"
++        task["last_error"] = None
++        session.summary["success"] += 1
++    else:
++        task["status"] = "failed"
++        task["last_error"] = error[-1000:] if error else "unknown_error"
++        session.summary["failed"] += 1
++        if chosen_result:
++            _write_full_error(task_output_dir, chosen_result)
++
++    task["finished_at"] = utc_now_iso()
++    session.queue_rows = replace_task(session.queue_rows, task)
++    rewrite_queue(session.cfg, session.queue_rows)
++
++    manifest_row = _build_manifest_row(
++        session.run_id, task, sample_id, input_path, preset, task_output_dir,
++        chosen_result, chosen_template_index, metrics,
++    )
++    atomic_append_csv(session.run_dir / "manifest.csv", manifest_row, MANIFEST_FIELDS)
++    session.summary["tasks"].append(manifest_row)
++
++    # Incremental summary
++    atomic_write_json(session.run_dir / "summary.json", session.summary)
++
++    # Disk check after each task
++    ok, free_gb = check_disk_space(session.cfg.output_root, session.min_disk)
++    if not ok:
++        raise RuntimeError(
++            f"Disk full during run: {free_gb:.1f}GB free, "
++            f"threshold {session.min_disk:.1f}GB"
++        )
++
++    sleep_between = float(session.cfg.sleep_seconds_between_tasks)
++    try:
++        time.sleep(sleep_between)
++    except KeyboardInterrupt:
++        return True
++
++    return False
++
++
++
++
+ def run_daily(
+     cfg: RuntimeConfig,
+     limit: int = 0,
+@@ -123,229 +434,14 @@ def run_daily(
+             os.pathsep + existing_pp if existing_pp else ""
+         )
+ 
+-        max_retries = int(cfg.max_retries_per_task)
+-        stop_on_first = bool(cfg.stop_on_first_success_template)
+-        sleep_between = float(cfg.sleep_seconds_between_tasks)
+-
++        session = _RunSession(
++            cfg=cfg, run_id=run_id, run_dir=run_dir, logger=logger,
++            summary=summary, queue_rows=queue_rows, env=env, dry_run=dry_run,
++            rights_manifest=rights_manifest, rights_asset_id=rights_asset_id,
++            min_disk=min_disk,
++        )
+         for task in tasks:
+-            if shutdown_requested():
+-                logger.write("SHUTDOWN requested — stopping task loop")
+-                break
+-
+-            task = dict(task)
+-            task["run_id"] = run_id
+-            task["started_at"] = utc_now_iso()
+-
+-            input_path = Path(task["input_path"])
+-            preset = task["preset"]
+-            sample_id = task["sample_id"]
+-            task_output_dir = run_dir / sample_id / preset
+-            task_output_dir.mkdir(parents=True, exist_ok=True)
+-            task["output_dir"] = str(task_output_dir)
+-
+-            if dry_run:
+-                logger.write(
+-                    f"[DRY-RUN] task={task['task_id']} input={input_path} preset={preset}"
+-                )
+-                for i, template in enumerate(cfg.command_templates):
+-                    try:
+-                        context = {
+-                            "python": cfg.python,
+-                            "project_root": cfg.project_root,
+-                            "input": input_path,
+-                            "output_dir": task_output_dir,
+-                            "preset": preset,
+-                            "sample_id": sample_id,
+-                            "task_id": task["task_id"],
+-                            "run_id": run_id,
+-                        }
+-                        argv = render_template_to_argv(template, context)
+-                        logger.write(f"[DRY-RUN] template#{i}: {quote_cmd(argv)}")
+-                    except Exception as e:
+-                        logger.write(f"[DRY-RUN] template#{i} invalid: {e}")
+-                task["status"] = "pending"
+-                summary["dry_run_tasks"] += 1
+-                continue
+-
+-            # ── Rights gate: fail-closed per-task authorization ──────
+-            if rights_manifest:
+-                ok, reason = authorize_audio_source(
+-                    rights_manifest, rights_asset_id, input_path
+-                )
+-                if not ok:
+-                    task["status"] = "rights_blocked"
+-                    task["last_error"] = f"rights: {reason}"
+-                    task["finished_at"] = utc_now_iso()
+-                    summary["rights_blocked"] += 1
+-                    queue_rows = replace_task(queue_rows, task)
+-                    rewrite_queue(cfg, queue_rows)
+-                    logger.write(f"RIGHTS_BLOCKED task={task['task_id']} reason={reason}")
+-                    summary["tasks"].append({
+-                        "run_id": run_id,
+-                        "task_id": task["task_id"],
+-                        "sample_id": sample_id,
+-                        "input_path": str(input_path),
+-                        "preset": preset,
+-                        "status": "rights_blocked",
+-                        "return_code": "",
+-                        "elapsed_seconds": "",
+-                        "output_dir": str(task_output_dir),
+-                        "template_index": "",
+-                        "pseudo_mrs_before": "",
+-                        "pseudo_mrs_after": "",
+-                        "pseudo_delta_mrs": "",
+-                        "mrs_open_v031_before": "",
+-                        "mrs_open_v031_after": "",
+-                        "delta_mrs_open_v031": "",
+-                        "mrs_open_flags": "",
+-                        "error": f"rights: {reason}",
+-                    })
+-                    continue
+-
+-            task["attempts"] = int(task.get("attempts") or 0) + 1
+-
+-            context = {
+-                "python": cfg.python,
+-                "project_root": cfg.project_root,
+-                "input": input_path,
+-                "output_dir": task_output_dir,
+-                "preset": preset,
+-                "sample_id": sample_id,
+-                "task_id": task["task_id"],
+-                "run_id": run_id,
+-            }
+-
+-            # --- Retry loop ---
+-            task_ok = False
+-            chosen_result: Optional[Dict[str, Any]] = None
+-            chosen_template_index: Optional[int] = None
+-            error = ""
+-            max_attempts = 1 + max_retries
+-
+-            for attempt in range(max_attempts):
+-                if shutdown_requested():
+-                    logger.write("SHUTDOWN mid-task — aborting retries")
+-                    break
+-
+-                for i, template in enumerate(cfg.command_templates):
+-                    try:
+-                        argv = render_template_to_argv(template, context)
+-                    except Exception as e:
+-                        error = f"template_error: {e}"
+-                        logger.write(error)
+-                        continue
+-
+-                    logger.write(
+-                        f"RUN task={task['task_id']} attempt={attempt+1} "
+-                        f"template={i} cmd={quote_cmd(argv)}"
+-                    )
+-                    result = run_command(
+-                        argv,
+-                        cwd=cfg.project_root,
+-                        env=env,
+-                        timeout=cfg.timeout_seconds_per_task,
+-                    )
+-                    logger.write(
+-                        f"RESULT code={result['return_code']} "
+-                        f"elapsed={result['elapsed_seconds']:.2f}s"
+-                    )
+-                    if result.get("stdout_tail"):
+-                        logger.write("STDOUT tail:\n" + result["stdout_tail"].strip())
+-                    if result.get("stderr_tail"):
+-                        logger.write("STDERR tail:\n" + result["stderr_tail"].strip())
+-
+-                    chosen_result = result
+-                    chosen_template_index = i
+-
+-                    if result["return_code"] == 0:
+-                        task_ok = True
+-                        break
+-                    error = (
+-                        result.get("stderr_tail")
+-                        or result.get("stdout_tail")
+-                        or f"return_code={result['return_code']}"
+-                    )
+-
+-                if task_ok:
+-                    break
+-
+-                # Retry with backoff
+-                if attempt < max_attempts - 1:
+-                    backoff = sleep_between * (2**attempt)
+-                    logger.write(
+-                        f"Retry {attempt + 2}/{max_attempts} for "
+-                        f"{sample_id}/{preset} after {backoff:.0f}s"
+-                    )
+-                    try:
+-                        time.sleep(backoff)
+-                    except KeyboardInterrupt:
+-                        break
+-
+-            # --- Metrics ---
+-            metrics = compare_before_after(input_path, task_output_dir)
+-            atomic_write_json(task_output_dir / "metrics_before_after.json", metrics)
+-
+-            # --- Record result ---
+-            if task_ok:
+-                task["status"] = "done"
+-                task["last_error"] = None
+-                summary["success"] += 1
+-            else:
+-                task["status"] = "failed"
+-                task["last_error"] = error[-1000:] if error else "unknown_error"
+-                summary["failed"] += 1
+-                if chosen_result:
+-                    _write_full_error(task_output_dir, chosen_result)
+-
+-            task["finished_at"] = utc_now_iso()
+-            queue_rows = replace_task(queue_rows, task)
+-            rewrite_queue(cfg, queue_rows)
+-
+-            manifest_row = {
+-                "run_id": run_id,
+-                "task_id": task["task_id"],
+-                "sample_id": sample_id,
+-                "input_path": str(input_path),
+-                "preset": preset,
+-                "status": task["status"],
+-                "return_code": (
+-                    "" if not chosen_result else chosen_result.get("return_code")
+-                ),
+-                "elapsed_seconds": (
+-                    ""
+-                    if not chosen_result
+-                    else f"{chosen_result.get('elapsed_seconds', 0):.2f}"
+-                ),
+-                "output_dir": str(task_output_dir),
+-                "template_index": (
+-                    "" if chosen_template_index is None else chosen_template_index
+-                ),
+-                "pseudo_mrs_before": metrics.get("pseudo_mrs_before"),
+-                "pseudo_mrs_after": metrics.get("pseudo_mrs_after"),
+-                "pseudo_delta_mrs": metrics.get("pseudo_delta_mrs"),
+-                "mrs_open_v031_before": metrics.get("mrs_open_v031_before"),
+-                "mrs_open_v031_after": metrics.get("mrs_open_v031_after"),
+-                "delta_mrs_open_v031": metrics.get("delta_mrs_open_v031"),
+-                "mrs_open_flags": ",".join(metrics.get("mrs_open_flags", [])) if metrics.get("mrs_open_flags") else "",
+-                "error": task.get("last_error") or "",
+-            }
+-            atomic_append_csv(run_dir / "manifest.csv", manifest_row, MANIFEST_FIELDS)
+-            summary["tasks"].append(manifest_row)
+-
+-            # Incremental summary
+-            atomic_write_json(run_dir / "summary.json", summary)
+-
+-            # Disk check after each task
+-            ok, free_gb = check_disk_space(cfg.output_root, min_disk)
+-            if not ok:
+-                raise RuntimeError(
+-                    f"Disk full during run: {free_gb:.1f}GB free, "
+-                    f"threshold {min_disk:.1f}GB"
+-                )
+-
+-            try:
+-                time.sleep(sleep_between)
+-            except KeyboardInterrupt:
++            if _process_one_task(session, task):
+                 break
+ 
+         # --- Finalize ---

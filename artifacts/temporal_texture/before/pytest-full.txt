@@ -1,0 +1,218 @@
+
+=================================== ERRORS ====================================
+__________ ERROR collecting moodify-bridge/tests/test_cli_errors.py ___________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_cli_errors.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_cli_errors.py:7: in <module>
+    from typer.testing import CliRunner
+E   ModuleNotFoundError: No module named 'typer'
+_____________ ERROR collecting moodify-bridge/tests/test_gates.py _____________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_gates.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_gates.py:6: in <module>
+    from moodify_bridge.schemas import GateResult, GateStatus
+E   ModuleNotFoundError: No module named 'moodify_bridge'
+_________ ERROR collecting moodify-bridge/tests/test_lyrics_intent.py _________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_lyrics_intent.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_lyrics_intent.py:10: in <module>
+    from moodify_bridge import services
+E   ModuleNotFoundError: No module named 'moodify_bridge'
+____________ ERROR collecting moodify-bridge/tests/test_metrics.py ____________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_metrics.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_metrics.py:3: in <module>
+    from moodify_bridge.metrics import comparison_metrics, left_right_correlation, level_metrics
+E   ModuleNotFoundError: No module named 'moodify_bridge'
+___________ ERROR collecting moodify-bridge/tests/test_one_point.py ___________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_one_point.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_one_point.py:10: in <module>
+    from moodify_bridge.hashing import sha256_file
+E   ModuleNotFoundError: No module named 'moodify_bridge'
+__________ ERROR collecting moodify-bridge/tests/test_ppe_runner.py ___________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_ppe_runner.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_ppe_runner.py:9: in <module>
+    from moodify_bridge.schemas import PPEFinalStatus
+E   ModuleNotFoundError: No module named 'moodify_bridge'
+______ ERROR collecting moodify-bridge/tests/test_promotion_atomicity.py ______
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_promotion_atomicity.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_promotion_atomicity.py:7: in <module>
+    import duckdb
+E   ModuleNotFoundError: No module named 'duckdb'
+____________ ERROR collecting moodify-bridge/tests/test_schemas.py ____________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_schemas.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_schemas.py:6: in <module>
+    from moodify_bridge.schemas import DecisionRecord, ProductionCase, RuleRecord, RuleState
+E   ModuleNotFoundError: No module named 'moodify_bridge'
+________ ERROR collecting moodify-bridge/tests/test_store_workflow.py _________
+ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_store_workflow.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify-bridge\tests\test_store_workflow.py:3: in <module>
+    import duckdb
+E   ModuleNotFoundError: No module named 'duckdb'
+_ ERROR collecting science/Moodify_Spectral_Evidence_v0_1_Package/tests/test_spectral_evidence.py _
+ImportError while importing test module 'E:\moodify\science\Moodify_Spectral_Evidence_v0_1_Package\tests\test_spectral_evidence.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+science\Moodify_Spectral_Evidence_v0_1_Package\tests\test_spectral_evidence.py:12: in <module>
+    from moodify_spectral_evidence.analyzer import AnalysisParams, TrackSpec, analyze_track
+E   ModuleNotFoundError: No module named 'moodify_spectral_evidence'
+_ ERROR collecting ²¹¶¡°ü/Moodify_Temporal_Texture_Codex_Patch_Pack/pack/tests/test_temporal_texture_audit.py _
+import file mismatch:
+imported module 'test_temporal_texture_audit' has this __file__ attribute:
+  E:\moodify\tests\temporal_texture\test_temporal_texture_audit.py
+which is not the same as the test file we want to collect:
+  E:\moodify\²¹¶¡°ü\Moodify_Temporal_Texture_Codex_Patch_Pack\pack\tests\test_temporal_texture_audit.py
+HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules
+============================== warnings summary ===============================
+moodify-core-package\tests\test_api_v01.py:14
+  E:\moodify\moodify-core-package\tests\test_api_v01.py:14: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_api_v01.py:26
+  E:\moodify\moodify-core-package\tests\test_api_v01.py:26: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_api_v01.py:49
+  E:\moodify\moodify-core-package\tests\test_api_v01.py:49: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_api_v01.py:63
+  E:\moodify\moodify-core-package\tests\test_api_v01.py:63: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_api_v01.py:77
+  E:\moodify\moodify-core-package\tests\test_api_v01.py:77: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_map_data_model.py:379
+  E:\moodify\moodify-core-package\tests\test_map_data_model.py:379: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:15
+  E:\moodify\moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:15: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:44
+  E:\moodify\moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:67
+  E:\moodify\moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:67: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:87
+  E:\moodify\moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:87: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:106
+  E:\moodify\moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:106: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:127
+  E:\moodify\moodify-core-package\tests\test_v01_analyzer_diagnostics_exporter.py:127: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_pipeline.py:13
+  E:\moodify\moodify-core-package\tests\test_v01_pipeline.py:13: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_pipeline.py:88
+  E:\moodify\moodify-core-package\tests\test_v01_pipeline.py:88: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_pipeline.py:105
+  E:\moodify\moodify-core-package\tests\test_v01_pipeline.py:105: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_pipeline.py:124
+  E:\moodify\moodify-core-package\tests\test_v01_pipeline.py:124: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_pipeline.py:139
+  E:\moodify\moodify-core-package\tests\test_v01_pipeline.py:139: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_presets_types.py:30
+  E:\moodify\moodify-core-package\tests\test_v01_presets_types.py:30: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_presets_types.py:36
+  E:\moodify\moodify-core-package\tests\test_v01_presets_types.py:36: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_presets_types.py:57
+  E:\moodify\moodify-core-package\tests\test_v01_presets_types.py:57: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_presets_types.py:62
+  E:\moodify\moodify-core-package\tests\test_v01_presets_types.py:62: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_presets_types.py:101
+  E:\moodify\moodify-core-package\tests\test_v01_presets_types.py:101: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+moodify-core-package\tests\test_v01_presets_types.py:121
+  E:\moodify\moodify-core-package\tests\test_v01_presets_types.py:121: PytestUnknownMarkWarning: Unknown pytest.mark.v01 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.v01
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR moodify-bridge/tests/test_cli_errors.py
+ERROR moodify-bridge/tests/test_gates.py
+ERROR moodify-bridge/tests/test_lyrics_intent.py
+ERROR moodify-bridge/tests/test_metrics.py
+ERROR moodify-bridge/tests/test_one_point.py
+ERROR moodify-bridge/tests/test_ppe_runner.py
+ERROR moodify-bridge/tests/test_promotion_atomicity.py
+ERROR moodify-bridge/tests/test_schemas.py
+ERROR moodify-bridge/tests/test_store_workflow.py
+ERROR science/Moodify_Spectral_Evidence_v0_1_Package/tests/test_spectral_evidence.py
+ERROR ²¹¶¡°ü/Moodify_Temporal_Texture_Codex_Patch_Pack/pack/tests/test_temporal_texture_audit.py
+!!!!!!!!!!!!!!!!!! Interrupted: 11 errors during collection !!!!!!!!!!!!!!!!!!!
+2 skipped, 23 warnings, 11 errors in 49.08s
+FULL_EXIT=2

@@ -1,0 +1,57 @@
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 48%]
+........................................................................ [ 58%]
+........................................................................ [ 68%]
+........................................................................ [ 78%]
+........................................................................ [ 87%]
+........................................................................ [ 97%]
+.................                                                        [100%]
+============================== warnings summary ===============================
+tests/api/test_v1_demo_flow.py: 1 warning
+tests/test_api_v01.py: 4 warnings
+tests/test_map_data_model.py: 3 warnings
+tests/test_v01_analyzer_diagnostics_exporter.py: 1 warning
+tests/test_v01_pipeline.py: 5 warnings
+tests/v2/test_analyst_service.py: 1 warning
+  E:\moodify\moodify-core-package\src\moodify\v01_analyzer.py:190: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+    fig.tight_layout()
+
+tests/api/test_v1_demo_flow.py: 1 warning
+tests/test_api_v01.py: 4 warnings
+tests/test_map_data_model.py: 3 warnings
+tests/test_v01_pipeline.py: 5 warnings
+  E:\moodify\moodify-core-package\src\moodify\v01_delivery.py:143: DeprecationWarning: Accessing jsonschema.__version__ is deprecated and will be removed in a future release. Use importlib.metadata directly to query for jsonschema's version.
+    versions[pkg] = getattr(mod, "__version__", "unknown")
+
+tests/test_map_data_model.py::TestMRSAdapter::test_adapter_handles_missing_file
+  C:\Program Files\Python311\Lib\site-packages\audioread\rawread.py:16: DeprecationWarning: 'aifc' is deprecated and slated for removal in Python 3.13
+    import aifc
+
+tests/test_map_data_model.py::TestMRSAdapter::test_adapter_handles_missing_file
+  C:\Program Files\Python311\Lib\site-packages\audioread\rawread.py:17: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+tests/test_map_data_model.py::TestMRSAdapter::test_adapter_handles_missing_file
+  C:\Program Files\Python311\Lib\site-packages\audioread\rawread.py:19: DeprecationWarning: 'sunau' is deprecated and slated for removal in Python 3.13
+    import sunau
+
+tests/test_map_data_model.py::TestMRSAdapter::test_adapter_handles_missing_file
+  E:\moodify\moodify-core-package\src\moodify\audio_io.py:19: UserWarning: PySoundFile failed. Trying audioread instead.
+    data, sr = librosa.load(str(path), sr=None, mono=False)
+
+tests/test_map_data_model.py::TestMRSAdapter::test_adapter_handles_missing_file
+  C:\Program Files\Python311\Lib\site-packages\librosa\core\audio.py:184: FutureWarning: librosa.core.audio.__audioread_load
+  	Deprecated as of librosa version 0.10.0.
+  	It will be removed in librosa version 1.0.
+    y, sr_native = __audioread_load(path, offset, duration, dtype)
+
+tests/v2/test_failure_recovery.py::TestMrsDegradation::test_judge_degrades_gracefully_when_mrs_unavailable
+  C:\Program Files\Python311\Lib\site-packages\numpy\lib\_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+    c /= stddev[:, None]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+737 passed, 1 skipped, 34 warnings in 254.85s (0:04:14)
+CORE_EXIT=0

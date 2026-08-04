@@ -326,7 +326,8 @@ class WorkflowOrchestrator:
             self._validate_rag_params(rag_params, rag_strength, ctx.emotion_parsed)
             return rag_params, rag_strength, rag_confidence
 
-        except Exception:
+        except Exception as exc:
+            logger.debug(f"[try_rag] RAG unavailable, falling back to search: {exc!r}")
             return None, None, 0.0
 
     @staticmethod
@@ -406,8 +407,13 @@ class WorkflowOrchestrator:
                     ctx.best_strength = ctx.strengths[i]
 
     def _finalize(self, ctx: PipelineContext) -> None:
-        """后处理: LLM 诊断解读 + 写入处理历史。"""
-        # 诊断解读
+        """后处理: LLM 诊断解读 + 写入处理历史 + 在线校准。"""
+        self._narrate_diagnosis(ctx)
+        self._save_history(ctx)
+        self._update_calibration(ctx)
+
+    def _narrate_diagnosis(self, ctx: PipelineContext) -> None:
+        """LLM 诊断解读 (非关键路径, 失败仅记录)."""
         try:
             from moodify.llm.client import DeepSeekClient
             llm = DeepSeekClient()
@@ -423,10 +429,11 @@ class WorkflowOrchestrator:
                         eds=ctx.best_eds,
                         emotion_name=ctx.emotion_target,
                     )
-        except Exception:
-            logger.debug("[narrative] LLM diagnosis narration failed (non-critical)")
+        except Exception as exc:
+            logger.debug(f"[narrative] LLM diagnosis narration failed (non-critical): {exc!r}")
 
-        # 历史记录
+    def _save_history(self, ctx: PipelineContext) -> None:
+        """写入处理历史 (非关键路径, 失败仅记录)."""
         try:
             from moodify.memory.history import ProcessingHistory, ProcessingRecord, diagnosis_to_vector
             h = ProcessingHistory(self._output_dir)
@@ -450,7 +457,8 @@ class WorkflowOrchestrator:
         except Exception as e:
             logger.warning(f"[history] save failed: {e}")
 
-        # ── 在线校准: 自动对比 proxy vs real, 更新偏差估计 ──
+    def _update_calibration(self, ctx: PipelineContext) -> None:
+        """在线校准: 自动对比 proxy vs real, 更新偏差估计 (非关键路径)."""
         try:
             from moodify.calibration.online import update_calibration
             from moodify.orchestration.state_transfer import StateTransferEngine
@@ -469,9 +477,11 @@ class WorkflowOrchestrator:
                     ws_after_5d=ws_after_5d,
                     storage_dir=self._output_dir,
                 )
-                logger.debug(f"[calibration] updated for {ctx.emotion_parsed.get('emotion_code', 'GA')}: "
-                            f"proxy={ctx.scores[ctx.best_idx] if ctx.scores and ctx.best_idx < len(ctx.scores) else 0:.0f} "
-                            f"real_eds={ctx.best_eds:.0f}")
+                proxy = (ctx.scores[ctx.best_idx]
+                         if ctx.scores and ctx.best_idx < len(ctx.scores) else 0)
+                logger.debug(f"[calibration] updated for "
+                            f"{ctx.emotion_parsed.get('emotion_code', 'GA')}: "
+                            f"proxy={proxy:.0f} real_eds={ctx.best_eds:.0f}")
         except Exception as e:
             logger.warning(f"[calibration] update failed: {e}")
 
@@ -481,8 +491,9 @@ class WorkflowOrchestrator:
         if ctx.best_output and os.path.exists(ctx.best_output):
             try:
                 ws_after_obj = self._diagnose_audio(ctx.best_output)
-            except Exception:
-                pass  # re-diagnose best_output failed — ws_after_obj stays None
+            except Exception as exc:
+                logger.warning(f"[build_result] re-diagnose failed for {ctx.best_output}: {exc}")
+                ws_after_obj = None
 
         total_elapsed = (time.perf_counter() - ctx.total_start) * 1000
         success = all(
@@ -538,14 +549,15 @@ class WorkflowOrchestrator:
         gate = QualityGate.gate_1_diagnosis(ws, elapsed)
 
         best_card = None
+        craft_warnings: list[str] = []
         try:
             from moodify.knowledge.craft_chain_match import CraftChainMatch, generate_craft_cards_from_data
             cards = generate_craft_cards_from_data()
             matcher = CraftChainMatch()
             matches = matcher.match(defects, emotion_target, ws, cards, top_k=1)
             best_card = matches[0].craft_card if matches else None
-        except Exception:
-            pass
+        except Exception as exc:
+            craft_warnings.append(f"[craft-match] failed: {exc}")
 
         return PhaseResult(
             phase=1, name="诊断",
@@ -557,7 +569,7 @@ class WorkflowOrchestrator:
                 "craft_card": best_card,
                 "emotion_key": resolve_emotion(emotion_target),
             },
-            warnings=gate.warnings,
+            warnings=gate.warnings + craft_warnings,
             elapsed_ms=elapsed,
             gate_passed=gate.passed,
         )
@@ -621,23 +633,8 @@ class WorkflowOrchestrator:
                 elapsed_ms=(time.perf_counter() - t0) * 1000,
             )
 
-        width = 1.0
-        if craft_card is not None:
-            try:
-                params = craft_card.get_recommended_params()
-                width = params.get("P12_reverb_width", 1.0)
-            except Exception:
-                pass
-        else:
-            try:
-                from moodify.knowledge.craft_chains import get_recommended_params
-                from moodify.knowledge.emotion_targets import resolve_emotion, KEY_TO_CODE
-                resolved_key = resolve_emotion(emotion_target)
-                resolved_code = KEY_TO_CODE.get(resolved_key, "GA")
-                params = get_recommended_params(resolved_code)
-                width = params.get("P12_reverb_width", 1.0)
-            except Exception:
-                pass
+        width, width_warnings = self._resolve_spatial_width(emotion_target, craft_card)
+        warnings += width_warnings
 
         mid = (audio[:, 0] + audio[:, 1]) / 2.0
         side = (audio[:, 0] - audio[:, 1]) / 2.0
@@ -657,6 +654,28 @@ class WorkflowOrchestrator:
             warnings=warnings,
             elapsed_ms=(time.perf_counter() - t0) * 1000,
         )
+
+    @staticmethod
+    def _resolve_spatial_width(emotion_target: str, craft_card=None) -> tuple:
+        """Resolve stereo width from craft card or recommended params (default 1.0).
+
+        Returns (width, warnings). Resolution failure is an explicit warning,
+        never a silent fallback.
+        """
+        warnings: list[str] = []
+        try:
+            if craft_card is not None:
+                params = craft_card.get_recommended_params()
+                return params.get("P12_reverb_width", 1.0), warnings
+            from moodify.knowledge.craft_chains import get_recommended_params
+            from moodify.knowledge.emotion_targets import resolve_emotion, KEY_TO_CODE
+            resolved_key = resolve_emotion(emotion_target)
+            resolved_code = KEY_TO_CODE.get(resolved_key, "GA")
+            params = get_recommended_params(resolved_code)
+            return params.get("P12_reverb_width", 1.0), warnings
+        except Exception as exc:
+            warnings.append(f"[spatial] width resolution failed, using 1.0: {exc}")
+            return 1.0, warnings
 
 
     # ── Phase 6 helpers ───────────────────────────────────

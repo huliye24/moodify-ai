@@ -70,14 +70,7 @@ def print_json(obj: Any) -> None:
     print(json.dumps(obj, ensure_ascii=False, indent=2))
 
 
-def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(
-        prog="moodify-runtime",
-        description="Moodify Daily Run System: register, plan, run, report, craft memory."
-    )
-    p.add_argument("--config", default=None, help="配置文件路径，默认使用 configs/runtime_config.json 或内置默认值")
-    sub = p.add_subparsers(dest="command", required=True)
-
+def _add_core_commands(sub) -> None:
     sp = sub.add_parser("register", help="扫描 input_dirs 并写入 input_registry.jsonl")
     sp.add_argument("--source", default="unknown")
     sp.add_argument("--genre", default="")
@@ -109,7 +102,20 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("next", help="给出下一轮实验建议")
     sp.add_argument("--run-id", default=None)
 
+    sp = sub.add_parser("all", help="register → plan → run → report → craft")
+    sp.add_argument("--source", default="unknown")
+    sp.add_argument("--genre", default="")
+    sp.add_argument("--vocal-type", default="")
+    sp.add_argument("--notes", default="")
+    sp.add_argument("--presets", default=None)
+    sp.add_argument("--max-new-tasks", type=int, default=0)
+    sp.add_argument("--limit", type=int, default=0)
+    sp.add_argument("--dry-run", action="store_true")
+    sp.add_argument("--rights-manifest", default=None)
+    sp.add_argument("--rights-asset-id", default="")
 
+
+def _add_operator_commands(sub) -> None:
     sp = sub.add_parser("operator-create", help="Create internal operator-console Job")
     sp.add_argument("--source-audio", required=True)
     sp.add_argument("--depth", default="quick_scan", choices=["quick_scan", "standard_process", "deep_process", "studio_process"])
@@ -121,7 +127,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("operator-list", help="List internal operator-console Jobs")
     sp.add_argument("--status", default=None)
-
 
     sp = sub.add_parser("operator-attach-run", help="Attach runtime run/report evidence to an Operator Job")
     sp.add_argument("--job-id", required=True)
@@ -168,7 +173,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("operator-report", help="Build Operator Report Bundle for a job")
     sp.add_argument("--job-id", required=True)
 
-    # ── Studio (MHP-036) ─────────────────────────────────
+
+def _add_studio_commands(sub) -> None:
     sp = sub.add_parser("studio-client-create", help="Create a studio client")
     sp.add_argument("--name", required=True)
     sp.add_argument("--contact", default="")
@@ -181,33 +187,6 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--name", required=True)
     sp.add_argument("--description", default="")
 
-    # ── Craft (MHP-167) ──
-    sp = sub.add_parser("craft-list", help="List craft records")
-    sp.add_argument("--status", default=None, help="Filter by adoption status")
-
-    sp = sub.add_parser("craft-safety-check", help="Run preset safety gate check")
-    sp.add_argument("--preset", default="warm_vocal")
-    sp.add_argument("--over-dark", default="none", choices=["none","mild","severe"])
-    sp.add_argument("--over-bright", default="none", choices=["none","mild","severe"])
-    sp.add_argument("--transient", default="none", choices=["none","mild","severe"])
-    sp.add_argument("--vocal", default="none", choices=["none","mild","severe"])
-    sp.add_argument("--stereo", default="none", choices=["none","mild","severe"])
-
-    # ── Runtime Supervisor (MHP-113) ──
-    sp = sub.add_parser("runtime-status", help="Show runtime health, heartbeat, active tasks")
-    sp.add_argument("--json", action="store_true")
-
-    sp = sub.add_parser("runtime-health", help="Full health check (disk, memory, SLO)")
-    sp.add_argument("--json", action="store_true")
-
-    sp = sub.add_parser("runtime-supervisor-start", help="Launch supervised runner daemon")
-    sp.add_argument("--limit", type=int, default=0)
-    sp.add_argument("--dry-run", action="store_true")
-    sp.add_argument("--heartbeat-interval", type=int, default=15)
-    sp.add_argument("--rights-manifest", default=None)
-    sp.add_argument("--rights-asset-id", default="")
-
-    # ── Studio ──
     sp = sub.add_parser("studio-project-list", help="List studio projects")
     sp.add_argument("--client-id", default=None)
 
@@ -239,7 +218,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--target-type", default=None)
     sp.add_argument("--target-id", default=None)
 
-    # ── Scheduler (MHP-038) ──────────────────────────────
+
+def _add_scheduler_commands(sub) -> None:
     sp = sub.add_parser("scheduler-schedule", help="Create a compute request for a job")
     sp.add_argument("--job-id", required=True)
     sp.add_argument("--compute-class", default="cpu_standard")
@@ -263,7 +243,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("scheduler-runs", help="List scheduler runs")
     sp = sub.add_parser("scheduler-costs", help="List scheduler costs")
 
-    # ── Calibration (MHP-039) ─────────────────────────────
+
+def _add_calibration_commands(sub) -> None:
     sp = sub.add_parser("calibration-set-create", help="Create a calibration sample set")
     sp.add_argument("--name", required=True)
     sp.add_argument("--description", default="")
@@ -293,7 +274,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("calibration-thresholds", help="List calibration thresholds")
 
-    # ── Craft (MHP-037) ───────────────────────────────────
+
+def _add_craft_commands(sub) -> None:
+    sp = sub.add_parser("craft-list", help="List craft records")
+    sp.add_argument("--status", default=None, help="Filter by adoption status")
+
+    sp = sub.add_parser("craft-safety-check", help="Run preset safety gate check")
+    sp.add_argument("--preset", default="warm_vocal")
+    sp.add_argument("--over-dark", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--over-bright", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--transient", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--vocal", default="none", choices=["none","mild","severe"])
+    sp.add_argument("--stereo", default="none", choices=["none","mild","severe"])
+
     sp = sub.add_parser("craft-writeback", help="Create craft record from delivered job")
     sp.add_argument("--job-id", required=True)
     sp.add_argument("--candidate-id", required=True)
@@ -303,7 +296,40 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("craft-records", help="List craft records")
     sp.add_argument("--adoption-status", default=None)
 
-    # ── PDF Report (MHP-665-667) ──────────────────────────
+    sp = sub.add_parser("craft-plan", help="Plan a craft chain for audio (dry-run)")
+    sp.add_argument("--wav", required=True, help="Path to input WAV file")
+    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
+    sp.add_argument("--genre", default="")
+    sp.add_argument("--ct-findings", default="")
+
+    sp = sub.add_parser("craft-run", help="Run a craft chain on audio")
+    sp.add_argument("--wav", required=True, help="Path to input WAV file")
+    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
+    sp.add_argument("--output", default=None, help="Output WAV path")
+    sp.add_argument("--keep-artifacts", action="store_true")
+    sp.add_argument("--rights-manifest", default=None)
+    sp.add_argument("--rights-asset-id", default="")
+
+    sp = sub.add_parser("craft-inspect", help="Inspect a craft chain manifest")
+    sp.add_argument("--manifest", required=True, help="Path to chain manifest JSON")
+
+
+def _add_runtime_commands(sub) -> None:
+    sp = sub.add_parser("runtime-status", help="Show runtime health, heartbeat, active tasks")
+    sp.add_argument("--json", action="store_true")
+
+    sp = sub.add_parser("runtime-health", help="Full health check (disk, memory, SLO)")
+    sp.add_argument("--json", action="store_true")
+
+    sp = sub.add_parser("runtime-supervisor-start", help="Launch supervised runner daemon")
+    sp.add_argument("--limit", type=int, default=0)
+    sp.add_argument("--dry-run", action="store_true")
+    sp.add_argument("--heartbeat-interval", type=int, default=15)
+    sp.add_argument("--rights-manifest", default=None)
+    sp.add_argument("--rights-asset-id", default="")
+
+
+def _add_pdf_commands(sub) -> None:
     sp = sub.add_parser("pdf-report", help="PDF report commands")
     pdf_sub = sp.add_subparsers(dest="pdf_action", required=True)
 
@@ -329,32 +355,14 @@ def build_parser() -> argparse.ArgumentParser:
     sp_inspect = pdf_sub.add_parser("inspect", help="Inspect a PDF report and its manifest")
     sp_inspect.add_argument("--pdf-path", required=True, help="Path to PDF file")
 
-    # ── Craft 22 commands (MHP-714-716) ────────────────────
-    sp = sub.add_parser("craft-plan", help="Plan a craft chain for audio (dry-run)")
-    sp.add_argument("--wav", required=True, help="Path to input WAV file")
-    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
-    sp.add_argument("--genre", default="")
-    sp.add_argument("--ct-findings", default="")
 
-    sp = sub.add_parser("craft-run", help="Run a craft chain on audio")
-    sp.add_argument("--wav", required=True, help="Path to input WAV file")
-    sp.add_argument("--preset", default="clean_master", choices=["clean_master", "warm_vocal", "wide_space", "safe_air"])
-    sp.add_argument("--output", default=None, help="Output WAV path")
-    sp.add_argument("--keep-artifacts", action="store_true")
-    sp.add_argument("--rights-manifest", default=None)
-    sp.add_argument("--rights-asset-id", default="")
-
-    sp = sub.add_parser("craft-inspect", help="Inspect a craft chain manifest")
-    sp.add_argument("--manifest", required=True, help="Path to chain manifest JSON")
-
-    # ═══ Tidal Intelligence (ECHAIN-009) ═══
+def _add_tidal_commands(sub) -> None:
     sp = sub.add_parser("tidal-intel", help="Run tidal intelligence smoke/report")
     sp.add_argument("--run-id", default="", help="Run ID for report context")
 
     sp = sub.add_parser("tidal-intel-brief", help="Generate morning brief markdown")
     sp.add_argument("--run-id", default="", help="Run ID for report context")
 
-    # ═══ Tidal Operations (ECHAIN-010) ═══
     sp = sub.add_parser("tidal-ops", help="Run tidal operations smoke/report")
     sp.add_argument("--run-id", default="", help="Run ID for report context")
 
@@ -379,7 +387,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("tidal-notes", help="Read operator notes")
     sp.add_argument("--target", default="", help="Filter by target ID")
 
-    # ═══ Data Loop (ECHAIN-MOODIFY-DATA-LOOP-014) ═══
+
+def _add_data_loop_commands(sub) -> None:
     dl = sub.add_parser("data-loop", help="Data optimization loop commands")
     dl_sub = dl.add_subparsers(dest="data_loop_action")
 
@@ -398,27 +407,30 @@ def build_parser() -> argparse.ArgumentParser:
     dl_report.add_argument("--bundle", required=True, help="Path to recommendation_bundle.json")
     dl_report.add_argument("--output-dir", default="reports/data_loop", help="Output directory")
 
-    # ── All-in-one ──
-    sp = sub.add_parser("all", help="register → plan → run → report → craft")
-    sp.add_argument("--source", default="unknown")
-    sp.add_argument("--genre", default="")
-    sp.add_argument("--vocal-type", default="")
-    sp.add_argument("--notes", default="")
-    sp.add_argument("--presets", default=None)
-    sp.add_argument("--max-new-tasks", type=int, default=0)
-    sp.add_argument("--limit", type=int, default=0)
-    sp.add_argument("--dry-run", action="store_true")
-    sp.add_argument("--rights-manifest", default=None)
-    sp.add_argument("--rights-asset-id", default="")
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="moodify-runtime",
+        description="Moodify Daily Run System: register, plan, run, report, craft memory."
+    )
+    p.add_argument("--config", default=None, help="配置文件路径，默认使用 configs/runtime_config.json 或内置默认值")
+    sub = p.add_subparsers(dest="command", required=True)
+
+    _add_core_commands(sub)
+    _add_operator_commands(sub)
+    _add_studio_commands(sub)
+    _add_scheduler_commands(sub)
+    _add_calibration_commands(sub)
+    _add_craft_commands(sub)
+    _add_runtime_commands(sub)
+    _add_pdf_commands(sub)
+    _add_tidal_commands(sub)
+    _add_data_loop_commands(sub)
 
     return p
 
 
-def main(argv=None) -> int:
-    parser = build_parser()
-    args = parser.parse_args(argv)
-    cfg = load_config(args.config)
-
+def _handle_core_commands(args, cfg) -> int:
     if args.command == "register":
         print_json(register_inputs(cfg, source=args.source, genre=args.genre, vocal_type=args.vocal_type, notes=args.notes))
         return 0
@@ -445,7 +457,34 @@ def main(argv=None) -> int:
         print_json(analyze_failures(cfg, run_id=args.run_id))
         return 0
 
-    # ═══ Tidal Intelligence ═══
+    if args.command == "next":
+        print_json(suggest_next_plan(cfg, run_id=args.run_id))
+        return 0
+
+    if args.command == "all":
+        presets = args.presets.split(",") if args.presets else None
+        result = {
+            "register": register_inputs(cfg, source=args.source, genre=args.genre, vocal_type=args.vocal_type, notes=args.notes),
+            "plan": None,
+            "run": None,
+            "report": None,
+            "craft": None,
+            "next": None,
+        }
+        result["plan"] = plan_queue(cfg, presets=presets, max_new_tasks=args.max_new_tasks)
+        result["run"] = run_daily(cfg, limit=args.limit, dry_run=args.dry_run,
+                                 rights_manifest=args.rights_manifest, rights_asset_id=args.rights_asset_id)
+        if not args.dry_run:
+            result["report"] = generate_daily_report(cfg)
+            result["craft"] = seed_craft_memory(cfg)
+            result["next"] = suggest_next_plan(cfg)
+        print_json(result)
+        return 0
+
+    return 1
+
+
+def _handle_tidal_commands(args, cfg) -> int:
     if args.command == "tidal-intel":
         print_json(cli_intelligence_report(run_id=args.run_id))
         return 0
@@ -454,7 +493,6 @@ def main(argv=None) -> int:
         print(cli_morning_brief(run_id=args.run_id))
         return 0
 
-    # ═══ Tidal Operations ═══
     if args.command == "tidal-ops":
         print_json(cli_operations_report(run_id=args.run_id))
         return 0
@@ -492,11 +530,10 @@ def main(argv=None) -> int:
         print_json([n.to_dict() for n in notes])
         return 0
 
-    if args.command == "next":
-        print_json(suggest_next_plan(cfg, run_id=args.run_id))
-        return 0
+    return 1
 
-    # ── Craft commands (MHP-167) ──
+
+def _handle_craft_commands(args, cfg) -> int:
     if args.command == "craft-list":
         from .craft_memory import list_craft_records
         print_json(list_craft_records(cfg, adoption_status=getattr(args, 'status', None)))
@@ -515,7 +552,54 @@ def main(argv=None) -> int:
         print_json(r.to_dict())
         return 0
 
-    # ── Runtime Supervisor commands (MHP-113) ──
+    if args.command == "craft-writeback":
+        print_json(writeback_delivery_to_craft_record(cfg, job_id=args.job_id, candidate_id=args.candidate_id,
+                                                       adoption_status=args.adoption_status,
+                                                       operator_notes=args.operator_notes))
+        return 0
+
+    if args.command == "craft-records":
+        print_json({"records": list_craft_records(cfg, adoption_status=args.adoption_status)})
+        return 0
+
+    if args.command == "craft-plan":
+        from .craft_chain import ChainStep, CraftChainExecutor, preset_to_chain
+        steps = preset_to_chain(args.preset)
+        executor = CraftChainExecutor()
+        plan = executor.plan(steps, source=args.wav)
+        print_json(plan.to_dict())
+        return 0
+
+    if args.command == "craft-run":
+        from .craft_chain import CraftChainExecutor, preset_to_chain
+        from .hardening_gates import authorize_audio_source
+        if args.rights_manifest:
+            ok, reason = authorize_audio_source(args.rights_manifest, args.rights_asset_id, args.wav)
+            if not ok:
+                print_json({"status": "rights_blocked", "error": f"rights: {reason}"})
+                return 1
+        steps = preset_to_chain(args.preset)
+        executor = CraftChainExecutor(keep_artifacts=args.keep_artifacts)
+        result = executor.execute(args.wav, steps, output_path=args.output)
+        print_json(result.to_dict())
+        if not args.keep_artifacts:
+            executor.cleanup()
+        return 0 if result.success else 1
+
+    if args.command == "craft-inspect":
+        import json as _json
+        manifest_path = Path(args.manifest)
+        if manifest_path.exists():
+            data = _json.loads(manifest_path.read_text())
+            print_json(data)
+        else:
+            print_json({"error": f"Manifest not found: {args.manifest}"})
+        return 0
+
+    return 1
+
+
+def _handle_runtime_commands(args, cfg) -> int:
     if args.command == "runtime-status":
         from .runtime_state import Heartbeat
         hb = Heartbeat(path=cfg.project_root / "runtime_heartbeat.json")
@@ -558,6 +642,10 @@ def main(argv=None) -> int:
         print_json(result_dict)
         return 0
 
+    return 1
+
+
+def _handle_operator_commands(args, cfg) -> int:
     if args.command == "operator-create":
         print_json(create_operator_job(
             cfg,
@@ -574,7 +662,6 @@ def main(argv=None) -> int:
     if args.command == "operator-list":
         print_json({"jobs": list_operator_jobs(cfg, status=args.status)})
         return 0
-
 
     if args.command == "operator-attach-run":
         print_json(attach_run_report_to_job(
@@ -643,7 +730,10 @@ def main(argv=None) -> int:
         print_json(build_operator_report_bundle(cfg, job_id=args.job_id))
         return 0
 
-    # ── Studio handlers ─────────────────────────────────
+    return 1
+
+
+def _handle_studio_commands(args, cfg) -> int:
     if args.command == "studio-client-create":
         print_json(create_client(cfg, name=args.name, contact=args.contact, notes=args.notes))
         return 0
@@ -677,8 +767,10 @@ def main(argv=None) -> int:
     if args.command == "studio-note-list":
         print_json({"notes": list_staff_notes(cfg, target_type=args.target_type, target_id=args.target_id)})
         return 0
+    return 1
 
-    # ── Scheduler handlers ───────────────────────────────
+
+def _handle_scheduler_commands(args, cfg) -> int:
     if args.command == "scheduler-schedule":
         print_json(schedule_job(cfg, job_id=args.job_id, compute_class=args.compute_class, priority=args.priority))
         return 0
@@ -699,8 +791,10 @@ def main(argv=None) -> int:
     if args.command == "scheduler-costs":
         print_json({"costs": list_scheduler_costs(cfg)})
         return 0
+    return 1
 
-    # ── Calibration handlers ─────────────────────────────
+
+def _handle_calibration_commands(args, cfg) -> int:
     if args.command == "calibration-set-create":
         print_json(create_calibration_sample_set(cfg, name=args.name, description=args.description))
         return 0
@@ -728,164 +822,129 @@ def main(argv=None) -> int:
     if args.command == "calibration-thresholds":
         print_json({"thresholds": list_calibration_thresholds(cfg)})
         return 0
+    return 1
 
-    # ── Craft handlers ────────────────────────────────────
-    if args.command == "craft-writeback":
-        print_json(writeback_delivery_to_craft_record(cfg, job_id=args.job_id, candidate_id=args.candidate_id,
-                                                       adoption_status=args.adoption_status,
-                                                       operator_notes=args.operator_notes))
-        return 0
-    if args.command == "craft-records":
-        print_json({"records": list_craft_records(cfg, adoption_status=args.adoption_status)})
-        return 0
 
-    # ── PDF Report handlers ────────────────────────────────
-    if args.command == "pdf-report":
-        if args.pdf_action == "render-single":
-            from .pdf_ct_builder import generate_single_scan_pdf
-            output_dir = Path(args.output_dir) if args.output_dir else None
-            manifest = generate_single_scan_pdf(
-                wav_path=args.wav,
-                output_dir=output_dir,
-                sample_id=args.sample_id,
-                genre=args.genre,
-                preset=args.preset,
-                mrs_before=args.mrs_before,
-                mrs_after=args.mrs_after,
-            )
-            print_json(manifest.to_dict())
-            return 0
-
-        if args.pdf_action == "render-comparison":
-            from .pdf_ct_builder import generate_comparison_pdf
-            output_dir = Path(args.output_dir) if args.output_dir else None
-            manifest = generate_comparison_pdf(
-                before_wav=args.before_wav,
-                after_wav=args.after_wav,
-                output_dir=output_dir,
-                sample_id=args.sample_id,
-                genre=args.genre,
-                preset=args.preset,
-                mrs_before=args.mrs_before,
-                mrs_after=args.mrs_after,
-            )
-            print_json(manifest.to_dict())
-            return 0
-
-        if args.pdf_action == "inspect":
-            from .pdf_qa import run_full_qa
-            pdf_path = args.pdf_path
-            manifest_path = Path(pdf_path).with_suffix(".manifest.json")
-            result = {"pdf_path": pdf_path, "qa": None, "manifest": None}
-            result["qa"] = run_full_qa(pdf_path).to_dict()
-            if manifest_path.exists():
-                import json as _json
-                result["manifest"] = _json.loads(manifest_path.read_text())
-            print_json(result)
-            return 0
-
-    # ── Craft 22 handlers ──────────────────────────────────
-    if args.command == "craft-plan":
-        from .craft_chain import ChainStep, CraftChainExecutor, preset_to_chain
-        steps = preset_to_chain(args.preset)
-        executor = CraftChainExecutor()
-        plan = executor.plan(steps, source=args.wav)
-        print_json(plan.to_dict())
+def _handle_pdf_commands(args, cfg) -> int:
+    if args.command != "pdf-report":
+        return 1
+    if args.pdf_action == "render-single":
+        from .pdf_ct_builder import generate_single_scan_pdf
+        output_dir = Path(args.output_dir) if args.output_dir else None
+        manifest = generate_single_scan_pdf(
+            wav_path=args.wav,
+            output_dir=output_dir,
+            sample_id=args.sample_id,
+            genre=args.genre,
+            preset=args.preset,
+            mrs_before=args.mrs_before,
+            mrs_after=args.mrs_after,
+        )
+        print_json(manifest.to_dict())
         return 0
 
-    if args.command == "craft-run":
-        from .craft_chain import CraftChainExecutor, preset_to_chain
-        from .hardening_gates import authorize_audio_source
-        if args.rights_manifest:
-            ok, reason = authorize_audio_source(args.rights_manifest, args.rights_asset_id, args.wav)
-            if not ok:
-                print_json({"status": "rights_blocked", "error": f"rights: {reason}"})
-                return 1
-        steps = preset_to_chain(args.preset)
-        executor = CraftChainExecutor(keep_artifacts=args.keep_artifacts)
-        result = executor.execute(args.wav, steps, output_path=args.output)
-        print_json(result.to_dict())
-        if not args.keep_artifacts:
-            executor.cleanup()
-        return 0 if result.success else 1
+    if args.pdf_action == "render-comparison":
+        from .pdf_ct_builder import generate_comparison_pdf
+        output_dir = Path(args.output_dir) if args.output_dir else None
+        manifest = generate_comparison_pdf(
+            before_wav=args.before_wav,
+            after_wav=args.after_wav,
+            output_dir=output_dir,
+            sample_id=args.sample_id,
+            genre=args.genre,
+            preset=args.preset,
+            mrs_before=args.mrs_before,
+            mrs_after=args.mrs_after,
+        )
+        print_json(manifest.to_dict())
+        return 0
 
-    if args.command == "craft-inspect":
-        import json as _json
-        manifest_path = Path(args.manifest)
+    if args.pdf_action == "inspect":
+        from .pdf_qa import run_full_qa
+        pdf_path = args.pdf_path
+        manifest_path = Path(pdf_path).with_suffix(".manifest.json")
+        result = {"pdf_path": pdf_path, "qa": None, "manifest": None}
+        result["qa"] = run_full_qa(pdf_path).to_dict()
         if manifest_path.exists():
-            data = _json.loads(manifest_path.read_text())
-            print_json(data)
-        else:
-            print_json({"error": f"Manifest not found: {args.manifest}"})
-        return 0
-
-    # ═══ Data Loop ═══
-    if args.command == "data-loop":
-        from .data_loop_runner import DataLoopRunner
-
-        if args.data_loop_action == "run":
-            runner = DataLoopRunner(
-                summary_path=args.summary,
-                manifest_path=args.manifest,
-                queue_path=args.queue,
-                tidal_events_path=args.tidal_events,
-                tidal_heartbeat_path=args.tidal_heartbeat,
-                output_dir=args.output_dir,
-                craft_memory_dir=args.craft_memory_dir,
-            )
-            result = runner.run(writeback=args.writeback)
-            print_json(result.to_dict())
-            decision = result.recommendation_bundle.get("summary", {}).get("decision", "?")
-            return 0 if decision == "PASS" else 2
-
-        if args.data_loop_action == "report":
-            from .data_loop_runner import DataLoopRunner
-            record = json.loads(Path(args.record).read_text(encoding="utf-8"))
-            bundle_data = json.loads(Path(args.bundle).read_text(encoding="utf-8"))
-            # Reconstruct a temporary runner just to format the report
-            from moodify_runtime.recommenders.base import Recommendation, RecommendationBundle
-            from moodify_runtime.recommenders.operator_next_mhp import OperatorNextMhpWriter
-
-            # Build bundle from saved data
-            recs = [
-                Recommendation(**{k: v for k, v in r.items() if k in Recommendation.__dataclass_fields__})
-                for r in bundle_data.get("recommendations", [])
-            ]
-            bundle = RecommendationBundle(
-                run_id=bundle_data.get("run_id", ""),
-                generated_at=bundle_data.get("generated_at", ""),
-                recommendations=recs,
-                summary=bundle_data.get("summary", {}),
-            )
-            report = DataLoopRunner._format_report(record, bundle)
-            out = Path(args.output_dir)
-            out.mkdir(parents=True, exist_ok=True)
-            (out / "data_loop_report.md").write_text(report, encoding="utf-8")
-            print_json({"report_written": str(out / "data_loop_report.md")})
-            return 0
-
-    if args.command == "all":
-        presets = args.presets.split(",") if args.presets else None
-        result = {
-            "register": register_inputs(cfg, source=args.source, genre=args.genre, vocal_type=args.vocal_type, notes=args.notes),
-            "plan": None,
-            "run": None,
-            "report": None,
-            "craft": None,
-            "next": None,
-        }
-        result["plan"] = plan_queue(cfg, presets=presets, max_new_tasks=args.max_new_tasks)
-        result["run"] = run_daily(cfg, limit=args.limit, dry_run=args.dry_run,
-                                 rights_manifest=args.rights_manifest, rights_asset_id=args.rights_asset_id)
-        if not args.dry_run:
-            result["report"] = generate_daily_report(cfg)
-            result["craft"] = seed_craft_memory(cfg)
-            result["next"] = suggest_next_plan(cfg)
+            import json as _json
+            result["manifest"] = _json.loads(manifest_path.read_text())
         print_json(result)
         return 0
 
-    parser.print_help()
     return 1
+
+
+def _handle_data_loop_commands(args, cfg) -> int:
+    if args.command != "data-loop":
+        return 1
+    from .data_loop_runner import DataLoopRunner
+
+    if args.data_loop_action == "run":
+        runner = DataLoopRunner(
+            summary_path=args.summary,
+            manifest_path=args.manifest,
+            queue_path=args.queue,
+            tidal_events_path=args.tidal_events,
+            tidal_heartbeat_path=args.tidal_heartbeat,
+            output_dir=args.output_dir,
+            craft_memory_dir=args.craft_memory_dir,
+        )
+        result = runner.run(writeback=args.writeback)
+        print_json(result.to_dict())
+        decision = result.recommendation_bundle.get("summary", {}).get("decision", "?")
+        return 0 if decision == "PASS" else 2
+
+    if args.data_loop_action == "report":
+        record = json.loads(Path(args.record).read_text(encoding="utf-8"))
+        bundle_data = json.loads(Path(args.bundle).read_text(encoding="utf-8"))
+        from moodify_runtime.recommenders.base import Recommendation, RecommendationBundle
+        from moodify_runtime.recommenders.operator_next_mhp import OperatorNextMhpWriter
+
+        recs = [
+            Recommendation(**{k: v for k, v in r.items() if k in Recommendation.__dataclass_fields__})
+            for r in bundle_data.get("recommendations", [])
+        ]
+        bundle = RecommendationBundle(
+            run_id=bundle_data.get("run_id", ""),
+            generated_at=bundle_data.get("generated_at", ""),
+            recommendations=recs,
+            summary=bundle_data.get("summary", {}),
+        )
+        report = DataLoopRunner._format_report(record, bundle)
+        out = Path(args.output_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "data_loop_report.md").write_text(report, encoding="utf-8")
+        print_json({"report_written": str(out / "data_loop_report.md")})
+        return 0
+
+    return 1
+
+
+def main(argv=None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    cfg = load_config(args.config)
+
+    command = args.command
+    if command.startswith("operator"):
+        return _handle_operator_commands(args, cfg)
+    if command.startswith("studio"):
+        return _handle_studio_commands(args, cfg)
+    if command.startswith("scheduler"):
+        return _handle_scheduler_commands(args, cfg)
+    if command.startswith("calibration"):
+        return _handle_calibration_commands(args, cfg)
+    if command.startswith("craft"):
+        return _handle_craft_commands(args, cfg)
+    if command.startswith("tidal"):
+        return _handle_tidal_commands(args, cfg)
+    if command.startswith("runtime"):
+        return _handle_runtime_commands(args, cfg)
+    if command == "pdf-report":
+        return _handle_pdf_commands(args, cfg)
+    if command == "data-loop":
+        return _handle_data_loop_commands(args, cfg)
+    return _handle_core_commands(args, cfg)
 
 
 if __name__ == "__main__":

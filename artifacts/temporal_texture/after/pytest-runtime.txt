@@ -1,0 +1,90 @@
+..sss..ss............................................................... [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 21%]
+........................................................................ [ 28%]
+........................................................................ [ 35%]
+........................................................................ [ 43%]
+........................................................................ [ 50%]
+........................................................................ [ 57%]
+........................................................................ [ 64%]
+...........ssss..............................................s.......... [ 71%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................FF............FF................................ [ 93%]
+....................................................................     [100%]
+================================== FAILURES ===================================
+____________________ TestPhaseRunners.test_phase_register _____________________
+moodify_runtime\tests\test_tidal_core.py:122: in test_phase_register
+    r = phase_register()
+        ^^^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:102: in phase_register
+    r = _run_cli(["register", "--source", "tidal_cycle"])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:93: in _run_cli
+    return subprocess.run(
+C:\Program Files\Python311\Lib\subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+C:\Program Files\Python311\Lib\subprocess.py:1538: in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+E   FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+______________________ TestPhaseRunners.test_phase_plan _______________________
+moodify_runtime\tests\test_tidal_core.py:127: in test_phase_plan
+    r = phase_plan(presets="warm_vocal")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:111: in phase_plan
+    r = _run_cli(args)
+        ^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:93: in _run_cli
+    return subprocess.run(
+C:\Program Files\Python311\Lib\subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+C:\Program Files\Python311\Lib\subprocess.py:1538: in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+E   FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+_______________________ TestPhaseRunners.test_register ________________________
+moodify_runtime\tests\test_tidal_cycle.py:91: in test_register
+    r = phase_register()
+        ^^^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:102: in phase_register
+    r = _run_cli(["register", "--source", "tidal_cycle"])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:93: in _run_cli
+    return subprocess.run(
+C:\Program Files\Python311\Lib\subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+C:\Program Files\Python311\Lib\subprocess.py:1538: in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+E   FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+_________________________ TestPhaseRunners.test_plan __________________________
+moodify_runtime\tests\test_tidal_cycle.py:96: in test_plan
+    r = phase_plan(presets="warm_vocal")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:111: in phase_plan
+    r = _run_cli(args)
+        ^^^^^^^^^^^^^^
+moodify_runtime\tidal_cycle.py:93: in _run_cli
+    return subprocess.run(
+C:\Program Files\Python311\Lib\subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+C:\Program Files\Python311\Lib\subprocess.py:1538: in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+E   FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+=========================== short test summary info ===========================
+FAILED moodify_runtime/tests/test_tidal_core.py::TestPhaseRunners::test_phase_register
+FAILED moodify_runtime/tests/test_tidal_core.py::TestPhaseRunners::test_phase_plan
+FAILED moodify_runtime/tests/test_tidal_cycle.py::TestPhaseRunners::test_register
+FAILED moodify_runtime/tests/test_tidal_cycle.py::TestPhaseRunners::test_plan
+4 failed, 990 passed, 10 skipped in 90.72s (0:01:30)
+RUNTIME_EXIT=1

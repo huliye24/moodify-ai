@@ -12,11 +12,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import platform
 import subprocess
 import sys
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 MAP_CHAIN_VERSION = "0.2.0"
@@ -109,8 +112,8 @@ def _git_hash() -> str:
         )
         if result.returncode == 0:
             return result.stdout.strip()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug(f"[git_hash] unavailable, recording empty: {exc!r}")
     return ""
 
 
@@ -122,8 +125,8 @@ def _git_branch() -> str:
         )
         if result.returncode == 0:
             return result.stdout.strip()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug(f"[git_branch] unavailable, recording empty: {exc!r}")
     return ""
 
 
@@ -138,8 +141,8 @@ def _installed_packages() -> dict[str, str]:
         try:
             mod = __import__(pkg)
             versions[pkg] = getattr(mod, "__version__", "unknown")
-        except ImportError:
-            pass
+        except ImportError as exc:
+            logger.debug(f"[packages] {pkg} not installed, omitted: {exc!r}")
     return versions
 
 

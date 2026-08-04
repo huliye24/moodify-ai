@@ -7,10 +7,14 @@ The v1.x WorkflowOrchestrator (938 lines) is preserved for future use.
 """
 
 import json
+import logging
 import os
 import time
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
+
+logger = logging.getLogger(__name__)
 
 from moodify.audio_io import load_audio
 from moodify.processing.pedalboard_chain import MoodifyDSPChain
@@ -56,14 +60,9 @@ def process_audio(input_path: str,
     scan = scan_audio(input_path)
     stage_timings["S_scan_s"] = _elapsed(scan_t0)
     _emit("scan", 0.15)
-    if not scan.exists:
-        return ProcessResult(input_path=input_path, success=False,
-                             scan=scan, stage_timings=stage_timings,
-                             error=f"File not found: {input_path}")
-    if not scan.readable:
-        return ProcessResult(input_path=input_path, success=False,
-                             scan=scan, stage_timings=stage_timings,
-                             error="Audio file is not readable.")
+    failure = _validate_input(scan, input_path, stage_timings)
+    if failure:
+        return failure
 
     requested_preset = preset
     if preset != "auto" and get_preset(preset) is None:
@@ -139,7 +138,7 @@ def process_audio(input_path: str,
         generate_t0 = time.perf_counter()
         stage_timings["G_generate_s"] = 0.0
         stage_timings["total_s"] = _elapsed(t0)
-        report_path = _save_report(
+        report_path = _save_report(_ReportPayload(
             scan=scan,
             report=report,
             output_path=output_path,
@@ -151,7 +150,7 @@ def process_audio(input_path: str,
             output_dir=output_dir,
             stage_timings=stage_timings,
             pdf_report_path=pdf_report_path,
-        )
+        ))
         delivery = DeliveryBundle(
             output_audio=output_path,
             json_report=report_path,
@@ -206,6 +205,20 @@ def process_audio(input_path: str,
             success=False,
             error=str(e),
         )
+
+
+def _validate_input(scan: ScanResult, input_path: str,
+                    stage_timings: dict) -> ProcessResult | None:
+    """Return a failure ProcessResult when the scan shows unusable input."""
+    if not scan.exists:
+        return ProcessResult(input_path=input_path, success=False,
+                             scan=scan, stage_timings=stage_timings,
+                             error=f"File not found: {input_path}")
+    if not scan.readable:
+        return ProcessResult(input_path=input_path, success=False,
+                             scan=scan, stage_timings=stage_timings,
+                             error="Audio file is not readable.")
+    return None
 
 
 def scan_audio(input_path: str) -> ScanResult:
@@ -275,8 +288,8 @@ def scan_audio(input_path: str) -> ScanResult:
             freqs = np.fft.rfftfreq(n, 1.0 / sr)
             centroid = float(np.sum(freqs * fft) / (np.sum(fft) + 1e-12))
             scan.spectral_centroid_hz = round(centroid, 0)
-        except Exception:
-            pass
+        except Exception as exc:
+            scan.warnings.append(f"Spectral centroid computation failed: {exc}")
 
         # dc_offset: signal mean relative to full scale
         scan.dc_offset = round(float(np.mean(mono)), 6)
@@ -325,8 +338,8 @@ def _quality_gate(before, after) -> QualityGate:
                 before_path=before_path,
                 after_path=after_path,
             )
-        except Exception:
-            pass  # fall back to inline proxy below
+        except Exception as exc:
+            logger.debug(f"[quality_gate] mrs_adapter failed, using inline proxy: {exc!r}")
 
     # Inline proxy fallback (original v0.1 behavior)
     warnings: list[str] = []
@@ -409,17 +422,31 @@ def _risk_flags(deltas: dict, warnings: list[str], mrs_delta: float,
     return flags
 
 
-def _save_report(scan: ScanResult, report: DiagnosisReport, output_path: str,
-                 preset: str, requested_preset: str, elapsed_s: float,
-                 metrics_after, quality_gate: QualityGate, output_dir: str,
-                 stage_timings: dict, pdf_report_path: str = "") -> str:
+@dataclass
+class _ReportPayload:
+    """Report-builder inputs bundled to keep the signature reviewable."""
+
+    scan: ScanResult
+    report: DiagnosisReport
+    output_path: str
+    preset: str
+    requested_preset: str
+    elapsed_s: float
+    metrics_after: Any
+    quality_gate: QualityGate
+    output_dir: str
+    stage_timings: dict
+    pdf_report_path: str = ""
+
+
+def _save_report(payload: _ReportPayload) -> str:
     """Write a structured delivery JSON report next to the output file."""
-    report_path = output_path.replace(".wav", "_report.json")
+    report_path = payload.output_path.replace(".wav", "_report.json")
     before_spectrum = os.path.abspath(
-        spectrum_png_path(scan.input_path, output_dir, label="before")
+        spectrum_png_path(payload.scan.input_path, payload.output_dir, label="before")
     )
     after_spectrum = os.path.abspath(
-        spectrum_png_path(output_path, output_dir, label="after")
+        spectrum_png_path(payload.output_path, payload.output_dir, label="after")
     )
     data = {
         "workflow": [
@@ -431,25 +458,25 @@ def _save_report(scan: ScanResult, report: DiagnosisReport, output_path: str,
             "R_report",
             "G_generate",
         ],
-        "preset": preset,
-        "requested_preset": requested_preset,
-        "elapsed_s": round(elapsed_s, 1),
-        "stage_timings": stage_timings,
-        "scan": scan.to_dict(),
-        "feature_analysis": report.metrics.to_dict(),
-        "diagnosis_report": report.to_dict(),
-        "validation_result": quality_gate.to_dict(),
-        "quality_gate": quality_gate.to_dict(),
-        "metrics_before": report.metrics.to_dict(),
-        "metrics_after": metrics_after.to_dict(),
+        "preset": payload.preset,
+        "requested_preset": payload.requested_preset,
+        "elapsed_s": round(payload.elapsed_s, 1),
+        "stage_timings": payload.stage_timings,
+        "scan": payload.scan.to_dict(),
+        "feature_analysis": payload.report.metrics.to_dict(),
+        "diagnosis_report": payload.report.to_dict(),
+        "validation_result": payload.quality_gate.to_dict(),
+        "quality_gate": payload.quality_gate.to_dict(),
+        "metrics_before": payload.report.metrics.to_dict(),
+        "metrics_after": payload.metrics_after.to_dict(),
         "delivery": {
-            "output_audio": os.path.abspath(output_path),
+            "output_audio": os.path.abspath(payload.output_path),
             "json_report": os.path.abspath(report_path),
-            "pdf_report": pdf_report_path,
+            "pdf_report": payload.pdf_report_path,
             "spectrum_before": before_spectrum,
             "spectrum_after": after_spectrum,
         },
-        **report.to_dict(),
+        **payload.report.to_dict(),
     }
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
