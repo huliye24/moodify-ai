@@ -44,6 +44,9 @@ transcription = [
     "scikit-learn>=1.3,<1.6", "onnxruntime>=1.16,<2; platform_system == 'Windows'",
 ]
 api = ["fastapi>=0.100.0", "uvicorn", "python-multipart"]
+# lyric-align ML backend (DSK-MFY-LYRIC-TEMPORAL-ALIGNMENT-001 Phase B).
+# Pinned ranges only — installation happens on the GPU/server environment.
+ml = ["whisperx>=3.3,<4", "demucs>=4,<5"]
 dev = ["pytest>=7.0", "httpx>=0.24.0", "matplotlib>=3.5"]
 full = ["moodify[dsp,separation,api,dev]"]
 
