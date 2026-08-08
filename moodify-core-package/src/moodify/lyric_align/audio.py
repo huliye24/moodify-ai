@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import audioop
 import json
 import math
 import os
@@ -10,6 +9,25 @@ import sys
 import wave
 from pathlib import Path
 from statistics import median
+
+try:
+    import audioop
+except ImportError:  # Python >= 3.13 removed the audioop module
+    audioop = None
+
+
+def _rms(chunk: bytes, width: int) -> float:
+    """RMS of a PCM chunk; audioop.rms equivalent, numpy fallback for 3.13+."""
+    if audioop is not None:
+        return float(audioop.rms(chunk, width))
+    import numpy as np
+
+    dtype = np.int16 if width == 2 else np.int32
+    samples = np.frombuffer(chunk, dtype=dtype)
+    if samples.size == 0:
+        return 0.0
+    # audioop.rms returns the int-truncated RMS; mirror that exactly.
+    return float(int(np.sqrt(np.mean(samples.astype(np.float64) ** 2))))
 
 
 def _win_command(name: str) -> str | None:
@@ -112,7 +130,7 @@ def detect_active_intervals(
         chunk = raw[byte_start: byte_start + frame * width]
         if not chunk:
             break
-        energies.append(float(audioop.rms(chunk, width)))
+        energies.append(_rms(chunk, width))
         starts.append(sample_start)
 
     if not energies or max(energies) <= 0:
