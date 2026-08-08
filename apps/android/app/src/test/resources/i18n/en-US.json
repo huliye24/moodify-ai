@@ -24,7 +24,7 @@
   },
   "nav": {
     "home": "Home",
-    "process": "Process",
+    "process": "Listen",
     "works": "Works",
     "profile": "Profile",
     "discover": "Discover Music",
@@ -35,12 +35,13 @@
     "copyright": "Copyright & Publishing",
     "partnership": "Partnerships",
     "settings": "Settings",
-    "help": "Help & Feedback"
+    "help": "Help & Feedback",
+    "cases": "Cases"
   },
   "home": {
     "title": "Hear what others miss.",
     "subtitle": "Auditory intelligence for music analysis, judgment, intervention, and verification.",
-    "startAnalysis": "Start Analysis",
+    "startAnalysis": "Start Auditory Analysis",
     "importAudio": "Import Audio",
     "recentWorks": "Recent Works",
     "noRecentWorks": "No works yet"
@@ -61,10 +62,10 @@
     "residual": "Residual",
     "highFrequencyCutoff": "High-frequency cutoff",
     "report": "Analysis Report",
-    "exportReport": "Export Report"
+    "exportReport": "Export Report",
+    "processingTitle": "Auditory Intervention"
   },
   "works": {
-    "title": "My Works",
     "all": "All",
     "drafts": "Drafts",
     "processed": "Processed",
@@ -89,9 +90,7 @@
     "signUp": "Create Account",
     "signOut": "Sign Out",
     "email": "Email",
-    "password": "Password",
-    "forgotPassword": "Forgot password?",
-    "creatorPass": "CWC Creator Pass"
+    "forgotPassword": "Forgot password?"
   },
   "accessibility": {
     "openLanguageMenu": "Open language menu",

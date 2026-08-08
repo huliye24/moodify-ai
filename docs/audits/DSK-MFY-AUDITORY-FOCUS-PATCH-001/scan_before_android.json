@@ -1,0 +1,431 @@
+{
+  "root": "E:\\moodify\\apps\\android",
+  "count": 85,
+  "matches": [
+    {
+      "file": "app\\src\\androidTest\\java\\com\\moodify\\app\\i18n\\LanguageSwitchTest.kt",
+      "line": 35,
+      "text": "* persistence is triggered from its lifecycle. The CWC onboarding gate is"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\MainActivity.kt",
+      "line": 38,
+      "text": "/** Deep link reserved: moodify://cwc/CWC-XZ7M-42KP → gift landing page. */"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\MainActivity.kt",
+      "line": 40,
+      "text": "if (data == null || !data.startsWith(\"moodify://cwc/\")) return null"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\MainActivity.kt",
+      "line": 41,
+      "text": "return data.removePrefix(\"moodify://cwc/\")"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ApiModels.kt",
+      "line": 50,
+      "text": "val token: String,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ApiModels.kt",
+      "line": 56,
+      "text": "token = json.getString(\"token\"),"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 14,
+      "text": "* Owns pairing state: stores the token in the Keystore-backed TokenStore,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 15,
+      "text": "* re-pairs automatically when the server restarted (token invalidated),"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 30,
+      "text": "fun storedToken(): String? = tokenStore.token()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 46,
+      "text": "tokenStore.save(result.token, result.tokenId)"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 51,
+      "text": "val token = tokenStore.token()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 52,
+      "text": "if (token != null) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 54,
+      "text": "client.revoke(token)"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 56,
+      "text": "// token already dead server-side; clearing locally is enough"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\CwcRepository.kt",
+      "line": 11,
+      "text": "* Local demo CWC repository. Validation rules are intentionally client-side"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\CwcRepository.kt",
+      "line": 21,
+      "text": "CreatorPass(\"CWC-XZ7M-42KP\", \"泫榛\", \"2027-12-31\", CwcStatus.AVAILABLE),"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\CwcRepository.kt",
+      "line": 22,
+      "text": "CreatorPass(\"CWC-USED-0001\", \"泫榛\", \"2027-12-31\", CwcStatus.REDEEMED),"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\CwcRepository.kt",
+      "line": 23,
+      "text": "CreatorPass(\"CWC-OLD0-0001\", \"泫榛\", \"2026-01-01\", CwcStatus.EXPIRED),"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\CwcRepository.kt",
+      "line": 26,
+      "text": "/** CWC codes are 3-4-4: e.g. CWC-XZ7M-42KP. Works for both raw and formatted input. */"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\CwcRepository.kt",
+      "line": 40,
+      "text": "if (normalized.length < 8) return CwcValidationState.Error(\"请输入完整的 CWC 通行码\")"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\DemoProcessRepository.kt",
+      "line": 118,
+      "text": "val token = requireToken()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\DemoProcessRepository.kt",
+      "line": 143,
+      "text": "token = token,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 42,
+      "text": "fun revoke(token: String) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 43,
+      "text": "request(\"POST\", \"/pair/revoke\", null, token = token) { /* 200 {\"revoked\": true} */ }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 51,
+      "text": "fun createProject(title: String, sourceAudioIds: List<String>, token: String): ProjectCreated {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 56,
+      "text": "return request(\"POST\", \"/projects\", payload, token = token) { body ->"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 61,
+      "text": "fun getJob(jobId: String, token: String): DemoJobStatus ="
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 62,
+      "text": "request(\"GET\", \"/jobs/$jobId\", null, token = token) { body ->"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 66,
+      "text": "fun getJobResult(jobId: String, token: String): DemoResultSummary ="
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 67,
+      "text": "request(\"GET\", \"/jobs/$jobId/result\", null, token = token) { body ->"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 71,
+      "text": "fun requestCatalog(token: String): String ="
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 72,
+      "text": "request(\"GET\", \"/catalog\", null, token = token) { it }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 79,
+      "text": "token: String,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 99,
+      "text": "connection.setRequestProperty(\"Authorization\", \"Bearer $token\")"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 179,
+      "text": "token: String? = null,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 191,
+      "text": "token?.let { setRequestProperty(\"Authorization\", \"Bearer $it\") }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 41,
+      "text": "* Moodify backend with the pair token attached (the API requires Bearer"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 60,
+      "text": "tokenProvider = { tokenStore.token() }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 183,
+      "text": "/** Keep the Bearer header in sync with the current pair token. */"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 185,
+      "text": "val token = tokenProvider?.invoke()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 187,
+      "text": "if (token != null) mapOf(\"Authorization\" to \"Bearer $token\") else emptyMap()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 14,
+      "text": "* Pair token storage backed by Android Keystore (AES/GCM)."
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 16,
+      "text": "* The token never leaves the device in plaintext: only the ciphertext lives"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 40,
+      "text": "fun save(token: String, tokenId: String) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 43,
+      "text": "val encrypted = cipher.doFinal(token.toByteArray(Charsets.UTF_8))"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 52,
+      "text": "fun token(): String? {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\model\\CreatorPass.kt",
+      "line": 12,
+      "text": "/** Benefits granted after a successful CWC activation (front-end demo model). */"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\MoodifyApp.kt",
+      "line": 95,
+      "text": "val giftCode = remember { pendingCwcCode ?: \"CWC-XZ7M-42KP\" }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\MoodifyApp.kt",
+      "line": 184,
+      "text": "// CWC full-screen pages must not be covered by the 3-tab bar."
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CollaborationHubScreen.kt",
+      "line": 30,
+      "text": "when (page) { 0 -> Marketplace(onExit, { page = 1 }, { page = 2 }); 1 -> PublishCollaboration({ page = 0 }); else -> CollaborationDetail({ page = 0 }) }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CollaborationHubScreen.kt",
+      "line": 33,
+      "text": "@Composable private fun Marketplace(onExit: () -> Unit, onPublish: () -> Unit, onDetail: () -> Unit) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CreatorCenterScreen.kt",
+      "line": 55,
+      "text": "@Composable private fun CwcStatusCard(onOpen: () -> Unit) { Card(onClick = onOpen, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) { Row(Modifier.fillMaxWidth().background(Brush.horizontalGradient(listOf(Col"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcAuthScreen.kt",
+      "line": 89,
+      "text": "placeholder = { Text(\"CWC-XZ7M-42KP\") },"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcCenterScreen.kt",
+      "line": 31,
+      "text": "private val DemoShareCode = \"CWC-XZ7M-42KP\""
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcCenterScreen.kt",
+      "line": 32,
+      "text": "private val ShareLink = \"moodify://cwc/$DemoShareCode\""
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcCenterScreen.kt",
+      "line": 45,
+      "text": "clipboard.setPrimaryClip(ClipData.newPlainText(\"CWC\", text))"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcCenterScreen.kt",
+      "line": 204,
+      "text": "RecordRow(\"CWC-A2B4-88QP\", \"已发送\", Color(0xFFE9F0FF), MoodifyBlue)"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcCenterScreen.kt",
+      "line": 205,
+      "text": "RecordRow(\"CWC-5F7D-23MN\", \"已激活\", Color(0xFFE8F8EE), Color(0xFF31A35E))"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcCenterScreen.kt",
+      "line": 206,
+      "text": "RecordRow(\"CWC-9K1L-77XY\", \"已过期\", Color(0xFFF1F3F8), MoodifyMuted)"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcGiftScreen.kt",
+      "line": 71,
+      "text": "/** CWC-XZ7M-42KP → CWC-XZ7M-•••• — full code is only revealed in the auth page. */"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CwcIntroScreen.kt",
+      "line": 33,
+      "text": "Surface(color = MoodifyLavender, shape = RoundedCornerShape(10.dp)) { Text(\"CWC\", color = MoodifyPurple, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\HomeScreen.kt",
+      "line": 48,
+      "text": "tokenProvider = { TokenStore(context).token() },"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\ProcessingScreen.kt",
+      "line": 104,
+      "text": "tokenProvider = { tokenStore.token() },"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\ProfileScreen.kt",
+      "line": 63,
+      "text": "@Composable private fun QuickActions(onOpenCwcCenter: () -> Unit) { ProfileSection(stringResource(R.string.profile_quick_actions)) { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) { QuickItem(Icons.Outlined.ConfirmationNumber, stringResource(R.string.auth_creator_pass)"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 19,
+      "text": "assertEquals(\"CWC-XZ7M-42KP\", repo.normalize(\"CWCXZ7M42KP\"))"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 20,
+      "text": "assertEquals(\"CWC-XZ7M-42KP\", repo.normalize(\"CWC-XZ7M-42KP\"))"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 21,
+      "text": "assertEquals(\"CWC-XZ7M-42KP\", repo.normalize(\"  cwc-xz7m-42kp \"))"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 22,
+      "text": "assertEquals(\"CWC-XZ7M-42KP\", repo.normalize(\"CWC XZ7M 42KP\"))"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 23,
+      "text": "assertEquals(\"CWC-XZ7M-42KP\", repo.normalize(\"cwc.xz7m.42kp\"))"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 28,
+      "text": "val result = repo().validate(\"CWC-XZ7M-42KP\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 30,
+      "text": "assertEquals(\"CWC-XZ7M-42KP\", (result as CwcValidationState.Valid).pass.code)"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 35,
+      "text": "val result = repo().validate(\"CWC-USED-0001\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 41,
+      "text": "val result = repo().validate(\"CWC-OLD0-0001\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\CwcRepositoryTest.kt",
+      "line": 47,
+      "text": "val result = repo().validate(\"CWC-AAAA-0001\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 126,
+      "text": "200 to \"\"\"{\"token\":\"abc123\",\"token_id\":\"tid-1\",\"api_version\":\"0.1.0\"}\"\"\""
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 129,
+      "text": "assertEquals(\"abc123\", result.token)"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 137,
+      "text": "respond(401, \"\"\"{\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"missing bearer token\",\"request_id\":\"r1\"}}\"\"\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 139,
+      "text": "client().revoke(\"bad-token\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 214,
+      "text": "respond(200, \"\"\"{\"api_version\":\"0.1.0\",\"endpoints\":{\"health\":\"live\"},\"presets\":[\"auto\",\"clean_master\"],\"max_upload_bytes\":52428800,\"auth\":\"bearer-token\",\"server_time\":\"2026-08-02T12:00:00\"}\"\"\")"
+    },
+    {
+      "file": "app\\src\\test\\resources\\i18n\\en-US.json",
+      "line": 94,
+      "text": "\"creatorPass\": \"CWC Creator Pass\""
+    },
+    {
+      "file": "app\\src\\test\\resources\\i18n\\fr-FR.json",
+      "line": 94,
+      "text": "\"creatorPass\": \"Pass Créateur CWC\""
+    },
+    {
+      "file": "app\\src\\test\\resources\\i18n\\ja-JP.json",
+      "line": 94,
+      "text": "\"creatorPass\": \"CWC クリエイターパス\""
+    },
+    {
+      "file": "app\\src\\test\\resources\\i18n\\ko-KR.json",
+      "line": 94,
+      "text": "\"creatorPass\": \"CWC 크리에이터 패스\""
+    },
+    {
+      "file": "app\\src\\test\\resources\\i18n\\zh-CN.json",
+      "line": 94,
+      "text": "\"creatorPass\": \"CWC 创作者通行证\""
+    },
+    {
+      "file": "app\\src\\test\\resources\\i18n\\zh-TW.json",
+      "line": 94,
+      "text": "\"creatorPass\": \"CWC 創作者通行證\""
+    }
+  ]
+}

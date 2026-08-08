@@ -23,7 +23,9 @@
     <string name="common_storage_used">%1$s 사용 중</string>
     <!-- nav -->
     <string name="nav_home">홈</string>
-    <string name="nav_process">처리</string>
+    <string name="nav_process">청각 분석</string>
+    <string name="nav_cases">케이스</string>
+    <string name="cases_title">청각 케이스</string>
     <string name="nav_works">작품</string>
     <string name="nav_profile">마이</string>
     <string name="nav_discover">음악 탐색</string>
@@ -38,7 +40,7 @@
     <!-- home -->
     <string name="home_title">다른 이들이 놓치는 소리를 듣다.</string>
     <string name="home_subtitle">음악 분석, 판단, 개입, 검증을 위한 청각 지능.</string>
-    <string name="home_start_analysis">분석 시작</string>
+    <string name="home_start_analysis">청각 분석 시작</string>
     <string name="home_import_audio">오디오 가져오기</string>
     <string name="home_recent_works">최근 작품</string>
     <string name="home_no_recent_works">아직 작품이 없습니다</string>
@@ -92,7 +94,7 @@
     <string name="analysis_uploading">오디오 업로드 중…</string>
     <string name="analysis_uploading_to_pc">PC로 업로드 중…</string>
     <string name="analysis_upload_auto_start">업로드가 끝나면 실제 처리가 자동으로 시작됩니다</string>
-    <string name="analysis_processing_title">처리 중</string>
+    <string name="analysis_processing_title">청각 개입 실험</string>
     <string name="analysis_engine_running">PC의 실제 처리 엔진에서 실행 중…</string>
     <string name="analysis_save_to_works">완료되면 작품에 자동으로 저장됩니다</string>
     <string name="analysis_real_completed">실제 처리 완료</string>
@@ -102,7 +104,6 @@
     <string name="analysis_gate_passed">통과</string>
     <string name="analysis_gate_failed">미통과</string>
     <!-- works -->
-    <string name="works_title">내 작품</string>
     <string name="works_all">전체</string>
     <string name="works_drafts">초안</string>
     <string name="works_processed">처리됨</string>
@@ -134,9 +135,7 @@
     <string name="auth_sign_up">계정 만들기</string>
     <string name="auth_sign_out">로그아웃</string>
     <string name="auth_email">이메일</string>
-    <string name="auth_password">비밀번호</string>
     <string name="auth_forgot_password">비밀번호를 잊으셨나요?</string>
-    <string name="auth_creator_pass">CWC 크리에이터 패스</string>
     <!-- accessibility -->
     <string name="accessibility_open_language_menu">언어 메뉴 열기</string>
     <string name="accessibility_selected_language">%1$s 선택됨</string>
@@ -161,90 +160,6 @@
     <string name="profile_account_security">계정 및 보안</string>
     <string name="profile_general_settings">일반 설정</string>
     <!-- auth (extended) -->
-    <string name="auth_onboarding_title">크리에이터의 Moodify 첫걸음</string>
-    <string name="auth_onboarding_subtitle">패스를 활성화하고 크리에이터 계정을 만드세요</string>
-    <string name="auth_phone_email">휴대폰 / 이메일</string>
-    <string name="auth_cwc_code">CWC 패스 코드</string>
-    <string name="auth_what_is_cwc">CWC란 무엇인가요?</string>
-    <string name="auth_verify_cwc">CWC 확인 후 입장</string>
-    <string name="auth_have_account">이미 계정이 있습니다. 로그인</string>
-    <string name="auth_welcome_back">다시 오신 것을 환영합니다</string>
-    <string name="auth_account_synced">계정이 활성화되었으며 작품 라이브러리와 저작권 기록이 동기화되었습니다</string>
-    <string name="auth_login_create">로그인하고 계속 창작하기</string>
-    <string name="auth_wechat_login">WeChat 로그인</string>
-    <string name="auth_code_login">인증 코드 로그인</string>
-    <string name="auth_no_account">계정이 없으신가요? CWC를 입력하고 시작하세요</string>
-    <string name="auth_activation_success">CWC 활성화 완료</string>
-    <string name="auth_welcome">Moodify에 오신 것을 환영합니다, %1$s</string>
-    <string name="auth_enter_processing">처리 센터로</string>
-    <string name="auth_hint_idle">아직 입력되지 않았습니다. 전체 패스 코드를 입력하세요</string>
-    <string name="auth_hint_checking">확인 중…</string>
-    <string name="auth_hint_valid">유효 · 사용 가능</string>
-    <string name="auth_activated">활성화됨</string>
-    <string name="auth_activated_badge">CWC 활성화 완료</string>
-    <!-- cwc center -->
-    <string name="cwc_what_is">CWC란?</string>
-    <string name="cwc_help">도움말</string>
-    <string name="cwc_giftable_title">내가 선물할 수 있는 패스</string>
-    <string name="cwc_pass_count">%1$s장</string>
-    <string name="cwc_gift_one">패스 1장 선물하기</string>
-    <string name="cwc_rules">CWC 규칙 보기</string>
-    <string name="cwc_copy_link_label">패스 링크</string>
-    <string name="cwc_copy_code_label">패스 코드</string>
-    <string name="cwc_qr_title">패스 QR 코드</string>
-    <string name="cwc_qr_placeholder_note">MVP 자리표시자 — 추후 ZXing 연동 예정</string>
-    <string name="cwc_copy_code">패스 코드 복사</string>
-    <string name="cwc_share_title">크리에이터 패스 공유</string>
-    <string name="cwc_share_your_code">내 패스 코드: %1$s</string>
-    <string name="cwc_share_wechat">위챗으로 보내기</string>
-    <string name="cwc_share_copy_link">링크 복사</string>
-    <string name="cwc_share_poster">포스터 만들기</string>
-    <string name="cwc_brand_tagline">들을 가치가 있는 목소리를 위한 자리</string>
-    <string name="cwc_brand_sub">모든 패스는 크리에이터와 세상의 공식적인 악수입니다</string>
-    <string name="cwc_share_code">공유 코드</string>
-    <string name="cwc_donor">선물한 사람</string>
-    <string name="cwc_expiry">만료일</string>
-    <string name="cwc_invite_records">초대 기록</string>
-    <string name="cwc_share_subject">Moodify 크리에이터 패스</string>
-    <string name="cwc_share_text">%1$s님이 Moodify에 초대했습니다. 크리에이터 패스: %2$s\n%3$s</string>
-    <string name="cwc_copied">%1$s 복사됨</string>
-    <string name="cwc_qr_placeholder">QR 코드 자리표시자</string>
-    <string name="cwc_understand_as">이렇게 이해하세요</string>
-    <string name="cwc_benefit_gift">선물</string>
-    <string name="cwc_benefit_gift_desc">크리에이터, 브랜드 또는 단체가 선물합니다</string>
-    <string name="cwc_benefit_pass">패스</string>
-    <string name="cwc_benefit_pass_desc">Moodify에 들어갈 수 있는 유일한 초대 자격</string>
-    <string name="cwc_benefit_package">혜택 패키지</string>
-    <string name="cwc_benefit_package_desc">입점 즉시 크리에이터 기본 혜택 제공</string>
-    <string name="cwc_after_activation">활성화 후 혜택</string>
-    <string name="cwc_benefit_first_work">첫 작품 무료 입점</string>
-    <string name="cwc_benefit_first_work_desc">무료 입점 및 카탈로그 등록 서비스</string>
-    <string name="cwc_benefit_catalog">기본 작품 카탈로그 등록</string>
-    <string name="cwc_benefit_catalog_desc">작품 라이브러리와 저작권 기록</string>
-    <string name="cwc_benefit_profile">크리에이터 프로필 개설</string>
-    <string name="cwc_benefit_profile_desc">공개 프로필 만들기</string>
-    <string name="cwc_benefit_discount" formatted="false">표준 처리 20% 할인 쿠폰</string>
-    <string name="cwc_benefit_discount_desc">표준 처리 쿠폰 1장</string>
-    <string name="cwc_steps">사용 방법</string>
-    <string name="cwc_step1">CWC 받기</string>
-    <string name="cwc_step1_desc">크리에이터, 브랜드 또는 단체의 선물</string>
-    <string name="cwc_step2">인증 및 활성화</string>
-    <string name="cwc_step2_desc">패스 코드를 입력하고 계정을 만드세요</string>
-    <string name="cwc_step3">작품 가져오기</string>
-    <string name="cwc_step3_desc">처리 센터에서 창작을 시작하세요</string>
-    <string name="cwc_step4">성장 시작</string>
-    <string name="cwc_step4_desc">카탈로그 등록, 게시, 협업</string>
-    <string name="cwc_start">CWC 시작하기</string>
-    <string name="cwc_creator_pass_title">CWC 크리에이터 패스</string>
-    <string name="cwc_creator_pass_sub">Moodify에 들어가는 크리에이터 선물이자 입장 자격</string>
-    <string name="cwc_accept_pass">크리에이터 패스 수락</string>
-    <string name="cwc_benefit_copyright">기본 저작권 카탈로그 등록</string>
-    <string name="cwc_benefit_discount_note">쿠폰 1장, 무료 DSP 처리 제외</string>
-    <string name="cwc_welcome_quote">“Moodify에 오신 것을 환영합니다. 기술로 모든 목소리를 감동에 더 가깝게.”</string>
-    <string name="cwc_accept_start">수락하고 입점 시작</string>
-    <string name="cwc_pass_guide">패스 안내 보기</string>
-    <string name="cwc_gift_from">%1$s님이 크리에이터 패스를 선물했습니다</string>
-    <string name="cwc_masked_note">패스 코드 일부만 표시됩니다. 인증 시 전체 코드가 자동 입력됩니다</string>
     <!-- collab -->
     <string name="collab_marketplace">협업 마켓플레이스</string>
     <string name="collab_search_placeholder">협업 기회 / 서비스 / 크리에이터 / 기관 검색</string>
@@ -451,7 +366,6 @@
     <string name="creator_plays_7d">최근 7일 재생</string>
     <string name="creator_vs_last_week" formatted="false">지난주 대비 ↑ 18.6%</string>
     <string name="creator_new_followers">신규 팔로워  %1$s</string>
-    <string name="creator_cwc_line">%1$s · %2$s · %3$s</string>
     <!-- data center -->
     <string name="data_date">날짜</string>
     <string name="data_range_overview">최근 30일 성과 개요</string>

@@ -1,0 +1,296 @@
+{
+  "root": "E:\\moodify\\moodify-core-package",
+  "count": 58,
+  "matches": [
+    {
+      "file": "scripts\\audit_focus\\verify_strategy_alignment.py",
+      "line": 6,
+      "text": "LEGACY=[r'\\bCWC\\b',r'平台币',r'代币',r'艺术收藏',r'交易中心',r'\\bcollectible\\b',r'\\bwallet\\b',r'\\btoken\\b']"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 116,
+      "text": "# Pair token store (revocable, memory-backed; restart invalidates tokens)"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 121,
+      "text": "\"\"\"In-memory revocable token store."
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 133,
+      "text": "token = secrets.token_urlsafe(32)"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 143,
+      "text": "return {\"token\": existing[\"token\"], \"token_id\": existing[\"token_id\"]}"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 145,
+      "text": "record[\"token\"] = token"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 148,
+      "text": "return {\"token\": token, \"token_id\": token_id}"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 158,
+      "text": "def validate(self, token: str) -> dict[str, Any] | None:"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 161,
+      "text": "if record[\"token\"] == token and not record[\"revoked\"]:"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 165,
+      "text": "def find_by_token(self, token: str) -> tuple[str, dict[str, Any]] | None:"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 168,
+      "text": "if record[\"token\"] == token and not record[\"revoked\"]:"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 240,
+      "text": "\"\"\"Pair this device. Idempotent per device_id while its token is live.\"\"\""
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 251,
+      "text": "\"token\": issued[\"token\"],"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 260,
+      "text": "\"\"\"Revoke the caller's own token (Authorization: Bearer <token>).\"\"\""
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 261,
+      "text": "token = _bearer_token(request)"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 262,
+      "text": "if token is None:"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 263,
+      "text": "return _v1_error(\"UNAUTHORIZED\", \"missing bearer token\", _request_id(request))"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 264,
+      "text": "found = _pair_store.find_by_token(token)"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 266,
+      "text": "return _v1_error(\"UNAUTHORIZED\", \"unknown token\", _request_id(request))"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 291,
+      "text": "\"auth\": \"bearer-token\","
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 471,
+      "text": "token = _bearer_token(request)"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 472,
+      "text": "if token is None:"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 473,
+      "text": "return _v1_error(\"UNAUTHORIZED\", \"missing bearer token\", _request_id(request))"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 474,
+      "text": "record = _pair_store.validate(token)"
+    },
+    {
+      "file": "src\\moodify\\api\\routes\\v1.py",
+      "line": 476,
+      "text": "return _v1_error(\"UNAUTHORIZED\", \"unknown or revoked token\", _request_id(request))"
+    },
+    {
+      "file": "src\\moodify\\capability_registry\\detect.py",
+      "line": 156,
+      "text": "# sox --version prints \"<exe>:      SoX v14.4.2\" — keep the version token"
+    },
+    {
+      "file": "src\\moodify\\capability_registry\\adapters\\sox_adapter.py",
+      "line": 4,
+      "text": "this adapter extracts the version token. Integer bit-depth conversions may"
+    },
+    {
+      "file": "src\\moodify\\lyric_align\\lyrics.py",
+      "line": 74,
+      "text": "return [token for token in SPACE.split(display_text.strip()) if token]"
+    },
+    {
+      "file": "src\\moodify\\lyric_align\\README.md",
+      "line": 41,
+      "text": "PUBLISHABLE 仅当：非 heuristic、无时间倒置、无行重叠超容差、覆盖率 ≥ 0.92、未对齐 token 比 ≤ 0.05、词均值置信度 ≥ 0.72、行最小置信度 ≥ 0.55、确定性双跑中位边界差 ≤ 80ms。阈值暂行，待验证集校准。"
+    },
+    {
+      "file": "src\\moodify\\lyric_align\\backends\\heuristic.py",
+      "line": 60,
+      "text": "token_weights = [max(1, len(token)) for token in tokens]"
+    },
+    {
+      "file": "src\\moodify\\lyric_align\\backends\\heuristic.py",
+      "line": 64,
+      "text": "for token, token_weight in zip(tokens, token_weights):"
+    },
+    {
+      "file": "src\\moodify\\lyric_align\\backends\\heuristic.py",
+      "line": 70,
+      "text": "text=token,"
+    },
+    {
+      "file": "src\\moodify\\lyric_align\\backends\\heuristic.py",
+      "line": 71,
+      "text": "normalized_text=normalize_for_alignment(token, language),"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 42,
+      "text": "assert body[\"token\"]"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 45,
+      "text": "# url-safe base64 token, no padding issues"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 46,
+      "text": "assert all(c.isalnum() or c in \"-_\" for c in body[\"token\"])"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 53,
+      "text": "assert first.json()[\"token\"] == second.json()[\"token\"]"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 70,
+      "text": "assert \"token\" not in resp.text.lower()"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 75,
+      "text": "token = paired.json()[\"token\"]"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 77,
+      "text": "\"/api/v1/pair/revoke\", headers={\"Authorization\": f\"Bearer {token}\"}"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 81,
+      "text": "# revoking again -> unknown token"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 83,
+      "text": "\"/api/v1/pair/revoke\", headers={\"Authorization\": f\"Bearer {token}\"}"
+    },
+    {
+      "file": "tests\\api\\test_v1_contract.py",
+      "line": 105,
+      "text": "assert body[\"auth\"] == \"bearer-token\""
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 55,
+      "text": "return resp.json()[\"token\"]"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 58,
+      "text": "def _auth(token: str) -> dict[str, str]:"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 59,
+      "text": "return {\"Authorization\": f\"Bearer {token}\"}"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 62,
+      "text": "def _upload(client: TestClient, token: str, sample_audio: Path,"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 70,
+      "text": "headers=_auth(token),"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 83,
+      "text": "token = paired"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 86,
+      "text": "up = _upload(client, token, sample_audio)"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 96,
+      "text": "headers=_auth(token),"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 111,
+      "text": "job = client.get(f\"/api/v1/jobs/{job_id}\", headers=_auth(token))"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 132,
+      "text": "res = client.get(f\"/api/v1/jobs/{job_id}/result\", headers=_auth(token))"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 146,
+      "text": "f\"/api/v1/uploads/{summary['upload_id']}/download\", headers=_auth(token)"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 153,
+      "text": "art = client.get(f\"/api/v1/artifacts/{summary['artifact_id']}\", headers=_auth(token))"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 162,
+      "text": "f\"/api/v1/artifacts/{summary['artifact_id']}/download\", headers=_auth(token)"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 169,
+      "text": "detail = client.get(f\"/api/v1/projects/{project['project_id']}\", headers=_auth(token))"
+    },
+    {
+      "file": "tests\\api\\test_v1_demo_flow.py",
+      "line": 237,
+      "text": "resp = client.get(\"/api/v1/jobs/job-none\", headers=_auth(\"bogus-token\"))"
+    }
+  ]
+}

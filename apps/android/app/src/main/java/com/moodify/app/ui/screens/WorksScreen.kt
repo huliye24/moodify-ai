@@ -125,13 +125,13 @@ fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
         } else {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBackIos, stringResource(R.string.common_back)) }
-                Text(stringResource(R.string.works_title), Modifier.weight(1f), color = MoodifyNavy, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                Text(stringResource(R.string.cases_title), Modifier.weight(1f), color = MoodifyNavy, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 Spacer(Modifier.width(48.dp))
             }
         }
         Spacer(Modifier.height(28.dp))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.works_title), color = MoodifyNavy, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.cases_title), color = MoodifyNavy, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             OutlinedButton(onClick = {}, shape = RoundedCornerShape(22.dp), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyOutline)) {
                 Text(stringResource(R.string.works_filter), color = MoodifyMuted); Spacer(Modifier.width(6.dp)); Icon(Icons.Outlined.FilterList, null, tint = MoodifyMuted, modifier = Modifier.size(18.dp))
             }

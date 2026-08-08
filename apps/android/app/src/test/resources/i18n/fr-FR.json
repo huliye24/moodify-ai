@@ -24,7 +24,7 @@
   },
   "nav": {
     "home": "Accueil",
-    "process": "Traitement",
+    "process": "Analyse auditive",
     "works": "Œuvres",
     "profile": "Profil",
     "discover": "Découvrir la musique",
@@ -35,12 +35,13 @@
     "copyright": "Droits et publication",
     "partnership": "Partenariats",
     "settings": "Réglages",
-    "help": "Aide et commentaires"
+    "help": "Aide et commentaires",
+    "cases": "Cas"
   },
   "home": {
     "title": "Entendre ce que les autres manquent.",
     "subtitle": "Une intelligence auditive pour analyser, juger, intervenir et vérifier la musique.",
-    "startAnalysis": "Lancer l’analyse",
+    "startAnalysis": "Démarrer l’analyse auditive",
     "importAudio": "Importer un audio",
     "recentWorks": "Œuvres récentes",
     "noRecentWorks": "Aucune œuvre pour le moment"
@@ -61,10 +62,10 @@
     "residual": "Résiduel",
     "highFrequencyCutoff": "Coupure des hautes fréquences",
     "report": "Rapport d’analyse",
-    "exportReport": "Exporter le rapport"
+    "exportReport": "Exporter le rapport",
+    "processingTitle": "Intervention auditive"
   },
   "works": {
-    "title": "Mes œuvres",
     "all": "Toutes",
     "drafts": "Brouillons",
     "processed": "Traitées",
@@ -89,9 +90,7 @@
     "signUp": "Créer un compte",
     "signOut": "Se déconnecter",
     "email": "E-mail",
-    "password": "Mot de passe",
-    "forgotPassword": "Mot de passe oublié ?",
-    "creatorPass": "Pass Créateur CWC"
+    "forgotPassword": "Mot de passe oublié ?"
   },
   "accessibility": {
     "openLanguageMenu": "Ouvrir le menu des langues",

@@ -1,0 +1,231 @@
+{
+  "root": "E:\\moodify\\apps\\android",
+  "count": 45,
+  "matches": [
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ApiModels.kt",
+      "line": 50,
+      "text": "val token: String,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ApiModels.kt",
+      "line": 56,
+      "text": "token = json.getString(\"token\"),"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 14,
+      "text": "* Owns pairing state: stores the token in the Keystore-backed TokenStore,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 15,
+      "text": "* re-pairs automatically when the server restarted (token invalidated),"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 30,
+      "text": "fun storedToken(): String? = tokenStore.token()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 46,
+      "text": "tokenStore.save(result.token, result.tokenId)"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 51,
+      "text": "val token = tokenStore.token()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 52,
+      "text": "if (token != null) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 54,
+      "text": "client.revoke(token)"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\ConnectionRepository.kt",
+      "line": 56,
+      "text": "// token already dead server-side; clearing locally is enough"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\DemoProcessRepository.kt",
+      "line": 118,
+      "text": "val token = requireToken()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\DemoProcessRepository.kt",
+      "line": 143,
+      "text": "token = token,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 42,
+      "text": "fun revoke(token: String) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 43,
+      "text": "request(\"POST\", \"/pair/revoke\", null, token = token) { /* 200 {\"revoked\": true} */ }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 51,
+      "text": "fun createProject(title: String, sourceAudioIds: List<String>, token: String): ProjectCreated {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 56,
+      "text": "return request(\"POST\", \"/projects\", payload, token = token) { body ->"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 61,
+      "text": "fun getJob(jobId: String, token: String): DemoJobStatus ="
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 62,
+      "text": "request(\"GET\", \"/jobs/$jobId\", null, token = token) { body ->"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 66,
+      "text": "fun getJobResult(jobId: String, token: String): DemoResultSummary ="
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 67,
+      "text": "request(\"GET\", \"/jobs/$jobId/result\", null, token = token) { body ->"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 71,
+      "text": "fun requestCatalog(token: String): String ="
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 72,
+      "text": "request(\"GET\", \"/catalog\", null, token = token) { it }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 79,
+      "text": "token: String,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 99,
+      "text": "connection.setRequestProperty(\"Authorization\", \"Bearer $token\")"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 179,
+      "text": "token: String? = null,"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\MoodifyApiClient.kt",
+      "line": 191,
+      "text": "token?.let { setRequestProperty(\"Authorization\", \"Bearer $it\") }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 41,
+      "text": "* Moodify backend with the pair token attached (the API requires Bearer"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 60,
+      "text": "tokenProvider = { tokenStore.token() }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 183,
+      "text": "/** Keep the Bearer header in sync with the current pair token. */"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 185,
+      "text": "val token = tokenProvider?.invoke()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\PlaybackManager.kt",
+      "line": 187,
+      "text": "if (token != null) mapOf(\"Authorization\" to \"Bearer $token\") else emptyMap()"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 14,
+      "text": "* Pair token storage backed by Android Keystore (AES/GCM)."
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 16,
+      "text": "* The token never leaves the device in plaintext: only the ciphertext lives"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 40,
+      "text": "fun save(token: String, tokenId: String) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 43,
+      "text": "val encrypted = cipher.doFinal(token.toByteArray(Charsets.UTF_8))"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\data\\TokenStore.kt",
+      "line": 52,
+      "text": "fun token(): String? {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CollaborationHubScreen.kt",
+      "line": 30,
+      "text": "when (page) { 0 -> Marketplace(onExit, { page = 1 }, { page = 2 }); 1 -> PublishCollaboration({ page = 0 }); else -> CollaborationDetail({ page = 0 }) }"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\CollaborationHubScreen.kt",
+      "line": 33,
+      "text": "@Composable private fun Marketplace(onExit: () -> Unit, onPublish: () -> Unit, onDetail: () -> Unit) {"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\HomeScreen.kt",
+      "line": 48,
+      "text": "tokenProvider = { TokenStore(context).token() },"
+    },
+    {
+      "file": "app\\src\\main\\java\\com\\moodify\\app\\ui\\screens\\ProcessingScreen.kt",
+      "line": 104,
+      "text": "tokenProvider = { tokenStore.token() },"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 126,
+      "text": "200 to \"\"\"{\"token\":\"abc123\",\"token_id\":\"tid-1\",\"api_version\":\"0.1.0\"}\"\"\""
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 129,
+      "text": "assertEquals(\"abc123\", result.token)"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 137,
+      "text": "respond(401, \"\"\"{\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"missing bearer token\",\"request_id\":\"r1\"}}\"\"\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 139,
+      "text": "client().revoke(\"bad-token\")"
+    },
+    {
+      "file": "app\\src\\test\\java\\com\\moodify\\app\\data\\MoodifyApiClientTest.kt",
+      "line": 214,
+      "text": "respond(200, \"\"\"{\"api_version\":\"0.1.0\",\"endpoints\":{\"health\":\"live\"},\"presets\":[\"auto\",\"clean_master\"],\"max_upload_bytes\":52428800,\"auth\":\"bearer-token\",\"server_time\":\"2026-08-02T12:00:00\"}\"\"\")"
+    }
+  ]
+}

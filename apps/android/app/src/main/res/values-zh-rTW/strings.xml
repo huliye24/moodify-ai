@@ -23,7 +23,9 @@
     <string name="common_storage_used">已使用 %1$s</string>
     <!-- nav -->
     <string name="nav_home">首頁</string>
-    <string name="nav_process">處理</string>
+    <string name="nav_process">聽覺檢測</string>
+    <string name="nav_cases">案例</string>
+    <string name="cases_title">聽覺案例</string>
     <string name="nav_works">作品</string>
     <string name="nav_profile">我的</string>
     <string name="nav_discover">探索音樂</string>
@@ -38,7 +40,7 @@
     <!-- home -->
     <string name="home_title">聽見別人聽不見的。</string>
     <string name="home_subtitle">用於音樂分析、判斷、干預與驗證的聽覺智慧。</string>
-    <string name="home_start_analysis">開始分析</string>
+    <string name="home_start_analysis">開始聽覺檢測</string>
     <string name="home_import_audio">匯入音訊</string>
     <string name="home_recent_works">最近作品</string>
     <string name="home_no_recent_works">尚無作品</string>
@@ -92,7 +94,7 @@
     <string name="analysis_uploading">正在上傳音訊…</string>
     <string name="analysis_uploading_to_pc">正在上傳到電腦端…</string>
     <string name="analysis_upload_auto_start">上傳完成後將自動開始真實處理</string>
-    <string name="analysis_processing_title">處理中</string>
+    <string name="analysis_processing_title">聽覺干預實驗</string>
     <string name="analysis_engine_running">正在由電腦端真實處理引擎執行…</string>
     <string name="analysis_save_to_works">處理完成後將自動儲存到作品</string>
     <string name="analysis_real_completed">真實處理完成</string>
@@ -102,7 +104,6 @@
     <string name="analysis_gate_passed">通過</string>
     <string name="analysis_gate_failed">未通過</string>
     <!-- works -->
-    <string name="works_title">我的作品</string>
     <string name="works_all">全部</string>
     <string name="works_drafts">草稿</string>
     <string name="works_processed">已處理</string>
@@ -134,9 +135,7 @@
     <string name="auth_sign_up">建立帳戶</string>
     <string name="auth_sign_out">登出</string>
     <string name="auth_email">電子郵件</string>
-    <string name="auth_password">密碼</string>
     <string name="auth_forgot_password">忘記密碼？</string>
-    <string name="auth_creator_pass">CWC 創作者通行證</string>
     <!-- accessibility -->
     <string name="accessibility_open_language_menu">開啟語言選單</string>
     <string name="accessibility_selected_language">已選擇%1$s</string>
@@ -161,90 +160,6 @@
     <string name="profile_account_security">帳號與安全</string>
     <string name="profile_general_settings">通用設定</string>
     <!-- auth (extended) -->
-    <string name="auth_onboarding_title">創作者進入 Moodify 的第一步</string>
-    <string name="auth_onboarding_subtitle">啟用通行證，建立你的創作者帳戶</string>
-    <string name="auth_phone_email">手機號碼 / 電子郵件</string>
-    <string name="auth_cwc_code">CWC 通行碼</string>
-    <string name="auth_what_is_cwc">什麼是 CWC？</string>
-    <string name="auth_verify_cwc">驗證 CWC 並進入</string>
-    <string name="auth_have_account">我已經有帳戶，繼續登入</string>
-    <string name="auth_welcome_back">歡迎回來</string>
-    <string name="auth_account_synced">帳戶已啟用，作品庫與版權檔案已同步</string>
-    <string name="auth_login_create">登入並繼續創作</string>
-    <string name="auth_wechat_login">微信登入</string>
-    <string name="auth_code_login">驗證碼登入</string>
-    <string name="auth_no_account">還沒有帳戶？輸入 CWC 開始入駐</string>
-    <string name="auth_activation_success">CWC 啟用成功</string>
-    <string name="auth_welcome">歡迎加入 Moodify，%1$s</string>
-    <string name="auth_enter_processing">進入處理中心</string>
-    <string name="auth_hint_idle">未輸入，請輸入完整通行碼</string>
-    <string name="auth_hint_checking">校驗中…</string>
-    <string name="auth_hint_valid">有效 · 可使用</string>
-    <string name="auth_activated">已啟用</string>
-    <string name="auth_activated_badge">已完成 CWC 啟用</string>
-    <!-- cwc center -->
-    <string name="cwc_what_is">什麼是 CWC？</string>
-    <string name="cwc_help">說明</string>
-    <string name="cwc_giftable_title">我可贈送的通行證</string>
-    <string name="cwc_pass_count">%1$s 張</string>
-    <string name="cwc_gift_one">贈送一張通行證</string>
-    <string name="cwc_rules">查看 CWC 規則</string>
-    <string name="cwc_copy_link_label">通行證連結</string>
-    <string name="cwc_copy_code_label">通行碼</string>
-    <string name="cwc_qr_title">通行證 QR Code</string>
-    <string name="cwc_qr_placeholder_note">MVP 佔位圖，後續接入 ZXing 產生</string>
-    <string name="cwc_copy_code">複製通行碼</string>
-    <string name="cwc_share_title">分享創作者通行證</string>
-    <string name="cwc_share_your_code">你的通行碼：%1$s</string>
-    <string name="cwc_share_wechat">微信傳送</string>
-    <string name="cwc_share_copy_link">複製連結</string>
-    <string name="cwc_share_poster">產生海報</string>
-    <string name="cwc_brand_tagline">把一個位置，留給值得被聽見的人</string>
-    <string name="cwc_brand_sub">每一張通行證，都是創作者與世界的一次正式握手</string>
-    <string name="cwc_share_code">分享碼</string>
-    <string name="cwc_donor">贈送者</string>
-    <string name="cwc_expiry">到期時間</string>
-    <string name="cwc_invite_records">邀請記錄</string>
-    <string name="cwc_share_subject">Moodify 創作者通行證</string>
-    <string name="cwc_share_text">%1$s 邀請你加入 Moodify。你的創作者通行證：%2$s\n%3$s</string>
-    <string name="cwc_copied">%1$s 已複製</string>
-    <string name="cwc_qr_placeholder">二維碼佔位</string>
-    <string name="cwc_understand_as">你可以把它理解為</string>
-    <string name="cwc_benefit_gift">一份禮物</string>
-    <string name="cwc_benefit_gift_desc">由創作者、品牌或機構贈送</string>
-    <string name="cwc_benefit_pass">一張通行證</string>
-    <string name="cwc_benefit_pass_desc">進入 Moodify 的唯一邀請憑證</string>
-    <string name="cwc_benefit_package">一份權益包</string>
-    <string name="cwc_benefit_package_desc">入駐即獲得創作者基礎權益</string>
-    <string name="cwc_after_activation">啟用後獲得</string>
-    <string name="cwc_benefit_first_work">首個作品免費入駐</string>
-    <string name="cwc_benefit_first_work_desc">免費入駐與建檔服務</string>
-    <string name="cwc_benefit_catalog">基礎作品建檔</string>
-    <string name="cwc_benefit_catalog_desc">作品庫與版權檔案</string>
-    <string name="cwc_benefit_profile">創作者主頁開啟</string>
-    <string name="cwc_benefit_profile_desc">建立你的公開主頁</string>
-    <string name="cwc_benefit_discount">標準處理 8 折券</string>
-    <string name="cwc_benefit_discount_desc">1 張標準處理優惠券</string>
-    <string name="cwc_steps">使用步驟</string>
-    <string name="cwc_step1">收到 CWC</string>
-    <string name="cwc_step1_desc">來自創作者、品牌或機構的贈送</string>
-    <string name="cwc_step2">驗證啟用</string>
-    <string name="cwc_step2_desc">輸入通行碼並建立帳戶</string>
-    <string name="cwc_step3">匯入作品</string>
-    <string name="cwc_step3_desc">進入處理中心開始創作</string>
-    <string name="cwc_step4">開始成長</string>
-    <string name="cwc_step4_desc">建檔、發佈與合作</string>
-    <string name="cwc_start">開始使用 CWC</string>
-    <string name="cwc_creator_pass_title">CWC 創作者通行證</string>
-    <string name="cwc_creator_pass_sub">一份進入 Moodify 的創作者禮物與通行憑證</string>
-    <string name="cwc_accept_pass">接受創作者通行證</string>
-    <string name="cwc_benefit_copyright">基礎版權建檔</string>
-    <string name="cwc_benefit_discount_note">1 張優惠券，不包含免費 DSP 處理</string>
-    <string name="cwc_welcome_quote">「歡迎來到 Moodify，用科技讓每一份聲音更接近感動。」</string>
-    <string name="cwc_accept_start">接受並開始入駐</string>
-    <string name="cwc_pass_guide">查看通行說明</string>
-    <string name="cwc_gift_from">%1$s 向你贈送了一張創作者通行證</string>
-    <string name="cwc_masked_note">僅展示部分通行碼，驗證時自動填入完整碼</string>
     <!-- collab -->
     <string name="collab_marketplace">合作廣場</string>
     <string name="collab_search_placeholder">搜尋合作機會 / 服務 / 創作者 / 機構</string>
@@ -451,7 +366,6 @@
     <string name="creator_plays_7d">近 7 日播放</string>
     <string name="creator_vs_last_week" formatted="false">較上周 ↑ 18.6%</string>
     <string name="creator_new_followers">新增粉絲  %1$s</string>
-    <string name="creator_cwc_line">%1$s · %2$s · %3$s</string>
     <!-- data center -->
     <string name="data_date">日期</string>
     <string name="data_range_overview">近 30 天表現總覽</string>

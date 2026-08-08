@@ -24,7 +24,7 @@
   },
   "nav": {
     "home": "ホーム",
-    "process": "処理",
+    "process": "聴覚検出",
     "works": "作品",
     "profile": "マイページ",
     "discover": "音楽を探す",
@@ -35,12 +35,13 @@
     "copyright": "著作権と配信",
     "partnership": "パートナーシップ",
     "settings": "設定",
-    "help": "ヘルプとフィードバック"
+    "help": "ヘルプとフィードバック",
+    "cases": "ケース"
   },
   "home": {
     "title": "誰も気づかない音を聴く。",
     "subtitle": "音楽の分析・判断・介入・検証を支える聴覚インテリジェンス。",
-    "startAnalysis": "分析を開始",
+    "startAnalysis": "聴覚検出を開始",
     "importAudio": "音源を読み込む",
     "recentWorks": "最近の作品",
     "noRecentWorks": "作品はまだありません"
@@ -61,10 +62,10 @@
     "residual": "残差",
     "highFrequencyCutoff": "高域カットオフ",
     "report": "分析レポート",
-    "exportReport": "レポートを書き出す"
+    "exportReport": "レポートを書き出す",
+    "processingTitle": "聴覚介入実験"
   },
   "works": {
-    "title": "マイ作品",
     "all": "すべて",
     "drafts": "下書き",
     "processed": "処理済み",
@@ -89,9 +90,7 @@
     "signUp": "アカウント作成",
     "signOut": "ログアウト",
     "email": "メールアドレス",
-    "password": "パスワード",
-    "forgotPassword": "パスワードをお忘れですか？",
-    "creatorPass": "CWC クリエイターパス"
+    "forgotPassword": "パスワードをお忘れですか？"
   },
   "accessibility": {
     "openLanguageMenu": "言語メニューを開く",
