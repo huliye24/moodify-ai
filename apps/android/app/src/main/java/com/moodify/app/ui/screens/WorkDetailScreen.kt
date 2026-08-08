@@ -27,12 +27,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moodify.app.R
+import com.moodify.app.data.BaseUrlStore
+import com.moodify.app.data.MoodifyApiClient
+import com.moodify.app.data.PairwiseJudgmentResult
 import com.moodify.app.data.PlaybackManager
 import com.moodify.app.data.ProcessedWork
 import com.moodify.app.data.QueueItem
+import com.moodify.app.data.TokenStore
 import com.moodify.app.ui.components.GradientButton
 import com.moodify.app.ui.components.PlaybackBar
 import com.moodify.app.ui.theme.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: () -> Unit, onPublish: () -> Unit) {
@@ -73,6 +80,7 @@ fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: (
             Text(stringResource(R.string.work_detail_ab_hint), color = MoodifyMuted, fontSize = 11.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         Spacer(Modifier.height(14.dp))
+        if (work != null) { JudgeCard(work); Spacer(Modifier.height(14.dp)) }
         DetailCard { Text(stringResource(R.string.work_detail_results), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold); Spacer(Modifier.height(12.dp)); Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) { ResultChip(Icons.Outlined.GraphicEq, work?.preset ?: "标准处理", true); ResultChip(Icons.Outlined.CheckCircle, "响度标准化"); ResultChip(Icons.Outlined.ShowChart, "True Peak") }; Spacer(Modifier.height(11.dp)); Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.CheckCircle, null, tint = MoodifyGreen, modifier = Modifier.size(20.dp)); Text("  " + stringResource(R.string.work_detail_optimized), color = MoodifyMuted, fontSize = 13.sp) } }
         Spacer(Modifier.height(14.dp))
         DetailCard {
@@ -96,6 +104,117 @@ fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: (
         Spacer(Modifier.height(14.dp))
         DetailCard { Text(stringResource(R.string.work_detail_export_title), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold); Spacer(Modifier.height(12.dp)); Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { ExportAction(Icons.Outlined.FileDownload, stringResource(R.string.work_detail_export_audio), "WAV / MP3", Modifier.weight(1f)) {}; ExportAction(Icons.Outlined.AudioFile, stringResource(R.string.work_detail_download_score), "PDF 格式", Modifier.weight(1f)) {}; ExportAction(Icons.Outlined.Publish, stringResource(R.string.work_detail_publish), stringResource(R.string.work_detail_publish_sub), Modifier.weight(1f), onPublish) } }
         Spacer(Modifier.height(18.dp)); GradientButton(stringResource(R.string.work_detail_reprocess), onProcessAgain); TextButton(onClick = {}) { Text(stringResource(R.string.work_detail_full_report), color = MoodifyBlue, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }; Spacer(Modifier.height(18.dp))
+    }
+}
+
+@Composable
+private fun JudgeCard(work: ProcessedWork) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var judging by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf<PairwiseJudgmentResult?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var humanDecision by remember { mutableStateOf<String?>(null) }
+
+    val client = remember {
+        MoodifyApiClient(baseUrlProvider = { BaseUrlStore(context).baseUrl })
+    }
+    val token = remember { TokenStore(context).token() }
+    val requiresPairingLabel = stringResource(R.string.judge_requires_pairing)
+    val failedLabel = stringResource(R.string.judge_failed)
+
+    fun judge() {
+        val uploadId = work.uploadId
+        val artifactId = work.artifactId
+        val currentToken = token
+        if (uploadId == null || artifactId == null || currentToken == null) {
+            error = requiresPairingLabel
+            return
+        }
+        scope.launch {
+            judging = true
+            error = null
+            try {
+                result = withContext(Dispatchers.IO) {
+                    client.judgePair(uploadId, artifactId, null, currentToken)
+                }
+            } catch (e: Exception) {
+                error = failedLabel
+            } finally {
+                judging = false
+            }
+        }
+    }
+
+    fun submitDecision(decision: String) {
+        val current = result ?: return
+        val currentToken = token ?: return
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    client.submitHumanDecision(current.judgmentId, decision, "", currentToken)
+                }
+                humanDecision = decision
+            } catch (e: Exception) {
+                error = failedLabel
+            }
+        }
+    }
+
+    DetailCard {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.Gavel, null, tint = MoodifyPurple, modifier = Modifier.size(22.dp))
+            Text(stringResource(R.string.judge_title), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 8.dp))
+        }
+        Spacer(Modifier.height(12.dp))
+        val current = result
+        when {
+            judging -> Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = MoodifyPurple)
+                Spacer(Modifier.width(10.dp))
+                Text(stringResource(R.string.judge_start), color = MoodifyMuted, fontSize = 12.sp)
+            }
+            current != null -> {
+                val outcomeLabel = when (current.outcome) {
+                    "A_WINS" -> stringResource(R.string.judge_outcome_a_wins)
+                    "B_WINS" -> stringResource(R.string.judge_outcome_b_wins)
+                    else -> stringResource(R.string.judge_outcome_inconclusive)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(color = if (current.outcome == "INCONCLUSIVE") Color(0xFFFFF2E8) else Color(0xFFE8F8EE), shape = RoundedCornerShape(9.dp)) {
+                        Text(outcomeLabel, color = if (current.outcome == "INCONCLUSIVE") Color(0xFFE08A3C) else Color(0xFF31A35E), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Text(stringResource(R.string.judge_confidence, current.confidenceLevel), color = MoodifyMuted, fontSize = 11.sp)
+                }
+                if (current.topReasons.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(stringResource(R.string.judge_reasons) + "：${current.topReasons.take(2).joinToString("；")}", color = MoodifyMuted, fontSize = 10.sp)
+                }
+                Spacer(Modifier.height(12.dp))
+                if (humanDecision == null) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = { submitDecision("CONFIRM_MODEL") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) { Text(stringResource(R.string.judge_confirm_model), fontSize = 11.sp) }
+                        OutlinedButton(onClick = { submitDecision("CHOOSE_A") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) { Text(stringResource(R.string.judge_choose_a), fontSize = 11.sp) }
+                        OutlinedButton(onClick = { submitDecision("CHOOSE_B") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) { Text(stringResource(R.string.judge_choose_b), fontSize = 11.sp) }
+                        OutlinedButton(onClick = { submitDecision("UNDECIDED") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp)) { Text(stringResource(R.string.judge_undecided), fontSize = 11.sp) }
+                    }
+                } else {
+                    Text(stringResource(R.string.judge_recorded, humanDecision ?: ""), color = MoodifyPurple, fontSize = 11.sp)
+                }
+            }
+            else -> {
+                Button(onClick = { judge() }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MoodifyPurple), shape = RoundedCornerShape(16.dp)) {
+                    Icon(Icons.Outlined.Gavel, null, modifier = Modifier.size(17.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.judge_start), color = Color.White)
+                }
+            }
+        }
+        error?.let {
+            Spacer(Modifier.height(8.dp))
+            Text(it, color = Color(0xFFE05B5B), fontSize = 11.sp)
+        }
     }
 }
 

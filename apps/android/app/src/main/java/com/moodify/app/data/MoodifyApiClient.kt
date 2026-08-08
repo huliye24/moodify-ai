@@ -71,6 +71,34 @@ class MoodifyApiClient(
     fun requestCatalog(token: String): String =
         request("GET", "/catalog", null, token = token) { it }
 
+    /** Pairwise Auditory Judge: compare two candidates (DSK-MFY-PAIRWISE-JUDGE-001). */
+    fun judgePair(
+        candidateAUploadId: String,
+        candidateBArtifactId: String?,
+        candidateBUploadId: String?,
+        token: String,
+    ): PairwiseJudgmentResult {
+        val payload = JSONObject()
+            .put("candidate_a_upload_id", candidateAUploadId)
+            .apply {
+                if (candidateBUploadId != null) put("candidate_b_upload_id", candidateBUploadId)
+                if (candidateBArtifactId != null) put("candidate_b_artifact_id", candidateBArtifactId)
+            }
+            .toString()
+        return request("POST", "/pairwise-judgments", payload, token = token) { body ->
+            PairwiseJudgmentResult.fromJson(JSONObject(body))
+        }
+    }
+
+    /** Record a human confirm/override for a pairwise judgment. */
+    fun submitHumanDecision(judgmentId: String, decision: String, reason: String, token: String): String {
+        val payload = JSONObject()
+            .put("decision", decision)
+            .put("reason", reason)
+            .toString()
+        return request("POST", "/pairwise-judgments/$judgmentId/human-decision", payload, token = token) { it }
+    }
+
     /**
      * Multipart upload of a real audio file. Returns the upload_id.
      * Uses a longer read timeout since 50 MB over USB/LAN can take a while.

@@ -443,4 +443,20 @@
     <string name="support_reset_title">Reset demo session?</string>
     <string name="support_reset_text">This clears the creator pass activation, processed works, and desktop pairing, and returns to the opening story.</string>
     <string name="support_reset_confirm">Reset</string>
+
+    <!-- pairwise judge -->
+    <string name="judge_title">Auditory Judgment</string>
+    <string name="judge_start">Start Judgment</string>
+    <string name="judge_outcome_a_wins">A Wins</string>
+    <string name="judge_outcome_b_wins">B Wins</string>
+    <string name="judge_outcome_inconclusive">Inconclusive</string>
+    <string name="judge_confidence">Confidence: %1$s</string>
+    <string name="judge_reasons">Reasons</string>
+    <string name="judge_confirm_model">Accept</string>
+    <string name="judge_choose_a">Choose A</string>
+    <string name="judge_choose_b">Choose B</string>
+    <string name="judge_undecided">Undecided</string>
+    <string name="judge_failed">Judgment failed</string>
+    <string name="judge_requires_pairing">Pair with your desktop first</string>
+    <string name="judge_recorded">Decision recorded: %1$s</string>
 </resources>

@@ -319,6 +319,12 @@ class PairwisePreference:
     evaluator_id: str = ""
     created_at: str = field(default_factory=utcnow)
     schema_version: str = SCHEMA_VERSION
+    # DSK-MFY-PAIRWISE-JUDGE-001: training hygiene — machine-only labels are
+    # never eligible; eligibility requires human confirmation or override.
+    label_source: str = "HUMAN_CONFIRMED"  # MACHINE_ONLY | HUMAN_CONFIRMED | HUMAN_OVERRIDE
+    machine_outcome: str = ""  # A_WINS | B_WINS | INCONCLUSIVE (model decision)
+    machine_confidence: str = ""  # LOW | MEDIUM | HIGH
+    eligible_for_training: bool = False
 
     def to_dict(self) -> dict:
         return {
@@ -329,6 +335,10 @@ class PairwisePreference:
             "evaluator_id": self.evaluator_id,
             "created_at": self.created_at,
             "schema_version": self.schema_version,
+            "label_source": self.label_source,
+            "machine_outcome": self.machine_outcome,
+            "machine_confidence": self.machine_confidence,
+            "eligible_for_training": self.eligible_for_training,
         }
 
     @classmethod
@@ -341,6 +351,10 @@ class PairwisePreference:
             evaluator_id=data.get("evaluator_id", ""),
             created_at=data.get("created_at", utcnow()),
             schema_version=data.get("schema_version", SCHEMA_VERSION),
+            label_source=data.get("label_source", "HUMAN_CONFIRMED"),
+            machine_outcome=data.get("machine_outcome", ""),
+            machine_confidence=data.get("machine_confidence", ""),
+            eligible_for_training=data.get("eligible_for_training", False),
         )
 
 

@@ -443,4 +443,20 @@
     <string name="support_reset_title">重置演示会话？</string>
     <string name="support_reset_text">将清除创作者通行证激活、真实处理作品与电脑端配对，重新进入开场故事。</string>
     <string name="support_reset_confirm">重置</string>
+
+    <!-- pairwise judge -->
+    <string name="judge_title">听觉判断</string>
+    <string name="judge_start">开始判断</string>
+    <string name="judge_outcome_a_wins">A 胜出</string>
+    <string name="judge_outcome_b_wins">B 胜出</string>
+    <string name="judge_outcome_inconclusive">无法判定</string>
+    <string name="judge_confidence">置信度：%1$s</string>
+    <string name="judge_reasons">理由</string>
+    <string name="judge_confirm_model">采纳</string>
+    <string name="judge_choose_a">选 A</string>
+    <string name="judge_choose_b">选 B</string>
+    <string name="judge_undecided">未决</string>
+    <string name="judge_failed">判断失败</string>
+    <string name="judge_requires_pairing">需要先连接并配对电脑端</string>
+    <string name="judge_recorded">已记录判断：%1$s</string>
 </resources>
