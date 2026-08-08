@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "method_version": {
+          "title": "Method Version",
+          "type": "string"
+        },
+        "parameters_hash": {
+          "title": "Parameters Hash",
+          "type": "string"
+        },
+        "producer": {
+          "title": "Producer",
+          "type": "string"
+        },
+        "producer_version": {
+          "title": "Producer Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producer",
+        "producer_version",
+        "method",
+        "method_version",
+        "parameters_hash"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {
+      "title": "Case Id",
+      "type": "string"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confidence"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "measurement_id": {
+      "title": "Measurement Id",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "namespace": {
+      "title": "Namespace",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    },
+    "unit": {
+      "title": "Unit",
+      "type": "string"
+    },
+    "value": {
+      "title": "Value"
+    },
+    "window": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Window"
+    }
+  },
+  "required": [
+    "created_at",
+    "measurement_id",
+    "case_id",
+    "source_id",
+    "namespace",
+    "name",
+    "value",
+    "unit",
+    "provenance"
+  ],
+  "title": "MeasurementRecord",
+  "type": "object"
+}
