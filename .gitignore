@@ -16,6 +16,8 @@ Thumbs.db
 # Local editor / agent state
 .idea/
 .cursor/
+.vscode/*
+!.vscode/extensions.json
 .codex-work/
 _github_moodify_ai/
 

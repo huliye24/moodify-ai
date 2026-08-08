@@ -774,12 +774,12 @@ code
 
 ## License
 
-Moodify uses Apache License 2.0. See [LICENSE](LICENSE).
+Moodify uses the GNU General Public License v3.0. See [LICENSE](LICENSE).
 
-Unless stated otherwise, source code and documentation in this repository are licensed under Apache-2.0. Input audio, generated audio, third-party models, third-party datasets, and external media remain under their own rights and license terms.
+Unless stated otherwise, source code and documentation in this repository are licensed under `GPL-3.0-only`. Input audio, generated audio, third-party models, third-party datasets, and external media remain under their own rights and license terms.
 
 Repository:
 
 ```text
-https://github.com/huliye24/moodify-o3is
+https://github.com/huliye24/moodify-ai
 ```
