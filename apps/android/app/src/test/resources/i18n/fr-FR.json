@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "languageName": "Français",
+    "locale": "fr-FR"
+  },
+  "common": {
+    "appName": "Moodify",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "done": "Terminé",
+    "back": "Retour",
+    "next": "Suivant",
+    "close": "Fermer",
+    "retry": "Réessayer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "loading": "Chargement…",
+    "unknownError": "Un problème est survenu.",
+    "networkError": "Connexion réseau indisponible.",
+    "required": "Obligatoire",
+    "optional": "Facultatif"
+  },
+  "nav": {
+    "home": "Accueil",
+    "process": "Traitement",
+    "works": "Œuvres",
+    "profile": "Profil",
+    "discover": "Découvrir la musique",
+    "tasks": "Tâches de traitement",
+    "cloud": "Espace cloud",
+    "creatorCenter": "Espace créateur",
+    "dataCenter": "Centre de données",
+    "copyright": "Droits et publication",
+    "partnership": "Partenariats",
+    "settings": "Réglages",
+    "help": "Aide et commentaires"
+  },
+  "home": {
+    "title": "Entendre ce que les autres manquent.",
+    "subtitle": "Une intelligence auditive pour analyser, juger, intervenir et vérifier la musique.",
+    "startAnalysis": "Lancer l’analyse",
+    "importAudio": "Importer un audio",
+    "recentWorks": "Œuvres récentes",
+    "noRecentWorks": "Aucune œuvre pour le moment"
+  },
+  "analysis": {
+    "title": "Analyse audio",
+    "upload": "Téléverser un audio",
+    "analyzing": "Écoute et analyse en cours…",
+    "completed": "Analyse terminée",
+    "failed": "Échec de l’analyse",
+    "source": "Source",
+    "waveform": "Forme d’onde",
+    "loudness": "Sonie",
+    "stereo": "Stéréo",
+    "phase": "Phase",
+    "spectrum": "Spectre",
+    "transients": "Transitoires",
+    "residual": "Résiduel",
+    "highFrequencyCutoff": "Coupure des hautes fréquences",
+    "report": "Rapport d’analyse",
+    "exportReport": "Exporter le rapport"
+  },
+  "works": {
+    "title": "Mes œuvres",
+    "all": "Toutes",
+    "drafts": "Brouillons",
+    "processed": "Traitées",
+    "published": "Publiées",
+    "empty": "Vos œuvres apparaîtront ici.",
+    "version": "Version {{version}}",
+    "updatedAt": "Mis à jour le {{date}}"
+  },
+  "settings": {
+    "title": "Réglages",
+    "language": "Langue",
+    "languageDescription": "Choisissez la langue d’affichage de Moodify.",
+    "followSystem": "Suivre la langue du système",
+    "appearance": "Apparence",
+    "notifications": "Notifications",
+    "privacy": "Confidentialité",
+    "about": "À propos de Moodify",
+    "languageChanged": "Langue définie sur {{language}}."
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "signOut": "Se déconnecter",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "creatorPass": "Pass Créateur CWC"
+  },
+  "accessibility": {
+    "openLanguageMenu": "Ouvrir le menu des langues",
+    "selectedLanguage": "{{language}} sélectionné"
+  }
+}

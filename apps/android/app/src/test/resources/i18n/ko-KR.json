@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "languageName": "한국어",
+    "locale": "ko-KR"
+  },
+  "common": {
+    "appName": "Moodify",
+    "confirm": "확인",
+    "cancel": "취소",
+    "save": "저장",
+    "done": "완료",
+    "back": "뒤로",
+    "next": "다음",
+    "close": "닫기",
+    "retry": "다시 시도",
+    "delete": "삭제",
+    "edit": "편집",
+    "search": "검색",
+    "loading": "불러오는 중…",
+    "unknownError": "문제가 발생했습니다.",
+    "networkError": "네트워크에 연결할 수 없습니다.",
+    "required": "필수",
+    "optional": "선택"
+  },
+  "nav": {
+    "home": "홈",
+    "process": "처리",
+    "works": "작품",
+    "profile": "마이",
+    "discover": "음악 탐색",
+    "tasks": "처리 작업",
+    "cloud": "클라우드 공간",
+    "creatorCenter": "크리에이터 센터",
+    "dataCenter": "데이터 센터",
+    "copyright": "저작권 및 배포",
+    "partnership": "파트너십",
+    "settings": "설정",
+    "help": "도움말 및 피드백"
+  },
+  "home": {
+    "title": "다른 이들이 놓치는 소리를 듣다.",
+    "subtitle": "음악 분석, 판단, 개입, 검증을 위한 청각 지능.",
+    "startAnalysis": "분석 시작",
+    "importAudio": "오디오 가져오기",
+    "recentWorks": "최근 작품",
+    "noRecentWorks": "아직 작품이 없습니다"
+  },
+  "analysis": {
+    "title": "오디오 분석",
+    "upload": "오디오 업로드",
+    "analyzing": "듣고 분석하는 중…",
+    "completed": "분석 완료",
+    "failed": "분석 실패",
+    "source": "원본",
+    "waveform": "파형",
+    "loudness": "라우드니스",
+    "stereo": "스테레오",
+    "phase": "위상",
+    "spectrum": "스펙트럼",
+    "transients": "트랜지언트",
+    "residual": "잔차",
+    "highFrequencyCutoff": "고주파 차단",
+    "report": "분석 보고서",
+    "exportReport": "보고서 내보내기"
+  },
+  "works": {
+    "title": "내 작품",
+    "all": "전체",
+    "drafts": "초안",
+    "processed": "처리됨",
+    "published": "게시됨",
+    "empty": "작품이 여기에 표시됩니다.",
+    "version": "버전 {{version}}",
+    "updatedAt": "{{date}} 업데이트"
+  },
+  "settings": {
+    "title": "설정",
+    "language": "언어",
+    "languageDescription": "Moodify 표시 언어를 선택하세요.",
+    "followSystem": "시스템 언어 따르기",
+    "appearance": "화면 설정",
+    "notifications": "알림",
+    "privacy": "개인정보",
+    "about": "Moodify 정보",
+    "languageChanged": "언어가 {{language}}(으)로 변경되었습니다."
+  },
+  "auth": {
+    "signIn": "로그인",
+    "signUp": "계정 만들기",
+    "signOut": "로그아웃",
+    "email": "이메일",
+    "password": "비밀번호",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "creatorPass": "CWC 크리에이터 패스"
+  },
+  "accessibility": {
+    "openLanguageMenu": "언어 메뉴 열기",
+    "selectedLanguage": "{{language}} 선택됨"
+  }
+}

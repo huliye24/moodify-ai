@@ -24,7 +24,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.moodify.app.R
 import com.moodify.app.ui.screens.HomeScreen
 import com.moodify.app.ui.screens.CreatorCenterScreen
 import com.moodify.app.ui.screens.NotificationCenterScreen
@@ -59,11 +61,11 @@ data class CwcAuthRequest(val mode: AuthMode, val prefilledCode: String? = null)
 @Composable
 fun MoodifyApp(pendingCwcCode: String? = null) {
     val destinations = listOf(
-        MainDestination("首页", Icons.Outlined.Home),
-        MainDestination("处理", Icons.Outlined.GraphicEq),
-        MainDestination("我的", Icons.Outlined.PersonOutline),
+        MainDestination(stringResource(R.string.nav_home), Icons.Outlined.Home),
+        MainDestination(stringResource(R.string.nav_process), Icons.Outlined.GraphicEq),
+        MainDestination(stringResource(R.string.nav_profile), Icons.Outlined.PersonOutline),
     )
-    var selected by remember { mutableIntStateOf(0) }
+    var selected by rememberSaveable { mutableIntStateOf(0) }
     var processingOpen by remember { mutableStateOf(false) }
     var detailOpen by remember { mutableStateOf(false) }
     var publishOpen by remember { mutableStateOf(false) }
@@ -74,8 +76,8 @@ fun MoodifyApp(pendingCwcCode: String? = null) {
     var dataCenterOpen by remember { mutableStateOf(false) }
     var collaborationOpen by remember { mutableStateOf(false) }
     var uploadOpen by remember { mutableStateOf(false) }
-    var worksOpen by remember { mutableStateOf(false) }
-    var settingsOpen by remember { mutableStateOf(false) }
+    var worksOpen by rememberSaveable { mutableStateOf(false) }
+    var settingsOpen by rememberSaveable { mutableStateOf(false) }
     var helpOpen by remember { mutableStateOf(false) }
     var aboutOpen by remember { mutableStateOf(false) }
     var startUploadPage by remember { mutableIntStateOf(0) }

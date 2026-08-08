@@ -1,6 +1,7 @@
 package com.moodify.app.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,9 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import android.widget.Toast
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moodify.app.R
+import com.moodify.app.data.LocaleKit
+import com.moodify.app.data.LocaleStore
 import com.moodify.app.ui.components.GradientButton
 import com.moodify.app.ui.components.MoodifyMark
 import com.moodify.app.ui.theme.*
@@ -59,7 +65,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("设�
     var notices by remember { mutableStateOf(listOf(true,true,true,true)) }
     Section("通知设置") { listOf("处理完成通知","交易消息","评论与点赞","系统通知").forEachIndexed { i,t -> ToggleRow(t,notices[i]) { v -> notices = notices.toMutableList().also { it[i]=v } } } }
     Section("隐私与权限") { SimpleRow(Icons.Outlined.PersonOutline,"主页可见性","所有人可见"); SimpleRow(Icons.Outlined.Public,"作品公开设置","公开"); SimpleRow(Icons.Outlined.Download,"下载权限","仅自己"); SimpleRow(Icons.Outlined.Block,"黑名单管理","") }
-    Section("偏好设置") { SimpleRow(Icons.Outlined.MusicNote,"默认导出格式","MP3"); ToggleRow("自动生成封面",true){}; ToggleRow("后台处理",true){}; SimpleRow(Icons.Outlined.Language,"语言","简体中文"); ToggleRow("深色模式",false){} }
+    Section("偏好设置") { SimpleRow(Icons.Outlined.MusicNote,"默认导出格式","MP3"); ToggleRow("自动生成封面",true){}; ToggleRow("后台处理",true){}; LanguageRow(); ToggleRow("深色模式",false){} }
     Section("存储与数据") { SimpleRow(Icons.Outlined.Cloud,"云端空间","8.24 GB / 50 GB"); SimpleRow(Icons.Outlined.DeleteOutline,"清理缓存","128 MB"); SimpleRow(Icons.Outlined.Sync,"数据同步","刚刚") }
     Section("演示") {
         Card(onClick = { showResetDialog = true }, modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color.White)) {
@@ -86,10 +92,49 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("设�
     }
 }
 
+@Composable private fun LanguageRow() {
+    var pickerOpen by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val currentName = LocaleStore.currentTag()?.let { LocaleKit.metaFor(it).nativeName }
+        ?: stringResource(R.string.settings_follow_system)
+    SimpleRow(Icons.Outlined.Language, stringResource(R.string.settings_language), currentName) { pickerOpen = true }
+    if (pickerOpen) {
+        val options = listOf(null as String? to stringResource(R.string.settings_follow_system)) +
+            LocaleKit.SUPPORTED.map { it.code to it.nativeName }
+        val selectedTag = LocaleStore.currentTag()
+        AlertDialog(
+            onDismissRequest = { pickerOpen = false },
+            title = { Text(stringResource(R.string.settings_language)) },
+            text = {
+                Column {
+                    options.forEach { (tag, name) ->
+                        Row(
+                            Modifier.fillMaxWidth().height(48.dp).clickable {
+                                if (tag == null) LocaleStore.resetToSystem() else LocaleStore.set(tag)
+                                pickerOpen = false
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.settings_language_changed, name),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(selected = selectedTag == tag, onClick = null)
+                            Text(name, color = MoodifyNavy, fontSize = 14.sp, modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { pickerOpen = false }) { Text(stringResource(R.string.common_done), color = MoodifyPurple) } },
+        )
+    }
+}
+
 @Composable private fun SupportPage(title:String,onBack:()->Unit,end:ImageVector,content:@Composable ColumnScope.()->Unit){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal=18.dp)){Spacer(Modifier.height(10.dp));Row(verticalAlignment=Alignment.CenterVertically){IconButton(onClick=onBack){Icon(Icons.AutoMirrored.Outlined.ArrowBackIos,"返回")};Text(title,Modifier.weight(1f),color=MoodifyNavy,fontSize=21.sp,fontWeight=FontWeight.Bold,textAlign=androidx.compose.ui.text.style.TextAlign.Center);IconButton(onClick={}){Icon(end,null)}};Spacer(Modifier.height(10.dp));content();Spacer(Modifier.height(24.dp))}}
 @Composable private fun Hero(title:String,sub:String){Card(Modifier.fillMaxWidth(),shape=RoundedCornerShape(20.dp),colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.fillMaxWidth().padding(24.dp),horizontalAlignment=Alignment.CenterHorizontally){Row(verticalAlignment=Alignment.CenterVertically){MoodifyMark(Modifier.size(62.dp,42.dp));Text("Moodify",fontSize=29.sp,fontWeight=FontWeight.Bold,color=MoodifyNavy)};Text(title,fontSize=18.sp,fontWeight=FontWeight.Bold,color=MoodifyNavy,modifier=Modifier.padding(top=14.dp));Text(sub,fontSize=11.sp,color=MoodifyMuted,modifier=Modifier.padding(top=7.dp))}};Spacer(Modifier.height(12.dp))}
 @Composable private fun Section(title:String?,modifier:Modifier=Modifier,content:@Composable ColumnScope.()->Unit){Card(modifier.fillMaxWidth(),shape=RoundedCornerShape(18.dp),colors=CardDefaults.cardColors(containerColor=Color.White)){Column(Modifier.padding(14.dp)){title?.let{Text(it,color=MoodifyNavy,fontSize=15.sp,fontWeight=FontWeight.Bold,modifier=Modifier.padding(bottom=8.dp))};content()}};Spacer(Modifier.height(12.dp))}
 @Composable private fun InfoRow(icon:ImageVector,title:String,sub:String){Row(Modifier.fillMaxWidth().padding(vertical=8.dp),verticalAlignment=Alignment.CenterVertically){Box(Modifier.size(40.dp).background(Color(0xFFF4F2FF),RoundedCornerShape(11.dp)),contentAlignment=Alignment.Center){Icon(icon,null,tint=MoodifyPurple)};Column(Modifier.padding(start=12.dp).weight(1f)){Text(title,color=MoodifyNavy,fontSize=13.sp,fontWeight=FontWeight.SemiBold);Text(sub,color=MoodifyMuted,fontSize=9.sp)}}}
-@Composable private fun SimpleRow(icon:ImageVector,title:String,value:String){Row(Modifier.fillMaxWidth().height(43.dp),verticalAlignment=Alignment.CenterVertically){Icon(icon,null,tint=MoodifyPurple,modifier=Modifier.size(20.dp));Text(title,Modifier.padding(start=12.dp).weight(1f),color=MoodifyNavy,fontSize=12.sp);Text(value,color=MoodifyMuted,fontSize=10.sp);Icon(Icons.Outlined.ChevronRight,null,tint=MoodifyMuted,modifier=Modifier.size(18.dp))}}
+@Composable private fun SimpleRow(icon:ImageVector,title:String,value:String,onClick:(()->Unit)?=null){val row: @Composable ()->Unit={Row(Modifier.fillMaxWidth().height(43.dp),verticalAlignment=Alignment.CenterVertically){Icon(icon,null,tint=MoodifyPurple,modifier=Modifier.size(20.dp));Text(title,Modifier.padding(start=12.dp).weight(1f),color=MoodifyNavy,fontSize=12.sp);Text(value,color=MoodifyMuted,fontSize=10.sp);Icon(Icons.Outlined.ChevronRight,null,tint=MoodifyMuted,modifier=Modifier.size(18.dp))}};if(onClick==null)row()else Surface(onClick=onClick,modifier=Modifier.fillMaxWidth(),color=Color.Transparent,shape=RoundedCornerShape(12.dp)){row()}}
 @Composable private fun ToggleRow(title:String,value:Boolean,onChange:(Boolean)->Unit){Row(Modifier.fillMaxWidth().height(43.dp),verticalAlignment=Alignment.CenterVertically){Text(title,Modifier.weight(1f),color=MoodifyNavy,fontSize=12.sp);Switch(value,onChange)}}
 @Composable private fun Mini(icon:ImageVector,title:String,modifier:Modifier){Card(modifier,colors=CardDefaults.cardColors(containerColor=Color(0xFFFCFCFF))){Column(Modifier.padding(12.dp),horizontalAlignment=Alignment.CenterHorizontally){Icon(icon,null,tint=MoodifyPurple);Text(title,color=MoodifyNavy,fontSize=10.sp,modifier=Modifier.padding(top=6.dp))}}}

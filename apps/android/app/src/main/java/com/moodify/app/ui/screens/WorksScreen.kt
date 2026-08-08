@@ -19,10 +19,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moodify.app.R
+import com.moodify.app.data.LocaleKit
+import com.moodify.app.data.LocaleStore
 import com.moodify.app.data.WorkLibrary
 import com.moodify.app.data.ProcessedWork
 import com.moodify.app.ui.components.MoodifyMark
@@ -47,13 +51,13 @@ private val demoWorks = listOf(
 private val realWorkColors = listOf(Color(0xFF7B61FF), Color(0xFF4A9BFF), Color(0xFF25258E))
 
 /** Queue with [original, processed] adjacent per work for one-tap A/B. */
-private fun buildQueue(works: List<ProcessedWork>): List<com.moodify.app.data.QueueItem> {
+private fun buildQueue(works: List<ProcessedWork>, originalLabel: String, processedLabel: String): List<com.moodify.app.data.QueueItem> {
     val items = mutableListOf<com.moodify.app.data.QueueItem>()
     works.forEach { w ->
         w.uploadId?.let {
             items.add(com.moodify.app.data.QueueItem(
                 title = w.filename,
-                subtitle = "原始音频",
+                subtitle = originalLabel,
                 path = "/uploads/$it/download",
                 isOriginal = true,
                 preset = w.preset,
@@ -62,7 +66,7 @@ private fun buildQueue(works: List<ProcessedWork>): List<com.moodify.app.data.Qu
         w.artifactId?.let {
             items.add(com.moodify.app.data.QueueItem(
                 title = w.filename,
-                subtitle = "AI 处理完成",
+                subtitle = processedLabel,
                 path = "/artifacts/$it/download",
                 isOriginal = false,
                 preset = w.preset,
@@ -74,24 +78,24 @@ private fun buildQueue(works: List<ProcessedWork>): List<com.moodify.app.data.Qu
     return items
 }
 
-private fun realWorkItem(w: ProcessedWork): WorkItem = WorkItem(
+private fun realWorkItem(w: ProcessedWork, processedLabel: String, gatePassedLabel: String, gateFailedLabel: String, mrsImprovedLabel: String, dateLocale: Locale): WorkItem = WorkItem(
     title = w.filename,
-    duration = "已处理",
-    status = if (w.gatePassed) "质量门通过" else "质量门未通过",
-    date = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(w.createdAt)),
+    duration = processedLabel,
+    status = if (w.gatePassed) gatePassedLabel else gateFailedLabel,
+    date = SimpleDateFormat("yyyy-MM-dd HH:mm", dateLocale).format(Date(w.createdAt)),
     colors = realWorkColors,
     tags = buildList {
         add(Icons.Outlined.Verified to w.preset)
         w.mrsDelta?.let { add(Icons.Outlined.ShowChart to "MRS Δ+%.1f".format(it)) }
-        add(Icons.Outlined.GraphicEq to (w.mrsBefore?.let { "MRS %.0f→%.0f".format(it, w.mrsAfter ?: 0.0) } ?: "MRS 已提升"))
+        add(Icons.Outlined.GraphicEq to (w.mrsBefore?.let { "MRS %.0f→%.0f".format(it, w.mrsAfter ?: 0.0) } ?: mrsImprovedLabel))
     },
     progress = null,
     artifactId = w.artifactId,
     uploadId = w.uploadId,
 )
 
-private fun playFromWorks(works: List<ProcessedWork>, item: WorkItem) {
-    val queue = buildQueue(works)
+private fun playFromWorks(works: List<ProcessedWork>, item: WorkItem, originalLabel: String, processedLabel: String) {
+    val queue = buildQueue(works, originalLabel, processedLabel)
     val idx = queue.indexOfFirst { !it.isOriginal && it.title == item.title }
     com.moodify.app.data.PlaybackManager.playQueue(queue, if (idx >= 0) idx else 0)
 }
@@ -99,8 +103,15 @@ private fun playFromWorks(works: List<ProcessedWork>, item: WorkItem) {
 @Composable
 fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
     val context = LocalContext.current
+    val originalLabel = stringResource(R.string.works_original_audio)
+    val processedLabel = stringResource(R.string.works_processed)
+    val aiProcessedLabel = stringResource(R.string.works_ai_processed)
+    val gatePassedLabel = stringResource(R.string.works_gate_passed)
+    val gateFailedLabel = stringResource(R.string.works_gate_failed)
+    val mrsImprovedLabel = stringResource(R.string.works_mrs_improved)
+    val dateLocale = Locale.forLanguageTag(LocaleKit.normalize(LocaleStore.currentTag() ?: Locale.getDefault().toLanguageTag()))
     val realWorks = remember { WorkLibrary(context).all() }
-    val works = realWorks.map(::realWorkItem) + demoWorks
+    val works = realWorks.map { realWorkItem(it, processedLabel, gatePassedLabel, gateFailedLabel, mrsImprovedLabel, dateLocale) } + demoWorks
     val playbackState by com.moodify.app.data.PlaybackManager.state.collectAsStateWithLifecycle()
     androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = if (playbackState.url != null) 88.dp else 0.dp)) {
@@ -110,30 +121,30 @@ fun WorksScreen(onBack: (() -> Unit)? = null, onOpenDetail: () -> Unit = {}) {
                 MoodifyMark(Modifier.size(48.dp, 34.dp)); Spacer(Modifier.width(8.dp))
                 Text("Moodify", color = MoodifyNavy, fontSize = 27.sp, fontWeight = FontWeight.Bold)
             }
-            Text("让每一首音乐都更动人", Modifier.fillMaxWidth(), color = MoodifyMuted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            Text(stringResource(R.string.works_motto), Modifier.fillMaxWidth(), color = MoodifyMuted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         } else {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBackIos, "返回") }
-                Text("我的作品", Modifier.weight(1f), color = MoodifyNavy, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBackIos, stringResource(R.string.common_back)) }
+                Text(stringResource(R.string.works_title), Modifier.weight(1f), color = MoodifyNavy, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 Spacer(Modifier.width(48.dp))
             }
         }
         Spacer(Modifier.height(28.dp))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("我的作品", color = MoodifyNavy, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.works_title), color = MoodifyNavy, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             OutlinedButton(onClick = {}, shape = RoundedCornerShape(22.dp), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyOutline)) {
-                Text("筛选", color = MoodifyMuted); Spacer(Modifier.width(6.dp)); Icon(Icons.Outlined.FilterList, null, tint = MoodifyMuted, modifier = Modifier.size(18.dp))
+                Text(stringResource(R.string.works_filter), color = MoodifyMuted); Spacer(Modifier.width(6.dp)); Icon(Icons.Outlined.FilterList, null, tint = MoodifyMuted, modifier = Modifier.size(18.dp))
             }
         }
         Spacer(Modifier.height(12.dp))
         works.forEach { item ->
             WorkCard(item, onOpenDetail, onPlay = item.artifactId?.let {
-                { playFromWorks(realWorks, item) }
+                { playFromWorks(realWorks, item, originalLabel, aiProcessedLabel) }
             })
             Spacer(Modifier.height(14.dp))
         }
         OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(27.dp), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyBlue)) {
-            Icon(Icons.Outlined.Add, null, tint = MoodifyBlue); Spacer(Modifier.width(8.dp)); Text("导入作品", color = MoodifyBlue, fontSize = 16.sp)
+            Icon(Icons.Outlined.Add, null, tint = MoodifyBlue); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.works_import), color = MoodifyBlue, fontSize = 16.sp)
         }
         Spacer(Modifier.height(14.dp))
         Spacer(Modifier.height(20.dp))

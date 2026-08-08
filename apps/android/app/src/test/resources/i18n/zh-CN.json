@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "languageName": "中文（简体）",
+    "locale": "zh-CN"
+  },
+  "common": {
+    "appName": "Moodify",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "done": "完成",
+    "back": "返回",
+    "next": "下一步",
+    "close": "关闭",
+    "retry": "重试",
+    "delete": "删除",
+    "edit": "编辑",
+    "search": "搜索",
+    "loading": "加载中…",
+    "unknownError": "出现了一些问题。",
+    "networkError": "当前网络不可用。",
+    "required": "必填",
+    "optional": "选填"
+  },
+  "nav": {
+    "home": "首页",
+    "process": "处理",
+    "works": "作品",
+    "profile": "我的",
+    "discover": "发现音乐",
+    "tasks": "处理任务",
+    "cloud": "云端空间",
+    "creatorCenter": "创作者中心",
+    "dataCenter": "数据中心",
+    "copyright": "版权与发布",
+    "partnership": "合作计划",
+    "settings": "设置",
+    "help": "帮助与反馈"
+  },
+  "home": {
+    "title": "听见别人听不见的。",
+    "subtitle": "用于音乐分析、判断、干预与验证的听觉智能。",
+    "startAnalysis": "开始分析",
+    "importAudio": "导入音频",
+    "recentWorks": "最近作品",
+    "noRecentWorks": "还没有作品"
+  },
+  "analysis": {
+    "title": "音频分析",
+    "upload": "上传音频",
+    "analyzing": "正在聆听与分析…",
+    "completed": "分析完成",
+    "failed": "分析失败",
+    "source": "源文件",
+    "waveform": "波形",
+    "loudness": "响度",
+    "stereo": "立体声",
+    "phase": "相位",
+    "spectrum": "频谱",
+    "transients": "瞬态",
+    "residual": "残差",
+    "highFrequencyCutoff": "高频截止",
+    "report": "分析报告",
+    "exportReport": "导出报告"
+  },
+  "works": {
+    "title": "我的作品",
+    "all": "全部",
+    "drafts": "草稿",
+    "processed": "已处理",
+    "published": "已发布",
+    "empty": "你的作品会显示在这里。",
+    "version": "版本 {{version}}",
+    "updatedAt": "更新于 {{date}}"
+  },
+  "settings": {
+    "title": "设置",
+    "language": "语言",
+    "languageDescription": "选择 Moodify 的显示语言。",
+    "followSystem": "跟随系统语言",
+    "appearance": "外观",
+    "notifications": "通知",
+    "privacy": "隐私",
+    "about": "关于 Moodify",
+    "languageChanged": "语言已切换为{{language}}。"
+  },
+  "auth": {
+    "signIn": "登录",
+    "signUp": "创建账户",
+    "signOut": "退出登录",
+    "email": "邮箱",
+    "password": "密码",
+    "forgotPassword": "忘记密码？",
+    "creatorPass": "CWC 创作者通行证"
+  },
+  "accessibility": {
+    "openLanguageMenu": "打开语言菜单",
+    "selectedLanguage": "已选择{{language}}"
+  }
+}

@@ -14,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moodify.app.R
 import com.moodify.app.ui.components.MoodifyMark
 import com.moodify.app.ui.theme.*
 
@@ -33,35 +35,35 @@ fun ProcessingHubScreen(
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
         Spacer(Modifier.height(18.dp))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onOpenDrawer) { Icon(Icons.Outlined.Menu, "菜单", tint = MoodifyNavy) }
-            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) { MoodifyMark(Modifier.size(48.dp, 34.dp)); Spacer(Modifier.width(8.dp)); Text("处理", color = MoodifyNavy, fontSize = 27.sp, fontWeight = FontWeight.Bold) }
+            IconButton(onClick = onOpenDrawer) { Icon(Icons.Outlined.Menu, stringResource(R.string.accessibility_open_menu), tint = MoodifyNavy) }
+            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) { MoodifyMark(Modifier.size(48.dp, 34.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.nav_process), color = MoodifyNavy, fontSize = 27.sp, fontWeight = FontWeight.Bold) }
             Icon(Icons.Outlined.HelpOutline, null, tint = MoodifyMuted)
         }
         Spacer(Modifier.height(20.dp))
         PickAudioCard(onPickAudio)
         Spacer(Modifier.height(14.dp))
-        Text("导入来源", color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.analysis_import_source), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(11.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-            SourceCard(Icons.Outlined.Folder, "本地导入", "从手机存储选择", Modifier.weight(1f), onPickAudio)
-            SourceCard(Icons.Outlined.Chat, "微信导入", "聊天文件与收藏", Modifier.weight(1f), onWechatImport)
-            SourceCard(Icons.Outlined.CloudQueue, "云端导入", "云盘或远程空间", Modifier.weight(1f), onCloudImport)
+            SourceCard(Icons.Outlined.Folder, stringResource(R.string.analysis_local_import), stringResource(R.string.analysis_local_import_desc), Modifier.weight(1f), onPickAudio)
+            SourceCard(Icons.Outlined.Chat, stringResource(R.string.analysis_wechat_import), stringResource(R.string.analysis_wechat_import_desc), Modifier.weight(1f), onWechatImport)
+            SourceCard(Icons.Outlined.CloudQueue, stringResource(R.string.analysis_cloud_import), stringResource(R.string.analysis_cloud_import_desc), Modifier.weight(1f), onCloudImport)
         }
         Spacer(Modifier.height(20.dp))
-        Text("处理方案", color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.analysis_plan), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(11.dp))
-        PlanCard(Icons.Outlined.Verified, "标准处理", "响度 · 音质 · 平台适配", "¥30", true, onStandardProcess)
+        PlanCard(Icons.Outlined.Verified, stringResource(R.string.analysis_standard), stringResource(R.string.analysis_standard_desc), "¥30", true, onStandardProcess)
         Spacer(Modifier.height(9.dp))
-        PlanCard(Icons.Outlined.FreeBreakfast, "免费入驻", "先保存到作品库，之后再处理或发布", "", false, onFreeSave)
+        PlanCard(Icons.Outlined.FreeBreakfast, stringResource(R.string.analysis_free_onboard), stringResource(R.string.analysis_free_onboard_desc), "", false, onFreeSave)
         Spacer(Modifier.height(20.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("最近处理任务", Modifier.weight(1f), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
-            Text("查看全部  ›", color = MoodifyMuted, fontSize = 11.sp)
+            Text(stringResource(R.string.analysis_recent_tasks), Modifier.weight(1f), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.home_view_all), color = MoodifyMuted, fontSize = 11.sp)
         }
         Spacer(Modifier.height(11.dp))
-        RecentTask("Dreamscape", "处理中 68%", 0.68f, onOpenRecentTask)
-        RecentTask("Sunset Drive", "已完成", null, onOpenRecentTask)
-        RecentTask("AI Demo Track", "等待处理", null, onOpenRecentTask)
+        RecentTask("Dreamscape", stringResource(R.string.analysis_processing, "68%"), MoodifyPurple, 0.68f, onOpenRecentTask)
+        RecentTask("Sunset Drive", stringResource(R.string.analysis_done), MoodifyGreen, null, onOpenRecentTask)
+        RecentTask("AI Demo Track", stringResource(R.string.analysis_waiting), MoodifyOrange, null, onOpenRecentTask)
         Spacer(Modifier.height(20.dp))
     }
 }
@@ -73,8 +75,8 @@ private fun PickAudioCard(onPick: () -> Unit) {
             Box(Modifier.size(66.dp).background(Brush.linearGradient(listOf(MoodifyPurple, MoodifyBlue)), RoundedCornerShape(18.dp)), contentAlignment = Alignment.Center) {
                 Icon(Icons.Outlined.FileUpload, null, tint = Color.White, modifier = Modifier.size(38.dp))
             }
-            Text("选择音频文件", color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp))
-            Text("支持 WAV / MP3 / FLAC / AAC / M4A，单个不超过 50MB", color = MoodifyMuted, fontSize = 10.sp, modifier = Modifier.padding(top = 9.dp))
+            Text(stringResource(R.string.analysis_pick_audio), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp))
+            Text(stringResource(R.string.analysis_pick_audio_support), color = MoodifyMuted, fontSize = 10.sp, modifier = Modifier.padding(top = 9.dp))
         }
     }
 }
@@ -114,7 +116,7 @@ private fun PlanCard(icon: ImageVector, title: String, sub: String, price: Strin
 }
 
 @Composable
-private fun RecentTask(name: String, status: String, progress: Float?, click: () -> Unit) {
+private fun RecentTask(name: String, status: String, statusColor: Color, progress: Float?, click: () -> Unit) {
     Card(onClick = click, modifier = Modifier.fillMaxWidth().padding(bottom = 9.dp), shape = RoundedCornerShape(17.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyOutline)) {
         Row(Modifier.padding(13.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(46.dp).background(Brush.linearGradient(listOf(MoodifyPurple, MoodifyBlue)), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
@@ -122,7 +124,7 @@ private fun RecentTask(name: String, status: String, progress: Float?, click: ()
             }
             Column(Modifier.padding(start = 13.dp).weight(1f)) {
                 Text(name, color = MoodifyNavy, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                Text(status, color = if (status.contains("完成")) MoodifyGreen else if (status.contains("等待")) MoodifyOrange else MoodifyPurple, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+                Text(status, color = statusColor, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
                 if (progress != null) LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().padding(top = 6.dp).height(4.dp), color = MoodifyBlue, trackColor = MoodifyOutline)
             }
             Icon(Icons.Outlined.ChevronRight, null, tint = MoodifyMuted)

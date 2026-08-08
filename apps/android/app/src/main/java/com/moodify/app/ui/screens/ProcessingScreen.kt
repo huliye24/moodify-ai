@@ -39,9 +39,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moodify.app.R
 import com.moodify.app.data.BaseUrlStore
 import com.moodify.app.data.ConnectionError
 import com.moodify.app.data.DemoJobStatus
@@ -138,10 +140,10 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("音乐处理", fontSize = 21.sp, fontWeight = FontWeight.Bold, color = MoodifyNavy)
+        Text(stringResource(R.string.analysis_title), fontSize = 21.sp, fontWeight = FontWeight.Bold, color = MoodifyNavy)
         when (val s = state) {
             is DemoProcessState.Uploading -> {
-                Text("正在上传音频…", fontSize = 12.sp, color = MoodifyMuted)
+                Text(stringResource(R.string.analysis_uploading), fontSize = 12.sp, color = MoodifyMuted)
                 Spacer(Modifier.height(18.dp))
                 SurfaceCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -150,14 +152,14 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                         }
                         Column(Modifier.padding(start = 16.dp).weight(1f)) {
                             Text(fileName(uri), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = MoodifyNavy)
-                            Text("正在上传到电脑端…", color = MoodifyMuted, fontSize = 13.sp)
+                            Text(stringResource(R.string.analysis_uploading_to_pc), color = MoodifyMuted, fontSize = 13.sp)
                             Spacer(Modifier.height(10.dp))
                             LinearProgressIndicator(progress = { 0.1f }, modifier = Modifier.fillMaxWidth().height(5.dp), color = MoodifyBlue, trackColor = Color(0xFFE8ECF5), strokeCap = StrokeCap.Round)
                         }
                     }
                 }
                 Spacer(Modifier.height(14.dp))
-                SurfaceCard { Text("上传完成后将自动开始真实处理", color = MoodifyMuted, fontSize = 13.sp) }
+                SurfaceCard { Text(stringResource(R.string.analysis_upload_auto_start), color = MoodifyMuted, fontSize = 13.sp) }
             }
             is DemoProcessState.Processing -> {
                 val progress = s.progress
@@ -166,7 +168,7 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                 Spacer(Modifier.height(18.dp))
                 SurfaceCard {
                     Row(verticalAlignment = Alignment.Bottom) {
-                        Text("处理中", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MoodifyNavy)
+                        Text(stringResource(R.string.analysis_processing_title), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MoodifyNavy)
                         Text(" ${(progress * 100).toInt()}%", fontSize = 18.sp, color = MoodifyNavy)
                     }
                     Spacer(Modifier.height(12.dp))
@@ -178,7 +180,7 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                         strokeCap = StrokeCap.Round,
                     )
                     Spacer(Modifier.height(10.dp))
-                    Text("正在由电脑端真实处理引擎执行…", color = MoodifyMuted, fontSize = 13.sp)
+                    Text(stringResource(R.string.analysis_engine_running), color = MoodifyMuted, fontSize = 13.sp)
                 }
                 Spacer(Modifier.height(14.dp))
                 SurfaceCard {
@@ -193,10 +195,10 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                     }
                 }
                 Spacer(Modifier.height(20.dp))
-                Text("处理完成后将自动保存到作品", color = MoodifyBlue, fontSize = 13.sp)
+                Text(stringResource(R.string.analysis_save_to_works), color = MoodifyBlue, fontSize = 13.sp)
             }
             is DemoProcessState.Done -> {
-                Text("真实处理完成", fontSize = 12.sp, color = Color(0xFF31A35E))
+                Text(stringResource(R.string.analysis_real_completed), fontSize = 12.sp, color = Color(0xFF31A35E))
                 Spacer(Modifier.height(18.dp))
                 SurfaceCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -205,9 +207,9 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                         }
                         Column(Modifier.padding(start = 16.dp).weight(1f)) {
                             Text(s.summary.filename, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = MoodifyNavy)
-                            Text("${s.summary.preset} · 已保存到作品库", color = MoodifyMuted, fontSize = 13.sp)
+                            Text("${s.summary.preset} · ${stringResource(R.string.analysis_saved_to_library)}", color = MoodifyMuted, fontSize = 13.sp)
                             Spacer(Modifier.height(10.dp))
-                            Text("MRS 质量分 ${fmt(s.summary.mrsBefore)} → ${fmt(s.summary.mrsAfter)} (Δ${fmt(s.summary.mrsDelta)})", color = MoodifyBlue, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            Text("${stringResource(R.string.analysis_mrs_score)} ${fmt(s.summary.mrsBefore)} → ${fmt(s.summary.mrsAfter)} (Δ${fmt(s.summary.mrsDelta)})", color = MoodifyBlue, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -215,7 +217,13 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                 SurfaceCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.CheckCircle, null, tint = MoodifyBlue, modifier = Modifier.size(22.dp))
-                        Text("质量门：${if (s.summary.gatePassed) "通过" else "未通过"}", Modifier.padding(start = 12.dp), color = MoodifyNavy, fontSize = 14.sp)
+                        Text(
+                            stringResource(
+                                R.string.analysis_gate,
+                                if (s.summary.gatePassed) stringResource(R.string.analysis_gate_passed) else stringResource(R.string.analysis_gate_failed),
+                            ),
+                            Modifier.padding(start = 12.dp), color = MoodifyNavy, fontSize = 14.sp,
+                        )
                     }
                     if (s.summary.issues.isNotEmpty()) {
                         s.summary.issues.take(3).forEach { issue ->
@@ -226,10 +234,10 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                 }
                 Spacer(Modifier.height(20.dp))
                 val doneSummary = s.summary
-                GradientButton("查看作品库", onClick = { onDone(doneSummary) })
+                GradientButton(stringResource(R.string.works_view_library), onClick = { onDone(doneSummary) })
             }
             is DemoProcessState.Failed -> {
-                Text("处理失败", fontSize = 12.sp, color = Color(0xFFE05B5B))
+                Text(stringResource(R.string.analysis_failed), fontSize = 12.sp, color = Color(0xFFE05B5B))
                 Spacer(Modifier.height(18.dp))
                 SurfaceCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -238,7 +246,7 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                     }
                 }
                 Spacer(Modifier.height(20.dp))
-                GradientButton("返回", onBackHome)
+                GradientButton(stringResource(R.string.common_back), onBackHome)
             }
         }
     }
