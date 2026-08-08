@@ -30,14 +30,14 @@ fun MoodifyDrawerContent(selected: Int, onDestination: (Int) -> Unit) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             Spacer(Modifier.height(26.dp)); ProfileCard(); Spacer(Modifier.height(22.dp))
             listOf(
-                DrawerItem(Icons.Outlined.VideoLibrary, stringResource(R.string.works_title), 0), DrawerItem(Icons.Outlined.FactCheck, stringResource(R.string.nav_tasks), 1, "1"), DrawerItem(Icons.Outlined.CloudQueue, stringResource(R.string.nav_cloud))
+                DrawerItem(Icons.Outlined.VideoLibrary, stringResource(R.string.cases_title), 0), DrawerItem(Icons.Outlined.FactCheck, stringResource(R.string.nav_process), 1, "1"), DrawerItem(Icons.Outlined.CloudQueue, stringResource(R.string.nav_cloud))
             ).forEach { DrawerRow(it, selected, onDestination) }
             HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MoodifyOutline)
             listOf(
-                DrawerItem(Icons.Outlined.PersonOutline, stringResource(R.string.nav_creator_center), 2, "•"), DrawerItem(Icons.Outlined.BarChart, stringResource(R.string.nav_data_center), 3), DrawerItem(Icons.Outlined.VerifiedUser, stringResource(R.string.nav_copyright), 4, "•"), DrawerItem(Icons.Outlined.Handshake, stringResource(R.string.nav_partnership), 5)
+                DrawerItem(Icons.Outlined.BarChart, stringResource(R.string.nav_data_center), 3)
             ).forEach { DrawerRow(it, selected, onDestination) }
             HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MoodifyOutline)
-            listOf(DrawerItem(Icons.Outlined.Settings, stringResource(R.string.nav_settings), 6), DrawerItem(Icons.Outlined.HeadsetMic, stringResource(R.string.nav_help), 7), DrawerItem(Icons.Outlined.Info, stringResource(R.string.settings_about), 8)).forEach { DrawerRow(it, selected, onDestination) }
+            listOf(DrawerItem(Icons.Outlined.Settings, stringResource(R.string.nav_settings), 4), DrawerItem(Icons.Outlined.HeadsetMic, stringResource(R.string.nav_help), 5), DrawerItem(Icons.Outlined.Info, stringResource(R.string.settings_about), 6)).forEach { DrawerRow(it, selected, onDestination) }
             Spacer(Modifier.height(16.dp)); StorageCard(); Spacer(Modifier.height(24.dp))
         }
     }

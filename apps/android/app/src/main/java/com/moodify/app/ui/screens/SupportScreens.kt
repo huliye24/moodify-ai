@@ -80,7 +80,6 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("è®¾ç½
             text = { Text(stringResource(R.string.support_reset_text)) },
             confirmButton = {
                 TextButton(onClick = {
-                    com.moodify.app.data.CwcRepository(context).resetDemoSession()
                     com.moodify.app.data.WorkLibrary(context).clear()
                     com.moodify.app.data.TokenStore(context).clear()
                     com.moodify.app.data.BaseUrlStore(context).baseUrl = com.moodify.app.data.BaseUrlPolicy.DEFAULT

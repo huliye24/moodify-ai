@@ -32,8 +32,7 @@ import java.io.File
  * - the persisted storage record contains the choice (survives restarts).
  *
  * Drives the real MainActivity (AppCompatActivity) because appcompat's locale
- * persistence is triggered from its lifecycle. The CWC onboarding gate is
- * bypassed by seeding the activation flag before launch.
+ * persistence is triggered from its lifecycle.
  */
 @RunWith(AndroidJUnit4::class)
 class LanguageSwitchTest {
@@ -50,8 +49,6 @@ class LanguageSwitchTest {
     @Before
     fun setup() {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
-        appContext.getSharedPreferences("moodify_cwc", Context.MODE_PRIVATE)
-            .edit().putBoolean("cwc_activated", true).apply()
         val pm = appContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "language-test").apply {
             acquire(10 * 60 * 1000L)

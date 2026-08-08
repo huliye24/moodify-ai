@@ -24,7 +24,7 @@
   },
   "nav": {
     "home": "홈",
-    "process": "처리",
+    "process": "청각 분석",
     "works": "작품",
     "profile": "마이",
     "discover": "음악 탐색",
@@ -35,12 +35,13 @@
     "copyright": "저작권 및 배포",
     "partnership": "파트너십",
     "settings": "설정",
-    "help": "도움말 및 피드백"
+    "help": "도움말 및 피드백",
+    "cases": "케이스"
   },
   "home": {
     "title": "다른 이들이 놓치는 소리를 듣다.",
     "subtitle": "음악 분석, 판단, 개입, 검증을 위한 청각 지능.",
-    "startAnalysis": "분석 시작",
+    "startAnalysis": "청각 분석 시작",
     "importAudio": "오디오 가져오기",
     "recentWorks": "최근 작품",
     "noRecentWorks": "아직 작품이 없습니다"
@@ -61,10 +62,10 @@
     "residual": "잔차",
     "highFrequencyCutoff": "고주파 차단",
     "report": "분석 보고서",
-    "exportReport": "보고서 내보내기"
+    "exportReport": "보고서 내보내기",
+    "processingTitle": "청각 개입 실험"
   },
   "works": {
-    "title": "내 작품",
     "all": "전체",
     "drafts": "초안",
     "processed": "처리됨",
@@ -89,9 +90,7 @@
     "signUp": "계정 만들기",
     "signOut": "로그아웃",
     "email": "이메일",
-    "password": "비밀번호",
-    "forgotPassword": "비밀번호를 잊으셨나요?",
-    "creatorPass": "CWC 크리에이터 패스"
+    "forgotPassword": "비밀번호를 잊으셨나요?"
   },
   "accessibility": {
     "openLanguageMenu": "언어 메뉴 열기",

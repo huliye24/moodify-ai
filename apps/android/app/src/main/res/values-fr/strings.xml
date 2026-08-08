@@ -23,7 +23,9 @@
     <string name="common_storage_used">%1$s utilisés</string>
     <!-- nav -->
     <string name="nav_home">Accueil</string>
-    <string name="nav_process">Traitement</string>
+    <string name="nav_process">Analyse auditive</string>
+    <string name="nav_cases">Cas</string>
+    <string name="cases_title">Cas auditifs</string>
     <string name="nav_works">Œuvres</string>
     <string name="nav_profile">Profil</string>
     <string name="nav_discover">Découvrir la musique</string>
@@ -38,7 +40,7 @@
     <!-- home -->
     <string name="home_title">Entendre ce que les autres manquent.</string>
     <string name="home_subtitle">Une intelligence auditive pour analyser, juger, intervenir et vérifier la musique.</string>
-    <string name="home_start_analysis">Lancer l’analyse</string>
+    <string name="home_start_analysis">Démarrer l’analyse auditive</string>
     <string name="home_import_audio">Importer un audio</string>
     <string name="home_recent_works">Œuvres récentes</string>
     <string name="home_no_recent_works">Aucune œuvre pour le moment</string>
@@ -92,7 +94,7 @@
     <string name="analysis_uploading">Téléversement de l’audio…</string>
     <string name="analysis_uploading_to_pc">Téléversement vers votre ordinateur…</string>
     <string name="analysis_upload_auto_start">Le traitement réel démarre automatiquement après le téléversement</string>
-    <string name="analysis_processing_title">Traitement</string>
+    <string name="analysis_processing_title">Intervention auditive</string>
     <string name="analysis_engine_running">Exécution sur le moteur de traitement réel de votre ordinateur…</string>
     <string name="analysis_save_to_works">Enregistré dans Œuvres automatiquement à la fin</string>
     <string name="analysis_real_completed">Traitement réel terminé</string>
@@ -102,7 +104,6 @@
     <string name="analysis_gate_passed">Réussi</string>
     <string name="analysis_gate_failed">Échoué</string>
     <!-- works -->
-    <string name="works_title">Mes œuvres</string>
     <string name="works_all">Toutes</string>
     <string name="works_drafts">Brouillons</string>
     <string name="works_processed">Traitées</string>
@@ -134,9 +135,7 @@
     <string name="auth_sign_up">Créer un compte</string>
     <string name="auth_sign_out">Se déconnecter</string>
     <string name="auth_email">E-mail</string>
-    <string name="auth_password">Mot de passe</string>
     <string name="auth_forgot_password">Mot de passe oublié ?</string>
-    <string name="auth_creator_pass">Pass Créateur CWC</string>
     <!-- accessibility -->
     <string name="accessibility_open_language_menu">Ouvrir le menu des langues</string>
     <string name="accessibility_selected_language">%1$s sélectionné</string>
@@ -161,90 +160,6 @@
     <string name="profile_account_security">Compte et sécurité</string>
     <string name="profile_general_settings">Réglages généraux</string>
     <!-- auth (extended) -->
-    <string name="auth_onboarding_title">Le premier pas dans Moodify pour les créateurs</string>
-    <string name="auth_onboarding_subtitle">Activez votre pass et créez votre compte créateur</string>
-    <string name="auth_phone_email">Téléphone / E-mail</string>
-    <string name="auth_cwc_code">Code du Pass CWC</string>
-    <string name="auth_what_is_cwc">Qu’est-ce que CWC ?</string>
-    <string name="auth_verify_cwc">Vérifier CWC et entrer</string>
-    <string name="auth_have_account">J’ai déjà un compte, me connecter</string>
-    <string name="auth_welcome_back">Bon retour</string>
-    <string name="auth_account_synced">Compte actif ; bibliothèque d’œuvres et droits synchronisés</string>
-    <string name="auth_login_create">Se connecter et continuer à créer</string>
-    <string name="auth_wechat_login">Connexion WeChat</string>
-    <string name="auth_code_login">Connexion par code</string>
-    <string name="auth_no_account">Pas encore de compte ? Entrez CWC pour commencer</string>
-    <string name="auth_activation_success">CWC activé</string>
-    <string name="auth_welcome">Bienvenue sur Moodify, %1$s</string>
-    <string name="auth_enter_processing">Entrer dans le centre de traitement</string>
-    <string name="auth_hint_idle">Aucune saisie, entrez le code complet</string>
-    <string name="auth_hint_checking">Vérification…</string>
-    <string name="auth_hint_valid">Valide · Prêt à l’emploi</string>
-    <string name="auth_activated">Activé</string>
-    <string name="auth_activated_badge">Activation CWC terminée</string>
-    <!-- cwc center -->
-    <string name="cwc_what_is">Qu’est-ce que CWC ?</string>
-    <string name="cwc_help">Aide</string>
-    <string name="cwc_giftable_title">Mes passes à offrir</string>
-    <string name="cwc_pass_count">%1$s passes</string>
-    <string name="cwc_gift_one">Offrir un pass</string>
-    <string name="cwc_rules">Voir les règles CWC</string>
-    <string name="cwc_copy_link_label">Lien du pass</string>
-    <string name="cwc_copy_code_label">Code du pass</string>
-    <string name="cwc_qr_title">QR code du pass</string>
-    <string name="cwc_qr_placeholder_note">Placeholder MVP — génération ZXing à venir</string>
-    <string name="cwc_copy_code">Copier le code du pass</string>
-    <string name="cwc_share_title">Partager le pass créateur</string>
-    <string name="cwc_share_your_code">Votre code de pass : %1$s</string>
-    <string name="cwc_share_wechat">Envoyer via WeChat</string>
-    <string name="cwc_share_copy_link">Copier le lien</string>
-    <string name="cwc_share_poster">Créer une affiche</string>
-    <string name="cwc_brand_tagline">Une place réservée aux voix qui méritent d’être entendues</string>
-    <string name="cwc_brand_sub">Chaque pass est une poignée de main officielle entre un créateur et le monde</string>
-    <string name="cwc_share_code">Code de partage</string>
-    <string name="cwc_donor">Donateur</string>
-    <string name="cwc_expiry">Expire le</string>
-    <string name="cwc_invite_records">Historique des invitations</string>
-    <string name="cwc_share_subject">Pass créateur Moodify</string>
-    <string name="cwc_share_text">%1$s vous invite à rejoindre Moodify. Votre pass créateur : %2$s\n%3$s</string>
-    <string name="cwc_copied">%1$s copié</string>
-    <string name="cwc_qr_placeholder">Placeholder QR code</string>
-    <string name="cwc_understand_as">Voyez-le comme</string>
-    <string name="cwc_benefit_gift">Un cadeau</string>
-    <string name="cwc_benefit_gift_desc">Offert par un créateur, une marque ou une organisation</string>
-    <string name="cwc_benefit_pass">Un pass</string>
-    <string name="cwc_benefit_pass_desc">Le seul justificatif d’invitation pour entrer dans Moodify</string>
-    <string name="cwc_benefit_package">Un pack d’avantages</string>
-    <string name="cwc_benefit_package_desc">Avantages créateur essentiels dès l’arrivée</string>
-    <string name="cwc_after_activation">Après activation</string>
-    <string name="cwc_benefit_first_work">Première œuvre : onboarding offert</string>
-    <string name="cwc_benefit_first_work_desc">Service d’onboarding et de catalogage offert</string>
-    <string name="cwc_benefit_catalog">Catalogage de base des œuvres</string>
-    <string name="cwc_benefit_catalog_desc">Bibliothèque d’œuvres et dossiers de droits</string>
-    <string name="cwc_benefit_profile">Profil créateur activé</string>
-    <string name="cwc_benefit_profile_desc">Créez votre profil public</string>
-    <string name="cwc_benefit_discount" formatted="false">-20 % sur le traitement standard</string>
-    <string name="cwc_benefit_discount_desc">1 coupon de traitement standard</string>
-    <string name="cwc_steps">Comment l’utiliser</string>
-    <string name="cwc_step1">Recevoir un CWC</string>
-    <string name="cwc_step1_desc">Offert par un créateur, une marque ou une organisation</string>
-    <string name="cwc_step2">Vérifier et activer</string>
-    <string name="cwc_step2_desc">Saisissez votre code de pass et créez un compte</string>
-    <string name="cwc_step3">Importer vos œuvres</string>
-    <string name="cwc_step3_desc">Commencez à créer dans le Centre de traitement</string>
-    <string name="cwc_step4">Commencer à grandir</string>
-    <string name="cwc_step4_desc">Catalogage, publication et collaboration</string>
-    <string name="cwc_start">Commencer avec CWC</string>
-    <string name="cwc_creator_pass_title">Pass créateur CWC</string>
-    <string name="cwc_creator_pass_sub">Un cadeau de créateur et un justificatif d’entrée dans Moodify</string>
-    <string name="cwc_accept_pass">Accepter le pass créateur</string>
-    <string name="cwc_benefit_copyright">Catalogage de base des droits d’auteur</string>
-    <string name="cwc_benefit_discount_note">1 coupon ; traitement DSP gratuit non inclus</string>
-    <string name="cwc_welcome_quote">« Bienvenue sur Moodify — la technologie pour rapprocher chaque voix de l’émotion. »</string>
-    <string name="cwc_accept_start">Accepter et commencer l’arrivée</string>
-    <string name="cwc_pass_guide">Voir le guide du pass</string>
-    <string name="cwc_gift_from">%1$s vous a offert un pass créateur</string>
-    <string name="cwc_masked_note">Seule une partie du code est affichée ; le code complet s’insère automatiquement à la vérification</string>
     <!-- collab -->
     <string name="collab_marketplace">Place de marché des collaborations</string>
     <string name="collab_search_placeholder">Rechercher des opportunités / services / créateurs / organisations</string>
@@ -451,7 +366,6 @@
     <string name="creator_plays_7d">Lectures sur 7 jours</string>
     <string name="creator_vs_last_week" formatted="false">vs semaine dernière ↑ 18,6 %</string>
     <string name="creator_new_followers">Nouveaux abonnés  %1$s</string>
-    <string name="creator_cwc_line">%1$s · %2$s · %3$s</string>
     <!-- data center -->
     <string name="data_date">Date</string>
     <string name="data_range_overview">Aperçu des performances sur 30 jours</string>

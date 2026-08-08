@@ -24,7 +24,7 @@
   },
   "nav": {
     "home": "首页",
-    "process": "处理",
+    "process": "听觉检测",
     "works": "作品",
     "profile": "我的",
     "discover": "发现音乐",
@@ -35,12 +35,13 @@
     "copyright": "版权与发布",
     "partnership": "合作计划",
     "settings": "设置",
-    "help": "帮助与反馈"
+    "help": "帮助与反馈",
+    "cases": "案例"
   },
   "home": {
     "title": "听见别人听不见的。",
     "subtitle": "用于音乐分析、判断、干预与验证的听觉智能。",
-    "startAnalysis": "开始分析",
+    "startAnalysis": "开始听觉检测",
     "importAudio": "导入音频",
     "recentWorks": "最近作品",
     "noRecentWorks": "还没有作品"
@@ -61,10 +62,10 @@
     "residual": "残差",
     "highFrequencyCutoff": "高频截止",
     "report": "分析报告",
-    "exportReport": "导出报告"
+    "exportReport": "导出报告",
+    "processingTitle": "听觉干预实验"
   },
   "works": {
-    "title": "我的作品",
     "all": "全部",
     "drafts": "草稿",
     "processed": "已处理",
@@ -89,9 +90,7 @@
     "signUp": "创建账户",
     "signOut": "退出登录",
     "email": "邮箱",
-    "password": "密码",
-    "forgotPassword": "忘记密码？",
-    "creatorPass": "CWC 创作者通行证"
+    "forgotPassword": "忘记密码？"
   },
   "accessibility": {
     "openLanguageMenu": "打开语言菜单",
