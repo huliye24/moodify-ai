@@ -6,12 +6,15 @@ Subprocess argument arrays only — never shell command strings.
 from __future__ import annotations
 
 import json
+import logging
 import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 from moodify.auditory.errors import (
     AudioDecodeFailed,
@@ -116,6 +119,14 @@ def probe(path: Path) -> FileProbe:
     )
 
 
+def _best_effort_cleanup(path: Path) -> None:
+    """Remove a temp decode file; failure is logged, never fatal."""
+    try:
+        path.unlink()
+    except OSError as exc:
+        logger.warning("temp decode cleanup failed for %s: %s", path, exc)
+
+
 def decode(path: Path, analysis_sample_rate: int, timeout_s: int = 300) -> DecodedAudio:
     """Decode to float32 via ffmpeg, resampling to the analysis rate.
 
@@ -133,17 +144,11 @@ def decode(path: Path, analysis_sample_rate: int, timeout_s: int = 300) -> Decod
     ]
     proc = subprocess.run(args, capture_output=True, text=True, timeout=timeout_s)
     if proc.returncode != 0:
-        try:
-            out_path.unlink()
-        except OSError:
-            pass
+        _best_effort_cleanup(out_path)
         raise AudioDecodeFailed(f"ffmpeg decode failed: {proc.stderr[:300]}")
 
     data = np.fromfile(out_path, dtype=np.float32)
-    try:
-        out_path.unlink()
-    except OSError:
-        pass
+    _best_effort_cleanup(out_path)
 
     if data.size == 0:
         raise AudioEmpty(f"audio decoded to zero samples: {path}")

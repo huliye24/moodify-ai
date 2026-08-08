@@ -1,0 +1,216 @@
+{
+  "fixture": {
+    "path": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\source.wav",
+    "sha256": "14dc60fece31e996100633a7ff887354c99021bcd1c93b8949d6805ddfcbd602"
+  },
+  "project_init": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "project",
+      "init",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--title",
+      "audit"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"command\": \"project.init\", \"project_dir\": \"E:\\\\moodify\\\\artifacts\\\\audits\\\\product_alignment\\\\runtime\\\\project\", \"project_id\": \"3a66ea13-0949-4ec3-a333-29f37f2a4bc0\", \"schema_version\": \"1.0.0\", \"status\": \"created\"}\n",
+    "stderr": ""
+  },
+  "source_intake": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "asset",
+      "import",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\source.wav"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"asset\": {\"asset_id\": \"13ef0fc7-cd40-410e-9a4a-9d9d320468ae\", \"kind\": \"audio\", \"metadata\": {}, \"path\": \"E:\\\\moodify\\\\artifacts\\\\audits\\\\product_alignment\\\\runtime\\\\source.wav\", \"role\": \"source\", \"sha256\": \"14dc60fece31e996100633a7ff887354c99021bcd1c93b8949d6805ddfcbd602\"}, \"command\": \"asset.import\", \"project_id\": \"3a66ea13-0949-4ec3-a333-29f37f2a4bc0\", \"schema_version\": \"1.0.0\", \"status\": \"created\"}\n",
+    "stderr": ""
+  },
+  "dry_plan": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "plan",
+      "create",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--intent",
+      "{\"gain_db\":-1}",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"command\": \"plan.create\", \"plan\": {\"dry_run\": true, \"intent\": {\"gain_db\": -1}, \"plan_id\": \"f957d2b0-1491-46c4-9150-10591a8bd8de\", \"steps\": [{\"params\": {\"gain_db\": -1.0}, \"type\": \"gain\"}], \"warnings\": []}, \"project_id\": \"3a66ea13-0949-4ec3-a333-29f37f2a4bc0\", \"schema_version\": \"1.0.0\", \"status\": \"planned\"}\n",
+    "stderr": ""
+  },
+  "dry_plan_apply_attempt": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "run",
+      "execute",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--plan-id",
+      "f957d2b0-1491-46c4-9150-10591a8bd8de",
+      "--output-dir",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\dry_apply"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\"command\": \"run.execute\", \"errors\": [{\"code\": \"DRY_RUN_PLAN\", \"message\": \"A dry-run plan cannot be executed; create an executable plan\"}], \"schema_version\": \"1.0.0\", \"status\": \"error\"}\n"
+  },
+  "executable_plan_without_spec": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "plan",
+      "create",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--intent",
+      "{\"gain_db\":-1}"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"command\": \"plan.create\", \"plan\": {\"dry_run\": false, \"intent\": {\"gain_db\": -1}, \"plan_id\": \"fa48f5a7-53d2-48b6-b6da-a4ab123a62de\", \"steps\": [{\"params\": {\"gain_db\": -1.0}, \"type\": \"gain\"}], \"warnings\": []}, \"project_id\": \"3a66ea13-0949-4ec3-a333-29f37f2a4bc0\", \"schema_version\": \"1.0.0\", \"status\": \"planned\"}\n",
+    "stderr": ""
+  },
+  "unapproved_apply": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "run",
+      "execute",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--plan-id",
+      "fa48f5a7-53d2-48b6-b6da-a4ab123a62de",
+      "--output-dir",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\unapproved_apply"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"artifacts\": [{\"kind\": \"audio\", \"path\": \"E:\\\\moodify\\\\artifacts\\\\audits\\\\product_alignment\\\\runtime\\\\unapproved_apply\\\\render.wav\", \"sha256\": \"81bd18851f2dadb935f61f7e3b7b924cf25dd3edfc64f1b24d17a29c8a9688b3\"}], \"command\": \"run.execute\", \"evidence_path\": \"E:\\\\moodify\\\\artifacts\\\\audits\\\\product_alignment\\\\runtime\\\\unapproved_apply\\\\render_evidence.json\", \"project_id\": \"3a66ea13-0949-4ec3-a333-29f37f2a4bc0\", \"run_id\": \"a49cbd5f-a495-4200-a422-0d5811659206\", \"schema_version\": \"1.0.0\", \"status\": \"completed\"}\n",
+    "stderr": ""
+  },
+  "verify_after_success_status": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "run",
+      "verify",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--run-id",
+      "a49cbd5f-a495-4200-a422-0d5811659206"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"checks\": {\"evidence_exists\": true, \"output_exists\": true, \"output_hash_match\": true, \"source_hash_match\": true}, \"command\": \"run.verify\", \"project_id\": \"3a66ea13-0949-4ec3-a333-29f37f2a4bc0\", \"run_id\": \"a49cbd5f-a495-4200-a422-0d5811659206\", \"schema_version\": \"1.0.0\", \"status\": \"verified\"}\n",
+    "stderr": ""
+  },
+  "source_changed_apply": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "run",
+      "execute",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--plan-id",
+      "94180cea-d829-4694-b9a1-fba54da0e7aa",
+      "--output-dir",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\changed_source"
+    ],
+    "exit_code": 4,
+    "stdout": "",
+    "stderr": "{\"command\": \"run.execute\", \"errors\": [{\"code\": \"SOURCE_HASH_MISMATCH\", \"message\": \"Source is missing or its SHA-256 changed\"}], \"schema_version\": \"1.0.0\", \"status\": \"error\"}\n"
+  },
+  "source_hashes": {
+    "initial": "14dc60fece31e996100633a7ff887354c99021bcd1c93b8949d6805ddfcbd602",
+    "mutated": "01f310bcf4bf9adee8ac8794d3fc07a67966daccde820effab9fab2cfb18d00d"
+  },
+  "retry_same_output": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "run",
+      "execute",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--plan-id",
+      "fa48f5a7-53d2-48b6-b6da-a4ab123a62de",
+      "--output-dir",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\unapproved_apply"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\"command\": \"run.execute\", \"errors\": [{\"code\": \"OUTPUT_EXISTS\", \"message\": \"Output directory already exists: E:\\\\moodify\\\\artifacts\\\\audits\\\\product_alignment\\\\runtime\\\\unapproved_apply\"}], \"schema_version\": \"1.0.0\", \"status\": \"error\"}\n"
+  },
+  "retry_new_output": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "run",
+      "execute",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--plan-id",
+      "fa48f5a7-53d2-48b6-b6da-a4ab123a62de",
+      "--output-dir",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\duplicate_apply"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"artifacts\": [{\"kind\": \"audio\", \"path\": \"E:\\\\moodify\\\\artifacts\\\\audits\\\\product_alignment\\\\runtime\\\\duplicate_apply\\\\render.wav\", \"sha256\": \"81bd18851f2dadb935f61f7e3b7b924cf25dd3edfc64f1b24d17a29c8a9688b3\"}], \"command\": \"run.execute\", \"evidence_path\": \"E:\\\\moodify\\\\artifacts\\\\audits\\\\product_alignment\\\\runtime\\\\duplicate_apply\\\\render_evidence.json\", \"project_id\": \"3a66ea13-0949-4ec3-a333-29f37f2a4bc0\", \"run_id\": \"67def74b-9a17-40a6-955f-34075eaa68ee\", \"schema_version\": \"1.0.0\", \"status\": \"completed\"}\n",
+    "stderr": ""
+  },
+  "malformed_json": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-m",
+      "moodify",
+      "plan",
+      "create",
+      "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\project",
+      "--intent",
+      "{bad"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\"command\": \"plan.create\", \"errors\": [{\"code\": \"INTENT_INVALID\", \"message\": \"Intent must be a JSON object or JSON file: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)\"}], \"schema_version\": \"1.0.0\", \"status\": \"error\"}\n"
+  },
+  "constraint_exercises": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-c",
+      "\nimport json, sys, types\n# services imports optional parquet modules at module load; these exercises call\n# only detect_conflicts, so isolate that function from an unavailable pyarrow.\npa=types.ModuleType(\"pyarrow\"); pa.__version__=\"audit-stub-not-used\"\npq=types.ModuleType(\"pyarrow.parquet\"); pa.parquet=pq\nsys.modules.setdefault(\"pyarrow\",pa); sys.modules.setdefault(\"pyarrow.parquet\",pq)\nfrom moodify_bridge.schemas import OnePointSpec\nfrom moodify_bridge.services import detect_conflicts\nbase={\"source\":\"fixture.wav\",\"case_id\":\"audit\",\"essence\":\"intimate soft vocal\",\"human_owner\":\"human\",\"must_preserve\":[\"vocal intimacy\",\"dynamic range\",\"mono compatibility\",\"soft texture\"],\"must_avoid\":[\"sibilance\",\"clipping\"],\"desired_change\":\"warmer\"}\nout={}\ntry:\n    OnePointSpec.model_validate({k:v for k,v in base.items() if k!=\"must_preserve\"})\n    out[\"omit_must_preserve\"]=\"accepted\"\nexcept Exception as e: out[\"omit_must_preserve\"]=\"blocked: \"+type(e).__name__\ncases={\n \"warmth_vs_intimacy\":\"warm saturated vocal\",\n \"loudness_vs_dynamics\":\"increase loudness and compressed impact\",\n \"width_vs_mono\":\"wide stereo image\",\n \"hf_vs_sibilance\":\"bright high frequency enhancement\",\n \"transient_vs_soft\":\"transient enhancement\"\n}\nfor key,desired in cases.items():\n    item=dict(base); item[\"desired_change\"]=desired\n    out[key]=detect_conflicts(OnePointSpec.model_validate(item))\nprint(json.dumps(out,ensure_ascii=False))\n"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 9, in <module>\n  File \"E:\\moodify\\moodify-bridge\\src\\moodify_bridge\\services.py\", line 45, in <module>\n    from .serialization import canonical_json, read_model, write_yaml\n  File \"E:\\moodify\\moodify-bridge\\src\\moodify_bridge\\serialization.py\", line 15\n    def read_model[T: BaseModel](path: Path, model_type: type[T]) -> T:\n                  ^\nSyntaxError: expected '('\n"
+  },
+  "evidence_missing_input": {
+    "argv": [
+      "C:\\Program Files\\Python311\\python.exe",
+      "-c",
+      "\nimport json\nfrom pathlib import Path\nfrom moodify.app.evidence import aggregate_evidence, write_evidence_bundle\nb=aggregate_evidence(\"audit-missing\", {\"output\":Path(r\"E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\does-not-exist.wav\")})\np=write_evidence_bundle(b, Path(r\"E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\missing_evidence_bundle\"))\nprint(p.read_text(encoding=\"utf-8\"))\n"
+    ],
+    "exit_code": 0,
+    "stdout": "{\n  \"schema_version\": \"1.0.0\",\n  \"run_id\": \"audit-missing\",\n  \"aggregated_at\": \"2026-08-01T13:32:09Z\",\n  \"sources\": {},\n  \"aggregated_hashes\": {},\n  \"limitations\": [\n    \"output: not available\"\n  ]\n}\n",
+    "stderr": ""
+  },
+  "serialized_plan_fields": [
+    "dry_run",
+    "intent",
+    "plan_id",
+    "steps",
+    "warnings"
+  ],
+  "noninteractive": {
+    "stdin_isatty": true,
+    "cli_completed": true
+  }
+}

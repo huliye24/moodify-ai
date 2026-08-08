@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moodify.local/schemas/power_pair_record_v0.2.json",
+  "title": "Moodify Power Pair Record v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pair_id", "source", "candidate_a", "candidate_b", "constraints", "context", "labels", "governance"],
+  "properties": {
+    "pair_id": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["track_id", "audio_sha256"],
+      "properties": {
+        "track_id": {"type": "string", "minLength": 1},
+        "audio_sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+        "genre": {"type": "string"},
+        "provenance": {"type": "string"}
+      }
+    },
+    "candidate_a": {"$ref": "#/$defs/candidate"},
+    "candidate_b": {"$ref": "#/$defs/candidate"},
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lufs_delta", "clarity_delta"],
+      "properties": {
+        "lufs_delta": {"type": "number"},
+        "clarity_delta": {"type": "number"}
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playback_system", "randomized_order"],
+      "properties": {
+        "playback_system": {"type": "string", "minLength": 1},
+        "randomized_order": {"type": "boolean"},
+        "notes": {"type": "string"}
+      }
+    },
+    "labels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["annotator_id", "preference"],
+        "properties": {
+          "annotator_id": {"type": "string", "minLength": 1},
+          "preference": {"enum": ["A", "B", "tie", "cant_tell"]},
+          "confidence": {"type": "integer", "minimum": 1, "maximum": 5},
+          "reason_code": {"type": "string"}
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dataset_split", "rubric_version", "created_at"],
+      "properties": {
+        "dataset_split": {"enum": ["train", "validation", "test"]},
+        "rubric_version": {"const": "power-v0.1"},
+        "created_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "audio_sha256", "processing_chain", "features"],
+      "properties": {
+        "candidate_id": {"type": "string", "minLength": 1},
+        "audio_sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+        "processing_chain": {"type": "array", "items": {"type": "object"}},
+        "features": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lufs_i", "true_peak_dbTP", "rms_dbFS", "crest_db", "low_ratio", "mid_ratio", "high_ratio", "transient_strength", "clarity_proxy"],
+          "properties": {
+            "lufs_i": {"type": "number"},
+            "true_peak_dbTP": {"type": "number"},
+            "rms_dbFS": {"type": "number"},
+            "crest_db": {"type": "number"},
+            "low_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+            "mid_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+            "high_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+            "transient_strength": {"type": "number", "minimum": 0},
+            "clarity_proxy": {"type": "number"}
+          }
+        }
+      }
+    }
+  }
+}

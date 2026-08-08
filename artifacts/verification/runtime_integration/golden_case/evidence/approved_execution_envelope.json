@@ -1,0 +1,33 @@
+{
+  "actions": [
+    {
+      "params": {
+        "gain_db": 3.7
+      },
+      "reason": "Normalize to -1.0 dB peak",
+      "type": "gain"
+    },
+    {
+      "params": {
+        "ratio": 2.0,
+        "threshold_db": -12.0
+      },
+      "reason": "Reduce excessive crest factor",
+      "type": "compressor"
+    }
+  ],
+  "approval_id": "APR-85bc53a1b459",
+  "approved_by": "huliye24",
+  "case_id": "MFY-CASE-5030DEA8F22D",
+  "case_version": "1",
+  "created_at": "2026-08-01T14:28:30Z",
+  "engine_name": "native",
+  "engine_version": "1.0.0",
+  "one_point_spec_hash": "3c06761a7f61af3b0763945d486d187c72eb6e1b841652ec06e2f61460ef33bb",
+  "output_path": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mfy-golden-idgyn_f5\\golden_project\\cases\\MFY-CASE-5030DEA8F22D\\output\\processed_audio.wav",
+  "parameters": [],
+  "plan_hash": "ce0f39451f8a58fb17754eea497aecc13c41860ee840ec74e6e0a21700467782",
+  "plan_id": "PLN-0fb17d9abd2e",
+  "source_path": "E:\\moodify\\moodify-core-package\\tests\\baseline\\test_audio\\vocal_folk.wav",
+  "source_sha256": "34b94987959122b75788373eba2382564a351942670e701314f492ddce733d1d"
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "moodify.analytics.weekly/0.1",
+  "status": "complete",
+  "test_collection_errors": 0,
+  "test_collected": 662,
+  "task_state_conflicts": 0,
+  "task_states": {
+    "PLANNED": 9,
+    "ACCEPTED": 9,
+    "READY_FOR_REVIEW": 14
+  },
+  "workspace_unknown": 0,
+  "workspace_counts": {
+    "tracked": 54,
+    "untracked": 153,
+    "entries": 207
+  },
+  "enclosure_violations": 0,
+  "enclosure_debt": 2,
+  "in_progress": 0,
+  "red_lines": {
+    "test_collection_errors": false,
+    "task_state_conflicts": false,
+    "enclosure_violations": false
+  }
+}

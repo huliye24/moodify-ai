@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+rule_id: R-DEMO-001
+version: 1.0.0
+title: Preserve input identity
+state: experimental
+rationale: Reproducibility requires a content-addressed source.
+parameters:
+  hash_algorithm: sha256
+hypothesis_ids:
+- H-DEMO-001
+evidence_packet_ids: []
+limitations:
+- Identity proves equality of bytes
+- not provenance

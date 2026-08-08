@@ -1,0 +1,13 @@
+{
+  "schema": "test-gates/0.1",
+  "python": "3.11.9",
+  "stamp": "20260802T113243",
+  "results": [
+    {
+      "layer": "integration",
+      "exit_code": 0,
+      "elapsed_s": 5.78,
+      "summary": "3 passed, 1 skipped in 0.60s"
+    }
+  ]
+}

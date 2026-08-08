@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="4.172" timestamp="2026-08-01T21:44:54.830109+08:00" hostname="PC-202305161653"><testcase classname="" name="tests.test_one_point" time="0.000"><error message="collection failure">ImportError while importing test module 'E:\moodify\moodify-bridge\tests\test_one_point.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_one_point.py:12: in &lt;module&gt;
+    from moodify_bridge.services import detect_conflicts, refine_prepare
+src\moodify_bridge\services.py:10: in &lt;module&gt;
+    import pyarrow as pa
+E   ModuleNotFoundError: No module named 'pyarrow'</error></testcase></testsuite></testsuites>

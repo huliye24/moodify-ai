@@ -1,0 +1,2 @@
+﻿pair_id,source_track_id,segment_id,candidate_a_id,candidate_b_id,genre_family,section_role,generator_name,generator_version,lufs_a,lufs_b,lufs_delta,true_peak_a,true_peak_b,clarity_gate_a,clarity_gate_b,rater_id,rater_group,device_type,preference,clarity_worse_winner,loudness_issue,confidence_1_5,response_time_ms,protocol_version,created_at
+PWR-PAIR-000001,TRK-0001,SEG-0001,CAND-A-0001,CAND-B-0001,electronic,drop,example_generator,v1,-14.02,-13.96,0.06,-1.18,-1.11,pass,pass,RATER-001,trained,headphones,A,no,no,4,8200,PWR-ANN-v0.1,2026-07-24T12:00:00+08:00

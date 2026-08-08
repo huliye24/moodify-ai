@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "audit-missing",
+  "aggregated_at": "2026-08-01T13:32:09Z",
+  "sources": {},
+  "aggregated_hashes": {},
+  "limitations": [
+    "output: not available"
+  ]
+}

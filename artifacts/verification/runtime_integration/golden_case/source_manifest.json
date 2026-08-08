@@ -1,0 +1,8 @@
+{
+  "fixture": "E:\\moodify\\moodify-core-package\\tests\\baseline\\test_audio\\vocal_folk.wav",
+  "relative_path": "moodify-core-package\\tests\\baseline\\test_audio\\vocal_folk.wav",
+  "sha256": "34b94987959122b75788373eba2382564a351942670e701314f492ddce733d1d",
+  "duration_s": 45.0,
+  "sample_rate": 48000,
+  "channels": 2
+}

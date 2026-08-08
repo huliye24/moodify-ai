@@ -1,0 +1,19 @@
+{
+  "schema": "test-gates/0.1",
+  "python": "3.11.9",
+  "stamp": "20260802T113115",
+  "results": [
+    {
+      "layer": "core",
+      "exit_code": 0,
+      "elapsed_s": 47.96,
+      "summary": "179 passed, 2 warnings in 44.32s"
+    },
+    {
+      "layer": "integration",
+      "exit_code": 4,
+      "elapsed_s": 2.82,
+      "summary": "no tests ran in 0.01s"
+    }
+  ]
+}

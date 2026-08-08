@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "moodify.analytics.run-manifest/0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "analysis_id", "analysis_kind", "started_at", "timezone", "status", "metric_contract", "sources", "outputs", "validation"],
+  "properties": {
+    "schema": {"const": "moodify.analytics.run-manifest/0.1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "analysis_id": {"type": "string", "minLength": 1},
+    "analysis_kind": {"enum": ["routine", "stage", "dedicated"]},
+    "started_at": {"type": "string", "format": "date-time"},
+    "timezone": {"const": "Asia/Shanghai"},
+    "status": {"enum": ["complete", "partial", "failed"]},
+    "metric_contract": {"type": "string", "minLength": 1},
+    "supersedes": {"type": ["string", "null"]},
+    "sources": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "outputs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collector_exit_code", "test_collection_exit_code", "calculation_checks"],
+      "properties": {
+        "collector_exit_code": {"type": "integer"},
+        "test_collection_exit_code": {"type": ["integer", "null"]},
+        "calculation_checks": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
+

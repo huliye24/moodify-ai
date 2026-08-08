@@ -1,0 +1,13 @@
+{
+  "desired_change": "Gentle loudness normalization to -1 dB peak without coloration.",
+  "essence": "Preserve the intimate vocal performance and acoustic space.",
+  "human_owner": "huliye24",
+  "must_avoid": [
+    "harsh sibilance",
+    "pumping compression"
+  ],
+  "must_preserve": [
+    "vocal intimacy",
+    "natural reverb tail"
+  ]
+}

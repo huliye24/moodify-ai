@@ -1,0 +1,38 @@
+{
+  "schema": "moodify.architecture.enclosure-report/0.1",
+  "violations": 0,
+  "baseline_debt": 2,
+  "cross_area_edges": 42,
+  "cycles": 0,
+  "core_share_pct": 77.5,
+  "symbol_deltas": {
+    "domain": 40,
+    "orchestration": 12,
+    "capability": 108,
+    "dsp": 47,
+    "storage": 5,
+    "api_cli": 105,
+    "services": 10,
+    "analytics": 36,
+    "runtime": 976
+  },
+  "oversized_modules": [
+    "moodify_runtime\\operator_console.py",
+    "moodify_runtime\\craft_processes.py",
+    "moodify_runtime\\tests\\test_atomic_pair_writer.py",
+    "moodify_runtime\\cli.py",
+    "moodify_runtime\\tests\\test_craft_proposals.py"
+  ],
+  "documented_exceptions": [
+    {
+      "id": "EXC-002",
+      "from_area": "api_cli",
+      "to_area": "runtime",
+      "reason": "api/main.py imports moodify_runtime (operator jobs + config) for the v0.1 API; pre-existing cross-area debt, not introduced by 024",
+      "expiry": "2026-10-01",
+      "status": "active",
+      "remove_condition": "operator job endpoints move behind a runtime-facing contract or into moodify_runtime.api"
+    }
+  ],
+  "pass": true
+}

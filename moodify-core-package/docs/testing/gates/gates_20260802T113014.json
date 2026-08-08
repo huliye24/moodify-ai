@@ -1,0 +1,19 @@
+{
+  "schema": "test-gates/0.1",
+  "python": "3.11.9",
+  "stamp": "20260802T113014",
+  "results": [
+    {
+      "layer": "collect",
+      "exit_code": 0,
+      "elapsed_s": 20.34,
+      "summary": "647 tests collected in 14.98s"
+    },
+    {
+      "layer": "fast",
+      "exit_code": 0,
+      "elapsed_s": 442.24,
+      "summary": "435 passed, 30 deselected, 9 warnings in 434.86s (0:07:14)"
+    }
+  ]
+}

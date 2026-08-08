@@ -1,0 +1,22 @@
+{
+  "basic_audio_checks": {
+    "channels": 2,
+    "duration_positive": true,
+    "duration_s": 45.0,
+    "sample_rate": 44100
+  },
+  "case_id": "MFY-CASE-5030DEA8F22D",
+  "completed_at": "2026-08-01T14:28:39Z",
+  "engine_identity_matches": true,
+  "execution_id": "MFY-EXEC-ea2290afad74",
+  "output_exists": true,
+  "output_readable": true,
+  "output_sha256": "266eb6ffe3eb839231b4ecde16df6eb257a327d2e3146efd6c4c4dc2ea98427d",
+  "plan_identity_matches": true,
+  "source_sha256_expected": "34b94987959122b75788373eba2382564a351942670e701314f492ddce733d1d",
+  "source_sha256_observed": "34b94987959122b75788373eba2382564a351942670e701314f492ddce733d1d",
+  "source_unchanged": true,
+  "started_at": "2026-08-01T14:28:39Z",
+  "status": "PASS",
+  "verification_id": "VERIFY-4f1e13050945"
+}

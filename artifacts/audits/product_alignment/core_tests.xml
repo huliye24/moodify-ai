@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="3" failures="0" skipped="0" tests="3" time="4.222" timestamp="2026-08-01T21:28:27.491286+08:00" hostname="PC-202305161653"><testcase classname="" name="tests.v2.test_approval" time="0.000"><error message="collection failure">ImportError while importing test module 'E:\moodify\moodify-core-package\tests\v2\test_approval.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\v2\test_approval.py:6: in &lt;module&gt;
+    from moodify.domain import (
+E   ImportError: cannot import name 'ApprovalActorType' from 'moodify.domain' (E:\moodify\moodify-core-package\src\moodify\domain\__init__.py)</error></testcase><testcase classname="" name="tests.v2.test_audio_version" time="0.000"><error message="collection failure">ImportError while importing test module 'E:\moodify\moodify-core-package\tests\v2\test_audio_version.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\v2\test_audio_version.py:6: in &lt;module&gt;
+    from moodify.domain import (
+E   ImportError: cannot import name 'ApprovalActorType' from 'moodify.domain' (E:\moodify\moodify-core-package\src\moodify\domain\__init__.py)</error></testcase><testcase classname="" name="tests.v2.test_treatment_plan" time="0.000"><error message="collection failure">ImportError while importing test module 'E:\moodify\moodify-core-package\tests\v2\test_treatment_plan.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Program Files\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\v2\test_treatment_plan.py:6: in &lt;module&gt;
+    from moodify.domain import (
+E   ImportError: cannot import name 'TreatmentAction' from 'moodify.domain' (E:\moodify\moodify-core-package\src\moodify\domain\__init__.py)</error></testcase></testsuite></testsuites>

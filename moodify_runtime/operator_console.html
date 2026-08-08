@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moodify Operator Console</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, "Microsoft YaHei", sans-serif; background:#08111f; color:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at top left,#15304d 0,#08111f 42%); }
+    header { display:flex; justify-content:space-between; align-items:center; padding:22px 28px; border-bottom:1px solid #29415c; }
+    h1 { margin:0; font-size:20px; }
+    .status { display:flex; gap:9px; align-items:center; color:#9fb2c8; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#f59e0b; box-shadow:0 0 12px currentColor; }
+    .dot.ok { background:#22c55e; }
+    main { display:grid; grid-template-columns:210px 1fr; min-height:calc(100vh - 70px); }
+    nav { padding:20px 14px; border-right:1px solid #29415c; }
+    button { width:100%; padding:11px 13px; margin:4px 0; border:0; border-radius:8px; color:#b8c7d9; background:transparent; text-align:left; cursor:pointer; }
+    button:hover, button.active { color:#fff; background:#17324e; }
+    section { padding:26px; }
+    .title { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    h2 { margin:0; font-size:22px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; }
+    .card { padding:17px; border:1px solid #29415c; border-radius:12px; background:rgba(17,35,55,.78); }
+    .label { color:#8fa5bd; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+    .value { margin-top:8px; font-size:23px; font-weight:700; overflow-wrap:anywhere; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; color:#b9cce0; font-size:12px; }
+    .error { color:#fca5a5; }
+    @media (max-width:700px) { main { grid-template-columns:1fr; } nav { border-right:0; border-bottom:1px solid #29415c; display:grid; grid-template-columns:repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Moodify Operator Console</h1>
+    <div class="status"><span id="healthDot" class="dot"></span><span id="healthText">连接中</span></div>
+  </header>
+  <main>
+    <nav id="nav">
+      <button data-view="queue">Queue</button>
+      <button data-view="jobs">Jobs</button>
+      <button data-view="reports">Reports</button>
+      <button data-view="delivery">Delivery</button>
+      <button data-view="craft">Craft</button>
+      <button data-view="studio">Studio</button>
+      <button data-view="scheduler">Scheduler</button>
+      <button data-view="calibration">Calibration</button>
+    </nav>
+    <section>
+      <div class="title"><h2 id="viewTitle">Queue</h2><button id="refresh" style="width:auto;background:#1d4ed8;color:white">刷新</button></div>
+      <div id="content" class="grid"></div>
+    </section>
+  </main>
+  <script>
+    const views = {
+      Queue: "/operator/jobs", Jobs: "/operator/jobs", Reports: "/operator/reports",
+      Delivery: "/operator/deliveries", Craft: "/craft/library", Studio: "/studio-os/status",
+      Scheduler: "/scheduler/status", Calibration: "/calibration/thresholds"
+    };
+    let active = "Queue";
+    const nav = document.querySelector("#nav");
+    for (const button of nav.children) {
+      const name = button.textContent;
+      button.onclick = () => { active = name; renderNav(); loadView(); };
+    }
+    function renderNav() {
+      [...nav.children].forEach(button => button.classList.toggle("active", button.textContent === active));
+      document.querySelector("#viewTitle").textContent = active;
+    }
+    function card(label, value, error=false) {
+      const node = document.createElement("article");
+      node.className = "card";
+      node.innerHTML = `<div class="label">${label}</div><pre class="value${error ? " error" : ""}"></pre>`;
+      node.querySelector("pre").textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+      return node;
+    }
+    async function request(path) {
+      const response = await fetch(path, {headers:{Accept:"application/json"}});
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    }
+    async function checkHealth() {
+      try {
+        const data = await request("/health");
+        document.querySelector("#healthDot").classList.add("ok");
+        document.querySelector("#healthText").textContent = data.status || "ok";
+      } catch (error) {
+        document.querySelector("#healthDot").classList.remove("ok");
+        document.querySelector("#healthText").textContent = "离线";
+      }
+    }
+    async function loadView() {
+      const content = document.querySelector("#content");
+      content.replaceChildren(card("Loading", views[active]));
+      try {
+        const data = await request(views[active]);
+        content.replaceChildren(card("Endpoint", views[active]), card("Response", data));
+      } catch (error) {
+        content.replaceChildren(card("Endpoint", views[active]), card("Unavailable", error.message, true));
+      }
+    }
+    // Stable view entry points retained for API-contract and automation clients.
+    const renderQueue = loadView;
+    const renderJobDetail = loadView;
+    const renderReports = loadView;
+    const renderDelivery = loadView;
+    const renderCraft = loadView;
+    const renderStudio = loadView;
+    const renderScheduler = loadView;
+    const renderCalibration = loadView;
+    document.querySelector("#refresh").onclick = () => { checkHealth(); loadView(); };
+    renderNav(); checkHealth(); loadView();
+  </script>
+</body>
+</html>

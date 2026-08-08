@@ -1,0 +1,361 @@
+{
+  "schema": "moodify.task-report/0.1",
+  "tasks": 32,
+  "events": 64,
+  "validation_issues": [],
+  "task_table": [
+    {
+      "task_id": "DSK-MFY-ANDROID-001",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-002",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-003",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-004",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-005",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-006",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-AUX-HARDENING-002",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3103Z",
+      "event_count": 3
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-017",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-018",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-019",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-020",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-021",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-CLI-NATIVE-REFACTOR-015",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3103Z",
+      "event_count": 3
+    },
+    {
+      "task_id": "DSK-MFY-DATA-ASSET-001",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-DATA-ASSET-013",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-DAW-BACKENDS-014",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-DAY2-CLOSURE-003",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3103Z",
+      "event_count": 3
+    },
+    {
+      "task_id": "DSK-MFY-DECISION-INTELLIGENCE-011",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-IDENTITY-CORE-010",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-KNOWLEDGE-LAYERS-022",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-LYRICS-INTENT-007",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3103Z",
+      "event_count": 3
+    },
+    {
+      "task_id": "DSK-MFY-ONE-POINT-006",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3103Z",
+      "event_count": 3
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-022",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-023",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-024",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-025",
+      "state": "PLANNED",
+      "conflict": null,
+      "last_event": "orchestration",
+      "last_timestamp": "2026-08-02T03:59:3101Z",
+      "event_count": 1
+    },
+    {
+      "task_id": "DSK-MFY-PIPELINE-016",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-PPE-HARDENING-005",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3104Z",
+      "event_count": 4
+    },
+    {
+      "task_id": "DSK-MFY-SCORE-ENGINE-009",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    },
+    {
+      "task_id": "DSK-MFY-SPECTRAL-EVIDENCE-012",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3103Z",
+      "event_count": 3
+    },
+    {
+      "task_id": "DSK-MFY-STEM-MIDI-008",
+      "state": "ACCEPTED",
+      "conflict": null,
+      "last_event": "acceptance",
+      "last_timestamp": "2026-08-02T03:59:3103Z",
+      "event_count": 3
+    },
+    {
+      "task_id": "DSK-MFY-STUDIO-PREP-004",
+      "state": "READY_FOR_REVIEW",
+      "conflict": null,
+      "last_event": "handoff",
+      "last_timestamp": "2026-08-02T03:59:3102Z",
+      "event_count": 2
+    }
+  ],
+  "conflict_table": [],
+  "in_progress_table": [
+    {
+      "task_id": "DSK-MFY-ANDROID-001",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-002",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-003",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-004",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-005",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ANDROID-006",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-023",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-024",
+      "state": "PLANNED"
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-025",
+      "state": "PLANNED"
+    }
+  ],
+  "awaiting_review_table": [
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-017",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-018",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-019",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-020",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-CAPABILITY-ACCRETION-021",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-DATA-ASSET-013",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-DAW-BACKENDS-014",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-DECISION-INTELLIGENCE-011",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-IDENTITY-CORE-010",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-KNOWLEDGE-LAYERS-022",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-ORDER-BEAUTY-022",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-PIPELINE-016",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-SCORE-ENGINE-009",
+      "state": "READY_FOR_REVIEW"
+    },
+    {
+      "task_id": "DSK-MFY-STUDIO-PREP-004",
+      "state": "READY_FOR_REVIEW"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Synthetic stem placeholder; intentionally not an audio measurement source.

@@ -1,0 +1,100 @@
+{
+  "schema": "moodify.architecture.enclosure/0.1",
+  "version": "0.1",
+  "generated": "2026-08-02",
+  "areas": [
+    {
+      "area": "domain",
+      "path_prefix": ["moodify-core-package/src/moodify/domain/"],
+      "public_facade": ["moodify.domain"],
+      "allowed_deps": ["pydantic", "std"],
+      "forbidden_deps": ["moodify.services", "moodify.api", "moodify_runtime", "moodify.processing"],
+      "reverse_deps_forbidden": ["moodify.processing", "moodify_runtime"],
+      "data_ownership": "value objects, entities, enums",
+      "failure_semantics": "validation errors are domain-level, never leaked as processing exceptions"
+    },
+    {
+      "area": "orchestration",
+      "path_prefix": ["moodify-core-package/src/moodify/orchestration/", "moodify-core-package/src/moodify/v01_pipeline.py"],
+      "public_facade": ["moodify.orchestration"],
+      "allowed_deps": ["moodify.domain", "moodify.processing", "moodify.knowledge", "moodify.calibration", "std", "pydantic"],
+      "forbidden_deps": ["moodify.api", "moodify_runtime"],
+      "data_ownership": "workflow state, treatment plans",
+      "failure_semantics": "workflow failures are surfaced as typed results"
+    },
+    {
+      "area": "capability",
+      "path_prefix": ["moodify-core-package/src/moodify/capability_registry/"],
+      "public_facade": ["moodify.capability_registry"],
+      "allowed_deps": ["std", "pydantic"],
+      "forbidden_deps": ["moodify_runtime", "moodify.processing", "moodify.services"],
+      "data_ownership": "capability contracts, envelopes, execution records",
+      "failure_semantics": "provider failures classified (invalid_input/provider_defect/timeout/...)"
+    },
+    {
+      "area": "dsp",
+      "path_prefix": ["moodify-core-package/src/moodify/processing/", "moodify-core-package/src/moodify/v01_analyzer.py", "moodify-core-package/src/moodify/reality_metrics.py"],
+      "public_facade": ["moodify.processing"],
+      "allowed_deps": ["numpy", "scipy", "librosa", "soundfile", "pyloudnorm", "pedalboard", "std"],
+      "forbidden_deps": ["moodify_runtime", "moodify.services", "moodify.api", "moodify.knowledge"],
+      "data_ownership": "audio buffers, metrics",
+      "failure_semantics": "audio errors surfaced as typed exceptions, never NaN-silent"
+    },
+    {
+      "area": "storage",
+      "path_prefix": ["moodify-core-package/src/moodify/storage/"],
+      "public_facade": ["moodify.storage"],
+      "allowed_deps": ["moodify.domain", "std", "pydantic"],
+      "forbidden_deps": ["moodify.processing", "moodify.api"],
+      "data_ownership": "workspace store, versions, archives",
+      "failure_semantics": "storage conflicts are explicit (StorageConflict)"
+    },
+    {
+      "area": "api_cli",
+      "path_prefix": ["moodify-core-package/src/moodify/api/", "moodify-core-package/src/moodify/cli.py", "moodify-core-package/src/moodify/cli_v2/", "moodify-core-package/src/moodify/cli_daw/"],
+      "public_facade": ["moodify.api", "moodify.cli"],
+      "allowed_deps": ["moodify.domain", "moodify.orchestration", "moodify.processing", "moodify.services", "moodify.storage", "fastapi", "uvicorn", "std"],
+      "forbidden_deps": ["moodify_runtime"],
+      "data_ownership": "http contracts, cli commands",
+      "failure_semantics": "errors mapped to typed CLI/API responses"
+    },
+    {
+      "area": "services",
+      "path_prefix": ["moodify-core-package/src/moodify/services/"],
+      "public_facade": ["moodify.services"],
+      "allowed_deps": ["moodify.domain", "moodify.storage", "std", "pydantic"],
+      "forbidden_deps": ["moodify.processing", "moodify_runtime"],
+      "data_ownership": "service orchestration between domain and storage",
+      "failure_semantics": "service failures typed, not swallowed"
+    },
+    {
+      "area": "analytics",
+      "path_prefix": ["moodify-core-package/src/moodify/evaluation/", "moodify-core-package/src/moodify/reality_metrics.py", "moodify_runtime/trend_analyzer.py", "moodify_runtime/significance_evaluator.py"],
+      "public_facade": ["moodify.evaluation"],
+      "allowed_deps": ["numpy", "scipy", "pandas", "std"],
+      "forbidden_deps": ["moodify.processing"],
+      "data_ownership": "evaluation records, trends",
+      "failure_semantics": "measurement gaps stay NOT_MEASURED, never zero-filled"
+    },
+    {
+      "area": "runtime",
+      "path_prefix": ["moodify_runtime/"],
+      "public_facade": ["moodify_runtime.cli", "moodify_runtime.operator_api"],
+      "allowed_deps": ["moodify-core-package", "std", "fastapi", "uvicorn", "pydantic"],
+      "forbidden_deps": ["moodify-core-package/src/moodify/processing"],
+      "data_ownership": "jobs, queues, operator records",
+      "failure_semantics": "job failures classified and recoverable"
+    }
+  ],
+  "documented_exceptions": [
+    {
+      "id": "EXC-002",
+      "from_area": "api_cli",
+      "to_area": "runtime",
+      "reason": "api/main.py imports moodify_runtime (operator jobs + config) for the v0.1 API; pre-existing cross-area debt, not introduced by 024",
+      "expiry": "2026-10-01",
+      "status": "active",
+      "remove_condition": "operator job endpoints move behind a runtime-facing contract or into moodify_runtime.api"
+    }
+  ]
+}

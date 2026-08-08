@@ -1,0 +1,10 @@
+{
+  "run_at": "2026-07-30T05:32:01.219884+00:00",
+  "model": "deepseek-chat",
+  "total": 18,
+  "validated": 18,
+  "rejected": 0,
+  "dry_run": true,
+  "outputs_path": "reports\\aep_worker\\ECHAIN-MOODIFY-THICKNESS-016\\20260730_pack_validation\\model_outputs.jsonl",
+  "rejected_path": "reports\\aep_worker\\ECHAIN-MOODIFY-THICKNESS-016\\20260730_pack_validation\\rejected_outputs.jsonl"
+}

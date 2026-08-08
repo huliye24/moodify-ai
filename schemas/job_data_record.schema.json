@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moodify.local/schemas/job_data_record.schema.json",
+  "title": "Job Data Record",
+  "description": "Unified structured output of one Moodify job: acoustic scan, scores, gates, review labels, craft, and evidence references. Every record carries provenance (source_artifacts); missing measurements are explicit nulls with reasons, never omitted or fabricated. scores is required: MRS absence is declared as mrs=null with mrs_not_available.",
+  "type": "object",
+  "required": ["record_id", "record_type", "schema_version", "collected_at", "source_artifacts", "scores"],
+  "properties": {
+    "record_id": { "type": "string", "description": "Unique content-derived identifier, e.g. treatment-<sha256>[:12]" },
+    "record_type": {
+      "type": "string",
+      "enum": ["treatment", "listening", "metrics_comparison", "night_metric", "evidence_package", "job"]
+    },
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "collected_at": { "type": "string", "format": "date-time" },
+    "source_artifacts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string" },
+      "description": "Provenance: logical name -> source file path. Required, never empty."
+    },
+    "job": {
+      "type": "object",
+      "properties": {
+        "job_id": { "type": "string" },
+        "case_id": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["job_id"]
+    },
+    "source_audio": {
+      "type": "object",
+      "properties": {
+        "song_id": { "type": "string" },
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "duration_s": { "type": "number" },
+        "sample_rate": { "type": "integer" },
+        "channels": { "type": "integer" }
+      },
+      "required": ["path", "sha256"]
+    },
+    "scan": {
+      "type": "object",
+      "description": "Acoustic feature scan of the source audio.",
+      "properties": {
+        "peak_db": { "type": "number" },
+        "rms_db": { "type": "number" },
+        "crest_factor": { "type": "number" },
+        "dynamic_range_db": { "type": "number" },
+        "correlation_lr": { "type": "number" },
+        "mid_side_ratio_db": { "type": "number" },
+        "spectral_centroid": { "type": "number" },
+        "spectral_rolloff_95": { "type": "number" },
+        "spectral_flatness": { "type": "number" },
+        "loudness_lufs": { "type": ["number", "null"] },
+        "has_clipping": { "type": "boolean" },
+        "silence_ratio": { "type": "number" },
+        "bands": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "after_features": {
+          "type": "object",
+          "description": "Features measured on the processed output (before/after pairs)."
+        }
+      },
+      "additionalProperties": true
+    },
+    "scores": {
+      "type": "object",
+      "properties": {
+        "mrs": {
+          "type": ["number", "null"],
+          "description": "Moodify Reality Score; null when not measured, with not_available reason."
+        },
+        "mrs_not_available": { "type": "string" },
+        "supporting": {
+          "type": "object",
+          "additionalProperties": { "type": ["number", "null"] }
+        }
+      },
+      "required": ["mrs", "mrs_not_available"]
+    },
+    "gates": {
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "enum": ["PASS", "FAIL", "WARN", "NONE"] },
+        "checks": { "type": "object" },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "checked_at": { "type": "string" }
+      },
+      "required": ["status"]
+    },
+    "review": {
+      "type": ["object", "null"],
+      "description": "Human listening labels for a preset candidate; null when no review exists.",
+      "properties": {
+        "preset": { "type": "string" },
+        "listener": { "type": "string" },
+        "volume_matched": { "type": "boolean" },
+        "better_than_before": { "type": ["boolean", "null"] },
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 5
+          }
+        },
+        "notes": { "type": "string" },
+        "reviewed_at": { "type": "string" }
+      },
+      "required": ["preset", "dimensions"]
+    },
+    "craft": {
+      "type": "object",
+      "properties": {
+        "preset": { "type": "string" },
+        "chain": { "type": "string" },
+        "engine_name": { "type": "string" },
+        "engine_version": { "type": "string" },
+        "params": { "type": "object" },
+        "steps": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "evidence_dir": { "type": "string" },
+        "evidence_manifest": { "type": "object" },
+        "execution_id": { "type": "string" },
+        "verification_id": { "type": "string" },
+        "verification_status": { "type": "string" },
+        "output_path": { "type": "string" },
+        "output_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

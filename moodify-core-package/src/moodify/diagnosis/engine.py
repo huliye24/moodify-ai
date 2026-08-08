@@ -19,12 +19,15 @@ Pattern: 每个参数独立计算, 失败时回退到默认值 (best-effort meas
 
 from __future__ import annotations
 
+import logging
 import math
 import time
 
 import numpy as np
 from scipy.signal import butter, sosfilt
 from scipy.ndimage import uniform_filter1d
+
+logger = logging.getLogger(__name__)
 
 from moodify.diagnosis.metrics import (
     SpectrumAnalyzer, DynamicsAnalyzer, SpaceAnalyzer, BANDS as EXISTING_BANDS, frame_signal, load_audio,
@@ -141,8 +144,8 @@ class DiagnosisEngine:
         try:
             import soxr
             return soxr.resample(signal.astype(np.float64), orig_sr, target_sr).astype(np.float32)
-        except ImportError:
-            pass
+        except ImportError as exc:
+            logger.debug(f"[resample_fast] soxr unavailable, using scipy: {exc!r}")
         try:
             from scipy.signal import resample_poly
             from math import gcd
@@ -150,8 +153,8 @@ class DiagnosisEngine:
             up = target_sr // g
             down = orig_sr // g
             return resample_poly(signal.astype(np.float64), up=up, down=down).astype(np.float32)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug(f"[resample_fast] scipy resample failed, using librosa: {exc!r}")
         import librosa
         return librosa.resample(signal, orig_sr=orig_sr, target_sr=target_sr)
 

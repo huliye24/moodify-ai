@@ -1,0 +1,9 @@
+{
+  "min_records": 20,
+  "min_decisive_labels": 40,
+  "max_anomalies": 0,
+  "max_track_split_leakage": 0,
+  "min_mean_decisive_pair_agreement": 0.67,
+  "max_tie_rate": 0.35,
+  "max_cant_tell_rate": 0.2
+}

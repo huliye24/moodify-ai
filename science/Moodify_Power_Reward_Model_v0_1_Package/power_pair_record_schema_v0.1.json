@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Power Pair Record v0.1",
+  "type": "object",
+  "required": [
+    "pair_id",
+    "source",
+    "candidate_a",
+    "candidate_b",
+    "constraints",
+    "context",
+    "labels",
+    "governance"
+  ],
+  "properties": {
+    "pair_id": {
+      "type": "string",
+      "pattern": "^PWR-PAIR-[0-9]{6}$"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "track_id",
+        "segment_id",
+        "audio_sha256",
+        "rights_status"
+      ],
+      "properties": {
+        "track_id": {
+          "type": "string"
+        },
+        "segment_id": {
+          "type": "string"
+        },
+        "audio_sha256": {
+          "type": "string"
+        },
+        "generator_name": {
+          "type": "string"
+        },
+        "generator_version": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "rights_status": {
+          "type": "string",
+          "enum": [
+            "cleared",
+            "restricted",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "candidate_a": {
+      "$ref": "#/$defs/candidate"
+    },
+    "candidate_b": {
+      "$ref": "#/$defs/candidate"
+    },
+    "constraints": {
+      "type": "object",
+      "required": [
+        "lufs_delta",
+        "loudness_pass",
+        "clarity_pass"
+      ],
+      "properties": {
+        "lufs_delta": {
+          "type": "number"
+        },
+        "loudness_pass": {
+          "type": "boolean"
+        },
+        "clarity_pass": {
+          "type": "boolean"
+        },
+        "true_peak_ceiling_dbTP": {
+          "type": "number"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "genre_family": {
+          "type": "string"
+        },
+        "section_role": {
+          "type": "string"
+        },
+        "device_type": {
+          "type": "string"
+        },
+        "playback_level_bucket": {
+          "type": "string"
+        }
+      }
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rater_id",
+          "preference"
+        ],
+        "properties": {
+          "rater_id": {
+            "type": "string"
+          },
+          "rater_group": {
+            "type": "string"
+          },
+          "preference": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "tie",
+              "cant_tell"
+            ]
+          },
+          "clarity_worse_winner": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "confidence_1_5": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 5
+          },
+          "response_time_ms": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "required": [
+        "dataset_split",
+        "protocol_version",
+        "processing_version"
+      ],
+      "properties": {
+        "dataset_split": {
+          "type": "string",
+          "enum": [
+            "train",
+            "validation",
+            "test",
+            "gold",
+            "adversarial"
+          ]
+        },
+        "protocol_version": {
+          "type": "string"
+        },
+        "processing_version": {
+          "type": "string"
+        },
+        "measurement_version": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "required": [
+        "candidate_id",
+        "audio_sha256",
+        "processing_chain",
+        "lufs_i",
+        "true_peak_dbTP",
+        "clarity_gate"
+      ],
+      "properties": {
+        "candidate_id": {
+          "type": "string"
+        },
+        "audio_sha256": {
+          "type": "string"
+        },
+        "processing_chain": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "lufs_i": {
+          "type": "number"
+        },
+        "true_peak_dbTP": {
+          "type": "number"
+        },
+        "clarity_gate": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "review"
+          ]
+        },
+        "failure_tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

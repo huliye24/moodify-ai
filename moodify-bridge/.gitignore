@@ -1,0 +1,12 @@
+.venv/
+.moodify-bridge/
+.demo-ledger/
+*.duckdb
+*.parquet
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+demo/evidence.yaml
+demo/promoted-rule.yaml
+reports/

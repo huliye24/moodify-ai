@@ -1,0 +1,21 @@
+{
+  "candidates": [
+    {
+      "candidate_id": "low_shelf_plus_1db",
+      "processing_chain": [{"op": "low_shelf", "gain_db": 1.0, "cutoff_hz": 180}]
+    },
+    {
+      "candidate_id": "transient_plus_10pct",
+      "processing_chain": [{"op": "transient", "amount": 0.1}]
+    },
+    {
+      "candidate_id": "gentle_saturation",
+      "processing_chain": [{"op": "saturation", "drive": 1.1}]
+    }
+  ],
+  "gates": {
+    "max_lufs_delta": 0.2,
+    "max_true_peak_dbTP": -1.0,
+    "max_abs_clarity_delta": 0.08
+  }
+}

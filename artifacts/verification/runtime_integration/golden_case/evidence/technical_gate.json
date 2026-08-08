@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-08-01T14:28:28Z",
+  "checks": {
+    "plan": true,
+    "source": true,
+    "spec": true
+  },
+  "errors": [],
+  "status": "PASS"
+}

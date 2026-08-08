@@ -1,0 +1,12 @@
+{
+  "approval_id": "APR-85bc53a1b459",
+  "approved_at": "2026-08-01T14:28:29Z",
+  "case_id": "MFY-CASE-5030DEA8F22D",
+  "comment": "",
+  "decision": "APPROVED",
+  "human_owner": "huliye24",
+  "one_point_spec_hash": "3c06761a7f61af3b0763945d486d187c72eb6e1b841652ec06e2f61460ef33bb",
+  "plan_hash": "ce0f39451f8a58fb17754eea497aecc13c41860ee840ec74e6e0a21700467782",
+  "plan_id": "PLN-0fb17d9abd2e",
+  "source_sha256": "34b94987959122b75788373eba2382564a351942670e701314f492ddce733d1d"
+}

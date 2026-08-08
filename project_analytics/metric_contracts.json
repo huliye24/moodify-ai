@@ -1,0 +1,190 @@
+{
+  "schema": "moodify.analytics.metric-contracts/0.2",
+  "timezone": "Asia/Shanghai",
+  "version": "0.2",
+  "note": "0.2 extends 0.1 with formula/unit/source/frequency/owner/limits per 025 Stage A; 0.1 definitions preserved and not rewritten",
+  "metrics": {
+    "accepted_share_of_started_pct": {
+      "definition": "100 * accepted formal task packages / (accepted + awaiting_acceptance formal task packages)",
+      "formula": "100 * accepted / (accepted + awaiting_acceptance)",
+      "unit": "percent",
+      "grain": "task package",
+      "source": "task_ledger.jsonl (023)",
+      "refresh_frequency": "weekly",
+      "owner": "project-governance",
+      "source_precedence": ["CODEX_FINAL_ACCEPTANCE", "HANDOFF status", "task orchestration"],
+      "exclusions": ["planned", "not_started", "unclassified", "directories without orchestration"],
+      "limits": ["only meaningful when started > 0; NOT_MEASURED otherwise"]
+    },
+    "test_collection_errors": {
+      "definition": "pytest collection errors in the configured Core suite",
+      "formula": "count(pytest --collect-only errors)",
+      "unit": "collection error",
+      "grain": "collection error",
+      "source": "pytest --collect-only -q (package dir)",
+      "refresh_frequency": "daily",
+      "owner": "022 test-gates",
+      "target": 0,
+      "red_line": true,
+      "limits": ["must run from moodify-core-package dir (moodify-bridge isolated)"]
+    },
+    "tracked_change_files": {
+      "definition": "files returned by git diff --numstat",
+      "formula": "count(git diff --numstat HEAD)",
+      "unit": "tracked file",
+      "grain": "tracked file",
+      "source": "git diff --numstat",
+      "refresh_frequency": "daily",
+      "owner": "023 inventory"
+    },
+    "untracked_entries": {
+      "definition": "entries returned by git status --porcelain that begin with ??",
+      "formula": "count(git status --porcelain ?? entries)",
+      "unit": "Git status entry",
+      "grain": "Git status entry",
+      "source": "git status --porcelain -c core.quotepath=false",
+      "refresh_frequency": "daily",
+      "owner": "023 inventory",
+      "caveat": "an entry may represent an entire untracked directory; inventory expands to file counts"
+    },
+    "workspace_bucket_unknown_count": {
+      "definition": "workspace inventory entries classified UNKNOWN",
+      "formula": "count(inventory entries bucket == UNKNOWN)",
+      "unit": "entry",
+      "grain": "workspace entry",
+      "source": "workspace_inventory.json (023)",
+      "refresh_frequency": "daily",
+      "owner": "023 inventory",
+      "red_line": true,
+      "limits": ["every change must have a bucket or explicit UNKNOWN; target 0"]
+    },
+    "task_state_conflicts": {
+      "definition": "ledger tasks with derived-state conflict",
+      "formula": "count(build_conflict_table)",
+      "unit": "task",
+      "grain": "task package",
+      "source": "task_ledger.jsonl (023 gate)",
+      "refresh_frequency": "daily",
+      "owner": "023 ledger",
+      "red_line": true
+    },
+    "architecture_new_violations": {
+      "definition": "enclosure enforcer violations not covered by documented exceptions",
+      "formula": "count(enforcer violations)",
+      "unit": "violation",
+      "grain": "import edge",
+      "source": "tools/architecture/enforcer.py (024)",
+      "refresh_frequency": "weekly",
+      "owner": "024 enclosure",
+      "red_line": true,
+      "limits": ["documented exceptions with expiry are baseline debt, not violations"]
+    },
+    "core_change_concentration_pct": {
+      "definition": "share of tracked changes touching core/runtime areas",
+      "formula": "100 * core_changes / total_changes",
+      "unit": "percent",
+      "grain": "changed line",
+      "source": "git diff --numstat + 024 budget",
+      "refresh_frequency": "weekly",
+      "owner": "024 budget",
+      "limits": ["trend indicator; no calibrated threshold yet"]
+    },
+    "cross_area_import_edges": {
+      "definition": "import edges between enclosure areas",
+      "formula": "count(budget import_edges)",
+      "unit": "edge",
+      "grain": "import edge",
+      "source": "tools/architecture/budget.py (024)",
+      "refresh_frequency": "weekly",
+      "owner": "024 budget"
+    },
+    "test_to_source_physical_line_ratio_pct": {
+      "definition": "100 * physical lines in tracked Python test files / physical lines in other tracked Python files",
+      "formula": "100 * test_lines / source_lines",
+      "unit": "percent",
+      "grain": "physical line",
+      "source": "git ls-files + line counts",
+      "refresh_frequency": "weekly",
+      "owner": "022 gates",
+      "caveat": "structural investment indicator; not code coverage or test quality"
+    },
+    "rework_drag_pct": {
+      "definition": "100 * rework hours / total engineering hours",
+      "formula": "100 * rework_hours / (active + wait + rework + machine)",
+      "unit": "percent",
+      "grain": "engineering hour",
+      "source": "task investment records (025 schema, manual/CLI input)",
+      "refresh_frequency": "weekly",
+      "owner": "project-governance",
+      "status": "not_measurable_until_time_logging_exists",
+      "limits": ["NOT_MEASURED until records exist"]
+    },
+    "owner_leverage_ratio": {
+      "definition": "agent execution hours producing accepted output / owner decision and review hours",
+      "formula": "agent_hours / owner_hours",
+      "unit": "ratio",
+      "grain": "engineering hour",
+      "source": "task investment records (025 schema)",
+      "refresh_frequency": "weekly",
+      "owner": "project-governance",
+      "status": "not_measurable_until_time_logging_exists"
+    },
+    "first_acceptance_rate_pct": {
+      "definition": "tasks accepted on first review / tasks reaching review",
+      "formula": "100 * first_try_accepted / reached_review",
+      "unit": "percent",
+      "grain": "task package",
+      "source": "task_ledger.jsonl events (acceptance without prior rework)",
+      "refresh_frequency": "stage",
+      "owner": "project-governance",
+      "limits": ["small samples are misleading; report median/interval not mean"]
+    },
+    "change_propagation_scope": {
+      "definition": "areas touched per task / total areas",
+      "formula": "touched_areas / 9",
+      "unit": "ratio",
+      "grain": "task package",
+      "source": "git diff per task (needs task->commit mapping)",
+      "refresh_frequency": "stage",
+      "owner": "024 enclosure",
+      "status": "not_measurable_until_task_commit_mapping",
+      "limits": ["NOT_MEASURED until mapping exists"]
+    }
+  },
+  "schemata": {
+    "task_investment": {
+      "schema": "moodify.analytics.task-investment/0.1",
+      "fields": {
+        "task_id": "string (task package id)",
+        "recorded_at": "ISO timestamp",
+        "planned_hours": "number",
+        "active_hours": "number",
+        "wait_hours": "number",
+        "rework_hours": "number",
+        "machine_hours": "number",
+        "evidence": "string (path to run evidence)"
+      },
+      "note": "fact vs estimate separated: planned is estimate, active/wait/rework/machine are measured"
+    },
+    "user_value": {
+      "schema": "moodify.analytics.user-value/0.1",
+      "fields": {
+        "recorded_at": "ISO timestamp",
+        "task_outcome": "success | failed | abandoned",
+        "feature_usage_count": "integer",
+        "feature_completion_rate_pct": "number",
+        "audio_review": "blind_A_B | technical_metrics | human_acceptance",
+        "time_saved_minutes": "number",
+        "evidence": "string"
+      },
+      "note": "aggregate task-level summaries only; no keypress/screen/audio-content/personal tracking; missing fields stay NOT_MEASURED"
+    }
+  },
+  "historical_snapshot_2026_08_02": {
+    "test_collection": "421 tests / 19 errors (09:43 snapshot); 469/19 (re-check); 647 collected / 0 errors after 022",
+    "accepted_share_pct": "57.1% (snapshot); 39.1% (023 weekly, different denominator)",
+    "core_share_pct": "83.6% (snapshot); 77.5% (024 budget)",
+    "workspace": "55 tracked / 140 untracked (snapshot); 54/153 (023 inventory)",
+    "note": "historical snapshot is immutable; current values computed live"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "approval_id": "APR-85bc53a1b459",
+  "case_id": "MFY-CASE-5030DEA8F22D",
+  "case_version": "1",
+  "created_at": "2026-08-01T14:28:39Z",
+  "engine_name": "native",
+  "engine_version": "1.0.0",
+  "evidence_package_sha256": "f10ac0c86abd333a74de4c2bc279bd8e29fecebf85913d9898ed15aec4d8dd1d",
+  "execution_id": "MFY-EXEC-ea2290afad74",
+  "moodify_version": "0.1.0",
+  "one_point_spec_hash": "3c06761a7f61af3b0763945d486d187c72eb6e1b841652ec06e2f61460ef33bb",
+  "output_path": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mfy-golden-idgyn_f5\\golden_project\\cases\\MFY-CASE-5030DEA8F22D\\output\\processed_audio.wav",
+  "output_sha256": "266eb6ffe3eb839231b4ecde16df6eb257a327d2e3146efd6c4c4dc2ea98427d",
+  "plan_hash": "ce0f39451f8a58fb17754eea497aecc13c41860ee840ec74e6e0a21700467782",
+  "source_sha256": "34b94987959122b75788373eba2382564a351942670e701314f492ddce733d1d",
+  "verification_id": "VERIFY-4f1e13050945",
+  "verification_status": "PASS"
+}

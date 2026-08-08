@@ -1,0 +1,15 @@
+{
+  "project_id": "0bbc4607-2a58-4ce5-aea5-3e4fd7f39d15",
+  "engine": "native",
+  "command": [],
+  "exit_code": 0,
+  "output_path": "E:\\moodify\\artifacts\\audits\\product_alignment\\codex\\runtime\\duplicate_apply\\render.wav",
+  "output_hash": "81bd18851f2dadb935f61f7e3b7b924cf25dd3edfc64f1b24d17a29c8a9688b3",
+  "output_duration_s": 0.25,
+  "output_sample_rate": 44100,
+  "output_channels": 2,
+  "output_peak_db": -13.25,
+  "elapsed_seconds": 4.461,
+  "errors": [],
+  "warnings": []
+}

@@ -1,0 +1,17 @@
+{
+  "sample_rate": 16000,
+  "separate_vocals": "auto",
+  "demucs_model": "htdemucs",
+  "active_frame_ms": 30,
+  "active_hop_ms": 10,
+  "active_threshold_ratio": 0.20,
+  "merge_gap_seconds": 0.45,
+  "min_active_seconds": 0.12,
+  "publish_gate": {
+    "min_coverage": 0.92,
+    "max_unaligned_token_ratio": 0.05,
+    "min_mean_word_confidence": 0.72,
+    "min_line_confidence": 0.55,
+    "max_line_overlap_seconds": 0.08
+  }
+}

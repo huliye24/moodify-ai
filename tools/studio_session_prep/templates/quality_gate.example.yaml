@@ -1,0 +1,33 @@
+# Quality Gate Template
+# Candidate generation quality gates applied during processing.
+
+gates:
+  - name: "peak_safety"
+    description: "Output peak must not exceed -0.3 dBFS"
+    check: "output_peak_dbfs <= -0.3"
+    on_fail: "WARN"
+  - name: "dynamic_range"
+    description: "Dynamic range reduction must not exceed 4 dB"
+    check: "dynamic_range_delta_db >= -4.0"
+    on_fail: "WARN"
+  - name: "loudness_range"
+    description: "RMS delta must be within ±6 dB of original"
+    check: "abs(rms_delta_db) <= 6.0"
+    on_fail: "WARN"
+  - name: "stereo_correlation"
+    description: "Output L/R correlation must be above 0.05 (stereo only)"
+    check: "correlation_lr > 0.05 or channels == 1"
+    on_fail: "WARN"
+  - name: "output_not_silent"
+    description: "Output RMS must be above -80 dB"
+    check: "output_rms_db > -80"
+    on_fail: "FAIL"
+  - name: "sample_rate_match"
+    description: "Output sample rate must match input"
+    check: "output_sr == input_sr"
+    on_fail: "FAIL"
+
+# Human review is always PENDING. No automatic promotion.
+human_review_default: "PENDING"
+auto_select_final: false
+auto_promote_rule: false

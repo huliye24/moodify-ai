@@ -1,0 +1,47 @@
+schema_version: 1.0.0
+case_id: 11111111-1111-4111-8111-111111111111
+title: Synthetic immutable bridge demonstration
+created_at: 2026-01-01T00:00:00Z
+moodify_version: 0.1.0-demo
+rule_versions: {}
+source_asset_ids: [aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1]
+output_asset_ids: [aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2]
+assets:
+  - {schema_version: 1.0.0, asset_id: aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1, kind: project, local_path: demo/assets/source.txt, sha256: b9a19b1269175812237f9a0d590efbfc1a86582462ce5ba2e69ec55b4a98bb4a, size_bytes: 58, media_type: text/plain, role: source}
+  - {schema_version: 1.0.0, asset_id: aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2, kind: project, local_path: demo/assets/output.txt, sha256: 96206406967c66c53572312c45ca47a667baf0ce372f15e33fb37d2683e78ac6, size_bytes: 58, media_type: text/plain, role: output}
+  - {schema_version: 1.0.0, asset_id: aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3, kind: stem, local_path: demo/assets/stem.txt, sha256: f96346f36f96ae17af6a2168f2f2e95e4d504d93d295d2dbd044da0571f7d038, size_bytes: 75, media_type: text/plain, role: synthetic-stem-placeholder}
+  - {schema_version: 1.0.0, asset_id: aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4, kind: midi, local_path: demo/assets/notes.mid.txt, sha256: 5422d118b221faa5185c86cce9e0a6e2e303a4c014be37dc3577f066dee3b55f, size_bytes: 51, media_type: text/plain, role: symbolic-midi-description}
+  - {schema_version: 1.0.0, asset_id: aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa5, kind: score, local_path: demo/assets/score.musicxml.txt, sha256: 1d37e1712817f3ae781ea115ac6a161b08e5022fb6987b3af6af3cc4035b4714, size_bytes: 55, media_type: text/plain, role: score-description}
+  - {schema_version: 1.0.0, asset_id: aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa6, kind: lyrics, local_path: demo/assets/lyrics.txt, sha256: 512535a8db90968235e754b2cee1c59f381c05f5af4ba6a0a743f74bed513b4f, size_bytes: 57, media_type: text/plain, role: explicit-lyrics-absence}
+processing_stages:
+  - schema_version: 1.0.0
+    stage_id: bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1
+    name: synthetic pass-through
+    ordinal: 0
+    software: moodify-demo
+    software_version: 0.1.0
+    rule_ids: []
+    parameters: {gain: 1.0}
+    input_asset_ids: [aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1]
+    output_asset_ids: [aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2]
+symbolic_anchors: []
+human_observations:
+  - schema_version: 1.0.0
+    observation_id: cccccccc-cccc-4ccc-8ccc-ccccccccccc1
+    observer: demo-author
+    observed_at: 2026-01-01T00:00:00Z
+    text: No listening claim is made because this case contains no audio.
+    anchor_ids: []
+    tags: [synthetic, limitation]
+    rating: null
+events:
+  - schema_version: 1.0.0
+    event_id: dddddddd-dddd-4ddd-8ddd-ddddddddddd1
+    event_type: limitation
+    occurred_at: 2026-01-01T00:00:00Z
+    description: Audio is intentionally absent; all audio measurements are null/absent.
+    supersedes_event_id: null
+    details: {}
+limitations: [No audio content, No measured acoustic values]
+golden: true
+

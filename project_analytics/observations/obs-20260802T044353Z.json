@@ -1,0 +1,47 @@
+{
+  "schema": "moodify.analytics.observation/0.1",
+  "run_id": "obs-20260802T044353Z",
+  "collected_at": "2026-08-02T04:43:53Z",
+  "status": "complete",
+  "partial": [],
+  "metrics": {
+    "task_state_conflicts": 0,
+    "task_states": {
+      "PLANNED": 9,
+      "ACCEPTED": 9,
+      "READY_FOR_REVIEW": 14
+    },
+    "workspace_unknown_count": 0,
+    "workspace_counts": {
+      "tracked": 54,
+      "untracked": 153,
+      "entries": 207
+    },
+    "enclosure": {
+      "violations": 0,
+      "baseline_debt": 2
+    },
+    "architecture_budget": {
+      "cross_area_edges": 42,
+      "cycles": 0,
+      "core_share_pct": 77.5,
+      "oversized_top5": [
+        "moodify_runtime\\operator_console.py",
+        "moodify_runtime\\craft_processes.py",
+        "moodify_runtime\\tests\\test_atomic_pair_writer.py",
+        "moodify_runtime\\cli.py",
+        "moodify_runtime\\tests\\test_craft_proposals.py"
+      ]
+    },
+    "test_collection": {
+      "exit_code": 0,
+      "errors": 0,
+      "collected": 662
+    },
+    "git_concentration": {
+      "core_share_pct": 77.5,
+      "total": 2775,
+      "core": 2151
+    }
+  }
+}

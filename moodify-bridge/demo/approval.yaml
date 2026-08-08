@@ -1,0 +1,9 @@
+schema_version: 1.0.0
+approval_id: eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1
+rule_id: R-DEMO-001
+rule_version: 1.0.0
+approver: demo-human
+approved_at: 2026-01-01T00:00:00Z
+decision: approve
+rationale: Explicit demonstration approval; not evidence of production readiness.
+

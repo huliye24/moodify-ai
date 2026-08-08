@@ -4,6 +4,7 @@ dist-electron
 release
 __pycache__
 *.pyc
+*.egg-info/
 .env
 .venv
 .playwright-mcp

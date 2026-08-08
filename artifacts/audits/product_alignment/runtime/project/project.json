@@ -1,0 +1,112 @@
+{
+  "assets": [
+    {
+      "asset_id": "13ef0fc7-cd40-410e-9a4a-9d9d320468ae",
+      "kind": "audio",
+      "metadata": {},
+      "path": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\source.wav",
+      "role": "source",
+      "sha256": "14dc60fece31e996100633a7ff887354c99021bcd1c93b8949d6805ddfcbd602"
+    }
+  ],
+  "decisions": [],
+  "evidence": [],
+  "metadata": {},
+  "plans": [
+    {
+      "dry_run": true,
+      "intent": {
+        "gain_db": -1
+      },
+      "plan_id": "f957d2b0-1491-46c4-9150-10591a8bd8de",
+      "steps": [
+        {
+          "params": {
+            "gain_db": -1.0
+          },
+          "type": "gain"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "dry_run": false,
+      "intent": {
+        "gain_db": -1
+      },
+      "plan_id": "fa48f5a7-53d2-48b6-b6da-a4ab123a62de",
+      "steps": [
+        {
+          "params": {
+            "gain_db": -1.0
+          },
+          "type": "gain"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "dry_run": false,
+      "intent": {
+        "gain_db": -2
+      },
+      "plan_id": "94180cea-d829-4694-b9a1-fba54da0e7aa",
+      "steps": [
+        {
+          "params": {
+            "gain_db": -2.0
+          },
+          "type": "gain"
+        }
+      ],
+      "warnings": []
+    }
+  ],
+  "project_id": "3a66ea13-0949-4ec3-a333-29f37f2a4bc0",
+  "revisions": [
+    {
+      "description": "Initialized",
+      "revision_id": "1"
+    }
+  ],
+  "runs": [
+    {
+      "artifacts": [
+        {
+          "kind": "audio",
+          "path": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\unapproved_apply\\render.wav",
+          "sha256": "81bd18851f2dadb935f61f7e3b7b924cf25dd3edfc64f1b24d17a29c8a9688b3"
+        }
+      ],
+      "errors": [],
+      "evidence_path": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\unapproved_apply\\render_evidence.json",
+      "output_dir": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\unapproved_apply",
+      "plan_id": "fa48f5a7-53d2-48b6-b6da-a4ab123a62de",
+      "run_id": "a49cbd5f-a495-4200-a422-0d5811659206",
+      "source_hashes": {
+        "13ef0fc7-cd40-410e-9a4a-9d9d320468ae": "14dc60fece31e996100633a7ff887354c99021bcd1c93b8949d6805ddfcbd602"
+      },
+      "status": "completed"
+    },
+    {
+      "artifacts": [
+        {
+          "kind": "audio",
+          "path": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\duplicate_apply\\render.wav",
+          "sha256": "81bd18851f2dadb935f61f7e3b7b924cf25dd3edfc64f1b24d17a29c8a9688b3"
+        }
+      ],
+      "errors": [],
+      "evidence_path": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\duplicate_apply\\render_evidence.json",
+      "output_dir": "E:\\moodify\\artifacts\\audits\\product_alignment\\runtime\\duplicate_apply",
+      "plan_id": "fa48f5a7-53d2-48b6-b6da-a4ab123a62de",
+      "run_id": "67def74b-9a17-40a6-955f-34075eaa68ee",
+      "source_hashes": {
+        "13ef0fc7-cd40-410e-9a4a-9d9d320468ae": "14dc60fece31e996100633a7ff887354c99021bcd1c93b8949d6805ddfcbd602"
+      },
+      "status": "completed"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "title": "audit"
+}

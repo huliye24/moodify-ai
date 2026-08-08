@@ -1,0 +1,14 @@
+# Delivery Contract Template
+# Used internally by session-init; customize in the session brief YAML.
+
+deliverables:
+  - "Raw takes (WAV, as recorded)"
+  - "Session notes (Markdown)"
+  - "Technical report (Markdown + HTML)"
+sample_rate_delivery: "48000"
+bit_depth_delivery: "24"
+loudness_target_lufs: null
+true_peak_limit_dbtp: null
+include_wse_report: true
+include_candidate_plans: false
+revision_policy: "Changes after contract freeze require written approval."

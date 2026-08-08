@@ -1,0 +1,28 @@
+experiment_id: PWRM-E001
+project: Moodify Power Reward Model v0.1
+status: proposed
+research_question: >
+  Under loudness-matched and clarity-constrained conditions, can a pairwise reward model
+  predict which processed version is perceived as more powerful?
+source_tracks_target: 60
+segments_per_track: 2
+unique_pairs_target: 720
+labels_per_pair_target: 3
+constraints:
+  integrated_loudness_delta_lu_target: 0.1
+  integrated_loudness_delta_lu_max_pilot: 0.2
+  true_peak_ceiling_dbtp: -1.0
+  clipping_allowed: false
+splits:
+  train: 0.70
+  validation: 0.15
+  test: 0.15
+  split_unit: source_track
+acceptance_gates:
+  pairwise_accuracy_min: 0.65
+  per_genre_accuracy_min: 0.60
+  clarity_violation_top1_max: 0.05
+  reproducible_record_rate_min: 0.95
+notes:
+  - Thresholds are v0.1 engineering hypotheses, not universal psychoacoustic standards.
+  - v0.1 trains a reward model only; no full RL treatment policy is required.

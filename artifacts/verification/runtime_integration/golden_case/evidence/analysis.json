@@ -1,0 +1,12 @@
+{
+  "crest_factor": 16.1,
+  "duration_s": 45.0,
+  "has_clipping": false,
+  "loudness_lufs": -20.8,
+  "peak_db": -4.65,
+  "rms_db": -20.75,
+  "sample_rate": 48000,
+  "silence_ratio": 0.0035,
+  "spectral_centroid_hz": 3472.9,
+  "warnings": []
+}

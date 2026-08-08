@@ -1,0 +1,51 @@
+# Session Brief Example
+# Copy this template, fill in values, and pass to: session-init --brief this-file.yaml --output-dir ./session
+
+project_title: "Example Recording Session"
+client_name: "Client Name"
+engineer_name: "Engineer Name"
+studio_location: "Studio Name, City"
+session_date: "2026-08-01"
+genre: "pop"
+target_bpm: 120.0
+target_key: "C major"
+notes: |
+  Any additional notes about the session.
+  Multi-line notes are supported.
+
+# ── Recording Specification ──
+recording_spec:
+  sample_rate: "48000"        # 44100 | 48000 | 96000 | 192000
+  bit_depth: "24"             # 16 | 24 | 32
+  file_format: "wav"          # wav | flac | aiff
+  target_peak_dbfs: -6.0      # headroom in dBFS
+  channel_count: 2            # stereo
+  naming_template: "{session_id}_T{take:03d}_{role}.wav"
+
+# ── Backup Targets (must be different paths) ──
+backup_targets:
+  - label: "external_ssd"
+    path: "D:/backup/session_2026-08-01"
+  - label: "nas"
+    path: "//nas/audio/session_2026-08-01"
+
+# ── Deliverable Contract ──
+deliverable_contract:
+  deliverables:
+    - "Raw takes (WAV, 48kHz/24-bit)"
+    - "Session notes (Markdown)"
+    - "Technical report (Markdown + HTML)"
+    - "WSE profile (JSON)"
+  sample_rate_delivery: "48000"
+  bit_depth_delivery: "24"
+  loudness_target_lufs: null       # null = no loudness normalization
+  true_peak_limit_dbtp: null       # null = no true peak limit
+  include_wse_report: true
+  include_candidate_plans: false
+  revision_policy: "Changes after contract freeze require written approval."
+
+# ── Pre-registered Assets (optional at init time) ──
+assets: []
+  # - filename: "reference_mix.wav"
+  #   role: "reference_mix"
+  #   notes: "Client-provided reference track"
