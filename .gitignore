@@ -12,6 +12,48 @@ backend/moodify-server.exe~
 .DS_Store
 Thumbs.db
 
+# Local editor / agent state
+.idea/
+.cursor/
+.codex-work/
+_github_moodify_ai/
+
+# Local installers, archives, model weights, and databases
+*.exe
+*.msi
+*.zip
+*.7z
+*.rar
+*.ckpt
+*.safetensors
+*.onnx
+*.pt
+*.pth
+*.duckdb
+*.aup3
+*.mscz~
+
+# Exported office / publication artifacts (keep editable source files)
+*.pdf
+*.pptx
+*.docx
+
+# Machine-local asset workspaces
+local_audio_assets/
+models/
+pre-music/
+output/
+tmp/
+scratch/
+video/
+Moodify_Deep_Ear_Diagnostic_Pack_v0.1.1/
+RJWC_VideoPack_System/
+实验图库/
+工程经验层/
+投资ppt/
+研究论文/
+补丁包/
+
 # Moodify generated heavy assets
 calibration_reports/
 inspector_reports/
