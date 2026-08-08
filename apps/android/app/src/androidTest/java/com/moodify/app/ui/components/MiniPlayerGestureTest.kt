@@ -22,6 +22,7 @@ import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.moodify.app.data.BaseUrlStore
 import com.moodify.app.data.PlaybackManager
 import com.moodify.app.data.QueueItem
 import com.moodify.app.ui.theme.MoodifyTheme
@@ -48,6 +49,9 @@ class MiniPlayerGestureTest {
             MoodifyTheme {
                 val context = LocalContext.current
                 LaunchedEffect(Unit) {
+                    // Use a closed loopback port so Media3 fails immediately on
+                    // physical devices instead of waiting for a backend timeout.
+                    BaseUrlStore(context).baseUrl = "http://127.0.0.1:1"
                     PlaybackManager.init(context)
                     // Unreachable path on purpose: playback settles into a stable
                     // error state instead of depending on a live server.

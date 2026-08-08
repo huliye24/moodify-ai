@@ -3,6 +3,7 @@ package com.moodify.app.data
 import android.content.Context
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
@@ -79,6 +80,13 @@ object PlaybackManager {
                         if (playbackState == Player.STATE_ENDED && s.queue.size > 1) {
                             next()
                         }
+                    }
+
+                    override fun onPlayerError(error: PlaybackException) {
+                        _state.value = _state.value.copy(
+                            playing = false,
+                            error = "播放失败：无法从服务器加载音频",
+                        )
                     }
 
                     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
