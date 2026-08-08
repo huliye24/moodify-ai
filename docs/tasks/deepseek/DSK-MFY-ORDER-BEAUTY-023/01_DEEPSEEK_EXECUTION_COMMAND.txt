@@ -1,0 +1,10 @@
+执行任务：DSK-MFY-ORDER-BEAUTY-023｜城门：建立任务与变更的单一秩序
+
+前置条件：DSK-MFY-ORDER-BEAUTY-022 已 ACCEPT。若未满足，状态设为 HOLD，不得绕过。
+
+先完整阅读本目录的 00_TASK_ORCHESTRATION.md 与 02_CODEX_ACCEPTANCE_MATRIX.md，并读取最新 project_analytics 快照。严格区分历史快照与实时扫描。
+
+先建追加式账本，再导入历史事件；先生成工作区 inventory，再做分类。任何无法确定的内容保留 UNKNOWN 并报告给 Judge。禁止移动、删除、提交、stash 或清理用户文件，禁止改写历史验收文档。
+
+交付 PROGRESS.md、VALIDATION.md、FAILURE_LEDGER.md、HANDOFF.md，以及机器可读账本、schema、状态校验器、工作区 inventory 和派生报告。
+

@@ -1,0 +1,27 @@
+你是 Moodify 的受限工程实施 Worker。执行：
+
+DSK-MFY-PIPELINE-016｜工具链安装与第一条端到端生产流水线
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-PIPELINE-016\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-PIPELINE-016\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\scripts\install_moodify_toolchain.ps1
+
+严格串行执行：
+Phase 0：运行 install_moodify_toolchain.ps1 安装 SoX、matchering、Rubber Band、lameenc。全部通过后写入 TOOLCHAIN_INSTALLED.txt。
+Phase 1：实现 SoXAdapter、MatcheringAdapter、RubberBandAdapter，接入 cli_daw/adapters/。每个 adapter 有 probe()、capabilities()、execute() 三个方法。不可用返回 UNAVAILABLE，不伪造。
+Phase 2：实现 DecisionOrchestrator：读入分析结果 + OnePointSpec，生成 TreatmentPlan，dry-run 预览，人工确认后调用 CLI DAW 执行。plan 写 project.json，run 写 run_manifest.json。
+Phase 3：实现 EvidenceAggregator：收集 Bridge evidence、spectral evidence、CLI DAW render evidence、lyrics evidence，写入统一的 evidence_bundle.json。
+Phase 4：用合成 WAV + OnePointSpec 跑完整闭环：import → analyze → plan → dry-run → execute → verify → evidence。生成 HANDOFF.md。
+
+硬规则：
+1. 不处理真实歌曲。只用生成的短 WAV 合成夹具。
+2. 源音频只读且 hash 不变。所有输出只进全新目录。
+3. 没有 GUI、窗口、鼠标。全程 CLI。
+4. 每个 adapter 诚实报告能力——缺失工具返回 UNAVAILABLE，不静默跳过。
+5. 每次执行保存命令、参数、版本、exit code、hash、耗时。
+6. 禁止修改既有模块、删除模块、Git 操作。用户 dirty 文件不可触碰。
+
+最终回复不超过 25 行，报告：Phase 状态、安装的工具、adapter 矩阵、闭环结果、测试数、限制和 HANDOFF.md 路径。然后停止。

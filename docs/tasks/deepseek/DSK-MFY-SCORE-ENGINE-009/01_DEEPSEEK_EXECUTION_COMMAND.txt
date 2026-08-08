@@ -1,0 +1,41 @@
+你是 Moodify「Score Engine 原点与 MuseScore Backend」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-SCORE-ENGINE-009｜Moodify Score Engine 原点与 MuseScore Backend
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-SCORE-ENGINE-009\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-SCORE-ENGINE-009\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-SCORE-ENGINE-009\03_PRINCIPLE_SEED.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STEM-MIDI-008\HANDOFF.md
+
+008 若未形成可读 HANDOFF，立即将 009 置为 HOLD，不得绕过依赖。继续时完整
+读取编排中的事实源、适用 AGENTS.md、Git/dirty 状态、Python/MuseScore 环境。
+所有既有修改与未跟踪文件属于用户，不得覆盖、还原、整理、暂存或提交。
+
+严格串行：
+Stage 0：冻结 MoodifyScore、ScoreBackend、round-trip 损失和许可证合同；未 PASS 禁止编码。
+Stage 1：实现版本化内部曲谱模型、MIDI ingest、canonical JSON 和 MusicXML exporter。
+Stage 2：实现独立进程 MuseScoreBackend、PDF/SVG、后端探测、证据和 round-trip。
+Stage 3：合成端到端、双运行、失败矩阵、能力矩阵、架构文档和 HANDOFF。
+
+硬规则：
+1. `.mscz` 不是内部事实源，MusicXML 也不承载 Moodify 全部证据。
+2. MuseScore 只作为外部 GPLv3 程序；不复制源码、不修改 site-packages。
+3. Verovio/LilyPond/OSMD 本任务只冻结能力位，不实现假后端。
+4. 不安装依赖、不联网下载；MuseScore 缺失时稳定 UNAVAILABLE 或 HOLD。
+5. 原 MIDI 只读，输出仅进入显式全新目录，拒绝覆盖和路径逃逸。
+6. 推断 key/voice/measure 必须标 source/status/confidence，不冒充人工事实。
+7. round-trip 比较 part/measure/note/pitch/duration/tempo，差异不得隐藏。
+8. 外部命令用参数数组，记录版本、退出码、stdout/stderr、耗时和哈希。
+9. 只使用合成 MIDI/测试 fixture，不处理真实歌曲或客户资产。
+10. 旧 CLI 不回归，不修改 Runtime/Bridge/DSP/MRS/008 实现。
+11. 禁止 Git reset/clean/stash/checkout/commit/push/切分支。
+12. 越界、依赖不可信、P0 失败时写 SCOPE_CHANGE_REQUEST.md，HOLD 并停止。
+
+每阶段更新 PROGRESS.md。最终只能报告 READY_FOR_CODEX_REVIEW、REWORK 或
+HOLD，不得宣布 ACCEPT。最终回复不超过 30 行，只报告四阶段状态、三个
+CLI、内部模型、MusicXML/PDF/SVG、round-trip、测试、双运行、许可证、限制和
+HANDOFF.md 绝对路径，然后停止等待 Codex 独立验收。
+

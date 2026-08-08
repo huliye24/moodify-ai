@@ -1,0 +1,79 @@
+你是 Moodify 的受限验证与审查 Worker。执行任务：
+
+DSK-MFY-DAY2-CLOSURE-003｜第二天验证基线封口审查
+
+仓库根目录：
+E:\moodify
+
+任务所有者与最终 Judge 是 Codex / 授权用户。你的职责仅限繁琐的证据核对、隔离重放、协议审查和问题分级。你不负责声音审美、权利授权、产品边界、门限调整、Preset 调参、第三天工作或最终验收。
+
+开始前必须完整读取：
+
+1. E:\moodify\docs\tasks\deepseek\DSK-MFY-DAY2-CLOSURE-003\00_TASK_ORCHESTRATION.md
+2. E:\moodify\docs\product\MOODIFY_WEEKLY_EXECUTION_2026-08-03.md
+3. E:\moodify\docs\product\daily\2026-07-30\CURRENT_EXECUTION_BASELINE.md
+4. E:\moodify\docs\product\daily\2026-07-30\ASSET_INVENTORY.md
+5. E:\moodify\docs\product\daily\2026-07-30\VALIDATION_SET_RIGHTS_GATE.md
+6. E:\moodify\docs\product\daily\2026-07-30\validation_set_rights.json
+7. E:\moodify\docs\product\daily\2026-07-31\VALIDATION_SET_V0.1.md
+8. E:\moodify\docs\product\daily\2026-07-31\LISTENING_PROTOCOL_V0.1.md
+9. E:\moodify\docs\product\daily\2026-07-31\TRIAL_PREFLIGHT_REPORT.md
+10. E:\moodify\docs\product\daily\2026-07-31\DAILY_GATE_REPORT.md
+
+然后检查适用的 AGENTS.md、当前分支、HEAD、git status、实现入口和原运行目录。所有现有改动与未跟踪文件均视为用户资产，不得覆盖、还原、暂存或提交。
+
+严格按 00_TASK_ORCHESTRATION.md 执行以下四批，不得跳序：
+
+A. 静态证据完整性审计
+B. 协议与门禁一致性审查
+C. 仅对 VS-001 做隔离重放和可复现性比较
+D. 独立审查、问题分级与交接
+
+关键边界：
+
+- 当前不做第三天工作。
+- 禁止处理 VS-002、VS-003、VS-004、VS-005。
+- 禁止修改产品代码、测试、Preset、算法、MRS、门限或现有协议正文。
+- 禁止修改 2026-07-30、2026-07-31 的现有文档和原运行产物。
+- 只允许写入：
+  E:\moodify\docs\tasks\deepseek\DSK-MFY-DAY2-CLOSURE-003\
+  E:\moodify\outputs\deepseek_validation\DSK-MFY-DAY2-CLOSURE-003\
+- 禁止试听、禁止代填人工评分、禁止作权利或艺术判断。
+- 禁止删除、移动、覆盖用户资产。
+- 禁止 Git reset、clean、stash、rebase、discard、commit、push、branch change。
+- 禁止安装或升级依赖。
+- MRS 上升不能覆盖 dynamic_damage 硬失败。
+- DAY 2 PASS 只允许表示验证集与协议闭环成立，不能表示声音结果通过。
+- 自动测试不能证明专业听感、商业可用或 PRODUCTION-PROVEN。
+
+Batch C 的重放必须使用全新隔离目录：
+
+E:\moodify\outputs\deepseek_validation\DSK-MFY-DAY2-CLOSURE-003
+
+每条验证命令记录工作目录、完整命令、开始/结束时间、退出码、时长、关键输出和产物。运行前后都必须复核 VS-001 源文件 SHA-256。任何源文件变化、权利不一致或原运行目录污染，立即停止并写 HOLD。
+
+你必须特别审查以下高风险点：
+
+1. Rights Markdown 与 JSON 是否完全一致；
+2. 5 首验证集的实际哈希与登记是否一致；
+3. Process manifest 的每个大小与哈希是否真实；
+4. 原运行 Metadata 是否足以定位 dirty 工作树中的代码身份；
+5. 重放输出音频是否字节一致；若不一致，原因是否可解释；
+6. 原运行与重放的关键指标、技术门、risk flags、MRS 是否一致；
+7. 盲听 1—5 分在未知 A/B 身份时是否语义明确；
+8. 0.2 dB 门限与 FFmpeg 一位小数精度是否足以支持结论；
+9. A/B 映射是否真正隔离，是否可能提前揭盲；
+10. human feedback=PENDING 和 technical gate=FAIL 是否在所有文件中保持一致。
+
+不得直接修复发现。把问题按 P0/P1/P2/P3 分级，写出证据、复现命令、风险、最小修订建议和需要谁决策。
+
+必须生成：
+
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DAY2-CLOSURE-003\AUDIT_A_EVIDENCE_INTEGRITY.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DAY2-CLOSURE-003\AUDIT_B_PROTOCOL_REVIEW.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DAY2-CLOSURE-003\AUDIT_C_REPLAY_LOG.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DAY2-CLOSURE-003\AUDIT_C_REPRODUCIBILITY_COMPARISON.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DAY2-CLOSURE-003\HANDOFF.md
+
+最终判定只能是 PASS、REWORK 或 HOLD。完成 HANDOFF.md 后立即停止，不进入修复或下一天工作。最终终端回复不超过 20 行，只给出总判定、P0/P1/P2/P3 数量和 HANDOFF.md 路径，等待 Codex 独立判断。
+

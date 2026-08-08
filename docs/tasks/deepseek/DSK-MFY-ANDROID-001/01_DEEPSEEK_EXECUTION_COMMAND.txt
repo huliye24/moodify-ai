@@ -1,0 +1,8 @@
+执行 DSK-MFY-ANDROID-001。计划与目标完成日期均为 2026-08-02。
+
+先完整阅读 00_TASK_ORCHESTRATION.md、02_CODEX_ACCEPTANCE_MATRIX.md 和 apps/android/README.md。保护现有 Android 工程，不得删除重建。
+
+先诊断构建阻塞并保存日志，再固定 wrapper，最后构建、安装、启动和真机冒烟。不得把 Compose Preview 或“编译到一半”写成完成。不得创建发布密钥或执行任何 Git 危险操作。
+
+交付四份执行文档及 APK、SHA-256、构建日志、ADB 安装日志、前台 Activity、Logcat 和截图证据。最终状态仅允许 READY_FOR_CODEX_REVIEW / REWORK / HOLD。
+

@@ -1,0 +1,10 @@
+执行任务：DSK-MFY-ORDER-BEAUTY-024｜城墙：建立复杂度围护与稳定门面
+
+前置条件：022 与 023 均已 ACCEPT；否则 HOLD。
+
+先读 00_TASK_ORCHESTRATION.md、02_CODEX_ACCEPTANCE_MATRIX.md、最新 overall-project-analysis 和系统架构文档。先画围护图并采集基线，再写边界检查器，最后只做一个经证据选择的示范切口。
+
+高级秩序不是隐藏错误。所有门面必须保留可诊断失败、来源证据和回滚边界。禁止全仓重构、批量重命名、引入新框架、改变声音结果或为降低指标机械拆文件。
+
+交付 PROGRESS.md、VALIDATION.md、FAILURE_LEDGER.md、HANDOFF.md、系统围护图、机器可读边界 manifest、复杂度基线、边界检查器、反例测试和示范边界前后证据。
+

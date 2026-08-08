@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "gate_id": "VSR-001",
+  "purpose": "Moodify Phase 1 internal sound validation only",
+  "authority": {
+    "confirmed_by": "user_in_current_codex_task",
+    "confirmed_at": "2026-07-31T08:45:00+08:00",
+    "scope": "internal_validation_only"
+  },
+  "assets": [
+    {
+      "asset_id": "VS-001",
+      "source_path": "E:\\moodify\\local_audio_assets\\mhp026\\source\\01_ai_vocal\\mhp026_01_ai_vocal__pour_le_moi_pas_encore_ecrit.wav",
+      "status": "ready"
+    },
+    {
+      "asset_id": "VS-002",
+      "source_path": "E:\\moodify\\local_audio_assets\\mhp026\\source\\06_dense_mix\\mhp026_06_dense_mix__neural_poison.mp3",
+      "status": "ready"
+    },
+    {
+      "asset_id": "VS-003",
+      "source_path": "E:\\moodify\\local_audio_assets\\mhp026\\source\\07_thin_demo\\mhp026_07_thin_demo__jian_zhong_weiguang.mp3",
+      "status": "ready"
+    },
+    {
+      "asset_id": "VS-004",
+      "source_path": "E:\\moodify\\local_audio_assets\\mhp026\\source\\03_rock\\mhp026_03_rock__black_therapy.mp3",
+      "status": "ready"
+    },
+    {
+      "asset_id": "VS-005",
+      "source_path": "E:\\moodify\\local_audio_assets\\mhp026\\source\\04_ambient\\mhp026_04_ambient__echoes_in_the_neon_labyrinth.mp3",
+      "status": "ready"
+    }
+  ]
+}

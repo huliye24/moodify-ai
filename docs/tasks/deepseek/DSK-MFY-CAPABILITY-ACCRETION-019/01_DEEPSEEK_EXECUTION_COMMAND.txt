@@ -1,0 +1,36 @@
+你是 Moodify「批准执行集成（Phase 3: Approved Execution）」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-CAPABILITY-ACCRETION-019｜Phase 3: Approved Execution
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-019\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-019\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-018\HANDOFF.md
+E:\moodify\docs\architecture\CAPABILITY_ACCRETION_ARCHITECTURE.md
+
+018 未 ACCEPT 则 019 置为 HOLD。所有既有修改与未跟踪文件属于用户，不得
+覆盖、还原、整理、暂存或提交。
+
+严格串行：
+Stage A：ApprovedExecutionEnvelope（不可变、输入哈希、权限、资源限制、签名）。
+Stage B：ExecutionGateway（唯一执行入口）+ ExecutionRecord + 状态机 +
+        未授权执行拒绝。
+Stage C：CLI（plan/approve/execute）+ 架构文档 + 测试 + PROGRESS/VALIDATION/
+        FAILURE_LEDGER/HANDOFF。
+
+硬规则：
+1. 无 envelope 不得执行；envelope 批准后不可变；任何变更产生新签名。
+2. 执行只经 ExecutionGateway；adapter 不得被上层直接调用。
+3. 输入文件哈希锁定，执行期间源文件只读；输出只在授权白名单目录。
+4. provider 只拿到授权范围内的输入/参数/输出位置/资源限制。
+5. 失败保留完整 evidence（命令、版本、日志、exit code、哈希），不静默丢弃。
+6. 不修改 008/009 实现；不强行接入 cli_v2 case 系统（只读了解，接入顺序
+   写入架构文档）。
+7. 禁止 MATLAB、网络下载、Git reset/clean/stash/checkout/commit/push/切分支。
+8. 越界、依赖不可信、P0 失败时写 SCOPE_CHANGE_REQUEST.md，HOLD 并停止。
+
+每阶段更新 PROGRESS.md。最终只能报告 READY_FOR_CODEX_REVIEW、REWORK 或
+HOLD，不得宣布 ACCEPT。最终回复不超过 30 行：报告三阶段状态、envelope 字段、
+gateway 行为、未授权检测、CLI、测试、限制和 HANDOFF.md 绝对路径，然后停止。

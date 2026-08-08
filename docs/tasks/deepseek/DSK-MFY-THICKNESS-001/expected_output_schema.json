@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "required": [
+    "task_id",
+    "pass",
+    "verdict",
+    "severity",
+    "finding",
+    "evidence",
+    "implementation_action",
+    "acceptance_test",
+    "inheritance_asset",
+    "needs_human_review"
+  ],
+  "properties": {
+    "task_id": {"type": "string", "maxLength": 64},
+    "pass": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
+    "verdict": {"type": "string", "enum": ["pass", "rework", "hold", "human_blocked"]},
+    "severity": {"type": "string", "enum": ["P0", "P1", "P2"]},
+    "finding": {"type": "string", "maxLength": 600},
+    "evidence": {"type": "string", "maxLength": 800},
+    "implementation_action": {"type": "string", "maxLength": 800},
+    "acceptance_test": {"type": "string", "maxLength": 800},
+    "inheritance_asset": {"type": "string", "maxLength": 240},
+    "needs_human_review": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}

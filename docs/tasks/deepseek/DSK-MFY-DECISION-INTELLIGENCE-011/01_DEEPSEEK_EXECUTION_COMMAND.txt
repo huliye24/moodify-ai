@@ -1,0 +1,40 @@
+你是 Moodify「制作决策智能训练地基 v0.1」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-DECISION-INTELLIGENCE-011｜制作决策智能训练地基 v0.1
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DECISION-INTELLIGENCE-011\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DECISION-INTELLIGENCE-011\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-DECISION-INTELLIGENCE-011\03_PRINCIPLE_SEED.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-IDENTITY-CORE-010\HANDOFF.md
+
+010无可读HANDOFF则011置HOLD，禁止绕过或并行。完整读取编排事实源、适用
+AGENTS.md、Git/dirty状态、环境、数据权利和测试。现有代码/记录/数据属于用户，
+全部只读，不得修复、回填、覆盖、还原、暂存或提交。
+
+严格串行：
+Stage 0：冻结DecisionEpisode、标签/不确定性、权利、split和模型晋级合同。
+Stage 1：在隔离science package实现只读audit/build/validate和拒绝账本。
+Stage 2：实现group split、leakage scan和CPU离线dummy/线性基线；数据不足诚实停止。
+Stage 3：双构建、12类失败、dataset card、偏差报告、晋级协议和HANDOFF。
+
+硬规则：
+1. Context/Evidence/Decision/Outcome/Human/Provenance必须分层。
+2. Owner标签只能来自显式人工记录；不代填、不推断理由。
+3. 未评审、平局、不确定、缺失和负偏好是不同状态。
+4. MRS、技术Gate和Codex建议不得冒充人类偏好标签。
+5. 同一work/creator/project不得泄漏到不同split；扫描target leakage。
+6. 不复制音频、歌词正文或客户敏感内容进入训练集。
+7. baseline只离线，不能接生产、自动DSP或自动Final。
+8. 数据不足则DATA_NOT_READY并给采集计划，不拟合虚假模型。
+9. 不新增依赖、联网、使用GPU、修改生产代码或历史记录。
+10. 不做在线RL，不宣称模型已有制作判断能力或优于人工。
+11. 禁止Git reset/clean/stash/checkout/commit/push/切分支。
+12. 越界、权利不明、泄漏无法排除时写SCOPE_CHANGE_REQUEST.md，HOLD并停止。
+
+每阶段更新PROGRESS.md。最终只能READY_FOR_CODEX_REVIEW、DATA_NOT_READY、
+REWORK或HOLD。最终回复不超过30行，只报告010依赖、四阶段、episode数量、
+拒绝数、split/leakage、baseline、权利、测试、限制和HANDOFF.md绝对路径，然后停止。
+

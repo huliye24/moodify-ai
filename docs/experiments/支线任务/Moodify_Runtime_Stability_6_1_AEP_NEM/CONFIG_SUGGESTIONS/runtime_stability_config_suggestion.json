@@ -1,0 +1,46 @@
+{
+  "experiment_id": "runtime_stability_6_1",
+  "nem_id": "NEM-6.1-RUNTIME-STABILITY",
+  "input_dir": "data/night_inputs/",
+  "special_filename_input_dir": "data/test_inputs/special_filenames/",
+  "output_dir": "outputs/runtime_stability_6_1/",
+  "log_dir": "logs/runtime_stability_6_1/",
+  "report_path": "reports/runtime_stability_6_1_report.md",
+  "presets": [
+    "clean_master",
+    "safe_air",
+    "control"
+  ],
+  "max_runtime_hours": {
+    "smoke_test": 1,
+    "full_test": 6,
+    "endurance_run": 6,
+    "day_run": 24
+  },
+  "max_consecutive_failures": 3,
+  "task_timeout_minutes": 30,
+  "summary_enabled": true,
+  "resume_enabled": true,
+  "circuit_breaker_enabled": true,
+  "metrics": [
+    "success_rate",
+    "exit_code_distribution",
+    "unrecognized_arguments_count",
+    "max_consecutive_failures",
+    "average_task_duration",
+    "median_task_duration",
+    "p90_task_duration",
+    "p95_task_duration",
+    "stuck_task_count",
+    "summary_generated",
+    "log_integrity_rate"
+  ],
+  "gate_thresholds": {
+    "adopt_success_rate_min": 0.98,
+    "hold_success_rate_min": 0.9,
+    "unrecognized_arguments_max": 0,
+    "stuck_task_count_max": 0,
+    "max_consecutive_failures_adopt": 2,
+    "log_integrity_rate_min": 0.98
+  }
+}

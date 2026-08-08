@@ -1,0 +1,31 @@
+{
+  "task_pack_id": "DSK-MFY-THICKNESS-001",
+  "chain_id": "ECHAIN-MOODIFY-THICKNESS-016",
+  "created_at": "2026-07-30T00:00:00+08:00",
+  "task_count": 18,
+  "execution_model": "DeepSeek bounded audit worker; Codex/engineer implementation; independent judge verification",
+  "baseline": {
+    "branch": "codex/mainline-cloud-dev-20260603",
+    "commit": "b4bb5ef1d511169f315e10d18f4d6a27827d67e9",
+    "state": "v2.0.0-mvp-dirty",
+    "tests_passed": 197,
+    "tests_failed": 0
+  },
+  "constraints": {
+    "daily_human_hours": 4,
+    "rights_pending_audio_must_not_be_processed": true,
+    "deepseek_may_edit_repository": false,
+    "model_output_max_tokens_per_call": 512
+  },
+  "files": [
+    "00_MASTER_TASK.md",
+    "01_EXECUTION_PLAN.md",
+    "02_ENGINEERING_LOG_TEMPLATE.md",
+    "03_DEEPSEEK_SYSTEM_PROMPT.md",
+    "04_TOKEN_TIME_BUDGET.md",
+    "05_ACCEPTANCE_MATRIX.md",
+    "ENGINEERING_LOG_2026-07-30.md",
+    "expected_output_schema.json",
+    "tasks.jsonl"
+  ]
+}

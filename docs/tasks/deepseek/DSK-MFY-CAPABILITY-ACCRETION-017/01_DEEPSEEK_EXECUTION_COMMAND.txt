@@ -1,0 +1,43 @@
+你是 Moodify「能力注册表（Phase 1: Capability Registry）」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-CAPABILITY-ACCRETION-017｜Phase 1: Capability Registry
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-017\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-017\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-017\03_PRINCIPLE_SEED.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-SCORE-ENGINE-009\HANDOFF.md
+E:\moodify\docs\architecture\SCORE_ENGINE_ARCHITECTURE.md
+
+依赖 009 已 ACCEPT 且 HANDOFF 可读；未满足则 017 置为 HOLD。所有既有修改
+与未跟踪文件属于用户，不得覆盖、还原、整理、暂存或提交。
+
+严格串行：
+Stage A：Registry 模型 + manifest 严格 schema（未知键拒绝、双运行一致）。
+Stage B：只读环境探测器（MuseScore/FFmpeg/ffprobe/SoX/RubberBand/Audacity/
+        Basic Pitch/自身能力），不执行加工命令。
+Stage C：注册首批真实能力（media.transcode / media.probe / notation.render /
+        audio.time_stretch / audio.measure_loudness / audio.separate_manifest /
+        waveform.region_edit）；未安装的只登记 known_missing，禁止伪注册。
+        每个能力必须登记 known_failure_modes（负面知识）：从 009/008 失败
+        台账提取真实边界作为种子（如 MuseScore 多页 SVG 页码后缀、单 -o
+        限制、round-trip 隐藏损失禁令），不允许空表或 "未遇到失败" 声明。
+Stage D：测试、回归、CLI、架构文档、PROGRESS/VALIDATION/FAILURE_LEDGER/HANDOFF。
+
+硬规则：
+1. 探测只读：不安装、不下载、不修改第三方程序、不处理真实歌曲。
+2. 不注册未安装能力为可用；Demucs/分离模型缺失 = known_missing。
+3. manifest 严格 schema：未知键拒绝；序列化确定性（键排序、无时间戳）。
+4. 不得 import 或修改 009/008 实现；只用它们作为事实基线。
+5. 许可证与版本必须真实记录，不猜测（MuseScore GPLv3、FFmpeg GPL/LGPL、
+   SoX LGPL、RubberBand GPLv2、Audacity GPLv2、Basic Pitch Apache-2.0）。
+6. 禁止 MATLAB 调用；禁止网络下载；禁止 Git reset/clean/stash/checkout/
+   commit/push/切分支。
+7. 越界、依赖不可信、P0 失败时写 SCOPE_CHANGE_REQUEST.md，HOLD 并停止。
+
+每阶段更新 PROGRESS.md。最终只能报告 READY_FOR_CODEX_REVIEW、REWORK 或
+HOLD，不得宣布 ACCEPT。最终回复不超过 30 行：报告四阶段状态、注册能力数、
+探测器覆盖、manifest schema、测试、CLI、限制和 HANDOFF.md 绝对路径，然后
+停止等待 Codex 独立验收。

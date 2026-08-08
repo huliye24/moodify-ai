@@ -1,0 +1,6 @@
+执行 DSK-MFY-ANDROID-003，目标完成日期 2026-08-02。ANDROID-002 必须 ACCEPT，且 ORDER-BEAUTY-022 已恢复 API 导入和测试收集；否则 HOLD。
+
+先冻结 API v0.1 schema，再实现 health/pair/capabilities 和 Android 连接状态。通过 USB adb reverse 在小米真机验证。App 只能依赖协议，不得导入或复制 Python 内部模型。
+
+禁止 Go 重写、云部署、硬编码 IP/令牌、无鉴权局域网服务和日志泄密。交付 API 文档、schema、契约测试、真机证据及四份执行文档。
+

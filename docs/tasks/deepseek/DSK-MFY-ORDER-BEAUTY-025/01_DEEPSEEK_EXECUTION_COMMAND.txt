@@ -1,0 +1,12 @@
+执行任务：DSK-MFY-ORDER-BEAUTY-025｜城楼：建立项目效能与秩序观测系统
+
+前置条件：DSK-MFY-ORDER-BEAUTY-022、023、024 均已 ACCEPT；否则状态设为 HOLD。
+
+先完整阅读本目录的 00_TASK_ORCHESTRATION.md、02_CODEX_ACCEPTANCE_MATRIX.md，以及 022–024 的 HANDOFF/ACCEPTANCE、project_analytics 指标契约和 2026-08-02 整体分析。
+
+严格按 Stage A -> B -> C -> D -> E 串行执行。先定义指标契约和缺失值语义，再写采集器；先保存 JSON 数据与 manifest，再生成展示报告。
+
+必须保持只读：不得修改产品状态、任务状态或用户工作区；不得联网上传、启动后台监听、采集个人行为、引入外部数据库或把估算写成实测。没有数据时写 NOT_MEASURED。
+
+交付 PROGRESS.md、VALIDATION.md、FAILURE_LEDGER.md、HANDOFF.md、版本化 schema、采集器、三类报告入口、2026-08-02 基线回放和首次阶段报告。
+

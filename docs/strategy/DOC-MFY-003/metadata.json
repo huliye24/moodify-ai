@@ -1,0 +1,65 @@
+{
+  "doc_id": "DOC-MFY-003",
+  "title": "Moodify Acoustic Compliance Upgrade v0.4 项目章程",
+  "version": "v0.4-ACU",
+  "company": "荣景文川（深圳）科技有限公司",
+  "date": "2026-07-02T15:37:00+08:00",
+  "timezone": "Asia/Singapore",
+  "author": {
+    "role": "Founder / CTO",
+    "executor": "DeepSeek / AI Worker Layer"
+  },
+  "upstream": {
+    "doc_id": "DOC-MFY-002",
+    "title": "Moodify 声学理论合规审计与第二代研发路线图"
+  },
+  "downstream": {
+    "experiments": "EXP-MFY-XXX",
+    "engineering": "ENG-MFY-XXX"
+  },
+  "deliverables": {
+    "markdown": [
+      "00_project_charter.md",
+      "01_scope_boundary.md",
+      "02_aep_acu_list.md",
+      "03_acceptance_matrix.md",
+      "04_release_cadence.md",
+      "05_risk_register.md",
+      "06_formula_system.md",
+      "07_deepseek_execution_prompt.md",
+      "DOC-MFY-003_任务文件.md"
+    ],
+    "docx": ["DOC-MFY-003_项目章程_合订版.docx", "DOC-MFY-003_需求说明书.docx", "DOC-MFY-003_验收标准与检查表.docx"],
+    "pdf": ["DOC-MFY-003_项目章程_合订版.pdf", "DOC-MFY-003_需求说明书.pdf", "DOC-MFY-003_验收标准与检查表.pdf"],
+    "assets": ["scope_diagram.png", "priority_matrix.png", "cadence_diagram.png", "company_logo.png"],
+    "references": ["reference_standards.md"]
+  },
+  "aep_tasks": [
+    {"id": "AEP-ACU-001", "name": "Schroeder Reverb 合规修复", "priority": "P0"},
+    {"id": "AEP-ACU-002", "name": "RBJ Biquad EQ 替换", "priority": "P0"},
+    {"id": "AEP-ACU-003", "name": "HPSS 残差守恒", "priority": "P0"},
+    {"id": "AEP-ACU-004", "name": "7 频段默认启用", "priority": "P1"},
+    {"id": "AEP-ACU-005", "name": "True Peak Limiter", "priority": "P1"},
+    {"id": "AEP-ACU-006", "name": "Mel/Bark/ERB 感知尺度", "priority": "P1"},
+    {"id": "AEP-ACU-007", "name": "心理声学掩蔽初版", "priority": "P2"},
+    {"id": "AEP-ACU-008", "name": "F0/Pitch Stability", "priority": "P2"},
+    {"id": "AEP-ACU-009", "name": "Chroma/Key/Harmony", "priority": "P2"},
+    {"id": "AEP-ACU-010", "name": "MRS 参考集鲁棒化", "priority": "P2"}
+  ],
+  "milestones": {
+    "M1_charter_signoff": "2026-07-03",
+    "M2_p0_complete": "2026-07-05",
+    "M3_p1_complete": "2026-07-12",
+    "M4_regression_pass": "2026-07-13",
+    "M5_p2_decision": "2026-07-14",
+    "M6_seal": "2026-07-15"
+  },
+  "formulas": {
+    "C_v04": "S_scope × A_AEP × Q_accept × F_freeze / R_drift",
+    "V_ACU": "I_sound × R_risk × A_standard × E_evidence"
+  },
+  "status": "draft",
+  "approval": {
+    "founder_cto": "pending"
+  }
+}

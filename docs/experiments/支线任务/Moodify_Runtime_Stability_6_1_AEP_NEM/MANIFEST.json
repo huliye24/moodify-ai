@@ -1,0 +1,43 @@
+{
+  "package_name": "Moodify Runtime Stability 6.1 AEP-NEM Package",
+  "version": "v0.1",
+  "created_at": "2026-06-03",
+  "project": "Moodify",
+  "e_chain": {
+    "id": "EC-SIDE-RUNTIME-STABILITY",
+    "name": "Runtime Stability Side E-Chain",
+    "zh_name": "Runtime 稳定性支线工程链"
+  },
+  "nem": {
+    "id": "NEM-6.1-RUNTIME-STABILITY",
+    "name": "Runtime Stability Validation Node",
+    "zh_name": "Runtime 稳定性验证节点",
+    "status": "READY_TO_EXECUTE",
+    "gate": "ADOPT / HOLD / REJECT"
+  },
+  "aep_count": 8,
+  "aep_list": [
+    "AEP-6.1.01 Special Filename Smoke Test",
+    "AEP-6.1.02 90-task Full Test",
+    "AEP-6.1.03 6h Endurance Run",
+    "AEP-6.1.04 24h Day Run",
+    "AEP-6.1.05 Failure Circuit Breaker Test",
+    "AEP-6.1.06 Task Recovery Test",
+    "AEP-6.1.07 Log Integrity Test",
+    "AEP-6.1.08 Summary Auto-generation Test"
+  ],
+  "core_metrics": [
+    "success_rate",
+    "exit_code_distribution",
+    "unrecognized_arguments_count",
+    "max_consecutive_failures",
+    "average_task_duration",
+    "p90_task_duration",
+    "p95_task_duration",
+    "stuck_task_count",
+    "summary_generated"
+  ],
+  "recommended_output_dir": "outputs/runtime_stability_6_1/",
+  "recommended_log_dir": "logs/runtime_stability_6_1/",
+  "recommended_report_path": "reports/runtime_stability_6_1_report.md"
+}

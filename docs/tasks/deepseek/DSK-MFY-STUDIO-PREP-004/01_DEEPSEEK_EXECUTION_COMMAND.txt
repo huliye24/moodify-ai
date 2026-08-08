@@ -1,0 +1,67 @@
+你是 Moodify 的受限工程执行 Worker。请执行：
+
+DSK-MFY-STUDIO-PREP-004｜商业录音棚项目 6 小时工具链预备
+
+仓库根目录：
+E:\moodify
+
+这是一个最长 6 小时、必须分批串行执行的工程任务。任务所有者与最终 Judge 是 Codex / 授权用户。你的职责是新增隔离的录音项目预备工具、WSE 分析/候选计划、候选比较、报告、测试和明日运行手册。你不负责声音审美、客户承诺、版权判断、核心 DSP 重写或最终商业交付审批。
+
+开始前必须完整读取：
+
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STUDIO-PREP-004\00_TASK_ORCHESTRATION.md
+
+并严格读取其中列出的全部事实源。检查适用 AGENTS.md、当前分支、HEAD、git status、Python 环境和真实实现。所有现存修改和未跟踪文件均属于用户，不得覆盖、还原、暂存或提交。
+
+严格按以下顺序执行，不得跳序：
+
+Batch 0（45分钟）：事实审计、依赖检查、写入边界和实现设计。
+Batch A（75分钟）：SessionBrief、RecordingSpec、DeliverableContract、session-init、asset-verify、录音日清单和安全测试。
+Batch B（90分钟）：复用现有指标实现 WSE profile、window/section evolution、明确 null/warning、生成保守/平衡/探索候选计划和合成数值测试。
+Batch C（90分钟）：现有 v01 pipeline 的隔离候选 adapter、dry-run/显式执行、候选比较、失败留档、人工 PENDING、Markdown/HTML 报告。
+Batch D（60分钟）：全量测试、CLI smoke、合成 demo、越权检查、明日 runbook、验证报告和 HANDOFF。
+
+每批结束必须：
+
+1. 运行该批测试；
+2. 更新 PROGRESS.md，记录开始/结束时间、命令、退出码和产物；
+3. 检查源文件哈希未变；
+4. 检查 git diff 只落在允许目录；
+5. 通过 Batch Gate 后才能继续下一批。
+
+只允许修改：
+
+E:\moodify\tools\studio_session_prep\
+E:\moodify\tests\studio_session_prep\
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STUDIO-PREP-004\
+E:\moodify\outputs\deepseek_validation\DSK-MFY-STUDIO-PREP-004\
+
+禁止修改核心 DSP、preset、MRS、门限、Runtime、bridge schema/store、历史实验、客户文件和现有运行产物。禁止安装依赖，禁止网络，禁止 Git reset/clean/stash/rebase/discard/commit/push/切分支。
+
+测试只能使用程序生成的确定性合成信号或明确测试 fixture，绝对禁止读取或处理明日客户音频。任何工具都不得覆盖源文件；输出只能进入显式全新 --output-dir。已有输出默认拒绝覆盖。
+
+关键科学边界：
+
+- RMS 不能冒充标准 LUFS；
+- 未实现的 LRA、true peak、phase、masking 必须 null + warning；
+- 波谱差异不能直接写成“更好听”；
+- candidate plan 只是处理假设，不是自动决策；
+- 不自动选择 Final；human_review 默认为 PENDING；
+- 不自动晋级规则；
+- 不宣称发行级或超过人工；
+- 硬失败不能被总分或某个改善指标冲销。
+
+必须交付至少：
+
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STUDIO-PREP-004\00_IMPLEMENTATION_AUDIT.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STUDIO-PREP-004\PROGRESS.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STUDIO-PREP-004\TOMORROW_STUDIO_RUNBOOK.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STUDIO-PREP-004\VALIDATION_REPORT.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-STUDIO-PREP-004\HANDOFF.md
+
+以及 tools/studio_session_prep 下的代码、模板，tests/studio_session_prep 下的确定性测试和隔离 demo 产物。
+
+任一批发生越权路径、源文件变化、核心回归、依赖不可信或无法解释的测量结果，立即停止并按 00_TASK_ORCHESTRATION.md 写 MTP 失败报告，判定 HOLD。不得为了继续而扩大权限。
+
+最终只能给 READY_WITH_LIMITS、REWORK 或 HOLD。完成 HANDOFF.md 后立即停止。最终终端回复不超过 25 行，只报告总判定、Batch 0/A/B/C/D 状态、测试数量、修改文件数、主要限制和 HANDOFF.md 的绝对路径，等待 Codex 独立复核。
+

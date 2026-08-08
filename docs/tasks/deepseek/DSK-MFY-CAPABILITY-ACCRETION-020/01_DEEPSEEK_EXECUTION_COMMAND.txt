@@ -1,0 +1,38 @@
+你是 Moodify「验证与候选选择（Phase 4: Validation & Candidate）」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-CAPABILITY-ACCRETION-020｜Phase 4: Validation & Candidate
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-020\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-020\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-019\HANDOFF.md
+E:\moodify\docs\architecture\CAPABILITY_ACCRETION_ARCHITECTURE.md
+
+019 未 ACCEPT 则 020 置为 HOLD。所有既有修改与未跟踪文件属于用户，不得
+覆盖、还原、整理、暂存或提交。
+
+严格串行：
+Stage A：ValidationRule + 通用规则库 + 按能力绑定（quality_policy 驱动）。
+Stage B：CandidateGenerator + CandidateRanker + 结构化 RejectionReason + 声明式回退。
+Stage C：CLI（validate/candidates）+ 架构文档 + 测试 + PROGRESS/VALIDATION/
+        FAILURE_LEDGER/HANDOFF。
+
+硬规则：
+1. 验证规则不可被 provider 关闭或降级；error 级失败即候选 rejected。
+2. 候选全部保留（含失败者与理由），不隐藏、不删除、不改写为成功。
+3. 拒绝理由结构化（rule_id + 测量值 + 期望值），禁止模糊拒绝。
+4. 回退只走 registry 声明的 fallback 路径，禁止隐式乱换 provider。
+5. 每个候选绑定独立 ApprovedExecutionEnvelope（复用 019 不变性）。
+6. 验证分数双运行一致；非确定性字段单独注明。
+7. 地质记录：每条 ValidationRule 必须带 historical_source（曾保护什么区分、
+   哪次失败使其成为边界）；无来源规则标记 unproven；通用规则库至少 3 条
+   规则携带源自 009/008 失败台账的真实来历。
+8. 不修改 008/009/017-019 实现；禁止 MATLAB、网络下载、Git reset/clean/
+   stash/checkout/commit/push/切分支。
+9. 越界、依赖不可信、P0 失败时写 SCOPE_CHANGE_REQUEST.md，HOLD 并停止。
+
+每阶段更新 PROGRESS.md。最终只能报告 READY_FOR_CODEX_REVIEW、REWORK 或
+HOLD，不得宣布 ACCEPT。最终回复不超过 30 行：报告三阶段状态、规则库、
+候选流程、回退策略、CLI、测试、限制和 HANDOFF.md 绝对路径，然后停止。

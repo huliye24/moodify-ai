@@ -1,0 +1,8 @@
+执行 DSK-MFY-ANDROID-006，目标完成日期 2026-08-02。ANDROID-005 未 ACCEPT 或治理接口不可用时 HOLD。
+
+立即冻结功能，只做稳定化与封版。按安装升级、完整主链路、故障/MIUI、性能隐私、封版产物执行。主链路必须连续两次通过，P0 必须为 0。
+
+不得创建正式签名、上传商店、增加 Go/云端/支付/社区或隐瞒失败。DeepSeek 只能交 READY_FOR_CODEX_REVIEW；最终 ACCEPT 由 Codex 独立构建和真机复验后写入。
+
+交付 APK、SHA-256、版本链、证据包、安装/服务/恢复/回滚说明、已知问题及 PROGRESS/VALIDATION/FAILURE_LEDGER/HANDOFF。
+

@@ -1,0 +1,41 @@
+你是 Moodify「作品身份守恒核心 v0.1」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-IDENTITY-CORE-010｜作品身份守恒核心 v0.1
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-IDENTITY-CORE-010\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-IDENTITY-CORE-010\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-IDENTITY-CORE-010\03_PRINCIPLE_SEED.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-SCORE-ENGINE-009\HANDOFF.md
+
+009若未形成可读HANDOFF，立即将010置为HOLD，不得绕过。完整读取任务编排
+列出的事实源、适用AGENTS.md、Git/dirty状态和测试基线。所有既有修改和
+未跟踪文件属于用户，不得覆盖、还原、整理、暂存或提交。
+
+严格串行：
+Stage 0：冻结身份守恒、证据对齐、Owner主权和可证伪合同；未PASS禁止编码。
+Stage 1：实现有证据引用的四态IdentityConservationReport，保持One-Point兼容。
+Stage 2：实现盲听包、显式Owner decision和默认NOT_PROMOTED的CraftObservation。
+Stage 3：五类fixture、双运行、12类失败、全量回归、claim边界和HANDOFF。
+
+硬规则：
+1. 不输出身份总分、质量排名、自动Final或自动审批。
+2. PRESERVED/INTENDED_CHANGE/UNEXPECTED_CHANGE/UNCERTAIN均须引用证据ID。
+3. 缺失/冲突证据只能UNCERTAIN或NEEDS_EVIDENCE，不得推断守恒。
+4. human_only约束不得用关键词或单一指标冒充机器理解。
+5. 默认表面仍只有Essence/Protect/Allow/Action/Entrust五中心。
+6. Owner选择只能来自显式输入；系统不得代填理由或偏好。
+7. CraftObservation默认NOT_PROMOTED，不自动改Preset或形成普遍规则。
+8. 技术Gate通过不等于身份通过；硬冲突不得被其他指标冲销。
+9. 不新增依赖、联网、migration；不处理真实歌曲和客户资产。
+10. 不修改Core DSP/Runtime/MRS/Preset/008/009实现。
+11. 禁止Git reset/clean/stash/checkout/commit/push/切分支。
+12. 越界、P0失败、身份结论过度自信时写SCOPE_CHANGE_REQUEST.md，HOLD并停止。
+
+每阶段更新PROGRESS.md。最终只能报告READY_FOR_CODEX_REVIEW、REWORK或HOLD，
+不得宣布ACCEPT、优于制作人或独有性已证明。最终回复不超过30行，只报告
+依赖、四阶段、CLI、四态finding、Owner/Craft、测试、双运行、失败、claim
+边界和HANDOFF.md绝对路径，然后停止等待Codex独立验收。
+

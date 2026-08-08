@@ -1,0 +1,6 @@
+执行 DSK-MFY-ANDROID-002，目标完成日期 2026-08-02。前置条件 ANDROID-001 已 ACCEPT，否则 HOLD。
+
+将两张设计稿的秩序、留白、卡片和品牌语言转成 Android 原生设计系统，不复制 iPhone 外框。统一首页/作品/任务/我的，演示数据集中隔离，明确显示“演示状态”。
+
+不得接入真实 API、支付、合作计划、云账号或 DSP。完成 UI 测试、Debug 构建、真机截图和导航冒烟，交付 PROGRESS/VALIDATION/FAILURE_LEDGER/HANDOFF。
+

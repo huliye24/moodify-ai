@@ -1,0 +1,24 @@
+requirement_id,principle,requirement,status,confidence,code_evidence,test_evidence,runtime_evidence,risk,recommended_action,priority
+I-01,I,Canonical specification object,"IMPLEMENTED",HIGH,"OnePointSpec in bridge/schemas.py","test_one_point.py validates schema","Runtime accepts valid spec","Low","Maintain",P2
+I-02,I,Explicit must_preserve representation,"IMPLEMENTED",HIGH,"must_preserve: tuple[str,...]","schema test validates non-empty","Field present in runtime","Low","Maintain",P2
+I-03,I,Constraints validated before plan,PARTIAL,MEDIUM,generate_plan reads but does not enforce,"No test for constraint bypass","Plan generated without preserve","HIGH","Add constraint validation to generate_plan",P0
+I-04,I,Missing identity blocks execution,ABSENT,HIGH,"No guard in app/orchestrator.py","No negative test","Empty must_preserve produces plan","CRITICAL","Fail-closed when constraints missing",P0
+I-05,I,Conflict handled fail-closed,PARTIAL,MEDIUM,detect_conflicts in bridge services,"test_one_point tests conflict detection","Keyword-only; semantic conflicts pass","HIGH","Add BLOCKED state enforcement",P0
+I-06,I,Engine cannot bypass specification,CONTRADICTED,HIGH,"CLI DAW render works on raw WAV","No test for spec bypass","moodify daw render executes without OnePointSpec","CRITICAL","Add spec requirement to CLI DAW",P0
+II-01,II,Analysis separated from planning,IMPLEMENTED,HIGH,analyze_audio vs generate_plan,"Tested via orchestrator smoke","Functions are separate","Low","Maintain",P3
+II-02,II,Plan serializable before execution,IMPLEMENTED,HIGH,TreatmentPlan is a dataclass,"plan_id and steps are serializable","JSON output confirmed","Low","Maintain",P3
+II-03,II,Dry-run avoids modifying source,IMPLEMENTED,HIGH,"plan.dry_run = True flag","Orchestrator smoke test","No WAV generated in dry-run mode","Low","Maintain",P3
+II-04,II,Approval state technically enforced,ABSENT,HIGH,"No approval check in execute_plan","No test for approval gate","execute_plan runs without approval","CRITICAL","Add approval gate to execute_plan",P0
+II-05,II,Unapproved plan blocked,ABSENT,HIGH,"No approval schema in orchestrator","No negative test","Plan executes without human decision","CRITICAL","Block unapproved execution",P0
+II-06,II,Approval tied to plan version,ABSENT,HIGH,"No plan hash in approval model","No test","No version binding exists","CRITICAL","Bind approval to plan_hash",P0
+III-01,III,Source SHA-256 recorded,IMPLEMENTED,HIGH,CLI DAW records hashes,"Multiple adapters record hashes","Hash present in render evidence","Low","Maintain",P2
+III-02,III,Output SHA-256 recorded,IMPLEMENTED,HIGH,CLI DAW records output hash,"Hash verification tests","Hash present in evidence","Low","Maintain",P2
+III-03,III,Unified evidence package,PARTIAL,MEDIUM,EvidenceAggregator exists,"No full evidence test","Bundle mostly empty in test","MEDIUM","Connect real evidence sources",P1
+III-04,III,Before/after measurements,PARTIAL,MEDIUM,Spectral evidence package,"Tests exist in science package","Separate from main pipeline","MEDIUM","Integrate spectral evidence into pipeline",P1
+IV-01,IV,Real engine adapters,IMPLEMENTED,HIGH,"SoX/matchering/RubberBand/native/FFmpeg","Adapter probe tests","All return real status","Low","Maintain",P2
+IV-02,IV,Engine params isolated from intent,PARTIAL,MEDIUM,"Action types are generic (gain, EQ)","No isolation test","SoX params mixed in orchestrator","MEDIUM","Separate engine params from plan model",P2
+IV-03,IV,Missing engine explicit,IMPLEMENTED,HIGH,"UNAVAILABLE status in probes","Probe tests verify","SoX shows UNAVAILABLE when not found","Low","Maintain",P2
+V-01,V,Non-interactive execution,IMPLEMENTED,HIGH,All CLI commands subprocess-compatible,"CLI smoke tests","All commands run headless","Low","Maintain",P2
+V-02,V,JSON output,IMPLEMENTED,HIGH,"CLI v2 uses json.dumps","CLI v2 tests","JSON clean on stdout","Low","Maintain",P2
+V-03,V,Stable exit codes,PARTIAL,MEDIUM,"CLI v2 has structured exits","Partial tests","Main CLI uses ad-hoc codes","MEDIUM","Standardize exit codes across all commands",P2
+V-04,V,Agent can complete full lifecycle,ABSENT,HIGH,"No approval integration","No end-to-end agent test","Agent cannot approve; execute bypasses approval","CRITICAL","Complete agent lifecycle with approval gate",P0

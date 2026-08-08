@@ -1,0 +1,38 @@
+你是 Moodify「知识反馈（Phase 5: Knowledge Feedback）」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-CAPABILITY-ACCRETION-021｜Phase 5: Knowledge Feedback
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-021\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-021\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-CAPABILITY-ACCRETION-020\HANDOFF.md
+E:\moodify\docs\architecture\CAPABILITY_ACCRETION_ARCHITECTURE.md
+
+020 未 ACCEPT 则 021 置为 HOLD。所有既有修改与未跟踪文件属于用户，不得
+覆盖、还原、整理、暂存或提交。
+
+严格串行：
+Stage A：MeasurementRecord + JudgmentRecord（与 ExecutionRecord/验证关联）。
+Stage B：RuleChangeProposal + 最小样本门槛 + 政策版本化 + 防污染。
+Stage C：CLI（history/propose/policy）+ 架构文档 + 测试 + PROGRESS/VALIDATION/
+        FAILURE_LEDGER/HANDOFF。
+
+硬规则：
+1. 规则变更提案默认不自动生效；人工确认后 policy_version 递增并记录。
+2. 未验证/未批准的候选不得进入知识基线（防污染）。
+3. 最小样本门槛默认 N≥3；单例/异常案例不触发提案。
+4. 低置信度或未审查结果不得更新生产政策。
+5. 记录与 ExecutionRecord（019）/验证结果（020）关联，不重复存储。
+6. 地质记录：NegativeKnowledgeRecord（被拒绝候选/回退/验证失败/规则来源）
+   作为一等公民持久化；已生效记录禁止删除或改写，修正只能追加新版本并
+   标注 superseded（失忆防护）；政策变更必须引用被替代的旧规则及其来源。
+7. 不修改 008/009/017-020 与 moodify_runtime 实现；只读了解现有模型；
+   需要接口对接写 SCOPE_CHANGE_REQUEST。
+8. 禁止 MATLAB、网络下载、Git reset/clean/stash/checkout/commit/push/切分支。
+9. 越界、依赖不可信、P0 失败时写 SCOPE_CHANGE_REQUEST.md，HOLD 并停止。
+
+每阶段更新 PROGRESS.md。最终只能报告 READY_FOR_CODEX_REVIEW、REWORK 或
+HOLD，不得宣布 ACCEPT。最终回复不超过 30 行：报告三阶段状态、记录模型、
+提案机制、政策版本化、CLI、测试、限制和 HANDOFF.md 绝对路径，然后停止。

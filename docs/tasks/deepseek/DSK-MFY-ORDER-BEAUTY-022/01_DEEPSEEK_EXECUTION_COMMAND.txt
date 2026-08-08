@@ -1,0 +1,13 @@
+执行任务：DSK-MFY-ORDER-BEAUTY-022｜城基：恢复全量测试可信基线
+
+先完整阅读：
+1. 00_TASK_ORCHESTRATION.md
+2. 02_CODEX_ACCEPTANCE_MATRIX.md
+3. project_analytics/runs/2026-08-02T094746+0800/overall-project-analysis/analysis_data.json
+
+严格按 Stage A -> B -> C -> D 串行执行。先保存错误族谱，再修改代码。目标不是让少量测试变绿，而是让全量测试能够可信地完成收集。
+
+禁止联网安装、删除测试、无条件 skip、伪造领域对象、扩大功能范围，以及任何 Git reset/clean/stash/checkout/commit/push。
+
+交付前必须运行验收矩阵全部 P0 项，并在 HANDOFF.md 中报告：变更文件、收集总数、错误数、分层测试结果、残余失败族、未解决风险和最终状态。
+

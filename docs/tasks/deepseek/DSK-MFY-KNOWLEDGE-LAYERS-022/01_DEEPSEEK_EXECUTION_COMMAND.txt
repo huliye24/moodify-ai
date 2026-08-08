@@ -1,0 +1,38 @@
+你是 Moodify「三层知识结构（原理层/经验层/代码层）」任务的受限工程实施 Worker。执行：
+
+DSK-MFY-KNOWLEDGE-LAYERS-022｜三层知识结构
+
+仓库根目录：E:\moodify
+
+开始前完整读取：
+E:\moodify\docs\tasks\deepseek\DSK-MFY-KNOWLEDGE-LAYERS-022\00_TASK_ORCHESTRATION.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-KNOWLEDGE-LAYERS-022\02_CODEX_ACCEPTANCE_MATRIX.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-KNOWLEDGE-LAYERS-022\03_PRINCIPLE_SEED.md
+E:\moodify\docs\standards\FAILURE_LEDGER.md
+E:\moodify\docs\tasks\deepseek\DSK-MFY-SCORE-ENGINE-009\FAILURE_LEDGER.md
+
+素材以实际文件为准：文件缺失或路径变化时记录并跳过，不得编造。所有既有
+修改与未跟踪文件属于用户，不得覆盖、还原、整理、暂存或提交。
+
+严格串行：
+Stage 0：盘点三层素材 + 冻结注册表 schema（PR-0xx/EX-0xx 字段）+ STAGE_0_GATE。
+Stage B：PRINCIPLE_REGISTRY.md 首批 8-12 条（来源可核对）。
+Stage C：EXPERIENCE_REGISTRY.md 首批 10-15 条（含 008/009 失败台账至少
+         3 条真实失败，防复发机制可核对）。
+Stage D：THREE_LAYER_KNOWLEDGE.md 追溯约定 + 引用示范 + 验证 +
+         PROGRESS/VALIDATION/FAILURE_LEDGER/HANDOFF。
+
+硬规则：
+1. 不修改任何 src/ 代码、tests/、008/009/017-021 任务包、strategy/decisions/
+   standards 既有文件——本任务只新建注册表与追溯文档。
+2. 每条 PR/EX 条目必须携带真实来源（文档路径/章节或 ADR 编号），
+   Codex 能逐条核对；无来源条目不得提交。
+3. 经验条目防复发机制必须指向真实文件/测试/流程，禁止笼统写"已修复"。
+4. 编号连续无重复；Markdown 结构一致；禁止为凑数量编造条目。
+5. 本任务自身失败（如有）记入 FAILURE_LEDGER，不删除不改写。
+6. 禁止 MATLAB、网络下载、Git reset/clean/stash/checkout/commit/push/切分支。
+7. 越界、依赖不可信、P0 失败时写 SCOPE_CHANGE_REQUEST.md，HOLD 并停止。
+
+每阶段更新 PROGRESS.md。最终只能报告 READY_FOR_CODEX_REVIEW、REWORK 或
+HOLD，不得宣布 ACCEPT。最终回复不超过 30 行：报告四阶段状态、原理条数、
+经验条数、追溯约定要点、验证结果、限制和 HANDOFF.md 绝对路径，然后停止。
