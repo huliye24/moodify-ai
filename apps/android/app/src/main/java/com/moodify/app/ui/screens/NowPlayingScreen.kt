@@ -19,11 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moodify.app.R
 import com.moodify.app.data.PlaybackManager
 import com.moodify.app.data.QueueItem
 import com.moodify.app.ui.theme.MoodifyBlue
@@ -49,9 +51,9 @@ fun NowPlayingScreen(onClose: () -> Unit) {
     Column(Modifier.fillMaxSize().background(Color(0xFFF7F8FC)).padding(horizontal = 22.dp)) {
         Spacer(Modifier.height(10.dp))
         IconButton(onClick = onClose, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Icon(Icons.Outlined.KeyboardArrowDown, "收起", tint = MoodifyMuted, modifier = Modifier.size(32.dp))
+            Icon(Icons.Outlined.KeyboardArrowDown, stringResource(R.string.player_collapse), tint = MoodifyMuted, modifier = Modifier.size(32.dp))
         }
-        Text("正在播放", Modifier.fillMaxWidth(), color = MoodifyNavy, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Text(stringResource(R.string.player_now_playing), Modifier.fillMaxWidth(), color = MoodifyNavy, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         Spacer(Modifier.height(28.dp))
 
         // Cover placeholder
@@ -90,7 +92,7 @@ fun NowPlayingScreen(onClose: () -> Unit) {
             current?.let {
                 Spacer(Modifier.width(8.dp))
                 Surface(color = if (it.gatePassed) Color(0xFFE8F8EE) else Color(0xFFFFF2E8), shape = RoundedCornerShape(8.dp)) {
-                    Text(if (it.gatePassed) "质量门通过" else "质量门未通过", color = if (it.gatePassed) Color(0xFF31A35E) else Color(0xFFE08A3C), fontSize = 11.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                    Text(if (it.gatePassed) stringResource(R.string.works_gate_passed) else stringResource(R.string.works_gate_failed), color = if (it.gatePassed) Color(0xFF31A35E) else Color(0xFFE08A3C), fontSize = 11.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
                 }
             }
         }
@@ -99,10 +101,10 @@ fun NowPlayingScreen(onClose: () -> Unit) {
         // A/B switch (original/processed adjacent in queue)
         if (current != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                AbSwitch("试听处理前", current.isOriginal, Modifier.weight(1f)) {
+                AbSwitch(stringResource(R.string.player_listen_before), current.isOriginal, Modifier.weight(1f)) {
                     if (!current.isOriginal) PlaybackManager.previous()
                 }
-                AbSwitch("处理后", !current.isOriginal, Modifier.weight(1f)) {
+                AbSwitch(stringResource(R.string.work_detail_after), !current.isOriginal, Modifier.weight(1f)) {
                     if (current.isOriginal) PlaybackManager.next()
                 }
             }
@@ -137,7 +139,7 @@ fun NowPlayingScreen(onClose: () -> Unit) {
                 modifier = Modifier.size(72.dp),
                 colors = IconButtonDefaults.filledIconButtonColors(containerColor = MoodifyPurple),
             ) {
-                Icon(if (state.playing) Icons.Outlined.Pause else Icons.Outlined.PlayArrow, if (state.playing) "暂停" else "播放", tint = Color.White, modifier = Modifier.size(36.dp))
+                Icon(if (state.playing) Icons.Outlined.Pause else Icons.Outlined.PlayArrow, if (state.playing) stringResource(R.string.player_pause) else stringResource(R.string.player_play), tint = Color.White, modifier = Modifier.size(36.dp))
             }
             Spacer(Modifier.width(30.dp))
             IconButton(onClick = { PlaybackManager.next() }, modifier = Modifier.size(52.dp)) {
@@ -147,10 +149,10 @@ fun NowPlayingScreen(onClose: () -> Unit) {
         Spacer(Modifier.height(18.dp))
 
         // Queue list
-        Text("曲目列表", color = MoodifyNavy, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.player_queue), color = MoodifyNavy, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(6.dp))
         if (state.queue.isEmpty()) {
-            Text("暂无队列", color = MoodifyMuted, fontSize = 12.sp)
+            Text(stringResource(R.string.player_queue_empty), color = MoodifyMuted, fontSize = 12.sp)
         } else {
             Column(Modifier.weight(0.45f)) {
                 state.queue.forEachIndexed { index, item ->
@@ -167,7 +169,7 @@ fun NowPlayingScreen(onClose: () -> Unit) {
                         Icon(Icons.Outlined.MusicNote, null, tint = if (active) MoodifyPurple else MoodifyMuted, modifier = Modifier.size(16.dp))
                         Column(Modifier.weight(1f).padding(start = 10.dp)) {
                             Text(item.title, color = if (active) MoodifyPurple else MoodifyNavy, fontSize = 13.sp, fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(item.isOriginal.let { if (it) "处理前" else item.preset }, color = MoodifyMuted, fontSize = 10.sp)
+                            Text(if (item.isOriginal) stringResource(R.string.work_detail_before) else item.preset, color = MoodifyMuted, fontSize = 10.sp)
                         }
                         if (active) {
                             Icon(if (state.playing) Icons.Outlined.Pause else Icons.Outlined.PlayArrow, null, tint = MoodifyPurple, modifier = Modifier.size(18.dp))

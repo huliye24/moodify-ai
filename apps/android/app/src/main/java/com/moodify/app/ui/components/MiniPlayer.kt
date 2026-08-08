@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moodify.app.R
 import com.moodify.app.data.PlaybackManager
 import com.moodify.app.data.PlaybackState
 import com.moodify.app.data.QueueItem
@@ -306,7 +308,7 @@ private fun MiniPlayerContent(
                     IconButton(onClick = { PlaybackManager.toggle() }, modifier = Modifier.testTag("mini_player_play")) {
                         Icon(
                             if (state.playing) Icons.Outlined.Pause else Icons.Outlined.PlayArrow,
-                            contentDescription = if (state.playing) "暂停" else "播放",
+                            contentDescription = if (state.playing) stringResource(R.string.player_pause) else stringResource(R.string.player_play),
                             tint = Color.White,
                             modifier = Modifier.size(26.dp),
                         )

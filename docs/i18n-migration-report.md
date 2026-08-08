@@ -39,15 +39,47 @@
 - 设备实测（API 31 / MiUI，手动 adb 验证）：首启跟随系统中文 ✅、切换立即生效（底部 tab 即时变日语）✅、杀进程重开保留（持久化文件含 ja-JP）✅。
 - `:app:assembleDebug` 通过。
 
-## 剩余未翻译屏幕（后续增量清单）
+## 第二轮（2026-08-08，DSK-MFY-I18N-001 round-2）
 
-按硬编码中文串数量排序（302 处 / 23 文件，其中首轮区域内残留 80 处）：
+迁移了报告首轮列出的全部 15 个未迁移区域 + 组件，新增 **~340 个 key**（六语言 key 集合同步，`StringKeyParityTest` 继续强制）。
 
-- 未迁移区域：CwcCenterScreen（34）、CollaborationHubScreen（27）、WorkDetailScreen（21）、CwcIntroScreen（20）、ConnectionCard（16）、UploadFlowScreen（15）、CwcGiftScreen（15）、SearchScreen（13）、CreatorCenterScreen（12）、DataCenterScreen（11）、NotificationCenterScreen（10）、CopyrightCenterScreen（10）、NowPlayingScreen（9）、PublishWorkScreen（7）、PlaybackBar/MiniPlayer（各 1）
-- 首轮区域内残留（低优先级）：SupportScreens 设置页其余硬编码（34，多为演示静态数据）、ProcessingScreen 阶段详情（23，处理中实时状态文案）、CwcAuthScreen 权益列表（7）、WorksScreen demo 状态枚举（4，按规则不译）、HomeScreen demo 数据（6）、ProfileScreen 少量（5）、MoodifyDrawer 用户名（1）
+| 区域 | 处理 |
+|---|---|
+| CwcCenterScreen / CwcIntroScreen / CwcGiftScreen | ✅ 全量 chrome + 品牌文案（入资源，待人工审核标注） |
+| CollaborationHubScreen | ✅ chrome 全量；演示卡片内容（标题/创作者名/预算/地区/描述）按 WorksScreen 同规则不译 |
+| WorkDetailScreen | ✅ 全量 chrome；preset/状态 chip 按规则保留；gate 状态复用 works_gate_passed/failed |
+| UploadFlowScreen / WeChatImport / BatchUpload | ✅ 全量 chrome；演示音频文件名等数据不译 |
+| SearchScreen | ✅ chrome；榜单/标签/曲目 demo 数据不译 |
+| CreatorCenterScreen / DataCenterScreen | ✅ chrome；状态枚举（已发布/草稿/处理中）、城市、指标值不译 |
+| NotificationCenterScreen | ✅ chrome（tab/标题/空态）；通知内容为 demo 数据不译 |
+| CopyrightCenterScreen | ✅ chrome + 资产类型标签；平台状态（已发布/同步中/待发布）不译 |
+| NowPlayingScreen / PlaybackBar / MiniPlayer | ✅ 全量（含 gate 状态复用、A/B 标签、播放/暂停） |
+| ConnectionCard | ✅ 全量（真实功能 UI，含运行时连接状态） |
+| SupportScreens 重置演示会话对话框 | ✅ 迁移（真功能）；设置页其余演示静态文案保持低优先级残留 |
+
+### 本轮约定（与首轮一致）
+
+- **不译（machine fields）**：状态枚举（已发布/草稿/处理中/审核中/可使用/已发送/已激活/已过期/已确权/可用）、CWC 通行码、用户名（泫榛）、日期、文件格式（WAV/MP3/PDF/MIDI）、预算/地区/城市、演示卡片内容数据、B2B/B2C/C2C 业务码。
+- **品牌文案**（cwc_brand_tagline/sub、cwc_welcome_quote 等）已入资源，列入下方待审核清单。
+- 含字面 `%` 的字符串已加 `formatted="false"`（aapt2 默认语言校验）。
+- 复用既有 key：works_gate_passed/failed、analysis_pick_audio(_support)、works_all、home_view_all、home_followers、home_follow、home_hot_works、nav_*、common_* 等，避免重复翻译。
+
+### 验证（round-2 增量）
+
+- JVM 单测全绿（`:app:testDebugUnitTest`），`StringKeyParityTest` 六文件 key 集一致。
+- `:app:assembleDebug` 通过。
+- 首轮 46 例 JVM 测试 + 本轮无新增测试文件（parity 契约已覆盖 key 集一致性）。
+
+## 剩余残留（低优先级，不再新增）
+
+- SupportScreens 设置页其余硬编码（约 30，多为演示静态数据与 About/Help 文案）
+- ProcessingScreen 阶段详情（23，处理中实时状态文案）
+- CwcAuthScreen 权益列表（7，见待审核）
+- WorksScreen/HomeScreen/ProfileScreen/MoodifyDrawer 的 demo 数据与用户名（按规则不译）
+- 各处演示卡片内容数据（CollaborationHub/Search/DataCenter 等，按规则不译）
 
 ## 需人工审核的文案
 
 - CwcAuthScreen 激活成功对话框的**权益列表**（「首个作品免费入驻」「1 张标准处理 8 折券」等——涉及支付/营销承诺，禁止机翻，需产品确认后入资源）。
-- CwcIntroScreen/CwcGiftScreen 的 CWC 品牌介绍文案。
-- 价格（¥30）、数据单位（GB/MB/万）等本地化格式需按目标市场复核。
+- 本轮入资源的品牌文案：cwc_brand_tagline / cwc_brand_sub / cwc_welcome_quote / cwc_creator_pass_sub（五语言译文为 AI 直译，需品牌方确认）。
+- 价格（¥30/¥5000）、数据单位（GB/MB/万）等本地化格式需按目标市场复核。

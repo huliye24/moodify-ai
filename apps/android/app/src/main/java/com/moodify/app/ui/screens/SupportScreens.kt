@@ -76,8 +76,8 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("设�
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text("重置演示会话？") },
-            text = { Text("将清除创作者通行证激活、真实处理作品与电脑端配对，重新进入开场故事。") },
+            title = { Text(stringResource(R.string.support_reset_title)) },
+            text = { Text(stringResource(R.string.support_reset_text)) },
             confirmButton = {
                 TextButton(onClick = {
                     com.moodify.app.data.CwcRepository(context).resetDemoSession()
@@ -85,9 +85,9 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("设�
                     com.moodify.app.data.TokenStore(context).clear()
                     com.moodify.app.data.BaseUrlStore(context).baseUrl = com.moodify.app.data.BaseUrlPolicy.DEFAULT
                     showResetDialog = false
-                }) { Text("重置", color = Color(0xFFE05B5B)) }
+                }) { Text(stringResource(R.string.support_reset_confirm), color = Color(0xFFE05B5B)) }
             },
-            dismissButton = { TextButton(onClick = { showResetDialog = false }) { Text("取消", color = MoodifyMuted) } },
+            dismissButton = { TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.common_cancel), color = MoodifyMuted) } },
         )
     }
 }

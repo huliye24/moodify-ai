@@ -15,9 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moodify.app.R
 import com.moodify.app.ui.theme.*
 
 private data class Notice(val icon: ImageVector, val title: String, val body: String, val detail: String = "", val time: String, val category: Int, val tint: Color, val read: Boolean = false)
@@ -36,10 +38,10 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
     )
     val visible = if (tab == 0) notices else notices.filter { it.category == tab }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
-        Spacer(Modifier.height(14.dp)); Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBackIos, "返回", tint = MoodifyNavy) }; Text("通知中心", Modifier.weight(1f), color = MoodifyNavy, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center); TextButton(onClick = { allRead = true }) { Text("全部已读", color = MoodifyBlue, fontSize = 14.sp) } }
-        Spacer(Modifier.height(16.dp)); Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(3.dp)) { Row(Modifier.fillMaxWidth().padding(9.dp)) { listOf("全部", "互动", "系统", "处理").forEachIndexed { i, label -> Surface(onClick = { tab = i }, modifier = Modifier.weight(1f), color = if (tab == i) Color(0xFFF0EDFF) else Color.Transparent, shape = RoundedCornerShape(14.dp)) { Text(label, color = if (tab == i) MoodifyBlue else MoodifyMuted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(vertical = 12.dp)) } } } }
+        Spacer(Modifier.height(14.dp)); Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBackIos, stringResource(R.string.common_back), tint = MoodifyNavy) }; Text(stringResource(R.string.accessibility_notifications), Modifier.weight(1f), color = MoodifyNavy, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center); TextButton(onClick = { allRead = true }) { Text(stringResource(R.string.notify_read_all), color = MoodifyBlue, fontSize = 14.sp) } }
+        Spacer(Modifier.height(16.dp)); Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(3.dp)) { Row(Modifier.fillMaxWidth().padding(9.dp)) { listOf(stringResource(R.string.works_all), stringResource(R.string.notify_tab_interact), stringResource(R.string.notify_tab_system), stringResource(R.string.notify_tab_processing)).forEachIndexed { i, label -> Surface(onClick = { tab = i }, modifier = Modifier.weight(1f), color = if (tab == i) Color(0xFFF0EDFF) else Color.Transparent, shape = RoundedCornerShape(14.dp)) { Text(label, color = if (tab == i) MoodifyBlue else MoodifyMuted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(vertical = 12.dp)) } } } }
         Spacer(Modifier.height(18.dp)); visible.forEach { NotificationCard(it, allRead || it.read); Spacer(Modifier.height(12.dp)) }
-        if (visible.isEmpty()) Column(Modifier.fillMaxWidth().padding(top = 80.dp), horizontalAlignment = Alignment.CenterHorizontally) { Icon(Icons.Outlined.NotificationsNone, null, tint = MoodifyOutline, modifier = Modifier.size(52.dp)); Text("暂无通知", color = MoodifyMuted, modifier = Modifier.padding(top = 12.dp)) }
+        if (visible.isEmpty()) Column(Modifier.fillMaxWidth().padding(top = 80.dp), horizontalAlignment = Alignment.CenterHorizontally) { Icon(Icons.Outlined.NotificationsNone, null, tint = MoodifyOutline, modifier = Modifier.size(52.dp)); Text(stringResource(R.string.notify_empty), color = MoodifyMuted, modifier = Modifier.padding(top = 12.dp)) }
         Spacer(Modifier.height(18.dp))
     }
 }
