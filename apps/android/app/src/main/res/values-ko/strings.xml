@@ -443,4 +443,20 @@
     <string name="support_reset_title">데모 세션을 초기화할까요?</string>
     <string name="support_reset_text">크리에이터 패스 활성화, 처리된 작품, PC 페어링을 지우고 오프닝 스토리로 돌아갑니다.</string>
     <string name="support_reset_confirm">초기화</string>
+
+    <!-- pairwise judge -->
+    <string name="judge_title">청각 판정</string>
+    <string name="judge_start">판정 시작</string>
+    <string name="judge_outcome_a_wins">A 우세</string>
+    <string name="judge_outcome_b_wins">B 우세</string>
+    <string name="judge_outcome_inconclusive">판정 불가</string>
+    <string name="judge_confidence">신뢰도: %1$s</string>
+    <string name="judge_reasons">이유</string>
+    <string name="judge_confirm_model">채택</string>
+    <string name="judge_choose_a">A 선택</string>
+    <string name="judge_choose_b">B 선택</string>
+    <string name="judge_undecided">미정</string>
+    <string name="judge_failed">판정 실패</string>
+    <string name="judge_requires_pairing">먼저 PC와 페어링하세요</string>
+    <string name="judge_recorded">판정이 기록되었습니다: %1$s</string>
 </resources>

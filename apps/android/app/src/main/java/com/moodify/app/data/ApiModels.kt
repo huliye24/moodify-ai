@@ -59,3 +59,30 @@ data class PairResult(
         )
     }
 }
+
+/** Pairwise Auditory Judge result (DSK-MFY-PAIRWISE-JUDGE-001). */
+data class PairwiseJudgmentResult(
+    val judgmentId: String,
+    val outcome: String,
+    val confidenceLevel: String,
+    val winnerMargin: Double,
+    val evidenceCoverage: Double,
+    val topReasons: List<String>,
+) {
+    companion object {
+        fun fromJson(json: JSONObject): PairwiseJudgmentResult {
+            val reasons = mutableListOf<String>()
+            json.optJSONArray("top_reasons")?.let { arr ->
+                for (i in 0 until arr.length()) reasons.add(arr.getString(i))
+            }
+            return PairwiseJudgmentResult(
+                judgmentId = json.getString("judgment_id"),
+                outcome = json.getString("outcome"),
+                confidenceLevel = json.optString("confidence_level", "LOW"),
+                winnerMargin = json.optDouble("winner_margin", 0.0),
+                evidenceCoverage = json.optDouble("evidence_coverage", 0.0),
+                topReasons = reasons,
+            )
+        }
+    }
+}

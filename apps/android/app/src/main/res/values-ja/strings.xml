@@ -443,4 +443,20 @@
     <string name="support_reset_title">デモセッションをリセットしますか？</string>
     <string name="support_reset_text">クリエイターパスの有効化、処理済み作品、PC ペアリングをクリアし、オープニングストーリーに戻ります。</string>
     <string name="support_reset_confirm">リセット</string>
+
+    <!-- pairwise judge -->
+    <string name="judge_title">聴覚判定</string>
+    <string name="judge_start">判定を開始</string>
+    <string name="judge_outcome_a_wins">A が優位</string>
+    <string name="judge_outcome_b_wins">B が優位</string>
+    <string name="judge_outcome_inconclusive">判定不能</string>
+    <string name="judge_confidence">信頼度：%1$s</string>
+    <string name="judge_reasons">理由</string>
+    <string name="judge_confirm_model">採用</string>
+    <string name="judge_choose_a">A を選択</string>
+    <string name="judge_choose_b">B を選択</string>
+    <string name="judge_undecided">未決定</string>
+    <string name="judge_failed">判定に失敗しました</string>
+    <string name="judge_requires_pairing">先に PC とペアリングしてください</string>
+    <string name="judge_recorded">判定を記録しました：%1$s</string>
 </resources>

@@ -443,4 +443,20 @@
     <string name="support_reset_title">Réinitialiser la session de démo ?</string>
     <string name="support_reset_text">Cela efface l’activation du pass créateur, les œuvres traitées et l’association au PC, puis revient à l’histoire d’ouverture.</string>
     <string name="support_reset_confirm">Réinitialiser</string>
+
+    <!-- pairwise judge -->
+    <string name="judge_title">Jugement auditif</string>
+    <string name="judge_start">Lancer le jugement</string>
+    <string name="judge_outcome_a_wins">A gagne</string>
+    <string name="judge_outcome_b_wins">B gagne</string>
+    <string name="judge_outcome_inconclusive">Non concluant</string>
+    <string name="judge_confidence">Confiance : %1$s</string>
+    <string name="judge_reasons">Raisons</string>
+    <string name="judge_confirm_model">Accepter</string>
+    <string name="judge_choose_a">Choisir A</string>
+    <string name="judge_choose_b">Choisir B</string>
+    <string name="judge_undecided">Indécis</string>
+    <string name="judge_failed">Échec du jugement</string>
+    <string name="judge_requires_pairing">Associez d’abord votre PC</string>
+    <string name="judge_recorded">Décision enregistrée : %1$s</string>
 </resources>

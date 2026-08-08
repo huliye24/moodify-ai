@@ -1,0 +1,15 @@
+# Pairwise Auditory Judge decision policy v1 (DSK-MFY-PAIRWISE-JUDGE-001).
+# Versioned and auditable; thresholds are provisional until calibrated on
+# a labeled preference dataset. Confidence is reported only as LOW/MEDIUM/HIGH.
+policy_version: pairwise_policy_v1
+
+dimension_weights:
+  signal_integrity: 0.30
+  loudness: 0.15
+  dynamics: 0.20
+  spectral_balance: 0.20
+  stereo_phase: 0.15
+
+min_evidence_coverage: 0.5
+min_winner_margin: 0.15
+conflict_threshold: 0.30

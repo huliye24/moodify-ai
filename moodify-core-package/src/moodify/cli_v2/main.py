@@ -613,6 +613,62 @@ def cmd_case_lyrics_align(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def cmd_case_pairwise_judge(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.evaluation.pairwise.policy import DecisionPolicy
+    from moodify.evaluation.pairwise.service import run_pairwise_judge
+
+    root, _ = _read_project(args.project_dir)
+    case_root = _case_evidence_root(root, args.case_id)
+    policy = DecisionPolicy.from_yaml(args.config) if args.config else DecisionPolicy()
+    result = run_pairwise_judge(
+        case_id=args.case_id,
+        case_root=case_root,
+        candidate_a_path=Path(args.candidate_a),
+        candidate_b_path=Path(args.candidate_b),
+        policy=policy,
+    )
+    return _result(
+        "case.pairwise-judge", "ok", result_status="PAIRWISE_JUDGMENT_COMPLETED",
+        case_id=args.case_id,
+        judgment_id=result["judgment_id"],
+        outcome=result["outcome"],
+        confidence_level=result["confidence_level"],
+        winner_margin=result["winner_margin"],
+        evidence_coverage=result["evidence_coverage"],
+        top_reasons=result["top_reasons"],
+        analysis_failed=result["analysis_failed"],
+        judgment_dir=result["judgment_dir"],
+    )
+
+
+def cmd_case_pairwise_decision(args: argparse.Namespace) -> dict[str, Any]:
+    import json as _json
+
+    from moodify.evaluation.pairwise.service import record_human_decision
+
+    root, _ = _read_project(args.project_dir)
+    case_root = _case_evidence_root(root, args.case_id)
+    judgment_path = case_root / "06_pairwise" / "judgment.json"
+    if not judgment_path.is_file():
+        raise CLIError("PAIRWISE_JUDGMENT_NOT_FOUND",
+                       "run case pairwise-judge before recording a human decision")
+    judgment = _json.loads(judgment_path.read_text(encoding="utf-8"))
+    result = record_human_decision(
+        case_root=case_root,
+        pairwise_case_id=args.case_id,
+        decision=args.decision,
+        machine_outcome=judgment["outcome"],
+        machine_confidence=judgment["confidence_level"],
+        override_reason=args.reason,
+    )
+    return _result(
+        "case.pairwise-decision", "ok", result_status="PAIRWISE_HUMAN_DECISION_RECORDED",
+        case_id=args.case_id,
+        human_decision=result["human_decision"]["decision"],
+        preference=result["preference_record"],
+    )
+
+
 def cmd_case_observations_add(args: argparse.Namespace) -> dict[str, Any]:
     import json as _json
 
@@ -802,6 +858,16 @@ def build_parser() -> argparse.ArgumentParser:
     cla.add_argument("--separate-vocals", default="auto", choices=["never", "auto", "always"])
     cla.add_argument("--device", default="cpu")
     cla.add_argument("--granularity", default=None, choices=["line", "word"], help="请求粒度（默认行+词均输出）")
+    cpw = case.add_parser("pairwise-judge")
+    cpw.add_argument("project_dir"); cpw.add_argument("case_id")
+    cpw.add_argument("--candidate-a", required=True, help="候选 A 音频文件路径")
+    cpw.add_argument("--candidate-b", required=True, help="候选 B 音频文件路径")
+    cpw.add_argument("--config", default=None, help="决策策略 YAML 路径（默认 pairwise_policy_v1）")
+    cpd = case.add_parser("pairwise-decision")
+    cpd.add_argument("project_dir"); cpd.add_argument("case_id")
+    cpd.add_argument("--decision", required=True,
+                     choices=["CONFIRM_MODEL", "CHOOSE_A", "CHOOSE_B", "UNDECIDED"])
+    cpd.add_argument("--reason", default="", help="人工覆盖/弃权理由")
 
     # learning-domain commands (AIR-001)
     cobs = case.add_parser("observations").add_subparsers(dest="observations_command", required=True)
@@ -874,6 +940,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "case.candidate.register": cmd_case_candidate_register,
         "case.compare": cmd_case_compare,
         "case.lyrics-align": cmd_case_lyrics_align,
+        "case.pairwise-judge": cmd_case_pairwise_judge,
+        "case.pairwise-decision": cmd_case_pairwise_decision,
         "case.observations.add": cmd_case_observations_add,
         "case.intervention.register": cmd_case_intervention_register,
         "case.listening.evaluate": cmd_case_listening_evaluate,
