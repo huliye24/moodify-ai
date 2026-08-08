@@ -511,6 +511,44 @@ def cmd_case_compare(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def cmd_case_lyrics_align(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.lyric_align.service import run_lyric_alignment
+
+    root, _ = _read_project(args.project_dir)
+    case_root = _case_evidence_root(root, args.case_id)
+    audio = Path(args.audio)
+    lyrics = Path(args.lyrics)
+    if not audio.is_file():
+        raise CLIError("AUDIO_NOT_FOUND", f"audio file not found: {args.audio}")
+    if not lyrics.is_file():
+        raise CLIError("LYRICS_NOT_FOUND", f"lyrics file not found: {args.lyrics}")
+    translation = Path(args.translation) if args.translation else None
+    if translation is not None and not translation.is_file():
+        raise CLIError("TRANSLATION_NOT_FOUND", f"translation file not found: {args.translation}")
+
+    manifest = run_lyric_alignment(
+        case_id=args.case_id,
+        case_root=case_root,
+        audio_path=audio,
+        lyrics_path=lyrics,
+        translation_path=translation,
+        language=args.language,
+        backend_name=args.backend,
+        separate_vocals=args.separate_vocals,
+        device=args.device,
+        granularity=args.granularity,
+    )
+    return _result(
+        "case.lyrics-align", "ok", result_status="LYRIC_ALIGNMENT_COMPLETED",
+        case_id=args.case_id,
+        backend=manifest["backend"],
+        alignment_status=manifest["status"],
+        alignment_sha256=manifest["alignment_sha256"],
+        rerun_delta_ms=manifest["rerun_delta_ms"],
+        output_dir=str(case_root / "05_lyric_align"),
+    )
+
+
 def cmd_case_observations_add(args: argparse.Namespace) -> dict[str, Any]:
     import json as _json
 
@@ -686,6 +724,16 @@ def build_parser() -> argparse.ArgumentParser:
     ccomp.add_argument("project_dir"); ccomp.add_argument("case_id")
     ccomp.add_argument("--candidate-id", required=True)
     ccomp.add_argument("--plan", default=None, help="processing_plan.json 路径")
+    cla = case.add_parser("lyrics-align")
+    cla.add_argument("project_dir"); cla.add_argument("case_id")
+    cla.add_argument("--audio", required=True, help="最终音频文件路径（时间权威）")
+    cla.add_argument("--lyrics", required=True, help="权威歌词文本文件路径（文字权威）")
+    cla.add_argument("--language", required=True, help="歌词语言代码（fr/zh/en 等）")
+    cla.add_argument("--translation", default=None, help="可选翻译歌词文件路径（行数须与歌词一致）")
+    cla.add_argument("--backend", default="heuristic", choices=["heuristic", "whisperx"])
+    cla.add_argument("--separate-vocals", default="auto", choices=["never", "auto", "always"])
+    cla.add_argument("--device", default="cpu")
+    cla.add_argument("--granularity", default=None, choices=["line", "word"], help="请求粒度（默认行+词均输出）")
 
     # learning-domain commands (AIR-001)
     cobs = case.add_parser("observations").add_subparsers(dest="observations_command", required=True)
@@ -757,6 +805,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "case.scan": cmd_case_scan,
         "case.candidate.register": cmd_case_candidate_register,
         "case.compare": cmd_case_compare,
+        "case.lyrics-align": cmd_case_lyrics_align,
         "case.observations.add": cmd_case_observations_add,
         "case.intervention.register": cmd_case_intervention_register,
         "case.listening.evaluate": cmd_case_listening_evaluate,

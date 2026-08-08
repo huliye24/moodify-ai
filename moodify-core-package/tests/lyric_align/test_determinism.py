@@ -1,3 +1,5 @@
+import pytest
+
 from moodify.lyric_align.models import AlignmentResult, LineTiming
 from moodify.lyric_align.pipeline import _median_boundary_delta
 
@@ -22,4 +24,4 @@ def test_median_boundary_delta_zero_for_identical() -> None:
 def test_median_boundary_delta_measures_shift() -> None:
     first = (LineTiming(0, "a", 0.0, 1.0, 0.5),)
     second = (LineTiming(0, "a", 0.1, 1.1, 0.5),)
-    assert _median_boundary_delta(_result(first), _result(second)) == 0.1
+    assert _median_boundary_delta(_result(first), _result(second)) == pytest.approx(0.1)

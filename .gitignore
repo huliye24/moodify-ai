@@ -172,3 +172,9 @@ apps/android/local.properties
 
 # Task-package acceptance docs (tracked deliberately)
 !outputs/deepseek_validation/**
+
+# Local third-party executables downloaded by validation tools
+tools/third_party/
+
+# Keep experiment notes, but never bundle archives in source control
+docs/experiments/**/*.zip
