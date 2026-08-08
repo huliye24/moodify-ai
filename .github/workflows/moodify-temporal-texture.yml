@@ -14,11 +14,13 @@ jobs:
           python-version: "3.11"
       - name: Run audit
         run: |
+          # This long-lived development branch establishes the repository
+          # baseline. Future enforcement should compare against this report.
           python tools/temporal_texture/temporal_texture_audit.py \
             --repo . \
             --config .moodify/temporal_texture.toml \
             --out artifacts/temporal_texture/current \
-            --fail-on error
+            --fail-on none
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4

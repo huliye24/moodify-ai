@@ -10,11 +10,9 @@ import json
 import logging
 import os
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
-
-logger = logging.getLogger(__name__)
 
 from moodify.audio_io import load_audio
 from moodify.processing.pedalboard_chain import MoodifyDSPChain
@@ -29,6 +27,8 @@ from moodify.v01_analyzer import analyze, spectrum_png_path
 from moodify.v01_diagnostics import diagnose
 from moodify.v01_exporter import export
 from moodify.v01_presets import get_preset, list_presets
+
+logger = logging.getLogger(__name__)
 
 
 def process_audio(input_path: str,

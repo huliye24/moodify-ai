@@ -14,8 +14,6 @@ from pathlib import Path
 
 import numpy as np
 
-logger = logging.getLogger(__name__)
-
 from moodify.auditory.errors import (
     AudioDecodeFailed,
     AudioEmpty,
@@ -24,6 +22,8 @@ from moodify.auditory.errors import (
     FfprobeNotFound,
 )
 from moodify.auditory.models import FileProbe
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
