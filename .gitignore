@@ -4,6 +4,7 @@ dist-electron
 release
 __pycache__
 *.pyc
+*.egg-info/
 .env
 .venv
 .playwright-mcp
@@ -11,6 +12,12 @@ backend/moodify-server.exe
 backend/moodify-server.exe~
 .DS_Store
 Thumbs.db
+
+# Local editor and agent state
+.idea/
+.cursor/
+.vscode/*
+!.vscode/extensions.json
 
 # Moodify generated heavy assets
 calibration_reports/

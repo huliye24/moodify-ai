@@ -141,6 +141,6 @@ Moodify 的核心流程是 local-first：输入音频可以只在本机处理。
 
 ## 开源协议
 
-Moodify 使用 Apache License 2.0 开源，见 [LICENSE](LICENSE)。
+Moodify 使用 GNU General Public License v3.0 开源，见 [LICENSE](LICENSE)。
 
-除非另有说明，本仓库中的源代码和文档按 Apache-2.0 授权。输入音频、生成音频、第三方模型、第三方数据集和外部素材仍归各自权利人所有，并遵循它们自己的许可规则。
+除非另有说明，本仓库中的源代码和文档按 `GPL-3.0-only` 授权。输入音频、生成音频、第三方模型、第三方数据集和外部素材仍归各自权利人所有，并遵循它们自己的许可规则。
