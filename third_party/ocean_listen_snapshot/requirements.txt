@@ -1,0 +1,10 @@
+# Ocean Listen / 听海 — shallow listen dependencies
+librosa
+numpy
+basic-pitch
+onnxruntime
+pretty-midi
+scipy
+faster-whisper
+matplotlib
+setuptools<81

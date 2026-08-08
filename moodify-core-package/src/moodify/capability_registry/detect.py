@@ -233,6 +233,30 @@ def detect_basic_pitch() -> DetectionResult:
     )
 
 
+def detect_ocean_listen() -> DetectionResult:
+    """Detect the vendored Ocean Listen auditory sensor (DSK-MFY-OCEAN-ABSORPTION-001)."""
+    repo_root = Path(__file__).resolve().parents[4]
+    ocean_py = repo_root / "third_party" / "ocean-listen" / "ocean.py"
+    found = ocean_py.is_file()
+    pin = "928dfba62a2c074ccb0154f7ddd42743e4ce9e75"
+    return DetectionResult(
+        tool="ocean_listen",
+        found=found,
+        binary_path=str(ocean_py) if found else None,
+        version=pin,
+        known_failure_modes=(
+            "Upstream not vendored (third_party/ocean-listen missing)",
+            "Commit pin mismatch blocks execution (allow_unreviewed_commit=false)",
+            "Sensor output is never artistic authority (quarantine semantics)",
+        ),
+        notes=(
+            "isolated external sensor; pinned commit "
+            + pin
+            + "; velocity is a confidence proxy, not loudness"
+        ),
+    )
+
+
 def detect_moodify_self() -> DetectionResult:
     """Detect Moodify's own capability modules (009 score_engine, 008 pipeline)."""
     pkg_dir = Path(__file__).resolve().parents[1]
@@ -263,6 +287,7 @@ def detect_all() -> dict[str, DetectionResult]:
         "rubberband": detect_rubberband,
         "audacity": detect_audacity,
         "basic_pitch": detect_basic_pitch,
+        "ocean_listen": detect_ocean_listen,
         "moodify_self": detect_moodify_self,
     }
     return {name: detector() for name, detector in detectors.items()}

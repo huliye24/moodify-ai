@@ -45,12 +45,18 @@ class TestDetectReadOnly:
 
 
 class TestRegistryBootstrap:
-    def test_bootstrap_registers_seven_capabilities(self) -> None:
+    def test_bootstrap_registers_all_capabilities(self) -> None:
         from moodify.capability_registry.bootstrap import build_registry
 
         r = build_registry()
-        assert len(r.capabilities) == 7
-        assert len(r.providers) == 7
+        ids = {c.capability_id for c in r.capabilities}
+        assert ids == {
+            "media.transcode", "media.probe", "notation.render",
+            "audio.time_stretch", "audio.measure_loudness",
+            "audio.separate_manifest", "waveform.region_edit",
+            "lyric.align", "auditory.ocean_listen",
+        }
+        assert len(r.capabilities) == len(r.providers)
         assert all(p.capability_id for p in r.providers)
 
     def test_bootstrap_provider_license_labels(self) -> None:
