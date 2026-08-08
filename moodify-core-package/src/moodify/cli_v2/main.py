@@ -306,13 +306,35 @@ def cmd_case_analyze(args: argparse.Namespace) -> dict[str, Any]:
     case = store.load(args.case_id)
     from moodify.app.orchestrator import analyze_audio
     from moodify.app.production_control import default_plan
+
+    sensor_warnings: list[str] = []
+    sensor_observation: dict | None = None
+    sensor_gate: str | None = None
+    if getattr(args, "sensor", None) == "ocean" or _ocean_sensor_enabled():
+        case.begin_analysis()
+        store.save(case)
+        sensor = _run_ocean_sensor(case, root, args)
+        sensor_gate = sensor["gate_status"]
+        sensor_warnings = sensor["warnings"]
+        sensor_observation = sensor["observation"]
+
     analysis = analyze_audio(case.source_path)
-    case.analyze({"peak_db": analysis.peak_db, "rms_db": analysis.rms_db,
-                  "crest_factor": analysis.crest_factor,
-                  "spectral_centroid_hz": analysis.spectral_centroid_hz,
-                  "loudness_lufs": analysis.loudness_lufs, "duration_s": analysis.duration_s,
-                  "sample_rate": analysis.sample_rate, "has_clipping": analysis.has_clipping,
-                  "silence_ratio": analysis.silence_ratio, "warnings": analysis.warnings})
+    analysis_payload = {
+        "peak_db": analysis.peak_db, "rms_db": analysis.rms_db,
+        "crest_factor": analysis.crest_factor,
+        "spectral_centroid_hz": analysis.spectral_centroid_hz,
+        "loudness_lufs": analysis.loudness_lufs, "duration_s": analysis.duration_s,
+        "sample_rate": analysis.sample_rate, "has_clipping": analysis.has_clipping,
+        "silence_ratio": analysis.silence_ratio,
+        "warnings": list(analysis.warnings) + sensor_warnings,
+    }
+    if sensor_observation is not None:
+        analysis_payload["auditory_observation"] = sensor_observation
+        analysis_payload["sensor"] = "ocean"
+        analysis_payload["sensor_gate"] = sensor_gate
+    if case.state.value == "SPECIFIED":
+        case.begin_analysis()
+    case.analyze(analysis_payload)
     intent = _parse_intent(args.intent) if getattr(args, "intent", None) else {}
     plan = default_plan(case.analysis, intent)
     case.set_plan(plan, engine_name="native")
@@ -320,6 +342,48 @@ def cmd_case_analyze(args: argparse.Namespace) -> dict[str, Any]:
     store.save(case)
     return _result("case.analyze", "planned", case_id=case.case_id, state=case.state.value,
                    plan_id=plan["plan_id"], plan_hash=case.plan_hash, steps=plan["steps"])
+
+
+def _ocean_config() -> dict[str, Any]:
+    import json as _json
+
+    path = Path(__file__).resolve().parents[3] / "configs" / "ocean_adapter.json"
+    if not path.is_file():
+        return {}
+    try:
+        return _json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _ocean_sensor_enabled() -> bool:
+    return bool(_ocean_config().get("enabled", False))
+
+
+def _run_ocean_sensor(case: Any, root: Path, args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.adapters.auditory.ocean_listen.adapter import (
+        OceanAdapterError,
+        run_sensor,
+    )
+
+    case_root = _case_evidence_root(root, case.case_id)
+    try:
+        sensor = run_sensor(
+            case_id=case.case_id,
+            case_root=case_root,
+            source_path=Path(case.source_path),
+            source_sha256=case.source_sha256,
+            config=_ocean_config(),
+            spec_hash=case.one_point_spec_hash,
+            fake=bool(getattr(args, "fake", False)),
+        )
+    except OceanAdapterError as exc:
+        raise CLIError("SENSOR_FAILED", str(exc)) from exc
+    return {
+        "gate_status": sensor.gate_status,
+        "warnings": list(sensor.gate_warnings),
+        "observation": sensor.observation,
+    }
 
 
 def cmd_case_approve(args: argparse.Namespace) -> dict[str, Any]:
@@ -699,6 +763,10 @@ def build_parser() -> argparse.ArgumentParser:
     case = sub.add_parser("case").add_subparsers(dest="case_command", required=True)
     create = case.add_parser("create"); create.add_argument("project_dir"); create.add_argument("--spec", required=True); create.add_argument("--owner", required=True); create.add_argument("--asset-id")
     analyze = case.add_parser("analyze"); analyze.add_argument("project_dir"); analyze.add_argument("case_id"); analyze.add_argument("--intent", default=None)
+    analyze.add_argument("--sensor", default=None, choices=["ocean", "off"],
+                         help="听觉传感器（默认取 configs/ocean_adapter.json 的 enabled）")
+    analyze.add_argument("--fake", action="store_true",
+                         help="用 fake 传感器进程执行（测试用，不调用 vendored ocean）")
     approve = case.add_parser("approve"); approve.add_argument("project_dir"); approve.add_argument("case_id"); approve.add_argument("--owner", required=True)
     status = case.add_parser("status"); status.add_argument("project_dir"); status.add_argument("case_id")
     cexecute = case.add_parser("execute"); cexecute.add_argument("project_dir"); cexecute.add_argument("case_id")

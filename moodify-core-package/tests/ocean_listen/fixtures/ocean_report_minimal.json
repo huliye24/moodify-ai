@@ -1,0 +1,113 @@
+{
+  "name": "fixture",
+  "sourcePath": "fixture.wav",
+  "duration": 12.0,
+  "bpm": 96,
+  "key": "F#",
+  "percussiveRatio": 0.35,
+  "vocalCoverage": 0.42,
+  "brightnessTrend": "falling",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 6.0,
+      "avgEnergy": 0.1
+    },
+    {
+      "start": 6.0,
+      "end": 12.0,
+      "avgEnergy": 0.2
+    }
+  ],
+  "classification": {
+    "type": "music",
+    "confidence": 0.85,
+    "reasoning": "fixture",
+    "details": {
+      "bpm": 96
+    }
+  },
+  "notes": [
+    {
+      "pitch": 60,
+      "note_name": "C4",
+      "start": 0.5,
+      "end": 1.0,
+      "duration": 0.5,
+      "velocity": 80,
+      "dynamics": {
+        "mean_rms": 0.1,
+        "peak_rms": 0.15
+      }
+    },
+    {
+      "pitch": 64,
+      "note_name": "E4",
+      "start": 1.0,
+      "end": 1.4,
+      "duration": 0.4,
+      "velocity": 70,
+      "dynamics": {
+        "mean_rms": 0.08,
+        "peak_rms": 0.11
+      }
+    }
+  ],
+  "total_notes": 2,
+  "stemTimeline": {
+    "vocals": [
+      [
+        0.0,
+        10.0
+      ]
+    ]
+  },
+  "stemNotes": {
+    "vocals": [
+      {
+        "pitch": 60,
+        "start": 0.5,
+        "end": 1.0,
+        "duration": 0.5,
+        "velocity": 80
+      }
+    ]
+  },
+  "totalStemNotes": 1,
+  "voiceProfile": {
+    "loudnessRatio": 2.0
+  },
+  "voiceSegments": [
+    {
+      "type": "melodic",
+      "start": 0.0,
+      "end": 2.0,
+      "duration": 2.0,
+      "median_f0": 220,
+      "pitch_iqr": 45,
+      "voiced_ratio": 0.7
+    }
+  ],
+  "phraseDynamics": [
+    {
+      "start": 0.0,
+      "end": 5.0,
+      "mean_energy": 0.1,
+      "trend": "rising",
+      "label": "crescendo"
+    }
+  ],
+  "lyrics": {
+    "source": "fixture",
+    "language": "en",
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 2.0,
+        "text": "hello"
+      }
+    ]
+  },
+  "shallowVersion": 1,
+  "deepVersion": 1
+}

@@ -53,7 +53,7 @@ class ControlError(Exception):
 class CaseState(StrEnum):
     CREATED = "CREATED"
     SOURCE_REGISTERED = "SOURCE_REGISTERED"; SPECIFIED = "SPECIFIED"
-    ANALYZED = "ANALYZED"; PLANNED = "PLANNED"
+    ANALYZING = "ANALYZING"; ANALYZED = "ANALYZED"; PLANNED = "PLANNED"
     TECHNICALLY_VALIDATED = "TECHNICALLY_VALIDATED"
     AWAITING_ARTISTIC_APPROVAL = "AWAITING_ARTISTIC_APPROVAL"
     APPROVED = "APPROVED"; EXECUTING = "EXECUTING"; EXECUTED = "EXECUTED"
@@ -65,7 +65,8 @@ class CaseState(StrEnum):
 ALLOWED = {
     CaseState.CREATED: {CaseState.SOURCE_REGISTERED},
     CaseState.SOURCE_REGISTERED: {CaseState.SPECIFIED},
-    CaseState.SPECIFIED: {CaseState.ANALYZED},
+    CaseState.SPECIFIED: {CaseState.ANALYZING},
+    CaseState.ANALYZING: {CaseState.ANALYZED},
     CaseState.ANALYZED: {CaseState.PLANNED, CaseState.REJECTED},
     CaseState.PLANNED: {CaseState.TECHNICALLY_VALIDATED, CaseState.REJECTED},
     CaseState.TECHNICALLY_VALIDATED: {CaseState.AWAITING_ARTISTIC_APPROVAL, CaseState.REJECTED},
@@ -192,6 +193,10 @@ class ProductionCase:
         self.one_point_spec_hash = hashlib.sha256(
             json.dumps(spec, sort_keys=True).encode()).hexdigest()
         self._transition(CaseState.SPECIFIED)
+
+    def begin_analysis(self):
+        """Transition SPECIFIED -> ANALYZING before sensor/analysis execution."""
+        self._transition(CaseState.ANALYZING)
 
     def analyze(self, analysis: dict):
         if not analysis or not isinstance(analysis, dict):

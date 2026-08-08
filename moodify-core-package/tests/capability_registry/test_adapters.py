@@ -31,7 +31,7 @@ def make_request(tmp_path: Path, inputs: dict[str, str], parameters: dict | None
 class TestAdapterRegistry:
     def test_all_adapters_shape(self) -> None:
         adapters = all_adapters()
-        assert len(adapters) == 7
+        assert len(adapters) == 9
         for adapter in adapters:
             assert adapter.capability_id
             assert adapter.provider_id

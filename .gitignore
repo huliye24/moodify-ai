@@ -178,5 +178,10 @@ apps/android/local.properties
 # Local third-party executables downloaded by validation tools
 tools/third_party/
 
+# Vendored upstream sources (never committed; pinned via MOODIFY_VENDOR_MANIFEST.json)
+third_party/*
+# ...but the immutable 21-file snapshot IS tracked for offline reproducibility
+!third_party/ocean_listen_snapshot/
+
 # Keep experiment notes, but never bundle archives in source control
 docs/experiments/**/*.zip

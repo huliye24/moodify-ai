@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "enabled": false,
+  "upstream_commit": "928dfba62a2c074ccb0154f7ddd42743e4ce9e75",
+  "ocean_root": "third_party/ocean-listen",
+  "python_executable": ".venv-basic-pitch/Scripts/python.exe",
+  "analysis_profile": "shallow",
+  "mode": "auto",
+  "lyrics_mode": "disabled",
+  "timeout_seconds": 1800,
+  "cache_root": "artifacts/ocean_cache",
+  "output_root": "artifacts/ocean_bridge",
+  "allow_unreviewed_commit": false
+}

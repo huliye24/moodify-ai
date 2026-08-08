@@ -41,6 +41,7 @@ def make_case(source_wav: Path, store: ProductionCaseStore, case_id: str = "MFY-
     case.register_source(str(source_wav))
     case.specify("warm vocal", ["vocal intimacy"], ["harsh highs"],
                  "gentle normalization", "tester")
+    case.begin_analysis()
     case.analyze({"peak_db": -12.0, "crest_factor": 8.0})
     case.set_plan(default_plan(case.analysis), engine_name="native")
     case.run_technical_gate()
@@ -103,6 +104,17 @@ def test_only_packaged_can_transition_to_completed():
     assert ALLOWED.get(CaseState.PACKAGED) == {CaseState.COMPLETED, CaseState.FAILED}
 
 
+def test_specified_must_pass_through_analyzing():
+    assert ALLOWED[CaseState.SPECIFIED] == {CaseState.ANALYZING}
+    assert ALLOWED[CaseState.ANALYZING] == {CaseState.ANALYZED}
+
+
+def test_specified_to_analyzed_rejected_at_runtime():
+    case = ProductionCase(case_id="MFY-CASE-X", state=CaseState.SPECIFIED)
+    with pytest.raises(ValueError, match="Invalid"):
+        case._transition(CaseState.ANALYZED)
+
+
 @pytest.mark.parametrize("state", [
     CaseState.APPROVED, CaseState.EXECUTING, CaseState.EXECUTED,
     CaseState.VERIFYING, CaseState.VERIFIED, CaseState.FAILED,
@@ -120,6 +132,7 @@ def test_engine_not_invoked_when_approval_gate_fails(tmp_path, source_wav):
     case = ProductionCase(case_id="MFY-CASE-NA")
     case.register_source(str(source_wav))
     case.specify("x", ["a"], ["b"], "c", "tester")
+    case.begin_analysis()
     case.analyze({"peak_db": -3.0})
     case.set_plan(default_plan(case.analysis))
     case.run_technical_gate()
@@ -221,6 +234,7 @@ def test_unsupported_action_fails_closed_without_final_output(tmp_path, source_w
     case = ProductionCase(case_id="MFY-CASE-UNSUP")
     case.register_source(str(source_wav))
     case.specify("x", ["a"], ["b"], "c", "tester")
+    case.begin_analysis()
     case.analyze({"peak_db": -3.0})
     case.set_plan({"plan_id": "PLN-x", "steps": [{"type": "unknown_action", "params": {}}]})
     case.run_technical_gate()

@@ -1,0 +1,137 @@
+{
+  "git_commit": "3bfeabcc7a7cd953d73dc27602eaf38515a1c198",
+  "files": [
+    {
+      "path": "ocean.py",
+      "sha256": "8fb731c1559ac7c66a8c74ca8cb46e6bd49e12c2bb7beb369b3f9600be8050b4",
+      "size_bytes": 21594
+    },
+    {
+      "path": "modules/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "modules/classifier.py",
+      "sha256": "1c76619f92fbebdfe53e133fdc1158db179d2d8e2d5fc98de02ce9de32946c1a",
+      "size_bytes": 8027
+    },
+    {
+      "path": "modules/dynamics.py",
+      "sha256": "fc4535842610b9f1372f83ae014aaac8bcf0614a58eeaac031c407e4e375afbf",
+      "size_bytes": 7469
+    },
+    {
+      "path": "modules/harmonic_filter.py",
+      "sha256": "79dafe3b8e7d131881f06af85ae01aa576fa0f178af4143aebb540e458fd72c7",
+      "size_bytes": 5250
+    },
+    {
+      "path": "modules/instruments.py",
+      "sha256": "6408c13afeab62e6269d518886c554f1b3054901ab959a7bb6dd0fdf9a93dd51",
+      "size_bytes": 3858
+    },
+    {
+      "path": "modules/lyrics_netease.py",
+      "sha256": "2f9f156e9c155018ed5abef90e38d40540b7af38532db584e703e2ca65bc33b8",
+      "size_bytes": 5804
+    },
+    {
+      "path": "modules/lyrics_sensevoice.py",
+      "sha256": "6bd442b0cd9c5e44c54b76fdb64bc1821db02ddc50cf1b2933164b7183c8401a",
+      "size_bytes": 6452
+    },
+    {
+      "path": "modules/lyrics_whisper.py",
+      "sha256": "11939c22d166bb92b7eb9283dfaa8b96a52672ef1ddd7db1369ef128bc0c21b7",
+      "size_bytes": 1049
+    },
+    {
+      "path": "modules/notes.py",
+      "sha256": "40d84a18eed9ddce96d3e757f306643eba8ee88abf726b2630aeff9915677216",
+      "size_bytes": 2032
+    },
+    {
+      "path": "modules/per_stem_notes.py",
+      "sha256": "b40432acbcfd5b2322c77ae83be2ba4fd6b3ed06356eb87e69b5dc35b2bef813",
+      "size_bytes": 5080
+    },
+    {
+      "path": "modules/report.py",
+      "sha256": "a95555501afa8e1528b587e7d5be2129da1d26cf00e7c666ac1f580c42ec0927",
+      "size_bytes": 7956
+    },
+    {
+      "path": "modules/stems.py",
+      "sha256": "1f5066a6b394da0362cba85bcbd608f34f0a8b2d53bd1f311861a5fffc3d8393",
+      "size_bytes": 3647
+    },
+    {
+      "path": "modules/structure.py",
+      "sha256": "6fd06dce8a671c4e8c4e3f0d1c9e3b52a441e1aa6c76342888e3ad28e221daee",
+      "size_bytes": 7127
+    },
+    {
+      "path": "modules/visualize.py",
+      "sha256": "f129b2011d6ab5fab7e7a6a9efdf6c5f07ea22ad09fa517a617a803b8612ce15",
+      "size_bytes": 2662
+    },
+    {
+      "path": "modules/voice.py",
+      "sha256": "3c89d41d98bb2b77430e6a27edbb55f42f73ca4bf954ebc198cff715c4c129a7",
+      "size_bytes": 31214
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "19973ab94c63ef23ee95790255594f68e35f6a0e457272f2bcedb227728ab07e",
+      "size_bytes": 162
+    },
+    {
+      "path": "requirements-deep.txt",
+      "sha256": "8ca5b2aa9abe89926260177f3c33c5147e98414bb4559d77fb9a3745aebbd95f",
+      "size_bytes": 183
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "5ca54e95d6cb26ac1a6b0ba1d31fbecf682e88ca6691f5a3d652f0c176550366",
+      "size_bytes": 1092
+    },
+    {
+      "path": "NOTICES",
+      "sha256": "dbd43b076398e43f1996a0cc9385e278cbe71cec9b5c2b8e0e3a957df4d451af",
+      "size_bytes": 1151
+    },
+    {
+      "path": "README.md",
+      "sha256": "35eb4bd080cb0255736ad17dc03fb9c6dfda006c8fb7a0cea6d5b12d73157e35",
+      "size_bytes": 11567
+    }
+  ],
+  "manifest_sha256": "cdbddc7104abc5d954b88dd4ebd672c387ea265539d1272ed45b55566370bf2f",
+  "source_repository": "https://github.com/ennisaaaaaaaa-stack/ocean-listen.git",
+  "source_commit": "928dfba62a2c074ccb0154f7ddd42743e4ce9e75",
+  "vendor_policy": "immutable snapshot; modify through Moodify adapter layer",
+  "copied_paths": [
+    "ocean.py",
+    "modules/__init__.py",
+    "modules/classifier.py",
+    "modules/dynamics.py",
+    "modules/harmonic_filter.py",
+    "modules/instruments.py",
+    "modules/lyrics_netease.py",
+    "modules/lyrics_sensevoice.py",
+    "modules/lyrics_whisper.py",
+    "modules/notes.py",
+    "modules/per_stem_notes.py",
+    "modules/report.py",
+    "modules/stems.py",
+    "modules/structure.py",
+    "modules/visualize.py",
+    "modules/voice.py",
+    "requirements.txt",
+    "requirements-deep.txt",
+    "LICENSE",
+    "NOTICES",
+    "README.md"
+  ]
+}

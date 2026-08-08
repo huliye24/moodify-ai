@@ -17,6 +17,8 @@ from moodify.capability_registry.adapters.sox_adapter import SoxAdapter
 from moodify.capability_registry.adapters.rubberband_adapter import RubberBandAdapter
 from moodify.capability_registry.adapters.audacity_adapter import AudacityAdapter
 from moodify.capability_registry.adapters.basic_pitch_adapter import BasicPitchAdapter
+from moodify.capability_registry.adapters.lyric_align_adapter import LyricAlignAdapter
+from moodify.capability_registry.adapters.ocean_listen_adapter import OceanListenAdapter
 
 __all__ = [
     "AdapterResult",
@@ -26,7 +28,9 @@ __all__ = [
     "FfmpegAdapter",
     "FfprobeAdapter",
     "InvokeRequest",
+    "LyricAlignAdapter",
     "MuseScoreAdapter",
+    "OceanListenAdapter",
     "ProviderAdapter",
     "RubberBandAdapter",
     "SoxAdapter",
@@ -42,4 +46,6 @@ def all_adapters() -> list[ProviderAdapter]:
         RubberBandAdapter(),
         AudacityAdapter(),
         BasicPitchAdapter(),
+        LyricAlignAdapter(),
+        OceanListenAdapter(),
     ]

@@ -142,6 +142,36 @@ def build_registry() -> CapabilityRegistry:
             validation=("output_exists", "source_hash_linked"),
             evidence=("provider_version", "command_manifest", "output_hashes", "execution_log"),
         ),
+        _capability(
+            "lyric.align",
+            "Align authoritative lyric text to final audio, producing line/word timelines with quality gates.",
+            ("wav", "mp3", "flac", "m4a", "aac", "lyrics_text", "translation_text"),
+            ("alignment_json", "lrc", "enhanced_lrc", "srt", "ass", "qc_report", "evidence_manifest"),
+            quality={"min_coverage": 0.92, "max_unaligned_token_ratio": 0.05,
+                     "min_mean_word_confidence": 0.72, "min_line_confidence": 0.55,
+                     "max_rerun_delta_ms": 80.0, "heuristic_always_draft_only": True},
+            execution={"network_access": False, "requires_approved_envelope": False},
+            validation=("line_monotonicity", "word_monotonicity", "coverage",
+                        "unaligned_token_ratio", "rerun_delta", "boundary_jump"),
+            evidence=("audio_sha256", "lyrics_sha256", "translation_sha256",
+                      "alignment_sha256", "backend_sha256", "backend_raw_sha256",
+                      "config_sha256", "qc_report"),
+        ),
+        _capability(
+            "auditory.ocean_listen",
+            "Raw auditory sensor evidence from Ocean Listen (hearing layer only).",
+            ("wav", "mp3", "flac", "m4a"),
+            ("raw_ocean_report", "auditory_observation_v1", "ocean_quality_gate", "ocean_run_manifest"),
+            quality={
+                "sensor_output_only": True,
+                "may_approve_artistic_decision": False,
+                "may_transition_to_technically_validated": False,
+                "heuristic_always_draft_only": True,
+            },
+            execution={"requires_approved_envelope": False, "network_access": False},
+            validation=("source_hash_linked", "commit_pin_linked", "no_non_finite", "evidence_registry_written"),
+            evidence=("source_sha256", "configuration_hash", "upstream_commit", "artifact_sha256", "qc_report"),
+        ),
     )
 
     providers = (
@@ -152,6 +182,8 @@ def build_registry() -> CapabilityRegistry:
         _provider("sox.cli", "audio.measure_loudness", "external_process", "LGPL (external process)", det["sox"]),
         _provider("basic_pitch.moodify", "audio.separate_manifest", "reviewed", "Apache-2.0 (internal)", det["basic_pitch"]),
         _provider("audacity.cli", "waveform.region_edit", "external_process", "GPLv2 (external process)", det["audacity"]),
+        _provider("lyric_align.core", "lyric.align", "internal", "Apache-2.0 (internal)", det["moodify_self"]),
+        _provider("ocean_listen.git", "auditory.ocean_listen", "external_process", "MIT (external sensor; bridge code proprietary)", det["ocean_listen"]),
     )
 
     return CapabilityRegistry(
