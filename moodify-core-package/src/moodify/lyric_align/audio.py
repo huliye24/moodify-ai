@@ -3,6 +3,7 @@ from __future__ import annotations
 import audioop
 import json
 import math
+import os
 import shutil
 import subprocess
 import sys
@@ -11,8 +12,21 @@ from pathlib import Path
 from statistics import median
 
 
+def _win_command(name: str) -> str | None:
+    """Windows fallbacks for ffmpeg installed outside PATH (winget / Program Files)."""
+    if sys.platform != "win32":
+        return None
+    for base in (
+        Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft" / "WinGet" / "Packages",
+        Path("C:/Program Files/ffmpeg/bin"),
+    ):
+        for candidate in base.rglob(f"{name}.exe"):
+            return str(candidate)
+    return None
+
+
 def require_command(name: str) -> str:
-    path = shutil.which(name)
+    path = shutil.which(name) or _win_command(name)
     if path is None:
         raise RuntimeError(f"Required command '{name}' was not found in PATH.")
     return path

@@ -11,7 +11,7 @@ MSE 回答“音乐结构是什么”。自动输出必须允许人工校正，�
 | Melody extraction | pitch events/contour | 研究目标 | Planned | note onset/pitch metrics；保留失败 |
 | Chord estimation | chord timeline | 研究目标/人审 | Planned | chord symbol recall 与 no-chord |
 | Vocal/instrument roles | role/time/confidence | 需人工校正 | Experimental | stem/专家标注混淆矩阵 |
-| Lyrics alignment | token/line timeline | 有歌词时实验；需人工校正 | Planned interface | 时间偏差分布与未对齐比例 |
+| Lyrics alignment | token/line timeline | 有歌词时实验；需人工校正 | v0.1 implemented (2026-08-08) | `lyric_align/`：heuristic（DRAFT_ONLY）+ WhisperX 适配器 + LRC/SRT/ASS 导出 + 质量门；验证集待采集（Phase E），详见 `docs/verification/lyric_align_verification_set.md` |
 | MIDI reconstruction | notes/tracks/roles | 研究目标，不承诺完整扒谱 | Planned | 分轨 note metrics + 可编辑性 |
 | Score representation | bars/voices/notation assets | 人工主导 | v0.1 implemented (2026-08-02) | `score_engine/`：MoodifyScore v0.1 canonical JSON → MusicXML 4.0 → MuseScore PDF/SVG；详见 `SCORE_ENGINE_ARCHITECTURE.md` |
 | Structural confidence | per-field confidence/provenance | 必须可靠生成 | Schema partial | 每个字段有 backend/version/reason |

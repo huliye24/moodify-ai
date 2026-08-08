@@ -30,6 +30,7 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from moodify.v01_pipeline import process_audio
 from moodify.v01_presets import PRESETS, list_presets
+from moodify.api.routes.lyric_align import router as lyric_align_router
 from moodify.api.routes.workspace_projects import router as workspace_projects_router
 from moodify.api.routes.v1 import router as mobile_v1_router
 from moodify_runtime.config import load_config
@@ -81,6 +82,7 @@ app.add_middleware(
 )
 app.include_router(workspace_projects_router)
 app.include_router(mobile_v1_router)
+app.include_router(lyric_align_router)
 
 
 # Legacy emotion compatibility.

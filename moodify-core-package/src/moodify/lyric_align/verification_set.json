@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0.0",
+  "task": "DSK-MFY-LYRIC-TEMPORAL-ALIGNMENT-001",
+  "phase": "E",
+  "note": "Private validation manifest. Audio assets and manually verified line/word anchors are not yet collected. Calibration of the publish-gate thresholds is blocked until anchors exist.",
+  "tracks": [
+    {"id": "VS-001", "category": "french_ballad_long_vowels", "language": "fr", "status": "pending", "anchors": null},
+    {"id": "VS-002", "category": "french_pop_dense_lyrics", "language": "fr", "status": "pending", "anchors": null},
+    {"id": "VS-003", "category": "chinese_pop", "language": "zh", "status": "pending", "anchors": null},
+    {"id": "VS-004", "category": "bilingual_song", "language": "mixed", "status": "pending", "anchors": null},
+    {"id": "VS-005", "category": "lead_plus_backing_vocals", "language": "mixed", "status": "pending", "anchors": null},
+    {"id": "VS-006", "category": "heavy_reverb", "language": "mixed", "status": "pending", "anchors": null},
+    {"id": "VS-007", "category": "distorted_vocal", "language": "mixed", "status": "pending", "anchors": null},
+    {"id": "VS-008", "category": "quiet_intro_long_instrumental_break", "language": "mixed", "status": "pending", "anchors": null},
+    {"id": "VS-009", "category": "repeated_chorus", "language": "mixed", "status": "pending", "anchors": null},
+    {"id": "VS-010", "category": "ai_generated_vocal_artifacts", "language": "mixed", "status": "pending", "anchors": null}
+  ]
+}
