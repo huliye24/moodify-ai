@@ -1,92 +1,99 @@
-# 影焰实验室总入口
+# Moodify Core
 
-创建日期：2026-05-22
+`moodify-core-package` is the current Python implementation of Moodify's local auditory-analysis and intervention engine.
 
-## AI 工作入口
+Moodify's product identity is:
 
-AI 接手影焰实验室时，先读：
+> **The Ear of AI — an Auditory Intelligence System.**
 
-```text
-AI_PREVIEW.md
-00_AGENT编制.md
-04_实验室运行台/影焰实验室_部门工作台_2026-05-26.md
-01_实验项目登记/Moodify_AI实验/AI_PREVIEW.md
-```
+This package implements part of that architecture today. It does **not** claim that the entire Auditory Intelligence roadmap is already implemented.
 
-当前主线：Moodify 已由工川署完成八颗理论元器件封装验收，影焰实验室负责实验组合、失败记录和核心引擎候选沉淀。
+## Current v0.1 Mainline
 
-## 一句话定位
-
-影焰实验室是工川署的项目实验场，负责把工川署的方法、任务、模板、Agent 协作方式和工程控制机制放到具体项目中试验，并把成功经验、失败记录和可复用做法回流给工川署。
-
-## 三机关关系
+The stable v0.1 path is intentionally narrow:
 
 ```text
-文川院
-  -> 基础理论、概念模型、研究问题
-
-工川署
-  -> 总体设计、工程制度、任务容器、验收门禁、资产沉淀
-
-影焰实验室
-  -> 项目实验、跨模型对比、方案对比、失败记录、经验抽取、回流验证
-
-项目
-  -> 作为接入对象进入系统，提供真实场景、真实约束、真实反馈
+Import
+  -> Analyze
+  -> Diagnose
+  -> Process
+  -> Export
 ```
 
-## 基本原则
+The canonical implementation should continue to preserve a simple, testable mainline while experimental systems evolve separately.
 
-影焰实验室不是普通项目组。
+## What the Core Does Today
 
-它的价值不只是把某个项目做完，而是通过项目试验回答：
+Depending on the active version, the package includes:
 
-- 工川署的方法是否可执行。
-- 任务容器是否足够清晰。
-- Agent 分工是否真的提高命中率。
-- 不同大模型是否能被同一套外部制度统一调度。
-- 验收标准是否能发现偏差。
-- 哪些做法可以固化为通用资产。
-- 哪些失败需要回传工川署或文川院。
+- audio loading and normalization;
+- spectral / acoustic metric extraction;
+- rule-based diagnosis;
+- controlled DSP processing;
+- preset-based interventions;
+- export and report generation;
+- CLI/API entry points;
+- test fixtures and regression checks;
+- experimental measurement and feedback modules.
 
-## 运行循环
+## How This Fits the Auditory Intelligence Model
 
 ```text
-文川院提出理论
-  -> 工川署转译为工程方法和任务制度
-  -> 影焰实验室在项目中试验
-  -> 项目返回真实结果和偏差
-  -> 影焰实验室抽取经验
-  -> 工川署沉淀资产、修正规则
-  -> 必要时提交文川院形成新研究问题
+Listen       -> audio I/O and source handling
+Represent    -> analysis / metrics / structural representations
+Judge        -> diagnosis / scoring / rule evaluation
+Intervene    -> DSP and controlled processing
+Verify       -> before/after metrics, tests, evidence
+Learn        -> records, feedback, benchmarks, rules
 ```
 
-## 目录说明
+The current code has stronger coverage in some stages than others.
+
+Do not rename an experimental implementation into a production capability merely to make the diagram look complete.
+
+## Auditory Intervention Laboratory
+
+DSP, presets and post-processing are treated as the **Auditory Intervention Laboratory**.
+
+Their role is to:
+
+- create controlled acoustic changes;
+- test hypotheses;
+- generate before/after evidence;
+- discover failures;
+- support production cases.
+
+They are important, but they are not the complete definition of Moodify.
+
+## Installation
+
+Python 3.10+:
+
+```bash
+pip install -e .
+```
+
+Development:
+
+```bash
+pip install -e ".[dev]"
+```
+
+## Verification
+
+```bash
+python -m ruff check src/moodify
+python -m pytest -q
+```
+
+## Agent Rule
+
+Before modifying this package, read the repository root:
 
 ```text
-00_实验室章程
-  影焰实验室定位、职责、边界和运行原则。
-
-01_实验项目登记
-  登记进入实验室的项目、实验问题、输入规则和输出物。
-
-02_实验记录
-  保存每次实验的过程、结果、偏差、失败和复盘。
-
-03_经验回流
-  把实验经验转成工川署可吸收的 SOP、模板、指标和资产建议。
+AGENTS.md
+docs/AUDITORY_INTELLIGENCE_ARCHITECTURE.md
+docs/LEGACY_AND_EXPERIMENTAL_POLICY.md
 ```
 
-## 当前重点
-
-影焰实验室的第一阶段任务不是追求项目数量，而是建立稳定的项目实验回流机制。
-
-每个进入影焰实验室的项目，都必须留下：
-
-- 实验目标
-- 工川署输入
-- 项目执行记录
-- 偏差与失败
-- 可复用经验
-- 回流到工川署的资产建议
-- 需要文川院研究的问题
+Preserve the verified mainline unless a task explicitly authorizes architectural migration.
