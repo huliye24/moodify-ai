@@ -1,0 +1,58 @@
+# Open Access + CWC Compute Credit policy v1 (DSK-MFY-ACCESS-CWC-PATCH-001).
+# CWC = Compute Work Credit (计算额度): a non-transferable quota for
+# heavy auditory compute. It is NOT a token, wallet asset, or financial
+# instrument. Open registration is the default; invite codes are only an
+# optional referral/reward mechanism.
+policy_version: access_policy_v1
+
+registration:
+  open_registration: true
+  invite_required: false
+  starter_cwc: 100
+  max_users: 10000
+
+operations:
+  quick_scan:
+    base_cwc: 1
+  full_analysis:
+    base_cwc: 3
+  pairwise_ab_judge:
+    base_cwc: 5
+  deep_pairwise_ab_judge:
+    base_cwc: 8
+  ranking_10_tracks:
+    base_cwc: 20
+  ranking_20_tracks:
+    base_cwc: 45
+
+tiers:
+  free:
+    concurrency_limit: 1
+    daily_limits:
+      pairwise_ab_judge: 5
+      ranking_10_tracks: 2
+    rate_limit_submissions_per_minute: 3
+  creator:
+    concurrency_limit: 3
+    daily_limits:
+      pairwise_ab_judge: 20
+      ranking_10_tracks: 8
+    rate_limit_submissions_per_minute: 10
+  enterprise:
+    concurrency_limit: 10
+    daily_limits:
+      pairwise_ab_judge: 100
+      ranking_10_tracks: 40
+    rate_limit_submissions_per_minute: 60
+
+referral:
+  enabled: true
+  inviter_reward_cwc: 10
+  invitee_reward_cwc: 5
+  reward_after_compute_task: false
+  one_time_per_inviter: true
+  max_referrals_per_inviter: 20
+
+queue:
+  max_queue_depth: 100
+  backpressure_message: "当前任务较多，你的任务已加入队列。"

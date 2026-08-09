@@ -33,6 +33,7 @@ from moodify.v01_presets import PRESETS, list_presets
 from moodify.api.routes.lyric_align import router as lyric_align_router
 from moodify.api.routes.pairwise_judge import router as pairwise_judge_router
 from moodify.api.routes.ntrack_ranking import router as ntrack_ranking_router
+from moodify.api.routes.access import router as access_router
 from moodify.api.routes.workspace_projects import router as workspace_projects_router
 from moodify.api.routes.v1 import router as mobile_v1_router
 from moodify_runtime.config import load_config
@@ -87,6 +88,7 @@ app.include_router(mobile_v1_router)
 app.include_router(lyric_align_router)
 app.include_router(pairwise_judge_router)
 app.include_router(ntrack_ranking_router)
+app.include_router(access_router)
 
 
 # Legacy emotion compatibility.

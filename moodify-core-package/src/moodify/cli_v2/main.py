@@ -669,6 +669,63 @@ def cmd_case_pairwise_decision(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def cmd_access_register(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.access.service import AccessService
+
+    service = AccessService(Path(args.store))
+    result = service.register(args.user_id, referral_code=args.referral_code)
+    return _result(
+        "access.register", "ok", result_status="USER_REGISTERED",
+        user_id=result["user_id"],
+        registration_mode=result["registration_mode"],
+        available_cwc=result["balance"]["available_cwc"],
+        referral_state=result.get("referral", {}).get("state", "NONE"),
+    )
+
+
+def cmd_access_balance(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.access.service import AccessService
+
+    service = AccessService(Path(args.store))
+    return _result("access.balance", "ok", result_status="BALANCE_READ",
+                   balance=service.balance(args.user_id))
+
+
+def cmd_access_estimate(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.access.service import AccessService
+
+    service = AccessService(Path(args.store))
+    return _result("access.estimate", "ok", result_status="COST_ESTIMATED",
+                   estimate=service.estimate(args.operation))
+
+
+def cmd_access_admit(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.access.service import AccessService
+
+    service = AccessService(Path(args.store))
+    result = service.admit(args.user_id, args.operation, args.priority_tier)
+    return _result(
+        "access.admit", "ok", result_status="ADMISSION_RESULT",
+        admission_id=result["admission_id"],
+        operation_type=result["operation_type"],
+        estimated_cwc=result["estimated_cwc"],
+        queue_state=result["queue_state"],
+        failure_reason=result.get("failure_reason"),
+        message=result.get("message"),
+    )
+
+
+def cmd_access_referral(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.access.service import AccessService
+
+    service = AccessService(Path(args.store))
+    result = service.grant_referral_reward(args.inviter, args.invitee)
+    return _result("access.referral", "ok", result_status="REFERRAL_REWARD",
+                   state=result.get("state"),
+                   inviter_reward=result.get("inviter_reward"),
+                   invitee_reward=result.get("invitee_reward"))
+
+
 def cmd_case_ntrack_rank(args: argparse.Namespace) -> dict[str, Any]:
     from moodify.evaluation.ntrack.policy import RankingPolicy
     from moodify.evaluation.ntrack.service import run_ntrack_ranking
@@ -870,6 +927,21 @@ def build_parser() -> argparse.ArgumentParser:
     execute = run.add_parser("execute"); execute.add_argument("project_dir"); execute.add_argument("--plan-id", required=True); execute.add_argument("--output-dir", required=True); execute.add_argument("--allow-uncontrolled", action="store_true")
     verify = run.add_parser("verify"); verify.add_argument("project_dir"); verify.add_argument("--run-id", required=True); verify.add_argument("--allow-uncontrolled", action="store_true")
     case = sub.add_parser("case").add_subparsers(dest="case_command", required=True)
+    access = sub.add_parser("access").add_subparsers(dest="access_command", required=True)
+    p_reg = access.add_parser("register")
+    p_reg.add_argument("user_id"); p_reg.add_argument("--referral-code", default=None)
+    p_reg.add_argument("--store", default="outputs/access")
+    p_bal = access.add_parser("balance")
+    p_bal.add_argument("user_id"); p_bal.add_argument("--store", default="outputs/access")
+    p_est = access.add_parser("estimate")
+    p_est.add_argument("operation"); p_est.add_argument("--store", default="outputs/access")
+    p_adm = access.add_parser("admit")
+    p_adm.add_argument("user_id"); p_adm.add_argument("operation")
+    p_adm.add_argument("--priority-tier", default="free")
+    p_adm.add_argument("--store", default="outputs/access")
+    p_ref = access.add_parser("referral")
+    p_ref.add_argument("inviter"); p_ref.add_argument("invitee")
+    p_ref.add_argument("--store", default="outputs/access")
     create = case.add_parser("create"); create.add_argument("project_dir"); create.add_argument("--spec", required=True); create.add_argument("--owner", required=True); create.add_argument("--asset-id")
     analyze = case.add_parser("analyze"); analyze.add_argument("project_dir"); analyze.add_argument("case_id"); analyze.add_argument("--intent", default=None)
     analyze.add_argument("--sensor", default=None, choices=["ocean", "off"],
@@ -985,7 +1057,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
     key = args.command
-    if key in {"project", "asset", "plan", "run", "case"}:
+    if key in {"project", "asset", "plan", "run", "case", "access"}:
         key = f"{key}.{getattr(args, key + '_command')}"
     if key in {"case.candidate", "case.observations", "case.intervention", "case.listening", "case.learning"}:
         sub_cmd = key.split(".")[-1] + "_command"
@@ -1009,6 +1081,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         "case.lyrics-align": cmd_case_lyrics_align,
         "case.pairwise-judge": cmd_case_pairwise_judge,
         "case.pairwise-decision": cmd_case_pairwise_decision,
+        "access.register": cmd_access_register, "access.balance": cmd_access_balance,
+        "access.estimate": cmd_access_estimate, "access.admit": cmd_access_admit,
+        "access.referral": cmd_access_referral,
         "case.ntrack-rank": cmd_case_ntrack_rank,
         "case.ntrack-human-ranking": cmd_case_ntrack_human_ranking,
         "case.observations.add": cmd_case_observations_add,
