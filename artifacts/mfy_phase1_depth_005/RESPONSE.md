@@ -32,7 +32,7 @@ HARD_CLIP iou 0.86、NEAR_CLIP 0.86、SILENCE 1.0、LOWPASS 0.67、ANTIPHASE 0.8
 全部检出事件携带 evidence_windows（evidence_complete=True）
 
 ## 11. Calibration Recommendations
-KEEP × 4（DC/LOWPASS/NOISE/DYNAMIC）；REVIEW_DETECTOR × 5（HARD_CLIP/NEAR_CLIP/SILENCE/ANTIPHASE/GAIN_STEP——fp 或定位偏差）；auto_update=False
+KEEP × 9；未声明事件 FP=0。GAIN_STEP 的低 IoU 仍单独记录为 TEMPORAL_FAILURE；auto_update=False。
 
 ## 12. Failure Analysis
 1 个 TEMPORAL_FAILURE（GAIN_STEP 定位 ~300ms 偏差：400ms 窗+过渡窗）；无 MEASUREMENT/RULE/EVIDENCE 失败

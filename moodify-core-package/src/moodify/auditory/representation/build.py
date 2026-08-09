@@ -9,11 +9,10 @@ events overlay onto S1 windows via deterministic interval arithmetic.
 from __future__ import annotations
 
 from typing import Any
-from uuid import uuid4
-
 import numpy as np
 
 from moodify.auditory.metrics import compute_metrics
+from moodify.auditory.identity import logical_id
 from moodify.auditory.representation.feature_registry import BANDS, plane_meta
 from moodify.auditory.representation.models import AuditoryRepresentation, ScalePlane
 from moodify.auditory.representation.scales import REPRESENTATION_VERSION, get_scale
@@ -25,6 +24,7 @@ def build_representation(
     source_sha256: str,
     temporal_profile_id: str = "temporal-hearing-v1",
     events: list[Any] | None = None,
+    global_metrics: dict[str, Any] | None = None,
 ) -> AuditoryRepresentation:
     """One canonical multi-scale representation of the source."""
     if samples.ndim == 1:
@@ -37,11 +37,16 @@ def build_representation(
         "S1": _build_scale(samples, sr, "S1"),
         "S2": _build_scale(samples, sr, "S2"),
     }
-    global_summary = _global_summary(samples, sr)
+    global_summary = _global_summary(samples, sr, global_metrics)
     event_refs = _overlay_events(events or [], planes["S1"])
 
     return AuditoryRepresentation(
-        representation_id=f"rep-{uuid4().hex[:12]}",
+        representation_id=logical_id("rep", {
+            "source_sha256": source_sha256,
+            "representation_version": REPRESENTATION_VERSION,
+            "temporal_profile_id": temporal_profile_id,
+            "sample_rate": sr,
+        }, 12),
         source_sha256=source_sha256,
         representation_version=REPRESENTATION_VERSION,
         profile_ids={"temporal": temporal_profile_id, "measurement": "mfy-measurement-v1"},
@@ -180,11 +185,13 @@ def _medium_rows(samples: np.ndarray, mono: np.ndarray, sr: int, win: int, hop: 
     return names, rows
 
 
-def _global_summary(samples: np.ndarray, sr: int) -> dict[str, Any]:
+def _global_summary(samples: np.ndarray, sr: int,
+                    metrics: dict[str, Any] | None = None) -> dict[str, Any]:
     class _Probe:
         sha256 = "representation"
 
-    metrics = compute_metrics(samples, sr, _Probe())
+    if metrics is None:
+        metrics = compute_metrics(samples, sr, _Probe())
     return {
         "metric_count": len(metrics),
         "metrics": {k: v for k, v in metrics.items()},

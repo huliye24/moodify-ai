@@ -29,6 +29,8 @@ def evaluate_experiment(result: ExperimentResult) -> dict[str, Any]:
     truth: GroundTruth = result.ground_truth
     expected_type = truth.expected_event_type
     detected = result.detected_events
+    allowed_types = {expected_type, *truth.allowed_secondary_event_types}
+    unexpected = [event for event in detected if event["event_type"] not in allowed_types]
 
     matched = None
     for event in detected:
@@ -45,13 +47,13 @@ def evaluate_experiment(result: ExperimentResult) -> dict[str, Any]:
     if expected_type is None:
         # Measurement-only experiments: no event expected (e.g. DC_OFFSET).
         summary.update({
-            "tp": 0, "fp": len(detected), "tn": 1, "fn": 0,
-            "recall": None, "precision": 0.0 if detected else None,
-            "unexpected_events": [e["event_type"] for e in detected],
+            "tp": 0, "fp": len(unexpected), "tn": 1, "fn": 0,
+            "recall": None, "precision": 0.0 if unexpected else None,
+            "unexpected_events": [e["event_type"] for e in unexpected],
         })
     elif matched is None:
         summary.update({
-            "tp": 0, "fp": len(detected), "tn": 0, "fn": 1,
+            "tp": 0, "fp": len(unexpected), "tn": 0, "fn": 1,
             "recall": 0.0, "precision": 0.0,
             "failure_class": _classify_failure(result, "missed"),
         })
@@ -64,8 +66,10 @@ def evaluate_experiment(result: ExperimentResult) -> dict[str, Any]:
             truth.expected_end_ms or matched["end_ms"],
         )
         summary.update({
-            "tp": 1, "fp": len(detected) - 1, "tn": 0, "fn": 0,
-            "recall": 1.0, "precision": 1.0 / max(len(detected), 1),
+            "tp": 1, "fp": len(unexpected), "tn": 0, "fn": 0,
+            "recall": 1.0, "precision": 1.0 / (1 + len(unexpected)),
+            "allowed_secondary_events": list(truth.allowed_secondary_event_types),
+            "unexpected_events": [e["event_type"] for e in unexpected],
             "start_error_ms": start_err,
             "end_error_ms": end_err,
             "temporal_iou": round(iou, 4),

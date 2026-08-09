@@ -6,13 +6,13 @@
 
 | 源 | 算子 | TP | FP | Recall | IoU | Delta 方向 | 失败分类 |
 |---|---|---|---|---|---|---|---|
-| C1 | HARD_CLIP | 1 | 3 | 1.0 | 0.86 | ✓ | — |
-| C1 | NEAR_CLIP | 1 | 2 | 1.0 | 0.86 | ✓ | — |
+| C1 | HARD_CLIP | 1 | 0 | 1.0 | 0.86 | ✓ | — |
+| C1 | NEAR_CLIP | 1 | 0 | 1.0 | 0.86 | ✓ | — |
 | C1 | DC_OFFSET | 0 | 0 | n/a | n/a | ✓ | — |
-| C3 | GAIN_STEP | 1 | 2 | 1.0 | 0.11 | ✓ | TEMPORAL_FAILURE |
-| C1 | SILENCE_INSERT | 1 | 2 | 1.0 | 1.00 | ✓ | — |
+| C3 | GAIN_STEP | 1 | 0 | 1.0 | 0.11 | ✓ | TEMPORAL_FAILURE |
+| C1 | SILENCE_INSERT | 1 | 0 | 1.0 | 1.00 | ✓ | — |
 | C3 | LOWPASS | 1 | 0 | 1.0 | 0.67 | ✓ | — |
-| C2 | ANTIPHASE_REGION | 1 | 4 | 1.0 | 0.83 | ✓ | — |
+| C2 | ANTIPHASE_REGION | 1 | 0 | 1.0 | 0.83 | ✓ | — |
 | C3 | NOISE_INJECTION | 0 | 0 | n/a | n/a | ✓ | — |
 | C1 | DYNAMIC_COMPRESSION | 0 | 0 | n/a | n/a | ✓ | — |
 
@@ -22,8 +22,9 @@
 
 | 算子 | 建议 | 证据 |
 |---|---|---|
-| DC_OFFSET / LOWPASS / NOISE_INJECTION / DYNAMIC_COMPRESSION | KEEP | 0 漏检/0 delta 失败/0 fp |
-| HARD_CLIP / NEAR_CLIP / SILENCE_INSERT / ANTIPHASE_REGION / GAIN_STEP | REVIEW_DETECTOR | fp 2-4/实验（预增益削波引发关联事件 + spike/drop 边界误报） |
+| 全部 9 个算子 | KEEP | 0 漏检/0 delta 失败/0 未声明事件 FP；GAIN_STEP 定位偏差单独保留为 TEMPORAL_FAILURE |
+
+FP 只统计未在构造真值中声明的事件。物理必然的次级事件（例如静音插入产生 LEVEL_DROP）由算子规范预先声明，不由检测输出反推。
 
 ## 失败分析
 

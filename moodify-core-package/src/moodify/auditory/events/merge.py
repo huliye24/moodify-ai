@@ -8,10 +8,9 @@ millisecond bounds with honest localization precision (one hop).
 
 from __future__ import annotations
 
-from uuid import uuid4
-
 from moodify.auditory.events.models import EventCandidate, TemporalEvent
 from moodify.auditory.events.temporal_profile import TemporalProfile
+from moodify.auditory.identity import logical_id
 
 
 def merge_candidates(
@@ -52,8 +51,16 @@ def merge_candidates(
             duration_ms = end_ms - start_ms
             if duration_ms < profile.minimum_event_duration_ms:
                 continue
+            event_identity = {
+                "type": event_type,
+                "start_ms": start_ms,
+                "end_ms": end_ms,
+                "windows": candidate.window_indices,
+                "profile": profile.profile_id,
+                "domain": candidate.domain,
+            }
             events.append(TemporalEvent(
-                event_id=f"evt-{uuid4().hex[:12]}",
+                event_id=logical_id("evt", event_identity, 12),
                 event_type=event_type,
                 start_ms=start_ms,
                 end_ms=end_ms,

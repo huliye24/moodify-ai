@@ -11,7 +11,7 @@ import hashlib
 
 import numpy as np
 
-from moodify.auditory.evidence.bundle import build_bundle, logical_hash, save_bundle
+from moodify.auditory.evidence.bundle import build_bundle, logical_hash
 from moodify.auditory.evidence.completeness import is_fail_closed, validate_completeness
 from moodify.auditory.evidence.conflicts import detect_conflicts
 from moodify.auditory.evidence.models import Coverage, EvidenceNode, JudgmentEvidence
@@ -101,8 +101,8 @@ def test_e401_complete_clipping_evidence():
 
 def test_e402_missing_measurement_fails_closed():
     x = _clip_signal()
-    events = run_temporal_hearing(x, SR).events
     source_hash = _hash(x)
+    events = run_temporal_hearing(x, SR).events
     # Representation with global metrics stripped of a critical metric.
     rep = build_representation(x, SR, source_hash, events=events)
     rep_dict = rep.to_dict()
@@ -185,8 +185,6 @@ def test_e406_global_local_context_not_conflict():
 # ---------------------------------------------------------------------------
 
 def test_e407_invalid_metric_status_conflict():
-    x = _sine(6.0)
-    source_hash = _hash(x)
     node = EvidenceNode(node_id="measurement:integrated_lufs", kind="MEASUREMENT",
                         ref="integrated_lufs",
                         data={"value": -10.0, "unit": "LUFS", "status": "INVALID"})

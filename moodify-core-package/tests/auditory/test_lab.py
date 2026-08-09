@@ -68,6 +68,9 @@ def test_ground_truth_derived_from_construction():
     assert truth.expected_start_ms == 4000
     assert truth.expected_end_ms == 4600
     assert truth.expected_measurement_delta["silence_ratio"] == "up"
+    assert set(truth.allowed_secondary_event_types) == {
+        "LEVEL_DROP", "HIGH_FREQUENCY_DROPOUT",
+    }
 
 
 def test_sources_have_unperturbed_controls():
@@ -151,6 +154,14 @@ def test_single_domain_perturbation_limited_cross_firing():
         if event["event_type"] in {"NEGATIVE_CORRELATION_REGION", "PHASE_RISK_REGION"}
     }
     assert not unexpected, f"stereo detectors fired on mono source: {unexpected}"
+
+
+def test_constructed_secondary_events_are_not_false_positives():
+    # The allowance comes from operator physics in the ground-truth manifest,
+    # never from observed detector output.
+    for source_id, operator, level in QUICK_MATRIX:
+        evaluation = run_experiment(source_id, _spec(operator, level))["evaluation"]
+        assert evaluation["fp"] == 0, (operator, evaluation.get("unexpected_events"))
 
 
 # ---------------------------------------------------------------------------

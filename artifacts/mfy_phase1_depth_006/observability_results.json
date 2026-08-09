@@ -1,0 +1,5 @@
+{
+  "cold": {"cache_hits": 0, "cache_misses": 6, "nodes_executed": 7, "nodes_reused": 0, "decoded_source_count": 1, "bytes_written": 68225},
+  "warm": {"cache_hits": 6, "cache_misses": 0, "nodes_executed": 1, "nodes_reused": 6, "decoded_source_count": 0, "bytes_read": 68225},
+  "logical_report_equal": true
+}

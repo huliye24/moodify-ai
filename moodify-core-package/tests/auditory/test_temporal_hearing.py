@@ -201,8 +201,8 @@ def test_events_use_only_approved_types():
 def test_deterministic_same_input_same_events():
     x = _sine(8.0)
     x[_time(2.0):_time(2.6)] = 1.0
-    first = [(e.event_type, e.start_ms, e.end_ms) for e in _detect(x)]
-    second = [(e.event_type, e.start_ms, e.end_ms) for e in _detect(x)]
+    first = [(e.event_id, e.event_type, e.start_ms, e.end_ms) for e in _detect(x)]
+    second = [(e.event_id, e.event_type, e.start_ms, e.end_ms) for e in _detect(x)]
     assert first == second
 
 

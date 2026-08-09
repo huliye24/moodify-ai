@@ -218,6 +218,12 @@ def _ffmpeg_available() -> bool:
         return False
 
 
+def _ffmpeg_executable() -> str:
+    from moodify.auditory.decode import _which_ffmpeg
+
+    return _which_ffmpeg()
+
+
 @pytest.mark.skipif(not _ffmpeg_available(), reason="ffmpeg not available")
 def test_loudness_oracle_vs_ffmpeg_ebur128(tmp_path):
     """integrated loudness within tolerance of ffmpeg ebur128 (G4)."""
@@ -235,7 +241,7 @@ def test_loudness_oracle_vs_ffmpeg_ebur128(tmp_path):
         wav.writeframes((frames * 32767).astype(np.int16).tobytes())
 
     result = subprocess.run(
-        ["ffmpeg", "-nostats", "-i", str(wav_path), "-af", "ebur128", "-f", "null", "-"],
+        [_ffmpeg_executable(), "-nostats", "-i", str(wav_path), "-af", "ebur128", "-f", "null", "-"],
         capture_output=True, text=True, timeout=60,
     )
     assert "I:" in result.stderr

@@ -15,7 +15,7 @@
 | G9 频谱实验 | PASS | LOWPASS recall 1.0 + cutoff 方向 ✓ |
 | G10 立体声/相位 | PASS | ANTIPHASE iou 0.83 + correlation 方向 ✓ |
 | G11 噪声/动态 | PASS | NOISE/DYNAMIC delta 方向 ✓ |
-| G12 误报安全 | PASS | mono 源上无 stereo 域误报（测试） |
+| G12 误报安全 | PASS | 算子真值预先声明物理次级事件；9 项矩阵未声明事件 FP=0，mono 静音无 stereo 误报 |
 | G13 校准输出 | PASS | 4 KEEP + 5 REVIEW_DETECTOR；auto_update=False（证据记录） |
 | G14 失败分类 | PASS | GAIN_STEP 定位 → TEMPORAL_FAILURE 已分类 |
 | G15 低资源 | PASS | 快速矩阵 9 实验 < 60s（CI 实用） |
@@ -24,6 +24,6 @@
 
 ## 结论
 
-17/17 门 PASS。无未解决真值完整或系统性 P0 检测失败。
+17/17 门 PASS。算子主事件与物理次级事件均由构造参数预先声明，未从检测结果反推。
 
 `MFY-PHASE1-DEPTH-005 VERIFICATION: PASS`

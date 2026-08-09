@@ -9,9 +9,8 @@ shared authorities.
 from __future__ import annotations
 
 from typing import Any
-from uuid import uuid4
-
 from moodify.auditory.events.engine import run_temporal_hearing
+from moodify.auditory.identity import logical_id
 from moodify.auditory.lab.evaluate import evaluate_experiment
 from moodify.auditory.lab.ground_truth import build_ground_truth
 from moodify.auditory.lab.models import ExperimentResult, PerturbationSpec
@@ -63,7 +62,10 @@ def run_experiment(source_id: str, spec: PerturbationSpec,
     ]
 
     result = ExperimentResult(
-        experiment_id=f"exp-{uuid4().hex[:10]}",
+        experiment_id=logical_id("exp", {
+            "source_id": source_id,
+            "perturbation": spec.to_dict(),
+        }, 10),
         source_id=source_id,
         perturbation=spec,
         ground_truth=ground_truth,

@@ -25,6 +25,19 @@ MEASUREMENT_DELTA = {
     "DYNAMIC_COMPRESSION": {"crest_factor_db": "down"},
 }
 
+# Declared from operator physics before analysis, never inferred from detector output.
+# These secondary observations are real constructed consequences, not cross-domain FP.
+ALLOWED_SECONDARY_EVENTS = {
+    "HARD_CLIP": ("LEVEL_SPIKE", "LEVEL_DROP", "HIGH_FREQUENCY_DROPOUT"),
+    "NEAR_CLIP": ("LEVEL_SPIKE", "LEVEL_DROP", "HIGH_FREQUENCY_DROPOUT"),
+    "GAIN_STEP": ("LEVEL_DROP", "CLIPPING_CLUSTER", "NEAR_CLIPPING_CLUSTER"),
+    "SILENCE_INSERT": ("LEVEL_DROP", "HIGH_FREQUENCY_DROPOUT"),
+    "LOWPASS": (),
+    "ANTIPHASE_REGION": (
+        "PHASE_RISK_REGION", "LEVEL_DROP", "SILENCE_GAP", "HIGH_FREQUENCY_DROPOUT",
+    ),
+}
+
 
 def build_ground_truth(source_id: str, spec: PerturbationSpec) -> GroundTruth:
     expected_event = EVENT_EXPECTATIONS.get(spec.operator)
@@ -40,4 +53,5 @@ def build_ground_truth(source_id: str, spec: PerturbationSpec) -> GroundTruth:
         expected_start_ms=start,
         expected_end_ms=end,
         expected_measurement_delta=MEASUREMENT_DELTA.get(spec.operator),
+        allowed_secondary_event_types=ALLOWED_SECONDARY_EVENTS.get(spec.operator, ()),
     )

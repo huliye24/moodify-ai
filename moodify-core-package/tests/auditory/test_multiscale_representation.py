@@ -235,6 +235,7 @@ def test_deterministic_rerun_logically_identical():
     x = _sine(6.0)
     first = _build(x)
     second = _build(x)
+    assert first.representation_id == second.representation_id
     assert first.planes["S1"].window_starts_ms == second.planes["S1"].window_starts_ms
     assert np.allclose(first.planes["S1"].values, second.planes["S1"].values,
                        equal_nan=True)

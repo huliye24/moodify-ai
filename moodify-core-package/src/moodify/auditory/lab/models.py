@@ -51,12 +51,17 @@ class GroundTruth:
     expected_start_ms: int | None
     expected_end_ms: int | None
     expected_measurement_delta: dict[str, str] | None = None  # metric -> "up"|"down"|"same"
+    allowed_secondary_event_types: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "GroundTruth":
+        data = dict(data)
+        data["allowed_secondary_event_types"] = tuple(
+            data.get("allowed_secondary_event_types", ())
+        )
         return cls(**data)
 
 
