@@ -4,6 +4,8 @@
 >
 > Moodify is an **Auditory Intelligence System** for AI-generated audio and music.
 
+Its primary question is: **Can machines learn to hear?**
+
 **中文定位：Moodify 是 AI 的耳朵。**
 
 Moodify is built to help AI systems **listen, represent, judge, intervene, verify, and learn from sound**. It does not generate another song on top of a song. It develops a structured understanding of what is happening in audio, preserves evidence, and turns repeated production cases into reusable auditory knowledge.

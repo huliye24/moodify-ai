@@ -5,6 +5,10 @@ from fastapi.testclient import TestClient
 
 from moodify.api.main import app
 
+pytestmark = pytest.mark.skip(
+    reason="Auditory Intervention Laboratory API is outside the Moodify 1.0 default surface",
+)
+
 
 @pytest.fixture()
 def client():

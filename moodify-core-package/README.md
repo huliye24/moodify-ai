@@ -8,19 +8,16 @@ Moodify's product identity is:
 
 This package implements part of that architecture today. It does **not** claim that the entire Auditory Intelligence roadmap is already implemented.
 
-## Current v0.1 Mainline
+## Moodify 1.0 RC Mainline
 
-The stable v0.1 path is intentionally narrow:
+The `1.0.0-rc.1` product path is intentionally narrow:
 
 ```text
-Import
-  -> Analyze
-  -> Diagnose
-  -> Process
-  -> Export
+Listen -> Represent -> Judge -> Evidence -> Learn
 ```
 
-The canonical implementation should continue to preserve a simple, testable mainline while experimental systems evolve separately.
+Run `moodify analyze AUDIO --cases-root DIR`, then reopen the persisted result with
+`moodify show CASE_ID --cases-root DIR`. Intervention remains a secondary laboratory.
 
 ## What the Core Does Today
 
