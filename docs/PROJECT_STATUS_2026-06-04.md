@@ -1,5 +1,10 @@
 # Moodify Project Status — 2026-06-04
 
+> **Superseded notice:** 本文记录 2026-06-04 状态。许可决策已被
+> `Adopt GPL-3.0 and clean repository metadata (#14)` 取代：Moodify 现为
+> `GPL-3.0-only`（见 LICENSE 与 OPEN_SOURCE_NOTICE.md）。文中 Apache-2.0
+> 相关表述为历史事实，不代表当前许可。
+
 ## Summary
 
 Moodify's active mainline is `codex/mainline-cloud-dev-20260603`.

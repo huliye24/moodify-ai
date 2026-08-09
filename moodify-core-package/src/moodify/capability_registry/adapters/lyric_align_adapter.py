@@ -14,7 +14,7 @@ from moodify.capability_registry.adapters.base import AdapterResult, ControlledP
 class LyricAlignAdapter(ControlledProcessAdapter):
     capability_id = "lyric.align"
     provider_id = "lyric_align.core"
-    license_label = "Apache-2.0 (internal)"
+    license_label = "GPL-3.0-only (internal)"
 
     def _candidate_paths(self) -> tuple[str, ...]:
         return ()

@@ -182,7 +182,7 @@ def build_registry() -> CapabilityRegistry:
         _provider("sox.cli", "audio.measure_loudness", "external_process", "LGPL (external process)", det["sox"]),
         _provider("basic_pitch.moodify", "audio.separate_manifest", "reviewed", "Apache-2.0 (internal)", det["basic_pitch"]),
         _provider("audacity.cli", "waveform.region_edit", "external_process", "GPLv2 (external process)", det["audacity"]),
-        _provider("lyric_align.core", "lyric.align", "internal", "Apache-2.0 (internal)", det["moodify_self"]),
+        _provider("lyric_align.core", "lyric.align", "internal", "GPL-3.0-only (internal)", det["moodify_self"]),
         _provider("ocean_listen.git", "auditory.ocean_listen", "external_process", "MIT (external sensor; bridge code proprietary)", det["ocean_listen"]),
     )
 

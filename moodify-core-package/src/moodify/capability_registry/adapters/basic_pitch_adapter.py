@@ -1,9 +1,10 @@
 """BasicPitch adapter — audio.separate_manifest via the 008 internal capability.
 
-Basic Pitch is Moodify's own internal capability (Apache-2.0, from
-DSK-MFY-STEM-MIDI-008). Unlike external-process adapters, this adapter
-imports the 008 interface directly — it is the one sanctioned internal
-integration. Accuracy claims remain prohibited (no ground truth).
+Basic Pitch (Spotify AB, Apache-2.0) is integrated as an internal
+capability via DSK-MFY-STEM-MIDI-008. Unlike external-process adapters,
+this adapter imports the 008 interface directly — it is the one
+sanctioned internal integration. Moodify-side adapter code is
+GPL-3.0-only. Accuracy claims remain prohibited (no ground truth).
 """
 
 from __future__ import annotations

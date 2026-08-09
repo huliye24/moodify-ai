@@ -1,5 +1,9 @@
 # DSK-MFY-SCORE-ENGINE-009｜许可证集成说明
 
+> **Superseded notice:** 本文为重授权前（Apache-2.0 时期）的隔离分析。
+> Moodify 现已采用 `GPL-3.0-only`（PR #14 / 0b355e7）；文中
+> "保持 Apache-2.0" 的结论已被取代，仅作为历史决策记录保留。
+
 **日期：** 2026-08-02 UTC
 
 ## 1. 归属边界（不混淆）
