@@ -1,0 +1,45 @@
+# Recommendation policy v1 (DSK-MFY-TASTE-FEED-PATCH-001).
+# Weighted heuristic pipeline: candidate generation -> filter -> score ->
+# re-rank. All weights and budgets are configurable and experiment-ready;
+# the engine optimizes for good listening, not addictive noise.
+policy_version: recommendation_policy_v1
+
+pipeline:
+  candidate_pool_size: 20
+  default_feed_size: 10
+  exploration_fraction: 0.20
+  freshness_window_days: 30
+  session_repetition_limit: 1
+
+scoring_weights:
+  preference_match: 1.0
+  novelty_bonus: 0.15
+  diversity_bonus: 0.20
+  transition_coherence: 0.10
+  quality_confidence: 0.25
+
+quality_gate:
+  require_available: true
+  exclude_severe_quality_failures: true
+  exclude_overplayed_per_session: true
+
+feedback_weights:
+  IMPRESSION: 0.0
+  PLAY_START: 0.10
+  COMPLETION: 0.40
+  REPLAY: 0.60
+  LIKE: 0.80
+  SAVE: 1.00
+  SKIP_HARD: -0.80
+  SKIP_SOFT: -0.30
+
+taste:
+  long_term_alpha: 0.05
+  short_term_alpha: 0.30
+  novelty_tolerance_start: 0.20
+  novelty_tolerance_step: 0.05
+  novelty_tolerance_max: 0.60
+
+cold_start:
+  safe_broad_recommendation: true
+  quality_floor_required: true

@@ -669,6 +669,45 @@ def cmd_case_pairwise_decision(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def cmd_feed_request(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.recommendation.service import FeedService
+
+    service = FeedService(Path(args.store))
+    result = service.get_for_you(args.user_id, size=args.size)
+    return _result(
+        "feed.request", "ok", result_status="FEED_SERVED",
+        request_id=result["request_id"],
+        user_id=result["user_id"],
+        ranking_version=result["ranking_version"],
+        feed=[c["track_id"] for c in result["feed"]],
+    )
+
+
+def cmd_feed_feedback(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.recommendation.service import FeedService
+
+    service = FeedService(Path(args.store))
+    result = service.record_feedback(
+        args.user_id, args.track_id, args.event_type,
+        request_id=args.request_id or "", elapsed_ms=args.elapsed_ms,
+    )
+    return _result(
+        "feed.feedback", "ok", result_status="FEEDBACK_RECORDED",
+        event_id=result["event_id"],
+        event_type=result["event_type"],
+        derived_signal=result["derived_signal"],
+    )
+
+
+def cmd_feed_taste(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.recommendation.service import FeedService
+
+    service = FeedService(Path(args.store))
+    taste = service.taste_profile(args.user_id)
+    return _result("feed.taste", "ok", result_status="TASTE_READ",
+                   taste=taste.to_dict())
+
+
 def cmd_access_register(args: argparse.Namespace) -> dict[str, Any]:
     from moodify.access.service import AccessService
 
@@ -942,6 +981,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_ref = access.add_parser("referral")
     p_ref.add_argument("inviter"); p_ref.add_argument("invitee")
     p_ref.add_argument("--store", default="outputs/access")
+    feed = sub.add_parser("feed").add_subparsers(dest="feed_command", required=True)
+    p_fr = feed.add_parser("request")
+    p_fr.add_argument("user_id"); p_fr.add_argument("--size", type=int, default=None)
+    p_fr.add_argument("--store", default="outputs/feed")
+    p_ff = feed.add_parser("feedback")
+    p_ff.add_argument("user_id"); p_ff.add_argument("track_id"); p_ff.add_argument("event_type")
+    p_ff.add_argument("--request-id", default=None); p_ff.add_argument("--elapsed-ms", type=int, default=None)
+    p_ff.add_argument("--store", default="outputs/feed")
+    p_ft = feed.add_parser("taste")
+    p_ft.add_argument("user_id"); p_ft.add_argument("--store", default="outputs/feed")
     create = case.add_parser("create"); create.add_argument("project_dir"); create.add_argument("--spec", required=True); create.add_argument("--owner", required=True); create.add_argument("--asset-id")
     analyze = case.add_parser("analyze"); analyze.add_argument("project_dir"); analyze.add_argument("case_id"); analyze.add_argument("--intent", default=None)
     analyze.add_argument("--sensor", default=None, choices=["ocean", "off"],
@@ -1057,7 +1106,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
     key = args.command
-    if key in {"project", "asset", "plan", "run", "case", "access"}:
+    if key in {"project", "asset", "plan", "run", "case", "access", "feed"}:
         key = f"{key}.{getattr(args, key + '_command')}"
     if key in {"case.candidate", "case.observations", "case.intervention", "case.listening", "case.learning"}:
         sub_cmd = key.split(".")[-1] + "_command"
@@ -1081,6 +1130,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "case.lyrics-align": cmd_case_lyrics_align,
         "case.pairwise-judge": cmd_case_pairwise_judge,
         "case.pairwise-decision": cmd_case_pairwise_decision,
+        "feed.request": cmd_feed_request, "feed.feedback": cmd_feed_feedback,
+        "feed.taste": cmd_feed_taste,
         "access.register": cmd_access_register, "access.balance": cmd_access_balance,
         "access.estimate": cmd_access_estimate, "access.admit": cmd_access_admit,
         "access.referral": cmd_access_referral,
