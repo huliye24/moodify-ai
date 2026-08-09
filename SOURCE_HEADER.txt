@@ -1,0 +1,3 @@
+This file is part of Moodify.
+Copyright (C) 2024–2026 荣景文川（深圳）科技有限公司
+SPDX-License-Identifier: GPL-3.0-only
