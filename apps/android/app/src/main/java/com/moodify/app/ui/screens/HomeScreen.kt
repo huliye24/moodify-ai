@@ -40,7 +40,7 @@ import com.moodify.app.ui.components.MoodifyMark
 import com.moodify.app.ui.theme.*
 
 @Composable
-fun HomeScreen(onOpenDrawer: () -> Unit = {}, onOpenSearch: () -> Unit = {}, onOpenNotifications: () -> Unit = {}) {
+fun HomeScreen(onOpenDrawer: () -> Unit = {}, onOpenSearch: () -> Unit = {}) {
     val context = LocalContext.current
     val repo = remember {
         DemoProcessRepository(
@@ -60,7 +60,6 @@ fun HomeScreen(onOpenDrawer: () -> Unit = {}, onOpenSearch: () -> Unit = {}, onO
             IconButton(onClick = onOpenDrawer) { Icon(Icons.Outlined.Menu, stringResource(R.string.accessibility_open_menu), tint = MoodifyNavy) }
             Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) { MoodifyMark(Modifier.size(48.dp, 34.dp)); Spacer(Modifier.width(8.dp)); Text("Moodify", color = MoodifyNavy, fontSize = 27.sp, fontWeight = FontWeight.Bold) }
             IconButton(onClick = onOpenSearch) { Icon(Icons.Outlined.Search, stringResource(R.string.accessibility_search), tint = MoodifyNavy) }
-            BadgedBox(badge = { Badge(containerColor = Color(0xFFFF4D5E)) }) { IconButton(onClick = onOpenNotifications) { Icon(Icons.Outlined.NotificationsNone, stringResource(R.string.accessibility_notifications), tint = MoodifyNavy) } }
         }
         Text(stringResource(R.string.home_discover_title), color = MoodifyNavy, fontSize = 27.sp, fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.home_discover_subtitle), color = MoodifyMuted, fontSize = 14.sp)

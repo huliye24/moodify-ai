@@ -6,6 +6,10 @@ Moodify's product identity is:
 
 > **The Ear of AI — an Auditory Intelligence System.**
 
+Its organizing question is **Can machines learn to hear?** The canonical loop
+is `Listen → Represent → Judge → Intervene → Verify → Learn`. Existing audio
+post-processing remains available only as the Auditory Intervention Laboratory.
+
 This package implements part of that architecture today. It does **not** claim that the entire Auditory Intelligence roadmap is already implemented.
 
 ## Current v0.1 Mainline

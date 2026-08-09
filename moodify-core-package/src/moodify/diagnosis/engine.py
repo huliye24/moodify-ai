@@ -27,8 +27,6 @@ import numpy as np
 from scipy.signal import butter, sosfilt
 from scipy.ndimage import uniform_filter1d
 
-logger = logging.getLogger(__name__)
-
 from moodify.diagnosis.metrics import (
     SpectrumAnalyzer, DynamicsAnalyzer, SpaceAnalyzer, BANDS as EXISTING_BANDS, frame_signal, load_audio,
 )
@@ -38,6 +36,8 @@ from moodify.data_types import (
     ParameterWithUncertainty,
 )
 from moodify.protocol import STFT_CONFIG_STANDARD, STFT_CONFIG_QUICK
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================

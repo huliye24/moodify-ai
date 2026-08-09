@@ -43,7 +43,11 @@ from moodify.auditory.manifests import (
 from moodify.auditory.metrics import compute_metrics
 from moodify.auditory.models import Candidate
 from moodify.auditory.profiles import ScanProfile, get_profile
-from moodify.auditory.reports import build_comparison_report, build_contact_sheet
+from moodify.auditory.reports import (
+    build_auditory_report,
+    build_comparison_report,
+    build_contact_sheet,
+)
 from moodify.auditory.spectrogram import SpectrogramRun, generate_spectrogram
 from moodify.auditory.stereo import compute_stereo_metrics
 from moodify.auditory.timeline import compute_timeline, write_timeline_jsonl
@@ -397,6 +401,40 @@ def compare_scans(
         candidate_sha256=candidate_sha256,
     )
 
+    auditory_report_path = comparison_dir / "auditory_report.json"
+    evidence_index = {
+        "metrics.json": {
+            "before": str(before.scan_dir / "metrics.json"),
+            "after": str(after.scan_dir / "metrics.json"),
+        },
+        "scan_manifest.json": {
+            "before": str(before.scan_dir / "scan_manifest.json"),
+            "after": str(after.scan_dir / "scan_manifest.json"),
+        },
+        "judgment_rules.json": str(judgment_rules_path),
+        "metrics_delta.json": str(delta_path),
+        "comparison_report.json": str(report_path),
+    }
+    build_auditory_report(
+        auditory_report_path,
+        source_name=before.scan_dir.name,
+        case_id=case_id,
+        source_sha256=source_sha256,
+        analysis_version=before.profile.profile_id,
+        overall_status="OK",
+        metrics=after.metrics,
+        findings=[flag.to_dict() for flag in risk_flags],
+        evidence_index=evidence_index,
+        summary=(
+            "Machine auditory comparison completed; human listening authority is required "
+            f"before artistic approval. Technical decision: {judgment.workflow_decision}."
+        ),
+        overall_confidence=min(
+            (flag.confidence for flag in risk_flags if flag.confidence is not None),
+            default=None,
+        ),
+    )
+
     manifest_path = comparison_dir / "comparison_manifest.json"
     write_comparison_manifest(
         manifest_path,
@@ -408,6 +446,7 @@ def compare_scans(
             "delta_spectrum_log": log_delta,
             "comparison_contact_sheet": sheet,
             "comparison_report": report_path,
+            "auditory_report": auditory_report_path,
             "judgment_rules": judgment_rules_path,
         },
         judgment_decision=judgment.workflow_decision,
@@ -417,5 +456,6 @@ def compare_scans(
         "deltas": deltas,
         "judgment": judgment,
         "report_path": report_path,
+        "auditory_report_path": auditory_report_path,
         "manifest_path": manifest_path,
     }

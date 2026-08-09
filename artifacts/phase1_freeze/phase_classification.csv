@@ -1,0 +1,72 @@
+subsystem,path,classification,notes
+Android 4-tab 导航,apps/android/app/src/main/java/com/moodify/app/ui/MoodifyApp.kt,PHASE1_CORE,首页/听觉检测/案例/我的；9d72799 冻结
+Android 全屏覆盖层,apps/android/app/src/main/java/com/moodify/app/ui/,PHASE1_CORE,Processing/WorkDetail/NowPlaying/Search/Upload/DataCenter 等
+Android CreatorCenter 死屏,apps/android/app/src/main/java/com/moodify/app/ui/screens/CreatorCenterScreen.kt,PHASE2_FROZEN,无 import 不可达；建议标注或删除
+Android CopyrightCenter 死屏,apps/android/app/src/main/java/com/moodify/app/ui/screens/CopyrightCenterScreen.kt,PHASE2_FROZEN,无 import 不可达；建议标注或删除
+Android CollaborationHub 死屏,apps/android/app/src/main/java/com/moodify/app/ui/screens/CollaborationHubScreen.kt,PHASE2_FROZEN,含 Marketplace/PublishCollaboration/CollaborationDetail 子组合
+Android PublishWork,apps/android/app/src/main/java/com/moodify/app/ui/screens/PublishWorkScreen.kt,PHASE2_FROZEN,已从 WorkDetail 接线；发布属 Phase II
+Android NotificationCenter,apps/android/app/src/main/java/com/moodify/app/ui/screens/NotificationCenterScreen.kt,UNKNOWN_REQUIRES_REVIEW,社交通知已接线
+Android build 产物,apps/android/app/build/,GENERATED,构建中间产物
+moodify-core-package 核心包,moodify-core-package/src/moodify/,PHASE1_CORE,v2.0.0 src-layout
+CLI v2,moodify-core-package/src/moodify/cli_v2/,PHASE1_CORE,JSON-first 稳定契约；case 全链路
+CLI v1 兼容层,moodify-core-package/src/moodify/cli.py,PHASE1_SUPPORT,转发 v2；legacy-* 命令保留
+控制脊柱,moodify-core-package/src/moodify/app/production_control.py,PHASE1_CORE,16 状态 CaseState + ApprovedExecutionEnvelope
+证据聚合,moodify-core-package/src/moodify/app/evidence.py,PHASE1_CORE,EvidenceBundle
+用例引擎,moodify-core-package/src/moodify/app/engines.py + orchestrator.py,PHASE1_CORE,NativeExecutionEngine
+WSE 听觉扫描,moodify-core-package/src/moodify/auditory/,PHASE1_CORE,scan/compare/manifests
+WSE 特征,moodify-core-package/src/moodify/features/,PHASE1_CORE,f0/chroma/perceptual
+WSE 心理声学,moodify-core-package/src/moodify/perception/,PHASE1_CORE,掩蔽模型
+WSE 物理实验,moodify-core-package/src/moodify/physics/,PHASE1_EXPERIMENTAL,可复现物理实验
+WSE Ocean Listen 桥,moodify-core-package/src/moodify/adapters/auditory/ocean_listen/,PHASE1_EXPERIMENTAL,configs/ocean_adapter.json enabled:false
+MSE 歌词对齐,moodify-core-package/src/moodify/lyric_align/,PHASE1_CORE,heuristic+whisperx
+MSE 转录,moodify-core-package/src/moodify/transcription_pipeline/,PHASE1_CORE,音频转 MIDI v0.2
+MSE 乐谱,moodify-core-package/src/moodify/score_engine/,PHASE1_SUPPORT,MusicXML 导出部分可延后
+PPE 能力注册,moodify-core-package/src/moodify/capability_registry/,PHASE1_CORE,execution/validation/knowledge
+PPE 评测,moodify-core-package/src/moodify/evaluation/,PHASE1_CORE,SPEC-013 + pairwise
+判断层,moodify-core-package/src/moodify/auditory/judgment.py,PHASE1_CORE,Judgment/RiskFlag
+判断层旧评测,moodify-core-package/src/moodify/evaluation/judges.py,LEGACY,LLM/Acoustic/Consensus Judge
+判断层五维诊断,moodify-core-package/src/moodify/diagnosis/,LEGACY,DefectClassifier/HealthScorer
+学习循环,moodify-core-package/src/moodify/learning/,PHASE1_CORE,build/review/commit；RightsMetadata=HumanReview 职能
+知识库,moodify-core-package/src/moodify/knowledge/,PHASE1_SUPPORT,情绪工艺库
+领域模型 Workspace v2,moodify-core-package/src/moodify/domain/,PHASE1_CORE,project/thread/approval/treatment_plan
+应用服务,moodify-core-package/src/moodify/services/,PHASE1_SUPPORT,Analyst/Designer/Judge/Archive 等
+持久化,moodify-core-package/src/moodify/storage/,PHASE1_CORE,workspace_store + case store
+旧六阶段流水线,moodify-core-package/src/moodify/orchestration/,LEGACY,WorkflowOrchestrator；API 注释不用
+REST API,moodify-core-package/src/moodify/api/,PHASE1_CORE,FastAPI 4 router
+数学基座,moodify-core-package/src/moodify/{audio_io,bands,fingerprint,conservation,icc,uncertainty,mrs_robust,mrs_adapter}.py,PHASE1_CORE,SPEC-011
+v0.1.0 主线,moodify-core-package/src/moodify/v01_*.py,LEGACY,v01 marker 测试覆盖
+优化器,moodify-core-package/src/moodify/optimizer/,PHASE1_EXPERIMENTAL,5D 强度空间搜索
+LLM 客户端,moodify-core-package/src/moodify/llm/,PHASE1_SUPPORT,DeepSeek API
+配置,moodify-core-package/config.py + configs/,PHASE1_CORE,MOODIFY_ROOT/OUTPUT 环境变量
+测试,moodify-core-package/tests/,PHASE1_CORE,85 文件；v01/legacy/experimental markers
+moodify_runtime,moodify_runtime/,PHASE1_CORE,活跃运行时 ~80 模块
+moodify-bridge,moodify-bridge/,PHASE1_SUPPORT,研究-生产桥
+moodify-pulse,moodify-pulse/,LEGACY,Electron 仪表盘产物
+moodify-app,moodify-app/,LEGACY,早期单体残留
+moodify-system,moodify-system/,LEGACY,早期单体残留
+deploy 部署,deploy/,PHASE1_CORE,Dockerfile/deploy.sh/nginx
+scripts 运维,scripts/,PHASE1_SUPPORT,40+ 脚本；demo_* 可归档
+07Music 素材,07Music/,LEGACY,音乐素材 MP3
+pre-music 素材,pre-music/,LEGACY,素材
+RJWC_VideoPack_System,RJWC_VideoPack_System/,LEGACY,已交付资产
+phys-lab,phys-lab/,LEGACY,研究
+night 夜间系统,night/,LEGACY,研究自动化
+listening_test,listening_test/,LEGACY,听测数据
+experiments,experiments/,LEGACY,研究实验
+science,science/,LEGACY,研究资产
+scratch,scratch/,LEGACY,临时
+calibration_reports,calibration_reports/,LEGACY,校准报告
+inspector_reports,inspector_reports/,LEGACY,检查报告
+CWC 规格文档,docs/DEEPSEEK_TASK_CWC_CREATOR_PASS.md,PHASE2_FROZEN,需归档/标记 FROZEN
+工程记录 docs/echain,docs/echain/,PHASE1_SUPPORT,17 份活跃记录
+工程记录 e_chain,e_chain/,LEGACY,与 docs/echain 重复 2 份
+artifacts/ocean_bridge,artifacts/ocean_bridge/,PHASE1_EXPERIMENTAL,git 未跟踪
+artifacts/audits,artifacts/audits/,PHASE1_SUPPORT,审计记录
+artifacts/temporal_texture,artifacts/temporal_texture/,PHASE1_EXPERIMENTAL,临时验证工作区
+artifacts/verification,artifacts/verification/,PHASE1_SUPPORT,验证记录
+schemas,schemas/,PHASE1_SUPPORT,JSON schema
+cloud_data,cloud_data/,UNKNOWN_REQUIRES_REVIEW,云端数据
+cloud_status.py,cloud_status.py,UNKNOWN_REQUIRES_REVIEW,云端状态脚本
+deliverables,deliverables/,UNKNOWN_REQUIRES_REVIEW,交付物
+outputs,outputs/,GENERATED,输出目录
+reports,reports/,GENERATED,报告输出

@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: () -> Unit, onPublish: () -> Unit) {
+fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: () -> Unit) {
     val context = LocalContext.current
     val title = work?.filename ?: "AI Demo Track"
     var playOriginal by remember { mutableStateOf(false) }
@@ -102,7 +102,7 @@ fun WorkDetailScreen(work: ProcessedWork?, onBack: () -> Unit, onProcessAgain: (
             }
         }
         Spacer(Modifier.height(14.dp))
-        DetailCard { Text(stringResource(R.string.work_detail_export_title), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold); Spacer(Modifier.height(12.dp)); Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { ExportAction(Icons.Outlined.FileDownload, stringResource(R.string.work_detail_export_audio), "WAV / MP3", Modifier.weight(1f)) {}; ExportAction(Icons.Outlined.AudioFile, stringResource(R.string.work_detail_download_score), "PDF 格式", Modifier.weight(1f)) {}; ExportAction(Icons.Outlined.Publish, stringResource(R.string.work_detail_publish), stringResource(R.string.work_detail_publish_sub), Modifier.weight(1f), onPublish) } }
+        DetailCard { Text(stringResource(R.string.work_detail_export_title), color = MoodifyNavy, fontSize = 19.sp, fontWeight = FontWeight.Bold); Spacer(Modifier.height(12.dp)); Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { ExportAction(Icons.Outlined.FileDownload, stringResource(R.string.work_detail_export_audio), "WAV / MP3", Modifier.weight(1f)) {}; ExportAction(Icons.Outlined.AudioFile, stringResource(R.string.work_detail_download_score), "PDF 格式", Modifier.weight(1f)) {} } }
         Spacer(Modifier.height(18.dp)); GradientButton(stringResource(R.string.work_detail_reprocess), onProcessAgain); TextButton(onClick = {}) { Text(stringResource(R.string.work_detail_full_report), color = MoodifyBlue, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }; Spacer(Modifier.height(18.dp))
     }
 }

@@ -24,6 +24,7 @@ import com.moodify.app.R
 import com.moodify.app.ui.components.GradientButton
 import com.moodify.app.ui.theme.*
 
+@Deprecated("PHASE2_FROZEN (MFY-PHASE1-FREEZE-001): marketplace/collaboration is Phase II, unreachable from primary navigation")
 @Composable
 fun CollaborationHubScreen(onExit: () -> Unit) {
     var page by remember { mutableIntStateOf(0) }

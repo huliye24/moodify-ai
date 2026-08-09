@@ -26,6 +26,7 @@ import com.moodify.app.R
 import com.moodify.app.ui.components.GradientButton
 import com.moodify.app.ui.theme.*
 
+@Deprecated("PHASE2_FROZEN (MFY-PHASE1-FREEZE-001): publishing flow is Phase II, entry removed from WorkDetail")
 @Composable
 fun PublishWorkScreen(onBack: () -> Unit, onPublished: () -> Unit) {
     var title by remember { mutableStateOf("") }; var intro by remember { mutableStateOf("") }; var visibility by remember { mutableIntStateOf(0) }; var copyright by remember { mutableStateOf(true) }; var recommend by remember { mutableStateOf(true) }

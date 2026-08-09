@@ -1,6 +1,14 @@
 # Moodify
 
 > **The Ear of AI.**
+
+Moodify begins with one research and engineering question:
+
+> **Can machines learn to hear?**
+
+Every canonical capability must strengthen the loop:
+
+`Listen → Represent → Judge → Intervene → Verify → Learn`
 >
 > Moodify is an **Auditory Intelligence System** for AI-generated audio and music.
 

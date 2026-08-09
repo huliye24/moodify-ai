@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.moodify.app.R
 import com.moodify.app.ui.theme.*
 
+@Deprecated("PHASE2_FROZEN (MFY-PHASE1-FREEZE-001): creator center is Phase II, unreachable from primary navigation")
 @Composable
 fun CreatorCenterScreen(onBack: () -> Unit, onUpload: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {

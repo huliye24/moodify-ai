@@ -1,10 +1,102 @@
-"""Comparison reports and the four-image contact sheet (DSK-MFY-AUDITORY-SCAN-001)."""
+"""Comparison reports, the four-image contact sheet, and the Phase I auditory report
+(DSK-MFY-AUDITORY-SCAN-001 / MFY-PHASE1-FREEZE-001)."""
 
 from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+
+
+_SECTION_METRICS = {
+    "loudness_dynamics": {"integrated_lufs", "crest_factor_db", "true_peak_dbfs"},
+    "spectral_balance": {"bass_60_120_hz", "brilliance_5000_10000_hz"},
+    "low_frequency": {"bass_60_120_hz"},
+    "high_frequency_cutoff": {"estimated_high_frequency_cutoff_hz"},
+    "stereo_field": {"negative_correlation_ratio"},
+    "phase": {"phase_risk_ratio"},
+    "transients": {"crest_factor_db"},
+    "artifact_detection": {"clipping_sample_count", "invalid_sample_count"},
+    "musical_structure": set(),
+}
+
+
+def _metric_is_valid(metrics: dict, name: str) -> bool:
+    value = metrics.get(name)
+    if isinstance(value, dict):
+        return value.get("value") is not None and value.get("status", "VALID") == "VALID"
+    return value is not None
+
+
+def _derive_sections(metrics: dict, findings: list[dict]) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    finding_metrics = {
+        finding.get("metric")
+        for finding in findings
+        if finding.get("severity") in {"WARNING", "BLOCKING", "HIGH", "CRITICAL"}
+    }
+    for section, required in _SECTION_METRICS.items():
+        if not required:
+            sections[section] = "UNKNOWN"
+        elif not all(_metric_is_valid(metrics, name) for name in required):
+            sections[section] = "UNKNOWN"
+        elif required & finding_metrics:
+            sections[section] = "RISK"
+        else:
+            sections[section] = "PASS"
+    return sections
+
+
+def build_auditory_report(
+    out_path: Path,
+    *,
+    source_name: str,
+    case_id: str,
+    source_sha256: str,
+    analysis_version: str,
+    overall_status: str,
+    metrics: dict,
+    findings: list[dict],
+    evidence_index: dict,
+    summary: str,
+    overall_confidence: float | None = None,
+) -> dict:
+    """Phase I 机器可读听觉报告（06_AUDITORY_REPORT_SPEC）。human + machine 双形态之一。
+
+    每条 finding 必须携带 evidence_refs；HIGH/CRITICAL 判断若缺证据引用则标记
+    UNKNOWN 状态而非静默通过（08_ACCEPTANCE_TESTS 失败语义）。
+    """
+    sections = _derive_sections(metrics, findings)
+    unresolved = []
+    for finding in findings:
+        refs = finding.get("evidence_refs") or []
+        missing_refs = [ref for ref in refs if ref not in evidence_index]
+        if finding.get("severity") in {"BLOCKING", "HIGH", "CRITICAL"} and (
+            not refs or missing_refs
+        ):
+            unresolved.append({"code": finding.get("code"), "missing_refs": missing_refs})
+    if unresolved or "UNKNOWN" in sections.values():
+        overall_status = "PARTIAL"
+    elif any(value == "RISK" for value in sections.values()):
+        overall_status = "RISK"
+    report = {
+        "report_id": f"report-{case_id}",
+        "case_id": case_id,
+        "source_name": source_name,
+        "source_sha256": source_sha256,
+        "analysis_version": analysis_version,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "overall_status": overall_status,
+        "overall_confidence": overall_confidence,
+        "summary": summary,
+        "sections": sections,
+        "findings": findings,
+        "evidence_index": evidence_index,
+        "unresolved_evidence_findings": [item["code"] for item in unresolved],
+        "unresolved_evidence_details": unresolved,
+    }
+    out_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    return report
 
 
 

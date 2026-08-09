@@ -106,7 +106,6 @@ def golden_redundant_top(tmp: Path) -> dict:
     album_ids = list(result["album_rerank"]["selected_candidate_ids"])
     candidates = json.loads((case_root / "05_ntrack" / "candidates.json").read_text(encoding="utf-8"))
     hashes = {c["ranking_candidate_id"]: c["source_hash"] for c in candidates["candidates"]}
-    twins = sorted(raw_top[:2], key=lambda cid: hashes[cid])
     ok = (
         hashes[raw_top[0]] != hashes[raw_top[1]]  # twins distinct bytes
         and album_ids != raw_top[:3]  # album order differs from raw strength

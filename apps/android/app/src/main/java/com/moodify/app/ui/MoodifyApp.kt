@@ -29,13 +29,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.moodify.app.R
 import com.moodify.app.ui.screens.HomeScreen
-import com.moodify.app.ui.screens.NotificationCenterScreen
 import com.moodify.app.ui.screens.DataCenterScreen
 import com.moodify.app.ui.screens.UploadFlowScreen
 import com.moodify.app.ui.screens.ProfileScreen
 import com.moodify.app.ui.screens.ProcessingScreen
 import com.moodify.app.ui.screens.ProcessingHubScreen
-import com.moodify.app.ui.screens.PublishWorkScreen
 import com.moodify.app.ui.components.MiniPlayer
 import com.moodify.app.ui.components.MiniPlayerVisibility
 import com.moodify.app.ui.screens.SearchScreen
@@ -59,9 +57,7 @@ fun MoodifyApp() {
     var selected by rememberSaveable { mutableIntStateOf(0) }
     var processingOpen by remember { mutableStateOf(false) }
     var detailOpen by remember { mutableStateOf(false) }
-    var publishOpen by remember { mutableStateOf(false) }
     var searchOpen by remember { mutableStateOf(false) }
-    var notificationOpen by remember { mutableStateOf(false) }
     var dataCenterOpen by remember { mutableStateOf(false) }
     var uploadOpen by remember { mutableStateOf(false) }
     var settingsOpen by rememberSaveable { mutableStateOf(false) }
@@ -76,8 +72,8 @@ fun MoodifyApp() {
     val drawerState = androidx.compose.material3.rememberDrawerState(androidx.compose.material3.DrawerValue.Closed)
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
-    val backEnabled = nowPlayingOpen || processingOpen || detailOpen || publishOpen || searchOpen ||
-        notificationOpen || dataCenterOpen ||
+    val backEnabled = nowPlayingOpen || processingOpen || detailOpen || searchOpen ||
+        dataCenterOpen ||
         uploadOpen || settingsOpen || helpOpen || aboutOpen
     BackHandler(enabled = backEnabled) {
         when {
@@ -88,9 +84,7 @@ fun MoodifyApp() {
             uploadOpen -> uploadOpen = false
             processingOpen -> processingOpen = false
             detailOpen -> detailOpen = false
-            publishOpen -> publishOpen = false
             searchOpen -> searchOpen = false
-            notificationOpen -> notificationOpen = false
             dataCenterOpen -> dataCenterOpen = false
         }
     }
@@ -98,9 +92,7 @@ fun MoodifyApp() {
     fun closeOverlays() {
         processingOpen = false
         detailOpen = false
-        publishOpen = false
         searchOpen = false
-        notificationOpen = false
         dataCenterOpen = false
         uploadOpen = false
         settingsOpen = false
@@ -110,7 +102,7 @@ fun MoodifyApp() {
 
     androidx.compose.material3.ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = !processingOpen && !detailOpen && !publishOpen && !searchOpen && !notificationOpen && !dataCenterOpen && !uploadOpen && !settingsOpen && !helpOpen && !aboutOpen,
+        gesturesEnabled = !processingOpen && !detailOpen && !searchOpen && !dataCenterOpen && !uploadOpen && !settingsOpen && !helpOpen && !aboutOpen,
         drawerContent = {
             val drawerHighlight = when {
                 selected == 2 -> 0
@@ -166,12 +158,10 @@ fun MoodifyApp() {
                 aboutOpen -> AboutScreen(onBack = { aboutOpen = false })
                 uploadOpen -> UploadFlowScreen(startPage = startUploadPage, onExit = { uploadOpen = false }, onProcess = { uris -> processingUris = uris; uploadOpen = false; processingOpen = true }, onLibrary = { uploadOpen = false; selected = 2 })
                 dataCenterOpen -> DataCenterScreen(onBack = { dataCenterOpen = false })
-                notificationOpen -> NotificationCenterScreen(onBack = { notificationOpen = false })
                 searchOpen -> SearchScreen(onCancel = { searchOpen = false })
-                publishOpen -> PublishWorkScreen(onBack = { publishOpen = false }, onPublished = { publishOpen = false })
-                detailOpen -> WorkDetailScreen(work = remember { com.moodify.app.data.WorkLibrary(appContext).all().firstOrNull() }.let { it }, onBack = { detailOpen = false }, onProcessAgain = { detailOpen = false; processingOpen = true }, onPublish = { publishOpen = true })
+                detailOpen -> WorkDetailScreen(work = remember { com.moodify.app.data.WorkLibrary(appContext).all().firstOrNull() }.let { it }, onBack = { detailOpen = false }, onProcessAgain = { detailOpen = false; processingOpen = true })
                 processingOpen -> ProcessingScreen(uri = processingUris.firstOrNull(), onBackHome = { processingOpen = false; selected = 2 }, onDone = { processingOpen = false; selected = 2 })
-                selected == 0 -> HomeScreen(onOpenDrawer = { scope.launch { drawerState.open() } }, onOpenSearch = { searchOpen = true }, onOpenNotifications = { notificationOpen = true })
+                selected == 0 -> HomeScreen(onOpenDrawer = { scope.launch { drawerState.open() } }, onOpenSearch = { searchOpen = true })
                 selected == 1 -> ProcessingHubScreen(
                     onPickAudio = { startUploadPage = 0; uploadOpen = true },
                     onWechatImport = { startUploadPage = 1; uploadOpen = true },

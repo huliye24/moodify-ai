@@ -1,5 +1,9 @@
 # Moodify CWC 创作者通行证任务包
 
+> **PHASE2_FROZEN（MFY-PHASE1-FREEZE-001，2026-08-08）**
+> 本文档为 Phase II CWC 规格，已冻结。Phase I 禁止投入资源实现本文档内容；
+> 保留仅作为历史规格存档（代码已移除，git 历史可恢复）。任何解冻需创始人明确批准。
+
 ## 一、产品定义
 
 将 CWC 作为 Moodify 的创作者邀请与首次入驻凭证。

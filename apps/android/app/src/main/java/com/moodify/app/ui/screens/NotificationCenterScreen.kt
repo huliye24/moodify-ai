@@ -24,6 +24,7 @@ import com.moodify.app.ui.theme.*
 
 private data class Notice(val icon: ImageVector, val title: String, val body: String, val detail: String = "", val time: String, val category: Int, val tint: Color, val read: Boolean = false)
 
+@Deprecated("PHASE2_FROZEN (MFY-PHASE1-FREEZE-001): social notifications are Phase II, entry removed from Home")
 @Composable
 fun NotificationCenterScreen(onBack: () -> Unit) {
     var tab by remember { mutableIntStateOf(0) }; var allRead by remember { mutableStateOf(false) }

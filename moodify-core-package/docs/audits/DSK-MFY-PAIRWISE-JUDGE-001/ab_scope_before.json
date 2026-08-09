@@ -1,0 +1,1906 @@
+{
+  "root": "E:\\moodify\\moodify-core-package\\src\\moodify",
+  "count": 380,
+  "matches": [
+    {
+      "file": "cli.py",
+      "line": 732,
+      "text": "p_eval_run.add_argument(\"--top-k\", type=int, default=3, help=\"每个情绪取 top-k 个候选版本\")"
+    },
+    {
+      "file": "data_types.py",
+      "line": 238,
+      "text": "user_preference: float = 0.0"
+    },
+    {
+      "file": "data_types.py",
+      "line": 316,
+      "text": "\"user_preference\": self.confidence_metrics.user_preference,"
+    },
+    {
+      "file": "mrs_robust.py",
+      "line": 27,
+      "text": "\"\"\"Build median/MAD statistics while retaining mean/SD for comparison.\"\"\""
+    },
+    {
+      "file": "system_depth.py",
+      "line": 25,
+      "text": "TRAINED_JUDGMENT = \"trained_judgment\""
+    },
+    {
+      "file": "v01_types.py",
+      "line": 234,
+      "text": "Used for genre-weighted distance comparisons."
+    },
+    {
+      "file": "adapters\\audacity\\errors.py",
+      "line": 18,
+      "text": "(Edit -> Preferences -> Modules) and was restarted after enabling."
+    },
+    {
+      "file": "adapters\\auditory\\ocean_listen\\mapper.py",
+      "line": 217,
+      "text": "\"code\": \"SENSOR_NOT_JUDGMENT\","
+    },
+    {
+      "file": "adapters\\auditory\\ocean_listen\\mapper.py",
+      "line": 220,
+      "text": "\"artistic or production judgment.\""
+    },
+    {
+      "file": "api\\routes\\v1.py",
+      "line": 765,
+      "text": "\"\"\"Download the original (unprocessed) audio for A/B comparison (demo extension).\"\"\""
+    },
+    {
+      "file": "api\\routes\\workspace_projects.py",
+      "line": 316,
+      "text": "\"\"\"Serve immutable version audio for the Workspace A/B player.\"\"\""
+    },
+    {
+      "file": "api\\routes\\workspace_projects.py",
+      "line": 412,
+      "text": "def _judge_passed_for_version("
+    },
+    {
+      "file": "api\\routes\\workspace_projects.py",
+      "line": 416,
+      "text": "thread.thread_type is ThreadType.JUDGE"
+    },
+    {
+      "file": "api\\routes\\workspace_projects.py",
+      "line": 457,
+      "text": "_judge_passed_for_version(store, project_id, request.version_id)"
+    },
+    {
+      "file": "api\\routes\\workspace_projects.py",
+      "line": 460,
+      "text": "\"version cannot be approved before its Judge thread passes\""
+    },
+    {
+      "file": "api\\routes\\workspace_projects.py",
+      "line": 516,
+      "text": "\"\"\"List versions available for comparison.\"\"\""
+    },
+    {
+      "file": "auditory\\comparison.py",
+      "line": 1,
+      "text": "\"\"\"Before/after comparison (DSK-MFY-AUDITORY-SCAN-001)."
+    },
+    {
+      "file": "auditory\\comparison.py",
+      "line": 16,
+      "text": "ComparisonChannelMismatch,"
+    },
+    {
+      "file": "auditory\\comparison.py",
+      "line": 17,
+      "text": "ComparisonDurationMismatch,"
+    },
+    {
+      "file": "auditory\\comparison.py",
+      "line": 18,
+      "text": "ComparisonInvalid,"
+    },
+    {
+      "file": "auditory\\comparison.py",
+      "line": 60,
+      "text": "raise ComparisonInvalid(\"case IDs differ between scans\")"
+    },
+    {
+      "file": "auditory\\comparison.py",
+      "line": 64,
+      "text": "raise ComparisonDurationMismatch("
+    },
+    {
+      "file": "auditory\\comparison.py",
+      "line": 68,
+      "text": "raise ComparisonChannelMismatch("
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 95,
+      "text": "class ComparisonDurationMismatch(AuditoryError):"
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 96,
+      "text": "code = \"COMPARISON_DURATION_MISMATCH\""
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 99,
+      "text": "class ComparisonChannelMismatch(AuditoryError):"
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 100,
+      "text": "code = \"COMPARISON_CHANNEL_MISMATCH\""
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 107,
+      "text": "class ComparisonEvidenceIncomplete(AuditoryError):"
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 108,
+      "text": "code = \"COMPARISON_EVIDENCE_INCOMPLETE\""
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 111,
+      "text": "class ComparisonInvalid(AuditoryError):"
+    },
+    {
+      "file": "auditory\\errors.py",
+      "line": 112,
+      "text": "code = \"COMPARISON_INVALID\""
+    },
+    {
+      "file": "auditory\\GOLDEN_CASE_SCRIPT.md",
+      "line": 5,
+      "text": "## 1. 生成合成源与候选"
+    },
+    {
+      "file": "auditory\\GOLDEN_CASE_SCRIPT.md",
+      "line": 27,
+      "text": "# 候选 = 源 + 人声区 presence 提升（模拟外部精修）"
+    },
+    {
+      "file": "auditory\\GOLDEN_CASE_SCRIPT.md",
+      "line": 62,
+      "text": "└── 05_comparison/     metrics_delta.json, delta_spectrum_linear.png,"
+    },
+    {
+      "file": "auditory\\GOLDEN_CASE_SCRIPT.md",
+      "line": 63,
+      "text": "delta_spectrum_log.png, comparison_contact_sheet.png,"
+    },
+    {
+      "file": "auditory\\GOLDEN_CASE_SCRIPT.md",
+      "line": 64,
+      "text": "comparison_report.json, judgment_rules.json, comparison_manifest.json"
+    },
+    {
+      "file": "auditory\\GOLDEN_CASE_SCRIPT.md",
+      "line": 69,
+      "text": "- `comparison_report.json` 中 `human_listening_required: true`、`artistic_approval_granted: false`"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 32,
+      "text": "# ---- JUDGMENT (defect / risk / intentional / ambiguity) ----"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 33,
+      "text": "\"auditory.judgment\": {\"category\": \"JUDGMENT\", \"confidence\": \"high\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 34,
+      "text": "\"auditory.comparison\": {\"category\": \"JUDGMENT\", \"confidence\": \"high\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 35,
+      "text": "\"diagnosis\": {\"category\": \"JUDGMENT\", \"confidence\": \"high\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 36,
+      "text": "\"evaluation\": {\"category\": \"JUDGMENT\", \"confidence\": \"medium\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 37,
+      "text": "\"uncertainty\": {\"category\": \"JUDGMENT\", \"confidence\": \"medium\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 38,
+      "text": "\"reality_metrics\": {\"category\": \"JUDGMENT\", \"confidence\": \"medium\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 39,
+      "text": "\"mrs_adapter\": {\"category\": \"JUDGMENT\", \"confidence\": \"medium\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 40,
+      "text": "\"mrs_robust\": {\"category\": \"JUDGMENT\", \"confidence\": \"medium\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 41,
+      "text": "\"v01_diagnostics\": {\"category\": \"JUDGMENT\", \"confidence\": \"high\"},"
+    },
+    {
+      "file": "auditory\\inventory.py",
+      "line": 99,
+      "text": "\"JUDGMENT\": \"JUDGMENT\","
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 1,
+      "text": "\"\"\"Conservative technical judgment (DSK-MFY-AUDITORY-SCAN-001)."
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 12,
+      "text": "from moodify.auditory.models import Judgment, RiskFlag"
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 14,
+      "text": "JUDGMENT_RULES_VERSION = \"1.0\""
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 182,
+      "text": "def judge("
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 188,
+      "text": ") -> Judgment:"
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 191,
+      "text": "return Judgment("
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 201,
+      "text": "return Judgment("
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 211,
+      "text": "return Judgment("
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 220,
+      "text": "return Judgment("
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 228,
+      "text": "return Judgment("
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 236,
+      "text": "def write_judgment_rules(path: Path) -> None:"
+    },
+    {
+      "file": "auditory\\judgment.py",
+      "line": 238,
+      "text": "\"judgment_rules_version\": JUDGMENT_RULES_VERSION,"
+    },
+    {
+      "file": "auditory\\manifests.py",
+      "line": 3,
+      "text": "Every scan and comparison writes a manifest with hashes of all produced"
+    },
+    {
+      "file": "auditory\\manifests.py",
+      "line": 60,
+      "text": "def write_comparison_manifest("
+    },
+    {
+      "file": "auditory\\manifests.py",
+      "line": 66,
+      "text": "judgment_decision: str,"
+    },
+    {
+      "file": "auditory\\manifests.py",
+      "line": 72,
+      "text": "\"judgment_decision\": judgment_decision,"
+    },
+    {
+      "file": "auditory\\models.py",
+      "line": 101,
+      "text": "class Judgment:"
+    },
+    {
+      "file": "auditory\\models.py",
+      "line": 102,
+      "text": "technical_assessment: str  # IMPROVED | NEUTRAL | DEGRADED | UNCERTAIN | INVALID_COMPARISON"
+    },
+    {
+      "file": "auditory\\reports.py",
+      "line": 1,
+      "text": "\"\"\"Comparison reports and the four-image contact sheet (DSK-MFY-AUDITORY-SCAN-001).\"\"\""
+    },
+    {
+      "file": "auditory\\reports.py",
+      "line": 51,
+      "text": "def build_comparison_report("
+    },
+    {
+      "file": "auditory\\reports.py",
+      "line": 59,
+      "text": "judgment: dict,"
+    },
+    {
+      "file": "auditory\\reports.py",
+      "line": 64,
+      "text": "judgment_rules: dict,"
+    },
+    {
+      "file": "auditory\\reports.py",
+      "line": 78,
+      "text": "\"judgment\": judgment,"
+    },
+    {
+      "file": "auditory\\reports.py",
+      "line": 79,
+      "text": "\"judgment_rules\": judgment_rules,"
+    },
+    {
+      "file": "auditory\\run_golden.py",
+      "line": 91,
+      "text": "# 6. comparison"
+    },
+    {
+      "file": "auditory\\run_golden.py",
+      "line": 94,
+      "text": "cmp_dir = BASE / \"cases\" / CASE_ID / \"05_comparison\""
+    },
+    {
+      "file": "auditory\\run_golden.py",
+      "line": 101,
+      "text": "j = result[\"judgment\"]"
+    },
+    {
+      "file": "auditory\\run_golden.py",
+      "line": 102,
+      "text": "print(f\"AUDITORY_COMPARISON_COMPLETED {j.technical_assessment}/{j.workflow_decision}\")"
+    },
+    {
+      "file": "auditory\\run_golden.py",
+      "line": 110,
+      "text": "cmp_dir / \"comparison_manifest.json\","
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 3,
+      "text": "scan_audio / register_candidate / compare_scans / build_comparison_report /"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 18,
+      "text": "from moodify.auditory.comparison import ("
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 28,
+      "text": "ComparisonEvidenceIncomplete,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 32,
+      "text": "from moodify.auditory.judgment import ("
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 34,
+      "text": "judge,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 35,
+      "text": "write_judgment_rules,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 40,
+      "text": "write_comparison_manifest,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 46,
+      "text": "from moodify.auditory.reports import build_comparison_report, build_contact_sheet"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 171,
+      "text": "# numerical arrays for comparison"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 233,
+      "text": "\"\"\"Reload a completed scan directory as comparison-ready evidence.\"\"\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 237,
+      "text": "raise ComparisonEvidenceIncomplete(f\"scan evidence incomplete: {scan_dir}\")"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 307,
+      "text": "def verify_candidate_audio(candidate: Candidate) -> None:"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 322,
+      "text": "comparison_dir: Path,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 329,
+      "text": "\"\"\"Full comparison: deltas + delta spectrograms + judgment + report.\"\"\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 331,
+      "text": "comparison_dir.mkdir(parents=True, exist_ok=True)"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 336,
+      "text": "linear_delta = comparison_dir / \"delta_spectrum_linear.png\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 337,
+      "text": "log_delta = comparison_dir / \"delta_spectrum_log.png\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 346,
+      "text": "delta_path = comparison_dir / \"metrics_delta.json\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 361,
+      "text": "# judgment"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 363,
+      "text": "judgment = judge(deltas.metric_delta, before.metrics, after.metrics, plan, risk_flags)"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 364,
+      "text": "judgment_rules_path = comparison_dir / \"judgment_rules.json\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 365,
+      "text": "write_judgment_rules(judgment_rules_path)"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 368,
+      "text": "sheet = comparison_dir / \"comparison_contact_sheet.png\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 381,
+      "text": "# comparison report"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 382,
+      "text": "report_path = comparison_dir / \"comparison_report.json\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 383,
+      "text": "build_comparison_report("
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 390,
+      "text": "judgment=judgment.to_dict(),"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 395,
+      "text": "judgment_rules=json.loads(judgment_rules_path.read_text(encoding=\"utf-8\")),"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 400,
+      "text": "manifest_path = comparison_dir / \"comparison_manifest.json\""
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 401,
+      "text": "write_comparison_manifest("
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 409,
+      "text": "\"comparison_contact_sheet\": sheet,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 410,
+      "text": "\"comparison_report\": report_path,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 411,
+      "text": "\"judgment_rules\": judgment_rules_path,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 413,
+      "text": "judgment_decision=judgment.workflow_decision,"
+    },
+    {
+      "file": "auditory\\service.py",
+      "line": 418,
+      "text": "\"judgment\": judgment,"
+    },
+    {
+      "file": "auditory\\__init__.py",
+      "line": 4,
+      "text": "capture layer. It scans, measures, compares, verifies and judges — it does"
+    },
+    {
+      "file": "auditory\\__init__.py",
+      "line": 6,
+      "text": "processing; Moodify owns observation, measurement, comparison, evidence"
+    },
+    {
+      "file": "auditory\\__init__.py",
+      "line": 7,
+      "text": "and technical judgment."
+    },
+    {
+      "file": "auditory\\__init__.py",
+      "line": 10,
+      "text": "from moodify.auditory import errors, judgment, metrics, profiles, service"
+    },
+    {
+      "file": "auditory\\__init__.py",
+      "line": 12,
+      "text": "__all__ = [\"errors\", \"judgment\", \"metrics\", \"profiles\", \"service\"]"
+    },
+    {
+      "file": "calibration\\listener.py",
+      "line": 5,
+      "text": "Layer 2: 方向偏好 — 哪个版本更接近目标情绪的理想向量"
+    },
+    {
+      "file": "calibration\\listener.py",
+      "line": 70,
+      "text": "与目标情绪的理想向量比较 → 距离越小 = 越接近目标情绪。"
+    },
+    {
+      "file": "capability_registry\\detect.py",
+      "line": 71,
+      "text": "if candidate and Path(candidate).is_file():"
+    },
+    {
+      "file": "capability_registry\\adapters\\base.py",
+      "line": 119,
+      "text": "if candidate and Path(candidate).is_file():"
+    },
+    {
+      "file": "capability_registry\\knowledge\\cli.py",
+      "line": 30,
+      "text": "for j in store.judgments(case_id):"
+    },
+    {
+      "file": "capability_registry\\knowledge\\cli.py",
+      "line": 31,
+      "text": "print(f\"  J {j.record_id}  case={j.case_id}  {j.judgment}  {j.reason}\")"
+    },
+    {
+      "file": "capability_registry\\knowledge\\cli.py",
+      "line": 35,
+      "text": "f\"{store.count('judgments')} judgments / {store.count('negative')} negative\")"
+    },
+    {
+      "file": "capability_registry\\knowledge\\cli.py",
+      "line": 39,
+      "text": "\"judgments\": [j.to_dict() for j in store.judgments(case_id)],"
+    },
+    {
+      "file": "capability_registry\\knowledge\\cli.py",
+      "line": 65,
+      "text": "change_type=\"provider_preference\","
+    },
+    {
+      "file": "capability_registry\\knowledge\\cli.py",
+      "line": 68,
+      "text": "rationale=f\"Majority provider preference from {len(measurements)} measured cases\","
+    },
+    {
+      "file": "capability_registry\\knowledge\\cli.py",
+      "line": 99,
+      "text": "p_history = subparsers.add_parser(\"history\", help=\"List measurement/judgment/negative records\")"
+    },
+    {
+      "file": "capability_registry\\knowledge\\policy.py",
+      "line": 22,
+      "text": "\"provider_preference\", \"default_parameter\", \"validation_threshold\", \"fallback_order\","
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 1,
+      "text": "\"\"\"Knowledge records — measurement, judgment and negative knowledge."
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 19,
+      "text": "Judgment = Literal[\"approved\", \"rejected\", \"revised\"]"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 57,
+      "text": "class JudgmentRecord:"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 63,
+      "text": "judgment: Judgment"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 75,
+      "text": "\"judgment\": self.judgment,"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 139,
+      "text": "def add_judgment(self, record: JudgmentRecord) -> Path:"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 140,
+      "text": "return self._append(\"judgments\", record.to_dict())"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 161,
+      "text": "def judgments(self, case_id: str | None = None) -> list[JudgmentRecord]:"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 162,
+      "text": "return [JudgmentRecord(**r) for r in self._records(\"judgments\")"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 199,
+      "text": "def new_judgment("
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 201,
+      "text": "judgment: Judgment,"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 206,
+      "text": ") -> JudgmentRecord:"
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 207,
+      "text": "return JudgmentRecord("
+    },
+    {
+      "file": "capability_registry\\knowledge\\records.py",
+      "line": 211,
+      "text": "judgment=judgment,"
+    },
+    {
+      "file": "capability_registry\\knowledge\\__init__.py",
+      "line": 3,
+      "text": "The knowledge loop: Production case -> Measurement record -> Judgment record"
+    },
+    {
+      "file": "capability_registry\\knowledge\\__init__.py",
+      "line": 11,
+      "text": "JudgmentRecord,"
+    },
+    {
+      "file": "capability_registry\\knowledge\\__init__.py",
+      "line": 23,
+      "text": "\"JudgmentRecord\","
+    },
+    {
+      "file": "capability_registry\\validation\\candidates.py",
+      "line": 4,
+      "text": "capability. Each candidate binds its own approved envelope (019 immutability)."
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 536,
+      "text": "verify_candidate_audio,"
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 544,
+      "text": "verify_candidate_audio(candidate)"
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 560,
+      "text": "comparison_dir = case_root / \"05_comparison\""
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 562,
+      "text": "before, after, plan, comparison_dir,"
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 569,
+      "text": "\"case.compare\", \"ok\", result_status=\"AUDITORY_COMPARISON_COMPLETED\","
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 571,
+      "text": "technical_assessment=result[\"judgment\"].technical_assessment,"
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 572,
+      "text": "workflow_decision=result[\"judgment\"].workflow_decision,"
+    },
+    {
+      "file": "cli_v2\\main.py",
+      "line": 573,
+      "text": "comparison_dir=str(comparison_dir),"
+    },
+    {
+      "file": "diagnosis\\health_scorer.py",
+      "line": 192,
+      "text": "\"\"\"计算处理前后状态差 (用于 A/B 对比报告)\"\"\""
+    },
+    {
+      "file": "diagnosis\\metrics.py",
+      "line": 236,
+      "text": "#   线性假设: 最小-最大归一化, 差异在校准后可比较"
+    },
+    {
+      "file": "domain\\creative_brief.py",
+      "line": 38,
+      "text": "comparison_keys = [item.casefold() for item in normalized]"
+    },
+    {
+      "file": "domain\\creative_brief.py",
+      "line": 39,
+      "text": "if len(comparison_keys) != len(set(comparison_keys)):"
+    },
+    {
+      "file": "domain\\thread.py",
+      "line": 24,
+      "text": "JUDGE = \"JUDGE\""
+    },
+    {
+      "file": "domain\\thread.py",
+      "line": 38,
+      "text": "JUDGE = \"JUDGE\""
+    },
+    {
+      "file": "domain\\thread.py",
+      "line": 63,
+      "text": "ThreadType.JUDGE: ThreadRole.JUDGE,"
+    },
+    {
+      "file": "domain\\treatment_plan.py",
+      "line": 97,
+      "text": "\"\"\"One independently executable A/B/C candidate.\"\"\""
+    },
+    {
+      "file": "domain\\treatment_plan.py",
+      "line": 124,
+      "text": "comparison_keys = [item.casefold() for item in normalized]"
+    },
+    {
+      "file": "domain\\treatment_plan.py",
+      "line": 125,
+      "text": "if len(comparison_keys) != len(set(comparison_keys)):"
+    },
+    {
+      "file": "domain\\workflow.py",
+      "line": 25,
+      "text": "JUDGE = \"JUDGE\""
+    },
+    {
+      "file": "domain\\workflow.py",
+      "line": 45,
+      "text": "WorkflowStage.JUDGE,"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 180,
+      "text": "from moodify.evaluation.judges import EvaluatorOrchestrator"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 244,
+      "text": "\"judge_a\": assessment.judge_a_score,"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 245,
+      "text": "\"judge_b\": assessment.judge_b_score,"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 246,
+      "text": "\"judge_c\": assessment.judge_c_score,"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 374,
+      "text": "from moodify.evaluation.judges import EvaluatorOrchestrator"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 424,
+      "text": "print(\"  AI evaluating (3 judges)...\")"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 458,
+      "text": "print(\"\\n  === Judge Breakdown ===\")"
+    },
+    {
+      "file": "evaluation\\batch.py",
+      "line": 459,
+      "text": "for j in assessment.judges:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 6,
+      "text": "Judge A: LLM 音乐学视角  (DeepSeek API)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 7,
+      "text": "Judge B: 声学工程视角    (客观指标对比)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 8,
+      "text": "Judge C: 综合听感视角    (A+B 加权 + 随机噪声)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 34,
+      "text": "class JudgeResult:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 51,
+      "text": "judges: list[JudgeResult]"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 63,
+      "text": "judge_a_score: float = 0.0  # LLM 音乐学"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 64,
+      "text": "judge_b_score: float = 0.0  # 声学工程"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 65,
+      "text": "judge_c_score: float = 0.0  # 综合听感"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 77,
+      "text": "\"judges\": ["
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 86,
+      "text": "for j in self.judges"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 92,
+      "text": "#  Judge A: LLM 音乐学视角"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 95,
+      "text": "_JUDGE_A_SYSTEM = \"\"\"\\"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 132,
+      "text": "class LLMJudge:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 160,
+      "text": ") -> JudgeResult | None:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 179,
+      "text": "result = self._client._call(_JUDGE_A_SYSTEM, user_msg)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 183,
+      "text": "return JudgeResult("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 184,
+      "text": "name=\"LLMJudge\","
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 193,
+      "text": "logger.warning(f\"LLMJudge failed: {e}\")"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 213,
+      "text": "#  Judge B: 声学工程视角"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 228,
+      "text": "class AcousticJudge:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 239,
+      "text": ") -> JudgeResult:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 261,
+      "text": "return JudgeResult("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 262,
+      "text": "name=\"AcousticJudge\","
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 328,
+      "text": "return JudgeResult("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 329,
+      "text": "name=\"AcousticJudge\","
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 362,
+      "text": "#  Judge C: 综合听感视角（诊断重评）"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 365,
+      "text": "class ConsensusJudge:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 379,
+      "text": ") -> JudgeResult:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 403,
+      "text": "return JudgeResult("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 404,
+      "text": "name=\"ConsensusJudge\","
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 413,
+      "text": "logger.warning(f\"ConsensusJudge failed: {e}\")"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 414,
+      "text": "return JudgeResult("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 415,
+      "text": "name=\"ConsensusJudge\","
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 449,
+      "text": "self.judge_a = LLMJudge()"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 450,
+      "text": "self.judge_b = AcousticJudge()"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 451,
+      "text": "self.judge_c: ConsensusJudge | None = None  # 延迟初始化"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 472,
+      "text": "judges: list[JudgeResult] = []"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 475,
+      "text": "result_a = self.judge_a.evaluate("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 479,
+      "text": "judges.append(result_a)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 482,
+      "text": "result_b = self.judge_b.evaluate("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 485,
+      "text": "judges.append(result_b)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 489,
+      "text": "self.judge_c = ConsensusJudge(vector_bias=vector_bias)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 490,
+      "text": "result_c = self.judge_c.evaluate("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 494,
+      "text": "judges.append(result_c)"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 496,
+      "text": "# 无音频文件时：用 AcousticJudge 的结果作为代理"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 499,
+      "text": "judges.append(JudgeResult("
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 500,
+      "text": "name=\"ConsensusJudge\","
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 509,
+      "text": "scores = [j.overall for j in judges]"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 529,
+      "text": "judges=judges,"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 535,
+      "text": "judge_a_score=round(judges[0].overall, 1) if len(judges) > 0 else 0.0,"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 536,
+      "text": "judge_b_score=round(result_b.overall, 1),"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 537,
+      "text": "judge_c_score=round(judges[-1].overall, 1),"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 616,
+      "text": "if assessment.judge_a_score > 0:"
+    },
+    {
+      "file": "evaluation\\judges.py",
+      "line": 618,
+      "text": "base[i] += (assessment.judge_a_score - 50) / 200.0"
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 3,
+      "text": "from moodify.evaluation.judges import ("
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 4,
+      "text": "JudgeResult,"
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 6,
+      "text": "LLMJudge,"
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 7,
+      "text": "AcousticJudge,"
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 8,
+      "text": "ConsensusJudge,"
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 14,
+      "text": "\"JudgeResult\","
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 16,
+      "text": "\"LLMJudge\","
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 17,
+      "text": "\"AcousticJudge\","
+    },
+    {
+      "file": "evaluation\\__init__.py",
+      "line": 18,
+      "text": "\"ConsensusJudge\","
+    },
+    {
+      "file": "knowledge\\craft_chain_match.py",
+      "line": 156,
+      "text": "+ cm.user_preference * 0.2"
+    },
+    {
+      "file": "learning\\errors.py",
+      "line": 72,
+      "text": "class PairwisePreferenceInvalid(LearningError):"
+    },
+    {
+      "file": "learning\\errors.py",
+      "line": 73,
+      "text": "code = \"PAIRWISE_PREFERENCE_INVALID\""
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 4,
+      "text": "LearningRecord / RightsMetadata / TrainingEligibility / PairwisePreference /"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 202,
+      "text": "comparison_mode: str = \"A_B_BLIND\"  # A_B_BLIND | A_B_OPEN | SINGLE"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 221,
+      "text": "\"comparison_mode\": self.comparison_mode,"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 240,
+      "text": "comparison_mode=data.get(\"comparison_mode\", \"A_B_BLIND\"),"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 309,
+      "text": "# Pairwise preference / candidate outcome"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 314,
+      "text": "class PairwisePreference:"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 335,
+      "text": "def from_dict(cls, data: dict) -> \"PairwisePreference\":"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 407,
+      "text": "comparison_refs: list[str] = field(default_factory=list)"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 409,
+      "text": "pairwise_preferences: list[PairwisePreference] = field(default_factory=list)"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 435,
+      "text": "\"comparison_refs\": self.comparison_refs,"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 437,
+      "text": "\"pairwise_preferences\": [p.to_dict() for p in self.pairwise_preferences],"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 463,
+      "text": "comparison_refs=data.get(\"comparison_refs\", []),"
+    },
+    {
+      "file": "learning\\models.py",
+      "line": 465,
+      "text": "pairwise_preferences=[PairwisePreference.from_dict(p) for p in data.get(\"pairwise_preferences\", [])],"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 5,
+      "text": "after scans → comparisons → human listening → preference → learning record →"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 25,
+      "text": "PairwisePreference,"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 57,
+      "text": "# candidate A: presence lift (accepted path)"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 59,
+      "text": "# candidate B: overprocessed (rejected path: heavy limiting)"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 62,
+      "text": "cand_a_path = BASE / \"candidate_a.wav\""
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 63,
+      "text": "cand_b_path = BASE / \"candidate_b.wav\""
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 96,
+      "text": "# ---- two interventions + after scans + comparisons ----"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 98,
+      "text": "(\"CANDIDATE-A\", cand_a_path, \"synthetic-presence\", \"presence lift 4kHz\"),"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 99,
+      "text": "(\"CANDIDATE-B\", cand_b_path, \"synthetic-overprocess\", \"heavy tanh limiting\"),"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 111,
+      "text": "compare_scans(before, after, plan, case_root / \"05_comparison\" / cid,"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 115,
+      "text": "print(f\"AUDITORY_COMPARISON_COMPLETED {cid}\")"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 119,
+      "text": "evaluation_id=\"EV-GOLDEN\", case_id=CASE_ID, candidate_ids=[\"CANDIDATE-A\", \"CANDIDATE-B\"],"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 120,
+      "text": "evaluator_id=\"golden-listener\", comparison_mode=\"A_B_BLIND\","
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 121,
+      "text": "preferred_candidate_id=\"CANDIDATE-A\", audible_difference=\"CLEAR\","
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 123,
+      "text": "reasons=[\"candidate A clearer presence\", \"candidate B overprocessed\"],"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 128,
+      "text": "# ---- preferences + outcomes (accepted + rejected) ----"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 129,
+      "text": "store.append_preference(PairwisePreference("
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 130,
+      "text": "case_id=CASE_ID, preferred_candidate_id=\"CANDIDATE-A\","
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 131,
+      "text": "other_candidate_id=\"CANDIDATE-B\", basis=\"HUMAN_LISTENING\","
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 134,
+      "text": "case_id=CASE_ID, candidate_id=\"CANDIDATE-A\", outcome=\"ACCEPTED\","
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 139,
+      "text": "case_id=CASE_ID, candidate_id=\"CANDIDATE-B\", outcome=\"OVERPROCESSED\","
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 143,
+      "text": "print(\"PAIRWISE_PREFERENCE_RECORDED\")"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 176,
+      "text": "\"accepted_candidates\": [\"CANDIDATE-A\"],"
+    },
+    {
+      "file": "learning\\run_learning_golden.py",
+      "line": 177,
+      "text": "\"rejected_candidates\": [\"CANDIDATE-B\"],"
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 88,
+      "text": "# ---- 4/5/6. two candidates: interventions, after scans, comparisons ----"
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 107,
+      "text": "compare_scans(before, after, plan, case_root / \"05_comparison\" / cid,"
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 112,
+      "text": "(case_root / \"05_comparison\" / cid / \"comparison_report.json\").read_text(encoding=\"utf-8\")"
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 114,
+      "text": "print(f\"AUDITORY_COMPARISON_COMPLETED {cid}: \""
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 115,
+      "text": "f\"{report['judgment']['technical_assessment']}/{report['judgment']['workflow_decision']}\")"
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 122,
+      "text": "evaluator_id=\"user\", comparison_mode=\"A_B_OPEN\","
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 130,
+      "text": "# ---- 8. outcomes from technical judgment (artistic approval stays false) ----"
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 133,
+      "text": "(case_root / \"05_comparison\" / cid / \"comparison_report.json\").read_text(encoding=\"utf-8\")"
+    },
+    {
+      "file": "learning\\run_real_song.py",
+      "line": 135,
+      "text": "j = report[\"judgment\"]"
+    },
+    {
+      "file": "learning\\run_v2v3_spectra.py",
+      "line": 1,
+      "text": "\"\"\"Full V2/V3 spectrum comparison for the real song (AIR-001)."
+    },
+    {
+      "file": "learning\\run_v2v3_spectra.py",
+      "line": 15,
+      "text": "from moodify.auditory.comparison import build_delta_spectrograms"
+    },
+    {
+      "file": "learning\\run_v2_v3_compare.py",
+      "line": 1,
+      "text": "\"\"\"V2 vs V3 auditory comparison for the real song (AIR-001)."
+    },
+    {
+      "file": "learning\\run_v2_v3_compare.py",
+      "line": 57,
+      "text": "compare_scans(before, after, plan, case_root / \"05_comparison\" / cid,"
+    },
+    {
+      "file": "learning\\run_v2_v3_compare.py",
+      "line": 62,
+      "text": "(case_root / \"05_comparison\" / cid / \"comparison_report.json\").read_text(encoding=\"utf-8\")"
+    },
+    {
+      "file": "learning\\run_v2_v3_compare.py",
+      "line": 74,
+      "text": "j = report[\"judgment\"]"
+    },
+    {
+      "file": "learning\\run_v2_v3_compare.py",
+      "line": 80,
+      "text": "j = report[\"judgment\"]"
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 21,
+      "text": "PairwisePreference,"
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 41,
+      "text": "preferences = store.list_preferences()"
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 59,
+      "text": "pairwise_preferences=preferences,"
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 70,
+      "text": "cmp_root = store.case_root / \"05_comparison\""
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 71,
+      "text": "cmp_ok = cmp_root.joinpath(\"comparison_report.json\").is_file() or any("
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 72,
+      "text": "cmp_root.glob(\"*/comparison_report.json\")"
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 75,
+      "text": "problems.append(\"comparison report missing\")"
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 149,
+      "text": "def add_preference_and_outcome("
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 152,
+      "text": "pref: PairwisePreference,"
+    },
+    {
+      "file": "learning\\service.py",
+      "line": 155,
+      "text": "store.append_preference(pref)"
+    },
+    {
+      "file": "learning\\store.py",
+      "line": 19,
+      "text": "PairwisePreference,"
+    },
+    {
+      "file": "learning\\store.py",
+      "line": 132,
+      "text": "def append_preference(self, pref: PairwisePreference) -> None:"
+    },
+    {
+      "file": "learning\\store.py",
+      "line": 133,
+      "text": "_atomic_append(self._learning_dir() / \"pairwise_preferences.jsonl\", pref.to_dict())"
+    },
+    {
+      "file": "learning\\store.py",
+      "line": 135,
+      "text": "def list_preferences(self) -> list[PairwisePreference]:"
+    },
+    {
+      "file": "learning\\store.py",
+      "line": 136,
+      "text": "p = self._learning_dir() / \"pairwise_preferences.jsonl\""
+    },
+    {
+      "file": "learning\\store.py",
+      "line": 141,
+      "text": "out.append(PairwisePreference.from_dict(json.loads(line)))"
+    },
+    {
+      "file": "orchestration\\workflow_engine.py",
+      "line": 261,
+      "text": "\"\"\"对每个候选参数运行四级安全投影, 结果写回 ctx.candidates."
+    },
+    {
+      "file": "orchestration\\workflow_engine.py",
+      "line": 366,
+      "text": "\"\"\"Phase 3-6: 对每个候选参数做 DSP, 测 WHS/EDS, 选最优。"
+    },
+    {
+      "file": "orchestration\\workflow_engine.py",
+      "line": 368,
+      "text": "Phase 3 (HPSS) 对所有候选批量处理。"
+    },
+    {
+      "file": "orchestration\\workflow_engine.py",
+      "line": 369,
+      "text": "Phase 4-6 (空间/再合成/母带) 对每个候选独立处理。"
+    },
+    {
+      "file": "physics\\experiments_2.py",
+      "line": 505,
+      "text": "total_comparisons = 0"
+    },
+    {
+      "file": "physics\\experiments_2.py",
+      "line": 538,
+      "text": "total_comparisons += 1"
+    },
+    {
+      "file": "physics\\experiments_2.py",
+      "line": 547,
+      "text": "agreement_rate = 1.0 - disagreements / max(total_comparisons, 1)"
+    },
+    {
+      "file": "physics\\experiments_2.py",
+      "line": 553,
+      "text": "\"n_comparisons\": total_comparisons,"
+    },
+    {
+      "file": "physics\\experiments_2.py",
+      "line": 562,
+      "text": "print(f\"  Agreement rate: {agreement_rate:.1%} ({total_comparisons-disagreements}/{total_comparisons})\")"
+    },
+    {
+      "file": "physics\\experiments_3_engineering.py",
+      "line": 271,
+      "text": "# Main effects for comparison"
+    },
+    {
+      "file": "processing\\limiter.py",
+      "line": 10,
+      "text": "- Low-frequency THD audit — measurable before/after comparison"
+    },
+    {
+      "file": "processing\\limiter.py",
+      "line": 294,
+      "text": "# Legacy Limiter (preserved for A/B comparison)"
+    },
+    {
+      "file": "processing\\limiter.py",
+      "line": 305,
+      "text": "Preserved for A/B testing against apply_limiter_tp."
+    },
+    {
+      "file": "processing\\operators.py",
+      "line": 56,
+      "text": "mode=\"legacy_fft\":     旧 FFT sigmoid/Gaussian EQ (deprecated, 保留用于 A/B 测试)."
+    },
+    {
+      "file": "processing\\operators.py",
+      "line": 106,
+      "text": "\"\"\"[DEPRECATED] 旧 FFT sigmoid/Gaussian EQ — 保留用于 A/B 测试."
+    },
+    {
+      "file": "processing\\operators.py",
+      "line": 309,
+      "text": "保留用于 A/B 对比和回归测试。"
+    },
+    {
+      "file": "processing\\operators.py",
+      "line": 502,
+      "text": "Preserved for A/B testing. Use apply_limiter(mode=\\\"true_peak\\\")."
+    },
+    {
+      "file": "processing\\spectral_chain.py",
+      "line": 81,
+      "text": "# \"discard\": 丢弃 R (旧行为, 用于 A/B 对比)"
+    },
+    {
+      "file": "processing\\spectral_chain.py",
+      "line": 290,
+      "text": "# Recompute output STFT for comparison"
+    },
+    {
+      "file": "score_engine\\roundtrip.py",
+      "line": 77,
+      "text": "comparison = {"
+    },
+    {
+      "file": "score_engine\\roundtrip.py",
+      "line": 87,
+      "text": "return losses, warnings, comparison"
+    },
+    {
+      "file": "score_engine\\roundtrip.py",
+      "line": 100,
+      "text": "losses, warnings, comparison = _compare(score, summary)"
+    },
+    {
+      "file": "score_engine\\roundtrip.py",
+      "line": 117,
+      "text": "\"comparison\": comparison,"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 1,
+      "text": "\"\"\"Judge adapter for workspace v2 quality gate evaluation.\"\"\""
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 115,
+      "text": "class JudgeService:"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 118,
+      "text": "Creates JUDGE threads, runs quality checks (MRS, loudness, dynamics,"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 134,
+      "text": "def judge_version("
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 142,
+      "text": "if workflow.stage is not WorkflowStage.JUDGE:"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 143,
+      "text": "raise ValueError(\"Judge can run only during JUDGE stage\")"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 151,
+      "text": "thread_type=ThreadType.JUDGE,"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 152,
+      "text": "role=ThreadRole.JUDGE,"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 188,
+      "text": "\"judged_at\": finished_at.isoformat(),"
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 198,
+      "text": "reason=f\"Judge passed: {thread_id}\","
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 205,
+      "text": "f\"Judge requested reprocess: {thread_id}\","
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 213,
+      "text": "f\"Judge rejected: {thread_id}\","
+    },
+    {
+      "file": "services\\judge.py",
+      "line": 228,
+      "text": "f\"Judge failed: {message}\", at=failed_at,"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 3,
+      "text": "When Judge rejects a version, this service routes the workflow back to the"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 45,
+      "text": "def handle_judge_rejection("
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 48,
+      "text": "judge_thread_id: str,"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 52,
+      "text": "\"\"\"Handle a Judge rejection with retry routing."
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 59,
+      "text": "judge_thread = self.store.get_thread(project_id, judge_thread_id)"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 60,
+      "text": "if judge_thread.thread_type is not ThreadType.JUDGE:"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 61,
+      "text": "raise ValueError(\"only JUDGE threads can trigger rejection retry\")"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 62,
+      "text": "if judge_thread.status is not ThreadStatus.REJECTED:"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 65,
+      "text": "version_id = judge_thread.inputs.get(\"version_id\")"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 67,
+      "text": "raise ValueError(\"JUDGE thread missing version_id in inputs\")"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 129,
+      "text": "reason=f\"Judge rejection, retry #{retried_worker.retry_count}: {reason or 'quality gate not met'}\","
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 176,
+      "text": "rejected_judges = ["
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 178,
+      "text": "if t.thread_type is ThreadType.JUDGE"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 182,
+      "text": "if rejected_judges:"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 183,
+      "text": "latest_judge = max(rejected_judges, key=lambda t: t.finished_at or t.created_at)"
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 184,
+      "text": "return self.handle_judge_rejection("
+    },
+    {
+      "file": "services\\retry.py",
+      "line": 185,
+      "text": "project_id, latest_judge.thread_id, reason=reason"
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 1,
+      "text": "\"\"\"Version comparison service for workspace v2."
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 4,
+      "text": "across two AudioVersion nodes, returning a unified comparison structure."
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 99,
+      "text": "Produces a unified comparison structure suitable for A/B listening"
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 100,
+      "text": "and metric comparison in the UI."
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 119,
+      "text": "\"\"\"Compare two versions and return a unified comparison structure.\"\"\""
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 151,
+      "text": "\"comparisons\": {},"
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 155,
+      "text": "result[\"comparisons\"][\"duration\"] = _safe_compare("
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 159,
+      "text": "result[\"comparisons\"][\"sample_rate\"] = _safe_compare("
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 163,
+      "text": "result[\"comparisons\"][\"channels\"] = _safe_compare("
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 168,
+      "text": "result[\"comparisons\"][\"lineage\"] = {"
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 174,
+      "text": "result[\"comparisons\"][\"treatment\"] = _compare_treatment_plans("
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 186,
+      "text": "result[\"comparisons\"][\"approval\"] = {"
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 196,
+      "text": "result[\"comparisons\"][\"format\"] = _safe_compare(format_a, format_b)"
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 205,
+      "text": "\"\"\"List versions available for comparison."
+    },
+    {
+      "file": "services\\version_compare.py",
+      "line": 208,
+      "text": "basic comparison readiness."
+    },
+    {
+      "file": "services\\__init__.py",
+      "line": 7,
+      "text": "from .judge import JudgeService"
+    },
+    {
+      "file": "services\\__init__.py",
+      "line": 16,
+      "text": "\"JudgeService\","
+    }
+  ]
+}

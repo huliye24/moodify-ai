@@ -77,6 +77,11 @@ class Candidate:
 
 @dataclass
 class RiskFlag:
+    """AuditoryFinding 的项目原生形态（MFY-PHASE1-FREEZE-001 判断契约规范化）。
+
+    severity 归一化映射（05_JUDGMENT_CONTRACT）：INFO -> LOW, WARNING -> MEDIUM,
+    BLOCKING -> HIGH/CRITICAL。severity 为 BLOCKING 的判断必须携带 evidence_refs。
+    """
     code: str
     severity: str  # INFO | WARNING | BLOCKING
     message: str
@@ -84,6 +89,14 @@ class RiskFlag:
     before: float | None = None
     after: float | None = None
     threshold: float | None = None
+    label: str | None = None
+    observed_value: float | None = None
+    unit: str | None = None
+    reference_basis: str | None = None
+    confidence: float | None = None
+    classification: str = "UNCERTAIN"  # TECHNICAL_RISK | ARTISTIC_CHARACTERISTIC | LIKELY_ARTIFACT | STRUCTURAL_ANOMALY | INFORMATIONAL | UNCERTAIN | INSUFFICIENT_EVIDENCE
+    rule_or_model_version: str | None = None
+    evidence_refs: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -94,6 +107,14 @@ class RiskFlag:
             "before": self.before,
             "after": self.after,
             "threshold": self.threshold,
+            "label": self.label,
+            "observed_value": self.observed_value,
+            "unit": self.unit,
+            "reference_basis": self.reference_basis,
+            "confidence": self.confidence,
+            "classification": self.classification,
+            "rule_or_model_version": self.rule_or_model_version,
+            "evidence_refs": self.evidence_refs,
         }
 
 

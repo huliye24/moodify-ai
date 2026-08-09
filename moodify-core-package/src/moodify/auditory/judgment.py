@@ -126,7 +126,66 @@ def evaluate_risk_flags(metric_delta: dict, before_metrics: dict, after_metrics:
         flags.append(RiskFlag("ANALYSIS_CONFIDENCE_LOW", "WARNING",
                               "analysis confidence low", "finite_sample_ratio", None, finite_a))
 
-    return flags
+    return [_enrich_risk_flag(f) for f in flags]
+
+
+# 判断契约 (05_JUDGMENT_CONTRACT) 字段补全：classification 映射与证据引用
+_CLASSIFICATION_BY_CODE = {
+    "SILENCE_STRUCTURE_CHANGED": "INFORMATIONAL",
+    "ANALYSIS_CONFIDENCE_LOW": "INSUFFICIENT_EVIDENCE",
+    "NEW_CLIPPING": "TECHNICAL_RISK",
+    "INVALID_AUDIO_SAMPLES": "TECHNICAL_RISK",
+    "TRUE_PEAK_MARGIN_REDUCED": "TECHNICAL_RISK",
+    "EXCESSIVE_LOUDNESS_INCREASE": "TECHNICAL_RISK",
+    "EXCESSIVE_DYNAMIC_COMPRESSION": "TECHNICAL_RISK",
+    "CREST_FACTOR_COLLAPSE": "TECHNICAL_RISK",
+    "LOW_FREQUENCY_OVERACCUMULATION": "LIKELY_ARTIFACT",
+    "HIGH_FREQUENCY_OVERACCUMULATION": "LIKELY_ARTIFACT",
+    "NEW_HIGH_FREQUENCY_CUTOFF": "LIKELY_ARTIFACT",
+    "STEREO_PHASE_RISK_INCREASED": "TECHNICAL_RISK",
+    "NEGATIVE_CORRELATION_INCREASED": "TECHNICAL_RISK",
+}
+
+_UNIT_BY_METRIC = {
+    "integrated_lufs": "LUFS",
+    "true_peak_dbfs": "dBTP",
+    "crest_factor_db": "dB",
+    "clipping_sample_count": "count",
+    "invalid_sample_count": "count",
+    "estimated_high_frequency_cutoff_hz": "Hz",
+    "bass_60_120_hz": "ratio",
+    "brilliance_5000_10000_hz": "ratio",
+    "phase_risk_ratio": "ratio",
+    "negative_correlation_ratio": "ratio",
+    "silence_ratio": "ratio",
+    "finite_sample_ratio": "ratio",
+}
+
+
+def _enrich_risk_flag(flag: RiskFlag) -> RiskFlag:
+    """按判断契约补全 RiskFlag 的可选字段；BLOCKING 必须有证据引用。"""
+    rule_key = flag.code.lower()
+    reference_basis = rule_key if rule_key in UNIVERSAL_THRESHOLDS else flag.metric
+    evidence_refs = ["metrics.json", "judgment_rules.json"]
+    if flag.severity == "BLOCKING" and not flag.evidence_refs:
+        evidence_refs.append("scan_manifest.json")
+    return RiskFlag(
+        code=flag.code,
+        severity=flag.severity,
+        message=flag.message,
+        metric=flag.metric,
+        before=flag.before,
+        after=flag.after,
+        threshold=flag.threshold,
+        label=flag.message,
+        observed_value=flag.after if flag.after is not None else flag.before,
+        unit=_UNIT_BY_METRIC.get(flag.metric or "", None),
+        reference_basis=reference_basis,
+        confidence=0.9 if flag.severity != "INFO" else 0.5,
+        classification=_CLASSIFICATION_BY_CODE.get(flag.code, "UNCERTAIN"),
+        rule_or_model_version=f"judgment-rules-v{JUDGMENT_RULES_VERSION}",
+        evidence_refs=evidence_refs,
+    )
 
 
 def evaluate_processing_plan(plan: dict, metric_delta: dict, before_metrics: dict, after_metrics: dict) -> tuple[list[str], list[str]]:

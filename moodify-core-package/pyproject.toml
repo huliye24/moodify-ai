@@ -50,7 +50,7 @@ dev = ["pytest>=7.0", "httpx>=0.24.0", "matplotlib>=3.5"]
 full = ["moodify[dsp,separation,api,dev]"]
 
 [project.scripts]
-moodify = "moodify.cli:main"
+moodify = "moodify.cli_v2.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

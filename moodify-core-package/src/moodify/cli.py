@@ -1,4 +1,8 @@
-"""
+"""Legacy Auditory Intervention Laboratory CLI.
+
+The canonical ``moodify`` command is ``moodify.cli_v2.main``. This module is
+retained only for reproducibility of historical intervention cases.
+
 Moodify CLI — AI music post-processing, one command.
 
 Usage:

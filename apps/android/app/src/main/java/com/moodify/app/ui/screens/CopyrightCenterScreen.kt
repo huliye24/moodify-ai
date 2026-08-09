@@ -24,6 +24,7 @@ import com.moodify.app.R
 import com.moodify.app.ui.components.GradientButton
 import com.moodify.app.ui.theme.*
 
+@Deprecated("PHASE2_FROZEN (MFY-PHASE1-FREEZE-001): copyright exchange is Phase II, unreachable from primary navigation")
 @Composable
 fun CopyrightCenterScreen(onBack: () -> Unit, onContinuePublish: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {

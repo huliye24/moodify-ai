@@ -5,14 +5,17 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from moodify.api.main import app
+from moodify.api.routes.access import router
 
 
 def _client(tmp_path: Path) -> TestClient:
     os.environ["MOODIFY_ACCESS_ROOT"] = str(tmp_path / "access")
-    return TestClient(app)
+    lab_app = FastAPI()
+    lab_app.include_router(router)
+    return TestClient(lab_app)
 
 
 def test_register_open_without_code(tmp_path: Path):
