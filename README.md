@@ -1,5 +1,11 @@
 # Moodify
 
+> **The Ear of AI.**
+>
+> Moodify is an **Auditory Intelligence System** for AI-generated audio and music.
+
+**中文定位：Moodify 是 AI 的耳朵。**
+
 > 当前正式方向：v0.4 Research/Production Baseline。
 
 Moodify 聚焦 **AI 生成音乐的后生成处理、质量分析、结构恢复和资产化**。它的目标不是自动化传统混音或廉价替代混音师，而是在限定任务上，通过可测量实验验证 WSE 分析深度、MSE 结构理解和 PPE 稳定生产相对于传统人工工作流的优势。当前没有证据支持“已经超过专业混音师”的总体结论。
