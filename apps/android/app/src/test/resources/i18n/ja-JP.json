@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "languageName": "日本語",
+    "locale": "ja-JP"
+  },
+  "common": {
+    "appName": "Moodify",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "done": "完了",
+    "back": "戻る",
+    "next": "次へ",
+    "close": "閉じる",
+    "retry": "再試行",
+    "delete": "削除",
+    "edit": "編集",
+    "search": "検索",
+    "loading": "読み込み中…",
+    "unknownError": "問題が発生しました。",
+    "networkError": "ネットワークに接続できません。",
+    "required": "必須",
+    "optional": "任意"
+  },
+  "nav": {
+    "home": "ホーム",
+    "process": "聴覚検出",
+    "works": "作品",
+    "profile": "マイページ",
+    "discover": "音楽を探す",
+    "tasks": "処理タスク",
+    "cloud": "クラウド",
+    "creatorCenter": "クリエイターセンター",
+    "dataCenter": "データセンター",
+    "copyright": "著作権と配信",
+    "partnership": "パートナーシップ",
+    "settings": "設定",
+    "help": "ヘルプとフィードバック",
+    "cases": "ケース"
+  },
+  "home": {
+    "title": "誰も気づかない音を聴く。",
+    "subtitle": "音楽の分析・判断・介入・検証を支える聴覚インテリジェンス。",
+    "startAnalysis": "聴覚検出を開始",
+    "importAudio": "音源を読み込む",
+    "recentWorks": "最近の作品",
+    "noRecentWorks": "作品はまだありません"
+  },
+  "analysis": {
+    "title": "オーディオ分析",
+    "upload": "音源をアップロード",
+    "analyzing": "聴取・分析中…",
+    "completed": "分析が完了しました",
+    "failed": "分析に失敗しました",
+    "source": "ソース",
+    "waveform": "波形",
+    "loudness": "ラウドネス",
+    "stereo": "ステレオ",
+    "phase": "位相",
+    "spectrum": "スペクトル",
+    "transients": "トランジェント",
+    "residual": "残差",
+    "highFrequencyCutoff": "高域カットオフ",
+    "report": "分析レポート",
+    "exportReport": "レポートを書き出す",
+    "processingTitle": "聴覚介入実験"
+  },
+  "works": {
+    "all": "すべて",
+    "drafts": "下書き",
+    "processed": "処理済み",
+    "published": "公開済み",
+    "empty": "作品はここに表示されます。",
+    "version": "バージョン {{version}}",
+    "updatedAt": "{{date}} に更新"
+  },
+  "settings": {
+    "title": "設定",
+    "language": "言語",
+    "languageDescription": "Moodify の表示言語を選択します。",
+    "followSystem": "システム言語に従う",
+    "appearance": "外観",
+    "notifications": "通知",
+    "privacy": "プライバシー",
+    "about": "Moodify について",
+    "languageChanged": "言語を{{language}}に変更しました。"
+  },
+  "auth": {
+    "signIn": "ログイン",
+    "signUp": "アカウント作成",
+    "signOut": "ログアウト",
+    "email": "メールアドレス",
+    "forgotPassword": "パスワードをお忘れですか？"
+  },
+  "accessibility": {
+    "openLanguageMenu": "言語メニューを開く",
+    "selectedLanguage": "{{language}}を選択中"
+  }
+}
