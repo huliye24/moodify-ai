@@ -1,0 +1,36 @@
+{
+  "index_id": "index-production_system",
+  "family": "Production System",
+  "generated_at": "2026-08-09T04:27:39+00:00",
+  "member_count": 7,
+  "members": [
+    {
+      "asset_id": "MFY-KNW-0007",
+      "name": "PPE Standards"
+    },
+    {
+      "asset_id": "MFY-MDL-0003",
+      "name": "Pairwise Auditory Judge"
+    },
+    {
+      "asset_id": "MFY-MDL-0004",
+      "name": "N-track Ranking System"
+    },
+    {
+      "asset_id": "MFY-SFT-0001",
+      "name": "Moodify Android App"
+    },
+    {
+      "asset_id": "MFY-SFT-0014",
+      "name": "Auditory Evidence Tooling"
+    },
+    {
+      "asset_id": "MFY-SYS-0002",
+      "name": "Production Control Spine"
+    },
+    {
+      "asset_id": "MFY-SYS-0008",
+      "name": "CWC Compute Credit Accounting"
+    }
+  ]
+}

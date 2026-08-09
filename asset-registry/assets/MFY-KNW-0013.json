@@ -1,0 +1,32 @@
+{
+  "asset_id": "MFY-KNW-0013",
+  "name": "Strategic & Architecture Documentation",
+  "asset_class": "KNOWLEDGE",
+  "asset_subclass": "canonical-docs",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "VALIDATED",
+  "created_at": "2026-08-08",
+  "first_known_at": "2026-08-08",
+  "current_version": "v1",
+  "repository_locations": [
+    "docs/AUDITORY_INTELLIGENCE_ARCHITECTURE.md",
+    "docs/ASSET_MODEL.md",
+    "docs/LEGACY_AND_EXPERIMENTAL_POLICY.md",
+    "docs/REPOSITORY_STATUS.md",
+    "docs/architecture/"
+  ],
+  "creation_source": {"kind": "in-house-development", "description": "The Ear of AI 定位（Listen→Represent→Judge→Intervene→Verify→Learn）+ WSE/MSE/PPE + 资产循环"},
+  "evidence_refs": [
+    {"kind": "commit", "ref": "028ccf1 (PR #16 reconstitution)"},
+    {"kind": "verify", "ref": "scripts/verify_repositioning.py PASS"}
+  ],
+  "third_party_dependencies": [],
+  "related_assets": ["MFY-KNW-0005", "MFY-KNW-0006", "MFY-KNW-0007"],
+  "license_status": "GPL-3.0 (repository)",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "PUBLIC",
+  "notes": "canonical 身份文档族；README 合并决策后身份段已入当前分支",
+  "limitations": ["完整 canonical README 段落未入当前分支（合并决策边界，见记忆）"]
+}

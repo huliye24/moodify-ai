@@ -1,0 +1,32 @@
+{
+  "index_id": "index-models_decision_systems",
+  "family": "Models & Decision Systems",
+  "generated_at": "2026-08-09T04:27:39+00:00",
+  "member_count": 6,
+  "members": [
+    {
+      "asset_id": "MFY-DATA-0012",
+      "name": "Golden Case Corpora"
+    },
+    {
+      "asset_id": "MFY-KNW-0007",
+      "name": "PPE Standards"
+    },
+    {
+      "asset_id": "MFY-KNW-0013",
+      "name": "Strategic & Architecture Documentation"
+    },
+    {
+      "asset_id": "MFY-MDL-0003",
+      "name": "Pairwise Auditory Judge"
+    },
+    {
+      "asset_id": "MFY-MDL-0004",
+      "name": "N-track Ranking System"
+    },
+    {
+      "asset_id": "MFY-SYS-0002",
+      "name": "Production Control Spine"
+    }
+  ]
+}

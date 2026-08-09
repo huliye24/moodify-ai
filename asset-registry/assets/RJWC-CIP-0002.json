@@ -1,0 +1,23 @@
+{
+  "asset_id": "RJWC-CIP-0002",
+  "name": "Music Sample Corpus (Cadence 等)",
+  "asset_class": "CULTURAL_IP",
+  "asset_subclass": "audio-samples",
+  "project": "moodify-ai",
+  "owner_entity": "UNKNOWN (来源/授权待核)",
+  "ownership_status": "UNKNOWN",
+  "production_status": "LEGACY_UNVERIFIED",
+  "created_at": null,
+  "first_known_at": "2026-01-01",
+  "current_version": null,
+  "repository_locations": ["moodify-core-package/outputs/", "treatment_records/"],
+  "creation_source": {"kind": "uncertain", "description": "本地测试/演示音频样本（可能含版权音乐片段）"},
+  "evidence_refs": [],
+  "third_party_dependencies": [],
+  "related_assets": ["MFY-DATA-0009"],
+  "license_status": "UNKNOWN",
+  "transferability": "RESTRICTED",
+  "confidentiality": "RESTRICTED",
+  "notes": "保留但不分发；来源/授权/版权归属未核——LEGACY_UNVERIFIED 而非删除",
+  "limitations": ["授权证据缺失", "禁止导出/公开"]
+}

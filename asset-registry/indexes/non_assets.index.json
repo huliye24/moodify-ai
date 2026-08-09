@@ -1,0 +1,27 @@
+{
+  "index_id": "index-non-assets",
+  "generated_at": "2026-08-09T04:27:39+00:00",
+  "operational_capabilities": [
+    "deployment & demo operations (scripts/deploy/, cloud_status.py)",
+    "audit & scan tooling (scripts/audit_focus/, scan scripts)",
+    "CI/test execution environment (local JBR/venv setup)"
+  ],
+  "third_party_services": [
+    "阿里云 ECS demo host (120.55.191.146)",
+    "腾讯云 CVM hosts (139.199.186.106 / 43.134.12.248 / 43.156.175.4)"
+  ],
+  "temporary_experiments": [
+    "docs/experiments/ 与 artifacts/ 下未定稿实验",
+    "phase1 相关探索产物（docs/architecture/phase1_*）"
+  ],
+  "dependencies": [
+    "ffmpeg/ffprobe (external decode)",
+    "numpy/scipy/librosa/pyloudnorm/pydantic/PyYAML/fastapi (pypi)",
+    "MuseScore / whisperX / basic-pitch (optional backends)"
+  ],
+  "deprecated_items": [
+    "CWC 经济功能（补丁 08 已删除，git 历史可恢复）",
+    "legacy WorkflowOrchestrator（归档兼容路径）",
+    "night/moodify_daily_run_system* 打包重复"
+  ]
+}

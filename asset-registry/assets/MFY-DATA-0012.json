@@ -1,0 +1,31 @@
+{
+  "asset_id": "MFY-DATA-0012",
+  "name": "Golden Case Corpora",
+  "asset_class": "DATA",
+  "asset_subclass": "golden-cases",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "VALIDATED",
+  "created_at": "2026-08-08",
+  "first_known_at": "2026-08-08",
+  "current_version": "v1",
+  "repository_locations": [
+    "moodify-core-package/outputs/pairwise_golden/",
+    "moodify-core-package/outputs/ntrack_golden/",
+    "moodify-core-package/outputs/access_golden/"
+  ],
+  "creation_source": {"kind": "in-house-development", "description": "确定性合成（RNG seed 7）+ 真实扫描的黄金验证语料"},
+  "evidence_refs": [
+    {"kind": "golden", "ref": "outputs/pairwise_golden/golden_summary.json (6/6)"},
+    {"kind": "golden", "ref": "outputs/ntrack_golden/golden_summary.json (7/7)"},
+    {"kind": "golden", "ref": "outputs/access_golden/golden_summary.json (7/7)"}
+  ],
+  "third_party_dependencies": [],
+  "related_assets": ["MFY-MDL-0003", "MFY-MDL-0004", "MFY-SYS-0008"],
+  "license_status": "INTERNAL",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "INTERNAL",
+  "notes": "20 个黄金场景覆盖决策/排名/准入；可复现命令在各补丁报告",
+  "limitations": ["合成音色与真实音乐差异（特征区分度有限已记录）"]
+}

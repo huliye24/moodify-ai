@@ -1,0 +1,28 @@
+{
+  "index_id": "index-auditory_knowledge_system",
+  "family": "Auditory Knowledge System",
+  "generated_at": "2026-08-09T04:27:39+00:00",
+  "member_count": 5,
+  "members": [
+    {
+      "asset_id": "MFY-KNW-0005",
+      "name": "WSE Knowledge Base"
+    },
+    {
+      "asset_id": "MFY-KNW-0006",
+      "name": "MSE Knowledge Base"
+    },
+    {
+      "asset_id": "MFY-KNW-0007",
+      "name": "PPE Standards"
+    },
+    {
+      "asset_id": "MFY-KNW-0013",
+      "name": "Strategic & Architecture Documentation"
+    },
+    {
+      "asset_id": "MFY-SYS-0008",
+      "name": "CWC Compute Credit Accounting"
+    }
+  ]
+}

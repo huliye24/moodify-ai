@@ -1,0 +1,23 @@
+{
+  "asset_id": "RJWC-BRD-0001",
+  "name": "Moodify Brand & Domain",
+  "asset_class": "BRAND_DOMAIN",
+  "asset_subclass": "brand",
+  "project": "moodify-ai",
+  "owner_entity": "UNKNOWN (待创始人确认)",
+  "ownership_status": "UNKNOWN",
+  "production_status": "CONCEPT",
+  "created_at": null,
+  "first_known_at": "2026-08-01",
+  "current_version": null,
+  "repository_locations": ["README.md", "docs/"],
+  "creation_source": {"kind": "uncertain", "description": "品牌名/域名/商标注册状态未核实"},
+  "evidence_refs": [],
+  "third_party_dependencies": [],
+  "related_assets": ["MFY-KNW-0013"],
+  "license_status": null,
+  "transferability": "UNKNOWN",
+  "confidentiality": "INTERNAL",
+  "notes": "品牌资产：名称 Moodify、口号 The Ear of AI；注册/域名/商标状态需人类确认",
+  "limitations": ["无注册证据"]
+}

@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RJWC Asset Record",
+  "type": "object",
+  "required": [
+    "asset_id",
+    "name",
+    "asset_class",
+    "project",
+    "owner_entity",
+    "ownership_status",
+    "production_status",
+    "repository_locations",
+    "evidence_refs",
+    "third_party_dependencies",
+    "confidentiality"
+  ],
+  "properties": {
+    "asset_id": {
+      "type": "string",
+      "pattern": "^(MFY|RJWC)-(DATA|KNW|REP|MDL|SFT|SYS|CIP|CTR|BRD|INF|CAP)-[0-9]{4}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset_class": {
+      "type": "string",
+      "enum": [
+        "DATA",
+        "KNOWLEDGE",
+        "REPRESENTATION",
+        "MODEL",
+        "SOFTWARE",
+        "PRODUCTION_SYSTEM",
+        "CULTURAL_IP",
+        "CONTRACTUAL",
+        "BRAND_DOMAIN",
+        "INFRASTRUCTURE_RESOURCE",
+        "OPERATIONAL_CAPABILITY"
+      ]
+    },
+    "asset_subclass": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "project": {
+      "type": "string"
+    },
+    "owner_entity": {
+      "type": "string"
+    },
+    "ownership_status": {
+      "type": "string",
+      "enum": [
+        "OWNED",
+        "LICENSED_EXCLUSIVE",
+        "LICENSED_NONEXCLUSIVE",
+        "CONTROLLED_RESOURCE",
+        "THIRD_PARTY",
+        "JOINTLY_OWNED",
+        "UNKNOWN",
+        "DISPUTED",
+        "PUBLIC_DOMAIN",
+        "OPEN_SOURCE_DEPENDENCY"
+      ]
+    },
+    "production_status": {
+      "type": "string",
+      "enum": [
+        "CONCEPT",
+        "EXPERIMENTAL",
+        "INTERNAL",
+        "VALIDATED",
+        "PRODUCTION",
+        "DEPRECATED",
+        "ARCHIVED",
+        "LEGACY_UNVERIFIED"
+      ]
+    },
+    "created_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "first_known_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "repository_locations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "creation_source": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "third_party_dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "related_assets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "license_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "transferability": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "TRANSFERABLE",
+        "LICENSEABLE",
+        "NON_TRANSFERABLE",
+        "RESTRICTED",
+        "UNKNOWN",
+        null
+      ]
+    },
+    "confidentiality": {
+      "type": "string",
+      "enum": [
+        "PUBLIC",
+        "INTERNAL",
+        "CONFIDENTIAL",
+        "RESTRICTED",
+        "TRADE_SECRET"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

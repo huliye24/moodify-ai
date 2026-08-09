@@ -1,0 +1,33 @@
+{
+  "asset_id": "MFY-MDL-0003",
+  "name": "Pairwise Auditory Judge",
+  "asset_class": "PRODUCTION_SYSTEM",
+  "asset_subclass": "decision-system",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "PRODUCTION",
+  "created_at": "2026-08-08",
+  "first_known_at": "2026-08-08",
+  "current_version": "1.0",
+  "repository_locations": [
+    "moodify-core-package/src/moodify/evaluation/pairwise/",
+    "moodify-core-package/configs/pairwise_policy_v1.yaml"
+  ],
+  "creation_source": {"kind": "in-house-development", "description": "DSK-MFY-PAIRWISE-JUDGE-001 (commit 2e26fa4)"},
+  "evidence_refs": [
+    {"kind": "test-report", "ref": "docs/audits/DSK-MFY-PAIRWISE-JUDGE-001/"},
+    {"kind": "golden", "ref": "moodify-core-package/outputs/pairwise_golden/golden_summary.json"},
+    {"kind": "commit", "ref": "2e26fa4"}
+  ],
+  "third_party_dependencies": [
+    {"name": "ffmpeg", "license": "LGPL/GPL", "role": "decode (external)"},
+    {"name": "numpy", "license": "BSD-3-Clause", "role": "analysis"}
+  ],
+  "related_assets": ["MFY-MDL-0004", "MFY-DATA-0010", "MFY-KNW-0005", "MFY-SYS-0008"],
+  "license_status": "GPL-3.0 (repository)",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "INTERNAL",
+  "notes": "A_WINS/B_WINS/INCONCLUSIVE 三态 + LOW/MEDIUM/HIGH 置信带 + 强制弃权；5 维度比较；训练卫生 MACHINE_ONLY 永不 eligible",
+  "limitations": ["阈值待标注偏好数据集校准", "transient/residual/MSE 结构维度无检测器"]
+}

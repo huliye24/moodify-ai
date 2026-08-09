@@ -1,0 +1,34 @@
+{
+  "asset_id": "MFY-INF-0015",
+  "name": "Cloud Demo & Deployment Infrastructure",
+  "asset_class": "INFRASTRUCTURE_RESOURCE",
+  "asset_subclass": "cloud-deploy",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "CONTROLLED_RESOURCE",
+  "production_status": "INTERNAL",
+  "created_at": "2026-06-01",
+  "first_known_at": "2026-06-01",
+  "current_version": "2026-08",
+  "repository_locations": [
+    "scripts/deploy/",
+    "cloud_status.py",
+    "sync_cloud.sh",
+    "dashboard.html"
+  ],
+  "creation_source": {"kind": "procured-resource", "description": "阿里云 120.55.191.146 + 腾讯云 139.199.186.106 等演示/备份远端"},
+  "evidence_refs": [
+    {"kind": "deploy-script", "ref": "0a45c58 (一键部署脚本)"},
+    {"kind": "dashboard", "ref": "dashboard.html 云端实验控制面板"}
+  ],
+  "third_party_dependencies": [
+    {"name": "阿里云 ECS", "license": "commercial", "role": "demo host"},
+    {"name": "腾讯云 CVM", "license": "commercial", "role": "backup/analysis host"}
+  ],
+  "related_assets": ["MFY-SYS-0002", "MFY-SFT-0001"],
+  "license_status": "commercial-lease",
+  "transferability": "NON_TRANSFERABLE",
+  "confidentiality": "RESTRICTED",
+  "notes": "演示机 2C/1.6GB 不适合重活；API 演示/备份远端",
+  "limitations": ["凭据在本地配置，不随仓库分发"]
+}

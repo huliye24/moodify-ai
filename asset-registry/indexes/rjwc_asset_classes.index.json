@@ -1,0 +1,90 @@
+{
+  "index_id": "index-rjwc-asset-classes",
+  "generated_at": "2026-08-09T04:27:39+00:00",
+  "classes": {
+    "DATA": [
+      {
+        "asset_id": "MFY-DATA-0009",
+        "name": "Auditory Case Corpus"
+      },
+      {
+        "asset_id": "MFY-DATA-0010",
+        "name": "Preference & Ranking Corpus"
+      },
+      {
+        "asset_id": "MFY-DATA-0012",
+        "name": "Golden Case Corpora"
+      }
+    ],
+    "INFRASTRUCTURE_RESOURCE": [
+      {
+        "asset_id": "MFY-INF-0015",
+        "name": "Cloud Demo & Deployment Infrastructure"
+      }
+    ],
+    "KNOWLEDGE": [
+      {
+        "asset_id": "MFY-KNW-0005",
+        "name": "WSE Knowledge Base"
+      },
+      {
+        "asset_id": "MFY-KNW-0006",
+        "name": "MSE Knowledge Base"
+      },
+      {
+        "asset_id": "MFY-KNW-0007",
+        "name": "PPE Standards"
+      },
+      {
+        "asset_id": "MFY-KNW-0013",
+        "name": "Strategic & Architecture Documentation"
+      }
+    ],
+    "PRODUCTION_SYSTEM": [
+      {
+        "asset_id": "MFY-MDL-0003",
+        "name": "Pairwise Auditory Judge"
+      },
+      {
+        "asset_id": "MFY-MDL-0004",
+        "name": "N-track Ranking System"
+      },
+      {
+        "asset_id": "MFY-SYS-0002",
+        "name": "Production Control Spine"
+      },
+      {
+        "asset_id": "MFY-SYS-0008",
+        "name": "CWC Compute Credit Accounting"
+      }
+    ],
+    "REPRESENTATION": [
+      {
+        "asset_id": "MFY-REP-0011",
+        "name": "Auditory Representation Contracts"
+      }
+    ],
+    "SOFTWARE": [
+      {
+        "asset_id": "MFY-SFT-0001",
+        "name": "Moodify Android App"
+      },
+      {
+        "asset_id": "MFY-SFT-0014",
+        "name": "Auditory Evidence Tooling"
+      }
+    ],
+    "BRAND_DOMAIN": [
+      {
+        "asset_id": "RJWC-BRD-0001",
+        "name": "Moodify Brand & Domain"
+      }
+    ],
+    "CULTURAL_IP": [
+      {
+        "asset_id": "RJWC-CIP-0002",
+        "name": "Music Sample Corpus (Cadence 等)"
+      }
+    ]
+  }
+}

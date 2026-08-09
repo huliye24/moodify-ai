@@ -1,0 +1,33 @@
+{
+  "asset_id": "MFY-MDL-0004",
+  "name": "N-track Ranking System",
+  "asset_class": "PRODUCTION_SYSTEM",
+  "asset_subclass": "ranking-system",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "PRODUCTION",
+  "created_at": "2026-08-09",
+  "first_known_at": "2026-08-09",
+  "current_version": "1.0",
+  "repository_locations": [
+    "moodify-core-package/src/moodify/evaluation/ntrack/",
+    "moodify-core-package/configs/ntrack_policy_v1.yaml"
+  ],
+  "creation_source": {"kind": "in-house-development", "description": "DSK-MFY-NTRACK-RANKER-001 (commit 59d0b29)"},
+  "evidence_refs": [
+    {"kind": "test-report", "ref": "docs/audits/DSK-MFY-NTRACK-RANKER-001/"},
+    {"kind": "golden", "ref": "moodify-core-package/outputs/ntrack_golden/golden_summary.json"},
+    {"kind": "commit", "ref": "59d0b29"}
+  ],
+  "third_party_dependencies": [
+    {"name": "ffmpeg", "license": "LGPL/GPL", "role": "decode (external)"},
+    {"name": "numpy", "license": "BSD-3-Clause", "role": "analysis"}
+  ],
+  "related_assets": ["MFY-MDL-0003", "MFY-DATA-0010", "MFY-REP-0011"],
+  "license_status": "GPL-3.0 (repository)",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "INTERNAL",
+  "notes": "分级比较预算（≤15 全对）+ Elo 全局排名（tie bands/环容忍）+ 质量门 + 专辑感知重排（冗余惩罚/多样性奖励）；复用 Pairwise Judge 比较引擎",
+  "limitations": ["Android UI 未接入", "API 同步执行（大批需异步 job）", "跨 case 全局分析缓存未做"]
+}

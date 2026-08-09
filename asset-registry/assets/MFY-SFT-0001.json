@@ -1,0 +1,29 @@
+{
+  "asset_id": "MFY-SFT-0001",
+  "name": "Moodify Android App",
+  "asset_class": "SOFTWARE",
+  "asset_subclass": "mobile-client",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "INTERNAL",
+  "created_at": "2026-06-03",
+  "first_known_at": "2026-06-03",
+  "current_version": "0.4",
+  "repository_locations": ["apps/android/"],
+  "creation_source": {"kind": "in-house-development", "description": "自有 API v1 契约 + 零依赖数据层（ANDROID-003）"},
+  "evidence_refs": [
+    {"kind": "test-report", "ref": "docs/audits/DSK-MFY-AUDITORY-FOCUS-PATCH-001/TEST_REPORT.md"},
+    {"kind": "build", "ref": "assembleDebug"}
+  ],
+  "third_party_dependencies": [
+    {"name": "Media3 (ExoPlayer)", "license": "Apache-2.0", "role": "playback"},
+    {"name": "Jetpack Compose", "license": "Apache-2.0", "role": "ui"}
+  ],
+  "related_assets": ["MFY-SYS-0002", "MFY-REP-0011"],
+  "license_status": "GPL-3.0 (repository)",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "INTERNAL",
+  "notes": "4-tab 导航（首页/听觉检测/案例/我的）；补丁 08 减法后无 CWC 经济功能",
+  "limitations": ["模拟器/真机验证覆盖有限", "播放为本地链路，未接云端目录"]
+}

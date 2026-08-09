@@ -1,0 +1,30 @@
+{
+  "asset_id": "MFY-DATA-0009",
+  "name": "Auditory Case Corpus",
+  "asset_class": "DATA",
+  "asset_subclass": "case-corpus",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "CONTROLLED_RESOURCE",
+  "production_status": "INTERNAL",
+  "created_at": "2025-11-01",
+  "first_known_at": "2025-11-01",
+  "current_version": "unversioned",
+  "repository_locations": [
+    "moodify-core-package/outputs/cases/",
+    "treatment_records/",
+    "moodify-core-package/outputs/"
+  ],
+  "creation_source": {"kind": "in-house-production", "description": "扫描/比较/干预案例产物（before/after、metrics、timeline）"},
+  "evidence_refs": [
+    {"kind": "schema", "ref": "moodify-core-package/src/moodify/auditory/manifests.py"},
+    {"kind": "scan-profile", "ref": "MFY-WSE-SCAN-PROFILE-001"}
+  ],
+  "third_party_dependencies": [],
+  "related_assets": ["MFY-KNW-0005", "MFY-SYS-0002", "MFY-DATA-0010"],
+  "license_status": "INTERNAL",
+  "transferability": "RESTRICTED",
+  "confidentiality": "CONFIDENTIAL",
+  "notes": "含真实音频样本（Cadence 等），不可公开；输出音频大文件不入库",
+  "limitations": ["未统一 snapshot 版本化", "部分历史案例缺完整 provenance"]
+}

@@ -1,0 +1,30 @@
+{
+  "asset_id": "MFY-DATA-0010",
+  "name": "Preference & Ranking Corpus",
+  "asset_class": "DATA",
+  "asset_subclass": "preference-corpus",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "CONTROLLED_RESOURCE",
+  "production_status": "INTERNAL",
+  "created_at": "2026-08-08",
+  "first_known_at": "2026-08-08",
+  "current_version": "unversioned",
+  "repository_locations": [
+    "moodify-core-package/src/moodify/learning/",
+    "moodify-core-package/outputs/pairwise/",
+    "moodify-core-package/outputs/rankings/"
+  ],
+  "creation_source": {"kind": "in-house-production", "description": "PairwisePreference（MACHINE_ONLY/HUMAN_CONFIRMED/HUMAN_OVERRIDE/HUMAN_EDITED）+ ntrack 派生偏好"},
+  "evidence_refs": [
+    {"kind": "model", "ref": "moodify-core-package/src/moodify/learning/models.py"},
+    {"kind": "audit", "ref": "docs/audits/DSK-MFY-PAIRWISE-JUDGE-001/AB_PREFERENCE_DATA_REPORT.md"}
+  ],
+  "third_party_dependencies": [],
+  "related_assets": ["MFY-MDL-0003", "MFY-MDL-0004", "MFY-KNW-0007"],
+  "license_status": "INTERNAL",
+  "transferability": "RESTRICTED",
+  "confidentiality": "CONFIDENTIAL",
+  "notes": "训练卫生：机器标签（MACHINE_ONLY）永不 eligible_for_training；人工确认/编辑才入训练集",
+  "limitations": ["样本量小（演示/黄金语料为主）", "跨用户分布未建模"]
+}

@@ -1,0 +1,33 @@
+{
+  "asset_id": "MFY-KNW-0007",
+  "name": "PPE Standards",
+  "asset_class": "KNOWLEDGE",
+  "asset_subclass": "production-process-engineering",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "VALIDATED",
+  "created_at": "2026-08-08",
+  "first_known_at": "2026-08-08",
+  "current_version": "v1",
+  "repository_locations": [
+    "docs/contracts/CANONICAL_MINIMUM_CONTRACTS_V1.md",
+    "moodify-core-package/src/moodify/contracts/",
+    "artifacts/pr15_extraction_001/PRODUCTION_AUTHORITY_MAP.md"
+  ],
+  "creation_source": {"kind": "in-house-research", "description": "生产案例/测量/证据/规则契约与 14 态机规划（MFY-MIG-001/004）"},
+  "evidence_refs": [
+    {"kind": "contract", "ref": "docs/contracts/CANONICAL_MINIMUM_CONTRACTS_V1.md"},
+    {"kind": "tests", "ref": "moodify-core-package/tests/contracts/ (37 tests)"},
+    {"kind": "commit", "ref": "af0e1d4"}
+  ],
+  "third_party_dependencies": [
+    {"name": "pydantic", "license": "MIT", "role": "contract models"}
+  ],
+  "related_assets": ["MFY-SYS-0002", "MFY-REP-0011", "MFY-SYS-0008"],
+  "license_status": "GPL-3.0 (repository)",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "INTERNAL",
+  "notes": "四个最小契约（ProductionCase/MeasurementRecord/EvidenceArtifact/Rule）+ 6 不变式；测量与判断分离；人类权威显式",
+  "limitations": ["14 态机尚未生产实现（MIG-004）"]
+}

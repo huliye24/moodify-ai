@@ -1,0 +1,391 @@
+{
+  "scanner": "scan_asset_candidates.py",
+  "candidate_count": 77,
+  "candidates": [
+    {
+      "path": "apps/android",
+      "class_hint": "SOFTWARE",
+      "file_count": 77
+    },
+    {
+      "path": "apps/tools",
+      "class_hint": "SOFTWARE",
+      "file_count": 1
+    },
+    {
+      "path": "artifacts/audits",
+      "class_hint": "UNKNOWN",
+      "file_count": 27
+    },
+    {
+      "path": "artifacts/mfy_mig_001",
+      "class_hint": "UNKNOWN",
+      "file_count": 3
+    },
+    {
+      "path": "artifacts/ocean_bridge",
+      "class_hint": "UNKNOWN",
+      "file_count": 36
+    },
+    {
+      "path": "artifacts/phase1_freeze",
+      "class_hint": "UNKNOWN",
+      "file_count": 5
+    },
+    {
+      "path": "artifacts/pr15_extraction_001",
+      "class_hint": "UNKNOWN",
+      "file_count": 13
+    },
+    {
+      "path": "artifacts/reconstitution_001",
+      "class_hint": "UNKNOWN",
+      "file_count": 6
+    },
+    {
+      "path": "artifacts/temporal_texture",
+      "class_hint": "UNKNOWN",
+      "file_count": 24
+    },
+    {
+      "path": "artifacts/verification",
+      "class_hint": "UNKNOWN",
+      "file_count": 17
+    },
+    {
+      "path": "configs/runtime_profiles",
+      "class_hint": "REPRESENTATION",
+      "file_count": 2
+    },
+    {
+      "path": "docs/MHP",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 39
+    },
+    {
+      "path": "docs/adr",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 2
+    },
+    {
+      "path": "docs/api",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 2
+    },
+    {
+      "path": "docs/architecture",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 18
+    },
+    {
+      "path": "docs/audit",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/auditory",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/auditory_intelligence",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 9
+    },
+    {
+      "path": "docs/audits",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 30
+    },
+    {
+      "path": "docs/bug",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 2
+    },
+    {
+      "path": "docs/calibration",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/cloud",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 6
+    },
+    {
+      "path": "docs/contracts",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/decisions",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 4
+    },
+    {
+      "path": "docs/e_chain",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 2
+    },
+    {
+      "path": "docs/echain",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 16
+    },
+    {
+      "path": "docs/engineer",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 10
+    },
+    {
+      "path": "docs/engineering",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 4
+    },
+    {
+      "path": "docs/experiments",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 340
+    },
+    {
+      "path": "docs/inspector",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/math",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 32
+    },
+    {
+      "path": "docs/metrics",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/nem",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 44
+    },
+    {
+      "path": "docs/operator",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 3
+    },
+    {
+      "path": "docs/plan",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 812
+    },
+    {
+      "path": "docs/policy",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/product",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 37
+    },
+    {
+      "path": "docs/prompts",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/protocol",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 2
+    },
+    {
+      "path": "docs/reference",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 6
+    },
+    {
+      "path": "docs/roadmap",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 4
+    },
+    {
+      "path": "docs/spec",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 8
+    },
+    {
+      "path": "docs/standards",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 7
+    },
+    {
+      "path": "docs/strategy",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 103
+    },
+    {
+      "path": "docs/tasks",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 288
+    },
+    {
+      "path": "docs/technical",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/third_party",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 2
+    },
+    {
+      "path": "docs/treatment_records",
+      "class_hint": "DATA",
+      "file_count": 3
+    },
+    {
+      "path": "docs/ui-sketches",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 97
+    },
+    {
+      "path": "docs/verification",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 1
+    },
+    {
+      "path": "docs/xuanzhen",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 8
+    },
+    {
+      "path": "moodify-core-package/.pytest_cache",
+      "class_hint": "UNKNOWN",
+      "file_count": 5
+    },
+    {
+      "path": "moodify-core-package/.ruff_cache",
+      "class_hint": "UNKNOWN",
+      "file_count": 31
+    },
+    {
+      "path": "moodify-core-package/calibration",
+      "class_hint": "UNKNOWN",
+      "file_count": 8
+    },
+    {
+      "path": "moodify-core-package/configs",
+      "class_hint": "UNKNOWN",
+      "file_count": 5
+    },
+    {
+      "path": "moodify-core-package/data",
+      "class_hint": "DATA",
+      "file_count": 0
+    },
+    {
+      "path": "moodify-core-package/docs",
+      "class_hint": "KNOWLEDGE",
+      "file_count": 4
+    },
+    {
+      "path": "moodify-core-package/logs",
+      "class_hint": "UNKNOWN",
+      "file_count": 0
+    },
+    {
+      "path": "moodify-core-package/outputs",
+      "class_hint": "DATA",
+      "file_count": 1325
+    },
+    {
+      "path": "moodify-core-package/scripts",
+      "class_hint": "SOFTWARE",
+      "file_count": 8
+    },
+    {
+      "path": "moodify-core-package/sensitivity",
+      "class_hint": "UNKNOWN",
+      "file_count": 1
+    },
+    {
+      "path": "moodify-core-package/src",
+      "class_hint": "SOFTWARE",
+      "file_count": 272
+    },
+    {
+      "path": "moodify-core-package/tests",
+      "class_hint": "UNKNOWN",
+      "file_count": 114
+    },
+    {
+      "path": "moodify-core-package/tools",
+      "class_hint": "SOFTWARE",
+      "file_count": 2
+    },
+    {
+      "path": "moodify_runtime/collectors",
+      "class_hint": "PRODUCTION_SYSTEM",
+      "file_count": 5
+    },
+    {
+      "path": "moodify_runtime/outputs",
+      "class_hint": "DATA",
+      "file_count": 0
+    },
+    {
+      "path": "moodify_runtime/recommenders",
+      "class_hint": "PRODUCTION_SYSTEM",
+      "file_count": 7
+    },
+    {
+      "path": "moodify_runtime/tests",
+      "class_hint": "PRODUCTION_SYSTEM",
+      "file_count": 81
+    },
+    {
+      "path": "schemas/canonical",
+      "class_hint": "REPRESENTATION",
+      "file_count": 4
+    },
+    {
+      "path": "tests/studio_session_prep",
+      "class_hint": "UNKNOWN",
+      "file_count": 7
+    },
+    {
+      "path": "tests/temporal_texture",
+      "class_hint": "UNKNOWN",
+      "file_count": 1
+    },
+    {
+      "path": "tools/architecture",
+      "class_hint": "SOFTWARE",
+      "file_count": 4
+    },
+    {
+      "path": "tools/project_governance",
+      "class_hint": "SOFTWARE",
+      "file_count": 13
+    },
+    {
+      "path": "tools/studio_session_prep",
+      "class_hint": "SOFTWARE",
+      "file_count": 11
+    },
+    {
+      "path": "tools/temporal_texture",
+      "class_hint": "SOFTWARE",
+      "file_count": 2
+    },
+    {
+      "path": "tools/third_party",
+      "class_hint": "SOFTWARE",
+      "file_count": 6
+    },
+    {
+      "path": "tools/xhs_compare_video",
+      "class_hint": "SOFTWARE",
+      "file_count": 3
+    }
+  ]
+}

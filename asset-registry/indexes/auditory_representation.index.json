@@ -1,0 +1,16 @@
+{
+  "index_id": "index-auditory_representation",
+  "family": "Auditory Representation",
+  "generated_at": "2026-08-09T04:27:39+00:00",
+  "member_count": 2,
+  "members": [
+    {
+      "asset_id": "MFY-KNW-0007",
+      "name": "PPE Standards"
+    },
+    {
+      "asset_id": "MFY-REP-0011",
+      "name": "Auditory Representation Contracts"
+    }
+  ]
+}

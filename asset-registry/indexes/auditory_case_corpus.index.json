@@ -1,0 +1,36 @@
+{
+  "index_id": "index-auditory_case_corpus",
+  "family": "Auditory Case Corpus",
+  "generated_at": "2026-08-09T04:27:39+00:00",
+  "member_count": 7,
+  "members": [
+    {
+      "asset_id": "MFY-DATA-0009",
+      "name": "Auditory Case Corpus"
+    },
+    {
+      "asset_id": "MFY-DATA-0010",
+      "name": "Preference & Ranking Corpus"
+    },
+    {
+      "asset_id": "MFY-DATA-0012",
+      "name": "Golden Case Corpora"
+    },
+    {
+      "asset_id": "MFY-KNW-0007",
+      "name": "PPE Standards"
+    },
+    {
+      "asset_id": "MFY-SFT-0001",
+      "name": "Moodify Android App"
+    },
+    {
+      "asset_id": "MFY-SYS-0002",
+      "name": "Production Control Spine"
+    },
+    {
+      "asset_id": "RJWC-CIP-0002",
+      "name": "Music Sample Corpus (Cadence 等)"
+    }
+  ]
+}

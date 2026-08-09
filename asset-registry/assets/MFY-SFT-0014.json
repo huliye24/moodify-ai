@@ -1,0 +1,30 @@
+{
+  "asset_id": "MFY-SFT-0014",
+  "name": "Auditory Evidence Tooling",
+  "asset_class": "SOFTWARE",
+  "asset_subclass": "tooling",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "INTERNAL",
+  "created_at": "2026-08-01",
+  "first_known_at": "2026-08-01",
+  "current_version": "1.0",
+  "repository_locations": [
+    "moodify-core-package/tools/auditory_panel.py",
+    "scripts/",
+    "moodify-core-package/scripts/audit_focus/"
+  ],
+  "creation_source": {"kind": "in-house-development", "description": "听觉面板（iPad 副屏监听）、扫描/验证脚本族"},
+  "evidence_refs": [
+    {"kind": "audit", "ref": "docs/audits/DSK-MFY-AUDITORY-FOCUS-PATCH-001/"},
+    {"kind": "usage", "ref": "auditory_panel.py 在听音验证流程使用"}
+  ],
+  "third_party_dependencies": [],
+  "related_assets": ["MFY-KNW-0005", "MFY-DATA-0009"],
+  "license_status": "GPL-3.0 (repository)",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "INTERNAL",
+  "notes": "纯 stdlib 面板；扫描脚本 audit_focus 双子根（apps/android + core）",
+  "limitations": ["扫描脚本需 PYTHONIOENCODING=utf-8 运行"]
+}

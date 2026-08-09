@@ -1,0 +1,32 @@
+{
+  "asset_id": "MFY-SYS-0008",
+  "name": "CWC Compute Credit Accounting",
+  "asset_class": "PRODUCTION_SYSTEM",
+  "asset_subclass": "metering",
+  "project": "moodify-ai",
+  "owner_entity": "RJWC / Moodify 声音实验室",
+  "ownership_status": "OWNED",
+  "production_status": "PRODUCTION",
+  "created_at": "2026-08-09",
+  "first_known_at": "2026-08-09",
+  "current_version": "1.0",
+  "repository_locations": [
+    "moodify-core-package/src/moodify/access/",
+    "moodify-core-package/configs/access_policy_v1.yaml"
+  ],
+  "creation_source": {"kind": "in-house-development", "description": "DSK-MFY-ACCESS-CWC-PATCH-001 (commit 2b83b03)；CWC = Compute Work Credit 非金融工具"},
+  "evidence_refs": [
+    {"kind": "test-report", "ref": "docs/audits/DSK-MFY-ACCESS-CWC-PATCH-001/"},
+    {"kind": "golden", "ref": "moodify-core-package/outputs/access_golden/golden_summary.json"},
+    {"kind": "commit", "ref": "2b83b03"}
+  ],
+  "third_party_dependencies": [
+    {"name": "PyYAML", "license": "MIT", "role": "policy config"}
+  ],
+  "related_assets": ["MFY-SYS-0002", "MFY-MDL-0003", "MFY-MDL-0004"],
+  "license_status": "GPL-3.0 (repository)",
+  "transferability": "LICENSEABLE",
+  "confidentiality": "INTERNAL",
+  "notes": "append-only 账本 + 重放推导余额；开放注册 + 准入（estimate/reserve/queue/settle）；推荐奖励；非 token/钱包/金融工具",
+  "limitations": ["引擎准入集成 DEFER（pairwise/ntrack 未强制 admit）", "单机文件存储非多进程安全"]
+}
