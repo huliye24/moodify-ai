@@ -12,68 +12,6 @@ import numpy as np
 from moodify.auditory.models import MetricValue
 
 # ---------------------------------------------------------------------------
-# BS.1770-4 K-weighting filters (ffmpeg ebur128 coefficients @ 48 kHz)
-# ---------------------------------------------------------------------------
-
-
-def _k_weighted(x: np.ndarray, sr: int) -> np.ndarray:
-    """K-weighting: RLB high-pass + high-shelf (standard 48 kHz coefficients)."""
-    from scipy.signal import lfilter
-
-    if sr == 48000:
-        b1 = [1.53512485958697, -2.69169618940638, 1.19839281085285]
-        a1 = [1.0, -1.69065929318241, 0.73248077421585]
-        b2 = [1.0, -2.0, 1.0]
-        a2 = [1.0, -1.99004745483398, 0.99007225036621]
-    elif sr == 44100:
-        b1 = [1.53512485958697, -2.69169618940638, 1.19839281085285]
-        a1 = [1.0, -1.69065929318241, 0.73248077421585]
-        b2 = [1.0, -2.0, 1.0]
-        a2 = [1.0, -1.99004745483398, 0.99007225036621]
-    else:
-        # approximate: design at the nearest standard rate via direct biquad math
-        b1 = [1.53512485958697, -2.69169618940638, 1.19839281085285]
-        a1 = [1.0, -1.69065929318241, 0.73248077421585]
-        b2 = [1.0, -2.0, 1.0]
-        a2 = [1.0, -1.99004745483398, 0.99007225036621]
-    y = lfilter(b1, a1, x)
-    return lfilter(b2, a2, y)
-
-
-def integrated_lufs(x: np.ndarray, sr: int) -> float:
-    """BS.1770-4 integrated loudness (mono input expected)."""
-    y = _k_weighted(x, sr)
-    # 400 ms gating blocks, -70 LUFS absolute gate, -10 LU relative gate
-    block = int(0.4 * sr)
-    n_blocks = len(y) // block
-    if n_blocks < 1:
-        return -70.0
-    z = y[: n_blocks * block].reshape(n_blocks, block)
-    block_loudness = 10 * np.log10(np.mean(z ** 2, axis=1) + 1e-12) - 0.691
-    abs_gate = block_loudness[block_loudness > -70.0]
-    if abs_gate.size == 0:
-        return -70.0
-    rel_threshold = np.mean(abs_gate) - 10.0
-    final = abs_gate[abs_gate > rel_threshold]
-    if final.size == 0:
-        return -70.0
-    return float(10 * np.log10(np.mean(10 ** (final / 10)) + 1e-12))
-
-
-def loudness_range_lu(x: np.ndarray, sr: int) -> float:
-    """Loudness range via short-term (3 s) LUFS percentiles (EBU Tech 3342)."""
-    y = _k_weighted(x, sr)
-    win = int(3.0 * sr)
-    n = len(y) // win
-    if n < 2:
-        return 0.0
-    z = y[: n * win].reshape(n, win)
-    short = 10 * np.log10(np.mean(z ** 2, axis=1) + 1e-12) - 0.691
-    lo, hi = np.percentile(short, [10, 95])
-    return float(max(0.0, hi - lo))
-
-
-# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -136,11 +74,20 @@ def compute_metrics(
     mono = samples.mean(axis=1) if samples.ndim > 1 else samples
     channels = samples.shape[1] if samples.ndim > 1 else 1
 
-    # loudness / level
-    lufs = integrated_lufs(mono, sr)
+    # loudness / level (MFY-PHASE1-DEPTH-001: standards-backed modules)
+    from moodify.auditory.loudness import integrated_loudness_lufs, loudness_range_lu
+    from moodify.auditory.true_peak import true_peak_db
+
+    lufs = integrated_loudness_lufs(samples, sr)
     m["integrated_lufs"] = MetricValue(round(lufs, 2), "LUFS", "BS1770").to_dict()
-    m["loudness_range_lu"] = MetricValue(round(loudness_range_lu(mono, sr), 2), "LU", "EBU3342").to_dict()
-    tp = true_peak_db(mono)
+    lra = loudness_range_lu(samples, sr)
+    if lra is None:
+        m["loudness_range_lu"] = MetricValue(
+            None, "LU", "EBU3342", "UNAVAILABLE", ["insufficient duration (<6 s)"]
+        ).to_dict()
+    else:
+        m["loudness_range_lu"] = MetricValue(round(lra, 2), "LU", "EBU3342").to_dict()
+    tp = true_peak_db(samples, sr)
     m["true_peak_dbfs"] = MetricValue(round(tp, 2), "dBFS", "4x-oversample").to_dict()
     pk = _peak_db(mono)
     m["sample_peak_dbfs"] = MetricValue(round(pk, 2), "dBFS", "direct").to_dict()
@@ -148,7 +95,7 @@ def compute_metrics(
     m["rms_dbfs"] = MetricValue(round(rms, 2), "dBFS", "direct").to_dict()
     crest = pk - rms
     m["crest_factor_db"] = MetricValue(round(crest, 2), "dB", "derived").to_dict()
-    m["plr_db"] = MetricValue(round(tp - rms, 2), "dB", "derived").to_dict()
+    m["plr_db"] = MetricValue(round(tp - rms, 2), "dB", "peak-to-rms").to_dict()
 
     # signal integrity
     absx = np.abs(mono)

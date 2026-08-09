@@ -1,0 +1,310 @@
+# Measurement Authority Registry v1 (MFY-PHASE1-DEPTH-001)
+# Every Phase-I metric: authority class, definition, method, reference basis,
+# tolerance, policies and honest limitations. No AUDIT_REQUIRED class remains.
+
+schema_version: "1.0"
+algorithm_version: "mfy-measurement-v1"
+
+integrated_lufs:
+  display_name: Integrated Loudness
+  unit: LUFS
+  authority_class: STANDARD_COMPLIANT
+  definition: ITU-R BS.1770-5 / EBU Tech 3341 integrated loudness (K-weighted, gated)
+  method: channel-independent K-weighting + energy aggregation + absolute/relative gating
+  reference_basis: BS.1770-5 / EBU Tech 3341 v4.0
+  sample_rate_policy: 48k/44.1k direct coefficients; other rates resampled to 48k
+  channel_policy: per-channel K-weight (L=1.0, R=1.0, Ls/Rs=1.41); mono single channel
+  window_policy: 400 ms blocks, -70 LUFS absolute gate, -10 LU relative gate
+  tolerance: "+-0.1 LU vs ffmpeg ebur128 on sine fixtures"
+  judgment_eligible: true
+  known_limitations: "short content (<1 block) returns -70.0 gated-floor; 44.1k uses 48k coefficients (accepted, <0.1 LU)"
+
+loudness_range_lu:
+  display_name: Loudness Range
+  unit: LU
+  authority_class: STANDARD_COMPLIANT
+  definition: EBU Tech 3342 loudness range (3 s short-term loudness percentiles)
+  method: 3 s K-weighted short-term loudness, p10/p95 percentile difference
+  reference_basis: EBU Tech 3342 v4.0
+  sample_rate_policy: same as integrated_lufs
+  channel_policy: mono downmix for short-term loudness
+  window_policy: 3 s blocks, no overlap
+  tolerance: "+-1.0 LU vs ffmpeg ebur128 LRA on dynamics fixtures"
+  judgment_eligible: true
+  known_limitations: "insufficient duration (<2 blocks) returns UNAVAILABLE, not 0"
+
+true_peak_dbfs:
+  display_name: True Peak
+  unit: dBFS
+  authority_class: STANDARD_COMPLIANT
+  definition: ITU-R BS.1770-5 true peak (4x oversampled peak)
+  method: 4x polyphase resample + max abs
+  reference_basis: BS.1770-5 true-peak guidance
+  sample_rate_policy: any input rate; oversampled internally
+  channel_policy: per-channel peak, report max
+  window_policy: full signal
+  tolerance: "within 0.2 dB of analytic inter-sample peak on stress fixtures"
+  judgment_eligible: true
+  known_limitations: "polyphase resample approximates ideal interpolation; not validated against certified meter"
+
+sample_peak_dbfs:
+  display_name: Sample Peak
+  unit: dBFS
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: max abs sample level in dBFS
+  method: max(|x|) -> 20*log10
+  reference_basis: analytic
+  tolerance: "exact"
+  judgment_eligible: true
+
+rms_dbfs:
+  display_name: RMS Level
+  unit: dBFS
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: full-signal RMS in dBFS
+  method: sqrt(mean(x^2)) -> 20*log10
+  reference_basis: analytic
+  tolerance: "exact"
+  judgment_eligible: true
+
+crest_factor_db:
+  display_name: Crest Factor
+  unit: dB
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: sample_peak - rms (derived invariant)
+  method: derived from sample_peak_dbfs and rms_dbfs
+  reference_basis: derived
+  tolerance: "derived exact"
+  judgment_eligible: false
+
+plr_db:
+  display_name: Peak-to-RMS Ratio
+  unit: dB
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: true_peak - rms (true-peak-to-RMS ratio; NOT EBU Peak-to-Loudness Ratio)
+  method: derived from true_peak_dbfs and rms_dbfs
+  reference_basis: derived
+  tolerance: "derived exact"
+  judgment_eligible: false
+  known_limitations: "name does not imply EBU PLR; it is a peak-to-RMS margin"
+
+clipping_sample_count:
+  display_name: Clipping Sample Count
+  unit: samples
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: count of samples with |x| >= 0.999
+  method: direct comparison
+  reference_basis: analytic
+  tolerance: "exact"
+  judgment_eligible: true
+
+clipping_sample_ratio:
+  display_name: Clipping Sample Ratio
+  unit: ratio
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: clipping_sample_count / total samples
+  method: derived invariant
+  tolerance: "exact invariant"
+  judgment_eligible: true
+
+near_clipping_sample_count:
+  display_name: Near-Clipping Sample Count
+  unit: samples
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: count with 0.95 <= |x| < 0.999
+  method: direct comparison
+  tolerance: "exact; threshold edges versioned"
+  judgment_eligible: false
+
+dc_offset_left:
+  display_name: DC Offset Left
+  unit: linear
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: mean of left channel samples
+  method: mean
+  reference_basis: analytic
+  tolerance: "exact"
+  judgment_eligible: false
+
+dc_offset_right:
+  display_name: DC Offset Right
+  unit: linear
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: mean of right channel samples
+  method: mean
+  tolerance: "exact; UNAVAILABLE for mono"
+  judgment_eligible: false
+
+silence_ratio:
+  display_name: Silence Ratio
+  unit: ratio
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: fraction of 100 ms windows with RMS below -60 dBFS
+  method: windowed RMS threshold
+  tolerance: "deterministic relative to versioned window/threshold"
+  judgment_eligible: true
+
+longest_silence_seconds:
+  display_name: Longest Silence
+  unit: s
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: longest run of silent 100 ms windows
+  method: windowed run-length
+  tolerance: "deterministic relative to versioned window/threshold"
+  judgment_eligible: false
+
+invalid_sample_count:
+  display_name: Invalid Sample Count
+  unit: samples
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: count of non-finite samples
+  method: isfinite check
+  tolerance: "exact"
+  judgment_eligible: true
+
+finite_sample_ratio:
+  display_name: Finite Sample Ratio
+  unit: ratio
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: 1 - invalid/total
+  method: derived invariant
+  tolerance: "exact invariant"
+  judgment_eligible: true
+
+spectral_centroid_hz:
+  display_name: Spectral Centroid
+  unit: Hz
+  authority_class: SPECTRAL_DESCRIPTOR
+  definition: power-weighted mean frequency of STFT magnitude
+  method: STFT (8192 FFT, 2048 hop, Hann)
+  reference_basis: definitional
+  tolerance: "descriptor; pure-tone within 1 bin"
+  judgment_eligible: false
+
+spectral_rolloff_85_hz:
+  display_name: Spectral Rolloff 85%
+  unit: Hz
+  authority_class: SPECTRAL_DESCRIPTOR
+  definition: frequency below which 85% of power accumulates
+  method: STFT cumulative power
+  tolerance: "descriptor; synthetic spectrum fixtures"
+  judgment_eligible: false
+
+spectral_rolloff_95_hz:
+  display_name: Spectral Rolloff 95%
+  unit: Hz
+  authority_class: SPECTRAL_DESCRIPTOR
+  definition: frequency below which 95% of power accumulates
+  method: STFT cumulative power
+  tolerance: "descriptor; synthetic spectrum fixtures"
+  judgment_eligible: false
+
+spectral_flatness:
+  display_name: Spectral Flatness
+  unit: ratio
+  authority_class: SPECTRAL_DESCRIPTOR
+  definition: geometric mean / arithmetic mean of power spectrum
+  method: STFT
+  tolerance: "tonal ~0, noise-like ~1"
+  judgment_eligible: false
+
+spectral_flux:
+  display_name: Spectral Flux
+  unit: mag/frame
+  authority_class: SPECTRAL_DESCRIPTOR
+  definition: mean positive frame-to-frame magnitude difference (half-wave rectified)
+  method: STFT frame difference, normalized per frame count
+  tolerance: "descriptor; normalization defined for cross-file comparison"
+  judgment_eligible: false
+
+estimated_high_frequency_cutoff_hz:
+  display_name: Estimated High-Frequency Cutoff
+  unit: Hz
+  authority_class: ESTIMATOR
+  definition: lowest STFT bin where cumulative power reaches 99.5%
+  method: cumulative power threshold
+  tolerance: "estimator; low-pass ladder quantifies error, not universal truth"
+  judgment_eligible: false
+
+estimated_noise_floor_dbfs:
+  display_name: Estimated Noise Floor
+  unit: dBFS
+  authority_class: ESTIMATOR
+  definition: 10th percentile of frame RMS in dBFS
+  method: frame RMS percentile
+  tolerance: "estimator definition; not universal noise-floor truth"
+  judgment_eligible: false
+
+band_energy_*:
+  display_name: Band Energy (canonical bands)
+  unit: linear-power / ratio
+  authority_class: SPECTRAL_DESCRIPTOR
+  definition: STFT power summed per canonical band, normalized ratio variant
+  method: STFT band masks
+  tolerance: "descriptor; band-limited fixtures"
+  judgment_eligible: false
+
+stereo_correlation:
+  display_name: Stereo Correlation
+  unit: ratio
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: Pearson correlation between left and right channels
+  method: full-signal pearson
+  reference_basis: analytic (identity=1, antiphase=-1)
+  tolerance: "exact on identity/antiphase fixtures"
+  judgment_eligible: true
+
+mid_energy_ratio:
+  display_name: Mid Energy Ratio
+  unit: ratio
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: mid energy / total energy
+  method: analytic stereo (M=(L+R)/2, S=(L-R)/2)
+  tolerance: "analytic"
+  judgment_eligible: false
+
+side_energy_ratio:
+  display_name: Side Energy Ratio
+  unit: ratio
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: side energy / total energy
+  method: analytic stereo
+  tolerance: "analytic"
+  judgment_eligible: false
+
+side_to_mid_db:
+  display_name: Side-to-Mid
+  unit: dB
+  authority_class: DETERMINISTIC_PHYSICAL
+  definition: 10*log10(side energy / mid energy)
+  method: derived
+  tolerance: "analytic"
+  judgment_eligible: false
+
+stereo_width_proxy:
+  display_name: Stereo Width Proxy
+  unit: ratio
+  authority_class: PROXY
+  definition: 1 - |stereo_correlation| (proxy for perceived width)
+  method: derived proxy
+  tolerance: "proxy semantics only; not a calibrated width measure"
+  judgment_eligible: false
+
+negative_correlation_ratio:
+  display_name: Negative Correlation Ratio
+  unit: ratio
+  authority_class: PROXY
+  definition: fraction of frames with negative correlation
+  method: windowed correlation
+  tolerance: "proxy; windowed antiphase fixtures"
+  judgment_eligible: false
+
+phase_risk_ratio:
+  display_name: Phase Risk Ratio
+  unit: ratio
+  authority_class: PROXY
+  definition: fraction of frames where side energy substantially exceeds mid energy
+  method: windowed heuristic rule
+  tolerance: "versioned rule fixture; never an absolute phase diagnosis"
+  judgment_eligible: true
+  known_limitations: "uncalibrated heuristic proxy"
