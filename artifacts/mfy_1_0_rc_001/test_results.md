@@ -9,4 +9,4 @@ Verified 2026-08-09:
 - Android unit tests: 41 passed.
 - Android `assembleDebug`: PASS.
 
-GitHub-hosted CI is pending until push.
+GitHub-hosted results on PR #20: CI `test` PASS (1m30s); temporal-texture PASS (7s).
