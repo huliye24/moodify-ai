@@ -1,0 +1,33 @@
+name: Moodify Temporal Texture Guard
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  temporal-texture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run audit
+        run: |
+          python tools/temporal_texture/temporal_texture_audit.py \
+            --repo . \
+            --config .moodify/temporal_texture.toml \
+            --out artifacts/temporal_texture/current
+
+      - name: Guard against new debt on authoritative 1.0 paths
+        run: |
+          python tools/temporal_texture/temporal_texture_guard.py \
+            --baseline .moodify/tt_baseline/report.json \
+            --current artifacts/temporal_texture/current/report.json \
+            --out artifacts/temporal_texture/guard_report.md
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: temporal-texture-report
+          path: artifacts/temporal_texture/current

@@ -1,0 +1,5033 @@
+{
+  "schema_version": "1.0",
+  "tool": "moodify-temporal-texture-audit",
+  "generated_at": "2026-08-09T07:57:19.195049+00:00",
+  "repository": "E:\\moodify",
+  "config": "E:\\moodify\\.moodify\\temporal_texture.toml",
+  "summary": {
+    "files_scanned": 157,
+    "findings": 394,
+    "counts": {
+      "error": 57,
+      "warning": 288,
+      "info": 49
+    },
+    "weighted_pressure_score": 910,
+    "by_rule": {
+      "TT-BROAD-EXCEPTION": 111,
+      "TT-FUNCTION-LENGTH": 70,
+      "TT-LINE-LENGTH": 57,
+      "TT-DEBT-MARKER": 49,
+      "TT-COMPLEXITY": 41,
+      "TT-PARAMETERS": 31,
+      "TT-EMPTY-EXCEPTION": 24,
+      "TT-NESTING": 11
+    },
+    "top_paths": [
+      {
+        "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+        "findings": 28
+      },
+      {
+        "path": "scripts/mrs_validate_five_experiments.py",
+        "findings": 25
+      },
+      {
+        "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+        "findings": 24
+      },
+      {
+        "path": "moodify-core-package/src/moodify/physics/experiments.py",
+        "findings": 22
+      },
+      {
+        "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+        "findings": 17
+      },
+      {
+        "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+        "findings": 15
+      },
+      {
+        "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+        "findings": 13
+      },
+      {
+        "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+        "findings": 13
+      },
+      {
+        "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+        "findings": 11
+      },
+      {
+        "path": "cloud_status.py",
+        "findings": 10
+      },
+      {
+        "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+        "findings": 10
+      },
+      {
+        "path": "moodify-core-package/src/moodify/optimizer/search.py",
+        "findings": 10
+      },
+      {
+        "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+        "findings": 10
+      },
+      {
+        "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+        "findings": 9
+      },
+      {
+        "path": "scripts/v01_inspector.py",
+        "findings": 9
+      },
+      {
+        "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+        "findings": 8
+      },
+      {
+        "path": "moodify-core-package/src/moodify/llm/client.py",
+        "findings": 8
+      },
+      {
+        "path": "moodify-core-package/src/moodify/reality_metrics.py",
+        "findings": 7
+      },
+      {
+        "path": "moodify-core-package/src/moodify/auditory/service.py",
+        "findings": 6
+      },
+      {
+        "path": "moodify-core-package/src/moodify/calibration/online.py",
+        "findings": 6
+      },
+      {
+        "path": "moodify-core-package/src/moodify/cli.py",
+        "findings": 6
+      },
+      {
+        "path": "scripts/v01_aggregate_treatment_records.py",
+        "findings": 6
+      },
+      {
+        "path": "moodify-core-package/scripts/generate_calibration_versions.py",
+        "findings": 5
+      },
+      {
+        "path": "moodify-core-package/src/moodify/auditory/judgment.py",
+        "findings": 5
+      },
+      {
+        "path": "moodify-core-package/src/moodify/diagnosis/defect_classifier.py",
+        "findings": 5
+      }
+    ],
+    "skipped": []
+  },
+  "findings": [
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "cloud_status.py",
+      "line": 14,
+      "column": 0,
+      "symbol": "get_system",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "35f1ad6e163ad069acbc"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "cloud_status.py",
+      "line": 38,
+      "column": 4,
+      "symbol": "get_system",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "0d1842405d1aeb253c73"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "cloud_status.py",
+      "line": 47,
+      "column": 4,
+      "symbol": "get_system",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "5579bf40906d7b428202"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "cloud_status.py",
+      "line": 60,
+      "column": 0,
+      "symbol": "parse_reports",
+      "message": "Function complexity proxy is 26; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 26
+      },
+      "fingerprint": "87ab71572032c6d9944c"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "cloud_status.py",
+      "line": 60,
+      "column": 0,
+      "symbol": "parse_reports",
+      "message": "Function spans 103 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 103
+      },
+      "fingerprint": "483fc29c77f26668377f"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "error",
+      "path": "cloud_status.py",
+      "line": 60,
+      "column": 0,
+      "symbol": "parse_reports",
+      "message": "Maximum nesting depth is 9; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 9
+      },
+      "fingerprint": "8a6f79bc1e14a581b387"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "cloud_status.py",
+      "line": 72,
+      "column": 8,
+      "symbol": "parse_reports",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "7143ac4b8b9999611068"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "cloud_status.py",
+      "line": 142,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 122 characters; expression may be compressed.",
+      "evidence": {
+        "length": 122
+      },
+      "fingerprint": "46c018cfa6fe45d9d2b1"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "cloud_status.py",
+      "line": 152,
+      "column": 12,
+      "symbol": "parse_reports",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "e44707698b4c65a5d479"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "cloud_status.py",
+      "line": 152,
+      "column": 12,
+      "symbol": "parse_reports",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "f9213cd2eb3f21d41466"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/calibration/analyze.py",
+      "line": 64,
+      "column": 0,
+      "symbol": "compute_listener_reliability",
+      "message": "Function complexity proxy is 19; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 19
+      },
+      "fingerprint": "033883387409b212b5ce"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/calibration/analyze.py",
+      "line": 133,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 127 characters; expression may be compressed.",
+      "evidence": {
+        "length": 127
+      },
+      "fingerprint": "73e2de586fbf7a33f7a0"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/calibration/analyze.py",
+      "line": 188,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "5231f4475258f9c40a23"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/calibration/analyze.py",
+      "line": 199,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 141 characters; expression may be compressed.",
+      "evidence": {
+        "length": 141
+      },
+      "fingerprint": "b7e95d6dd2a98b699657"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/run_agent_b.py",
+      "line": 45,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 127 characters; expression may be compressed.",
+      "evidence": {
+        "length": 127
+      },
+      "fingerprint": "b10908dd7f8b2803e99d"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/run_agent_b.py",
+      "line": 140,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 155 characters; expression may be compressed.",
+      "evidence": {
+        "length": 155
+      },
+      "fingerprint": "0653d340738a1098af24"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/scripts/compute_proxy_scores.py",
+      "line": 130,
+      "column": 12,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "49adb0caa2f9388b25a9"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/scripts/generate_calibration_versions.py",
+      "line": 30,
+      "column": 0,
+      "symbol": "generate_versions",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "881d9d3752c53e4be54b"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/scripts/generate_calibration_versions.py",
+      "line": 30,
+      "column": 0,
+      "symbol": "generate_versions",
+      "message": "Function spans 87 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 87
+      },
+      "fingerprint": "5dd1227e7fcf706e4c73"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/scripts/generate_calibration_versions.py",
+      "line": 88,
+      "column": 4,
+      "symbol": "generate_versions",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "93a7070d34c63fa4676f"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/scripts/generate_calibration_versions.py",
+      "line": 88,
+      "column": 4,
+      "symbol": "generate_versions",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "1baa3cd94283a604875e"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/scripts/generate_calibration_versions.py",
+      "line": 134,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 141 characters; expression may be compressed.",
+      "evidence": {
+        "length": 141
+      },
+      "fingerprint": "a2de717e3e00302358b2"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/scripts/prepare_ab_pairs.py",
+      "line": 15,
+      "column": 0,
+      "symbol": "prepare_pairs",
+      "message": "Function complexity proxy is 16; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 16
+      },
+      "fingerprint": "a560f5e09a1f7391d4ae"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/scripts/prepare_ab_pairs.py",
+      "line": 65,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 148 characters; expression may be compressed.",
+      "evidence": {
+        "length": 148
+      },
+      "fingerprint": "ccbb0e0f78fa7515f825"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/api/main.py",
+      "line": 6,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile"
+      },
+      "fingerprint": "fa8a7244a1524731967b"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/api/main.py",
+      "line": 45,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as handle:"
+      },
+      "fingerprint": "381ae458f86a753bfbec"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/api/routes/calibration.py",
+      "line": 32,
+      "column": 4,
+      "symbol": "get_calibration_status",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "38e60ea45780130d7ade"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/api/routes/sessions.py",
+      "line": 63,
+      "column": 8,
+      "symbol": "list_sessions",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "eee4c384d5dd25ab403f"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/api/routes/sessions.py",
+      "line": 88,
+      "column": 12,
+      "symbol": "submit_feedback",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "949fd2d1c33c905f6638"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/audio_io.py",
+      "line": 15,
+      "column": 4,
+      "symbol": "load_audio",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "ae2c0ecdb43d446321ea"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/audio_io.py",
+      "line": 15,
+      "column": 4,
+      "symbol": "load_audio",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "bc968f2700121d4dc3fd"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/comparison.py",
+      "line": 80,
+      "column": 0,
+      "symbol": "compute_deltas",
+      "message": "Function complexity proxy is 25; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 25
+      },
+      "fingerprint": "77fb8cc39a824c2c44b2"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/comparison.py",
+      "line": 80,
+      "column": 0,
+      "symbol": "compute_deltas",
+      "message": "Function spans 69 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 69
+      },
+      "fingerprint": "955c62220e8e31ecaf7d"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/decode.py",
+      "line": 70,
+      "column": 4,
+      "symbol": "ffmpeg_version",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "904e6250b3671e13302e"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/decode.py",
+      "line": 74,
+      "column": 0,
+      "symbol": "probe",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "c2c02653cd4713bd2c42"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/auditory/decode.py",
+      "line": 123,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"\"\"Remove a temp decode file; failure is logged, never fatal.\"\"\""
+      },
+      "fingerprint": "f1060e8149a740596350"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/auditory/decode.py",
+      "line": 127,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "logger.warning(\"temp decode cleanup failed for %s: %s\", path, exc)"
+      },
+      "fingerprint": "a39275eae6e1ca9514a2"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/errors.py",
+      "line": 15,
+      "column": 4,
+      "symbol": "__init__",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "758dbbb265a15e1dfbfa"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/judgment.py",
+      "line": 37,
+      "column": 0,
+      "symbol": "evaluate_risk_flags",
+      "message": "Function complexity proxy is 35; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 35
+      },
+      "fingerprint": "26bb7b00331c35a19a71"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/judgment.py",
+      "line": 37,
+      "column": 0,
+      "symbol": "evaluate_risk_flags",
+      "message": "Function spans 93 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 93
+      },
+      "fingerprint": "1b002e3b879fc6355c25"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/judgment.py",
+      "line": 191,
+      "column": 0,
+      "symbol": "evaluate_processing_plan",
+      "message": "Function complexity proxy is 22; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 22
+      },
+      "fingerprint": "9c8f167803f8c8083916"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/judgment.py",
+      "line": 191,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 135 characters; expression may be compressed.",
+      "evidence": {
+        "length": 135
+      },
+      "fingerprint": "7c99877377442f7b3297"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/judgment.py",
+      "line": 191,
+      "column": 0,
+      "symbol": "evaluate_processing_plan",
+      "message": "Maximum nesting depth is 5; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 5
+      },
+      "fingerprint": "210844e9e6aab77c473e"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/manifests.py",
+      "line": 32,
+      "column": 0,
+      "symbol": "write_scan_manifest",
+      "message": "Function has 10 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 10
+      },
+      "fingerprint": "f627b63d8b56df48e398"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/metrics.py",
+      "line": 129,
+      "column": 0,
+      "symbol": "compute_metrics",
+      "message": "Function complexity proxy is 14; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 14
+      },
+      "fingerprint": "566a44be14a8dc1b1071"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/metrics.py",
+      "line": 129,
+      "column": 0,
+      "symbol": "compute_metrics",
+      "message": "Function spans 130 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 130
+      },
+      "fingerprint": "e2abacd87fabd764da53"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/models.py",
+      "line": 97,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 172 characters; expression may be compressed.",
+      "evidence": {
+        "length": 172
+      },
+      "fingerprint": "bc01a7c27571171eba60"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/reports.py",
+      "line": 50,
+      "column": 0,
+      "symbol": "build_auditory_report",
+      "message": "Function has 11 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 11
+      },
+      "fingerprint": "6bb58365020fb06abb1d"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/reports.py",
+      "line": 103,
+      "column": 0,
+      "symbol": "build_contact_sheet",
+      "message": "Function has 9 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 9
+      },
+      "fingerprint": "d42c3c4e97bfc63826de"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/reports.py",
+      "line": 143,
+      "column": 0,
+      "symbol": "build_comparison_report",
+      "message": "Function has 14 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 14
+      },
+      "fingerprint": "9e38ba8cb130db92e3f8"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/run_golden.py",
+      "line": 30,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 104 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 104
+      },
+      "fingerprint": "c1c23f6061c9ab80df06"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/service.py",
+      "line": 83,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 155 characters; expression may be compressed.",
+      "evidence": {
+        "length": 155
+      },
+      "fingerprint": "42c8c90067630ad0aec0"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/service.py",
+      "line": 123,
+      "column": 0,
+      "symbol": "scan_audio",
+      "message": "Function spans 111 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 111
+      },
+      "fingerprint": "74cb406f05373126999e"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/service.py",
+      "line": 164,
+      "column": 4,
+      "symbol": "scan_audio",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "db9457b7913a67274a26"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/service.py",
+      "line": 265,
+      "column": 0,
+      "symbol": "register_candidate",
+      "message": "Function has 11 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 11
+      },
+      "fingerprint": "b006c5989afd7dd8e2d4"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/auditory/service.py",
+      "line": 322,
+      "column": 0,
+      "symbol": "compare_scans",
+      "message": "Function spans 140 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 140
+      },
+      "fingerprint": "853e42eafe44c82bcf1b"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/service.py",
+      "line": 322,
+      "column": 0,
+      "symbol": "compare_scans",
+      "message": "Function has 8 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 8
+      },
+      "fingerprint": "3553e2d803ccf7a1b1bf"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/spectrogram.py",
+      "line": 62,
+      "column": 4,
+      "symbol": "_ffmpeg_version",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "5157ef488f86b4e0588b"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/stereo.py",
+      "line": 14,
+      "column": 0,
+      "symbol": "compute_stereo_metrics",
+      "message": "Function complexity proxy is 14; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 14
+      },
+      "fingerprint": "522e8d8d9984d3c0504f"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/auditory/timeline.py",
+      "line": 13,
+      "column": 0,
+      "symbol": "compute_timeline",
+      "message": "Function spans 71 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 71
+      },
+      "fingerprint": "fa06dcc1d11aa70034f6"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 51,
+      "column": 0,
+      "symbol": "run_calibration",
+      "message": "Function complexity proxy is 15; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 15
+      },
+      "fingerprint": "8d1b30505a72d673b2bd"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 51,
+      "column": 0,
+      "symbol": "run_calibration",
+      "message": "Function spans 84 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 84
+      },
+      "fingerprint": "cbc69ebdf97b02fa46c4"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 51,
+      "column": 0,
+      "symbol": "run_calibration",
+      "message": "Maximum nesting depth is 5; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 5
+      },
+      "fingerprint": "253d5b7288670b267f1b"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 95,
+      "column": 12,
+      "symbol": "run_calibration",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "e3a4cd31bb99a70c2483"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 137,
+      "column": 0,
+      "symbol": "_calibrate_one",
+      "message": "Function complexity proxy is 18; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 18
+      },
+      "fingerprint": "38de403129e859996fa5"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 137,
+      "column": 0,
+      "symbol": "_calibrate_one",
+      "message": "Function spans 147 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 147
+      },
+      "fingerprint": "ef0b6f327cc538cfb27d"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 211,
+      "column": 8,
+      "symbol": "_calibrate_one",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "507208ef7653788b6645"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/experiment.py",
+      "line": 257,
+      "column": 4,
+      "symbol": "_calibrate_one",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "e671e5b2656f51947bc0"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/listener.py",
+      "line": 96,
+      "column": 12,
+      "symbol": "is_discriminable",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "fb207f31f889bbacc21b"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/listener.py",
+      "line": 130,
+      "column": 12,
+      "symbol": "rank_versions",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "b5cf22f294247cb2196f"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/calibration/listener.py",
+      "line": 143,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"\"\"In-memory 5D diagnosis — no tempfile, no disk I/O.\"\"\""
+      },
+      "fingerprint": "a6a80a78c183202fe178"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/online.py",
+      "line": 84,
+      "column": 12,
+      "symbol": "load",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "d714d68a53bca40950b3"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/calibration/online.py",
+      "line": 84,
+      "column": 12,
+      "symbol": "load",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "1313f441f88906bfa09d"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/online.py",
+      "line": 109,
+      "column": 4,
+      "symbol": "update",
+      "message": "Function spans 73 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 73
+      },
+      "fingerprint": "040da8715f4cdd4076cc"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/online.py",
+      "line": 109,
+      "column": 4,
+      "symbol": "update",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "fe5a6ac06bd78fc3dd8d"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/online.py",
+      "line": 216,
+      "column": 8,
+      "symbol": "estimate_rho",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "5ea0eed7b1ad45bd06f7"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/online.py",
+      "line": 274,
+      "column": 0,
+      "symbol": "update_calibration",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "7af0648212f42c782de4"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/calibration/server.py",
+      "line": 80,
+      "column": 12,
+      "symbol": "_load_d_history",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "b3172caddb64dd23296c"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/calibration/server.py",
+      "line": 80,
+      "column": 12,
+      "symbol": "_load_d_history",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "d43b8a5035f7c03b538d"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/cli.py",
+      "line": 21,
+      "column": 0,
+      "symbol": "cmd_legacy_analyze",
+      "message": "Function spans 76 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 76
+      },
+      "fingerprint": "75a36ae966136aed4acf"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/cli.py",
+      "line": 178,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 169 characters; expression may be compressed.",
+      "evidence": {
+        "length": 169
+      },
+      "fingerprint": "a21eb7a668ed3399e97a"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/cli.py",
+      "line": 182,
+      "column": 8,
+      "symbol": "cmd_batch",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "51f7e332b9c0f851f74f"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/cli.py",
+      "line": 194,
+      "column": 4,
+      "symbol": "cmd_batch",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "e889cd12064e72093476"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/cli.py",
+      "line": 194,
+      "column": 4,
+      "symbol": "cmd_batch",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "8c531e51dff3e150f6bb"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/cli.py",
+      "line": 367,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 119 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 119
+      },
+      "fingerprint": "b4fbd5cd6501d6ffb160"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/defect_classifier.py",
+      "line": 273,
+      "column": 4,
+      "symbol": "_get_param_value",
+      "message": "Maximum nesting depth is 6; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 6
+      },
+      "fingerprint": "642aa6c5388d0b59b7b4"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/defect_classifier.py",
+      "line": 296,
+      "column": 8,
+      "symbol": "_get_param_value",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "b3aa940e67eb58c6432f"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/defect_classifier.py",
+      "line": 299,
+      "column": 4,
+      "symbol": "_get_severity",
+      "message": "Function complexity proxy is 22; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 22
+      },
+      "fingerprint": "6f9463fe003f2c6a3bcf"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/defect_classifier.py",
+      "line": 335,
+      "column": 4,
+      "symbol": "_assign_priorities",
+      "message": "Function complexity proxy is 17; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 17
+      },
+      "fingerprint": "6db22c7587224ff9f991"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/defect_classifier.py",
+      "line": 335,
+      "column": 4,
+      "symbol": "_assign_priorities",
+      "message": "Maximum nesting depth is 9; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 9
+      },
+      "fingerprint": "fa978d42b5307945668d"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 74,
+      "column": 4,
+      "symbol": "diagnose",
+      "message": "Function spans 61 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 61
+      },
+      "fingerprint": "566ade968850489e5b55"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 144,
+      "column": 8,
+      "symbol": "_resample_fast",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "783deaa50ca68f46b712"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 153,
+      "column": 8,
+      "symbol": "_resample_fast",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "152541fb4e82c9b1cfc3"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 153,
+      "column": 8,
+      "symbol": "_resample_fast",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "4bff6438ca0656894193"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 290,
+      "column": 16,
+      "symbol": "_compute_lra",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "60890db8ff786c25cd45"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 342,
+      "column": 12,
+      "symbol": "_compute_chorus_impact",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "903973bd85358fad0b72"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 372,
+      "column": 12,
+      "symbol": "_compute_micro_dynamics",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "11e23b6a1f0b6fd92603"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 384,
+      "column": 12,
+      "symbol": "_compute_micro_dynamics",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "0fb823b664de103815c4"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 477,
+      "column": 12,
+      "symbol": "_compute_rt60_consist",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "479439eb62c4fc215913"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 530,
+      "column": 4,
+      "symbol": "_extract_layers_optimized",
+      "message": "Function has 8 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 8
+      },
+      "fingerprint": "29964aefefe2239178c6"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 597,
+      "column": 8,
+      "symbol": "_compute_drum_detect",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "35719b2b316ebccfc720"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 623,
+      "column": 4,
+      "symbol": "_extract_emotion",
+      "message": "Function has 9 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 9
+      },
+      "fingerprint": "2f4d615a47a23badde0b"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/engine.py",
+      "line": 633,
+      "column": 4,
+      "symbol": "_extract_emotion_optimized",
+      "message": "Function has 11 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 11
+      },
+      "fingerprint": "d1c973277d421afc7e11"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/health_scorer.py",
+      "line": 149,
+      "column": 8,
+      "symbol": "_get_ideal_vector",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "297ef1ffb9a11a0494ef"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/health_scorer.py",
+      "line": 149,
+      "column": 8,
+      "symbol": "_get_ideal_vector",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "581be1bfc39da202a6d3"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/metrics.py",
+      "line": 280,
+      "column": 4,
+      "symbol": "diagnose",
+      "message": "Function spans 87 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 87
+      },
+      "fingerprint": "6720b63a258a96390e99"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/preprocessing.py",
+      "line": 100,
+      "column": 8,
+      "symbol": "_resample",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "4b420f7ee40f9479d31d"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/preprocessing.py",
+      "line": 115,
+      "column": 8,
+      "symbol": "_resample",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "6d960913a57393f58708"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/diagnosis/preprocessing.py",
+      "line": 115,
+      "column": 8,
+      "symbol": "_resample",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "32e87309a69f8c58acc6"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/quality_gate.py",
+      "line": 80,
+      "column": 4,
+      "symbol": "gate_2_separation",
+      "message": "Function spans 78 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 78
+      },
+      "fingerprint": "e74cdd0aef4cca3aae32"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/diagnosis/quality_gate.py",
+      "line": 162,
+      "column": 4,
+      "symbol": "gate_3_output",
+      "message": "Function spans 65 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 65
+      },
+      "fingerprint": "1b4396bb6ae238225ca3"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 108,
+      "column": 4,
+      "symbol": "run",
+      "message": "Function spans 68 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 68
+      },
+      "fingerprint": "67ae1208544b7cce5c25"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 144,
+      "column": 16,
+      "symbol": "run",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "bdf5b1971189654ca472"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 177,
+      "column": 4,
+      "symbol": "_evaluate_single",
+      "message": "Function spans 74 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 74
+      },
+      "fingerprint": "015318feb154ea0b7522"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 257,
+      "column": 8,
+      "symbol": "_load_d_value",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "23f7f364e036e7f46d83"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 289,
+      "column": 4,
+      "symbol": "cmd_evaluate_run",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "51e2eb59ddbb4ffbea0a"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 364,
+      "column": 4,
+      "symbol": "cmd_evaluate_status",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "861fbf969a5af9baf431"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 371,
+      "column": 0,
+      "symbol": "cmd_evaluate_single",
+      "message": "Function spans 101 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 101
+      },
+      "fingerprint": "906356176f725d6e48d6"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 394,
+      "column": 4,
+      "symbol": "cmd_evaluate_single",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "232978c8ea6573e8035d"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 446,
+      "column": 4,
+      "symbol": "cmd_evaluate_single",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "52b40b81f476653f2607"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/batch.py",
+      "line": 460,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 146 characters; expression may be compressed.",
+      "evidence": {
+        "length": 146
+      },
+      "fingerprint": "62aa4ffa3b1fb3265bd0"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 145,
+      "column": 8,
+      "symbol": "_init_client",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "03869b233f604d92a88f"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 152,
+      "column": 4,
+      "symbol": "evaluate",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "3dfa84f1da75249943ed"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 192,
+      "column": 8,
+      "symbol": "evaluate",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "e7112cdac0648b6523a2"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 231,
+      "column": 4,
+      "symbol": "evaluate",
+      "message": "Function complexity proxy is 15; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 15
+      },
+      "fingerprint": "760f4fd7cc80942d4ff8"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 231,
+      "column": 4,
+      "symbol": "evaluate",
+      "message": "Function spans 106 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 106
+      },
+      "fingerprint": "c02cfe320069d0cb3e1c"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 231,
+      "column": 4,
+      "symbol": "evaluate",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "3dfa84f1da75249943ed"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 260,
+      "column": 8,
+      "symbol": "evaluate",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "83f44304acf08eb1a539"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 371,
+      "column": 4,
+      "symbol": "evaluate",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "3dfa84f1da75249943ed"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 412,
+      "column": 8,
+      "symbol": "evaluate",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "188a27b2a252d1989efd"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 453,
+      "column": 4,
+      "symbol": "evaluate",
+      "message": "Function spans 91 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 91
+      },
+      "fingerprint": "c02cfe320069d0cb3e1c"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 453,
+      "column": 4,
+      "symbol": "evaluate",
+      "message": "Function has 15 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 15
+      },
+      "fingerprint": "3dfa84f1da75249943ed"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 572,
+      "column": 8,
+      "symbol": "_write_feedback",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "ecf47e9e9c5ee5e1395f"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 601,
+      "column": 8,
+      "symbol": "_write_feedback",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "8572ca46c3db6bd161c3"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 609,
+      "column": 8,
+      "symbol": "_get_current_d",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "194c575d40b0d852bfee"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/evaluation/judges.py",
+      "line": 626,
+      "column": 0,
+      "symbol": "evaluate_processing",
+      "message": "Function has 14 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 14
+      },
+      "fingerprint": "d3686d74b2eff73c1395"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/fingerprint.py",
+      "line": 52,
+      "column": 0,
+      "symbol": "compute_thd",
+      "message": "Function spans 62 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 62
+      },
+      "fingerprint": "4476616fe46723ab2da4"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/fingerprint.py",
+      "line": 109,
+      "column": 4,
+      "symbol": "compute_thd",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "193079943f001ffe8c82"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/icc.py",
+      "line": 58,
+      "column": 4,
+      "symbol": "compute_icc",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "7d067f57919895fb8cf7"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/icc.py",
+      "line": 76,
+      "column": 0,
+      "symbol": "_icc_anova_fallback",
+      "message": "Function spans 70 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 70
+      },
+      "fingerprint": "7470dca3d8503dc51c46"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 80,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 126 characters; expression may be compressed.",
+      "evidence": {
+        "length": 126
+      },
+      "fingerprint": "e4cff78aa4d8559e02f4"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 82,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 153 characters; expression may be compressed.",
+      "evidence": {
+        "length": 153
+      },
+      "fingerprint": "768b4ef48181f755c0b2"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 84,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "13e1f33049288aa5a865"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 118,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "bf3120e1d555055f7458"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 120,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 151 characters; expression may be compressed.",
+      "evidence": {
+        "length": 151
+      },
+      "fingerprint": "a362433816074cbb2980"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 121,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "7f1973673455b25875ce"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 155,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "ee407ff1e37a10aad049"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 157,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 149 characters; expression may be compressed.",
+      "evidence": {
+        "length": 149
+      },
+      "fingerprint": "9c724bea633d5fc56926"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 159,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "2569468b407f8f0cfc0d"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 192,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "f605c15b7bc0c039f60e"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 194,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 150 characters; expression may be compressed.",
+      "evidence": {
+        "length": 150
+      },
+      "fingerprint": "1daba630f754f50a9b27"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 195,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "07c84058a94acfdf7434"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 228,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "cf6c9a56777e95eb7431"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 230,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 151 characters; expression may be compressed.",
+      "evidence": {
+        "length": 151
+      },
+      "fingerprint": "a41cdf11eda0d4873f64"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 232,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 129 characters; expression may be compressed.",
+      "evidence": {
+        "length": 129
+      },
+      "fingerprint": "31a86ba3194be6d17913"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 265,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "7efd5d3ce4026c6b9bff"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 267,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 151 characters; expression may be compressed.",
+      "evidence": {
+        "length": 151
+      },
+      "fingerprint": "7d55501c145dd80698ca"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 269,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "86ccd1ced63d87948e23"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 302,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "4efc462fa0fe368f3d59"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 304,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 149 characters; expression may be compressed.",
+      "evidence": {
+        "length": 149
+      },
+      "fingerprint": "61a2405d46989a28a7bc"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 306,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "0d8eac22036897998079"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 339,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "74daf7c5de80d719a7a7"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 341,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 151 characters; expression may be compressed.",
+      "evidence": {
+        "length": 151
+      },
+      "fingerprint": "2054a8c8aa4dd4661993"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/craft_chains.py",
+      "line": 343,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 128 characters; expression may be compressed.",
+      "evidence": {
+        "length": 128
+      },
+      "fingerprint": "2613abe7ce6b04277702"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/knowledge/emotion_targets.py",
+      "line": 666,
+      "column": 4,
+      "symbol": "resolve_emotion_from_nl",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "7ca5d6bf020a726f318a"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/emotion_targets.py",
+      "line": 685,
+      "column": 4,
+      "symbol": "resolve_emotion_from_nl",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "f6b4e9ed1f2d05e3b917"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/knowledge/emotion_targets.py",
+      "line": 685,
+      "column": 4,
+      "symbol": "resolve_emotion_from_nl",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "fb6c821ab5ee6cf6b7e0"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/risk_model.py",
+      "line": 55,
+      "column": 4,
+      "symbol": "assess",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "2c28c910105121c4913d"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/risk_model.py",
+      "line": 227,
+      "column": 4,
+      "symbol": "_generate_warnings",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "fef0464638562a0c901f"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/knowledge/risk_model.py",
+      "line": 243,
+      "column": 4,
+      "symbol": "_generate_recommendations",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "91f9ce7ae71d380a1855"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 61,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 138 characters; expression may be compressed.",
+      "evidence": {
+        "length": 138
+      },
+      "fingerprint": "13e965142feeb8e7a081"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 129,
+      "column": 8,
+      "symbol": "interpret_emotion",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "93702b4706365b829a29"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 132,
+      "column": 4,
+      "symbol": "narrate_diagnosis",
+      "message": "Function has 8 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 8
+      },
+      "fingerprint": "d9d789a3064b38fd7037"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 158,
+      "column": 8,
+      "symbol": "narrate_diagnosis",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "981353eae7b5970310db"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 208,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "for attempt in range(3):"
+      },
+      "fingerprint": "93915b40e12450ff1668"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 224,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "temperature=0.2,"
+      },
+      "fingerprint": "a0b336f933611e1721a0"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 228,
+      "column": 12,
+      "symbol": "_call",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "4c54e1c9c0d13a79632e"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/llm/client.py",
+      "line": 229,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "if attempt == 2:"
+      },
+      "fingerprint": "84425266e8e0e76daf11"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/memory/history.py",
+      "line": 89,
+      "column": 16,
+      "symbol": "load_all",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "98c5242a6dbc4d1ab045"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/memory/history.py",
+      "line": 89,
+      "column": 16,
+      "symbol": "load_all",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "8f5b9684d92e238ed3f3"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/memory/history.py",
+      "line": 107,
+      "column": 12,
+      "symbol": "find_similar",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "79cebcc033dba78a25f7"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/calibrate.py",
+      "line": 148,
+      "column": 0,
+      "symbol": "calibrate",
+      "message": "Function spans 104 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 104
+      },
+      "fingerprint": "d32a37f62153612803e4"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/calibrate.py",
+      "line": 209,
+      "column": 8,
+      "symbol": "calibrate",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "bc3a5a5321774f05000a"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 266,
+      "column": 0,
+      "symbol": "proxy_evaluate",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "e395f0f1450404621989"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 350,
+      "column": 4,
+      "symbol": "_proxy_te_base",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "83509ef75b1cf7eb00d5"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 350,
+      "column": 4,
+      "symbol": "_proxy_te_base",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "05494bc7b7320fe4ce6a"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 400,
+      "column": 0,
+      "symbol": "search_3d",
+      "message": "Function spans 71 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 71
+      },
+      "fingerprint": "0d0b3058c16bd93803fd"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 421,
+      "column": 4,
+      "symbol": "search_3d",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "28f7fd06efba04a6055f"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 475,
+      "column": 0,
+      "symbol": "search_optimal_strengths",
+      "message": "Function spans 93 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 93
+      },
+      "fingerprint": "cb8d5389fa27ece38c2d"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 475,
+      "column": 0,
+      "symbol": "search_optimal_strengths",
+      "message": "Function has 9 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 9
+      },
+      "fingerprint": "28fe4ce56d1133cf67dd"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 496,
+      "column": 4,
+      "symbol": "search_optimal_strengths",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "8de5ca7ee0cccb679237"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 526,
+      "column": 8,
+      "symbol": "search_optimal_strengths",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "cc7d51f235a86bcb8d71"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/optimizer/search.py",
+      "line": 526,
+      "column": 8,
+      "symbol": "search_optimal_strengths",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "e89c70116c51f557796e"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 131,
+      "column": 4,
+      "symbol": "process",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "2d27701c641a974b9469"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 164,
+      "column": 8,
+      "symbol": "process",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "c2a528ad6b6aed3ed8b8"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 186,
+      "column": 8,
+      "symbol": "_resolve_emotion",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "04cb0d80d83b5f09bb96"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 247,
+      "column": 16,
+      "symbol": "_select_parameters",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "d2d33ee8902ae864a778"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 329,
+      "column": 8,
+      "symbol": "_try_rag",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "f60f7f0f791abb7f1782"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 395,
+      "column": 16,
+      "symbol": "_process_candidates",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "745fd7845605ed3c176f"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 408,
+      "column": 4,
+      "symbol": "_finalize",
+      "message": "Function complexity proxy is 23; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 23
+      },
+      "fingerprint": "fbaef485e7ea68e9a994"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 408,
+      "column": 4,
+      "symbol": "_finalize",
+      "message": "Function spans 69 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 69
+      },
+      "fingerprint": "6bff5ec061aaf49303cd"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 426,
+      "column": 8,
+      "symbol": "_finalize",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "95d58039933918c8695c"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 450,
+      "column": 8,
+      "symbol": "_finalize",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "240087911722adb21c8f"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 473,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 124 characters; expression may be compressed.",
+      "evidence": {
+        "length": 124
+      },
+      "fingerprint": "de0831d7cfb5571733fd"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 475,
+      "column": 8,
+      "symbol": "_finalize",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "ae1223553f79a1cfe5e8"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 484,
+      "column": 12,
+      "symbol": "_build_result",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "96c08d8745aa1a5e5f5a"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 484,
+      "column": 12,
+      "symbol": "_build_result",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "ad8a35486e001c44e727"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 547,
+      "column": 8,
+      "symbol": "_run_diagnosis",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "7b8fc44cff874de55310"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 547,
+      "column": 8,
+      "symbol": "_run_diagnosis",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "580013c61d2f0d2f0d8f"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 571,
+      "column": 8,
+      "symbol": "_run_load_audio",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "08e00bddbc9c7bc81733"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 600,
+      "column": 12,
+      "symbol": "_run_spectral_enhancement_multi",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "11271d3487bd54d69820"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 629,
+      "column": 12,
+      "symbol": "_run_spatial",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "0433df6490e11b90ce7f"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 629,
+      "column": 12,
+      "symbol": "_run_spatial",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "4de6875d062af5e3a04e"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 639,
+      "column": 12,
+      "symbol": "_run_spatial",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "edc70115095766d461bc"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 639,
+      "column": 12,
+      "symbol": "_run_spatial",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "23ebec8a8a6a2998c0f0"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 690,
+      "column": 4,
+      "symbol": "_export_wav",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "3ffd371c97adc96a8f54"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 701,
+      "column": 4,
+      "symbol": "_run_mastering",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "77adc4aea1f88a87e4df"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 728,
+      "column": 8,
+      "symbol": "_run_mastering",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "3ec94a069334cd045dc5"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 739,
+      "column": 12,
+      "symbol": "_run_mastering",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "eb3f6fd836311eba4b18"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 747,
+      "column": 4,
+      "symbol": "_run_strength_search",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "7a9d33a31bc35a090224"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/orchestration/workflow_engine.py",
+      "line": 773,
+      "column": 8,
+      "symbol": "_run_strength_search",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "add3b66ce31dd955a953"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 36,
+      "column": 0,
+      "symbol": "_process_batch",
+      "message": "Function complexity proxy is 14; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 14
+      },
+      "fingerprint": "48eeaa386c0bc5f24aa8"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 36,
+      "column": 0,
+      "symbol": "_process_batch",
+      "message": "Maximum nesting depth is 6; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 6
+      },
+      "fingerprint": "7f8942ff86fbc0924442"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 44,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile as tf"
+      },
+      "fingerprint": "8e7c22d19f1ed8c18e49"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 59,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with tf.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:"
+      },
+      "fingerprint": "88d8fa10fa96dd4885b3"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 73,
+      "column": 8,
+      "symbol": "_process_batch",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "3b12d2d2285d0eb927e7"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 113,
+      "column": 0,
+      "symbol": "identify_b_matrix",
+      "message": "Function complexity proxy is 21; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 21
+      },
+      "fingerprint": "be4fb99797910c008c06"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 113,
+      "column": 0,
+      "symbol": "identify_b_matrix",
+      "message": "Function spans 106 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 106
+      },
+      "fingerprint": "58ce52c551b7eb0f0473"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 132,
+      "column": 4,
+      "symbol": "identify_b_matrix",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "54cd27a0a034b81353cd"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/b_matrix_parallel.py",
+      "line": 221,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 72 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 72
+      },
+      "fingerprint": "de285fd4fb690fcfd58d"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 57,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 134 characters; expression may be compressed.",
+      "evidence": {
+        "length": 134
+      },
+      "fingerprint": "e9d2e3eacc7149fec155"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 65,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 121 characters; expression may be compressed.",
+      "evidence": {
+        "length": 121
+      },
+      "fingerprint": "802b48addaee19274506"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 66,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 122 characters; expression may be compressed.",
+      "evidence": {
+        "length": 122
+      },
+      "fingerprint": "e3ede370463b1f3c1592"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 67,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 124 characters; expression may be compressed.",
+      "evidence": {
+        "length": 124
+      },
+      "fingerprint": "877715a333e6060d1e47"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 80,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 127 characters; expression may be compressed.",
+      "evidence": {
+        "length": 127
+      },
+      "fingerprint": "962c4abb4f83f855d5bc"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 88,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 135 characters; expression may be compressed.",
+      "evidence": {
+        "length": 135
+      },
+      "fingerprint": "fb43388d1ad39d91975a"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 91,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 122 characters; expression may be compressed.",
+      "evidence": {
+        "length": 122
+      },
+      "fingerprint": "a64d6c812ad422ea530c"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 92,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "6089c8ad4392d0b518a2"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 93,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 125 characters; expression may be compressed.",
+      "evidence": {
+        "length": 125
+      },
+      "fingerprint": "ce3e2fcbd5d44ef5a22c"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 147,
+      "column": 4,
+      "symbol": "run_single_experiment",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "d1ab878d7e77f444ae56"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 156,
+      "column": 0,
+      "symbol": "generate_report",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "4f8172c8f8f3d9ecf2ed"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 156,
+      "column": 0,
+      "symbol": "generate_report",
+      "message": "Function spans 85 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 85
+      },
+      "fingerprint": "76d2a709c22b662f13d1"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/batch_runner.py",
+      "line": 243,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 61 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 61
+      },
+      "fingerprint": "4d01d0d39d31efb5f47e"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 64,
+      "column": 0,
+      "symbol": "experiment_D",
+      "message": "Function spans 66 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 66
+      },
+      "fingerprint": "b02d6d87c7b8080ee5dc"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 202,
+      "column": 0,
+      "symbol": "experiment_F",
+      "message": "Function spans 92 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 92
+      },
+      "fingerprint": "ed88e7c93d5de4579d52"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 202,
+      "column": 0,
+      "symbol": "experiment_F",
+      "message": "Maximum nesting depth is 5; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 5
+      },
+      "fingerprint": "54817c92d855255624ef"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 248,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile as tf"
+      },
+      "fingerprint": "fa89b0a14925ee76e8a1"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 249,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with tf.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:"
+      },
+      "fingerprint": "eb9eaca5b1b8adb92b99"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 260,
+      "column": 12,
+      "symbol": "experiment_F",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "fe5889be0ab46b248ed7"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 300,
+      "column": 0,
+      "symbol": "experiment_C",
+      "message": "Function spans 68 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 68
+      },
+      "fingerprint": "530efac3d81e1b67627c"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 332,
+      "column": 8,
+      "symbol": "experiment_C",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "fc9c442d369977b796fc"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 374,
+      "column": 0,
+      "symbol": "experiment_A",
+      "message": "Function complexity proxy is 15; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 15
+      },
+      "fingerprint": "a9f9295443497af7cdb5"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 374,
+      "column": 0,
+      "symbol": "experiment_A",
+      "message": "Function spans 105 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 105
+      },
+      "fingerprint": "b5abf6f8fa4cfd780240"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 424,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile as tf"
+      },
+      "fingerprint": "fa67db4cc42279694c63"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 425,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with tf.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:"
+      },
+      "fingerprint": "2da7d4ad815c012ca346"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 442,
+      "column": 8,
+      "symbol": "experiment_A",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "cfed06ece659329896ab"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 485,
+      "column": 0,
+      "symbol": "experiment_B",
+      "message": "Function complexity proxy is 14; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 14
+      },
+      "fingerprint": "65d47ff065e95044721a"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 485,
+      "column": 0,
+      "symbol": "experiment_B",
+      "message": "Function spans 95 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 95
+      },
+      "fingerprint": "c793f2f603e47f63fb6e"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 485,
+      "column": 0,
+      "symbol": "experiment_B",
+      "message": "Maximum nesting depth is 5; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 5
+      },
+      "fingerprint": "b61c753650859a3ba715"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 524,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "# Save to temp for diagnosis"
+      },
+      "fingerprint": "95d1064e934f7e69b4e3"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 525,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile as tf"
+      },
+      "fingerprint": "ea96fa9e3744bfa2a8e5"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 526,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with tf.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:"
+      },
+      "fingerprint": "22a9ca1f54a8056211a6"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 596,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function complexity proxy is 15; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 15
+      },
+      "fingerprint": "17aac980d37a85e7b9d9"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 596,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 68 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 68
+      },
+      "fingerprint": "c43416a35e9de3d02d36"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments.py",
+      "line": 631,
+      "column": 8,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "0bad3f052ce5e3aaa267"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 65,
+      "column": 0,
+      "symbol": "experiment_G",
+      "message": "Function complexity proxy is 21; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 21
+      },
+      "fingerprint": "dc379ec8a10a11f1a504"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 65,
+      "column": 0,
+      "symbol": "experiment_G",
+      "message": "Function spans 140 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 140
+      },
+      "fingerprint": "6bee7839b2ba990c635c"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 127,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with __import__('tempfile').NamedTemporaryFile(suffix='.wav', delete=False) as tmp:"
+      },
+      "fingerprint": "5b1368e5eb4e9f3d3a27"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 154,
+      "column": 12,
+      "symbol": "experiment_G",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "5835ffba22b21dbf8696"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 234,
+      "column": 0,
+      "symbol": "experiment_H",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "2968e169880ae9de620e"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 300,
+      "column": 0,
+      "symbol": "experiment_I",
+      "message": "Function complexity proxy is 22; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 22
+      },
+      "fingerprint": "5b68ba86d2b3463f7c00"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 300,
+      "column": 0,
+      "symbol": "experiment_I",
+      "message": "Function spans 91 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 91
+      },
+      "fingerprint": "b56f7cccbd1ff7259ffa"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 300,
+      "column": 0,
+      "symbol": "experiment_I",
+      "message": "Maximum nesting depth is 7; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 7
+      },
+      "fingerprint": "7ae9fc959a42f3b8a209"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 397,
+      "column": 0,
+      "symbol": "experiment_J",
+      "message": "Function spans 82 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 82
+      },
+      "fingerprint": "ffcd504ce4877947f868"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 485,
+      "column": 0,
+      "symbol": "experiment_K",
+      "message": "Function spans 81 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 81
+      },
+      "fingerprint": "e05e47eac6f8566851b9"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 572,
+      "column": 0,
+      "symbol": "experiment_L",
+      "message": "Function spans 81 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 81
+      },
+      "fingerprint": "7292f05c271c7e65f72f"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 609,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 123 characters; expression may be compressed.",
+      "evidence": {
+        "length": 123
+      },
+      "fingerprint": "582371472ad2362fceab"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 659,
+      "column": 0,
+      "symbol": "experiment_M",
+      "message": "Function spans 85 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 85
+      },
+      "fingerprint": "93feb8452ced41077781"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 704,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with __import__('tempfile').NamedTemporaryFile(suffix='.wav', delete=False) as tmp:"
+      },
+      "fingerprint": "8f5ee628f41cb9c8f40d"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 750,
+      "column": 0,
+      "symbol": "experiment_N",
+      "message": "Function spans 64 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 64
+      },
+      "fingerprint": "ca5e328708445a927476"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 820,
+      "column": 0,
+      "symbol": "experiment_O",
+      "message": "Function spans 75 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 75
+      },
+      "fingerprint": "01fb694b7d1acd5a06c7"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_2.py",
+      "line": 944,
+      "column": 8,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "fd42565a90e5ab07f3eb"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 49,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile"
+      },
+      "fingerprint": "eb4c2a518ed363983398"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 50,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:"
+      },
+      "fingerprint": "ab681706007b86a40ae2"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 66,
+      "column": 0,
+      "symbol": "experiment_P",
+      "message": "Function complexity proxy is 20; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 20
+      },
+      "fingerprint": "41897e7a75da4b011fda"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 66,
+      "column": 0,
+      "symbol": "experiment_P",
+      "message": "Function spans 138 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 138
+      },
+      "fingerprint": "aa90c92c7b83bc97f916"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 128,
+      "column": 12,
+      "symbol": "experiment_P",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "edd78bf33e2ef46ae918"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 211,
+      "column": 0,
+      "symbol": "experiment_Q",
+      "message": "Function spans 98 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 98
+      },
+      "fingerprint": "7f8c4f8e6df103b80754"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 263,
+      "column": 12,
+      "symbol": "experiment_Q",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "9cba0b21d2dc581deee2"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 316,
+      "column": 0,
+      "symbol": "experiment_R",
+      "message": "Function complexity proxy is 17; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 17
+      },
+      "fingerprint": "1292622a81f6d3b6df2c"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 316,
+      "column": 0,
+      "symbol": "experiment_R",
+      "message": "Function spans 94 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 94
+      },
+      "fingerprint": "4ff16005f88ec684bca2"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 361,
+      "column": 12,
+      "symbol": "experiment_R",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "59f98cb58dcae3d256e1"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/experiments_3_engineering.py",
+      "line": 436,
+      "column": 8,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "b48455fb5b004369ea5e"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 65,
+      "column": 4,
+      "symbol": "preflight_check",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "bc3f52adda584f10d9dc"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 80,
+      "column": 8,
+      "symbol": "preflight_check",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "a4e95de14d54b6771f78"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 153,
+      "column": 20,
+      "symbol": "load",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "59ab22c1f1ceb622ee8a"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 245,
+      "column": 0,
+      "symbol": "run_with_guard",
+      "message": "Function spans 92 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 92
+      },
+      "fingerprint": "a0b33844cd74ca8061c9"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 292,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 130 characters; expression may be compressed.",
+      "evidence": {
+        "length": 130
+      },
+      "fingerprint": "2cb6779ff27efc454b24"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 324,
+      "column": 4,
+      "symbol": "run_with_guard",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "d2693d16fce5b37c968e"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 341,
+      "column": 0,
+      "symbol": "run_suite",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "93b735ddfe2eec1c057e"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 341,
+      "column": 0,
+      "symbol": "run_suite",
+      "message": "Function spans 74 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 74
+      },
+      "fingerprint": "6a4a55ce29a5f70035e6"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 417,
+      "column": 0,
+      "symbol": "_generate_reliability_report",
+      "message": "Function spans 62 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 62
+      },
+      "fingerprint": "3e352cc2ee516920c016"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/physics/reliable_runner.py",
+      "line": 441,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 163 characters; expression may be compressed.",
+      "evidence": {
+        "length": 163
+      },
+      "fingerprint": "c669d3f26885d99792f8"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/operators.py",
+      "line": 19,
+      "column": 0,
+      "symbol": "_resolve_eq_params",
+      "message": "Maximum nesting depth is 6; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 6
+      },
+      "fingerprint": "09f8c5fe7bc318b445bc"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/operators.py",
+      "line": 19,
+      "column": 0,
+      "symbol": "_resolve_eq_params",
+      "message": "Function has 8 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 8
+      },
+      "fingerprint": "bb22cf7512b22c393347"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/operators.py",
+      "line": 40,
+      "column": 0,
+      "symbol": "apply_eq",
+      "message": "Function spans 74 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 74
+      },
+      "fingerprint": "09a1dd1c5890ed370532"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/processing/operators.py",
+      "line": 40,
+      "column": 0,
+      "symbol": "apply_eq",
+      "message": "Function has 10 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 10
+      },
+      "fingerprint": "c3796778763ccc093cec"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/operators.py",
+      "line": 145,
+      "column": 0,
+      "symbol": "apply_compressor",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "984dc7454758217db620"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/pedalboard_chain.py",
+      "line": 136,
+      "column": 8,
+      "symbol": "process_with_fingerprint",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "81c9c0862857e99580e9"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/pedalboard_chain.py",
+      "line": 232,
+      "column": 4,
+      "symbol": "_compute_transient_preservation",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "a6476a6422f20fb7885b"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/pedalboard_chain.py",
+      "line": 252,
+      "column": 4,
+      "symbol": "_compute_centroid_shift",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "03fded390a020690d889"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/processing/pedalboard_chain.py",
+      "line": 292,
+      "column": 4,
+      "symbol": "_estimate_dynamic_contribution",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "f4be4fe863a50e4f2de7"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "line": 29,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"temporal\": 0.15,"
+      },
+      "fingerprint": "497bac4390724cf8d010"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "line": 228,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "# ── Temporal stability features ────────────────────────────"
+      },
+      "fingerprint": "a15b9c2e733ad5603da8"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "line": 230,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "def _temporal_features(mono: np.ndarray, sr: int) -> dict:"
+      },
+      "fingerprint": "d68dbf852e3b823472b7"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "line": 324,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "temp = _temporal_features(mono, sr)"
+      },
+      "fingerprint": "1bf003bf47d6169d46bc"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "line": 336,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"temporal\": temp,"
+      },
+      "fingerprint": "80b78b9ff0c9645be470"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "line": 350,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "for group in [\"spectrum\", \"dynamic\", \"transient\", \"space\", \"texture\", \"temporal\", \"artifact\"]:"
+      },
+      "fingerprint": "37c4feb7e0a9959003a0"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/src/moodify/reality_metrics.py",
+      "line": 379,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"temporal\": [\"segment_rms_variance\", \"late_vs_early_delta\","
+      },
+      "fingerprint": "3fd3db76a1bd4b64dada"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/release.py",
+      "line": 38,
+      "column": 0,
+      "symbol": "analyze_to_case",
+      "message": "Function complexity proxy is 14; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 14
+      },
+      "fingerprint": "d0837db6e2b0445e646b"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/release.py",
+      "line": 38,
+      "column": 0,
+      "symbol": "analyze_to_case",
+      "message": "Function spans 112 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 112
+      },
+      "fingerprint": "b52c2fe9326caa126c90"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/release.py",
+      "line": 141,
+      "column": 4,
+      "symbol": "analyze_to_case",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "02f04f63afe7c952f08e"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/safety/projection.py",
+      "line": 11,
+      "column": 0,
+      "symbol": "project",
+      "message": "Function complexity proxy is 16; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 16
+      },
+      "fingerprint": "238d17c9f7fef717843f"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/safety/projection.py",
+      "line": 72,
+      "column": 4,
+      "symbol": "_get_rec_params",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "f1d73d5f7a9d7b75da3a"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/safety/test_projection.py",
+      "line": 88,
+      "column": 4,
+      "symbol": "test_pass_through",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "101690a455e8528c295c"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/safety/test_projection.py",
+      "line": 123,
+      "column": 4,
+      "symbol": "test_partial_params_pass_through",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "51c56d32a7e866190101"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/safety/test_projection.py",
+      "line": 123,
+      "column": 4,
+      "symbol": "test_partial_params_pass_through",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "5db579d4ac8a0e8e4f48"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "moodify-core-package/src/moodify/v01_diagnostics.py",
+      "line": 6,
+      "column": 0,
+      "symbol": "diagnose",
+      "message": "Function complexity proxy is 26; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 26
+      },
+      "fingerprint": "656f679858f29778ff53"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/v01_diagnostics.py",
+      "line": 6,
+      "column": 0,
+      "symbol": "diagnose",
+      "message": "Function spans 78 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 78
+      },
+      "fingerprint": "630b257da1f0bb5edbea"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/v01_pipeline.py",
+      "line": 22,
+      "column": 0,
+      "symbol": "process_audio",
+      "message": "Function spans 62 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 62
+      },
+      "fingerprint": "cc013d58cc01debcde06"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/src/moodify/v01_pipeline.py",
+      "line": 77,
+      "column": 4,
+      "symbol": "process_audio",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "0225ae2b73d0fd508127"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "moodify-core-package/tests/baseline/check_regression.py",
+      "line": 39,
+      "column": 0,
+      "symbol": "check_one",
+      "message": "Function complexity proxy is 17; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 17
+      },
+      "fingerprint": "7cbd6a883eba13dcf7d9"
+    },
+    {
+      "rule": "TT-NESTING",
+      "severity": "error",
+      "path": "moodify-core-package/tests/baseline/check_regression.py",
+      "line": 39,
+      "column": 0,
+      "symbol": "check_one",
+      "message": "Maximum nesting depth is 7; failure and decision paths are compressed.",
+      "evidence": {
+        "nesting": 7
+      },
+      "fingerprint": "42bfae12e9c14ec9e886"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "moodify-core-package/tests/baseline/check_regression.py",
+      "line": 81,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 61 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 61
+      },
+      "fingerprint": "d147b833e7e4505b2ee2"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/tests/baseline/run_baseline.py",
+      "line": 91,
+      "column": 4,
+      "symbol": "test_fallback_search",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "9df1c18f81abb8ea4426"
+    },
+    {
+      "rule": "TT-EMPTY-EXCEPTION",
+      "severity": "error",
+      "path": "moodify-core-package/tests/baseline/run_baseline.py",
+      "line": 91,
+      "column": 4,
+      "symbol": "test_fallback_search",
+      "message": "Empty exception handler hides failure evidence.",
+      "evidence": {},
+      "fingerprint": "3e245aff5852d41e5ea2"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/tests/baseline/run_baseline.py",
+      "line": 110,
+      "column": 8,
+      "symbol": "test_fallback_preset",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "019a48631ade6cdb9058"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/tests/baseline/run_baseline.py",
+      "line": 214,
+      "column": 8,
+      "symbol": "run_all",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "d0be3d22f00f336550f6"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/tests/baseline/run_baseline.py",
+      "line": 228,
+      "column": 8,
+      "symbol": "run_all",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "0b63dcb1ea7cef987d0d"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/tests/conftest.py",
+      "line": 18,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"\"\"Write mock audio to a temporary WAV file.\"\"\""
+      },
+      "fingerprint": "400218387e56274ff4e2"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/tests/test_fallback.py",
+      "line": 56,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile"
+      },
+      "fingerprint": "f8852ca5196f6e3c9eaf"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "moodify-core-package/tests/test_fallback.py",
+      "line": 64,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "with tempfile.NamedTemporaryFile(suffix=\".wav\", delete=False) as f:"
+      },
+      "fingerprint": "f7b5af7627574f6ab5cd"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "moodify-core-package/tests/test_mfy_1_0_representative.py",
+      "line": 24,
+      "column": 4,
+      "symbol": "_tools_available",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "98c48829c731080e2c72"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 10,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "import tempfile"
+      },
+      "fingerprint": "baf73331b062561782ce"
+    },
+    {
+      "rule": "TT-PARAMETERS",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 49,
+      "column": 0,
+      "symbol": "log_result",
+      "message": "Function has 7 declared parameters; implicit context may need a named structure.",
+      "evidence": {
+        "parameters": 7
+      },
+      "fingerprint": "4bf4247eaf933371397e"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 66,
+      "column": 0,
+      "symbol": "experiment_1_spectrum",
+      "message": "Function spans 62 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 62
+      },
+      "fingerprint": "e557fa114ec071c7f8ce"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 78,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "exp_dir = tempfile.mkdtemp(prefix=\"mrs_e1_\")"
+      },
+      "fingerprint": "4383af016acf5508af7b"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 143,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "exp_dir = tempfile.mkdtemp(prefix=\"mrs_e2_\")"
+      },
+      "fingerprint": "654070a1288cc222af9d"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 200,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "exp_dir = tempfile.mkdtemp(prefix=\"mrs_e3_\")"
+      },
+      "fingerprint": "2909b1385ac97296f462"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 241,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "# ── Experiment 4: Temporal Drift ───────────────────────────"
+      },
+      "fingerprint": "868e78c36201b5d0f1dd"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 243,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "def experiment_4_temporal(ref_stats: dict, real_path: str):"
+      },
+      "fingerprint": "f9517e1b0b8880ab3f9a"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 245,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "print(\"Experiment 4: Temporal Drift\")"
+      },
+      "fingerprint": "874860735f65edb2a2ff"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 253,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "log_result(\"E4_Temporal\", \"real\", mrs_real[\"mrs\"], mrs_real[\"components\"],"
+      },
+      "fingerprint": "c5b12cc8a566d14997f8"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 259,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "exp_dir = tempfile.mkdtemp(prefix=\"mrs_e4_\")"
+      },
+      "fingerprint": "4c701ecddb03e382d6fc"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 278,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "# Check temporal component specifically increased"
+      },
+      "fingerprint": "1980470f88f87cb5173c"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 279,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "temp_delta = mrs_lb[\"components\"][\"temporal\"] - mrs_real[\"components\"][\"temporal\"]"
+      },
+      "fingerprint": "e5427b9045989467e7f1"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 280,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "log_result(\"E4_Temporal\", \"late_bad\", mrs_lb[\"mrs\"], mrs_lb[\"components\"],"
+      },
+      "fingerprint": "f2d365cb1d4650b6dde5"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 281,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"MRS < real, temporal+\", f\"MRS={mrs_lb['mrs']:.1f}, temporal={mrs_lb['components']['temporal']:.3f} (Δ+{temp_delta:.3f})\", passed_lb)"
+      },
+      "fingerprint": "52268d70c2a881539bbd"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 281,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 148 characters; expression may be compressed.",
+      "evidence": {
+        "length": 148
+      },
+      "fingerprint": "433e7f7c64d42688cfe1"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 323,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 144 characters; expression may be compressed.",
+      "evidence": {
+        "length": 144
+      },
+      "fingerprint": "51f3acd813210eb5716b"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 332,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function complexity proxy is 14; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 14
+      },
+      "fingerprint": "61929e9985830b02dd57"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 332,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 77 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 77
+      },
+      "fingerprint": "d0cb2e2abd0e04f3a56d"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 371,
+      "column": 4,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "bb77af7bf8dc30f04487"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 378,
+      "column": 4,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "a746256a5012fc347480"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 385,
+      "column": 4,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "20291d005eb6497ea841"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 389,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "e4 = experiment_4_temporal(ref_stats, real_path)"
+      },
+      "fingerprint": "0af7b3640c74b1ed1dac"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 392,
+      "column": 4,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "2ae71888c18d4ea8d07d"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "scripts/mrs_validate_five_experiments.py",
+      "line": 399,
+      "column": 4,
+      "symbol": "main",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "0c95a7c0c1b7bac2f1a0"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "scripts/pr15_extraction_enrich.py",
+      "line": 24,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 122 characters; expression may be compressed.",
+      "evidence": {
+        "length": 122
+      },
+      "fingerprint": "06f317c6233dab59149b"
+    },
+    {
+      "rule": "TT-BROAD-EXCEPTION",
+      "severity": "warning",
+      "path": "scripts/v01_aggregate_treatment_records.py",
+      "line": 45,
+      "column": 8,
+      "symbol": "load_records",
+      "message": "Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
+      "evidence": {},
+      "fingerprint": "317290136589e517bdf9"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "scripts/v01_aggregate_treatment_records.py",
+      "line": 100,
+      "column": 0,
+      "symbol": "compute_preset_stats",
+      "message": "Function complexity proxy is 17; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 17
+      },
+      "fingerprint": "57a2c8ead4fb29a985c7"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_aggregate_treatment_records.py",
+      "line": 100,
+      "column": 0,
+      "symbol": "compute_preset_stats",
+      "message": "Function spans 70 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 70
+      },
+      "fingerprint": "2993d5a76be7ef3cdc71"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_aggregate_treatment_records.py",
+      "line": 172,
+      "column": 0,
+      "symbol": "build_summary",
+      "message": "Function spans 66 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 66
+      },
+      "fingerprint": "1feb5a3bdee81a458e9b"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "scripts/v01_aggregate_treatment_records.py",
+      "line": 258,
+      "column": 0,
+      "symbol": "write_summary_md",
+      "message": "Function complexity proxy is 23; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 23
+      },
+      "fingerprint": "2b5a49abdeac22833711"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "scripts/v01_aggregate_treatment_records.py",
+      "line": 258,
+      "column": 0,
+      "symbol": "write_summary_md",
+      "message": "Function spans 170 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 170
+      },
+      "fingerprint": "187a3d8c764cfedff520"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "scripts/v01_calibrate_presets.py",
+      "line": 36,
+      "column": 0,
+      "symbol": "run_calibration",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "86cb741486fb9e8e1931"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_calibrate_presets.py",
+      "line": 36,
+      "column": 0,
+      "symbol": "run_calibration",
+      "message": "Function spans 79 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 79
+      },
+      "fingerprint": "1310119e65f3fcbdc84a"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "error",
+      "path": "scripts/v01_calibrate_presets.py",
+      "line": 129,
+      "column": 0,
+      "symbol": "save_summary_md",
+      "message": "Function complexity proxy is 25; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 25
+      },
+      "fingerprint": "588637244d69e030d7f0"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_calibrate_presets.py",
+      "line": 129,
+      "column": 0,
+      "symbol": "save_summary_md",
+      "message": "Function spans 101 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 101
+      },
+      "fingerprint": "fc9231909f3bd49df3ad"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/v01_create_treatment_record.py",
+      "line": 22,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "HUMAN_FEEDBACK_TEMPLATE = {"
+      },
+      "fingerprint": "3ceb3442416dd2942cc8"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/v01_create_treatment_record.py",
+      "line": 36,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "ALGORITHM_LEARNING_TEMPLATE = {"
+      },
+      "fingerprint": "7fd235bb298ad28af4c8"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_create_treatment_record.py",
+      "line": 64,
+      "column": 0,
+      "symbol": "build_treatment_record",
+      "message": "Function spans 92 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 92
+      },
+      "fingerprint": "097d120eb52e69b58bfc"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/v01_create_treatment_record.py",
+      "line": 148,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"human_feedback\": dict(HUMAN_FEEDBACK_TEMPLATE),"
+      },
+      "fingerprint": "dc7d02d9ae84340163c5"
+    },
+    {
+      "rule": "TT-DEBT-MARKER",
+      "severity": "info",
+      "path": "scripts/v01_create_treatment_record.py",
+      "line": 149,
+      "column": 0,
+      "symbol": "",
+      "message": "Debt marker TEMP requires a reason and exit condition.",
+      "evidence": {
+        "marker": "TEMP",
+        "excerpt": "\"algorithm_learning\": dict(ALGORITHM_LEARNING_TEMPLATE),"
+      },
+      "fingerprint": "f27bf94d8dff0442ea35"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "scripts/v01_inspector.py",
+      "line": 158,
+      "column": 0,
+      "symbol": "compute_delta",
+      "message": "Function complexity proxy is 14; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 14
+      },
+      "fingerprint": "1a7e898a40ca5af1fb8e"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_inspector.py",
+      "line": 172,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 134 characters; expression may be compressed.",
+      "evidence": {
+        "length": 134
+      },
+      "fingerprint": "d1a9aa0aa401f98d36da"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "scripts/v01_inspector.py",
+      "line": 324,
+      "column": 0,
+      "symbol": "write_markdown_report",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "bf44b3fd14ae88f52eb8"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "scripts/v01_inspector.py",
+      "line": 324,
+      "column": 0,
+      "symbol": "write_markdown_report",
+      "message": "Function spans 210 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 210
+      },
+      "fingerprint": "4717f33af591aaf5bec0"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "scripts/v01_inspector.py",
+      "line": 536,
+      "column": 0,
+      "symbol": "write_html_report",
+      "message": "Function spans 171 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 171
+      },
+      "fingerprint": "42a99008e872fc95a33b"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_inspector.py",
+      "line": 636,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 124 characters; expression may be compressed.",
+      "evidence": {
+        "length": 124
+      },
+      "fingerprint": "7354e2521d101823b174"
+    },
+    {
+      "rule": "TT-LINE-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_inspector.py",
+      "line": 653,
+      "column": 0,
+      "symbol": "",
+      "message": "Line length is 130 characters; expression may be compressed.",
+      "evidence": {
+        "length": 130
+      },
+      "fingerprint": "a50f7890c11546346cb2"
+    },
+    {
+      "rule": "TT-COMPLEXITY",
+      "severity": "warning",
+      "path": "scripts/v01_inspector.py",
+      "line": 732,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function complexity proxy is 13; branch pressure may hide decisions.",
+      "evidence": {
+        "complexity": 13
+      },
+      "fingerprint": "a911fb5ccee6144d3954"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "error",
+      "path": "scripts/v01_inspector.py",
+      "line": 732,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 134 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 134
+      },
+      "fingerprint": "260578ddd16b79d3c9cc"
+    },
+    {
+      "rule": "TT-FUNCTION-LENGTH",
+      "severity": "warning",
+      "path": "scripts/v01_update_treatment_feedback.py",
+      "line": 85,
+      "column": 0,
+      "symbol": "main",
+      "message": "Function spans 85 lines; review responsibility boundaries.",
+      "evidence": {
+        "lines": 85
+      },
+      "fingerprint": "47f1a84557c65df0e955"
+    }
+  ]
+}

@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 import json
 from pydantic import BaseModel, Field
-from openai import OpenAI
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -100,14 +99,17 @@ class DeepSeekClient:
 
     def __init__(self):
         key = os.getenv("DEEPSEEK_API_KEY")
-        self._client = (
-            OpenAI(
+        self._client = None
+        self._model = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+        if key:
+            try:
+                from openai import OpenAI
+            except ImportError:
+                return
+            self._client = OpenAI(
                 api_key=key,
                 base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
             )
-            if key else None
-        )
-        self._model = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
     @property
     def available(self) -> bool:
