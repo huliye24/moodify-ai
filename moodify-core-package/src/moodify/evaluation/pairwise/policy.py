@@ -20,7 +20,7 @@ from moodify.evaluation.pairwise.models import (
     PairwiseJudgment,
 )
 
-DEFAULT_POLICY_PATH = Path(__file__).resolve().parents[2] / "configs" / "pairwise_policy_v1.yaml"
+DEFAULT_POLICY_PATH = Path(__file__).resolve().parents[4] / "configs" / "pairwise_policy_v1.yaml"
 
 # dimension -> weight (must sum to 1.0)
 DEFAULT_WEIGHTS: dict[str, float] = {

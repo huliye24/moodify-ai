@@ -669,6 +669,59 @@ def cmd_case_pairwise_decision(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def cmd_case_ntrack_rank(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.evaluation.ntrack.policy import RankingPolicy
+    from moodify.evaluation.ntrack.service import run_ntrack_ranking
+
+    root, _ = _read_project(args.project_dir)
+    case_root = _case_evidence_root(root, args.case_id)
+    ranking_policy = RankingPolicy.from_yaml(args.config) if args.config else RankingPolicy()
+    result = run_ntrack_ranking(
+        case_id=args.case_id,
+        case_root=case_root,
+        track_paths=[Path(p) for p in args.tracks],
+        mode=args.mode,
+        top_k=args.top_k,
+        ranking_policy=ranking_policy,
+    )
+    return _result(
+        "case.ntrack-rank", "ok", result_status="NTRACK_RANKING_COMPLETED",
+        case_id=args.case_id,
+        mode=result["mode"],
+        eligible_count=result["eligible_count"],
+        failed_count=result["failed_count"],
+        pairwise_edge_count=result["pairwise_edge_count"],
+        ranking=[c["candidate_id"] for c in result["ranking"]],
+        tie_bands=result["tie_bands"],
+        ranking_estimate_id=result["ranking_estimate_id"],
+        ranking_dir=result["ranking_dir"],
+    )
+
+
+def cmd_case_ntrack_human_ranking(args: argparse.Namespace) -> dict[str, Any]:
+    from moodify.evaluation.ntrack.service import record_human_ranking
+
+    root, _ = _read_project(args.project_dir)
+    case_root = _case_evidence_root(root, args.case_id)
+    result = record_human_ranking(
+        case_root=case_root,
+        ranking_case_id=args.case_id,
+        human_order=[cid.strip() for cid in args.human_order.split(",") if cid.strip()],
+        top_k=args.top_k,
+        must_keep=[cid.strip() for cid in args.must_keep.split(",") if cid.strip()]
+        if args.must_keep else None,
+        rejected=[cid.strip() for cid in args.rejected.split(",") if cid.strip()]
+        if args.rejected else None,
+        optional_reason=args.reason,
+    )
+    return _result(
+        "case.ntrack-human-ranking", "ok", result_status="NTRACK_HUMAN_RANKING_RECORDED",
+        case_id=args.case_id,
+        derived_preference_count=result["derived_preference_count"],
+        human_ranking_decision_id=result["human_ranking_decision"]["human_ranking_decision_id"],
+    )
+
+
 def cmd_case_observations_add(args: argparse.Namespace) -> dict[str, Any]:
     import json as _json
 
@@ -868,6 +921,20 @@ def build_parser() -> argparse.ArgumentParser:
     cpd.add_argument("--decision", required=True,
                      choices=["CONFIRM_MODEL", "CHOOSE_A", "CHOOSE_B", "UNDECIDED"])
     cpd.add_argument("--reason", default="", help="人工覆盖/弃权理由")
+    cnr = case.add_parser("ntrack-rank")
+    cnr.add_argument("project_dir"); cnr.add_argument("case_id")
+    cnr.add_argument("tracks", nargs="+", help="待排名音频文件路径（≥2）")
+    cnr.add_argument("--mode", default="TRACK_STRENGTH",
+                     choices=["TRACK_STRENGTH", "ALBUM_SELECTION"])
+    cnr.add_argument("--top-k", type=int, default=None, help="可选 Top-K 精排")
+    cnr.add_argument("--config", default=None, help="排名策略 YAML 路径（默认 ntrack_policy_v1）")
+    cnh = case.add_parser("ntrack-human-ranking")
+    cnh.add_argument("project_dir"); cnh.add_argument("case_id")
+    cnh.add_argument("--human-order", required=True, help="人工排序，逗号分隔 candidate_id")
+    cnh.add_argument("--top-k", type=int, default=None)
+    cnh.add_argument("--must-keep", default=None, help="必留候选，逗号分隔")
+    cnh.add_argument("--rejected", default=None, help="淘汰候选，逗号分隔")
+    cnh.add_argument("--reason", default="", help="人工调整理由")
 
     # learning-domain commands (AIR-001)
     cobs = case.add_parser("observations").add_subparsers(dest="observations_command", required=True)
@@ -942,6 +1009,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "case.lyrics-align": cmd_case_lyrics_align,
         "case.pairwise-judge": cmd_case_pairwise_judge,
         "case.pairwise-decision": cmd_case_pairwise_decision,
+        "case.ntrack-rank": cmd_case_ntrack_rank,
+        "case.ntrack-human-ranking": cmd_case_ntrack_human_ranking,
         "case.observations.add": cmd_case_observations_add,
         "case.intervention.register": cmd_case_intervention_register,
         "case.listening.evaluate": cmd_case_listening_evaluate,

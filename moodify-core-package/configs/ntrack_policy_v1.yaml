@@ -1,0 +1,40 @@
+# N-track ranking policy v1 (DSK-MFY-NTRACK-RANKER-001).
+# Versioned and auditable; thresholds provisional until calibrated on
+# a labeled ranking dataset. Comparison budgets follow the staged
+# architecture: small batches compare exhaustively, larger batches cap
+# pairs per candidate and refine only around the Top-K boundary.
+policy_version: ntrack_policy_v1
+
+small_batch_max: 15
+medium_batch_max: 100
+
+comparison_budget:
+  small_batch_pairs_ratio: 1.0
+  medium_batch_pairs_per_candidate: 4
+  large_batch_pairs_per_candidate: 3
+  top_k_refinement_pairs_per_boundary_candidate: 3
+  refinement_boundary_radius: 2
+
+uncertainty:
+  allow_tie_bands: true
+  minimum_rank_separation: 10.0
+
+quality_gate:
+  exclude_invalid_source: true
+  exclude_analysis_failed: true
+  severe_failure_requires_review: true
+  review_clipping_ratio_threshold: 0.05
+  review_silence_ratio_threshold: 0.90
+
+album_rerank:
+  enabled: true
+  quality_floor_required: true
+  redundancy_penalty_enabled: true
+  redundancy_penalty_weight: 0.25
+  diversity_bonus_enabled: true
+  diversity_bonus_weight: 0.20
+
+estimator:
+  elo_base_k: 40.0
+  elo_initial_score: 1000.0
+  confidence_weight: {LOW: 0.6, MEDIUM: 0.8, HIGH: 1.0}
