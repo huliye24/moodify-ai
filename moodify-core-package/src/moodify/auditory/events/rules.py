@@ -124,7 +124,7 @@ def detect_candidates(
 
 def _threshold_run(rows: list[WindowMeasurement], key: str, event_type: str,
                    threshold: float, min_windows: int,
-                   comparison: str = "gte") -> list[EventCandidate]:
+                   comparison: str = "gte", domain: str = "integrity") -> list[EventCandidate]:
     candidates: list[EventCandidate] = []
     run: list[int] = []
     magnitudes: list[float] = []
@@ -136,10 +136,10 @@ def _threshold_run(rows: list[WindowMeasurement], key: str, event_type: str,
             magnitudes.append(value)
         else:
             if len(run) >= min_windows:
-                candidates.append(_candidate(event_type, run, "integrity", magnitudes))
+                candidates.append(_candidate(event_type, run, domain, magnitudes))
             run, magnitudes = [], []
     if len(run) >= min_windows:
-        candidates.append(_candidate(event_type, run, "integrity", magnitudes))
+        candidates.append(_candidate(event_type, run, domain, magnitudes))
     return candidates
 
 
@@ -210,9 +210,9 @@ def _stereo_events(rows: list[WindowMeasurement], t: dict[str, float]) -> list[E
     neg = _threshold_run(rows, "correlation", "NEGATIVE_CORRELATION_REGION",
                          -abs(t["negative_correlation_max"]),  # correlation <= -0.5
                          int(t["negative_corr_min_windows"]),
-                         comparison="lte")
+                         comparison="lte", domain="stereo")
     risk = _threshold_run(rows, "phase_risk", "PHASE_RISK_REGION", 0.5,
-                          int(t["phase_risk_min_windows"]))
+                          int(t["phase_risk_min_windows"]), domain="stereo")
     return neg + risk
 
 
