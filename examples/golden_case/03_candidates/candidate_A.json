@@ -1,0 +1,41 @@
+{
+  "case_id": "case_00000000000000000000000000000001",
+  "candidate_id": "case_00000000000000000000000000000001__CAND_A",
+  "source_case_id": "case_00000000000000000000000000000001",
+  "candidate_path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\03_candidates\\candidate_A.wav",
+  "candidate_sha256": "6eca2361a06b460bd449bbf46d45f583bbb4ce4b55cd71527d0d916bbad87a93",
+  "created_at": "2026-08-10T23:41:58.849664+00:00",
+  "producing_application": "MoodifyDSPChain",
+  "producing_application_version": "0.1.0",
+  "processing_operator": "MFY-DATA-FACTORY-001",
+  "processing_method": "ABC_CONSERVATIVE",
+  "processing_notes": "MFY-ABC-HEURISTIC-001; intensity=0.65",
+  "parent_source_sha256": "e8e61feabb008ee6d695ed93608c2dfcbf4519d119217dab14ba734dbfb0e885",
+  "intervention_result": {
+    "candidate_label": "A",
+    "candidate_id": "case_00000000000000000000000000000001__CAND_A",
+    "output_path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\03_candidates\\candidate_A.wav",
+    "output_sha256": "6eca2361a06b460bd449bbf46d45f583bbb4ce4b55cd71527d0d916bbad87a93",
+    "sample_rate": 48000,
+    "frames": 192000,
+    "channels": 1,
+    "params": {
+      "P01_vocal_presence_freq": 3000.0,
+      "P02_vocal_presence_gain": 1.04,
+      "P03_vocal_presence_q": 0.7,
+      "P04_proximity_low_freq": 200.0,
+      "P05_proximity_low_gain": -0.65,
+      "P06_compression_ratio": 1.078,
+      "P07_compression_attack": 35.0,
+      "P08_compression_release": 250.0,
+      "P09_compression_threshold": -10.65,
+      "P10_reverb_t60": 0.0,
+      "P11_reverb_dry_wet": 0.0,
+      "P12_reverb_width": 1.0,
+      "P13_harmonic_drive": 0.0,
+      "P14_high_shelf_freq": 10000.0,
+      "P15_high_shelf_gain": 0.65
+    },
+    "warnings": []
+  }
+}

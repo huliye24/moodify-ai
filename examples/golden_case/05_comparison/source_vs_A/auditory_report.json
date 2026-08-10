@@ -1,0 +1,38 @@
+{
+  "report_id": "report-case_00000000000000000000000000000001",
+  "case_id": "case_00000000000000000000000000000001",
+  "source_name": "01_source_scan",
+  "source_sha256": "e8e61feabb008ee6d695ed93608c2dfcbf4519d119217dab14ba734dbfb0e885",
+  "analysis_version": "MFY-WSE-SCAN-PROFILE-001",
+  "generated_at": "2026-08-10T23:42:09.765366+00:00",
+  "overall_status": "PARTIAL",
+  "overall_confidence": null,
+  "summary": "Machine auditory comparison completed; human listening authority is required before artistic approval. Technical decision: PASS_TO_LISTENING.",
+  "sections": {
+    "loudness_dynamics": "PASS",
+    "spectral_balance": "PASS",
+    "low_frequency": "PASS",
+    "high_frequency_cutoff": "PASS",
+    "stereo_field": "UNKNOWN",
+    "phase": "UNKNOWN",
+    "transients": "PASS",
+    "artifact_detection": "PASS",
+    "musical_structure": "UNKNOWN"
+  },
+  "findings": [],
+  "evidence_index": {
+    "metrics.json": {
+      "before": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\01_source_scan\\metrics.json",
+      "after": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\A\\metrics.json"
+    },
+    "scan_manifest.json": {
+      "before": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\01_source_scan\\scan_manifest.json",
+      "after": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\A\\scan_manifest.json"
+    },
+    "judgment_rules.json": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_A\\judgment_rules.json",
+    "metrics_delta.json": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_A\\metrics_delta.json",
+    "comparison_report.json": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_A\\comparison_report.json"
+  },
+  "unresolved_evidence_findings": [],
+  "unresolved_evidence_details": []
+}

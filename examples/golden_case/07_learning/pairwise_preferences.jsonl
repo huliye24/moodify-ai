@@ -1,0 +1,6 @@
+{"case_id": "case_00000000000000000000000000000001", "winner": "A", "loser": "B", "preference": 1, "reviewer_id": "algorithm:MFY-ALGORITHMIC-REVIEW-001", "completed_at": "2026-08-10T23:42:29.112179+00:00"}
+{"case_id": "case_00000000000000000000000000000001", "winner": "A", "loser": "C", "preference": 1, "reviewer_id": "algorithm:MFY-ALGORITHMIC-REVIEW-001", "completed_at": "2026-08-10T23:42:29.112179+00:00"}
+{"case_id": "case_00000000000000000000000000000001", "winner": "A", "loser": "SOURCE", "preference": 1, "reviewer_id": "algorithm:MFY-ALGORITHMIC-REVIEW-001", "completed_at": "2026-08-10T23:42:29.112179+00:00"}
+{"case_id": "case_00000000000000000000000000000001", "winner": "B", "loser": "C", "preference": 1, "reviewer_id": "algorithm:MFY-ALGORITHMIC-REVIEW-001", "completed_at": "2026-08-10T23:42:29.112179+00:00"}
+{"case_id": "case_00000000000000000000000000000001", "winner": "B", "loser": "SOURCE", "preference": 1, "reviewer_id": "algorithm:MFY-ALGORITHMIC-REVIEW-001", "completed_at": "2026-08-10T23:42:29.112179+00:00"}
+{"case_id": "case_00000000000000000000000000000001", "winner": "C", "loser": "SOURCE", "preference": 1, "reviewer_id": "algorithm:MFY-ALGORITHMIC-REVIEW-001", "completed_at": "2026-08-10T23:42:29.112179+00:00"}

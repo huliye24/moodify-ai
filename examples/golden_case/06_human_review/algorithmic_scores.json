@@ -1,0 +1,45 @@
+{
+  "reviewer_id": "algorithm:MFY-ALGORITHMIC-REVIEW-001",
+  "formula_version": "MFY-ALGO-REVIEW-FORMULA-001",
+  "completed_at": "2026-08-10T23:42:29.112179+00:00",
+  "scores": {
+    "A": {
+      "goals_met": [
+        "PRESERVE_DYNAMICS"
+      ],
+      "guardrail_failures": [],
+      "score": 1.0,
+      "technical_assessment": "IMPROVED",
+      "warning_count": 0,
+      "workflow_decision": "PASS_TO_LISTENING"
+    },
+    "B": {
+      "goals_met": [
+        "PRESERVE_DYNAMICS"
+      ],
+      "guardrail_failures": [],
+      "score": 1.0,
+      "technical_assessment": "IMPROVED",
+      "warning_count": 0,
+      "workflow_decision": "PASS_TO_LISTENING"
+    },
+    "C": {
+      "goals_met": [
+        "PRESERVE_DYNAMICS"
+      ],
+      "guardrail_failures": [],
+      "score": 1.0,
+      "technical_assessment": "IMPROVED",
+      "warning_count": 0,
+      "workflow_decision": "PASS_TO_LISTENING"
+    },
+    "SOURCE": {
+      "goals_met": [],
+      "guardrail_failures": [],
+      "score": 0.0,
+      "technical_assessment": "BASELINE",
+      "warning_count": 0,
+      "workflow_decision": "NO_INTERVENTION"
+    }
+  }
+}

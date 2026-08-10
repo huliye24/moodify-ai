@@ -29,9 +29,14 @@ A generative model may create a track without having a reliable engineering syst
 - What actually happened in the waveform and spectrum?
 - Is the result stable, distorted, unbalanced, phase-problematic, overly dense, or structurally inconsistent?
 - What parts of the judgment are measurable?
-- What requires human listening authority?
 - If an intervention is made, did it actually improve the target condition?
 - Can the evidence from this case improve the next case?
+
+Moodify does not outsource judgment to subjective listening. Since 2026-08-11,
+case ranking is produced by a deterministic algorithmic reviewer
+(`moodify.data_factory.algorithmic_review`, formula `MFY-ALGO-REVIEW-FORMULA-001`)
+over frozen measurement judgments — Moodify is the ear of AI, and the loop is
+fully machine-operated.
 
 Moodify is designed around those questions.
 
@@ -114,35 +119,40 @@ Moodify is not only a collection of functions. Its long-term value comes from th
 
 ---
 
-## Current Implementation Status
+## Current Implementation Status — August 2026 Data Foundation
 
-Moodify is an **alpha research and engineering system**.
-
-The current stable Python mainline is intentionally narrower than the full Auditory Intelligence architecture. Its v0.1 flow is approximately:
+Moodify is converging to **Moodify 1.0 — Data Foundation** (freeze target 2026-08-31).
+The canonical production loop is:
 
 ```text
-Import
-  -> Analyze
-  -> Diagnose
-  -> Process
-  -> Export
+SOURCE -> LISTEN -> REPRESENT -> JUDGE -> ABC INTERVENTION -> VERIFY
+       -> ALGORITHMIC REVIEW -> DATASET -> NEXT CASE
 ```
 
-This working mainline should be preserved while the broader auditory-intelligence architecture is integrated incrementally.
+One real song produces a versioned `ProductionCase` with before-scan, diagnosis,
+A/B/C intervention plans (A=conservative, B=balanced, C=exploratory, derived
+from the diagnosis), three candidates, after-scans, source-vs-candidate
+comparisons, an algorithmic review record, and deterministic pairwise dataset
+rows — without manual file surgery.
 
-Current capabilities include, depending on the active branch/version:
+Current capabilities:
 
-- local audio loading;
-- acoustic metrics and spectrum analysis;
-- rule-based diagnosis;
-- controlled DSP processing;
-- WAV export;
-- API/CLI interfaces;
-- treatment records and human listening feedback;
-- experimental reality/quality metrics;
-- research and production-process tooling.
+- standards-backed measurement (BS.1770-4 loudness, EBU 3342 LRA, true-peak,
+  clipping, DC, spectral and band-energy descriptors) — see
+  [Metric Registry](docs/metrics/METRIC_REGISTRY_V1.md);
+- deterministic reference audio suite (10 fixtures, hashes, expected values) —
+  [Reference Suite](moodify-core-package/benchmarks/reference_audio/REFERENCE_SUITE.md);
+- diagnosis-derived ABC intervention plans and reproducible DSP candidates;
+- deterministic algorithmic review replacing human blind ranking;
+- evidence manifests with artifact hashes; failed jobs fail closed;
+- 24/7 unattended data node (single worker, queue survives restarts);
+- cross-machine repeatability: 52/52 metrics identical across OS/Python
+  versions (2026-08-11);
+- API/CLI interfaces and a local-first Android client.
 
-Not every research concept in this repository is production-ready. Experimental and legacy systems are explicitly distinguished from the canonical mainline.
+Not every research concept in this repository is production-ready. Experimental
+and legacy systems are explicitly distinguished from the canonical mainline
+(see [Legacy & Experimental Policy](docs/LEGACY_AND_EXPERIMENTAL_POLICY.md)).
 
 ---
 
@@ -196,6 +206,32 @@ See:
 - `docs/ASSET_MODEL.md`
 - `docs/LEGACY_AND_EXPERIMENTAL_POLICY.md`
 - `docs/REPOSITORY_STATUS.md`
+
+---
+
+## Scientific Release Assets
+
+- **Repository constitution:** [PHASE1_CONSTITUTION.md](docs/PHASE1_CONSTITUTION.md),
+  [CODE_FREEZE_POLICY.md](docs/CODE_FREEZE_POLICY.md)
+- **Data protocol:** [DATA_PROTOCOL_V1.md](docs/contracts/DATA_PROTOCOL_V1.md) (frozen)
+- **Metric registry:** [METRIC_REGISTRY_V1.md](docs/metrics/METRIC_REGISTRY_V1.md)
+- **Reference audio suite:** [REFERENCE_SUITE.md](moodify-core-package/benchmarks/reference_audio/REFERENCE_SUITE.md)
+- **Golden Production Case:** [examples/golden_case](examples/golden_case/)
+- **Benchmark:** reference-suite expected values + cross-machine report
+  (`moodify-core-package/benchmarks/reference_audio/expected/`)
+- **Citation:** [CITATION.cff](CITATION.cff)
+
+## Scope and Limitations
+
+- The current mainline measures and intervenes on **audio**; musical-structure
+  (MSE) and some research/experimental modules are not part of the frozen
+  1.0 surface.
+- Metrics are trustworthy only under the frozen scan profile
+  (`MFY-WSE-SCAN-PROFILE-001`); any profile change requires a new version and
+  explicit data separation.
+- The algorithmic reviewer is a deterministic technical ranking, not a claim
+  about artistic quality.
+- No private audio, API keys or unauthorized datasets are committed.
 
 ---
 

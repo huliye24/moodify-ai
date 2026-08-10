@@ -1,0 +1,94 @@
+{
+  "case_id": "case_00000000000000000000000000000001",
+  "plan_id": "case_00000000000000000000000000000001__PLAN_A",
+  "candidate_label": "A",
+  "candidate_id": "case_00000000000000000000000000000001__CAND_A",
+  "strategy": "CONSERVATIVE",
+  "intensity": 0.65,
+  "source_sha256": "e8e61feabb008ee6d695ed93608c2dfcbf4519d119217dab14ba734dbfb0e885",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "plan_generator_version": "MFY-ABC-HEURISTIC-001",
+  "params": {
+    "P01_vocal_presence_freq": 3000.0,
+    "P02_vocal_presence_gain": 1.04,
+    "P03_vocal_presence_q": 0.7,
+    "P04_proximity_low_freq": 200.0,
+    "P05_proximity_low_gain": -0.65,
+    "P06_compression_ratio": 1.078,
+    "P07_compression_attack": 35.0,
+    "P08_compression_release": 250.0,
+    "P09_compression_threshold": -10.65,
+    "P10_reverb_t60": 0.0,
+    "P11_reverb_dry_wet": 0.0,
+    "P12_reverb_width": 1.0,
+    "P13_harmonic_drive": 0.0,
+    "P14_high_shelf_freq": 10000.0,
+    "P15_high_shelf_gain": 0.65
+  },
+  "technical_goals": [
+    {
+      "goal_id": "INCREASE_PRESENCE",
+      "metric": "presence_2000_5000_hz",
+      "desired_direction": "INCREASE",
+      "minimum_meaningful_change": 0.01,
+      "rationale": "presence ratio 0.0000 below v1 seed threshold 0.090"
+    },
+    {
+      "goal_id": "REDUCE_LOW_MID_CONGESTION",
+      "metric": "low_mid_120_250_hz",
+      "desired_direction": "DECREASE",
+      "minimum_meaningful_change": 0.01,
+      "rationale": "combined low-mid ratio 1.0000 above v1 seed threshold 0.240"
+    },
+    {
+      "goal_id": "RESTORE_AIR",
+      "metric": "air_10000_16000_hz",
+      "desired_direction": "INCREASE",
+      "minimum_meaningful_change": 0.005,
+      "rationale": "air ratio 0.0000 below v1 seed threshold 0.018"
+    },
+    {
+      "goal_id": "PRESERVE_DYNAMICS",
+      "metric": "crest_factor_db",
+      "desired_direction": "DECREASE",
+      "minimum_meaningful_change": 0.2,
+      "rationale": "crest factor 9.55 dB at/below v1 seed threshold 13 dB"
+    }
+  ],
+  "guardrails": [
+    {
+      "guardrail_id": "NO_NEW_CLIPPING",
+      "metric": "clipping_sample_count",
+      "comparator": "EQUAL",
+      "threshold": 0,
+      "severity": "BLOCKING"
+    },
+    {
+      "guardrail_id": "TRUE_PEAK_SAFE",
+      "metric": "true_peak_dbfs",
+      "comparator": "VALUE_LE",
+      "threshold": 0.0,
+      "severity": "BLOCKING"
+    },
+    {
+      "guardrail_id": "FINITE_SAMPLES_ONLY",
+      "metric": "invalid_sample_count",
+      "comparator": "EQUAL",
+      "threshold": 0,
+      "severity": "BLOCKING"
+    }
+  ],
+  "goals": [
+    "increase_presence",
+    "reduce_low_mid_congestion",
+    "restore_air",
+    "preserve_dynamics"
+  ],
+  "rationale": [
+    "presence ratio 0.0000 below v1 seed threshold 0.090",
+    "combined low-mid ratio 1.0000 above v1 seed threshold 0.240",
+    "air ratio 0.0000 below v1 seed threshold 0.018"
+  ],
+  "human_listening_required": true
+}
