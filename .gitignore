@@ -62,6 +62,9 @@ calibration_reports/
 inspector_reports/
 listening_test/
 
+# Data-factory production cases (real-audio evidence, never committed)
+outputs/data_factory/
+
 # Generated audio / visual files
 *.wav
 *.flac

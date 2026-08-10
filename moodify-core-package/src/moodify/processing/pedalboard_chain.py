@@ -88,8 +88,11 @@ class MoodifyDSPChain:
                 cutoff_frequency_hz=_p(params, "P14_high_shelf_freq", 10000),
                 gain_db=g))
 
-        board.append(pedalboard.Gain())  # output gain staging
-        board.append(pedalboard.Limiter(threshold_db=-1.0))  # safety ceiling at -1 dBFS
+        # Unity output staging: pedalboard.Gain() 无参数默认 +1 dB, 必须显式 0 dB.
+        # 安全上限: pedalboard.Limiter 内置 auto-makeup-gain 会把输出归一化到满幅
+        # (spotify/pedalboard#282), 用 Clipping 做真正的 -1 dBFS 硬 ceiling.
+        board.append(pedalboard.Gain(gain_db=0.0))
+        board.append(pedalboard.Clipping(threshold_db=-1.0))
         return board
 
     def _run_board(self, audio: np.ndarray, sr: int,
