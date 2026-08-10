@@ -1,0 +1,63 @@
+{
+  "task_id": "MFY-ALIYUN-DATA-NODE-001",
+  "host": {
+    "address": "120.55.191.146",
+    "distro": "Ubuntu 26.04 LTS",
+    "vcpu": 2,
+    "memory_total_gb": 1.6,
+    "swap_gb": 2.0,
+    "disk_total_gb": 40,
+    "python": "3.14.4",
+    "ffmpeg": "8.0.1"
+  },
+  "cases": [
+    {
+      "case_id": "case_28bff5c8dbd842f6a9ce255e96229778",
+      "source": "mfy_smoke.wav (synthetic 20s)",
+      "job_id": "job_9ded088a3ce6467fb49b641d67b806d3",
+      "attempts": 2,
+      "elapsed_s": 21,
+      "disk_growth_mb": 26,
+      "result": "SUCCEEDED"
+    },
+    {
+      "case_id": "case_eced29b9c529419198d4d8ebe68fbca6",
+      "source": "track_0.wav (owned 45s excerpt)",
+      "job_id": "job_98c143f1b08f48a78b7c3e649050bd7b",
+      "attempts": 1,
+      "elapsed_s": 32,
+      "disk_growth_mb": 77,
+      "result": "SUCCEEDED"
+    },
+    {
+      "case_id": "case_d37b1df00f3e494a91517a597ec48cfe",
+      "source": "track_1.wav (owned 45s excerpt)",
+      "job_id": "job_ff351917a0254d029525ead800c8bcf6",
+      "attempts": 1,
+      "elapsed_s": 31,
+      "disk_growth_mb": 78,
+      "result": "SUCCEEDED"
+    },
+    {
+      "case_id": "case_be0b530c9d7f4c749cf49baf95653dbb",
+      "source": "mfy_smoke.wav attempt 1 (matplotlib missing)",
+      "job_id": "job_9ded088a3ce6467fb49b641d67b806d3",
+      "attempts": 1,
+      "result": "FAILED (ModuleNotFoundError matplotlib) -> retried"
+    }
+  ],
+  "capacity": {
+    "peak_observed_memory_used_gb": 1.0,
+    "minimum_available_memory_gb": 0.58,
+    "swap_used_mb": 76,
+    "oom_kills": 0,
+    "deferrals_observed": 0,
+    "worker_concurrency": 1
+  },
+  "persistence": {
+    "restart_test": "systemctl restart moodify-data-worker.service -> SUCCEEDED records retained",
+    "queue_db": "/var/lib/moodify/node.sqlite3",
+    "cases_dir": "/var/lib/moodify/data_factory/cases"
+  },
+  "bottleneck_conclusion": "2C2G (1.6G available) is sufficient for serial 24/7 data factory work: each 45s case completes in ~31s with ~77MB disk growth, no OOM, minimal swap. Upgrade memory only if longer tracks or parallel batches are required."
+}

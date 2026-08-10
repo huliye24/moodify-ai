@@ -43,6 +43,7 @@ full = ["moodify[dsp,separation,api,dev]"]
 
 [project.scripts]
 moodify = "moodify.release_cli:main"
+moodify-node = "moodify.node.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
