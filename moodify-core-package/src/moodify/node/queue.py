@@ -114,6 +114,27 @@ class JobQueue:
             )
             return cur.rowcount
 
+    def recover_interrupted(self) -> int:
+        """Requeue work left RUNNING by a previous serial worker process.
+
+        The node is intentionally a single-worker service. A fresh worker process
+        therefore owns recovery of any RUNNING row left behind by its predecessor,
+        without waiting for the long processing lease to expire.
+        """
+        now = _iso()
+        with connect(self.db_path) as con:
+            cur = con.execute(
+                "UPDATE jobs SET status=?, updated_at=?, started_at=NULL, lease_until=NULL, "
+                "last_error=COALESCE(last_error,'') || ? WHERE status=?",
+                (
+                    JobStatus.QUEUED.value,
+                    now,
+                    "\nRecovered after worker process restart.",
+                    JobStatus.RUNNING.value,
+                ),
+            )
+            return cur.rowcount
+
     def get(self, job_id: str) -> Job | None:
         with connect(self.db_path) as con:
             row = con.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()

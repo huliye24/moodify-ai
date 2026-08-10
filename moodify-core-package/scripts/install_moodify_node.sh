@@ -46,7 +46,7 @@ fi
 
 python3 -m venv "${REPO_DIR}/.venv"
 "${REPO_DIR}/.venv/bin/pip" install --upgrade pip
-"${REPO_DIR}/.venv/bin/pip" install -e "${REPO_DIR}/moodify-core-package"
+"${REPO_DIR}/.venv/bin/pip" install -e "${REPO_DIR}/moodify-core-package[node]"
 chown -R "${SERVICE_USER}:${SERVICE_USER}" "${REPO_DIR}/.venv"
 
 echo "Base node dependencies installed. Install systemd unit separately after reviewing paths."

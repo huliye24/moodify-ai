@@ -99,6 +99,10 @@ def test_aggregate_includes_only_completed_valid_cases(tmp_path: Path):
     dataset_dir = tmp_path / "dataset"
     assert (dataset_dir / "cases.jsonl").is_file()
     assert (dataset_dir / "pairwise_preferences.jsonl").is_file()
+    assert (dataset_dir / "rejected_cases.jsonl").is_file()
     cases_rows = (dataset_dir / "cases.jsonl").read_text().strip().splitlines()
     assert len(cases_rows) == 1
     assert json.loads(cases_rows[0])["case_id"] == CASE_ID
+    rejected_rows = (dataset_dir / "rejected_cases.jsonl").read_text().strip().splitlines()
+    assert len(rejected_rows) == 1
+    assert json.loads(rejected_rows[0])["case_id"] == broken.name

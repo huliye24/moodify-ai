@@ -79,11 +79,19 @@ def aggregate_dataset(cases_root: Path, output_dir: Path) -> dict[str, int]:
     case_rows: list[dict] = []
     pairwise_rows: list[dict] = []
     skipped = 0
+    rejections: list[dict[str, str]] = []
     for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir()):
         try:
             record = build_case_dataset(case_dir)
-        except (FileNotFoundError, KeyError, ValueError, json.JSONDecodeError):
+        except (FileNotFoundError, KeyError, ValueError, json.JSONDecodeError) as exc:
             skipped += 1
+            rejections.append(
+                {
+                    "case_id": case_dir.name,
+                    "error_type": type(exc).__name__,
+                    "message": str(exc),
+                }
+            )
             continue
         case_rows.append(record)
         pairwise_rows.extend(record["pairwise_preferences"])
@@ -93,6 +101,9 @@ def aggregate_dataset(cases_root: Path, output_dir: Path) -> dict[str, int]:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
     with (output_dir / "pairwise_preferences.jsonl").open("w", encoding="utf-8") as handle:
         for row in pairwise_rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    with (output_dir / "rejected_cases.jsonl").open("w", encoding="utf-8") as handle:
+        for row in rejections:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     summary = {

@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import com.moodify.app.ui.theme.MoodifyBlue
 import com.moodify.app.ui.theme.MoodifyGradient
 import com.moodify.app.ui.theme.MoodifyPurple
+import com.moodify.app.ui.theme.MoodifyBackground
+import com.moodify.app.ui.theme.MoodifyMuted
 
 @Composable
 fun MoodifyMark(modifier: Modifier = Modifier) {
@@ -43,8 +45,8 @@ fun MoodifyMark(modifier: Modifier = Modifier) {
                 brush = MoodifyGradient,
                 start = points[i],
                 end = points[i + 1],
-                strokeWidth = 3.2.dp.toPx(),
-                cap = StrokeCap.Round,
+                strokeWidth = 1.8.dp.toPx(),
+                cap = StrokeCap.Square,
             )
         }
     }
@@ -60,20 +62,20 @@ fun GradientButton(
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.fillMaxWidth().height(52.dp),
+        modifier = modifier.fillMaxWidth().height(50.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(),
-        shape = RoundedCornerShape(26.dp),
+        shape = RoundedCornerShape(10.dp),
     ) {
         Box(
             if (enabled) {
-                Modifier.fillMaxWidth().height(52.dp).background(MoodifyGradient, RoundedCornerShape(26.dp))
+                Modifier.fillMaxWidth().height(50.dp).background(MoodifyGradient, RoundedCornerShape(10.dp))
             } else {
-                Modifier.fillMaxWidth().height(52.dp).background(Color(0xFFC9CFE0), RoundedCornerShape(26.dp))
+                Modifier.fillMaxWidth().height(50.dp).background(MoodifyMuted, RoundedCornerShape(10.dp))
             },
             contentAlignment = Alignment.Center,
         ) {
-            Text(text, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text(text, color = MoodifyBackground, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -81,13 +83,13 @@ fun GradientButton(
 @Composable
 fun ProgressRing(progress: Float, modifier: Modifier = Modifier) {
     Canvas(modifier) {
-        drawArc(Color(0xFFE6EAF4), 0f, 360f, false, style = Stroke(2.5.dp.toPx(), cap = StrokeCap.Round))
+        drawArc(MoodifyMuted.copy(alpha = .24f), 0f, 360f, false, style = Stroke(2.dp.toPx()))
         drawArc(
             brush = androidx.compose.ui.graphics.Brush.sweepGradient(listOf(MoodifyBlue, MoodifyPurple)),
             startAngle = -90f,
             sweepAngle = 360f * progress,
             useCenter = false,
-            style = Stroke(2.5.dp.toPx(), cap = StrokeCap.Round),
+            style = Stroke(2.dp.toPx()),
         )
     }
 }

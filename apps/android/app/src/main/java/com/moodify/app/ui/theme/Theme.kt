@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-val MoodifyGradient = Brush.horizontalGradient(listOf(MoodifyBlue, MoodifyPurple))
+val MoodifyGradient = Brush.horizontalGradient(listOf(MoodifyBlue, MoodifyGreen))
 
 private val MoodifyColors = lightColorScheme(
     primary = MoodifyBlue,
@@ -18,6 +18,9 @@ private val MoodifyColors = lightColorScheme(
     onBackground = MoodifyNavy,
     onSurface = MoodifyNavy,
     outline = MoodifyOutline,
+    surfaceVariant = MoodifyLavender,
+    onSurfaceVariant = MoodifyMuted,
+    error = MoodifyCritical,
 )
 
 @Composable

@@ -25,9 +25,9 @@ def run_forever(config: NodeConfig | None = None) -> int:
     config.state_dir.mkdir(parents=True, exist_ok=True)
     config.output_root.mkdir(parents=True, exist_ok=True)
     queue = JobQueue(config.db_path, lease_seconds=config.lease_seconds)
-    recovered = queue.recover_expired()
+    recovered = queue.recover_interrupted()
     if recovered:
-        LOG.warning("recovered_expired_jobs=%s", recovered)
+        LOG.warning("recovered_interrupted_jobs=%s", recovered)
 
     stop = StopFlag()
 

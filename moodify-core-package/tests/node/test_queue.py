@@ -45,3 +45,15 @@ def test_recover_expired_lease(tmp_path):
         con.execute("UPDATE jobs SET lease_until=? WHERE job_id=?", (expired, job.job_id))
     assert q.recover_expired() == 1
     assert q.get(job.job_id).status == "QUEUED"
+
+
+def test_recover_interrupted_worker_without_waiting_for_lease(tmp_path):
+    q = JobQueue(tmp_path / "node.sqlite3", lease_seconds=6 * 60 * 60)
+    job = q.enqueue(_source(tmp_path), tmp_path / "out")
+    q.lease_next()
+
+    assert q.recover_interrupted() == 1
+    recovered = q.get(job.job_id)
+    assert recovered.status == "QUEUED"
+    assert recovered.lease_until is None
+    assert "worker process restart" in recovered.last_error
