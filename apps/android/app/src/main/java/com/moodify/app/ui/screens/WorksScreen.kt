@@ -3,6 +3,7 @@ package com.moodify.app.ui.screens
 import android.media.MediaPlayer
 import androidx.annotation.RawRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +41,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,6 +58,8 @@ import com.moodify.app.ui.theme.MoodifyInstrumentText
 
 private data class DemoMetric(val label: String, val before: String, val after: String)
 
+private data class ReportFigure(val title: String, val resource: Int)
+
 private data class OfflineDemoCase(
     val caseId: String,
     val title: String,
@@ -62,6 +67,9 @@ private data class OfflineDemoCase(
     @RawRes val sourceAudio: Int,
     @RawRes val candidateAudio: Int,
     val metrics: List<DemoMetric>,
+    val findings: List<String> = emptyList(),
+    val interventionPlan: List<String> = emptyList(),
+    val figures: List<ReportFigure> = emptyList(),
 )
 
 private val offlineCases = listOf(
@@ -89,6 +97,39 @@ private val offlineCases = listOf(
             DemoMetric("BASS", "23.25%", "20.52%"),
             DemoMetric("WIDTH", "24.44%", "26.65%"),
             DemoMetric("CLIPPING", "0", "0"),
+        ),
+    ),
+    OfflineDemoCase(
+        caseId = "DEEP EAR / V4 -> V5",
+        title = "Vieillir et devenir nouveau avec toi",
+        note = "Auditory scan and de-esser intervention verification.",
+        sourceAudio = R.raw.case_vieillir_v4,
+        candidateAudio = R.raw.case_vieillir_v5,
+        metrics = listOf(
+            DemoMetric("INTEGRATED", "V5", "-10.53 LUFS"),
+            DemoMetric("TRUE PEAK", "V5", "-0.96 dBTP est."),
+            DemoMetric("CREST FACTOR", "V5", "13.59 dB"),
+            DemoMetric("CLIPPING", "V5", "0 samples"),
+            DemoMetric("V4 -> V5 RESIDUAL", "0 ms lag", "10.26%"),
+        ),
+        findings = listOf(
+            "No clipped or non-finite samples were detected in V5.",
+            "The dynamic contour remains active: crest factor is 13.59 dB.",
+            "Stereo correlation is generally coherent; 6.27% of frames are negative and require listening attention.",
+            "A spectral edge near 17.86 kHz was detected with 0.55 confidence; this is a heuristic observation.",
+            "V5 differs from V4 beyond scalar gain: relative residual is 10.26%, with zero alignment lag.",
+        ),
+        interventionPlan = listOf(
+            "Use V4 as the listening reference and V5 as the de-essed candidate.",
+            "Judge sibilance control against vocal clarity, transient life, and retained air.",
+            "Keep true peak near or below -0.95 dBTP and introduce no clipping.",
+            "Grant artistic approval only after human A/B listening on headphones and speakers.",
+        ),
+        figures = listOf(
+            ReportFigure("LOUDNESS EVOLUTION", R.drawable.report_vieillir_loudness),
+            ReportFigure("AVERAGE SPECTRUM", R.drawable.report_vieillir_spectrum),
+            ReportFigure("BEFORE / AFTER / RESIDUAL", R.drawable.report_vieillir_residual),
+            ReportFigure("HIGH-FREQUENCY CUTOFF", R.drawable.report_vieillir_hf_cutoff),
         ),
     ),
 )
@@ -150,6 +191,7 @@ private fun OfflineCaseCard(demoCase: OfflineDemoCase) {
     val context = LocalContext.current
     var player by remember { mutableStateOf<MediaPlayer?>(null) }
     var active by remember { mutableStateOf<String?>(null) }
+    var reportExpanded by remember { mutableStateOf(false) }
 
     fun play(label: String, @RawRes resource: Int) {
         player?.release()
@@ -209,9 +251,61 @@ private fun OfflineCaseCard(demoCase: OfflineDemoCase) {
                 Icon(Icons.Outlined.Verified, null, tint = MoodifyInstrumentSignal, modifier = Modifier.size(17.dp))
                 Text("PASS TO LISTENING", color = MoodifyInstrumentSignal, style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(start = 9.dp))
             }
+            if (demoCase.findings.isNotEmpty()) {
+                OutlinedButton(
+                    onClick = { reportExpanded = !reportExpanded },
+                    modifier = Modifier.fillMaxWidth().padding(top = 18.dp).height(44.dp),
+                    shape = RoundedCornerShape(9.dp),
+                    border = BorderStroke(1.dp, MoodifyInstrumentOutline),
+                ) {
+                    Icon(Icons.Outlined.GraphicEq, null, tint = MoodifyInstrumentSignal, modifier = Modifier.size(17.dp))
+                    Text(
+                        if (reportExpanded) "HIDE SCAN REPORT" else "VIEW SCAN REPORT",
+                        color = MoodifyInstrumentText,
+                        fontSize = 10.sp,
+                        letterSpacing = .8.sp,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+            }
+            if (reportExpanded) {
+                ReportSection("MACHINE ANALYSIS") {
+                    demoCase.findings.forEach { finding ->
+                        Text("•  $finding", color = MoodifyInstrumentMuted, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 9.dp))
+                    }
+                }
+                ReportSection("POST-PROCESSING PLAN") {
+                    demoCase.interventionPlan.forEachIndexed { index, item ->
+                        Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.Top) {
+                            Text("0${index + 1}", color = MoodifyInstrumentSignal, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
+                            Text(item, color = MoodifyInstrumentMuted, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 12.dp))
+                        }
+                    }
+                }
+                if (demoCase.figures.isNotEmpty()) {
+                    ReportSection("EVIDENCE ARTIFACTS") {
+                        demoCase.figures.forEach { figure ->
+                            Text(figure.title, color = MoodifyInstrumentMuted, fontSize = 9.sp, letterSpacing = 1.sp, modifier = Modifier.padding(top = 14.dp, bottom = 7.dp))
+                            Image(
+                                painter = painterResource(figure.resource),
+                                contentDescription = figure.title,
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
+                            )
+                        }
+                        Text("Charts support measurement review; they do not determine artistic quality.", color = MoodifyInstrumentMuted, fontSize = 9.sp, modifier = Modifier.padding(top = 14.dp))
+                    }
+                }
+            }
             Text("Human listening required · Artistic approval not granted", color = MoodifyInstrumentMuted, fontSize = 10.sp, modifier = Modifier.padding(top = 6.dp))
         }
     }
+}
+
+@Composable
+private fun ReportSection(title: String, content: @Composable () -> Unit) {
+    HorizontalDivider(Modifier.padding(top = 20.dp, bottom = 18.dp), color = MoodifyInstrumentOutline)
+    Text(title, color = MoodifyInstrumentSignal, fontSize = 10.sp, letterSpacing = 1.2.sp)
+    content()
 }
 
 @Composable
