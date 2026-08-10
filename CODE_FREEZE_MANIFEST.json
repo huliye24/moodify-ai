@@ -1,0 +1,54 @@
+{
+  "manifest_version": "1.0",
+  "release": "Moodify 1.0 — Data Foundation",
+  "release_version": "1.0.0-rc.1",
+  "release_date": "2026-08-31",
+  "status": "DRAFT — finalize at Gate 6 close (2026-08-29..31)",
+  "git_commit": "40c6fd9",
+  "git_branch": "codex/mfy-data-factory-001",
+  "freeze_identities": {
+    "data_protocol": "MFY-DATA-PROTOCOL-001",
+    "data_protocol_schema": "1.0",
+    "scan_profile": "MFY-WSE-SCAN-PROFILE-001",
+    "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+    "metric_registry": "MFY-METRIC-REGISTRY-001",
+    "metric_registry_version": "1.0",
+    "dsp_engine": "MoodifyDSPChain",
+    "dsp_engine_version": "v1",
+    "plan_generator": "MFY-ABC-HEURISTIC-001",
+    "judgment_rules": "MFY-JUDGMENT-RULES-001",
+    "judgment_rules_version": "1.0",
+    "review_authority": "MFY-ALGORITHMIC-REVIEW-001",
+    "review_formula": "MFY-ALGO-REVIEW-FORMULA-001",
+    "human_review_schema": "MFY-HUMAN-REVIEW-001",
+    "dataset_schema": "MFY-DATASET-SCHEMA-001",
+    "runtime_node": "MFY-ALIYUN-DATA-NODE-001",
+    "reference_audio_suite": "MFY-REFERENCE-AUDIO-SUITE-001"
+  },
+  "runtime": {
+    "python_local": "3.11.9",
+    "python_node": "3.14",
+    "ffmpeg": "8.1.1",
+    "ffmpeg_path_win": "C:/Users/Administrator/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1.1-full_build/bin/ffmpeg.exe",
+    "node_os": "Ubuntu 26.04 LTS (kernel 7.0)",
+    "node_spec": "2 vCPU / 1.6 GiB, single worker, MemoryHigh=1500M"
+  },
+  "dependency_lock": {
+    "numpy": "2.4.4",
+    "scipy": "1.17.1",
+    "librosa": "0.11.0",
+    "soundfile": "0.13.1",
+    "pyloudnorm": "0.2.0",
+    "pydantic": "2.13.2",
+    "pedalboard": "0.9.23",
+    "fastapi": "0.136.0",
+    "uvicorn": "0.44.0",
+    "PyYAML": "6.0.3",
+    "note": "lockfile pinning to be finalized at Gate 6 (G6-01)"
+  },
+  "data_separation": {
+    "pre_fix_cases": "cases generated before the 2026-08-11 LUFS double-offset fix (e.g. /var/lib/moodify/data_factory/cases) retain metrics computed with the old loudness definition (-0.65..-1.28 LUFS bias)",
+    "post_fix_cases": "/var/lib/moodify/data_factory_v2/cases — authoritative post-fix set (10/10 pilot, bundle+reopen verified)",
+    "rule": "never mix rows produced under incompatible definitions (freeze protocol 1.4)"
+  }
+}
