@@ -12,6 +12,10 @@ from datetime import timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
+import numpy as np
+
+from moodify.auditory.decode import decode, probe
+from moodify.auditory.errors import AudioDecodeFailed, AudioEmpty
 from moodify.auditory.manifests import sha256_file
 from moodify.auditory.profiles import get_profile
 from moodify.auditory.service import (
@@ -42,6 +46,36 @@ def _write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def validate_source_audio(
+    path: Path,
+    *,
+    min_duration_s: float = 0.5,
+    min_decoded_s: float = 0.1,
+    analysis_sample_rate: int = 22050,
+) -> None:
+    """Reject degenerate audio before it produces a meaningless case.
+
+    ffprobe tolerates truncated containers, so duration alone is not enough:
+    verify that decoding actually yields a meaningful amount of non-silent
+    audio. Raises AudioDecodeFailed/AudioEmpty on invalid input.
+    """
+    info = probe(path)
+    if info.duration_seconds < min_duration_s:
+        raise AudioDecodeFailed(
+            f"source audio too short: {info.duration_seconds:.3f}s < {min_duration_s}s"
+        )
+    decoded = decode(path, analysis_sample_rate=analysis_sample_rate)
+    seconds = decoded.samples.shape[0] / decoded.sample_rate
+    if seconds < min_decoded_s:
+        raise AudioEmpty(
+            f"source audio decodes to {seconds:.3f}s < {min_decoded_s}s of samples"
+        )
+    head = decoded.samples[: max(1, int(0.5 * decoded.sample_rate))]
+    rms = float(np.sqrt(np.mean(head.astype(np.float64) ** 2)))
+    if rms < 1e-4:
+        raise AudioEmpty(f"source audio silent in first 0.5s (rms={rms:.2e})")
+
+
 def run_production_case(
     source_path: Path,
     output_root: Path,
@@ -65,6 +99,7 @@ def run_production_case(
     source_dir.mkdir(parents=True, exist_ok=True)
     preserved_source = source_dir / f"source{source_path.suffix.lower()}"
     shutil.copy2(source_path, preserved_source)
+    validate_source_audio(preserved_source)
     source_sha256 = sha256_file(preserved_source)
 
     # 01 BEFORE scan.

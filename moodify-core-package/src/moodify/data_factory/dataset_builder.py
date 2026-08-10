@@ -6,11 +6,42 @@ import json
 from pathlib import Path
 from typing import Any
 
+from moodify.auditory.manifests import sha256_file
+
 from .human_review import load_review, pairwise_preferences, validate_completed_review
 
 
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _verify_artifact_hashes(case_dir: Path, manifest: dict[str, Any]) -> None:
+    """Reject tampered artifacts: manifest hashes must match the actual files.
+
+    Missing files raise FileNotFoundError from the caller naturally; present
+    files with mismatched hashes are an integrity violation, never silent.
+    """
+    if manifest.get("source_sha256"):
+        source_rel = manifest.get("source_path")
+        if not source_rel:
+            raise ValueError("manifest declares source_sha256 but no source_path")
+        source_file = case_dir / source_rel
+        if not source_file.is_file():
+            raise FileNotFoundError(f"source artifact missing: {source_file}")
+        actual = sha256_file(source_file)
+        if actual != manifest["source_sha256"]:
+            raise ValueError(
+                f"source hash mismatch: manifest={manifest['source_sha256'][:12]} actual={actual[:12]}"
+            )
+    for label, expected in (manifest.get("candidate_sha256") or {}).items():
+        candidate_file = case_dir / "03_candidates" / f"candidate_{label}.wav"
+        if not candidate_file.is_file():
+            raise FileNotFoundError(f"candidate {label} artifact missing: {candidate_file}")
+        actual = sha256_file(candidate_file)
+        if actual != expected:
+            raise ValueError(
+                f"candidate {label} hash mismatch: manifest={expected[:12]} actual={actual[:12]}"
+            )
 
 
 def _metric_values(payload: dict) -> dict[str, Any]:
@@ -26,6 +57,7 @@ def _metric_values(payload: dict) -> dict[str, Any]:
 def build_case_dataset(case_dir: Path) -> dict[str, Any]:
     case_dir = Path(case_dir)
     manifest = _read_json(case_dir / "case_manifest.json")
+    _verify_artifact_hashes(case_dir, manifest)
     review = load_review(case_dir / "06_human_review" / "review.json")
     validate_completed_review(review)
 

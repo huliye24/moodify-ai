@@ -1,0 +1,14 @@
+{
+  "job_id": "job_0487e073ad7b4a20aa5711f0a733f595",
+  "source_path": "/var/lib/moodify/sources/sha256/da/da0e1a0666809c503784e9433cb8d079805aacd8d22283b1b9a5a1f4a573f69e/track_0.wav",
+  "output_root": "/var/lib/moodify/data_factory",
+  "status": "QUEUED",
+  "attempts": 0,
+  "created_at": "2026-08-10T20:58:29.149496+00:00",
+  "updated_at": "2026-08-10T20:58:29.149496+00:00",
+  "started_at": null,
+  "finished_at": null,
+  "lease_until": null,
+  "case_dir": null,
+  "last_error": null
+}

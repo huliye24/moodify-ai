@@ -1,0 +1,38 @@
+{
+  "schema_version": "moodify.auditory-observation/1.0",
+  "observation_id": "obs-e6dea14e-cc1",
+  "run_id": "e6dea14e-cc1e-5710-ba02-a31ab4485cf3",
+  "created_at": "2026-08-09T07:16:20+00:00",
+  "source": {
+    "path": "",
+    "sha256": "c726d333dd159a31423f3480dbb1c5c4a9dfcd30efe1f7e12ade390dc92e8908",
+    "size_bytes": 0
+  },
+  "analyzer": {
+    "name": "ocean-listen",
+    "commit": "928dfba62a2c074ccb0154f7ddd42743e4ce9e75"
+  },
+  "classification": {
+    "authority": "sensor_only"
+  },
+  "global_features": {},
+  "stems": [],
+  "notes": [],
+  "voice": {
+    "status": "experimental"
+  },
+  "lyrics": null,
+  "timeline": [],
+  "artifacts": [],
+  "uncertainty": {
+    "labels_are_experimental": true
+  },
+  "provenance": {
+    "fake_process": true
+  },
+  "quality_gate": {
+    "verdict": "PASS",
+    "issues": [],
+    "metrics": {}
+  }
+}

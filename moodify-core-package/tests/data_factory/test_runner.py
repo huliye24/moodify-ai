@@ -5,10 +5,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
+import pytest
 import soundfile as sf
 
+from moodify.auditory.errors import AudioDecodeFailed, AudioEmpty
 from moodify.data_factory.dataset_builder import build_case_dataset
 from moodify.data_factory.models import DATA_PROTOCOL_VERSION
+from moodify.data_factory.runner import validate_source_audio
 
 CASE_ID = "case_" + "f" * 32
 
@@ -112,3 +116,35 @@ def test_completed_review_materializes_six_pairwise_rows(completed_case_dir: Pat
     assert (learning_dir / "training_record.json").is_file()
     rows = list((learning_dir / "pairwise_preferences.jsonl").read_text().strip().splitlines())
     assert len(rows) == 6
+
+
+def _valid_wav(tmp_path: Path, name: str = "valid.wav", duration_s: float = 2.0) -> Path:
+    sr = 48000
+    t = np.arange(int(sr * duration_s)) / sr
+    x = (0.2 * np.sin(2 * np.pi * 440 * t)).astype(np.float32)
+    path = tmp_path / name
+    sf.write(path, x, sr)
+    return path
+
+
+def test_validate_source_audio_accepts_valid_wav(tmp_path: Path):
+    wav = _valid_wav(tmp_path)
+    validate_source_audio(wav)  # must not raise
+
+
+def test_validate_source_audio_rejects_truncated_wav(tmp_path: Path):
+    full = _valid_wav(tmp_path, "full.wav")
+    truncated = tmp_path / "truncated.wav"
+    truncated.write_bytes(full.read_bytes()[:128])
+    with pytest.raises((AudioDecodeFailed, AudioEmpty)):
+        validate_source_audio(truncated)
+
+
+def test_validate_source_audio_rejects_silence(tmp_path: Path):
+    sr = 48000
+    t = np.arange(sr * 2) / sr
+    x = np.zeros_like(t).astype(np.float32)
+    wav = tmp_path / "silent.wav"
+    sf.write(wav, x, sr)
+    with pytest.raises(AudioEmpty, match="silent"):
+        validate_source_audio(wav)
