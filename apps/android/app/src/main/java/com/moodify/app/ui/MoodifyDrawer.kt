@@ -1,50 +1,86 @@
 package com.moodify.app.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.FactCheck
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.VideoLibrary
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moodify.app.R
-import com.moodify.app.ui.theme.*
+import com.moodify.app.ui.components.MoodifyMark
+import com.moodify.app.ui.theme.MoodifyInstrumentField
+import com.moodify.app.ui.theme.MoodifyInstrumentMuted
+import com.moodify.app.ui.theme.MoodifyInstrumentOutline
+import com.moodify.app.ui.theme.MoodifyInstrumentSignal
+import com.moodify.app.ui.theme.MoodifyInstrumentSurface
+import com.moodify.app.ui.theme.MoodifyInstrumentText
 
-private data class DrawerItem(val icon: ImageVector, val label: String, val destination: Int? = null, val badge: String? = null)
+private data class DrawerItem(val icon: ImageVector, val label: String, val destination: Int)
 
 @Composable
 fun MoodifyDrawerContent(selected: Int, onDestination: (Int) -> Unit) {
-    ModalDrawerSheet(modifier = Modifier.fillMaxWidth(.82f), drawerContainerColor = Color(0xFFFCFCFF), drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp)) {
-        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
-            Spacer(Modifier.height(26.dp)); ProfileCard(); Spacer(Modifier.height(22.dp))
+    ModalDrawerSheet(
+        modifier = Modifier.fillMaxWidth(.78f),
+        drawerContainerColor = MoodifyInstrumentField,
+        drawerShape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
+    ) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+            Column(
+                Modifier.fillMaxWidth().padding(top = 42.dp, bottom = 30.dp),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                MoodifyMark(Modifier.size(42.dp, 26.dp))
+                Text("MOODIFY", color = MoodifyInstrumentText, fontSize = 13.sp, letterSpacing = 2.4.sp, modifier = Modifier.padding(top = 14.dp))
+                Text("THE EAR OF AI", color = MoodifyInstrumentMuted, fontSize = 10.sp, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 5.dp))
+            }
             listOf(
-                DrawerItem(Icons.Outlined.VideoLibrary, stringResource(R.string.cases_title), 0), DrawerItem(Icons.Outlined.FactCheck, stringResource(R.string.nav_process), 1, "1"), DrawerItem(Icons.Outlined.CloudQueue, stringResource(R.string.nav_cloud))
+                DrawerItem(Icons.Outlined.FactCheck, stringResource(R.string.nav_process), 1),
+                DrawerItem(Icons.Outlined.VideoLibrary, stringResource(R.string.cases_title), 0),
             ).forEach { DrawerRow(it, selected, onDestination) }
-            HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MoodifyOutline)
-            listOf(
-                DrawerItem(Icons.Outlined.BarChart, stringResource(R.string.nav_data_center), 3)
-            ).forEach { DrawerRow(it, selected, onDestination) }
-            HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MoodifyOutline)
-            listOf(DrawerItem(Icons.Outlined.Settings, stringResource(R.string.nav_settings), 4), DrawerItem(Icons.Outlined.HeadsetMic, stringResource(R.string.nav_help), 5), DrawerItem(Icons.Outlined.Info, stringResource(R.string.settings_about), 6)).forEach { DrawerRow(it, selected, onDestination) }
-            Spacer(Modifier.height(16.dp)); StorageCard(); Spacer(Modifier.height(24.dp))
+            HorizontalDivider(Modifier.padding(vertical = 16.dp), color = MoodifyInstrumentOutline)
+            DrawerRow(DrawerItem(Icons.Outlined.Settings, stringResource(R.string.nav_settings), 4), selected, onDestination)
+            DrawerRow(DrawerItem(Icons.Outlined.Info, stringResource(R.string.settings_about), 6), selected, onDestination)
+            Spacer(Modifier.weight(1f))
+            Text("V1 / HUMAN AUTHORITY", color = MoodifyInstrumentMuted, fontSize = 9.sp, letterSpacing = 1.1.sp, modifier = Modifier.padding(bottom = 28.dp))
         }
     }
 }
 
-@Composable private fun ProfileCard() { Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) { Row(Modifier.background(Brush.linearGradient(listOf(Color(0xFFE8F1FF), Color(0xFFE9DEFF), Color(0xFFE1F8FF))), RoundedCornerShape(22.dp)).padding(18.dp), verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(70.dp).background(Color(0xFFC9C5FF), CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Person, null, tint = Color(0xFF252069), modifier = Modifier.size(48.dp)) }; Column(Modifier.padding(start = 14.dp).weight(1f)) { Row(verticalAlignment = Alignment.CenterVertically) { Text("泫榛", color = MoodifyNavy, fontSize = 21.sp, fontWeight = FontWeight.Bold); Spacer(Modifier.width(9.dp)); Surface(color = MoodifyPurple, shape = RoundedCornerShape(7.dp)) { Text("Pro", color = Color.White, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) } }; Text("@moodify_xzhen", color = MoodifyMuted, fontSize = 12.sp, modifier = Modifier.padding(top = 5.dp)); Text("${stringResource(R.string.common_works_count, "24")} · ${stringResource(R.string.common_likes_count, "356")}", color = MoodifyNavy, fontSize = 12.sp, modifier = Modifier.padding(top = 9.dp)) }; Icon(Icons.Outlined.ChevronRight, null, tint = MoodifyMuted) } } }
-
-@Composable private fun DrawerRow(item: DrawerItem, selected: Int, onDestination: (Int) -> Unit) { val active = item.destination == selected; Surface(onClick = { item.destination?.let(onDestination) }, modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp), color = if (active) Color(0xFFF0EDFF) else Color.Transparent, shape = RoundedCornerShape(16.dp)) { Row(Modifier.height(56.dp), verticalAlignment = Alignment.CenterVertically) { if (active) Box(Modifier.width(5.dp).fillMaxHeight(.72f).background(MoodifyPurple, RoundedCornerShape(4.dp))) else Spacer(Modifier.width(5.dp)); Icon(item.icon, null, tint = if (active) MoodifyPurple else MoodifyMuted, modifier = Modifier.padding(start = 18.dp).size(25.dp)); Text(item.label, Modifier.padding(start = 18.dp).weight(1f), color = if (active) MoodifyPurple else MoodifyNavy, fontSize = 17.sp, fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal); item.badge?.let { if (it == "•") Text("●", color = Color(0xFFFF4D5E), fontSize = 10.sp) else Surface(color = Color(0xFFF0EDFF), shape = CircleShape) { Text(it, color = MoodifyPurple, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) } }; Icon(Icons.Outlined.ChevronRight, null, tint = MoodifyMuted, modifier = Modifier.padding(horizontal = 12.dp).size(20.dp)) } } }
-
-@Composable private fun StorageCard() { Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyOutline)) { Column(Modifier.padding(14.dp)) { Text(stringResource(R.string.common_storage_used, "3.2 / 10 GB"), color = MoodifyMuted, fontSize = 12.sp); Spacer(Modifier.height(10.dp)); LinearProgressIndicator(progress = { .32f }, modifier = Modifier.fillMaxWidth().height(7.dp), color = MoodifyPurple, trackColor = MoodifyOutline) } } }
+@Composable
+private fun DrawerRow(item: DrawerItem, selected: Int, onDestination: (Int) -> Unit) {
+    val active = item.destination == selected
+    Surface(
+        onClick = { onDestination(item.destination) },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
+        color = if (active) MoodifyInstrumentSurface else MoodifyInstrumentField,
+        shape = RoundedCornerShape(10.dp),
+    ) {
+        androidx.compose.foundation.layout.Row(
+            Modifier.height(52.dp).padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(item.icon, null, tint = if (active) MoodifyInstrumentSignal else MoodifyInstrumentMuted, modifier = Modifier.size(21.dp))
+            Text(item.label, color = if (active) MoodifyInstrumentText else MoodifyInstrumentMuted, fontSize = 14.sp, modifier = Modifier.padding(start = 16.dp))
+        }
+    }
+}
