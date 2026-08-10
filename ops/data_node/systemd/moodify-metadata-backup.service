@@ -1,0 +1,19 @@
+[Unit]
+Description=Moodify daily metadata backup
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/opt/moodify/.venv/bin/python /opt/moodify/ops/data_node/metadata_backup.py \
+  --state-db /var/lib/moodify/node.sqlite3 \
+  --ingest-db /var/lib/moodify/ops/ingest.sqlite3 \
+  --cases-root /var/lib/moodify/data_factory \
+  --reports-root /var/lib/moodify/reports \
+  --backup-root /var/backups/moodify \
+  --keep 7
+Nice=15
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/moodify /var/backups/moodify

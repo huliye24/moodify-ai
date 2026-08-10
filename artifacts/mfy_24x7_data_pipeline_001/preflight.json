@@ -1,0 +1,72 @@
+{
+  "task_id": "MFY-24X7-DATA-PIPELINE-001",
+  "captured_at": "2026-08-10T13:21:32+08:00",
+  "host": {
+    "address": "120.55.191.146",
+    "hostname": "iZln9jrdhi9iv6Z",
+    "uptime": "up 1 day, 17:41, load 0.42/0.19/0.12",
+    "distro": "Ubuntu 26.04 LTS",
+    "kernel": "kernel 7.0 (from patch 27 evidence)"
+  },
+  "memory_mib": {
+    "total": 1607,
+    "used": 1012,
+    "free": 44,
+    "buff_cache": 579,
+    "available": 594,
+    "swap_total": 2047,
+    "swap_used": 77
+  },
+  "swap": {
+    "device": "/swapfile",
+    "size_gib": 2,
+    "used_mib": 77.7,
+    "swappiness": 10
+  },
+  "disk": {
+    "device": "/dev/vda3",
+    "total_gib": 40,
+    "used_gib": 6.9,
+    "available_gib": 31
+  },
+  "services": {
+    "moodify-data-worker.service": "active (running), Restart=on-failure, RestartSec=15, Nice=10, MemoryHigh=1500M, User=moodify",
+    "moodify-api.service": "active (running) since 2026-08-08, uvicorn 0.0.0.0:8000, Memory 22.9M peak 143.2M",
+    "worker_dropins": "NONE",
+    "etc_moodify": "NONE"
+  },
+  "queue": {
+    "QUEUED": 0,
+    "RUNNING": 0,
+    "SUCCEEDED": 3,
+    "FAILED": 0
+  },
+  "latest_jobs": [
+    {
+      "job_id": "job_ff351917a0254d029525ead800c8bcf6",
+      "source": "/var/lib/moodify/inbox/track_1.wav",
+      "status": "SUCCEEDED",
+      "finished_at": "2026-08-10T04:04:36+00:00"
+    },
+    {
+      "job_id": "job_98c143f1b08f48a78b7c3e649050bd7b",
+      "source": "/var/lib/moodify/inbox/track_0.wav",
+      "status": "SUCCEEDED",
+      "finished_at": "2026-08-10T04:04:05+00:00"
+    },
+    {
+      "job_id": "job_9ded088a3ce6467fb49b641d67b806d3",
+      "source": "/var/lib/moodify/inbox/mfy_smoke.wav",
+      "status": "SUCCEEDED",
+      "attempts": 2,
+      "finished_at": "2026-08-10T03:56:12+00:00"
+    }
+  ],
+  "cases_dirs": [
+    "case_28bff5c8dbd842f6a9ce255e96229778",
+    "case_be0b530c9d7f4c749cf49baf95653dbb",
+    "case_d37b1df00f3e494a91517a597ec48cfe",
+    "case_eced29b9c529419198d4d8ebe68fbca6"
+  ],
+  "baseline_verdict": "KEEP_2C2G_UNTIL_10_SONG_PILOT (unchanged from patch 27)"
+}
