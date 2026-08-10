@@ -253,4 +253,16 @@ def test_loudness_oracle_vs_ffmpeg_ebur128(tmp_path):
     assert match
     ffmpeg_lufs = float(match.group(1))
     ours = integrated_loudness_lufs(x, sr)
-    assert abs(ours - ffmpeg_lufs) < 1.0  # documented tolerance
+    assert abs(ours - ffmpeg_lufs) < 0.3  # tightened after double-offset fix (2026-08-11)
+
+
+@pytest.mark.skipif(not _ffmpeg_available(), reason="ffmpeg not available")
+def test_loudness_oracle_vs_pyloudnorm_1khz():
+    """integrated loudness matches pyloudnorm on a 1 kHz sine (G2 cross-check)."""
+    import pyloudnorm as pyln
+
+    sr = 48000
+    x = _sine(4.0, 0.5, 1000.0, sr)
+    ref = pyln.Meter(sr).integrated_loudness(x)
+    ours = integrated_loudness_lufs(x, sr)
+    assert abs(ours - ref) < 0.1, f"ours={ours} pyloudnorm={ref}"

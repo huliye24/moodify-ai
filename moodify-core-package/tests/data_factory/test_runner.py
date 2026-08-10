@@ -96,13 +96,30 @@ def test_source_and_candidate_hashes_persisted_in_manifest(completed_case_dir: P
         assert versions[key]
 
 
-def test_production_case_awaits_human_authority(completed_case_dir: Path):
+def test_production_case_uses_algorithmic_authority(completed_case_dir: Path):
     production_case = json.loads(
         (completed_case_dir / "production_case.json").read_text(encoding="utf-8")
     )
-    assert production_case["lifecycle_state"] == "AWAITING_HUMAN"
-    assert production_case["authority_state"] == "HUMAN_REQUIRED"
+    assert production_case["lifecycle_state"] == "COMPLETED"
+    assert production_case["authority_state"] == "ALGORITHM"
     assert production_case["source_id"].startswith("sha256:")
+
+
+def test_algorithmic_review_completed_without_human_input(completed_case_dir: Path):
+    review = json.loads(
+        (completed_case_dir / "06_human_review" / "review.json").read_text(encoding="utf-8")
+    )
+    assert review["reviewer_id"].startswith("algorithm:")
+    assert len(review["ranking"]) == 4
+    assert set(review["ranking"]) == {"SOURCE", "A", "B", "C"}
+    assert review["completed_at"]
+    scores = json.loads(
+        (completed_case_dir / "06_human_review" / "algorithmic_scores.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert scores["formula_version"]
+    assert set(scores["scores"]) == {"SOURCE", "A", "B", "C"}
 
 
 def test_completed_review_materializes_six_pairwise_rows(completed_case_dir: Path):
@@ -148,3 +165,14 @@ def test_validate_source_audio_rejects_silence(tmp_path: Path):
     sf.write(wav, x, sr)
     with pytest.raises(AudioEmpty, match="silent"):
         validate_source_audio(wav)
+
+
+def test_validate_source_audio_accepts_fade_in_open(tmp_path: Path):
+    """A produced master opening with a -90 dBFS fade-in must pass."""
+    sr = 48000
+    t = np.arange(sr * 2) / sr
+    x = (0.5 * np.sin(2 * np.pi * 440 * t)).astype(np.float32)
+    x[: int(0.5 * sr)] *= np.linspace(0.0, 0.003, int(0.5 * sr))  # fade to ~-90 dBFS
+    wav = tmp_path / "fade_in.wav"
+    sf.write(wav, x, sr)
+    validate_source_audio(wav)  # must not raise

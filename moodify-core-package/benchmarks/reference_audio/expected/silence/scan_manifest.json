@@ -1,0 +1,52 @@
+{
+  "case_id": "ref_suite",
+  "stage": "ref",
+  "input_path": "benchmarks\\reference_audio\\fixtures\\silence.wav",
+  "input_sha256": "e294409b36a8ac1893b23336eeab5202d3e84ce4f66c7572aa1589c43d43c1ff",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "benchmarks\\reference_audio\\expected\\silence\\spectrum_linear.png",
+      "sha256": "ba5a5955ebf108cb14e1eda96d8856b8ec002588709cce20170a4fe393a70300",
+      "size_bytes": 17243
+    },
+    "spectrum_log": {
+      "path": "benchmarks\\reference_audio\\expected\\silence\\spectrum_log.png",
+      "sha256": "27ba3f5bedfface19dcdccc87ad5045bb683453c17f146b891dff7c4ebef8ea0",
+      "size_bytes": 16890
+    },
+    "metrics": {
+      "path": "benchmarks\\reference_audio\\expected\\silence\\metrics.json",
+      "sha256": "d15eee6dc0bebe5046209ce74cae5ecb30c7f88a4ced0cdd422772e793b2b8d3",
+      "size_bytes": 8035
+    },
+    "timeline": {
+      "path": "benchmarks\\reference_audio\\expected\\silence\\timeline_metrics.jsonl",
+      "sha256": "7c6aa6ad53b1dbc9122ffa6a7136f69f6fbe44a16d5c5282827f72f4ed8ba281",
+      "size_bytes": 1112
+    },
+    "analysis_data": {
+      "path": "benchmarks\\reference_audio\\expected\\silence\\analysis_data.npz",
+      "sha256": "526292daa60044307ea293742404a79d441c44b675429e9920995a62cfd6d51e",
+      "size_bytes": 3709
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\silence.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\silence\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\silence.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\silence\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:10:23.862369+00:00"
+}

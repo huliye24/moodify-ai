@@ -12,6 +12,7 @@ percentiles); insufficient duration yields UNAVAILABLE, never a fake 0.
 from __future__ import annotations
 
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 from scipy.signal import lfilter, resample_poly
 
 # BS.1770 K-weighting coefficients (48 kHz; accepted for 44.1 kHz).
@@ -40,12 +41,14 @@ def _k_weighted(x: np.ndarray, sr: int) -> np.ndarray:
     return lfilter(_HS_B, _HS_A, y)
 
 
-def _block_loudness(y: np.ndarray, sr: int, block_s: float) -> np.ndarray:
+def _block_loudness(y: np.ndarray, sr: int, block_s: float, overlap: float = 0.75) -> np.ndarray:
+    """Per-block loudness with standard 75% overlap (BS.1770: 400 ms / 100 ms hop)."""
     block = int(block_s * sr)
-    n_blocks = len(y) // block
-    if n_blocks < 1:
+    hop = max(1, int(block * (1 - overlap)))
+    n = len(y)
+    if n < block:
         return np.array([])
-    z = y[: n_blocks * block].reshape(n_blocks, block)
+    z = sliding_window_view(y, block)[::hop]  # view, no copy
     return 10 * np.log10(np.mean(z ** 2, axis=1) + 1e-12) + _LOUDNESS_OFFSET
 
 
@@ -69,7 +72,9 @@ def integrated_loudness_lufs(samples: np.ndarray, sr: int) -> float:
             return _ABS_GATE_LUFS
         energies.append(weight * 10 ** (loudness / 10))
     combined = np.sum(energies, axis=0) / sum(weights)
-    block_loudness = 10 * np.log10(combined + 1e-12) + _LOUDNESS_OFFSET
+    # loudness already carries _LOUDNESS_OFFSET; re-adding it here double-counts
+    # the 130 dB reference (measured -0.65 to -1.28 LUFS bias vs pyloudnorm).
+    block_loudness = 10 * np.log10(combined + 1e-12)
 
     abs_gate = block_loudness[block_loudness > _ABS_GATE_LUFS]
     if abs_gate.size == 0:

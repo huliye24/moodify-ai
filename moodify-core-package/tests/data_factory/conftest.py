@@ -6,8 +6,6 @@ tests stay bounded in CI. No copyrighted material; the fixture is synthetic.
 
 from __future__ import annotations
 
-import json
-
 import numpy as np
 import pytest
 import soundfile as sf
@@ -19,7 +17,7 @@ CASE_ID = "case_" + "f" * 32
 
 @pytest.fixture(scope="module")
 def completed_case_dir(tmp_path_factory):
-    """One real machine loop: run_production_case + completed human review."""
+    """One real machine loop: run_production_case with algorithmic review."""
     root = tmp_path_factory.mktemp("data_factory")
     sr = 48000
     t = np.arange(sr * 2) / sr
@@ -34,14 +32,4 @@ def completed_case_dir(tmp_path_factory):
     source = root / "fixture.wav"
     sf.write(source, x, sr)
 
-    case_dir = run_production_case(source, root / "out", case_id=CASE_ID)
-
-    review_path = case_dir / "06_human_review" / "review.json"
-    review = json.loads(review_path.read_text(encoding="utf-8"))
-    review["ranking"] = ["B", "A", "SOURCE", "C"]
-    review["reviewer_id"] = "human-test-001"
-    review["completed_at"] = "2026-08-10T00:00:00+00:00"
-    review_path.write_text(
-        json.dumps(review, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-    return case_dir
+    return run_production_case(source, root / "out", case_id=CASE_ID)

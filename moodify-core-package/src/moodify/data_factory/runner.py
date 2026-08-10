@@ -28,7 +28,7 @@ from moodify.contracts.base import utc_now
 from moodify.contracts.ids import new_id
 from moodify.contracts.production_case import AuthorityState, LifecycleState, ProductionCase
 
-from .human_review import write_review_template
+from .algorithmic_review import write_algorithmic_review
 from .intervention import execute_intervention
 from .models import DATA_PROTOCOL_VERSION, PLAN_GENERATOR_VERSION
 from .plan_generator import generate_abc_plans
@@ -72,7 +72,10 @@ def validate_source_audio(
         )
     head = decoded.samples[: max(1, int(0.5 * decoded.sample_rate))]
     rms = float(np.sqrt(np.mean(head.astype(np.float64) ** 2)))
-    if rms < 1e-4:
+    # 1e-6 ≈ -120 dBFS, below 16-bit quantization: only true digital
+    # silence is rejected. Produced masters routinely open with a fade-in
+    # at -80..-90 dBFS and must not be blocked (observed on pilot sources).
+    if rms < 1e-6:
         raise AudioEmpty(f"source audio silent in first 0.5s (rms={rms:.2e})")
 
 
@@ -161,17 +164,18 @@ def run_production_case(
             candidate_sha256=registered.candidate_sha256,
         )
 
-    # 06 human authority checkpoint.
-    write_review_template(case_id, case_dir / "06_human_review" / "review.json")
+    # 06 algorithmic authority checkpoint (Moodify is the ear of AI: no
+    # human listening step; decision 2026-08-11).
+    write_algorithmic_review(case_dir, case_id=case_id)
 
     created = utc_now()
     production_case = ProductionCase(
         created_at=created,
         case_id=case_id,
         source_id=f"sha256:{source_sha256}",
-        objective="Produce ABC auditory intervention evidence and collect human ranking",
-        lifecycle_state=LifecycleState.AWAITING_HUMAN,
-        authority_state=AuthorityState.HUMAN_REQUIRED,
+        objective="Produce ABC auditory intervention evidence and algorithmic ranking",
+        lifecycle_state=LifecycleState.COMPLETED,
+        authority_state=AuthorityState.ALGORITHM,
     )
     (case_dir / "production_case.json").write_text(
         production_case.model_dump_json(indent=2), encoding="utf-8"
@@ -193,7 +197,7 @@ def run_production_case(
             "judgment_authority": "moodify.auditory.judgment",
             "canonical_contract_schema": "1.0",
         },
-        "status": "AWAITING_HUMAN",
+        "status": "ALGO_REVIEWED",
     }
     _write_json(case_dir / "case_manifest.json", manifest)
     return case_dir

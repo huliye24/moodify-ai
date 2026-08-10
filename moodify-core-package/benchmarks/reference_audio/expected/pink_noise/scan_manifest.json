@@ -1,0 +1,52 @@
+{
+  "case_id": "ref_suite",
+  "stage": "ref",
+  "input_path": "benchmarks\\reference_audio\\fixtures\\pink_noise.wav",
+  "input_sha256": "617aea8a11dc05489163e7cd6b6dec6e12893236949cc49f5b388e633b85b602",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "benchmarks\\reference_audio\\expected\\pink_noise\\spectrum_linear.png",
+      "sha256": "ac375dfad325431f08be004b372cb290dd4d8029cdfeebd50b68430d71da067c",
+      "size_bytes": 1342615
+    },
+    "spectrum_log": {
+      "path": "benchmarks\\reference_audio\\expected\\pink_noise\\spectrum_log.png",
+      "sha256": "5263c5aa6156a38faf20bbbf08cdc9d6bdf40808e5111b4b71425a4527de449c",
+      "size_bytes": 976311
+    },
+    "metrics": {
+      "path": "benchmarks\\reference_audio\\expected\\pink_noise\\metrics.json",
+      "sha256": "e3d6b661fb4ad05dffc71dd12e0a246fde3552e0d0a6f25025440f96e0fd8e65",
+      "size_bytes": 8214
+    },
+    "timeline": {
+      "path": "benchmarks\\reference_audio\\expected\\pink_noise\\timeline_metrics.jsonl",
+      "sha256": "3f0a19dbf7a93def854f6a052c51e565088ef6d1a8461f0f9a22424b9c0716bf",
+      "size_bytes": 1198
+    },
+    "analysis_data": {
+      "path": "benchmarks\\reference_audio\\expected\\pink_noise\\analysis_data.npz",
+      "sha256": "1eec337fc5df89da576829f8562906ed88aa19add6303016f8327280f20e6058",
+      "size_bytes": 73074
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\pink_noise.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\pink_noise\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\pink_noise.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\pink_noise\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:10:18.002002+00:00"
+}

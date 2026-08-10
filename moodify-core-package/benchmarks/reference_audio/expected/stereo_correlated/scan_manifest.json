@@ -1,0 +1,52 @@
+{
+  "case_id": "ref_suite",
+  "stage": "ref",
+  "input_path": "benchmarks\\reference_audio\\fixtures\\stereo_correlated.wav",
+  "input_sha256": "4cf5759919040c87ebde904e7ce75e5ac680cf607801700074d8de4f5587e534",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "benchmarks\\reference_audio\\expected\\stereo_correlated\\spectrum_linear.png",
+      "sha256": "36fb76cf1b88b5cb789a2441303de74fa275183325c43f8d82024180bd3fe859",
+      "size_bytes": 42072
+    },
+    "spectrum_log": {
+      "path": "benchmarks\\reference_audio\\expected\\stereo_correlated\\spectrum_log.png",
+      "sha256": "46a0510d7704e88f6fb6ac9d9330d53e243b771313144fa7634d66faec77edca",
+      "size_bytes": 50958
+    },
+    "metrics": {
+      "path": "benchmarks\\reference_audio\\expected\\stereo_correlated\\metrics.json",
+      "sha256": "1aaf9bfa4299bc75544edbcd326bd3f6434790eee468ac715a0e1c2a739f9d25",
+      "size_bytes": 7898
+    },
+    "timeline": {
+      "path": "benchmarks\\reference_audio\\expected\\stereo_correlated\\timeline_metrics.jsonl",
+      "sha256": "1720c776c73917f3c6137c03c430213371fc0d76948e28e940d82fdea65ce64c",
+      "size_bytes": 1248
+    },
+    "analysis_data": {
+      "path": "benchmarks\\reference_audio\\expected\\stereo_correlated\\analysis_data.npz",
+      "sha256": "b1acf58fd4d704077a47904b01b5439e6a4ed024ac15a983303c0b2646f5df61",
+      "size_bytes": 67667
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\stereo_correlated.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\stereo_correlated\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\stereo_correlated.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\stereo_correlated\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:10:34.314979+00:00"
+}

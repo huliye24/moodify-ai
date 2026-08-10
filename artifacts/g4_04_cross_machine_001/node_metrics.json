@@ -1,0 +1,367 @@
+{
+  "integrated_lufs": {
+    "value": -18.26,
+    "unit": "LUFS",
+    "method": "BS1770",
+    "status": "VALID",
+    "warnings": []
+  },
+  "loudness_range_lu": {
+    "value": 9.67,
+    "unit": "LU",
+    "method": "EBU3342",
+    "status": "VALID",
+    "warnings": []
+  },
+  "true_peak_dbfs": {
+    "value": -3.97,
+    "unit": "dBFS",
+    "method": "4x-oversample",
+    "status": "VALID",
+    "warnings": []
+  },
+  "sample_peak_dbfs": {
+    "value": -4.18,
+    "unit": "dBFS",
+    "method": "direct",
+    "status": "VALID",
+    "warnings": []
+  },
+  "rms_dbfs": {
+    "value": -17.25,
+    "unit": "dBFS",
+    "method": "direct",
+    "status": "VALID",
+    "warnings": []
+  },
+  "crest_factor_db": {
+    "value": 13.07,
+    "unit": "dB",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "plr_db": {
+    "value": 13.28,
+    "unit": "dB",
+    "method": "peak-to-rms",
+    "status": "VALID",
+    "warnings": []
+  },
+  "clipping_sample_count": {
+    "value": 0,
+    "unit": "samples",
+    "method": "direct",
+    "status": "VALID",
+    "warnings": []
+  },
+  "clipping_sample_ratio": {
+    "value": 0.0,
+    "unit": "ratio",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "near_clipping_sample_count": {
+    "value": 0,
+    "unit": "samples",
+    "method": "direct",
+    "status": "VALID",
+    "warnings": []
+  },
+  "dc_offset_left": {
+    "value": -8.9e-06,
+    "unit": "linear",
+    "method": "direct",
+    "status": "VALID",
+    "warnings": []
+  },
+  "dc_offset_right": {
+    "value": 0.0004807,
+    "unit": "linear",
+    "method": "direct",
+    "status": "VALID",
+    "warnings": []
+  },
+  "silence_ratio": {
+    "value": 0.014854,
+    "unit": "ratio",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "longest_silence_seconds": {
+    "value": 1.9,
+    "unit": "s",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "invalid_sample_count": {
+    "value": 0,
+    "unit": "samples",
+    "method": "direct",
+    "status": "VALID",
+    "warnings": []
+  },
+  "finite_sample_ratio": {
+    "value": 1.0,
+    "unit": "ratio",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "spectral_centroid_hz": {
+    "value": 653.0,
+    "unit": "Hz",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "spectral_rolloff_85_hz": {
+    "value": 1031.2,
+    "unit": "Hz",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "spectral_rolloff_95_hz": {
+    "value": 3058.6,
+    "unit": "Hz",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "spectral_flatness": {
+    "value": 0.00348,
+    "unit": "ratio",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "spectral_flux": {
+    "value": 1307.2542,
+    "unit": "mag/frame",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "estimated_high_frequency_cutoff_hz": {
+    "value": 10160.2,
+    "unit": "Hz",
+    "method": "cumulative-99.5%",
+    "status": "VALID",
+    "warnings": []
+  },
+  "estimated_noise_floor_dbfs": {
+    "value": -30.5,
+    "unit": "dBFS",
+    "method": "p10-frame-rms",
+    "status": "VALID",
+    "warnings": []
+  },
+  "sub_20_60_hz": {
+    "value": 0.22080227,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_sub_20_60_hz": {
+    "value": 52366.26652504,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "bass_60_120_hz": {
+    "value": 0.21611363,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_bass_60_120_hz": {
+    "value": 51254.29219835,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "low_mid_120_250_hz": {
+    "value": 0.10604369,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_low_mid_120_250_hz": {
+    "value": 25149.70641178,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "mid_250_500_hz": {
+    "value": 0.19365038,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_mid_250_500_hz": {
+    "value": 45926.82477674,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "core_mid_500_2000_hz": {
+    "value": 0.19173498,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_core_mid_500_2000_hz": {
+    "value": 45472.56357275,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "presence_2000_5000_hz": {
+    "value": 0.05021078,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_presence_2000_5000_hz": {
+    "value": 11908.1697623,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "brilliance_5000_10000_hz": {
+    "value": 0.01549509,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_brilliance_5000_10000_hz": {
+    "value": 3674.87180482,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "air_10000_16000_hz": {
+    "value": 0.00557336,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_air_10000_16000_hz": {
+    "value": 1321.79920111,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "ultrasonic_16000_24000_hz": {
+    "value": 0.00037582,
+    "unit": "ratio",
+    "method": "normalized-band",
+    "status": "VALID",
+    "warnings": []
+  },
+  "band_energy_ultrasonic_16000_24000_hz": {
+    "value": 89.12987737,
+    "unit": "linear-power",
+    "method": "stft",
+    "status": "VALID",
+    "warnings": []
+  },
+  "stereo_correlation": {
+    "value": 0.8419,
+    "unit": "ratio",
+    "method": "pearson",
+    "status": "VALID",
+    "warnings": []
+  },
+  "mid_energy_ratio": {
+    "value": 0.920892,
+    "unit": "ratio",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "side_energy_ratio": {
+    "value": 0.079108,
+    "unit": "ratio",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "side_to_mid_db": {
+    "value": -10.66,
+    "unit": "dB",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "stereo_width_proxy": {
+    "value": 0.1581,
+    "unit": "ratio",
+    "method": "derived",
+    "status": "VALID",
+    "warnings": []
+  },
+  "negative_correlation_ratio": {
+    "value": 0.000226,
+    "unit": "ratio",
+    "method": "frame-wise",
+    "status": "VALID",
+    "warnings": []
+  },
+  "phase_risk_ratio": {
+    "value": 0.001811,
+    "unit": "ratio",
+    "method": "frame-wise",
+    "status": "VALID",
+    "warnings": []
+  },
+  "_mono": false,
+  "duration": {
+    "value": 188.52,
+    "unit": "s",
+    "method": "ffprobe",
+    "status": "VALID",
+    "warnings": []
+  },
+  "channels": {
+    "value": 2,
+    "unit": "ch",
+    "method": "ffprobe",
+    "status": "VALID",
+    "warnings": []
+  },
+  "sample_rate": {
+    "value": 48000,
+    "unit": "Hz",
+    "method": "ffprobe",
+    "status": "VALID",
+    "warnings": []
+  },
+  "source_sha256": {
+    "value": "c3886611711d6e657e2180eec16ca6b54e0c3e9afcf908c3dff0d83010c16c63",
+    "unit": "",
+    "method": "sha256",
+    "status": "VALID",
+    "warnings": []
+  }
+}

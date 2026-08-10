@@ -1,0 +1,79 @@
+{
+  "suite": "MFY-REFERENCE-AUDIO-SUITE-001",
+  "seed": 20260811,
+  "sample_rate": 48000,
+  "fixtures": {
+    "silence.wav": {
+      "purpose": "floor",
+      "params": {
+        "duration_s": 2.0
+      },
+      "sha256": "e294409b36a8ac1893b23336eeab5202d3e84ce4f66c7572aa1589c43d43c1ff"
+    },
+    "sine_1khz.wav": {
+      "purpose": "tone reference",
+      "params": {
+        "freq_hz": 1000,
+        "amp": 0.5
+      },
+      "sha256": "8446efde7f30862189f1541477c4037d97df60d986a93c4eb99a3b0f09bdb7a2"
+    },
+    "dual_tone.wav": {
+      "purpose": "band separation",
+      "params": {
+        "freqs_hz": [
+          440,
+          3000
+        ]
+      },
+      "sha256": "4cbb01e3484e99d936b5c03aebb5162213647ab52918911a4864f08b68645f7d"
+    },
+    "impulse.wav": {
+      "purpose": "impulse response / peak",
+      "params": {},
+      "sha256": "1f7a36b714a710b350a08fd6df453d9c1a27f30e2b5f9a9ad6bea7baa8d5bca3"
+    },
+    "clipped.wav": {
+      "purpose": "clipping detection",
+      "params": {
+        "over_drives_by": 1.2
+      },
+      "sha256": "ef2bf88b2c2a15ed3d7a7fa4b9f217f2c82ec8c10d84f0884e588f890cd37f45"
+    },
+    "mono.wav": {
+      "purpose": "channel layout",
+      "params": {
+        "channels": 1
+      },
+      "sha256": "b278496685004e6f220a67ad34ba85d084018cf17dd240f209727831345357e2"
+    },
+    "stereo_correlated.wav": {
+      "purpose": "phase integrity",
+      "params": {
+        "correlation": 1.0
+      },
+      "sha256": "4cf5759919040c87ebde904e7ce75e5ac680cf607801700074d8de4f5587e534"
+    },
+    "stereo_phase_inverted.wav": {
+      "purpose": "phase risk",
+      "params": {
+        "correlation": -1.0
+      },
+      "sha256": "4d95360df83defd4e191959f4b0b4d7472cf542415981f71a5ab8eac293818d8"
+    },
+    "pink_noise.wav": {
+      "purpose": "flat spectrum reference",
+      "params": {
+        "octaves": 8
+      },
+      "sha256": "617aea8a11dc05489163e7cd6b6dec6e12893236949cc49f5b388e633b85b602"
+    },
+    "dynamic_program.wav": {
+      "purpose": "loudness range",
+      "params": {
+        "duration_s": 4.0
+      },
+      "sha256": "e8e61feabb008ee6d695ed93608c2dfcbf4519d119217dab14ba734dbfb0e885"
+    }
+  }
+}

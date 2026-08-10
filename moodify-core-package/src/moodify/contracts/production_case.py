@@ -21,6 +21,7 @@ class LifecycleState(StrEnum):
 
 class AuthorityState(StrEnum):
     SYSTEM = "SYSTEM"
+    ALGORITHM = "ALGORITHM"
     HUMAN_REQUIRED = "HUMAN_REQUIRED"
     HUMAN_APPROVED = "HUMAN_APPROVED"
     HUMAN_REJECTED = "HUMAN_REJECTED"
