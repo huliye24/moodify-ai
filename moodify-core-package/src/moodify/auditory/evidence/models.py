@@ -33,10 +33,20 @@ class EvidenceNode:
     kind: str  # SOURCE | PROFILE | MEASUREMENT | WINDOW | EVENT | RULE | JUDGMENT
     ref: str
     data: dict[str, Any] = field(default_factory=dict)
+    # Chapter II §6/§17: evidential granularity and epistemic relation.
+    scale: str | None = None
+    epistemic_state: str = "OBSERVED"
 
     def __post_init__(self) -> None:
         if self.kind not in NODE_KINDS:
             raise ValueError(f"unknown node kind: {self.kind}")
+        from moodify.auditory.evidence.epistemic import EPISTEMIC_STATES
+        from moodify.auditory.evidence.scale import EVIDENCE_SCALES
+
+        if self.scale is not None and self.scale not in EVIDENCE_SCALES:
+            raise ValueError(f"unknown evidence scale: {self.scale}")
+        if self.epistemic_state not in EPISTEMIC_STATES:
+            raise ValueError(f"unknown epistemic state: {self.epistemic_state}")
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -88,6 +98,14 @@ class JudgmentEvidence:
     conflicts: tuple[Conflict, ...] = ()
     coverage: Coverage | None = None
     rule_versions: dict[str, str] = field(default_factory=dict)
+    # Chapter II §17: the judgment's epistemic relation to evidence.
+    epistemic_state: str = "INFERRED"
+
+    def __post_init__(self) -> None:
+        from moodify.auditory.evidence.epistemic import EPISTEMIC_STATES
+
+        if self.epistemic_state not in EPISTEMIC_STATES:
+            raise ValueError(f"unknown epistemic state: {self.epistemic_state}")
 
     def to_dict(self) -> dict[str, Any]:
         from moodify.auditory.uncertainty import Uncertainty
@@ -105,4 +123,5 @@ class JudgmentEvidence:
             "conflicts": [conflict.to_dict() for conflict in self.conflicts],
             "coverage": self.coverage.to_dict() if self.coverage else None,
             "rule_versions": dict(self.rule_versions),
+            "epistemic_state": self.epistemic_state,
         }

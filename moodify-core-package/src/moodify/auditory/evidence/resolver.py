@@ -17,6 +17,8 @@ from moodify.auditory.evidence.models import (
     EvidenceNode,
     JudgmentEvidence,
 )
+from moodify.auditory.evidence.scale import scale_for_duration_ms
+from moodify.auditory.structure import StructureContext, annotate_event_with_structure
 from moodify.auditory.uncertainty import Uncertainty
 
 CLASSIFICATION_MAP = {
@@ -37,13 +39,21 @@ def assemble_judgment_evidence(
     rule_versions: dict[str, str] | None = None,
     evaluated_domains: tuple[str, ...] = ("integrity", "level", "spectrum", "stereo"),
     channels: int = 2,
+    structure: StructureContext | None = None,
 ) -> JudgmentEvidence:
-    """Build the evidence graph for one judgment."""
+    """Build the evidence graph for one judgment.
+
+    structure (Chapter II §14): optional MSE context; when provided and
+    reliable, EVENT nodes are annotated with section labels and boundary
+    flags. Unreliable structure annotates nothing and records an
+    uncertainty instead of fabricating certainty.
+    """
     nodes: list[EvidenceNode] = []
     nodes.append(EvidenceNode(
         node_id="source", kind="SOURCE",
         ref=f"sha256:{source_sha256}",
         data={"source_sha256": source_sha256},
+        epistemic_state="OBSERVED",
     ))
     if representation is not None:
         nodes.append(EvidenceNode(
@@ -53,22 +63,39 @@ def assemble_judgment_evidence(
                 "representation_version": representation.representation_version,
                 "profile_ids": dict(representation.profile_ids),
             },
+            scale="WHOLE_TRACK",
+            epistemic_state="OBSERVED",
         ))
 
     rule_versions = dict(rule_versions or {})
     event_nodes = 0
     for event in events or []:
         event_id = getattr(event, "event_id", "")
+        start_ms = getattr(event, "start_ms", 0)
+        end_ms = getattr(event, "end_ms", 0)
+        event_type = getattr(event, "event_type", "UNKNOWN")
+        data: dict[str, Any] = {
+            "event_type": event_type,
+            "start_ms": start_ms,
+            "end_ms": end_ms,
+            "evidence_windows": list(getattr(event, "evidence_windows", ())),
+            "profile_id": getattr(event, "profile_id", ""),
+        }
+        if structure is not None:
+            if structure.is_reliable:
+                data.update(annotate_event_with_structure(event, structure))
+        scale = scale_for_duration_ms(max(end_ms - start_ms, 0.0))
+        epistemic = (
+            "ASSOCIATED"
+            if "CORRELATION" in event_type or "PHASE" in event_type
+            else "INFERRED"
+        )
         nodes.append(EvidenceNode(
             node_id=f"event:{event_id}", kind="EVENT",
             ref=event_id,
-            data={
-                "event_type": getattr(event, "event_type", "UNKNOWN"),
-                "start_ms": getattr(event, "start_ms", 0),
-                "end_ms": getattr(event, "end_ms", 0),
-                "evidence_windows": list(getattr(event, "evidence_windows", ())),
-                "profile_id": getattr(event, "profile_id", ""),
-            },
+            data=data,
+            scale=scale,
+            epistemic_state=epistemic,
         ))
         event_nodes += 1
         rule_id = f"rule:{getattr(event, 'event_type', 'UNKNOWN')}"
@@ -90,6 +117,8 @@ def assemble_judgment_evidence(
                         "method": metric.get("method", ""),
                         "status": metric.get("status", "VALID"),
                     },
+                    scale="WHOLE_TRACK",
+                    epistemic_state="OBSERVED",
                 ))
 
     coverage = Coverage(
@@ -101,6 +130,11 @@ def assemble_judgment_evidence(
     )
 
     uncertainties: list[Uncertainty] = []
+    if structure is not None and not structure.is_reliable:
+        uncertainties.append(Uncertainty(
+            "PROFILE_UNCERTAINTY",
+            "structural context below confidence threshold; no structural annotation applied",
+        ))
     if events and not rule_versions:
         uncertainties.append(Uncertainty(
             "EVIDENCE_INCOMPLETE", "events present but rule versions unresolved",
@@ -126,6 +160,9 @@ def assemble_judgment_evidence(
             "CONFLICTING_EVIDENCE", "; ".join(c.detail for c in conflicts[:3]),
         ))
 
+    judgment_epistemic = (
+        "UNKNOWN" if evidence_state in {"INVALID", "INSUFFICIENT"} else "INFERRED"
+    )
     evidence = JudgmentEvidence(
         judgment_id=getattr(judgment, "judgment_id", "jud-1"),
         classification=classification,
@@ -136,6 +173,7 @@ def assemble_judgment_evidence(
         conflicts=tuple(conflicts),
         coverage=coverage,
         rule_versions=rule_versions,
+        epistemic_state=judgment_epistemic,
     )
     # Fail-closed: critical missing/invalid evidence suppresses PASS and
     # technical rejection (G4/G5).
@@ -157,6 +195,7 @@ def assemble_judgment_evidence(
             conflicts=evidence.conflicts,
             coverage=evidence.coverage,
             rule_versions=evidence.rule_versions,
+            epistemic_state="UNKNOWN",
         )
     return evidence
 

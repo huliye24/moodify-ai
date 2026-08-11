@@ -34,13 +34,19 @@ def build_bundle(evidence: JudgmentEvidence, extra: dict[str, Any] | None = None
         "evidence_state": evidence.evidence_state,
         "workflow_decision": evidence.workflow_decision,
         "nodes": [
-            {"kind": node.kind, "data": node.data}  # ref may carry uuid identity
+            {  # ref may carry uuid identity; scale/epistemic are semantic
+                "kind": node.kind,
+                "data": node.data,
+                "scale": node.scale,
+                "epistemic_state": node.epistemic_state,
+            }
             for node in evidence.nodes
         ],
         "uncertainties": [dict(u) for u in evidence.uncertainties],
         "conflicts": [c.to_dict() for c in evidence.conflicts],
         "coverage": evidence.coverage.to_dict() if evidence.coverage else None,
         "rule_versions": dict(evidence.rule_versions),
+        "epistemic_state": evidence.epistemic_state,
         **(extra or {}),
     }
     bundle = {
