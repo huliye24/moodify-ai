@@ -1,0 +1,30 @@
+{
+  "algorithm_version": "mamse009-rpca-ialm-v0.1",
+  "candidate_intervals": [],
+  "config": {
+    "lam": null,
+    "max_iter": 1000,
+    "max_mu_factor": 10000000.0,
+    "mu_factor": 1.25,
+    "rho": 1.5,
+    "tol": 1e-07
+  },
+  "config_hash": "def6c6a1b2237792b96de4d438aa07a9a0e7a4055e542d276f8c35324074382e",
+  "converged": true,
+  "iterations": 33,
+  "lambda_used": 0.022496063533292376,
+  "model_id": "rpcamodel-d6954630c5d60f30",
+  "operator_id": "MAMSE-009",
+  "rank_L": 5,
+  "relative_constraint_error": 9.160830010463018e-08,
+  "schema_version": "mamse009-evidence-v1",
+  "semantic_boundary": "Sparse component is a structural deviation candidate, not an automatic defect or artistic judgment.",
+  "space_id": "real:case_7b3f021_ai",
+  "sparse_frame_score_summary": {
+    "max": 0.9874628852304133,
+    "max_robust_z": 2.0296991260421007,
+    "median": 0.6891558296783746
+  },
+  "sparsity_S": 0.8199645748987854,
+  "status": "OK"
+}
