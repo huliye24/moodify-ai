@@ -1,0 +1,51 @@
+{
+  "schema_version": "mamse-010-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "measurements": [
+    {
+      "label": "scale_feature_view",
+      "shape": [
+        1286,
+        3,
+        12
+      ],
+      "dtype": "float64",
+      "dense_bytes": 370368,
+      "valid_fraction": 0.3886,
+      "build_wall_time_s": 0.7977
+    },
+    {
+      "label": "channel_spectral_view",
+      "shape": [
+        1506,
+        99,
+        2
+      ],
+      "dtype": "float64",
+      "dense_bytes": 2385504,
+      "build_wall_time_s": 2.9723,
+      "hosvd_ranks": [
+        8,
+        8,
+        2
+      ],
+      "hosvd_wall_time_s": 0.2961,
+      "hosvd_relative_reconstruction_error": 0.209686,
+      "model_id": "tucker-c13f9ed1e78c7065"
+    },
+    {
+      "label": "guard_5d_probe",
+      "5d_shape": [
+        10000,
+        100,
+        24,
+        8,
+        8
+      ],
+      "estimated_bytes": 6144000000,
+      "guard_max_bytes": 1073741824,
+      "would_raise": true
+    }
+  ]
+}
