@@ -52,7 +52,14 @@ video/
 Moodify_Deep_Ear_Diagnostic_Pack_v0.1.1/
 RJWC_VideoPack_System/
 实验图库/
-工程经验层/
+工程经验层/*
+!工程经验层/README.md
+!工程经验层/CONSTRAINT_REGISTRY.md
+!工程经验层/constraints/
+工程经验层/constraints/*
+!工程经验层/constraints/ME-001_ORIGIN_BEFORE_FEATURE.md
+!工程经验层/constraints/ME-002_EVIDENCE_GATED_DEVELOPMENT.md
+!工程经验层/constraints/ME-003_WHOLE_SYSTEM_COHERENCE.md
 投资ppt/
 研究论文/
 补丁包/

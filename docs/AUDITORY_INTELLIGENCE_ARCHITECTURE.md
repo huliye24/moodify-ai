@@ -133,6 +133,9 @@ It owns:
 - packaging;
 - production readiness.
 
+> 参考：Chapter II《What Hearing Means for a Machine》的理念蒸馏与差距审计见
+> `docs/reference/MOODIFY_EAR_V1_CH02_ABSORPTION.md` 与 `docs/audits/DSK-MFY-EAR-V1-CH02-ABSORB-001/REPORT.md`（2026-08-12）。
+
 ## 4. Current vs Target Architecture
 
 The current v0.1 Python pipeline may remain:
