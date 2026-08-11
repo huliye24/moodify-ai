@@ -1,0 +1,15 @@
+# Moodify core dependency lock (G6-01, 2026-08-11)
+# Top-level pins. Transitive dependencies are resolved by pip at install time
+# and differ across Python 3.11 (local) and 3.14 (node); the node environment
+# is locked separately in ops/data_node/requirements-node.lock.txt.
+numpy==2.4.4
+scipy==1.17.1
+librosa==0.11.0
+soundfile==0.13.1
+pyloudnorm==0.2.0
+pydantic==2.13.2
+pedalboard==0.9.23
+fastapi==0.136.0
+uvicorn==0.44.0
+python-multipart==0.0.28
+PyYAML==6.0.3
