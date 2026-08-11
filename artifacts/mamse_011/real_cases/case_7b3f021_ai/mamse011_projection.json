@@ -1,0 +1,37 @@
+{
+  "case": "case_7b3f021_ai",
+  "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+  "duration_s": 197.96,
+  "n_rows": 1976,
+  "reference_model_id": "covmodel-c9329eefc6fe6951",
+  "complete_rows": 988,
+  "shrinkage_alpha": 0.008198425309981165,
+  "effective_rank": 5.653509804327067,
+  "lag1_by_feature": {
+    "band_air": 0.661,
+    "band_bass": 0.864,
+    "band_brilliance": 0.687,
+    "band_core_mid": 0.892,
+    "band_low_mid": 0.827,
+    "band_mid": 0.867,
+    "band_presence": 0.76,
+    "band_sub": 0.833,
+    "peak_db": 0.942,
+    "rms_db": 0.963,
+    "spectral_centroid_hz": 0.718,
+    "stereo_correlation": 0.941
+  },
+  "neff_ratio_min": 0.019,
+  "mahalanobis_second_half": {
+    "median_d2": 30.997,
+    "frac_above_q95": 0.0435,
+    "frac_above_q99": 0.0081
+  },
+  "relation_break_injection": {
+    "feature": "rms_db",
+    "median_d2": 34.372,
+    "frac_above_q95": 0.1326,
+    "frac_above_q99": 0.0567,
+    "increment": "NO_INCREMENT"
+  }
+}
