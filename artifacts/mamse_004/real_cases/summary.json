@@ -1,0 +1,74 @@
+{
+  "schema_version": "mamse-004-real-cases-v1",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "source_sha256": "06249dc76e4b9b0dd07021f542f9cdde0f25e9974096fbdac537fabe9d63453f",
+      "mono": {
+        "valid_bin_ratio": 0.29066315274509913,
+        "group_delay_median_ms": -0.6899778179832033,
+        "group_delay_mad_ms": 57.21429623374252,
+        "group_delay_p95_abs_ms": 80.03433418628937,
+        "phase_curvature_median_s2": 3.1107850052277753e-07,
+        "phase_curvature_mad_s2": 0.000285218282227425
+      },
+      "stereo": {
+        "ipd_available": true,
+        "valid_bin_ratio": 0.2985711059042552,
+        "interchannel_delay_median_ms": -0.004105084121519553,
+        "interchannel_delay_mad_ms": 7.525528247642466,
+        "gcc_phat_delay_ms": 0.0,
+        "cross_method_disagreement_ms": 0.004105084121519553
+      },
+      "runtime_seconds": 9.571337700000186
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "source_sha256": "859dea8a0ab02422f06010befb49029ff134829f06f51118f272e0a6911041e1",
+      "mono": {
+        "valid_bin_ratio": 0.4504436454462137,
+        "group_delay_median_ms": 0.03594481637136937,
+        "group_delay_mad_ms": 55.811158080350424,
+        "group_delay_p95_abs_ms": 79.76223717084423,
+        "phase_curvature_median_s2": 9.923472384532755e-08,
+        "phase_curvature_mad_s2": 0.0003876258795526349
+      },
+      "stereo": {
+        "ipd_available": true,
+        "valid_bin_ratio": 0.4538161277744926,
+        "interchannel_delay_median_ms": 0.0009495648039247199,
+        "interchannel_delay_mad_ms": 2.486570498434175,
+        "gcc_phat_delay_ms": 0.0,
+        "cross_method_disagreement_ms": 0.0009495648039247199
+      },
+      "runtime_seconds": 15.618934899999658
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "source_sha256": "a52a80eceb292ff788b5502bb9df0f0abd96cc3a26c0a750d9499a6670fe81ed",
+      "mono": {
+        "valid_bin_ratio": 0.43518087336734756,
+        "group_delay_median_ms": 0.044886456748716164,
+        "group_delay_mad_ms": 56.17278195197017,
+        "group_delay_p95_abs_ms": 79.79632184718068,
+        "phase_curvature_median_s2": 4.033489610141506e-07,
+        "phase_curvature_mad_s2": 0.0004266755157600073
+      },
+      "stereo": {
+        "ipd_available": true,
+        "valid_bin_ratio": 0.45071044550642086,
+        "interchannel_delay_median_ms": 0.003980410885118246,
+        "interchannel_delay_mad_ms": 4.495080486418224,
+        "gcc_phat_delay_ms": 0.0,
+        "cross_method_disagreement_ms": 0.003980410885118246
+      },
+      "runtime_seconds": 17.20173109999996
+    }
+  ]
+}

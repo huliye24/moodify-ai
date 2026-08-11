@@ -1,0 +1,43 @@
+{
+  "authority_class": "EXPERIMENTAL_DESCRIPTOR_ESTIMATOR",
+  "config": {
+    "f_max_hz": 18000.0,
+    "f_min_hz": 80.0,
+    "gcc_max_delay_ms": 5.0,
+    "hop_length": 2048,
+    "magnitude_floor_db": -45.0,
+    "n_fft": 8192,
+    "stereo_cross_convention": "R*conj(L)",
+    "unwrap_axis": "frequency",
+    "window": "hann"
+  },
+  "config_hash": "c7730ef9483a61dace751f153e035b3d22022b5b0fe6fcbbbdf0ddf4d2f54d63",
+  "config_version": "mamse004-phase-geometry-v0.1",
+  "judgment_eligible": false,
+  "limitations": [
+    "nonzero group delay is not automatically a defect",
+    "low-magnitude bins are masked by relative threshold, not encoded as 0",
+    "STFT/window/cross-spectrum conventions are part of the versioned result"
+  ],
+  "mono": {
+    "group_delay_mad_ms": 56.17278195197017,
+    "group_delay_median_ms": 0.044886456748716164,
+    "group_delay_p95_abs_ms": 79.79632184718068,
+    "phase_curvature_mad_s2": 0.0004266755157600073,
+    "phase_curvature_median_s2": 4.033489610141506e-07,
+    "valid_bin_ratio": 0.43518087336734756
+  },
+  "operator_id": "mamse004-phase-geometry",
+  "operator_version": "mamse004-phase-geometry-v0.1",
+  "runtime_seconds": 17.20173109999996,
+  "sample_rate": 48000,
+  "source_sha256": "a52a80eceb292ff788b5502bb9df0f0abd96cc3a26c0a750d9499a6670fe81ed",
+  "stereo": {
+    "cross_method_disagreement_ms": 0.003980410885118246,
+    "gcc_phat_delay_ms": 0.0,
+    "interchannel_delay_mad_ms": 4.495080486418224,
+    "interchannel_delay_median_ms": 0.003980410885118246,
+    "ipd_available": true,
+    "valid_bin_ratio": 0.45071044550642086
+  }
+}
