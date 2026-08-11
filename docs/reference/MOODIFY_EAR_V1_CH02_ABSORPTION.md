@@ -3,7 +3,7 @@
 **来源**: 《Moodify Ear v1: Can Machines Learn to Hear?》Technical Monographs Volume I, Chapter II
 "What Hearing Means for a Machine"（2026-08，外部路径 `E:\Moodify ear\Moodify_Ear_v1_Chapter_02\`，24 篇参考文献）
 **蒸馏日期**: 2026-08-12
-**状态**: 阶段 0 文档吸收（DSK-MFY-EAR-V1-CH02-ABSORB-001）
+**状态**: 阶段 0 文档吸收（DSK-MFY-EAR-V1-CH02-ABSORB-001）+ 阶段 1 补丁（DSK-MFY-CH02-PHASE1-001，5321680）+ 阶段 2 MAMSE-013（c68cbbc）已完成
 
 > 本文件是章节理念的蒸馏与项目映射，不是章节原文。原文留在外部目录；本文件沉淀可执行的架构原则。
 
@@ -41,20 +41,20 @@
 | §18 | 传感器契约 | `auditory/measurement_registry.py`、MFY-METRIC-REGISTRY-001、28 指标权威矩阵（补丁包 20） |
 | §10 底注 | 不必完美分离才有用 | MAMSE-008 NMF 匿名成分、MAMSE-009 RobustPCA 合成验证 |
 
-### 部分实现（阶段 1 补丁候选）
+### 部分实现（阶段 1 已交付）
 
-| 章节 | 理念 | 现状差距 |
+| 章节 | 理念 | 交付（DSK-MFY-CH02-PHASE1-001，5321680） |
 |---|---|---|
-| §14 | MSE 条件化判断 `J(z_audio, z_structure, c)` | 架构文档有 MSE 定义；代码只有 `MFY-WSE-SCAN-PROFILE-001`，无结构条件化路径——"合唱入口的能量跃升"与"副歌中途的能量跃升"当前无法区分 |
-| §6 | 时间尺度元数据 | 事件定位精度 = hop 已有（补丁包 21）；但 finding 未系统标注来源尺度（10ms / 500ms / 8s / 全曲） |
-| §17 | epistemic 词表（observed/inferred/associated/unknown） | 概念散落在 evidence models，未成为一等公民类型 |
-| §15 | AI 伪影嫌疑 ≠ 因果归因 | `data_factory/algorithmic_review.py` 有启发式评审；MAMSE-009 有负结果记录；未成命名路径 |
+| §14 | MSE 条件化判断 `J(z_audio, z_structure, c)` | ✅ `auditory/structure.py`：Section/StructureContext（重叠校验/查询/置信度门 0.8）；resolver 可选 structure 参数，可靠时标注段落标签+边界标志，不可靠时零标注+PROFILE_UNCERTAINTY |
+| §6 | 时间尺度元数据 | ✅ `auditory/evidence/scale.py`：EVIDENCE_SCALES + `scale_for_duration_ms`；EvidenceNode.scale 自动填充（事件按时长，全曲指标 WHOLE_TRACK） |
+| §17 | epistemic 词表（observed/inferred/associated/unknown） | ✅ `auditory/evidence/epistemic.py`：一等类型；事件 INFERRED、相关/相位事件 ASSOCIATED、fail-closed 判断 UNKNOWN |
+| §15 | AI 伪影嫌疑 ≠ 因果归因 | `data_factory/algorithmic_review.py` 有启发式评审；MAMSE-009 有负结果记录；未成命名路径（阶段 2 收尾） |
 
 ### 明确缺失（阶段 2 实验算子候选）
 
 | 章节 | 理念 | 立项建议 |
 |---|---|---|
-| §4 | ERB/Gammatone 听觉滤波器组 | MAMSE-013：与 MAMSE-002（CQT 对数频率）并存的感知视图 |
+| §4 | ERB/Gammatone 听觉滤波器组 | ✅ MAMSE-013（c68cbbc，2026-08-12）：Glasberg-Moore ERB 几何 + 4 阶 gammatone，与 MAMSE-001/002 并存的第三前端 |
 | §9 | 频率/时间掩蔽推断 | MAMSE-014：局部谱竞争 + 相对电平 + 置信度的概率推断 |
 | §10 | 软听觉对象（概率化区域/流） | MAMSE-015：NMF 成分带概率语义（0.86 主唱 / 0.44 合成纹理式） |
 | §10A | 带置信度的多候选音高状态 | 补 MAMSE-005 整曲 F0 不可靠短板；YIN 式候选+谐波一致性 |
