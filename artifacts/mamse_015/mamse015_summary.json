@@ -1,0 +1,436 @@
+[
+  {
+    "source": "pilot_a_60s.wav",
+    "duration_s": 60.0,
+    "status": "VALID",
+    "n_objects": 32,
+    "unresolved_fraction": 0.06046130549243966,
+    "objects": [
+      {
+        "object_id": "obj-000",
+        "label": "TONAL_CORE",
+        "start_ms": 778,
+        "end_ms": 800,
+        "probabilities": {
+          "TONAL_CORE": 0.9866868492731043,
+          "NOISE_TEXTURE": 0.05736456781144251,
+          "PERCUSSIVE": 0.007865960416759956,
+          "UNRESOLVED": 0.013313150726895725
+        },
+        "confidence": 0.9866868492731043
+      },
+      {
+        "object_id": "obj-001",
+        "label": "TONAL_CORE",
+        "start_ms": 896,
+        "end_ms": 8682,
+        "probabilities": {
+          "TONAL_CORE": 0.9775311663756858,
+          "NOISE_TEXTURE": 0.057329659421245176,
+          "PERCUSSIVE": 0.017075699351359053,
+          "UNRESOLVED": 0.02246883362431403
+        },
+        "confidence": 0.9775311663756858
+      },
+      {
+        "object_id": "obj-002",
+        "label": "PERCUSSIVE",
+        "start_ms": 8693,
+        "end_ms": 8725,
+        "probabilities": {
+          "TONAL_CORE": 0.2029045652943992,
+          "NOISE_TEXTURE": 0.057721289317400316,
+          "PERCUSSIVE": 0.7959678286090991,
+          "UNRESOLVED": 0.2040321713909009
+        },
+        "confidence": 0.7959678286090991
+      },
+      {
+        "object_id": "obj-003",
+        "label": "TONAL_CORE",
+        "start_ms": 8736,
+        "end_ms": 8928,
+        "probabilities": {
+          "TONAL_CORE": 0.9215276046693684,
+          "NOISE_TEXTURE": 0.058518080455687016,
+          "PERCUSSIVE": 0.07327871796829145,
+          "UNRESOLVED": 0.07847239533063147
+        },
+        "confidence": 0.9215276046693684
+      },
+      {
+        "object_id": "obj-004",
+        "label": "PERCUSSIVE",
+        "start_ms": 8938,
+        "end_ms": 8981,
+        "probabilities": {
+          "TONAL_CORE": 0.07033516326326962,
+          "NOISE_TEXTURE": 0.06086127578621855,
+          "PERCUSSIVE": 0.9292587861074665,
+          "UNRESOLVED": 0.07074121389253347
+        },
+        "confidence": 0.9292587861074665
+      },
+      {
+        "object_id": "obj-005",
+        "label": "TONAL_CORE",
+        "start_ms": 8992,
+        "end_ms": 11264,
+        "probabilities": {
+          "TONAL_CORE": 0.9612912940802456,
+          "NOISE_TEXTURE": 0.058274417118622156,
+          "PERCUSSIVE": 0.033313845004596825,
+          "UNRESOLVED": 0.038708705919754394
+        },
+        "confidence": 0.9612912940802456
+      },
+      {
+        "object_id": "obj-006",
+        "label": "PERCUSSIVE",
+        "start_ms": 11274,
+        "end_ms": 11317,
+        "probabilities": {
+          "TONAL_CORE": 0.05325012603467981,
+          "NOISE_TEXTURE": 0.06591573030015781,
+          "PERCUSSIVE": 0.9464113503802076,
+          "UNRESOLVED": 0.05358864961979244
+        },
+        "confidence": 0.9464113503802076
+      },
+      {
+        "object_id": "obj-007",
+        "label": "TONAL_CORE",
+        "start_ms": 11328,
+        "end_ms": 12640,
+        "probabilities": {
+          "TONAL_CORE": 0.9821764596310392,
+          "NOISE_TEXTURE": 0.057365283141066765,
+          "PERCUSSIVE": 0.01240132121088409,
+          "UNRESOLVED": 0.017823540368960767
+        },
+        "confidence": 0.9821764596310392
+      },
+      {
+        "object_id": "obj-008",
+        "label": "PERCUSSIVE",
+        "start_ms": 12650,
+        "end_ms": 12693,
+        "probabilities": {
+          "TONAL_CORE": 0.018655958216290982,
+          "NOISE_TEXTURE": 0.060779919791001655,
+          "PERCUSSIVE": 0.981231867791533,
+          "UNRESOLVED": 0.018768132208467004
+        },
+        "confidence": 0.981231867791533
+      },
+      {
+        "object_id": "obj-009",
+        "label": "TONAL_CORE",
+        "start_ms": 12704,
+        "end_ms": 14016,
+        "probabilities": {
+          "TONAL_CORE": 0.9418721367064785,
+          "NOISE_TEXTURE": 0.05951805729440449,
+          "PERCUSSIVE": 0.05272660410897592,
+          "UNRESOLVED": 0.05812786329352143
+        },
+        "confidence": 0.9418721367064785
+      },
+      {
+        "object_id": "obj-010",
+        "label": "PERCUSSIVE",
+        "start_ms": 14026,
+        "end_ms": 14058,
+        "probabilities": {
+          "TONAL_CORE": 0.1991082204107101,
+          "NOISE_TEXTURE": 0.06403669554979932,
+          "PERCUSSIVE": 0.7996691417990411,
+          "UNRESOLVED": 0.2003308582009589
+        },
+        "confidence": 0.7996691417990411
+      },
+      {
+        "object_id": "obj-011",
+        "label": "TONAL_CORE",
+        "start_ms": 14080,
+        "end_ms": 15264,
+        "probabilities": {
+          "TONAL_CORE": 0.9642823983843807,
+          "NOISE_TEXTURE": 0.057960577805474665,
+          "PERCUSSIVE": 0.03033563783887786,
+          "UNRESOLVED": 0.035717601615619286
+        },
+        "confidence": 0.9642823983843807
+      },
+      {
+        "object_id": "obj-012",
+        "label": "PERCUSSIVE",
+        "start_ms": 15274,
+        "end_ms": 15306,
+        "probabilities": {
+          "TONAL_CORE": 0.2533698947775155,
+          "NOISE_TEXTURE": 0.06191288420487864,
+          "PERCUSSIVE": 0.7451035446588958,
+          "UNRESOLVED": 0.2548964553411043
+        },
+        "confidence": 0.7451035446588958
+      },
+      {
+        "object_id": "obj-013",
+        "label": "TONAL_CORE",
+        "start_ms": 15317,
+        "end_ms": 16266,
+        "probabilities": {
+          "TONAL_CORE": 0.9715112159152826,
+          "NOISE_TEXTURE": 0.05735834465842286,
+          "PERCUSSIVE": 0.023126167395517098,
+          "UNRESOLVED": 0.028488784084717465
+        },
+        "confidence": 0.9715112159152826
+      },
+      {
+        "object_id": "obj-014",
+        "label": "PERCUSSIVE",
+        "start_ms": 16277,
+        "end_ms": 16320,
+        "probabilities": {
+          "TONAL_CORE": 0.045432004627506704,
+          "NOISE_TEXTURE": 0.058833896218639825,
+          "PERCUSSIVE": 0.9543101199985232,
+          "UNRESOLVED": 0.04568988000147687
+        },
+        "confidence": 0.9543101199985232
+      },
+      {
+        "object_id": "obj-015",
+        "label": "TONAL_CORE",
+        "start_ms": 16330,
+        "end_ms": 17376,
+        "probabilities": {
+          "TONAL_CORE": 0.9523916833584286,
+          "NOISE_TEXTURE": 0.0576273955858337,
+          "PERCUSSIVE": 0.042327239696347635,
+          "UNRESOLVED": 0.04760831664157125
+        },
+        "confidence": 0.9523916833584286
+      },
+      {
+        "object_id": "obj-016",
+        "label": "PERCUSSIVE",
+        "start_ms": 17386,
+        "end_ms": 17418,
+        "probabilities": {
+          "TONAL_CORE": 0.26897047603600344,
+          "NOISE_TEXTURE": 0.058530071360787375,
+          "PERCUSSIVE": 0.7295121744901006,
+          "UNRESOLVED": 0.2704878255098993
+        },
+        "confidence": 0.7295121744901006
+      },
+      {
+        "object_id": "obj-017",
+        "label": "TONAL_CORE",
+        "start_ms": 17429,
+        "end_ms": 18485,
+        "probabilities": {
+          "TONAL_CORE": 0.9490233191328453,
+          "NOISE_TEXTURE": 0.05795804261491434,
+          "PERCUSSIVE": 0.04568306428735726,
+          "UNRESOLVED": 0.05097668086715453
+        },
+        "confidence": 0.9490233191328453
+      },
+      {
+        "object_id": "obj-018",
+        "label": "PERCUSSIVE",
+        "start_ms": 18496,
+        "end_ms": 18538,
+        "probabilities": {
+          "TONAL_CORE": 0.05353874559781622,
+          "NOISE_TEXTURE": 0.06276167808412594,
+          "PERCUSSIVE": 0.9461330257898182,
+          "UNRESOLVED": 0.05386697421018176
+        },
+        "confidence": 0.9461330257898182
+      },
+      {
+        "object_id": "obj-019",
+        "label": "TONAL_CORE",
+        "start_ms": 18549,
+        "end_ms": 18890,
+        "probabilities": {
+          "TONAL_CORE": 0.9743536629062319,
+          "NOISE_TEXTURE": 0.0574003112113528,
+          "PERCUSSIVE": 0.020263804346095694,
+          "UNRESOLVED": 0.025646337093768037
+        },
+        "confidence": 0.9743536629062319
+      },
+      {
+        "object_id": "obj-020",
+        "label": "PERCUSSIVE",
+        "start_ms": 18901,
+        "end_ms": 18944,
+        "probabilities": {
+          "TONAL_CORE": 0.1494499428292013,
+          "NOISE_TEXTURE": 0.06020352726294696,
+          "PERCUSSIVE": 0.8496922607082213,
+          "UNRESOLVED": 0.1503077392917787
+        },
+        "confidence": 0.8496922607082213
+      },
+      {
+        "object_id": "obj-021",
+        "label": "TONAL_CORE",
+        "start_ms": 18954,
+        "end_ms": 19893,
+        "probabilities": {
+          "TONAL_CORE": 0.9831040384749887,
+          "NOISE_TEXTURE": 0.057363526702069484,
+          "PERCUSSIVE": 0.011468773780115554,
+          "UNRESOLVED": 0.016895961525011237
+        },
+        "confidence": 0.9831040384749887
+      },
+      {
+        "object_id": "obj-022",
+        "label": "PERCUSSIVE",
+        "start_ms": 19914,
+        "end_ms": 19946,
+        "probabilities": {
+          "TONAL_CORE": 0.035613107932119914,
+          "NOISE_TEXTURE": 0.060555156596897836,
+          "PERCUSSIVE": 0.9641780688175978,
+          "UNRESOLVED": 0.035821931182402206
+        },
+        "confidence": 0.9641780688175978
+      },
+      {
+        "object_id": "obj-023",
+        "label": "TONAL_CORE",
+        "start_ms": 19957,
+        "end_ms": 20277,
+        "probabilities": {
+          "TONAL_CORE": 0.9486446575460582,
+          "NOISE_TEXTURE": 0.05743312975897072,
+          "PERCUSSIVE": 0.04611239807465653,
+          "UNRESOLVED": 0.051355342453941945
+        },
+        "confidence": 0.9486446575460582
+      },
+      {
+        "object_id": "obj-024",
+        "label": "PERCUSSIVE",
+        "start_ms": 20288,
+        "end_ms": 20330,
+        "probabilities": {
+          "TONAL_CORE": 0.12510715464075056,
+          "NOISE_TEXTURE": 0.06333914992775226,
+          "PERCUSSIVE": 0.8741327295172766,
+          "UNRESOLVED": 0.12586727048272345
+        },
+        "confidence": 0.8741327295172766
+      },
+      {
+        "object_id": "obj-025",
+        "label": "TONAL_CORE",
+        "start_ms": 20341,
+        "end_ms": 21376,
+        "probabilities": {
+          "TONAL_CORE": 0.9680122145464001,
+          "NOISE_TEXTURE": 0.058939064634703685,
+          "PERCUSSIVE": 0.026490518078188235,
+          "UNRESOLVED": 0.031987785453599996
+        },
+        "confidence": 0.9680122145464001
+      },
+      {
+        "object_id": "obj-026",
+        "label": "PERCUSSIVE",
+        "start_ms": 21386,
+        "end_ms": 21429,
+        "probabilities": {
+          "TONAL_CORE": 0.18667894992266315,
+          "NOISE_TEXTURE": 0.06036486335591877,
+          "PERCUSSIVE": 0.81224491369143,
+          "UNRESOLVED": 0.18775508630857002
+        },
+        "confidence": 0.81224491369143
+      },
+      {
+        "object_id": "obj-027",
+        "label": "TONAL_CORE",
+        "start_ms": 21440,
+        "end_ms": 21696,
+        "probabilities": {
+          "TONAL_CORE": 0.9523982197506341,
+          "NOISE_TEXTURE": 0.05823477930784732,
+          "PERCUSSIVE": 0.042260035403403756,
+          "UNRESOLVED": 0.04760178024936595
+        },
+        "confidence": 0.9523982197506341
+      },
+      {
+        "object_id": "obj-028",
+        "label": "PERCUSSIVE",
+        "start_ms": 21706,
+        "end_ms": 21738,
+        "probabilities": {
+          "TONAL_CORE": 0.18845778273558475,
+          "NOISE_TEXTURE": 0.06177884464847042,
+          "PERCUSSIVE": 0.8104139677813162,
+          "UNRESOLVED": 0.1895860322186837
+        },
+        "confidence": 0.8104139677813162
+      },
+      {
+        "object_id": "obj-029",
+        "label": "TONAL_CORE",
+        "start_ms": 21749,
+        "end_ms": 22101,
+        "probabilities": {
+          "TONAL_CORE": 0.9619536770811387,
+          "NOISE_TEXTURE": 0.05750020480009141,
+          "PERCUSSIVE": 0.03272436921937638,
+          "UNRESOLVED": 0.0380463229188615
+        },
+        "confidence": 0.9619536770811387
+      },
+      {
+        "object_id": "obj-030",
+        "label": "PERCUSSIVE",
+        "start_ms": 22112,
+        "end_ms": 22144,
+        "probabilities": {
+          "TONAL_CORE": 0.05668598537979401,
+          "NOISE_TEXTURE": 0.060714405647681824,
+          "PERCUSSIVE": 0.9429819694384416,
+          "UNRESOLVED": 0.057018030561558436
+        },
+        "confidence": 0.9429819694384416
+      },
+      {
+        "object_id": "obj-031",
+        "label": "TONAL_CORE",
+        "start_ms": 22154,
+        "end_ms": 23157,
+        "probabilities": {
+          "TONAL_CORE": 0.9566802574182051,
+          "NOISE_TEXTURE": 0.057508357243265716,
+          "PERCUSSIVE": 0.03802499080752569,
+          "UNRESOLVED": 0.043319742581795
+        },
+        "confidence": 0.9566802574182051
+      }
+    ],
+    "track_features": {
+      "n_objects": 32.0,
+      "mean_confidence": 0.9395386945075603,
+      "unresolved_fraction": 0.06046130549243966,
+      "tonal_fraction": 0.53125,
+      "texture_fraction": 0.0,
+      "percussive_fraction": 0.46875,
+      "unresolved_object_fraction": 0.0
+    }
+  }
+]

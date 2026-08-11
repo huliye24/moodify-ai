@@ -1,0 +1,57 @@
+{
+  "schema_version": "mamse-013-manifest-v1",
+  "operator_id": "MAMSE-013",
+  "operator_version": "mamse-013-v0.1",
+  "geometry_id": "glasberg-moore-erb-1erbstep-v0.1",
+  "config": {
+    "operator_id": "MAMSE-013",
+    "operator_version": "mamse-013-v0.1",
+    "geometry_id": "glasberg-moore-erb-1erbstep-v0.1",
+    "fmin_hz": 20.0,
+    "fmax_hz": 20000.0,
+    "channels_per_erb": 1.0,
+    "gamma_order": 4,
+    "bandwidth_scale": 1.019,
+    "hop_length": 512,
+    "window": "hann",
+    "window_samples": 1024,
+    "max_filter_length_s": 0.5,
+    "n_channels": 41
+  },
+  "config_sha256": "e3cec3387954434ed6681c89b6571d856310b6c3395cd00a0fca191758f272f3",
+  "source_sha256": "09704c8741b3be2fc5bd9161c18cff9dd295dbd79cd776c5624604419e2973a7",
+  "sample_rate": 48000,
+  "duration_s": 60.0,
+  "hop_length": 512,
+  "window_samples": 1024,
+  "fmin_hz": 20.0,
+  "fmax_hz": 20000.0,
+  "n_channels": 41,
+  "feature_schema_version": "mamse-013-erb-features-v1",
+  "evidence_schema_version": "mamse-013-evidence-v1",
+  "feature_authority": {
+    "dominant_channel_index": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "dominant_frequency_hz": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "erb_centroid": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "erb_spread": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "low_band_ratio": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "mid_band_ratio": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "high_band_ratio": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "peak_to_floor_ratio_db": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "channel_flatness": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "frame_total_energy": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "frame_erb_centroid": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth",
+    "frame_dominant_channel": "DESCRIPTOR — perceptual organization view, not psychoacoustic truth"
+  },
+  "frame_count": 5624,
+  "git_commit": "128bcc3ce42f7b07742157fabb8bb801c23a53d8",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4"
+  },
+  "implementation": {
+    "backend": "gammatone-ir-fftconvolve",
+    "filter_normalization": "unit_peak_gain"
+  },
+  "generated_at_utc": "2026-08-11T17:53:56+00:00"
+}

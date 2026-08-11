@@ -1,0 +1,427 @@
+{
+  "status": "VALID",
+  "notes": [],
+  "voicing_fraction": 0.264318747776592,
+  "harmonic_consistency_mean": 0.3801525690824123,
+  "top_voiced_frames": [
+    {
+      "frame": 189,
+      "time_s": 2.016,
+      "frequency_hz": 466.0194174757282,
+      "confidence": 0.9780520260927125
+    },
+    {
+      "frame": 168,
+      "time_s": 1.792,
+      "frequency_hz": 466.0194174757282,
+      "confidence": 0.9773687067098918
+    },
+    {
+      "frame": 174,
+      "time_s": 1.856,
+      "frequency_hz": 466.0194174757282,
+      "confidence": 0.9701262174452328
+    }
+  ],
+  "events": [
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 458,
+      "end_ms": 2400,
+      "frequency_hz": 470.5882352941176,
+      "scale": "MUSICAL_UNIT"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 2474,
+      "end_ms": 2848,
+      "frequency_hz": 233.0097087378641,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 3584,
+      "end_ms": 3754,
+      "frequency_hz": 592.5925925925926,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 4032,
+      "end_ms": 4202,
+      "frequency_hz": 527.4725274725274,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 4277,
+      "end_ms": 4661,
+      "frequency_hz": 294.47852760736197,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 6144,
+      "end_ms": 6485,
+      "frequency_hz": 156.86274509803923,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 6538,
+      "end_ms": 6933,
+      "frequency_hz": 156.35179153094464,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 6997,
+      "end_ms": 7392,
+      "frequency_hz": 156.86274509803923,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 7434,
+      "end_ms": 7584,
+      "frequency_hz": 705.8823529411765,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 7658,
+      "end_ms": 7840,
+      "frequency_hz": 233.0097087378641,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 9258,
+      "end_ms": 9397,
+      "frequency_hz": 242.42424242424244,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 9408,
+      "end_ms": 9557,
+      "frequency_hz": 258.06451612903226,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 10240,
+      "end_ms": 10336,
+      "frequency_hz": 301.8867924528302,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 11349,
+      "end_ms": 11424,
+      "frequency_hz": 294.47852760736197,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 12885,
+      "end_ms": 13013,
+      "frequency_hz": 259.4594594594595,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 13024,
+      "end_ms": 13109,
+      "frequency_hz": 280.70175438596493,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 13322,
+      "end_ms": 13472,
+      "frequency_hz": 315.7894736842105,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 14080,
+      "end_ms": 14165,
+      "frequency_hz": 262.2950819672131,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 14912,
+      "end_ms": 15008,
+      "frequency_hz": 300.0,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 16320,
+      "end_ms": 16405,
+      "frequency_hz": 236.45320197044336,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 16501,
+      "end_ms": 16693,
+      "frequency_hz": 237.62376237623764,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 16704,
+      "end_ms": 17034,
+      "frequency_hz": 258.06451612903226,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 17642,
+      "end_ms": 18037,
+      "frequency_hz": 290.90909090909093,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 18154,
+      "end_ms": 18229,
+      "frequency_hz": 352.94117647058823,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 18560,
+      "end_ms": 18666,
+      "frequency_hz": 263.7362637362637,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 19968,
+      "end_ms": 20160,
+      "frequency_hz": 230.76923076923077,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 21525,
+      "end_ms": 21653,
+      "frequency_hz": 266.6666666666667,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 23168,
+      "end_ms": 23456,
+      "frequency_hz": 268.1564245810056,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 23466,
+      "end_ms": 23584,
+      "frequency_hz": 285.7142857142857,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 23594,
+      "end_ms": 23754,
+      "frequency_hz": 265.1933701657459,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 23765,
+      "end_ms": 23968,
+      "frequency_hz": 246.15384615384616,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 24042,
+      "end_ms": 24341,
+      "frequency_hz": 262.2950819672131,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 25269,
+      "end_ms": 25344,
+      "frequency_hz": 294.47852760736197,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 25877,
+      "end_ms": 25973,
+      "frequency_hz": 294.47852760736197,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 28448,
+      "end_ms": 28544,
+      "frequency_hz": 233.0097087378641,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 30976,
+      "end_ms": 31061,
+      "frequency_hz": 236.45320197044336,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 31328,
+      "end_ms": 31498,
+      "frequency_hz": 263.7362637362637,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 32490,
+      "end_ms": 32864,
+      "frequency_hz": 296.2962962962963,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 32906,
+      "end_ms": 33162,
+      "frequency_hz": 294.47852760736197,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 35253,
+      "end_ms": 35349,
+      "frequency_hz": 311.68831168831167,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 35402,
+      "end_ms": 35573,
+      "frequency_hz": 294.47852760736197,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 38400,
+      "end_ms": 38560,
+      "frequency_hz": 294.47852760736197,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 41109,
+      "end_ms": 41248,
+      "frequency_hz": 436.3636363636364,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 41525,
+      "end_ms": 41664,
+      "frequency_hz": 440.3669724770642,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 44981,
+      "end_ms": 45141,
+      "frequency_hz": 393.44262295081967,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 45429,
+      "end_ms": 45525,
+      "frequency_hz": 347.82608695652175,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 47904,
+      "end_ms": 48245,
+      "frequency_hz": 311.68831168831167,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 48586,
+      "end_ms": 48757,
+      "frequency_hz": 294.47852760736197,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 49749,
+      "end_ms": 49856,
+      "frequency_hz": 262.2950819672131,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 50293,
+      "end_ms": 50560,
+      "frequency_hz": 175.1824817518248,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 50720,
+      "end_ms": 51008,
+      "frequency_hz": 176.47058823529412,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 51040,
+      "end_ms": 51360,
+      "frequency_hz": 941.1764705882352,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 51530,
+      "end_ms": 51605,
+      "frequency_hz": 1043.4782608695652,
+      "scale": "PERCEPTUAL_FRAME"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 51754,
+      "end_ms": 51904,
+      "frequency_hz": 352.94117647058823,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 51957,
+      "end_ms": 52256,
+      "frequency_hz": 350.3649635036496,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 52405,
+      "end_ms": 52533,
+      "frequency_hz": 466.0194174757282,
+      "scale": "SHORT_TERM"
+    },
+    {
+      "event_type": "STABLE_PITCH_RUN",
+      "start_ms": 52864,
+      "end_ms": 53109,
+      "frequency_hz": 533.3333333333334,
+      "scale": "SHORT_TERM"
+    }
+  ]
+}

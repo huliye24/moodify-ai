@@ -1,0 +1,31 @@
+{
+  "status": "VALID",
+  "notes": [],
+  "top_channels": [
+    {
+      "channel": 7,
+      "frequency_hz": 299.62531408868983,
+      "mean_power": 0.002774760893414848
+    },
+    {
+      "channel": 6,
+      "frequency_hz": 245.71677022503872,
+      "mean_power": 0.002088808647099212
+    },
+    {
+      "channel": 2,
+      "frequency_hz": 79.74567027716589,
+      "mean_power": 0.0017684711203586351
+    },
+    {
+      "channel": 1,
+      "frequency_hz": 48.26726363532532,
+      "mean_power": 0.0016844459201107343
+    },
+    {
+      "channel": 8,
+      "frequency_hz": 359.65783393574134,
+      "mean_power": 0.0010874635653677514
+    }
+  ]
+}

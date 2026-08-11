@@ -1,0 +1,593 @@
+[
+  {
+    "source": "pilot_a_60s.wav",
+    "duration_s": 60.0,
+    "status": "VALID",
+    "masked_channel_ratio_mean": 0.08508406438261566,
+    "n_events": 82,
+    "events": [
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 480,
+        "end_ms": 1322,
+        "peak_depth": 0.3333333333333333,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 1344,
+        "end_ms": 1685,
+        "peak_depth": 0.38095238095238093,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 1738,
+        "end_ms": 2229,
+        "peak_depth": 0.42105263157894735,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 2250,
+        "end_ms": 2368,
+        "peak_depth": 0.2916666666666667,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 2453,
+        "end_ms": 3306,
+        "peak_depth": 0.43478260869565216,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 3349,
+        "end_ms": 3541,
+        "peak_depth": 0.3125,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 3562,
+        "end_ms": 3754,
+        "peak_depth": 0.375,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 3808,
+        "end_ms": 3978,
+        "peak_depth": 0.34615384615384615,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 4032,
+        "end_ms": 4213,
+        "peak_depth": 0.4230769230769231,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 4256,
+        "end_ms": 4672,
+        "peak_depth": 0.34782608695652173,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 4704,
+        "end_ms": 5130,
+        "peak_depth": 0.44,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 5162,
+        "end_ms": 5354,
+        "peak_depth": 0.35714285714285715,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 5386,
+        "end_ms": 5578,
+        "peak_depth": 0.3333333333333333,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 5610,
+        "end_ms": 5802,
+        "peak_depth": 0.4230769230769231,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 5845,
+        "end_ms": 6037,
+        "peak_depth": 0.3870967741935484,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 6080,
+        "end_ms": 6496,
+        "peak_depth": 0.391304347826087,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 6528,
+        "end_ms": 6933,
+        "peak_depth": 0.24,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 6986,
+        "end_ms": 7114,
+        "peak_depth": 0.2857142857142857,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 7136,
+        "end_ms": 7200,
+        "peak_depth": 0.18421052631578946,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 7221,
+        "end_ms": 7285,
+        "peak_depth": 0.2,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 7306,
+        "end_ms": 7402,
+        "peak_depth": 0.1935483870967742,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 7434,
+        "end_ms": 7850,
+        "peak_depth": 0.30434782608695654,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 7893,
+        "end_ms": 8010,
+        "peak_depth": 0.21739130434782608,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 8032,
+        "end_ms": 8085,
+        "peak_depth": 0.20833333333333334,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 8544,
+        "end_ms": 8586,
+        "peak_depth": 0.10256410256410256,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 9440,
+        "end_ms": 9536,
+        "peak_depth": 0.18421052631578946,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 11360,
+        "end_ms": 11413,
+        "peak_depth": 0.13157894736842105,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 12906,
+        "end_ms": 12992,
+        "peak_depth": 0.1794871794871795,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 13344,
+        "end_ms": 13472,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 14922,
+        "end_ms": 15008,
+        "peak_depth": 0.1794871794871795,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 16330,
+        "end_ms": 16384,
+        "peak_depth": 0.15384615384615385,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 16512,
+        "end_ms": 16682,
+        "peak_depth": 0.16666666666666666,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 16714,
+        "end_ms": 16960,
+        "peak_depth": 0.23684210526315788,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 16981,
+        "end_ms": 17045,
+        "peak_depth": 0.15384615384615385,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 17664,
+        "end_ms": 17877,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 20096,
+        "end_ms": 20138,
+        "peak_depth": 0.125,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 21536,
+        "end_ms": 21632,
+        "peak_depth": 0.15,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 23200,
+        "end_ms": 23573,
+        "peak_depth": 0.2222222222222222,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 23616,
+        "end_ms": 23754,
+        "peak_depth": 0.22857142857142856,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 23776,
+        "end_ms": 23957,
+        "peak_depth": 0.23684210526315788,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 24053,
+        "end_ms": 24224,
+        "peak_depth": 0.225,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 24778,
+        "end_ms": 24832,
+        "peak_depth": 0.125,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 27680,
+        "end_ms": 27733,
+        "peak_depth": 0.175,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 32501,
+        "end_ms": 32618,
+        "peak_depth": 0.1794871794871795,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 32693,
+        "end_ms": 32853,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 32896,
+        "end_ms": 33077,
+        "peak_depth": 0.15789473684210525,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 35221,
+        "end_ms": 35349,
+        "peak_depth": 0.2777777777777778,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 35402,
+        "end_ms": 35584,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 36768,
+        "end_ms": 36864,
+        "peak_depth": 0.15384615384615385,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 38165,
+        "end_ms": 38293,
+        "peak_depth": 0.175,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 38485,
+        "end_ms": 38538,
+        "peak_depth": 0.1388888888888889,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 41109,
+        "end_ms": 41365,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 41397,
+        "end_ms": 41450,
+        "peak_depth": 0.15384615384615385,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 41514,
+        "end_ms": 41834,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 42485,
+        "end_ms": 42538,
+        "peak_depth": 0.15,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 43402,
+        "end_ms": 43530,
+        "peak_depth": 0.225,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 43584,
+        "end_ms": 43690,
+        "peak_depth": 0.15,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 43712,
+        "end_ms": 43754,
+        "peak_depth": 0.225,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 43776,
+        "end_ms": 43840,
+        "peak_depth": 0.2,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 43872,
+        "end_ms": 44192,
+        "peak_depth": 0.20512820512820512,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 45088,
+        "end_ms": 45130,
+        "peak_depth": 0.15,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 45429,
+        "end_ms": 45514,
+        "peak_depth": 0.18421052631578946,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 45696,
+        "end_ms": 45760,
+        "peak_depth": 0.15,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 46112,
+        "end_ms": 46218,
+        "peak_depth": 0.175,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 48586,
+        "end_ms": 48672,
+        "peak_depth": 0.2,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 49760,
+        "end_ms": 49824,
+        "peak_depth": 0.13157894736842105,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 50165,
+        "end_ms": 50570,
+        "peak_depth": 0.23333333333333334,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 50613,
+        "end_ms": 51018,
+        "peak_depth": 0.2413793103448276,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 51072,
+        "end_ms": 51370,
+        "peak_depth": 0.28,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 51402,
+        "end_ms": 51445,
+        "peak_depth": 0.14634146341463414,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 51552,
+        "end_ms": 51605,
+        "peak_depth": 0.20588235294117646,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 51765,
+        "end_ms": 52298,
+        "peak_depth": 0.2564102564102564,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 52320,
+        "end_ms": 52362,
+        "peak_depth": 0.17073170731707318,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 52416,
+        "end_ms": 52522,
+        "peak_depth": 0.1891891891891892,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 52704,
+        "end_ms": 52746,
+        "peak_depth": 0.14634146341463414,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 52864,
+        "end_ms": 53120,
+        "peak_depth": 0.23076923076923078,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 54506,
+        "end_ms": 54549,
+        "peak_depth": 0.125,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 54762,
+        "end_ms": 54858,
+        "peak_depth": 0.1794871794871795,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 55882,
+        "end_ms": 55936,
+        "peak_depth": 0.175,
+        "scale": "PERCEPTUAL_FRAME"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 56330,
+        "end_ms": 56458,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 56544,
+        "end_ms": 56693,
+        "peak_depth": 0.225,
+        "scale": "SHORT_TERM"
+      },
+      {
+        "event_type": "STRONG_MASKING_REGION",
+        "start_ms": 56725,
+        "end_ms": 56906,
+        "peak_depth": 0.2,
+        "scale": "SHORT_TERM"
+      }
+    ],
+    "track_features": {
+      "masking_depth_mean": 0.002146211340439893,
+      "masking_depth_p95": 0.007209271336621486,
+      "masked_channel_ratio_mean": 0.08508406438261566,
+      "audible_channel_ratio_mean": 0.9149159356173844,
+      "strongest_masker_frequency_hz": 308.40774713805547,
+      "n_strong_masking_events": 82.0
+    }
+  }
+]

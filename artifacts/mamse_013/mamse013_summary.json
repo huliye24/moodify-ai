@@ -1,0 +1,20 @@
+[
+  {
+    "source": "pilot_a_60s.wav",
+    "duration_s": 60.0,
+    "status": "VALID",
+    "n_channels": 41,
+    "dominant_frequency_hz": 299.62531408868983,
+    "track_features": {
+      "dominant_channel_index": 7.0,
+      "dominant_frequency_hz": 299.62531408868983,
+      "erb_centroid": 7.8990049387803465,
+      "erb_spread": 6.426138574074779,
+      "low_band_ratio": 0.8949951909379825,
+      "mid_band_ratio": 0.07375172305588296,
+      "high_band_ratio": 0.03125308600613438,
+      "peak_to_floor_ratio_db": 20.785132339909662,
+      "channel_flatness": 0.24921849579331257
+    }
+  }
+]
