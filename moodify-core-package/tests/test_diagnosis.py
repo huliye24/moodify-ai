@@ -1,7 +1,6 @@
 """Tests for diagnosis subsystem."""
 import math
 import numpy as np
-import pytest
 
 
 class TestDataTypes:

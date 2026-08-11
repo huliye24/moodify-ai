@@ -1,7 +1,6 @@
 """T8 B 矩阵非线性检验测试 (SPEC-011 批次 8)."""
 
 import numpy as np
-import pytest
 
 
 class TestBMatrixLinearity:

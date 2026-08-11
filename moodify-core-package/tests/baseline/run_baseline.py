@@ -7,7 +7,11 @@
 输出: baseline_metrics.json (首次运行生成基准)
 """
 
-import json, os, sys, time, math
+import json
+import importlib
+import os
+import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -35,27 +39,27 @@ def find_audio(name_hint: str) -> str:
 # ═══════════════════════════════════════════════════════════════
 
 def test_import_core():
-    from moodify.diagnosis.engine import DiagnosisEngine
-    from moodify.processing.spectral_chain import SpectralDSPChain
-    from moodify.orchestration.workflow_engine import WorkflowOrchestrator
+    importlib.import_module("moodify.diagnosis.engine")
+    importlib.import_module("moodify.processing.spectral_chain")
+    importlib.import_module("moodify.orchestration.workflow_engine")
     return {"status": "pass"}
 
 
 def test_import_optimizer():
-    from moodify.optimizer.search import search_optimal_strengths
-    from moodify.optimizer.calibrate import calibrate_chain
+    importlib.import_module("moodify.optimizer.search")
+    importlib.import_module("moodify.optimizer.calibrate")
     return {"status": "pass"}
 
 
 def test_import_llm():
-    from moodify.llm.client import DeepSeekClient
-    from moodify.llm.prompt_assembler import assemble_rag_prompt
-    from moodify.llm.offline_fallback import offline_fallback
+    importlib.import_module("moodify.llm.client")
+    importlib.import_module("moodify.llm.prompt_assembler")
+    importlib.import_module("moodify.llm.offline_fallback")
     return {"status": "pass"}
 
 
 def test_import_memory():
-    from moodify.memory.history import ProcessingHistory, ProcessingRecord
+    importlib.import_module("moodify.memory.history")
     return {"status": "pass"}
 
 
@@ -182,7 +186,7 @@ def test_perf_search():
     engine = DiagnosisEngine()
     ws = engine.diagnose_quick(audio_path)
     t0 = time.perf_counter()
-    results = search_optimal_strengths(ws, "GA", top_k=3, n_samples=2000)
+    search_optimal_strengths(ws, "GA", top_k=3, n_samples=2000)
     elapsed = time.perf_counter() - t0
     return {"status": "pass" if elapsed < 3.0 else "warn",
             "elapsed_s": round(elapsed, 2)}

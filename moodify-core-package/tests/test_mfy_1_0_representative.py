@@ -19,7 +19,8 @@ from moodify.release import analyze_to_case, reopen_case
 
 def _tools_available() -> bool:
     try:
-        _which_ffmpeg(); _which_ffprobe()
+        _which_ffmpeg()
+        _which_ffprobe()
         return True
     except Exception:
         return False
@@ -28,7 +29,9 @@ def _tools_available() -> bool:
 def _write_wav(path: Path, *, gain: float = 0.35, frequency: float = 440.0,
                channels: int = 2, dc: float = 0.0, antiphase: bool = False) -> Path:
     with wave.open(str(path), "wb") as output:
-        output.setnchannels(channels); output.setsampwidth(2); output.setframerate(48000)
+        output.setnchannels(channels)
+        output.setsampwidth(2)
+        output.setframerate(48000)
         frames = bytearray()
         for index in range(48000):
             sample = gain * math.sin(2 * math.pi * frequency * index / 48000)
@@ -82,7 +85,8 @@ def test_canonical_path_persists_and_reopens_without_source_mutation(tmp_path: P
 
 @pytest.mark.skipif(not _tools_available(), reason="FFmpeg/ffprobe unavailable")
 def test_corrupt_input_is_failed_not_completed(tmp_path: Path):
-    corrupt = tmp_path / "corrupt.wav"; corrupt.write_bytes(b"not audio")
+    corrupt = tmp_path / "corrupt.wav"
+    corrupt.write_bytes(b"not audio")
     with pytest.raises(Exception):
         analyze_to_case(corrupt, tmp_path / "cases")
     case_files = list((tmp_path / "cases").glob("case_*/case.json"))
