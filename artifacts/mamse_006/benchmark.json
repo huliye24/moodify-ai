@@ -1,0 +1,50 @@
+{
+  "schema_version": "mamse-006-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "profile_hash": "60b3a6501db27ec7b0c6815f3039e5c99d99d10b1d8442ec768a8f901342de36",
+  "measurements": [
+    {
+      "label": "10s",
+      "duration_s": 10.0,
+      "wall_time_s": 0.209,
+      "cpu_time_s": 0.203,
+      "profile_hash": "60b3a6501db27ec7",
+      "status": "OK",
+      "log_frequency_bins": 99,
+      "modulation_segments": 4,
+      "temporal_peak_hz": 0.25,
+      "spectral_peak_cpo": 0.12121212121212122,
+      "json_bytes": 2001,
+      "npz_bytes": 2297590
+    },
+    {
+      "label": "30s",
+      "duration_s": 30.0,
+      "wall_time_s": 0.623,
+      "cpu_time_s": 0.594,
+      "profile_hash": "60b3a6501db27ec7",
+      "status": "OK",
+      "log_frequency_bins": 99,
+      "modulation_segments": 14,
+      "temporal_peak_hz": 0.25,
+      "spectral_peak_cpo": 0.12121212121212122,
+      "json_bytes": 1994,
+      "npz_bytes": 2353530
+    },
+    {
+      "label": "45s",
+      "duration_s": 45.0,
+      "wall_time_s": 1.063,
+      "cpu_time_s": 1.031,
+      "profile_hash": "60b3a6501db27ec7",
+      "status": "OK",
+      "log_frequency_bins": 99,
+      "modulation_segments": 22,
+      "temporal_peak_hz": 0.25,
+      "spectral_peak_cpo": 0.12121212121212122,
+      "json_bytes": 1997,
+      "npz_bytes": 2251792
+    }
+  ]
+}
