@@ -1,0 +1,16 @@
+{
+  "schema_version": "mamse-012-manifest-v1",
+  "operator_id": "MAMSE-012",
+  "schema_version_graph": "mamse012-graph-v0.1",
+  "graph_id": "agraph-6878bd9cfa0d4ad6",
+  "graph_family": "canonical_band_path",
+  "edge_semantic": "ordered acoustic-band adjacency",
+  "edge_authority": "DETERMINISTIC_TOPOLOGY",
+  "git_commit": "7369316f1d1c80bcd6a32ebbc5ea887b177f210b",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "generated_at_utc": "2026-08-11T14:02:36+00:00"
+}

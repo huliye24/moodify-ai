@@ -1,0 +1,39 @@
+{
+  "schema_version": "mamse-012-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "measurements": [
+    {
+      "label": "band_path_graph",
+      "nodes": 8,
+      "edges": 7,
+      "spectrum_wall_time_s": 0.0002
+    },
+    {
+      "label": "temporal_event_graph",
+      "nodes": 46,
+      "edges": 72,
+      "spectrum_wall_time_s": 0.0021
+    },
+    {
+      "label": "positive_correlation_graph",
+      "nodes": 12,
+      "edges": 5,
+      "spectrum_wall_time_s": 0.0001
+    },
+    {
+      "label": "sparse_path_800_k8",
+      "nodes": 800,
+      "edges": 799,
+      "k": 8,
+      "spectrum_wall_time_s": 0.4635,
+      "vals_shape": [
+        8
+      ],
+      "vecs_shape": [
+        800,
+        8
+      ]
+    }
+  ]
+}
