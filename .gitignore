@@ -87,6 +87,9 @@ outputs/data_factory/
 # Product UI source (required by moodify_runtime.operator_api)
 !moodify_runtime/operator_console.html
 
+# Music platform source and lightweight brand asset are canonical app inputs.
+!apps/music-web/public/moodify-logo.png
+
 # Keep baseline test audio (used by tests and calibration)
 !moodify-core-package/tests/baseline/test_audio/*.wav
 
