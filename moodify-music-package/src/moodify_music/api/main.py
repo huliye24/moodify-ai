@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+import logging
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -15,6 +16,7 @@ from moodify_music.api.routes_tracks import router as tracks_router
 from moodify_music.api.routes_users import router as users_router
 
 app = FastAPI(title="Moodify Music Data API", version="0.1.0", docs_url="/internal/v1/music/docs", openapi_url="/internal/v1/music/openapi.json")
+logger = logging.getLogger("moodify_music.api")
 
 
 @app.middleware("http")
@@ -27,6 +29,16 @@ async def error_normalization(request: Request, call_next):
         return JSONResponse(
             status_code=exc.status,
             content={"error": {"code": exc.code, "message": exc.message, "request_id": rid}},
+        )
+    except Exception:
+        logger.exception("unhandled Music API error request_id=%s path=%s", rid, request.url.path)
+        return JSONResponse(
+            status_code=500,
+            content={"error": {
+                "code": "INTERNAL_ERROR",
+                "message": "internal Music API error",
+                "request_id": rid,
+            }},
         )
 
 

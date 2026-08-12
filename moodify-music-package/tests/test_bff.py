@@ -39,3 +39,14 @@ def test_empty_object_write_body_is_forwarded():
         response = client.put("/api/v1/music/users/u1/follows/c1", json={})
     assert response.status_code == 200
     assert request.call_args.kwargs["json"] == {}
+
+
+def test_non_json_upstream_error_is_normalized_without_leaking_body():
+    upstream = httpx.Response(500, text="database traceback must not reach clients")
+    with patch("moodify_music.bff.main.httpx.request", return_value=upstream):
+        response = client.post("/api/v1/music/tracks", json={"title": "Probe"})
+    assert response.status_code == 502
+    body = response.json()["error"]
+    assert body["code"] == "UPSTREAM_INVALID_RESPONSE"
+    assert body["upstream_status"] == 500
+    assert "traceback" not in response.text

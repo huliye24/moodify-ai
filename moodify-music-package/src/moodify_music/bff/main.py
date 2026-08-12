@@ -75,9 +75,29 @@ def _forward(method: str, path: str, request: Request, body: dict | None = None,
     for attempt in range(retries + 1):
         try:
             r = httpx.request(method, url, headers=headers, json=body, timeout=TIMEOUT)
-            return JSONResponse(status_code=r.status_code, content=r.json() if r.content else {})
+            if not r.content:
+                return JSONResponse(status_code=r.status_code, content={})
+            try:
+                content = r.json()
+            except ValueError:
+                return JSONResponse(
+                    status_code=502,
+                    content={"error": {
+                        "code": "UPSTREAM_INVALID_RESPONSE",
+                        "message": "Hangzhou data API returned a non-JSON response",
+                        "request_id": headers["X-Request-Id"],
+                        "upstream_status": r.status_code,
+                    }},
+                )
+            return JSONResponse(status_code=r.status_code, content=content)
         except httpx.TimeoutException as exc:
             last_exc = exc
+        except httpx.RequestError:
+            return JSONResponse(status_code=502, content={"error": {
+                "code": "UPSTREAM_UNAVAILABLE",
+                "message": "Hangzhou data API is unavailable",
+                "request_id": headers["X-Request-Id"],
+            }})
     return JSONResponse(status_code=504, content={"error": {"code": "UPSTREAM_TIMEOUT", "message": "Hangzhou data API timed out", "request_id": request.headers.get("X-Request-Id", "")}})
 
 

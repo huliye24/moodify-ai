@@ -56,6 +56,21 @@ def test_error_model():
     assert "request_id" in body["error"]
 
 
+def test_unhandled_error_is_normalized(monkeypatch):
+    from moodify_music.api import main
+
+    def explode():
+        raise RuntimeError("private database detail")
+
+    main.app.add_api_route("/internal/v1/music/__error_probe__", explode, methods=["GET"])
+    response = client.get("/internal/v1/music/__error_probe__", headers=AUTH)
+    assert response.status_code == 500
+    body = response.json()["error"]
+    assert body["code"] == "INTERNAL_ERROR"
+    assert "request_id" in body
+    assert "private database detail" not in response.text
+
+
 def _seed_user_creator():
     u = client.post("/internal/v1/music/users", headers=AUTH, json={"display_name": "Alice", "email": "a@b.c"}).json()
     c = client.post("/internal/v1/music/creators", headers=AUTH, json={"user_id": u["id"], "handle": "alice"}).json()
