@@ -11,6 +11,11 @@ export default function InboxPage() {
   useEffect(() => {
     void api.bootstrap().then(async (user) => {
       setMe(user);
+      if (!user.capabilities?.account_actions) {
+        setError("只读演示模式：创作者 Inbox 将在真实登录接入后开放。");
+        setIntents([]);
+        return;
+      }
       try {
         const creator = await api.creatorByHandle(user.demo_creator_handle ?? "");
         const inbox = await api.creatorInbox(creator.id);

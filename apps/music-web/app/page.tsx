@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { BootstrapUser } from "../lib/music-client";
 
 type Track = {
   id?: string;
@@ -47,7 +48,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [liveTracks, setLiveTracks] = useState<Track[] | null>(null);
-  const [me, setMe] = useState<{ id: string } | null>(null);
+  const [me, setMe] = useState<BootstrapUser | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const sessionId = useRef(Math.random().toString(36).slice(2));
   const all = liveTracks ?? tracks;
@@ -91,7 +92,7 @@ export default function Home() {
   const toggleLike = (index: number) => {
     const track = all[index];
     setLiked((items) => items.includes(index) ? items.filter((item) => item !== index) : [...items, index]);
-    if (track?.id && me?.id) {
+    if (track?.id && me?.id && me.capabilities?.account_actions) {
       void import("../lib/music-client").then(({ api }) => {
         if (liked.includes(index)) void api.unfavorite(me.id, track.id as string).catch(() => {});
         else void api.favorite(me.id, track.id as string).catch(() => {});

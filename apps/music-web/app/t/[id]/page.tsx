@@ -73,7 +73,7 @@ export default function TrackPage({ params }: { params: Promise<{ id: string }> 
           <audio ref={audioRef} controls preload="metadata" src={audioUrl} onPlay={onPlay} onPause={() => setPlaying(false)} />
         )}
         <div className="hero-buttons">
-          {me && (
+          {me?.capabilities?.account_actions && (
             <button className="glass" onClick={toggleFavorite}>{favorited ? "♥ 已收藏" : "♡ 收藏"}</button>
           )}
           <a className="glass" href={`/c/${""}`} style={{ display: "none" }}>创作者</a>

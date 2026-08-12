@@ -46,7 +46,7 @@ export default function CreatorPage({ params }: { params: Promise<{ handle: stri
         <h1>{profile.display_name}</h1>
         {profile.bio && <p>{profile.bio}</p>}
         <p className="result-note">{page.follower_count} 关注</p>
-        {me && (
+        {me?.capabilities?.account_actions && (
           <button className="primary" onClick={toggleFollow} disabled={busy}>
             {following ? "取消关注" : "关注"}
           </button>

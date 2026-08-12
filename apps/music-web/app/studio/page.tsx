@@ -2,13 +2,14 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { api } from "../../lib/music-client";
+import type { BootstrapUser } from "../../lib/music-client";
 
 type Result = { track?: { id: string; publicUrl?: string }; error?: { message?: string } };
 
 export default function StudioPage() {
   const [message, setMessage] = useState("先建立音乐馆，再发布第一首作品。");
   const [busy, setBusy] = useState(false);
-  const [me, setMe] = useState<{ id: string; demo_creator_handle?: string } | null>(null);
+  const [me, setMe] = useState<BootstrapUser | null>(null);
   const [publishedUrl, setPublishedUrl] = useState("");
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function StudioPage() {
     setPublishedUrl("");
     const form = new FormData(event.currentTarget);
     try {
+      if (!me?.capabilities?.creator_writes) throw new Error("创作者发布将在真实登录接入后开放");
       if (!me?.id) throw new Error("无法确定当前用户（PUBLIC_USER_AUTH_NOT_PRODUCTION_READY：演示身份）");
       setMessage("正在确认音乐馆…");
       let creator;
@@ -76,8 +78,9 @@ export default function StudioPage() {
             <textarea name="humanEditing" maxLength={4000} placeholder="人工修改说明（可选）" />
             <textarea name="rightsStatement" required maxLength={4000} placeholder="权利声明（必填）" />
           </fieldset>
-          <button className="primary" disabled={busy}>{busy ? "处理中…" : "发布作品"}</button>
+          <button className="primary" disabled={busy || !me?.capabilities?.creator_writes}>{busy ? "处理中…" : "发布作品"}</button>
         </form>
+        {me && !me.capabilities?.creator_writes && <p className="result-note">只读演示模式：聆听保持开放，发布将在真实登录接入后开放。</p>}
         <output aria-live="polite">{message}{publishedUrl && <span> → <a href={publishedUrl}>{publishedUrl}</a></span>}</output>
         <p className="result-note">Creator-supplied provenance information. Not a copyright certification by Moodify.</p>
       </section>

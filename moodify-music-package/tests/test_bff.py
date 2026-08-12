@@ -18,9 +18,12 @@ def test_bootstrap_contract_is_flat_and_marks_demo_auth():
     assert "user" not in body
     assert body["auth_state"] == "PUBLIC_USER_AUTH_NOT_PRODUCTION_READY"
     assert "id" in body
+    assert body["capabilities"] == {"account_actions": False, "creator_writes": False}
 
 
-def test_write_body_and_idempotency_key_are_forwarded():
+def test_write_body_and_idempotency_key_are_forwarded(monkeypatch):
+    monkeypatch.setattr("moodify_music.bff.main.AUTH_MODE", "test_authenticated")
+    monkeypatch.setattr("moodify_music.bff.main.DEMO_USER_ID", "user-1")
     upstream = httpx.Response(200, json={"id": "track-1", "status": "draft"})
     with patch("moodify_music.bff.main.httpx.request", return_value=upstream) as request:
         response = client.post(
@@ -34,6 +37,7 @@ def test_write_body_and_idempotency_key_are_forwarded():
 
 
 def test_empty_object_write_body_is_forwarded(monkeypatch):
+    monkeypatch.setattr("moodify_music.bff.main.AUTH_MODE", "test_authenticated")
     monkeypatch.setattr("moodify_music.bff.main.DEMO_USER_ID", "u1")
     upstream = httpx.Response(200, json={"following": True})
     with patch("moodify_music.bff.main.httpx.request", return_value=upstream) as request:
@@ -42,7 +46,9 @@ def test_empty_object_write_body_is_forwarded(monkeypatch):
     assert request.call_args.kwargs["json"] == {}
 
 
-def test_non_json_upstream_error_is_normalized_without_leaking_body():
+def test_non_json_upstream_error_is_normalized_without_leaking_body(monkeypatch):
+    monkeypatch.setattr("moodify_music.bff.main.AUTH_MODE", "test_authenticated")
+    monkeypatch.setattr("moodify_music.bff.main.DEMO_USER_ID", "user-1")
     upstream = httpx.Response(500, text="database traceback must not reach clients")
     with patch("moodify_music.bff.main.httpx.request", return_value=upstream):
         response = client.post("/api/v1/music/tracks", json={"title": "Probe"})
@@ -54,6 +60,7 @@ def test_non_json_upstream_error_is_normalized_without_leaking_body():
 
 
 def test_public_actor_header_is_never_forwarded(monkeypatch):
+    monkeypatch.setattr("moodify_music.bff.main.AUTH_MODE", "test_authenticated")
     monkeypatch.setattr("moodify_music.bff.main.DEMO_USER_ID", "server-demo-user")
     upstream = httpx.Response(200, json={"id": "track-1"})
     with patch("moodify_music.bff.main.httpx.request", return_value=upstream) as request:
@@ -66,6 +73,7 @@ def test_public_actor_header_is_never_forwarded(monkeypatch):
 
 
 def test_user_scoped_route_rejects_path_identity_mismatch(monkeypatch):
+    monkeypatch.setattr("moodify_music.bff.main.AUTH_MODE", "test_authenticated")
     monkeypatch.setattr("moodify_music.bff.main.DEMO_USER_ID", "server-demo-user")
     response = client.put(
         "/api/v1/music/users/attacker/favorites/track-1",
@@ -74,6 +82,16 @@ def test_user_scoped_route_rejects_path_identity_mismatch(monkeypatch):
     )
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "OWNERSHIP_DENIED"
+
+
+def test_demo_mode_locks_creator_and_account_actions(monkeypatch):
+    monkeypatch.setattr("moodify_music.bff.main.AUTH_MODE", "demo_read_only")
+    monkeypatch.setattr("moodify_music.bff.main.DEMO_USER_ID", "demo-user")
+    create = client.post("/api/v1/music/tracks", json={"creator_id": "c1", "title": "No"})
+    favorite = client.put("/api/v1/music/users/demo-user/favorites/t1", json={})
+    inbox = client.get("/api/v1/music/creators/c1/license-intents")
+    assert {create.status_code, favorite.status_code, inbox.status_code} == {503}
+    assert create.json()["error"]["code"] == "BETA_AUTH_REQUIRED"
 
 
 def test_resource_routes_are_not_decorated_with_shared_static_cache_keys():

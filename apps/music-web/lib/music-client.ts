@@ -8,6 +8,7 @@ export type BootstrapUser = {
   status: string;
   auth_state?: string;
   demo_creator_handle?: string;
+  capabilities?: { account_actions: boolean; creator_writes: boolean };
 };
 
 export type CreatorProfile = {
