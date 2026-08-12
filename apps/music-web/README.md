@@ -26,6 +26,10 @@ cadeau10-album1/<manifest 中的 file>
 Production audio must be served from R2 or `NEXT_PUBLIC_AUDIO_BASE_URL`; it
 must not be bundled as Worker static assets.
 
+The LA Node deployment builds with `MOODIFY_SELF_HOSTED=1`. This aliases the
+Cloudflare binding module to a fail-closed adapter; browser and mobile traffic
+uses the canonical `/api/v1/music` BFF instead of D1/R2 routes.
+
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
 Drizzle support.

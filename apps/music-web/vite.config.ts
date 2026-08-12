@@ -1,5 +1,6 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
+import { fileURLToPath } from "node:url";
 import hostingConfig from "./.openai/hosting.json";
 import { sites } from "./build/sites-vite-plugin";
 
@@ -44,6 +45,15 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    resolve: process.env.MOODIFY_SELF_HOSTED === "1"
+      ? {
+          alias: {
+            "cloudflare:workers": fileURLToPath(
+              new URL("./lib/cloudflare-workers-self-hosted.ts", import.meta.url),
+            ),
+          },
+        }
+      : undefined,
     server: {
       host: "0.0.0.0",
       allowedHosts: ["terminal.local"],
