@@ -85,7 +85,7 @@ export default function Home() {
     </aside>
 
     <section className="content">
-      <header><div className="mobile-brand"><img src="/moodify-logo.png" alt="" />Moodify</div><div className="history"><button>‹</button><button>›</button></div><div className="header-actions"><button>上传作品</button><button className="round">◎</button></div></header>
+      <header><div className="mobile-brand"><img src="/moodify-logo.png" alt="" />Moodify</div><div className="history"><button>‹</button><button>›</button></div><div className="header-actions"><a href="/studio">上传作品</a><button className="round">◎</button></div></header>
       <div className="hero">
         <div className="hero-copy"><span className="eyebrow">CADEAU10 · 专辑 1</span><h1>{tracks[active].title}</h1><p>{tracks[active].artist}</p><div className="hero-buttons"><button onClick={() => setPlaying((value) => !value)} className="primary"><span>{playing ? "Ⅱ" : "▶"}</span>{playing ? "暂停" : "开始聆听"}</button><button className="glass" aria-label={liked.includes(active) ? "取消收藏" : "收藏"} onClick={() => toggleLike(active)}>{liked.includes(active) ? "♥" : "♡"}</button></div></div>
         <div className="orb-wrap"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="hero-vinyl"><RecordArtwork track={tracks[active]} spinning={playing} /></div><span className="floating-note note-a">♪</span><span className="floating-note note-b">♫</span></div>
