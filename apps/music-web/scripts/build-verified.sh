@@ -25,4 +25,5 @@ timeout \
   "${SITES_BUILD_TIMEOUT:-3m}" \
   "${vinext}" build
 
+"${script_dir}/prune-deploy-audio.sh"
 "${script_dir}/validate-artifact.sh"

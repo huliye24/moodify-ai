@@ -59,7 +59,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     object.writeHttpMetadata(headers);
     headers.set("etag", object.httpEtag);
     headers.set("accept-ranges", "bytes");
-    if ("range" in object && object.range) {
+    if (request.headers.has("range") && "range" in object && object.range) {
       const range = object.range;
       headers.set("content-range", `bytes ${range.offset}-${range.offset + range.length - 1}/${object.size}`);
       headers.set("content-length", String(range.length));

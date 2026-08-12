@@ -22,6 +22,10 @@ cadeau10-album1/<manifest 中的 file>
 
 ## Development
 
+`npm run build` removes `dist/client/audio/` before artifact validation.
+Production audio must be served from R2 or `NEXT_PUBLIC_AUDIO_BASE_URL`; it
+must not be bundled as Worker static assets.
+
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
 Drizzle support.
