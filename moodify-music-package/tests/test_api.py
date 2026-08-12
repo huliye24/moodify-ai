@@ -103,8 +103,9 @@ def test_social_and_intents():
     u, c, t, v = test_full_track_flow()
     u2 = client.post("/internal/v1/music/users", headers=AUTH, json={"display_name": "Bob"}).json()
     # follow + favorite
-    assert client.put(f"/internal/v1/music/users/{u2['id']}/follows/{c['id']}", headers=AUTH).status_code == 200
-    assert client.put(f"/internal/v1/music/users/{u2['id']}/favorites/{t['id']}", headers=AUTH).status_code == 200
+    actor_headers = {**AUTH, "X-Moodify-Actor-User-Id": u2["id"]}
+    assert client.put(f"/internal/v1/music/users/{u2['id']}/follows/{c['id']}", headers=actor_headers).status_code == 200
+    assert client.put(f"/internal/v1/music/users/{u2['id']}/favorites/{t['id']}", headers=actor_headers).status_code == 200
     # play event
     ev = client.post("/internal/v1/music/play-events", headers=AUTH, json={"track_id": t["id"], "played_ms": 30000, "source": "track_page"}).json()
     assert ev["id"]
@@ -115,7 +116,10 @@ def test_social_and_intents():
     ).json()
     assert li["status"] == "submitted"
     # creator inbox
-    inbox = client.get(f"/internal/v1/music/creators/{c['id']}/license-intents", headers=AUTH).json()
+    inbox = client.get(
+        f"/internal/v1/music/creators/{c['id']}/license-intents",
+        headers={**AUTH, "X-Moodify-Actor-User-Id": u["id"]},
+    ).json()
     assert len(inbox["intents"]) == 1
     assert inbox["intents"][0]["id"] == li["id"]
     # support intent
@@ -149,6 +153,17 @@ def test_ownership_denied():
     )
     assert r.status_code == 403
     assert r.json()["error"]["code"] == "OWNERSHIP_DENIED"
+
+
+def test_social_path_identity_cannot_override_actor():
+    u, c = _seed_user_creator()
+    other = client.post("/internal/v1/music/users", headers=AUTH, json={"display_name": "Other"}).json()
+    response = client.put(
+        f"/internal/v1/music/users/{other['id']}/follows/{c['id']}",
+        headers={**AUTH, "X-Moodify-Actor-User-Id": u["id"]},
+    )
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "OWNERSHIP_DENIED"
 
 
 def test_handle_normalization_and_uniqueness():

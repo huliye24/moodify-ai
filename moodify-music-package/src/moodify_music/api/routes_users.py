@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 
 from moodify_music import audit
 from moodify_music.models import Album, CreatorProfile, Track, User, utcnow
-from moodify_music.api.deps import Db, actor_user_id, error, service_key_required
+from moodify_music.api.deps import Db, actor_user_id, error, require_actor_matches, service_key_required
 from moodify_music.api.idem import idempotent_write, replay_response, request_id
 
 router = APIRouter(prefix="/internal/v1/music", dependencies=[Depends(service_key_required)])
@@ -60,6 +60,8 @@ def create_creator(db: Db, request: Request, body: dict, actor_id: str | None = 
     user_id = body.get("user_id") or actor_id
     if not user_id:
         raise error(400, "VALIDATION_ERROR", "user_id is required")
+    if actor_id:
+        require_actor_matches(actor_id, user_id)
     if db.get(User, user_id) is None:
         raise error(404, "RESOURCE_NOT_FOUND", "user not found")
     if db.scalar(select(CreatorProfile).where(CreatorProfile.user_id == user_id)):

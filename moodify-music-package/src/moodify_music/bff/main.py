@@ -53,6 +53,13 @@ def _cached(key: str, ttl_key: str):
     return decorator
 
 
+def _actor_user_id() -> str | None:
+    # Never accept the internal actor header from a public request. Until real
+    # session authentication is installed, only the server-owned demo identity
+    # may become an upstream actor.
+    return DEMO_USER_ID or None
+
+
 def _upstream_headers(request: Request, body: dict | None = None) -> dict:
     headers = {"X-Moodify-Service-Key": SERVICE_KEY, "Content-Type": "application/json"}
     rid = request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16]
@@ -60,9 +67,7 @@ def _upstream_headers(request: Request, body: dict | None = None) -> dict:
     idem = request.headers.get("Idempotency-Key")
     if idem:
         headers["Idempotency-Key"] = idem
-    actor = request.headers.get("X-Moodify-Actor-User-Id")
-    if not actor and DEMO_USER_ID:
-        actor = DEMO_USER_ID
+    actor = _actor_user_id()
     if actor:
         headers["X-Moodify-Actor-User-Id"] = actor
     return headers
@@ -107,7 +112,6 @@ def health():
 
 
 @app.get("/api/v1/music/bootstrap")
-@_cached("bootstrap", "bootstrap")
 def bootstrap(request: Request):
     if DEMO_USER_ID:
         response = _forward("GET", f"/users/{DEMO_USER_ID}", request, retries=1)
@@ -133,29 +137,30 @@ def catalogue(request: Request):
 
 @app.post("/api/v1/music/creators")
 async def create_creator(request: Request):
-    return _forward("POST", "/creators", request, await request.json())
+    actor = _actor_user_id()
+    if not actor:
+        return _auth_required(request)
+    body = await request.json()
+    body["user_id"] = actor
+    return _forward("POST", "/creators", request, body)
 
 
 @app.get("/api/v1/music/creators/by-handle/{handle}")
-@_cached("creator_page", "creator_page")
 def creator_by_handle(handle: str, request: Request):
     return _forward("GET", f"/creators/by-handle/{handle}", request, retries=1)
 
 
 @app.get("/api/v1/music/creators/{creator_id}/page")
-@_cached("creator_page", "creator_page")
 def creator_page(creator_id: str, request: Request):
     return _forward("GET", f"/creators/{creator_id}/page", request, retries=1)
 
 
 @app.get("/api/v1/music/tracks/{track_id}")
-@_cached("track", "track")
 def track_detail(track_id: str, request: Request):
     return _forward("GET", f"/tracks/{track_id}", request, retries=1)
 
 
 @app.get("/api/v1/music/tracks/{track_id}/passport")
-@_cached("track", "track")
 def track_passport(track_id: str, request: Request):
     return _forward("GET", f"/tracks/{track_id}/passport", request, retries=1)
 
@@ -182,27 +187,37 @@ async def upsert_passport(track_id: str, request: Request):
 
 @app.put("/api/v1/music/users/{user_id}/follows/{creator_id}")
 async def follow(user_id: str, creator_id: str, request: Request):
+    if user_id != _actor_user_id():
+        return _ownership_denied(request)
     return _forward("PUT", f"/users/{user_id}/follows/{creator_id}", request, await request.json())
 
 
 @app.delete("/api/v1/music/users/{user_id}/follows/{creator_id}")
 def unfollow(user_id: str, creator_id: str, request: Request):
+    if user_id != _actor_user_id():
+        return _ownership_denied(request)
     return _forward("DELETE", f"/users/{user_id}/follows/{creator_id}", request)
 
 
 @app.put("/api/v1/music/users/{user_id}/favorites/{track_id}")
 async def favorite(user_id: str, track_id: str, request: Request):
+    if user_id != _actor_user_id():
+        return _ownership_denied(request)
     return _forward("PUT", f"/users/{user_id}/favorites/{track_id}", request, await request.json())
 
 
 @app.delete("/api/v1/music/users/{user_id}/favorites/{track_id}")
 def unfavorite(user_id: str, track_id: str, request: Request):
+    if user_id != _actor_user_id():
+        return _ownership_denied(request)
     return _forward("DELETE", f"/users/{user_id}/favorites/{track_id}", request)
 
 
 @app.post("/api/v1/music/play-events")
 async def play_event(request: Request):
-    return _forward("POST", "/play-events", request, await request.json())
+    body = await request.json()
+    body["user_id"] = _actor_user_id()
+    return _forward("POST", "/play-events", request, body)
 
 
 @app.post("/api/v1/music/license-intents")
@@ -211,7 +226,6 @@ async def license_intent(request: Request):
 
 
 @app.get("/api/v1/music/creators/{creator_id}/license-intents")
-@_cached("inbox", "inbox")
 def creator_inbox(creator_id: str, request: Request):
     return _forward("GET", f"/creators/{creator_id}/license-intents", request)
 
@@ -219,3 +233,19 @@ def creator_inbox(creator_id: str, request: Request):
 @app.post("/api/v1/music/support-intents")
 async def support_intent(request: Request):
     return _forward("POST", "/support-intents", request, await request.json())
+
+
+def _ownership_denied(request: Request) -> JSONResponse:
+    return JSONResponse(status_code=403, content={"error": {
+        "code": "OWNERSHIP_DENIED",
+        "message": "the authenticated user does not match the requested user",
+        "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+    }})
+
+
+def _auth_required(request: Request) -> JSONResponse:
+    return JSONResponse(status_code=401, content={"error": {
+        "code": "AUTH_REQUIRED",
+        "message": "authenticated Music identity required",
+        "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+    }})

@@ -72,7 +72,9 @@ def creator_license_inbox(creator_id: str, db: Db, actor_id: str | None = Depend
     c = db.get(CreatorProfile, creator_id)
     if c is None:
         raise error(404, "RESOURCE_NOT_FOUND", "creator not found")
-    if actor_id and c.user_id != actor_id:
+    if not actor_id:
+        raise error(401, "ACTOR_REQUIRED", "authenticated actor required")
+    if c.user_id != actor_id:
         raise error(403, "OWNERSHIP_DENIED", "not authorized to view this inbox")
     rows = db.scalars(
         select(LicenseIntent).where(LicenseIntent.creator_id == creator_id).order_by(LicenseIntent.created_at.desc()).limit(100)

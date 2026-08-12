@@ -52,6 +52,13 @@ def actor_user_id(
     return x_moodify_actor_user_id or None
 
 
+def require_actor_matches(actor_id: str | None, user_id: str) -> None:
+    if not actor_id:
+        raise error(401, "ACTOR_REQUIRED", "authenticated actor required")
+    if actor_id != user_id:
+        raise error(403, "OWNERSHIP_DENIED", "actor does not match requested user")
+
+
 class NotFound(ApiError):
     pass
 
