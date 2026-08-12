@@ -1,52 +1,86 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { api } from "../../lib/music-client";
 
 type Result = { track?: { id: string; publicUrl?: string }; error?: { message?: string } };
 
 export default function StudioPage() {
   const [message, setMessage] = useState("先建立音乐馆，再发布第一首作品。");
   const [busy, setBusy] = useState(false);
+  const [me, setMe] = useState<{ id: string; demo_creator_handle?: string } | null>(null);
+  const [publishedUrl, setPublishedUrl] = useState("");
+
+  useEffect(() => {
+    api.bootstrap().then((user) => setMe(user)).catch(() => setMe(null));
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true);
+    event.preventDefault();
+    setBusy(true);
+    setPublishedUrl("");
     const form = new FormData(event.currentTarget);
     try {
+      if (!me?.id) throw new Error("无法确定当前用户（PUBLIC_USER_AUTH_NOT_PRODUCTION_READY：演示身份）");
       setMessage("正在确认音乐馆…");
-      let creator = await api("/api/v1/me/creator", { method: "GET" });
-      if (!creator.creator) creator = await api("/api/v1/me/creator", { method: "POST", body: JSON.stringify({ handle: form.get("handle"), displayName: form.get("displayName"), bio: form.get("bio") }) });
+      let creator;
+      try {
+        creator = await api.creatorByHandle(String(form.get("handle") || "").trim().toLowerCase());
+      } catch {
+        creator = await api.createCreator({ user_id: me.id, handle: String(form.get("handle") || "").trim().toLowerCase(), display_name: form.get("displayName"), bio: form.get("bio") });
+      }
       setMessage("正在创建作品草稿…");
-      const passport = { sourceType: form.get("sourceType"), rightsStatement: form.get("rightsStatement"), promptDisclosure: "private", aiTool: form.get("aiTool"), humanEditing: form.get("humanEditing") };
-      const draft = await api("/api/v1/tracks", { method: "POST", body: JSON.stringify({ title: form.get("title"), description: form.get("description"), language: form.get("language"), licenseStatus: form.get("licenseStatus"), ...passport }) }) as Result;
-      const trackId = draft.track?.id; const file = form.get("audio") as File;
-      if (!trackId || !file?.size) throw new Error("请选择音频文件");
-      setMessage("正在计算音频指纹…");
-      const hash = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
-      const sha256 = [...new Uint8Array(hash)].map((value) => value.toString(16).padStart(2, "0")).join("");
-      setMessage("正在安全上传音频…");
-      await api(`/api/v1/tracks/${trackId}/audio`, { method: "PUT", body: file, headers: { "content-type": file.type || "audio/wav", "x-filename": file.name, "x-content-sha256": sha256, "x-passport": encodeURIComponent(JSON.stringify(passport)) } });
+      const draft = await api.createTrack({ creator_id: creator.id, title: form.get("title"), primary_language: form.get("language"), duration_ms: Number(form.get("durationMs") || 0) || null });
+      setMessage("正在登记音频资产引用…");
+      await api.createVersion(draft.id, { audio_asset_key: String(form.get("audioAssetKey") || "").trim(), duration_ms: Number(form.get("durationMs") || 0) || null });
+      setMessage("正在填写创作护照…");
+      await api.upsertPassport(draft.id, {
+        origin_type: form.get("sourceType"), generation_tool: form.get("aiTool"),
+        generation_model: form.get("model"), prompt_disclosure: "private",
+        human_editing_notes: form.get("humanEditing"), rights_statement: form.get("rightsStatement"),
+      });
       setMessage("正在发布…");
-      const published = await api(`/api/v1/tracks/${trackId}/publish`, { method: "POST" }) as Result;
-      setMessage(`发布成功：${location.origin}${published.track?.publicUrl}`);
-    } catch (error) { setMessage(error instanceof Error ? error.message : "发布失败，草稿已保留"); }
-    finally { setBusy(false); }
+      await api.publish(draft.id);
+      setPublishedUrl(`${location.origin}/t/${draft.id}`);
+      setMessage("发布成功");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "发布失败，草稿已保留");
+    } finally {
+      setBusy(false);
+    }
   }
 
-  return <main className="studio-shell"><a href="/">← 返回聆听</a><section className="studio-card"><span className="eyebrow">CREATOR STUDIO</span><h1>发布作品</h1><p>封面可选。没有封面时，作品使用统一的 Moodify 黑胶视觉。</p><form onSubmit={submit}>
-    <fieldset><legend>音乐馆</legend><input name="handle" required minLength={3} maxLength={32} placeholder="唯一 handle，如 cadeau10"/><input name="displayName" required maxLength={80} placeholder="创作者名称"/><textarea name="bio" maxLength={500} placeholder="一句简介（可选）"/></fieldset>
-    <fieldset><legend>作品</legend><input name="title" required maxLength={160} placeholder="作品标题"/><textarea name="description" maxLength={2000} placeholder="作品简介（可选）"/><input name="language" maxLength={16} placeholder="语言，如 fr"/><input name="audio" type="file" accept="audio/wav,audio/mpeg,audio/flac,audio/mp4,audio/ogg,audio/aac" required/></fieldset>
-    <fieldset><legend>创作护照</legend><select name="sourceType" defaultValue="hybrid"><option value="ai">AI</option><option value="human">Human</option><option value="hybrid">Hybrid</option></select><input name="aiTool" maxLength={200} placeholder="使用工具（可选）"/><textarea name="humanEditing" maxLength={2000} placeholder="人工修改（可选）"/><textarea name="rightsStatement" required maxLength={2000} placeholder="权利声明（必填）"/><select name="licenseStatus" defaultValue="not_available"><option value="not_available">暂不授权</option><option value="inquiry">可询价授权</option></select></fieldset>
-    <button className="primary" disabled={busy}>{busy ? "处理中…" : "发布作品"}</button>
-  </form><output aria-live="polite">{message}</output></section></main>;
-}
-
-async function api(url: string, init: RequestInit) {
-  const response = await fetch(url, { ...init, headers: { "content-type": "application/json", ...init.headers } });
-  const body = await response.json() as Result & Record<string, unknown>;
-  if (response.status === 401) {
-    location.assign(`/signin-with-chatgpt?return_to=${encodeURIComponent("/studio")}`);
-    throw new Error("正在前往登录…");
-  }
-  if (!response.ok) throw new Error(body.error?.message ?? `请求失败 (${response.status})`);
-  return body;
+  return (
+    <main className="studio-shell">
+      <a href="/">← 返回聆听</a>
+      <section className="studio-card">
+        <span className="eyebrow">CREATOR STUDIO</span>
+        <h1>发布作品</h1>
+        <p>封面可选。没有封面时，作品使用统一的 Moodify 黑胶视觉。音频上传暂缓（MEDIA_UPLOAD_DEFERRED），先登记现有资产引用。</p>
+        <form onSubmit={submit}>
+          <fieldset><legend>音乐馆</legend>
+            <input name="handle" required minLength={3} maxLength={64} placeholder="唯一 handle，如 cadeau10" />
+            <input name="displayName" required maxLength={120} placeholder="创作者名称" />
+            <textarea name="bio" maxLength={2000} placeholder="一句简介（可选）" />
+          </fieldset>
+          <fieldset><legend>作品</legend>
+            <input name="title" required maxLength={300} placeholder="作品标题" />
+            <input name="language" maxLength={16} placeholder="语言，如 fr" />
+            <input name="durationMs" type="number" min={0} placeholder="时长（毫秒，可选）" />
+            <input name="audioAssetKey" required maxLength={512} placeholder="音频资产 key，如 cadeau10-album1/je-ne-veux-pas-enfermer-ton-aujourdhui.wav" />
+          </fieldset>
+          <fieldset><legend>创作护照（来源声明，非版权确权）</legend>
+            <select name="sourceType" defaultValue="ai_human_hybrid"><option value="ai">AI</option><option value="human">Human</option><option value="ai_human_hybrid">Hybrid</option></select>
+            <input name="aiTool" maxLength={128} placeholder="使用工具（可选）" />
+            <input name="model" maxLength={128} placeholder="模型/版本（可选）" />
+            <textarea name="humanEditing" maxLength={4000} placeholder="人工修改说明（可选）" />
+            <textarea name="rightsStatement" required maxLength={4000} placeholder="权利声明（必填）" />
+          </fieldset>
+          <button className="primary" disabled={busy}>{busy ? "处理中…" : "发布作品"}</button>
+        </form>
+        <output aria-live="polite">{message}{publishedUrl && <span> → <a href={publishedUrl}>{publishedUrl}</a></span>}</output>
+        <p className="result-note">Creator-supplied provenance information. Not a copyright certification by Moodify.</p>
+      </section>
+    </main>
+  );
 }

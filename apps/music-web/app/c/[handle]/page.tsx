@@ -1,13 +1,66 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { api } from "../../../lib/music-client";
+import type { BootstrapUser, CreatorPage as CreatorPageDto } from "../../../lib/music-client";
 
-type Creator = { handle: string; displayName: string; bio: string };
-type Work = { id: string; title: string; sourceType: string };
+const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
 
 export default function CreatorPage({ params }: { params: Promise<{ handle: string }> }) {
-  const [creator, setCreator] = useState<Creator | null>(null);
-  const [works, setWorks] = useState<Work[]>([]);
-  useEffect(() => { void params.then(({ handle }) => fetch(`/api/v1/creators/${encodeURIComponent(handle)}`).then((response) => response.ok ? response.json() : Promise.reject()).then((body) => { setCreator(body.creator); setWorks(body.tracks); }).catch(() => setCreator(null))); }, [params]);
-  return <main className="public-track"><a href="/">← Moodify</a>{creator ? <article><div className="avatar creator-avatar">{creator.displayName.slice(0, 1)}</div><span className="eyebrow">@{creator.handle}</span><h1>{creator.displayName}</h1>{creator.bio && <p>{creator.bio}</p>}<h2>作品</h2><div className="creator-works">{works.map((work) => <a key={work.id} href={`/track/${work.id}`}><span>{work.title}</span><small>{work.sourceType}</small></a>)}</div></article> : <p>音乐馆不存在或尚未公开。</p>}</main>;
+  const [page, setPage] = useState<CreatorPageDto | null>(null);
+  const [me, setMe] = useState<BootstrapUser | null>(null);
+  const [following, setFollowing] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    void params.then(({ handle }) => {
+      void api.creatorByHandle(handle).then(async (profile) => {
+        const [creatorPage, user] = await Promise.all([api.creatorPage(profile.id), api.bootstrap().catch(() => null)]);
+        setPage(creatorPage);
+        setMe(user);
+        setFollowing(Boolean(creatorPage.viewer_following));
+      }).catch(() => setPage(null));
+    });
+  }, [params]);
+
+  async function toggleFollow() {
+    if (!me?.id || !page) return;
+    setBusy(true);
+    try {
+      if (following) await api.unfollow(me.id, page.profile.id);
+      else await api.follow(me.id, page.profile.id);
+      setFollowing(!following);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!page) return <main className="public-track"><a href="/">← Moodify</a><p>音乐馆不存在或尚未公开。</p></main>;
+  const { profile } = page;
+  return (
+    <main className="public-track">
+      <a href="/">← Moodify</a>
+      <article>
+        <div className="avatar creator-avatar">{profile.display_name.slice(0, 1)}</div>
+        <span className="eyebrow">@{profile.handle}</span>
+        <h1>{profile.display_name}</h1>
+        {profile.bio && <p>{profile.bio}</p>}
+        <p className="result-note">{page.follower_count} 关注</p>
+        {me && (
+          <button className="primary" onClick={toggleFollow} disabled={busy}>
+            {following ? "取消关注" : "关注"}
+          </button>
+        )}
+        <h2>作品</h2>
+        <div className="creator-works">
+          {page.tracks.map((track) => (
+            <a key={track.id} href={`/t/${track.id}`}>
+              <span>{track.title}</span>
+              <small>{track.primary_language ?? "—"}</small>
+            </a>
+          ))}
+        </div>
+      </article>
+    </main>
+  );
 }
