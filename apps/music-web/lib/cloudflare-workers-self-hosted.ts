@@ -12,3 +12,9 @@ export const env = new Proxy({} as Cloudflare.Env, {
     );
   },
 });
+
+// The Cloudflare Vite plugin's virtual type module imports these names while
+// assembling the bundle, even though the LA runtime never instantiates them.
+export class WorkerEntrypoint {}
+export class DurableObject {}
+export class WorkflowEntrypoint {}
