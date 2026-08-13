@@ -12,23 +12,10 @@ os.environ["MOODIFY_DB_HOST"] = "127.0.0.1"
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.orm import Session
 
+from conftest import ENGINE
 from moodify_music import models as M
-from moodify_music.api.deps import get_db
 from moodify_music.api.main import app
-
-ENGINE = create_engine("sqlite://", poolclass=StaticPool, connect_args={"check_same_thread": False})
-M.Base.metadata.create_all(ENGINE)
-
-
-def _override_db():
-    with Session(ENGINE) as session:
-        yield session
-
-
-app.dependency_overrides[get_db] = _override_db
 
 client = TestClient(app)
 AUTH = {"X-Moodify-Service-Key": "test-service-key"}

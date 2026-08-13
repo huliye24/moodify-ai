@@ -150,10 +150,14 @@ def publish_track(track_id: str, db: Db, request: Request, body: dict, actor_id:
     if not db.scalar(select(CreationPassport).where(CreationPassport.track_id == track_id)):
         raise error(409, "PUBLISH_REQUIRES_PASSPORT", "track has no creation passport")
     prev = t.status
+    if prev == "published":
+        # safe replay: response was lost client-side; track is already published
+        return _track_dict(t)
     t.status = "published"
     t.published_at = utcnow()
     t.updated_at = utcnow()
-    payload = {"track_id": track_id, "from": prev, "to": "published"}
+    # stable idempotency payload: no mutable "from" field
+    payload = {"track_id": track_id, "to": "published"}
     row, replayed = idempotent_write(db, request, "publish", payload, response=_track_dict(t), resource_type="track", resource_id=t.id, status_code=200)
     if replayed:
         db.rollback()
@@ -256,3 +260,101 @@ def add_album_track(album_id: str, db: Db, request: Request, body: dict, actor_i
     db.add(m)
     db.commit()
     return {"album_id": album_id, "track_id": track_id, "position": m.position}
+
+
+# ============================================================
+# MFY_MUSIC_CREATOR_LIFECYCLE_001 — server-authoritative recovery
+# ============================================================
+
+def _draft_stage(db: Db, t: Track) -> dict:
+    """Derive lifecycle stage from server facts (no second state machine)."""
+    version = db.get(TrackVersion, t.current_version_id) if t.current_version_id else None
+    passport = db.scalar(select(CreationPassport).where(CreationPassport.track_id == t.id))
+    if t.status == "published":
+        stage, next_action = "published", "view"
+    elif t.status == "archived":
+        stage, next_action = "archived", "read_only"
+    elif version is None:
+        stage, next_action = "draft", "create_version"
+    elif passport is None:
+        stage, next_action = "version_ready", "upsert_passport"
+    else:
+        stage, next_action = "passport_ready", "confirm_publish"
+    return {
+        "track_id": t.id,
+        "stage": stage,
+        "next_action": next_action,
+        "title": t.title,
+        "status": t.status,
+        "has_version": version is not None,
+        "has_passport": passport is not None,
+        "version": {
+            "id": version.id, "version_no": version.version_no,
+            "audio_asset_key": version.audio_asset_key,
+        } if version else None,
+    }
+
+
+@router.get("/creators/{creator_id}/drafts")
+def creator_drafts(creator_id: str, db: Db, actor_id: str | None = Depends(actor_user_id)):
+    """My drafts — draft/archived tracks with derived completion stage."""
+    c = _require_owner(db, creator_id, actor_id)
+    rows = db.scalars(
+        select(Track).where(Track.creator_id == creator_id, Track.status.in_(["draft", "archived"]))
+        .order_by(Track.updated_at.desc()).limit(100)
+    )
+    return {
+        "creator_id": creator_id,
+        "drafts": [_draft_stage(db, t) for t in rows],
+    }
+
+
+@router.get("/drafts/{track_id}/resume")
+def resume_draft(track_id: str, db: Db, actor_id: str | None = Depends(actor_user_id)):
+    """Resume state for one draft — server facts decide the next step."""
+    t = _get_track(db, track_id)
+    _require_owner(db, t.creator_id, actor_id)
+    stage = _draft_stage(db, t)
+    version = db.get(TrackVersion, t.current_version_id) if t.current_version_id else None
+    passport = db.scalar(select(CreationPassport).where(CreationPassport.track_id == track_id))
+    media = None
+    if version and version.audio_asset_key:
+        meta = version.metadata_json or {}
+        media = {
+            "asset_key": version.audio_asset_key,
+            "sha256": meta.get("sha256"),
+            "bytes": meta.get("bytes"),
+            "mime_type": meta.get("mime_type"),
+        }
+    return {
+        "track": _track_dict(t, version),
+        "stage": stage["stage"],
+        "next_action": stage["next_action"],
+        "media": media,
+        "passport": {
+            "origin_type": passport.origin_type,
+            "generation_tool": passport.generation_tool,
+            "generation_model": passport.generation_model,
+            "prompt_disclosure": passport.prompt_disclosure,
+            "human_editing_notes": passport.human_editing_notes,
+            "rights_statement": passport.rights_statement,
+        } if passport else None,
+    }
+
+
+@router.post("/drafts/{track_id}/abandon")
+def abandon_draft(track_id: str, db: Db, request: Request, body: dict, actor_id: str | None = Depends(actor_user_id)):
+    """Abandon a draft: status -> archived (media untouched, subject to orphan audit)."""
+    t = _get_track(db, track_id)
+    _require_owner(db, t.creator_id, actor_id)
+    if t.status == "published":
+        raise error(409, "CANNOT_ABANDON_PUBLISHED", "published tracks cannot be abandoned")
+    if t.status == "archived":
+        return {"track_id": track_id, "status": "archived", "already": True}
+    prev = t.status
+    t.status = "archived"
+    t.updated_at = utcnow()
+    audit.record(db, actor_type="user", actor_id=actor_id or t.creator_id, action="track.abandoned",
+                 resource_type="track", resource_id=t.id, request_id=request_id(request), metadata={"from": prev})
+    db.commit()
+    return {"track_id": track_id, "status": "archived"}

@@ -381,3 +381,29 @@ def _media_error(request: Request, status: int, code: str, message: str) -> JSON
         "code": code, "message": message,
         "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
     }})
+
+
+# MFY_MUSIC_CREATOR_LIFECYCLE_001 — recovery endpoints
+@app.get("/api/v1/music/creators/{creator_id}/drafts")
+def creator_drafts(creator_id: str, request: Request):
+    return _forward("GET", f"/creators/{creator_id}/drafts", request)
+
+
+@app.get("/api/v1/music/drafts/{track_id}/resume")
+def resume_draft(track_id: str, request: Request):
+    return _forward("GET", f"/drafts/{track_id}/resume", request)
+
+
+@app.post("/api/v1/music/drafts/{track_id}/abandon")
+async def abandon_draft(track_id: str, request: Request):
+    return _forward("POST", f"/drafts/{track_id}/abandon", request, await request.json())
+
+
+@app.get("/api/v1/music/media/references")
+def media_references(request: Request):
+    return _forward("GET", "/media/references", request)
+
+
+@app.post("/api/v1/music/audit-events")
+async def audit_event(request: Request):
+    return _forward("POST", "/audit-events", request, await request.json())

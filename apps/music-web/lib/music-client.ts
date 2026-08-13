@@ -139,3 +139,29 @@ export const api = {
   supportIntent: (body: Record<string, unknown>) =>
     req<{ id: string }>("/support-intents", { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idem() } }),
 };
+
+export type DraftStage = {
+  track_id: string;
+  stage: "draft" | "version_ready" | "passport_ready" | "published" | "archived";
+  next_action: string;
+  title: string;
+  status: string;
+  has_version: boolean;
+  has_passport: boolean;
+  version: { id: string; version_no: number; audio_asset_key: string | null } | null;
+};
+
+export type ResumeState = {
+  track: TrackDto;
+  stage: string;
+  next_action: string;
+  media: { asset_key: string; sha256?: string | null; bytes?: number | null; mime_type?: string | null } | null;
+  passport: Record<string, unknown> | null;
+};
+
+export const lifecycle = {
+  myDrafts: (creatorId: string) => req<{ drafts: DraftStage[] }>(`/creators/${creatorId}/drafts`),
+  resume: (trackId: string) => req<ResumeState>(`/drafts/${trackId}/resume`),
+  abandon: (trackId: string) => req<{ status: string }>(`/drafts/${trackId}/abandon`, { method: "POST", body: JSON.stringify({}) }),
+  mediaReferences: () => req<{ references: string[] }>("/media/references"),
+};
