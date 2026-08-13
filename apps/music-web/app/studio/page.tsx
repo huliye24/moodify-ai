@@ -1,19 +1,34 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { api } from "../../lib/music-client";
-import type { BootstrapUser } from "../../lib/music-client";
+import type { BootstrapUser, MediaUpload } from "../../lib/music-client";
 
-type Result = { track?: { id: string; publicUrl?: string }; error?: { message?: string } };
+type Attempt = {
+  fingerprint: string;
+  media?: MediaUpload;
+  trackId?: string;
+  keys: { creator: string; track: string; version: string; passport: string; publish: string };
+};
+
+const newAttempt = (fingerprint: string): Attempt => ({
+  fingerprint,
+  keys: {
+    creator: crypto.randomUUID(), track: crypto.randomUUID(), version: crypto.randomUUID(),
+    passport: crypto.randomUUID(), publish: crypto.randomUUID(),
+  },
+});
 
 export default function StudioPage() {
   const [message, setMessage] = useState("先建立音乐馆，再发布第一首作品。");
   const [busy, setBusy] = useState(false);
   const [me, setMe] = useState<BootstrapUser | null>(null);
   const [publishedUrl, setPublishedUrl] = useState("");
+  const attempt = useRef<Attempt | null>(null);
 
   useEffect(() => {
-    api.bootstrap().then((user) => setMe(user)).catch(() => setMe(null));
+    api.bootstrap().then(setMe).catch(() => setMe(null));
   }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -22,35 +37,72 @@ export default function StudioPage() {
     setPublishedUrl("");
     const form = new FormData(event.currentTarget);
     try {
-      if (!me?.capabilities?.creator_writes) throw new Error("创作者发布将在真实登录接入后开放");
-      if (!me?.id) throw new Error("无法确定当前用户（PUBLIC_USER_AUTH_NOT_PRODUCTION_READY：演示身份）");
+      if (!me?.capabilities?.creator_writes) throw new Error("创作者发布仅对受邀账户开放");
+      if (!me.id) throw new Error("无法确认当前账户身份");
+      const file = form.get("audio") as File;
+      if (!file?.size) throw new Error("请选择音频文件");
+      const fingerprint = `${file.name}:${file.size}:${file.lastModified}`;
+      if (!attempt.current || attempt.current.fingerprint !== fingerprint) attempt.current = newAttempt(fingerprint);
+      const current = attempt.current;
+
       setMessage("正在确认音乐馆…");
       let creator;
       try {
         creator = await api.creatorByHandle(String(form.get("handle") || "").trim().toLowerCase());
       } catch {
-        creator = await api.createCreator({ user_id: me.id, handle: String(form.get("handle") || "").trim().toLowerCase(), display_name: form.get("displayName"), bio: form.get("bio") });
+        creator = await api.createCreator({
+          user_id: me.id,
+          handle: String(form.get("handle") || "").trim().toLowerCase(),
+          display_name: form.get("displayName"),
+          bio: form.get("bio"),
+        }, current.keys.creator);
       }
-      const file = form.get("audio") as File;
-      if (!file?.size) throw new Error("请选择音频文件");
-      setMessage("正在安全上传音频…");
-      const media = await api.uploadAudio(file);
+
+      let media = current.media;
+      if (!media) {
+        setMessage("正在安全上传音频 · 0%");
+        media = await api.uploadAudio(file, (loaded, total) => {
+          const percent = total > 0 ? Math.min(100, Math.round(loaded * 100 / total)) : 0;
+          setMessage(`正在安全上传音频 · ${percent}%`);
+        });
+        current.media = media;
+      } else {
+        setMessage("音频已上传，继续上次发布…");
+      }
+
       setMessage("正在创建作品草稿…");
-      const draft = await api.createTrack({ creator_id: creator.id, title: form.get("title"), primary_language: form.get("language"), duration_ms: Number(form.get("durationMs") || 0) || null });
-      setMessage("正在登记音频资产引用…");
-      await api.createVersion(draft.id, { audio_asset_key: media.asset_key, duration_ms: Number(form.get("durationMs") || 0) || null, metadata_json: { sha256: media.sha256, bytes: media.bytes, mime_type: media.mime_type } });
-      setMessage("正在填写创作护照…");
+      const draft = current.trackId
+        ? await api.track(current.trackId)
+        : await api.createTrack({
+            creator_id: creator.id,
+            title: form.get("title"),
+            primary_language: form.get("language"),
+            duration_ms: Number(form.get("durationMs") || 0) || null,
+          }, current.keys.track);
+      current.trackId = draft.id;
+
+      setMessage("正在登记音频版本…");
+      await api.createVersion(draft.id, {
+        audio_asset_key: media.asset_key,
+        duration_ms: Number(form.get("durationMs") || 0) || null,
+        metadata_json: { sha256: media.sha256, bytes: media.bytes, mime_type: media.mime_type },
+      }, current.keys.version);
+      setMessage("正在登记创作护照…");
       await api.upsertPassport(draft.id, {
-        origin_type: form.get("sourceType"), generation_tool: form.get("aiTool"),
-        generation_model: form.get("model"), prompt_disclosure: "private",
-        human_editing_notes: form.get("humanEditing"), rights_statement: form.get("rightsStatement"),
-      });
+        origin_type: form.get("sourceType"),
+        generation_tool: form.get("aiTool"),
+        generation_model: form.get("model"),
+        prompt_disclosure: "private",
+        human_editing_notes: form.get("humanEditing"),
+        rights_statement: form.get("rightsStatement"),
+      }, current.keys.passport);
       setMessage("正在发布…");
-      await api.publish(draft.id);
+      await api.publish(draft.id, current.keys.publish);
       setPublishedUrl(`${location.origin}/t/${draft.id}`);
       setMessage("发布成功");
+      attempt.current = null;
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "发布失败，草稿已保留");
+      setMessage(`${error instanceof Error ? error.message : "发布失败"}。可直接重试，已完成的步骤不会重复执行。`);
     } finally {
       setBusy(false);
     }
@@ -58,7 +110,7 @@ export default function StudioPage() {
 
   return (
     <main className="studio-shell">
-      <a href="/">← 返回聆听</a>
+      <Link href="/">← 返回聆听</Link>
       <section className="studio-card">
         <span className="eyebrow">CREATOR STUDIO</span>
         <h1>发布作品</h1>
@@ -84,9 +136,9 @@ export default function StudioPage() {
           </fieldset>
           <button className="primary" disabled={busy || !me?.capabilities?.creator_writes}>{busy ? "处理中…" : "发布作品"}</button>
         </form>
-        {me && !me.capabilities?.creator_writes && <p className="result-note">只读模式：聆听保持开放。<a href="/beta-login">受邀创作者登录 →</a></p>}
+        {me && !me.capabilities?.creator_writes && <p className="result-note">只读模式：聆听保持开放。<Link href="/beta-login">受邀创作者登录 →</Link></p>}
         <output aria-live="polite">{message}{publishedUrl && <span> → <a href={publishedUrl}>{publishedUrl}</a></span>}</output>
-        <p className="result-note">Creator-supplied provenance information. Not a copyright certification by Moodify.</p>
+        <p className="result-note">创作者自行提供来源信息；Moodify 不将其视为版权认证。</p>
       </section>
     </main>
   );

@@ -65,6 +65,8 @@ export type MediaUpload = {
   mime_type: string;
 };
 
+export type UploadProgress = (uploadedBytes: number, totalBytes: number) => void;
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
@@ -85,31 +87,41 @@ export const api = {
   signOut: () => req<{ authenticated: boolean }>("/session", { method: "DELETE" }),
   bootstrap: () => req<BootstrapUser>("/bootstrap"),
   catalogue: () => req<{ tracks: TrackDto[] }>("/catalogue"),
-  uploadAudio: async (file: File): Promise<MediaUpload> => {
-    const response = await fetch(`${BASE}/media`, {
-      method: "PUT",
-      headers: { "Content-Type": file.type || "audio/wav", "X-Filename": file.name },
-      body: file,
-    });
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({})) as { error?: { message?: string } };
-      throw new Error(body.error?.message ?? `HTTP ${response.status}`);
-    }
-    return response.json() as Promise<MediaUpload>;
-  },
-  createCreator: (body: Record<string, unknown>) =>
-    req<CreatorProfile>("/creators", { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idem() } }),
+  uploadAudio: (file: File, onProgress?: UploadProgress): Promise<MediaUpload> => new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("PUT", `${BASE}/media`);
+    request.setRequestHeader("Content-Type", file.type || "audio/wav");
+    request.setRequestHeader("X-Filename", file.name);
+    request.upload.onprogress = (event) => onProgress?.(event.loaded, event.lengthComputable ? event.total : file.size);
+    request.onerror = () => reject(new Error("音频上传中断，请检查网络后重试"));
+    request.onload = () => {
+      let body: (MediaUpload & { error?: { message?: string } }) | null = null;
+      try { body = JSON.parse(request.responseText); } catch { /* normalized below */ }
+      if (request.status < 200 || request.status >= 300) {
+        reject(new Error(body?.error?.message ?? `HTTP ${request.status}`));
+        return;
+      }
+      if (!body?.asset_key) {
+        reject(new Error("上传服务返回了无效结果"));
+        return;
+      }
+      resolve(body);
+    };
+    request.send(file);
+  }),
+  createCreator: (body: Record<string, unknown>, idempotencyKey = idem()) =>
+    req<CreatorProfile>("/creators", { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idempotencyKey } }),
   creatorByHandle: (handle: string) => req<CreatorProfile>(`/creators/by-handle/${handle}`),
   creatorPage: (creatorId: string) => req<CreatorPage>(`/creators/${creatorId}/page`),
   track: (id: string) => req<TrackDto>(`/tracks/${id}`),
-  createTrack: (body: Record<string, unknown>) =>
-    req<TrackDto>("/tracks", { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idem() } }),
-  createVersion: (trackId: string, body: Record<string, unknown>) =>
-    req<TrackDto>(`/tracks/${trackId}/versions`, { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idem() } }),
-  upsertPassport: (trackId: string, body: Record<string, unknown>) =>
-    req<Record<string, unknown>>(`/tracks/${trackId}/passport`, { method: "PUT", body: JSON.stringify(body), headers: { "Idempotency-Key": idem() } }),
-  publish: (trackId: string) =>
-    req<TrackDto>(`/tracks/${trackId}/publish`, { method: "POST", body: JSON.stringify({}), headers: { "Idempotency-Key": idem() } }),
+  createTrack: (body: Record<string, unknown>, idempotencyKey = idem()) =>
+    req<TrackDto>("/tracks", { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idempotencyKey } }),
+  createVersion: (trackId: string, body: Record<string, unknown>, idempotencyKey = idem()) =>
+    req<TrackDto>(`/tracks/${trackId}/versions`, { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idempotencyKey } }),
+  upsertPassport: (trackId: string, body: Record<string, unknown>, idempotencyKey = idem()) =>
+    req<Record<string, unknown>>(`/tracks/${trackId}/passport`, { method: "PUT", body: JSON.stringify(body), headers: { "Idempotency-Key": idempotencyKey } }),
+  publish: (trackId: string, idempotencyKey = idem()) =>
+    req<TrackDto>(`/tracks/${trackId}/publish`, { method: "POST", body: JSON.stringify({}), headers: { "Idempotency-Key": idempotencyKey } }),
   follow: (userId: string, creatorId: string) =>
     req<{ following: boolean }>(`/users/${userId}/follows/${creatorId}`, { method: "PUT", body: "{}", headers: { "Idempotency-Key": idem() } }),
   unfollow: (userId: string, creatorId: string) =>
