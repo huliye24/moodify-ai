@@ -93,3 +93,54 @@ def assert_profile_match(expected: ScanProfile, actual: ScanProfile) -> None:
         raise ScanProfileMismatch(
             "before/after scans must use the identical immutable scan profile"
         )
+
+
+# MFY_EAR_SCIENTIFIC_LISTENING_STACK_001: FAST and DEEP cost tiers
+MFY_WSE_SCAN_FAST_001 = ScanProfile(
+    profile_id="MFY-WSE-SCAN-FAST-001",
+    schema_version="1.0",
+    analysis_sample_rate=22050,
+    audio_decode_format="float32",
+    preserve_original_channels=True,
+    spectrogram={
+        "width": 800,
+        "height": 400,
+        "channel_mode": "combined",
+        "amplitude_scale": "log",
+        "color_map": "viridis",
+        "window_function": "hann",
+        "legend": True,
+        "dynamic_range_db": 96,
+        "upper_limit_dbfs": 0,
+    },
+    frequency_views=("linear",),
+    numerical_stft={"fft_size": 2048, "hop_length": 512, "window_function": "hann", "center": True},
+    timeline_window_seconds=1.0,
+    timeline_hop_seconds=0.5,
+)
+
+MFY_WSE_SCAN_DEEP_001 = ScanProfile(
+    profile_id="MFY-WSE-SCAN-DEEP-001",
+    schema_version="1.0",
+    analysis_sample_rate=48000,
+    audio_decode_format="float32",
+    preserve_original_channels=True,
+    spectrogram={
+        "width": 2400,
+        "height": 1000,
+        "channel_mode": "combined",
+        "amplitude_scale": "log",
+        "color_map": "viridis",
+        "window_function": "hann",
+        "legend": True,
+        "dynamic_range_db": 144,
+        "upper_limit_dbfs": 0,
+    },
+    frequency_views=("linear", "logarithmic"),
+    numerical_stft={"fft_size": 16384, "hop_length": 2048, "window_function": "hann", "center": True},
+    timeline_window_seconds=0.5,
+    timeline_hop_seconds=0.25,
+)
+
+_PROFILES[MFY_WSE_SCAN_FAST_001.profile_id] = MFY_WSE_SCAN_FAST_001
+_PROFILES[MFY_WSE_SCAN_DEEP_001.profile_id] = MFY_WSE_SCAN_DEEP_001
