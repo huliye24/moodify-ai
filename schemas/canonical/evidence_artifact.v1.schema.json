@@ -3,6 +3,23 @@
     "Provenance": {
       "additionalProperties": false,
       "properties": {
+        "algorithm_version": {
+          "default": "",
+          "title": "Algorithm Version",
+          "type": "string"
+        },
+        "input_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Sha256"
+        },
         "method": {
           "title": "Method",
           "type": "string"

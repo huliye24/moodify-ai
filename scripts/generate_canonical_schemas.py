@@ -14,13 +14,14 @@ sys.path.insert(0, str(CORE_SRC))
 
 
 def load_models():
-    from moodify.contracts import EvidenceArtifact, MeasurementRecord, ProductionCase, Rule
+    from moodify.contracts import EvidenceArtifact, MachineFinding, MeasurementRecord, ProductionCase, Rule
 
     return {
         "production_case.v1.schema.json": ProductionCase,
         "measurement_record.v1.schema.json": MeasurementRecord,
         "evidence_artifact.v1.schema.json": EvidenceArtifact,
         "rule.v1.schema.json": Rule,
+        "machine_finding.v1.schema.json": MachineFinding,
     }
 
 

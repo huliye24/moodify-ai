@@ -3,6 +3,7 @@
     "AuthorityState": {
       "enum": [
         "SYSTEM",
+        "ALGORITHM",
         "HUMAN_REQUIRED",
         "HUMAN_APPROVED",
         "HUMAN_REJECTED"

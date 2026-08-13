@@ -13,6 +13,10 @@ class Provenance(BaseModel):
     method: str
     method_version: str
     parameters_hash: str
+    # MFY_EAR_MEASUREMENT_CONTRACT_001: explicit algorithm/library version and
+    # input digest, distinct from method_version (implementation revision).
+    algorithm_version: str = ""
+    input_sha256: str | None = None
 
     @field_validator("producer", "producer_version", "method", "method_version")
     @classmethod

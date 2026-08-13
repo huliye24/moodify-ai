@@ -6,11 +6,11 @@ import re
 from typing import Literal
 from uuid import uuid4
 
-IdKind = Literal["case", "meas", "evid", "rule"]
+IdKind = Literal["case", "meas", "evid", "rule", "finding"]
 
 _PATTERNS = {
     kind: re.compile(rf"^{kind}_[0-9a-f]{{32}}$")
-    for kind in ("case", "meas", "evid", "rule")
+    for kind in ("case", "meas", "evid", "rule", "finding")
 }
 
 
