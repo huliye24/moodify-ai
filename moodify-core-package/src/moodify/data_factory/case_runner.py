@@ -12,6 +12,7 @@ MFY_EAR_DETERMINISTIC_CASE_RUNNER_001:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 from pathlib import Path
@@ -47,8 +48,12 @@ class CaseRunner:
         self.output_root = Path(output_root)
         self.output_root.mkdir(parents=True, exist_ok=True)
 
+    @staticmethod
+    def _safe_dir(key: str) -> str:
+        return hashlib.sha256(key.encode("utf-8")).hexdigest()[:24]
+
     def _idempotency_path(self, idempotency_key: str) -> Path:
-        return self.output_root / "cases" / ".idempotency" / f"{idempotency_key}.json"
+        return self.output_root / "cases" / ".idempotency" / f"{self._safe_dir(idempotency_key)}.json"
 
     def _existing_for_key(self, idempotency_key: str) -> Path | None:
         marker = self._idempotency_path(idempotency_key)
@@ -93,7 +98,7 @@ class CaseRunner:
         profile = get_profile(scan_profile_id)
         # temp dir: atomic promotion only on success
         tmp_root = self.output_root / "cases" / ".tmp"
-        tmp_dir = tmp_root / f"{idempotency_key}"
+        tmp_dir = tmp_root / self._safe_dir(idempotency_key)
         if tmp_dir.exists():
             shutil.rmtree(tmp_dir)
         tmp_dir.mkdir(parents=True, exist_ok=True)
