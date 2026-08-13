@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Header, Request
 from sqlalchemy import select
 
 from moodify_music import audit
@@ -43,6 +43,7 @@ def _track_dict(t: Track, current_version: TrackVersion | None = None, creator_h
         "duration_ms": t.duration_ms, "cover_asset_key": t.cover_asset_key,
         "current_version_id": t.current_version_id,
         "published_at": t.published_at.isoformat() if t.published_at else None,
+        "updated_at": t.updated_at.isoformat() if t.updated_at else None,
         "ear_production_case_ref": t.ear_production_case_ref,
         "creator_handle": creator_handle,
         "version": {
@@ -98,9 +99,13 @@ def get_track(track_id: str, db: Db):
 
 
 @router.patch("/tracks/{track_id}")
-def update_track(track_id: str, db: Db, body: dict, actor_id: str | None = Depends(actor_user_id)):
+def update_track(track_id: str, db: Db, body: dict, actor_id: str | None = Depends(actor_user_id),
+                 if_match: str = Header(default="")):
     t = _get_track(db, track_id)
     _require_owner(db, t.creator_id, actor_id)
+    if if_match:
+        if not t.updated_at or t.updated_at.isoformat() != if_match:
+            raise error(412, "PRECONDITION_FAILED", "track was modified elsewhere; refresh before editing")
     for field, maxlen in TRACK_FIELDS.items():
         if field in body and body[field] is not None:
             value = body[field]
@@ -358,3 +363,47 @@ def abandon_draft(track_id: str, db: Db, request: Request, body: dict, actor_id:
                  resource_type="track", resource_id=t.id, request_id=request_id(request), metadata={"from": prev})
     db.commit()
     return {"track_id": track_id, "status": "archived"}
+
+
+# ============================================================
+# MFY_MUSIC_LIBRARY_AND_CREATOR_CONSOLE_001 — creator console
+# ============================================================
+
+@router.get("/creators/{creator_id}/tracks")
+def creator_tracks(creator_id: str, db: Db, actor_id: str | None = Depends(actor_user_id), status: str | None = None):
+    """All tracks for a creator grouped by status (console)."""
+    _require_owner(db, creator_id, actor_id)
+    cond = [Track.creator_id == creator_id, Track.deleted_at.is_(None)]
+    if status:
+        if status not in ("draft", "published", "archived", "unlisted"):
+            raise error(400, "INVALID_STATUS", "status must be draft/published/archived/unlisted")
+        cond.append(Track.status == status)
+    rows = db.scalars(select(Track).where(*cond).order_by(Track.updated_at.desc()).limit(200))
+    return {
+        "creator_id": creator_id,
+        "tracks": [
+            {
+                "id": t.id, "title": t.title, "status": t.status, "visibility": t.visibility,
+                "primary_language": t.primary_language, "duration_ms": t.duration_ms,
+                "published_at": t.published_at.isoformat() if t.published_at else None,
+                "updated_at": t.updated_at.isoformat() if t.updated_at else None,
+                "stage": _draft_stage(db, t)["stage"],
+            }
+            for t in rows
+        ],
+    }
+
+
+@router.post("/tracks/{track_id}/unpublish")
+def unpublish_track(track_id: str, db: Db, request: Request, body: dict, actor_id: str | None = Depends(actor_user_id)):
+    """Take a published track off the public catalogue (-> archived, no deletion)."""
+    t = _get_track(db, track_id)
+    _require_owner(db, t.creator_id, actor_id)
+    if t.status != "published":
+        raise error(409, "NOT_PUBLISHED", "only published tracks can be unpublished")
+    t.status = "archived"
+    t.updated_at = utcnow()
+    audit.record(db, actor_type="user", actor_id=actor_id or t.creator_id, action="track.unpublished",
+                 resource_type="track", resource_id=t.id, request_id=request_id(request))
+    db.commit()
+    return {"track_id": track_id, "status": "archived", "public_url_live": False}

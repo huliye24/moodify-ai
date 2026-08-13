@@ -423,3 +423,14 @@ def my_recent_plays(user_id: str, request: Request, limit: int = 20):
 @app.get("/api/v1/music/search")
 def search(request: Request, q: str = "", type: str = "track", limit: int = 10):
     return _forward("GET", f"/search?q={q}&type={type}&limit={limit}", request)
+
+
+@app.get("/api/v1/music/creators/{creator_id}/tracks")
+def creator_tracks(creator_id: str, request: Request, status: str | None = None):
+    path = f"/creators/{creator_id}/tracks" + (f"?status={status}" if status else "")
+    return _forward("GET", path, request)
+
+
+@app.post("/api/v1/music/tracks/{track_id}/unpublish")
+async def unpublish(track_id: str, request: Request):
+    return _forward("POST", f"/tracks/{track_id}/unpublish", request, await request.json())

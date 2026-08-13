@@ -188,3 +188,21 @@ export const search = {
   creators: (q: string, limit = 10) =>
     req<{ creators: SearchCreator[] }>(`/search?q=${encodeURIComponent(q)}&type=creator&limit=${limit}`),
 };
+
+export type ConsoleTrack = {
+  id: string; title: string; status: string; visibility: string;
+  primary_language: string | null; duration_ms: number | null;
+  published_at: string | null; updated_at: string | null; stage: string;
+};
+
+export const consoleApi = {
+  myTracks: (creatorId: string, status?: string) =>
+    req<{ tracks: ConsoleTrack[] }>(`/creators/${creatorId}/tracks${status ? `?status=${status}` : ""}`),
+  updateTrack: (trackId: string, body: Record<string, unknown>, ifMatch?: string) =>
+    req<TrackDto>(`/tracks/${trackId}`, {
+      method: "PATCH", body: JSON.stringify(body),
+      headers: ifMatch ? { "If-Match": ifMatch } : {},
+    }),
+  unpublish: (trackId: string) =>
+    req<{ status: string; public_url_live: boolean }>(`/tracks/${trackId}/unpublish`, { method: "POST", body: JSON.stringify({}) }),
+};
