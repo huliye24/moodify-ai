@@ -52,7 +52,6 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [sessionId] = useState(() => `s${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`);
   const [searchResults, setSearchResults] = useState<{ tracks: { id: string; title: string; creator_id: string; primary_language: string | null; duration_ms: number | null; audio_asset_key: string | null }[] } | null>(null);
-  const [searchBusy, setSearchBusy] = useState(false);
   const all = liveTracks ?? tracks;
   const visible = useMemo(
     () => all.filter((track) => !query || `${track.title}${track.artist}`.toLowerCase().includes(query.toLowerCase())),
@@ -86,7 +85,6 @@ export default function Home() {
     if (playing) void audio.play().catch(() => setPlaying(false));
     else audio.pause();
   }, [active, playing]);
-
   const play = (index: number) => {
     if (index === active) setPlaying((value) => !value);
     else { setActive(index); setCurrentTime(0); setPlaying(true); }
@@ -96,6 +94,26 @@ export default function Home() {
     setCurrentTime(0);
     setPlaying(true);
   };
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    const track = all[active];
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: track.artist,
+        artwork: [{ src: "/moodify-logo.png", sizes: "512x512", type: "image/png" }],
+      });
+      navigator.mediaSession.playbackState = playing ? "playing" : "paused";
+      navigator.mediaSession.setActionHandler("play", () => setPlaying(true));
+      navigator.mediaSession.setActionHandler("pause", () => setPlaying(false));
+      navigator.mediaSession.setActionHandler("previoustrack", () => skip(-1));
+      navigator.mediaSession.setActionHandler("nexttrack", () => skip(1));
+    } catch {
+      // Media Session unsupported — player still works
+    }
+  }, [active, playing, all]);
+
+
   const formatTime = (seconds: number) => {
     if (!Number.isFinite(seconds)) return "0:00";
     return `${Math.floor(seconds / 60)}:${Math.floor(seconds % 60).toString().padStart(2, "0")}`;
@@ -141,7 +159,7 @@ export default function Home() {
 
       <div className="section-head"><div><span className="eyebrow">CURATED FOR YOU</span><h2>此刻值得听</h2></div></div>
       <div className="filters">{["为你推荐", "Cadeau10", "专辑 1"].map((item) => <button key={item} onClick={() => setFilter(item)} className={filter === item ? "selected" : ""}>{item}</button>)}</div>
-      {query && <p className="result-note">“{query}” 的搜索结果{searchBusy ? "…" : ""}</p>}
+      {query && <p className="result-note">“{query}” 的搜索结果</p>}
       {query && searchResults && searchResults.tracks.length === 0 && <p className="result-note">没有找到匹配的已发布作品。</p>}
       {query && searchResults && searchResults.tracks.length > 0 && (
         <div className="tracks">{searchResults.tracks.map((t) => (
