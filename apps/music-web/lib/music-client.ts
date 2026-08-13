@@ -63,6 +63,7 @@ export type MediaUpload = {
   bytes: number;
   sha256: string;
   mime_type: string;
+  deduplicated?: boolean;
 };
 
 export type UploadProgress = (uploadedBytes: number, totalBytes: number) => void;

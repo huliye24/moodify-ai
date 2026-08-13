@@ -41,8 +41,11 @@ enter Git. Sessions use a 12-hour Secure, HttpOnly, SameSite=Lax cookie.
 
 Authenticated beta creators upload audio with `PUT /api/v1/music/media` as a
 raw request body. The BFF limits files to 100 MiB, validates MIME and file
-signature, streams to a temporary file, computes SHA-256, then atomically moves
-the asset under the authenticated user's `beta/<user-id>/` media namespace.
+signature, streams to a temporary file, computes SHA-256, then atomically
+promotes the asset under the authenticated user's
+`beta/<user-id>/sha256/` content-addressed namespace. Re-uploading identical
+content for the same user reuses the existing object and returns
+`deduplicated: true`; media is never deduplicated across user boundaries.
 
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and

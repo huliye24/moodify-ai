@@ -143,10 +143,21 @@ def test_authenticated_audio_upload_is_scoped_and_hashed(monkeypatch, tmp_path):
     )
     assert response.status_code == 201
     body = response.json()
-    assert body["asset_key"].startswith("beta/user-1/")
-    assert body["asset_key"].endswith("/My-Song.wav")
+    assert body["asset_key"].startswith("beta/user-1/sha256/")
+    assert body["asset_key"].endswith(f"/{hashlib.sha256(audio).hexdigest()}.wav")
     assert body["sha256"] == hashlib.sha256(audio).hexdigest()
+    assert body["deduplicated"] is False
     assert (tmp_path / body["asset_key"]).read_bytes() == audio
+
+    duplicate = client.put(
+        "/api/v1/music/media",
+        headers={"Content-Type": "audio/wav", "X-Filename": "renamed.wav"},
+        content=audio,
+    )
+    assert duplicate.status_code == 200
+    assert duplicate.json()["asset_key"] == body["asset_key"]
+    assert duplicate.json()["deduplicated"] is True
+    assert len(list((tmp_path / "beta" / "user-1" / "sha256").rglob("*.wav"))) == 1
 
 
 def test_audio_upload_rejects_spoofed_signature_and_removes_temp(monkeypatch, tmp_path):
@@ -160,4 +171,20 @@ def test_audio_upload_rejects_spoofed_signature_and_removes_temp(monkeypatch, tm
     )
     assert response.status_code == 415
     assert response.json()["error"]["code"] == "AUDIO_SIGNATURE_INVALID"
-    assert not list(tmp_path.rglob(".upload-*"))
+    assert not list(tmp_path.rglob("upload-*"))
+
+
+def test_audio_deduplication_never_crosses_user_boundary(monkeypatch, tmp_path):
+    monkeypatch.setenv("MOODIFY_BFF_MEDIA_ROOT", str(tmp_path))
+    monkeypatch.setattr("moodify_music.bff.main._account_actions_enabled", lambda request: True)
+    actor = {"id": "user-1"}
+    monkeypatch.setattr("moodify_music.bff.main._actor_user_id", lambda request: actor["id"])
+    audio = b"RIFF" + (36).to_bytes(4, "little") + b"WAVEfmt " + b"\x00" * 28
+
+    first = client.put("/api/v1/music/media", headers={"Content-Type": "audio/wav", "X-Filename": "same.wav"}, content=audio)
+    actor["id"] = "user-2"
+    second = client.put("/api/v1/music/media", headers={"Content-Type": "audio/wav", "X-Filename": "same.wav"}, content=audio)
+
+    assert first.status_code == second.status_code == 201
+    assert first.json()["asset_key"] != second.json()["asset_key"]
+    assert second.json()["deduplicated"] is False

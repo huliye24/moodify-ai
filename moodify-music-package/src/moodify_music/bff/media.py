@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
-import re
 import tempfile
-import uuid
 from pathlib import Path
 
 MAX_AUDIO_BYTES = 100 * 1024 * 1024
@@ -19,12 +17,6 @@ ALLOWED_MIME = {
 
 def media_root() -> Path:
     return Path(os.environ.get("MOODIFY_BFF_MEDIA_ROOT", "/opt/moodify/music-media/audio"))
-
-
-def safe_filename(value: str, mime: str) -> str:
-    stem = Path(value).stem[:80]
-    stem = re.sub(r"[^a-zA-Z0-9._-]+", "-", stem).strip("-.") or "audio"
-    return stem + ALLOWED_MIME[mime]
 
 
 def looks_like_audio(head: bytes, mime: str) -> bool:
@@ -43,13 +35,32 @@ def looks_like_audio(head: bytes, mime: str) -> bool:
     return False
 
 
-def allocate_upload(user_id: str, filename: str, mime: str) -> tuple[str, Path, Path]:
-    relative = Path("beta") / user_id / uuid.uuid4().hex / safe_filename(filename, mime)
+def _user_media_root(user_id: str) -> Path:
+    if not user_id or any(character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-" for character in user_id):
+        raise ValueError("invalid media user id")
+    return media_root() / "beta" / user_id
+
+
+def allocate_upload(user_id: str) -> Path:
+    incoming = _user_media_root(user_id) / ".incoming"
+    incoming.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix="upload-", dir=incoming)
+    os.close(fd)
+    return Path(temporary)
+
+
+def promote_upload(user_id: str, temporary: Path, digest: str, mime: str) -> tuple[str, bool]:
+    """Atomically publish one content-addressed object; return key and dedupe state."""
+    relative = Path("beta") / user_id / "sha256" / digest[:2] / f"{digest}{ALLOWED_MIME[mime]}"
     final_path = media_root() / relative
     final_path.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix=".upload-", dir=final_path.parent)
-    os.close(fd)
-    return relative.as_posix(), Path(temporary), final_path
+    try:
+        os.link(temporary, final_path)
+        os.chmod(final_path, 0o644)
+        deduplicated = False
+    except FileExistsError:
+        deduplicated = True
+    return relative.as_posix(), deduplicated
 
 
 def sha256_file(path: Path) -> str:

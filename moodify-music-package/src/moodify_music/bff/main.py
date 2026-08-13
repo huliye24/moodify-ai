@@ -12,7 +12,6 @@ Env:
 from __future__ import annotations
 
 import functools
-import os
 import time
 import uuid
 import os
@@ -21,7 +20,7 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from moodify_music.bff.auth import COOKIE_NAME, authenticate_invite, issue_session, verify_session
-from moodify_music.bff.media import ALLOWED_MIME, MAX_AUDIO_BYTES, allocate_upload, looks_like_audio, sha256_file
+from moodify_music.bff.media import ALLOWED_MIME, MAX_AUDIO_BYTES, allocate_upload, looks_like_audio, promote_upload, sha256_file
 from starlette.concurrency import run_in_threadpool
 
 UPSTREAM = os.environ.get("MOODIFY_HANGZHOU_BASE", "http://120.55.191.146:8000").rstrip("/")
@@ -203,7 +202,10 @@ async def upload_media(request: Request):
         return _media_error(request, 413, "AUDIO_SIZE_INVALID", "audio must be between 1 byte and 100 MiB")
     if not filename or len(filename) > 255:
         return _media_error(request, 400, "FILENAME_INVALID", "valid X-Filename header required")
-    asset_key, temporary, final_path = allocate_upload(actor, filename, mime)
+    try:
+        temporary = allocate_upload(actor)
+    except ValueError:
+        return _media_error(request, 403, "MEDIA_IDENTITY_INVALID", "authenticated media identity is invalid")
     written = 0
     head = bytearray()
     try:
@@ -220,10 +222,10 @@ async def upload_media(request: Request):
         if not looks_like_audio(bytes(head), mime):
             return _media_error(request, 415, "AUDIO_SIGNATURE_INVALID", "file signature does not match audio type")
         digest = await run_in_threadpool(sha256_file, temporary)
-        await run_in_threadpool(os.replace, temporary, final_path)
-        await run_in_threadpool(os.chmod, final_path, 0o644)
-        return JSONResponse(status_code=201, content={
+        asset_key, deduplicated = await run_in_threadpool(promote_upload, actor, temporary, digest, mime)
+        return JSONResponse(status_code=200 if deduplicated else 201, content={
             "asset_key": asset_key, "bytes": written, "sha256": digest, "mime_type": mime,
+            "deduplicated": deduplicated,
         })
     finally:
         if temporary.exists():
