@@ -19,6 +19,7 @@ import uuid
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from moodify_music.bff.auth import COOKIE_NAME, authenticate_invite, issue_session, verify_session
 
 UPSTREAM = os.environ.get("MOODIFY_HANGZHOU_BASE", "http://120.55.191.146:8000").rstrip("/")
 SERVICE_KEY = os.environ.get("MOODIFY_HANGZHOU_KEY", "")
@@ -54,15 +55,17 @@ def _cached(key: str, ttl_key: str):
     return decorator
 
 
-def _actor_user_id() -> str | None:
+def _actor_user_id(request: Request) -> str | None:
     # Never accept the internal actor header from a public request. Until real
     # session authentication is installed, only the server-owned demo identity
     # may become an upstream actor.
+    if AUTH_MODE == "invite_beta":
+        return verify_session(request.cookies.get(COOKIE_NAME))
     return DEMO_USER_ID or None
 
 
-def _account_actions_enabled() -> bool:
-    return AUTH_MODE != "demo_read_only" and bool(_actor_user_id())
+def _account_actions_enabled(request: Request) -> bool:
+    return AUTH_MODE == "invite_beta" and bool(_actor_user_id(request))
 
 
 def _upstream_headers(request: Request, body: dict | None = None) -> dict:
@@ -72,7 +75,7 @@ def _upstream_headers(request: Request, body: dict | None = None) -> dict:
     idem = request.headers.get("Idempotency-Key")
     if idem:
         headers["Idempotency-Key"] = idem
-    actor = _actor_user_id()
+    actor = _actor_user_id(request)
     if actor:
         headers["X-Moodify-Actor-User-Id"] = actor
     return headers
@@ -116,17 +119,55 @@ def health():
     return {"status": "ok", "service": "moodify-music-bff", "direct_db": False}
 
 
+@app.post("/api/v1/music/session")
+async def create_session(request: Request):
+    if AUTH_MODE != "invite_beta":
+        return _beta_locked(request)
+    body = await request.json()
+    code = body.get("invite_code") if isinstance(body, dict) else None
+    user_id = authenticate_invite(code.strip() if isinstance(code, str) else "")
+    if not user_id:
+        return JSONResponse(status_code=401, content={"error": {
+            "code": "INVITE_INVALID",
+            "message": "invite code is invalid",
+            "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+        }})
+    try:
+        token = issue_session(user_id)
+    except RuntimeError:
+        return JSONResponse(status_code=503, content={"error": {
+            "code": "SESSION_NOT_CONFIGURED",
+            "message": "beta session service is not configured",
+            "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+        }})
+    response = JSONResponse(content={"authenticated": True})
+    response.set_cookie(
+        COOKIE_NAME, token, max_age=12 * 60 * 60, httponly=True,
+        secure=True, samesite="lax", path="/",
+    )
+    return response
+
+
+@app.delete("/api/v1/music/session")
+def delete_session():
+    response = JSONResponse(content={"authenticated": False})
+    response.delete_cookie(COOKIE_NAME, path="/", secure=True, httponly=True, samesite="lax")
+    return response
+
+
 @app.get("/api/v1/music/bootstrap")
 def bootstrap(request: Request):
-    if DEMO_USER_ID:
-        response = _forward("GET", f"/users/{DEMO_USER_ID}", request, retries=1)
+    actor = _actor_user_id(request)
+    if actor:
+        response = _forward("GET", f"/users/{actor}", request, retries=1)
         if response.status_code != 200:
             return response
         import json as _json
         user = _json.loads(response.body)
-        user["auth_state"] = "PUBLIC_USER_AUTH_NOT_PRODUCTION_READY"
+        user["auth_state"] = "BETA_INVITE_AUTHENTICATED" if AUTH_MODE == "invite_beta" else "PUBLIC_USER_AUTH_NOT_PRODUCTION_READY"
         user["demo_creator_handle"] = "cadeau10"
-        user["capabilities"] = {"account_actions": _account_actions_enabled(), "creator_writes": False}
+        enabled = _account_actions_enabled(request)
+        user["capabilities"] = {"account_actions": enabled, "creator_writes": enabled}
         return JSONResponse(content=user)
     return JSONResponse(status_code=200, content={
         "id": None, "display_name": "Moodify Creator", "status": "active",
@@ -144,9 +185,9 @@ def catalogue(request: Request):
 
 @app.post("/api/v1/music/creators")
 async def create_creator(request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
-    actor = _actor_user_id()
+    actor = _actor_user_id(request)
     if not actor:
         return _auth_required(request)
     body = await request.json()
@@ -176,64 +217,64 @@ def track_passport(track_id: str, request: Request):
 
 @app.post("/api/v1/music/tracks")
 async def create_track(request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
     return _forward("POST", "/tracks", request, await request.json())
 
 
 @app.post("/api/v1/music/tracks/{track_id}/versions")
 async def create_version(track_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
     return _forward("POST", f"/tracks/{track_id}/versions", request, await request.json())
 
 
 @app.post("/api/v1/music/tracks/{track_id}/publish")
 async def publish(track_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
     return _forward("POST", f"/tracks/{track_id}/publish", request, await request.json())
 
 
 @app.put("/api/v1/music/tracks/{track_id}/passport")
 async def upsert_passport(track_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
     return _forward("PUT", f"/tracks/{track_id}/passport", request, await request.json())
 
 
 @app.put("/api/v1/music/users/{user_id}/follows/{creator_id}")
 async def follow(user_id: str, creator_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
-    if user_id != _actor_user_id():
+    if user_id != _actor_user_id(request):
         return _ownership_denied(request)
     return _forward("PUT", f"/users/{user_id}/follows/{creator_id}", request, await request.json())
 
 
 @app.delete("/api/v1/music/users/{user_id}/follows/{creator_id}")
 def unfollow(user_id: str, creator_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
-    if user_id != _actor_user_id():
+    if user_id != _actor_user_id(request):
         return _ownership_denied(request)
     return _forward("DELETE", f"/users/{user_id}/follows/{creator_id}", request)
 
 
 @app.put("/api/v1/music/users/{user_id}/favorites/{track_id}")
 async def favorite(user_id: str, track_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
-    if user_id != _actor_user_id():
+    if user_id != _actor_user_id(request):
         return _ownership_denied(request)
     return _forward("PUT", f"/users/{user_id}/favorites/{track_id}", request, await request.json())
 
 
 @app.delete("/api/v1/music/users/{user_id}/favorites/{track_id}")
 def unfavorite(user_id: str, track_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
-    if user_id != _actor_user_id():
+    if user_id != _actor_user_id(request):
         return _ownership_denied(request)
     return _forward("DELETE", f"/users/{user_id}/favorites/{track_id}", request)
 
@@ -241,7 +282,7 @@ def unfavorite(user_id: str, track_id: str, request: Request):
 @app.post("/api/v1/music/play-events")
 async def play_event(request: Request):
     body = await request.json()
-    body["user_id"] = _actor_user_id()
+    body["user_id"] = _actor_user_id(request)
     return _forward("POST", "/play-events", request, body)
 
 
@@ -252,7 +293,7 @@ async def license_intent(request: Request):
 
 @app.get("/api/v1/music/creators/{creator_id}/license-intents")
 def creator_inbox(creator_id: str, request: Request):
-    if not _account_actions_enabled():
+    if not _account_actions_enabled(request):
         return _beta_locked(request)
     return _forward("GET", f"/creators/{creator_id}/license-intents", request)
 

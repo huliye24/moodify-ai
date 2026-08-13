@@ -93,9 +93,10 @@ export default function Home() {
     const track = all[index];
     setLiked((items) => items.includes(index) ? items.filter((item) => item !== index) : [...items, index]);
     if (track?.id && me?.id && me.capabilities?.account_actions) {
+      const userId = me.id;
       void import("../lib/music-client").then(({ api }) => {
-        if (liked.includes(index)) void api.unfavorite(me.id, track.id as string).catch(() => {});
-        else void api.favorite(me.id, track.id as string).catch(() => {});
+        if (liked.includes(index)) void api.unfavorite(userId, track.id as string).catch(() => {});
+        else void api.favorite(userId, track.id as string).catch(() => {});
       });
     }
   };

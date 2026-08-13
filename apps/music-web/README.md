@@ -30,6 +30,15 @@ The LA Node deployment builds with `MOODIFY_SELF_HOSTED=1`. This aliases the
 Cloudflare binding module to a fail-closed adapter; browser and mobile traffic
 uses the canonical `/api/v1/music` BFF instead of D1/R2 routes.
 
+## Invite-only beta authentication
+
+The self-hosted BFF defaults to `demo_read_only`. To enable invited creator
+sessions, set `MOODIFY_BFF_AUTH_MODE=invite_beta`, a random
+`MOODIFY_BFF_SESSION_SECRET` of at least 32 characters, and
+`MOODIFY_BFF_BETA_INVITES` as a JSON object mapping SHA-256 invite-code hashes
+to existing platform user IDs. Raw invite codes and session secrets must never
+enter Git. Sessions use a 12-hour Secure, HttpOnly, SameSite=Lax cookie.
+
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
 Drizzle support.

@@ -12,7 +12,7 @@ export default function InboxPage() {
     void api.bootstrap().then(async (user) => {
       setMe(user);
       if (!user.capabilities?.account_actions) {
-        setError("只读演示模式：创作者 Inbox 将在真实登录接入后开放。");
+        setError("只读模式：创作者 Inbox 仅向已登录的受邀创作者开放。");
         setIntents([]);
         return;
       }

@@ -3,7 +3,7 @@
 const BASE = "/api/v1/music";
 
 export type BootstrapUser = {
-  id: string;
+  id: string | null;
   display_name: string;
   status: string;
   auth_state?: string;
@@ -73,6 +73,9 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 const idem = () => crypto.randomUUID();
 
 export const api = {
+  signInWithInvite: (inviteCode: string) =>
+    req<{ authenticated: boolean }>("/session", { method: "POST", body: JSON.stringify({ invite_code: inviteCode }) }),
+  signOut: () => req<{ authenticated: boolean }>("/session", { method: "DELETE" }),
   bootstrap: () => req<BootstrapUser>("/bootstrap"),
   catalogue: () => req<{ tracks: TrackDto[] }>("/catalogue"),
   createCreator: (body: Record<string, unknown>) =>

@@ -80,7 +80,7 @@ export default function StudioPage() {
           </fieldset>
           <button className="primary" disabled={busy || !me?.capabilities?.creator_writes}>{busy ? "处理中…" : "发布作品"}</button>
         </form>
-        {me && !me.capabilities?.creator_writes && <p className="result-note">只读演示模式：聆听保持开放，发布将在真实登录接入后开放。</p>}
+        {me && !me.capabilities?.creator_writes && <p className="result-note">只读模式：聆听保持开放。<a href="/beta-login">受邀创作者登录 →</a></p>}
         <output aria-live="polite">{message}{publishedUrl && <span> → <a href={publishedUrl}>{publishedUrl}</a></span>}</output>
         <p className="result-note">Creator-supplied provenance information. Not a copyright certification by Moodify.</p>
       </section>
