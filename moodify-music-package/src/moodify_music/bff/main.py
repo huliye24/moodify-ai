@@ -407,3 +407,14 @@ def media_references(request: Request):
 @app.post("/api/v1/music/audit-events")
 async def audit_event(request: Request):
     return _forward("POST", "/audit-events", request, await request.json())
+
+
+@app.get("/api/v1/music/users/{user_id}/favorites")
+def my_favorites(user_id: str, request: Request, cursor: str | None = None):
+    path = f"/users/{user_id}/favorites" + (f"?cursor={cursor}" if cursor else "")
+    return _forward("GET", path, request)
+
+
+@app.get("/api/v1/music/users/{user_id}/recent-plays")
+def my_recent_plays(user_id: str, request: Request, limit: int = 20):
+    return _forward("GET", f"/users/{user_id}/recent-plays?limit={limit}", request)

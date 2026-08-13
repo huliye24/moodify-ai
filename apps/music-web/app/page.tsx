@@ -115,7 +115,7 @@ export default function Home() {
       <nav>
         <button className="nav-active" aria-current="page">◉　发现音乐</button>
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-        <button aria-disabled="true" title="音乐库即将推出" className="nav-disabled">▥　我的音乐</button>
+        <a href="/library" className="nav-link">▥　我的音乐</a>
       </nav>
       <div className="nav-group"><span>你的音乐</span><a href="/inbox" className="nav-link">✉　授权意向</a><a href="/studio" className="nav-link">＋　创作者中心</a></div>
       <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>创作者</span></div><button>•••</button></div>

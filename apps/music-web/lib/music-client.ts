@@ -165,3 +165,10 @@ export const lifecycle = {
   abandon: (trackId: string) => req<{ status: string }>(`/drafts/${trackId}/abandon`, { method: "POST", body: JSON.stringify({}) }),
   mediaReferences: () => req<{ references: string[] }>("/media/references"),
 };
+
+export const library = {
+  myFavorites: (userId: string, cursor?: string) =>
+    req<{ tracks: TrackDto[]; next_cursor: string | null }>(`/users/${userId}/favorites${cursor ? `?cursor=${cursor}` : ""}`),
+  myRecentPlays: (userId: string) =>
+    req<{ tracks: TrackDto[] }>(`/users/${userId}/recent-plays`),
+};
