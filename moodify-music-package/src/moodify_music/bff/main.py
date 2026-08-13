@@ -434,3 +434,38 @@ def creator_tracks(creator_id: str, request: Request, status: str | None = None)
 @app.post("/api/v1/music/tracks/{track_id}/unpublish")
 async def unpublish(track_id: str, request: Request):
     return _forward("POST", f"/tracks/{track_id}/unpublish", request, await request.json())
+
+
+@app.post("/api/v1/music/playlists")
+async def create_playlist(request: Request):
+    return _forward("POST", "/playlists", request, await request.json())
+
+
+@app.get("/api/v1/music/playlists/{playlist_id}")
+def get_playlist(playlist_id: str, request: Request):
+    return _forward("GET", f"/playlists/{playlist_id}", request)
+
+
+@app.patch("/api/v1/music/playlists/{playlist_id}")
+async def update_playlist(playlist_id: str, request: Request):
+    return _forward("PATCH", f"/playlists/{playlist_id}", request, await request.json())
+
+
+@app.delete("/api/v1/music/playlists/{playlist_id}")
+def delete_playlist(playlist_id: str, request: Request):
+    return _forward("DELETE", f"/playlists/{playlist_id}", request)
+
+
+@app.post("/api/v1/music/playlists/{playlist_id}/items")
+async def add_item(playlist_id: str, request: Request):
+    return _forward("POST", f"/playlists/{playlist_id}/items", request, await request.json())
+
+
+@app.delete("/api/v1/music/playlists/{playlist_id}/items/{track_id}")
+def remove_item(playlist_id: str, track_id: str, request: Request):
+    return _forward("DELETE", f"/playlists/{playlist_id}/items/{track_id}", request)
+
+
+@app.get("/api/v1/music/users/{user_id}/playlists")
+def my_playlists(user_id: str, request: Request):
+    return _forward("GET", f"/users/{user_id}/playlists", request)

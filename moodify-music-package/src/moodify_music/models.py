@@ -306,3 +306,29 @@ class AuditEvent(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=utcnow, server_default=func.current_timestamp()
     )
+
+
+class Playlist(Base, TimestampMixin):
+    """Minimal playlist — container only; deleting it never touches tracks."""
+
+    __tablename__ = "playlists"
+
+    id: Mapped[str] = mapped_column(String(ID_LEN), primary_key=True, default=new_id)
+    owner_user_id: Mapped[str] = mapped_column(String(ID_LEN), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    visibility: Mapped[str] = mapped_column(String(16), nullable=False, default="private")
+
+    __table_args__ = (
+        CheckConstraint("visibility IN ('private','public')", name="ck_playlists_visibility"),
+    )
+
+
+class PlaylistItem(Base):
+    __tablename__ = "playlist_items"
+
+    playlist_id: Mapped[str] = mapped_column(String(ID_LEN), primary_key=True)
+    track_id: Mapped[str] = mapped_column(String(ID_LEN), primary_key=True)
+    position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    added_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=utcnow, server_default=func.current_timestamp()
+    )

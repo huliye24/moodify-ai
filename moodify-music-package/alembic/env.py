@@ -47,12 +47,11 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    # session time zone = UTC so CURRENT_TIMESTAMP defaults store UTC
-    connectable = create_engine(
-        _dsn(),
-        pool_pre_ping=True,
-        connect_args={"init_command": "SET time_zone = '+00:00'"},
-    )
+    # session time zone = UTC so CURRENT_TIMESTAMP defaults store UTC (MySQL only)
+    kwargs = {"pool_pre_ping": True}
+    if _dsn().startswith("mysql"):
+        kwargs["connect_args"] = {"init_command": "SET time_zone = '+00:00'"}
+    connectable = create_engine(_dsn(), **kwargs)
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():

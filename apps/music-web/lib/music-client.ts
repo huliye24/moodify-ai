@@ -206,3 +206,25 @@ export const consoleApi = {
   unpublish: (trackId: string) =>
     req<{ status: string; public_url_live: boolean }>(`/tracks/${trackId}/unpublish`, { method: "POST", body: JSON.stringify({}) }),
 };
+
+export type PlaylistDto = {
+  id: string; owner_user_id: string; title: string; visibility: string;
+  created_at: string | null; updated_at: string | null;
+  items: { track_id: string; position: number; added_at: string | null }[];
+};
+
+export const playlists = {
+  mine: (userId: string) => req<{ playlists: PlaylistDto[] }>(`/users/${userId}/playlists`),
+  create: (body: Record<string, unknown>) =>
+    req<PlaylistDto>("/playlists", { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idem() } }),
+  get: (id: string) => req<PlaylistDto>(`/playlists/${id}`),
+  update: (id: string, body: Record<string, unknown>) =>
+    req<PlaylistDto>(`/playlists/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
+  remove: (id: string) => req<{ deleted: string }>(`/playlists/${id}`, { method: "DELETE" }),
+  addItem: (id: string, trackId: string) =>
+    req<{ playlist_id: string; track_id: string; position: number }>(`/playlists/${id}/items`, {
+      method: "POST", body: JSON.stringify({ track_id: trackId }), headers: { "Idempotency-Key": idem() },
+    }),
+  removeItem: (id: string, trackId: string) =>
+    req<{ removed: boolean }>(`/playlists/${id}/items/${trackId}`, { method: "DELETE" }),
+};
