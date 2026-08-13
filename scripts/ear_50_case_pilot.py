@@ -67,7 +67,7 @@ def write_signal(spec: dict, path: Path) -> None:
     if s["type"] == "sine":
         x = s["amp"] * np.sin(2 * np.pi * s["freq"] * t)
     else:
-        x = s["amp"] * np.random.RandomState(hash(s["id"]) % (2**32)).uniform(-1, 1, n)
+        x = s["amp"] * np.random.RandomState(hash(spec["id"]) % (2**32)).uniform(-1, 1, n)
     x = x.astype(np.float32)
     if channels == 2:
         x = np.stack([x, x], axis=1)
