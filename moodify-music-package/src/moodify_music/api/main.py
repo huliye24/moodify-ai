@@ -13,6 +13,7 @@ from moodify_music.api.routes_cwc import router as cwc_router
 from moodify_music.api.routes_intents import router as intents_router
 from moodify_music.api.routes_library import router as library_router
 from moodify_music.api.routes_ops import router as ops_router
+from moodify_music.api.routes_search import router as search_router
 from moodify_music.api.routes_social import router as social_router
 from moodify_music.api.routes_tracks import router as tracks_router
 from moodify_music.api.routes_users import router as users_router
@@ -49,5 +50,5 @@ def health() -> dict:
     return {"status": "ok", "service": "moodify-music-data-api", "version": "0.1.0"}
 
 
-for router in (users_router, tracks_router, social_router, intents_router, cwc_router, ops_router, library_router):
+for router in (users_router, tracks_router, social_router, intents_router, cwc_router, ops_router, library_router, search_router):
     app.include_router(router)

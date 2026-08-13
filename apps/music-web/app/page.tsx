@@ -51,11 +51,22 @@ export default function Home() {
   const [me, setMe] = useState<BootstrapUser | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [sessionId] = useState(() => `s${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`);
+  const [searchResults, setSearchResults] = useState<{ tracks: { id: string; title: string; creator_id: string; primary_language: string | null; duration_ms: number | null; audio_asset_key: string | null }[] } | null>(null);
+  const [searchBusy, setSearchBusy] = useState(false);
   const all = liveTracks ?? tracks;
   const visible = useMemo(
     () => all.filter((track) => !query || `${track.title}${track.artist}`.toLowerCase().includes(query.toLowerCase())),
     [query, all],
   );
+  useEffect(() => {
+    if (!query.trim()) return;
+    const timer = setTimeout(() => {
+      void import("../lib/music-client").then(({ search }) =>
+        search.tracks(query.trim()).then(setSearchResults).catch(() => setSearchResults({ tracks: [] }))
+      );
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
   useEffect(() => {
     void import("../lib/music-client").then(({ api }) => {
       void api.bootstrap().then((user) => setMe(user)).catch(() => null);
@@ -130,8 +141,15 @@ export default function Home() {
 
       <div className="section-head"><div><span className="eyebrow">CURATED FOR YOU</span><h2>此刻值得听</h2></div></div>
       <div className="filters">{["为你推荐", "Cadeau10", "专辑 1"].map((item) => <button key={item} onClick={() => setFilter(item)} className={filter === item ? "selected" : ""}>{item}</button>)}</div>
-      {query && <p className="result-note">“{query}” 的搜索结果</p>}
-      <div className="tracks">{visible.map((track) => { const index = all.indexOf(track); return <article key={track.title} className={active === index && playing ? "playing" : ""}><button className="cover" onClick={() => play(index)} aria-label={`播放 ${track.title}`} aria-pressed={active === index && playing}><RecordArtwork track={track} spinning={active === index && playing} /><span>{active === index && playing ? "Ⅱ" : "▶"}</span></button><div className="track-info"><h3>{track.title}</h3><p>{track.artist}</p></div><span className="duration">{track.length}</span><button className={`like ${liked.includes(index) ? "is-liked" : ""}`} onClick={() => toggleLike(index)} aria-label={liked.includes(index) ? `取消收藏 ${track.title}` : `收藏 ${track.title}`}>{liked.includes(index) ? "♥" : "♡"}</button></article>; })}</div>
+      {query && <p className="result-note">“{query}” 的搜索结果{searchBusy ? "…" : ""}</p>}
+      {query && searchResults && searchResults.tracks.length === 0 && <p className="result-note">没有找到匹配的已发布作品。</p>}
+      {query && searchResults && searchResults.tracks.length > 0 && (
+        <div className="tracks">{searchResults.tracks.map((t) => (
+          <article key={t.id}><div className="track-info"><h3><a href={`/t/${t.id}`} style={{ color: "inherit", textDecoration: "none" }}>{t.title}</a></h3><p>{t.primary_language ?? "—"}</p></div><span className="duration">{t.duration_ms ? `${Math.round(t.duration_ms / 1000)}s` : ""}</span></article>
+        ))}</div>
+      )}
+      {!query && <div className="tracks">{visible.map((track) => { const index = all.indexOf(track); return <article key={track.title} className={active === index && playing ? "playing" : ""}><button className="cover" onClick={() => play(index)} aria-label={`播放 ${track.title}`} aria-pressed={active === index && playing}><RecordArtwork track={track} spinning={active === index && playing} /><span>{active === index && playing ? "Ⅱ" : "▶"}</span></button><div className="track-info"><h3>{track.title}</h3><p>{track.artist}</p></div><span className="duration">{track.length}</span><button className={`like ${liked.includes(index) ? "is-liked" : ""}`} onClick={() => toggleLike(index)} aria-label={liked.includes(index) ? `取消收藏 ${track.title}` : `收藏 ${track.title}`}>{liked.includes(index) ? "♥" : "♡"}</button></article>; })}</div>}
+
     </section>
 
     <audio ref={audioRef} src={all[active].src} preload="metadata" onPlay={onPlay} onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)} onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)} onEnded={() => skip(1)} />

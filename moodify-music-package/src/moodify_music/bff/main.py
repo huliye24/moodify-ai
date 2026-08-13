@@ -418,3 +418,8 @@ def my_favorites(user_id: str, request: Request, cursor: str | None = None):
 @app.get("/api/v1/music/users/{user_id}/recent-plays")
 def my_recent_plays(user_id: str, request: Request, limit: int = 20):
     return _forward("GET", f"/users/{user_id}/recent-plays?limit={limit}", request)
+
+
+@app.get("/api/v1/music/search")
+def search(request: Request, q: str = "", type: str = "track", limit: int = 10):
+    return _forward("GET", f"/search?q={q}&type={type}&limit={limit}", request)

@@ -172,3 +172,19 @@ export const library = {
   myRecentPlays: (userId: string) =>
     req<{ tracks: TrackDto[] }>(`/users/${userId}/recent-plays`),
 };
+
+export type SearchTrack = {
+  id: string; title: string; creator_id: string; primary_language: string | null;
+  duration_ms: number | null; published_at: string | null; audio_asset_key: string | null;
+};
+
+export type SearchCreator = {
+  id: string; handle: string; display_name: string; bio: string | null; avatar_asset_key: string | null;
+};
+
+export const search = {
+  tracks: (q: string, limit = 10) =>
+    req<{ tracks: SearchTrack[] }>(`/search?q=${encodeURIComponent(q)}&type=track&limit=${limit}`),
+  creators: (q: string, limit = 10) =>
+    req<{ creators: SearchCreator[] }>(`/search?q=${encodeURIComponent(q)}&type=creator&limit=${limit}`),
+};
