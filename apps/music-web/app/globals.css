@@ -40,3 +40,13 @@
 .nav-link{height:44px;width:100%;display:flex;align-items:center;gap:14px;padding:0 15px;border-radius:11px;color:#8e95b2;text-align:left;font-size:14px;text-decoration:none;margin-top:8px}
 .nav-link:hover{color:white;background:rgba(255,255,255,.04)}
 .beta-login-card{max-width:480px}.beta-login-card form{gap:12px}.beta-login-card output{display:block;margin-top:16px}
+
+/* MFY_MUSIC_LISTENING_FIRST_WEB_001: a11y + reduced motion + disabled nav */
+:focus-visible{outline:2px solid #6a55ff;outline-offset:2px;border-radius:4px}
+.nav-disabled{opacity:.45;cursor:not-allowed;color:#5a6280}
+.nav-disabled:hover{background:transparent;color:#5a6280}
+@media (prefers-reduced-motion: reduce){
+  .vinyl.is-spinning{animation:none}
+  .floating-note,.orb,.orbit{animation:none !important;transition:none !important}
+  *{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}

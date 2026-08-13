@@ -50,7 +50,7 @@ export default function Home() {
   const [liveTracks, setLiveTracks] = useState<Track[] | null>(null);
   const [me, setMe] = useState<BootstrapUser | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const sessionId = useRef(Math.random().toString(36).slice(2));
+  const [sessionId] = useState(() => `s${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`);
   const all = liveTracks ?? tracks;
   const visible = useMemo(
     () => all.filter((track) => !query || `${track.title}${track.artist}`.toLowerCase().includes(query.toLowerCase())),
@@ -104,7 +104,7 @@ export default function Home() {
     const track = all[active];
     if (track?.id) {
       void import("../lib/music-client").then(({ api }) =>
-        api.playEvent({ track_id: track.id as string, user_id: me?.id ?? null, session_id: sessionId.current, played_ms: 0, source: "discover" }).catch(() => {}),
+        api.playEvent({ track_id: track.id as string, user_id: me?.id ?? null, session_id: sessionId, played_ms: 0, source: "discover" }).catch(() => {}),
       );
     }
   };
@@ -113,9 +113,9 @@ export default function Home() {
     <aside className="sidebar">
       <div className="brand"><img src="/moodify-logo.png" alt="Moodify" /><span>Moodify</span></div>
       <nav>
-        <button className="nav-active">◉　发现音乐</button>
+        <button className="nav-active" aria-current="page">◉　发现音乐</button>
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-        <button>▥　我的音乐</button>
+        <button aria-disabled="true" title="音乐库即将推出" className="nav-disabled">▥　我的音乐</button>
       </nav>
       <div className="nav-group"><span>你的音乐</span><a href="/inbox" className="nav-link">✉　授权意向</a><a href="/studio" className="nav-link">＋　创作者中心</a></div>
       <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>创作者</span></div><button>•••</button></div>
@@ -128,13 +128,13 @@ export default function Home() {
         <div className="orb-wrap"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="hero-vinyl"><RecordArtwork track={all[active]} spinning={playing} /></div><span className="floating-note note-a">♪</span><span className="floating-note note-b">♫</span></div>
       </div>
 
-      <div className="section-head"><div><span className="eyebrow">CURATED FOR YOU</span><h2>此刻值得听</h2></div><button>查看全部 <span>→</span></button></div>
+      <div className="section-head"><div><span className="eyebrow">CURATED FOR YOU</span><h2>此刻值得听</h2></div></div>
       <div className="filters">{["为你推荐", "Cadeau10", "专辑 1"].map((item) => <button key={item} onClick={() => setFilter(item)} className={filter === item ? "selected" : ""}>{item}</button>)}</div>
       {query && <p className="result-note">“{query}” 的搜索结果</p>}
-      <div className="tracks">{visible.map((track) => { const index = all.indexOf(track); return <article key={track.title} className={active === index && playing ? "playing" : ""}><button className="cover" onClick={() => play(index)} aria-label={`播放 ${track.title}`}><RecordArtwork track={track} spinning={active === index && playing} /><span>{active === index && playing ? "Ⅱ" : "▶"}</span></button><div className="track-info"><h3>{track.title}</h3><p>{track.artist}</p></div><span className="tag">{track.tag}</span><span className="duration">{track.length}</span><button className={`like ${liked.includes(index) ? "is-liked" : ""}`} onClick={() => toggleLike(index)}>{liked.includes(index) ? "♥" : "♡"}</button><button className="more">•••</button></article>; })}</div>
+      <div className="tracks">{visible.map((track) => { const index = all.indexOf(track); return <article key={track.title} className={active === index && playing ? "playing" : ""}><button className="cover" onClick={() => play(index)} aria-label={`播放 ${track.title}`} aria-pressed={active === index && playing}><RecordArtwork track={track} spinning={active === index && playing} /><span>{active === index && playing ? "Ⅱ" : "▶"}</span></button><div className="track-info"><h3>{track.title}</h3><p>{track.artist}</p></div><span className="duration">{track.length}</span><button className={`like ${liked.includes(index) ? "is-liked" : ""}`} onClick={() => toggleLike(index)} aria-label={liked.includes(index) ? `取消收藏 ${track.title}` : `收藏 ${track.title}`}>{liked.includes(index) ? "♥" : "♡"}</button></article>; })}</div>
     </section>
 
     <audio ref={audioRef} src={all[active].src} preload="metadata" onPlay={onPlay} onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)} onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)} onEnded={() => skip(1)} />
-    <div className="player"><div className="now"><RecordArtwork track={all[active]} spinning={playing} /><div><strong>{all[active].title}</strong><span>{all[active].artist}</span></div><button onClick={() => toggleLike(active)}>{liked.includes(active) ? "♥" : "♡"}</button></div><div className="controls"><div><button>↝</button><button onClick={() => skip(-1)}>◀</button><button className="play" onClick={() => setPlaying(!playing)}>{playing ? "Ⅱ" : "▶"}</button><button onClick={() => skip(1)}>▶</button><button>↝</button></div><div className="timeline"><span>{formatTime(currentTime)}</span><input aria-label="播放进度" type="range" min="0" max={duration || 0} step="0.1" value={Math.min(currentTime, duration || 0)} onChange={(event) => { const nextTime = Number(event.target.value); if (audioRef.current) audioRef.current.currentTime = nextTime; setCurrentTime(nextTime); }} /><span>{duration ? formatTime(duration) : all[active].length}</span></div></div><div className="utilities"><button>DIY</button><button>☰</button><span>◉</span><div className="volume"><i /></div></div></div>
+    <div className="player"><div className="now"><RecordArtwork track={all[active]} spinning={playing} /><div><strong>{all[active].title}</strong><span>{all[active].artist}</span></div><button onClick={() => toggleLike(active)} aria-label={liked.includes(active) ? "取消收藏" : "收藏"}>{liked.includes(active) ? "♥" : "♡"}</button></div><div className="controls"><div><button onClick={() => skip(-1)} aria-label="上一首">◀</button><button className="play" onClick={() => setPlaying(!playing)} aria-label={playing ? "暂停" : "播放"}>{playing ? "Ⅱ" : "▶"}</button><button onClick={() => skip(1)} aria-label="下一首">▶</button></div><div className="timeline"><span>{formatTime(currentTime)}</span><input aria-label="播放进度" type="range" min="0" max={duration || 0} step="0.1" value={Math.min(currentTime, duration || 0)} onChange={(event) => { const nextTime = Number(event.target.value); if (audioRef.current) audioRef.current.currentTime = nextTime; setCurrentTime(nextTime); }} /><span>{duration ? formatTime(duration) : all[active].length}</span></div></div><div className="utilities"><span aria-hidden="true">◉</span></div></div>
   </main>;
 }
