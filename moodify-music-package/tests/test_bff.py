@@ -127,3 +127,37 @@ def test_invite_login_sets_hardened_cookie(monkeypatch):
     cookie = response.headers["set-cookie"].lower()
     assert response.status_code == 200
     assert "httponly" in cookie and "secure" in cookie and "samesite=lax" in cookie
+
+
+def test_authenticated_audio_upload_is_scoped_and_hashed(monkeypatch, tmp_path):
+    import hashlib
+
+    monkeypatch.setenv("MOODIFY_BFF_MEDIA_ROOT", str(tmp_path))
+    monkeypatch.setattr("moodify_music.bff.main._account_actions_enabled", lambda request: True)
+    monkeypatch.setattr("moodify_music.bff.main._actor_user_id", lambda request: "user-1")
+    audio = b"RIFF" + (36).to_bytes(4, "little") + b"WAVEfmt " + b"\x00" * 28
+    response = client.put(
+        "/api/v1/music/media",
+        headers={"Content-Type": "audio/wav", "X-Filename": "My Song.wav"},
+        content=audio,
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["asset_key"].startswith("beta/user-1/")
+    assert body["asset_key"].endswith("/My-Song.wav")
+    assert body["sha256"] == hashlib.sha256(audio).hexdigest()
+    assert (tmp_path / body["asset_key"]).read_bytes() == audio
+
+
+def test_audio_upload_rejects_spoofed_signature_and_removes_temp(monkeypatch, tmp_path):
+    monkeypatch.setenv("MOODIFY_BFF_MEDIA_ROOT", str(tmp_path))
+    monkeypatch.setattr("moodify_music.bff.main._account_actions_enabled", lambda request: True)
+    monkeypatch.setattr("moodify_music.bff.main._actor_user_id", lambda request: "user-1")
+    response = client.put(
+        "/api/v1/music/media",
+        headers={"Content-Type": "audio/wav", "X-Filename": "fake.wav"},
+        content=b"this is not a wave file",
+    )
+    assert response.status_code == 415
+    assert response.json()["error"]["code"] == "AUDIO_SIGNATURE_INVALID"
+    assert not list(tmp_path.rglob(".upload-*"))

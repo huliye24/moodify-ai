@@ -15,11 +15,14 @@ import functools
 import os
 import time
 import uuid
+import os
 
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from moodify_music.bff.auth import COOKIE_NAME, authenticate_invite, issue_session, verify_session
+from moodify_music.bff.media import ALLOWED_MIME, MAX_AUDIO_BYTES, allocate_upload, looks_like_audio, sha256_file
+from starlette.concurrency import run_in_threadpool
 
 UPSTREAM = os.environ.get("MOODIFY_HANGZHOU_BASE", "http://120.55.191.146:8000").rstrip("/")
 SERVICE_KEY = os.environ.get("MOODIFY_HANGZHOU_KEY", "")
@@ -183,6 +186,50 @@ def catalogue(request: Request):
     return _forward("GET", "/catalogue", request, retries=1)
 
 
+@app.put("/api/v1/music/media")
+async def upload_media(request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    actor = _actor_user_id(request)
+    mime = (request.headers.get("content-type") or "").split(";", 1)[0].lower()
+    filename = request.headers.get("x-filename") or ""
+    try:
+        expected_bytes = int(request.headers.get("content-length") or "0")
+    except ValueError:
+        expected_bytes = 0
+    if mime not in ALLOWED_MIME:
+        return _media_error(request, 415, "AUDIO_TYPE_UNSUPPORTED", "unsupported audio format")
+    if expected_bytes <= 0 or expected_bytes > MAX_AUDIO_BYTES:
+        return _media_error(request, 413, "AUDIO_SIZE_INVALID", "audio must be between 1 byte and 100 MiB")
+    if not filename or len(filename) > 255:
+        return _media_error(request, 400, "FILENAME_INVALID", "valid X-Filename header required")
+    asset_key, temporary, final_path = allocate_upload(actor, filename, mime)
+    written = 0
+    head = bytearray()
+    try:
+        with temporary.open("wb") as target:
+            async for chunk in request.stream():
+                written += len(chunk)
+                if written > MAX_AUDIO_BYTES:
+                    return _media_error(request, 413, "AUDIO_SIZE_INVALID", "audio exceeds 100 MiB")
+                if len(head) < 16:
+                    head.extend(chunk[: 16 - len(head)])
+                await run_in_threadpool(target.write, chunk)
+        if written != expected_bytes:
+            return _media_error(request, 400, "AUDIO_SIZE_MISMATCH", "received size differs from Content-Length")
+        if not looks_like_audio(bytes(head), mime):
+            return _media_error(request, 415, "AUDIO_SIGNATURE_INVALID", "file signature does not match audio type")
+        digest = await run_in_threadpool(sha256_file, temporary)
+        await run_in_threadpool(os.replace, temporary, final_path)
+        await run_in_threadpool(os.chmod, final_path, 0o644)
+        return JSONResponse(status_code=201, content={
+            "asset_key": asset_key, "bytes": written, "sha256": digest, "mime_type": mime,
+        })
+    finally:
+        if temporary.exists():
+            temporary.unlink(missing_ok=True)
+
+
 @app.post("/api/v1/music/creators")
 async def create_creator(request: Request):
     if not _account_actions_enabled(request):
@@ -323,5 +370,12 @@ def _beta_locked(request: Request) -> JSONResponse:
     return JSONResponse(status_code=503, content={"error": {
         "code": "BETA_AUTH_REQUIRED",
         "message": "creator and account actions are locked until production authentication is enabled",
+        "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+    }})
+
+
+def _media_error(request: Request, status: int, code: str, message: str) -> JSONResponse:
+    return JSONResponse(status_code=status, content={"error": {
+        "code": code, "message": message,
         "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
     }})

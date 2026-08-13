@@ -58,6 +58,13 @@ export type LicenseIntentDto = {
   created_at: string | null;
 };
 
+export type MediaUpload = {
+  asset_key: string;
+  bytes: number;
+  sha256: string;
+  mime_type: string;
+};
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
@@ -78,6 +85,18 @@ export const api = {
   signOut: () => req<{ authenticated: boolean }>("/session", { method: "DELETE" }),
   bootstrap: () => req<BootstrapUser>("/bootstrap"),
   catalogue: () => req<{ tracks: TrackDto[] }>("/catalogue"),
+  uploadAudio: async (file: File): Promise<MediaUpload> => {
+    const response = await fetch(`${BASE}/media`, {
+      method: "PUT",
+      headers: { "Content-Type": file.type || "audio/wav", "X-Filename": file.name },
+      body: file,
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({})) as { error?: { message?: string } };
+      throw new Error(body.error?.message ?? `HTTP ${response.status}`);
+    }
+    return response.json() as Promise<MediaUpload>;
+  },
   createCreator: (body: Record<string, unknown>) =>
     req<CreatorProfile>("/creators", { method: "POST", body: JSON.stringify(body), headers: { "Idempotency-Key": idem() } }),
   creatorByHandle: (handle: string) => req<CreatorProfile>(`/creators/by-handle/${handle}`),

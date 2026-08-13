@@ -31,10 +31,14 @@ export default function StudioPage() {
       } catch {
         creator = await api.createCreator({ user_id: me.id, handle: String(form.get("handle") || "").trim().toLowerCase(), display_name: form.get("displayName"), bio: form.get("bio") });
       }
+      const file = form.get("audio") as File;
+      if (!file?.size) throw new Error("请选择音频文件");
+      setMessage("正在安全上传音频…");
+      const media = await api.uploadAudio(file);
       setMessage("正在创建作品草稿…");
       const draft = await api.createTrack({ creator_id: creator.id, title: form.get("title"), primary_language: form.get("language"), duration_ms: Number(form.get("durationMs") || 0) || null });
       setMessage("正在登记音频资产引用…");
-      await api.createVersion(draft.id, { audio_asset_key: String(form.get("audioAssetKey") || "").trim(), duration_ms: Number(form.get("durationMs") || 0) || null });
+      await api.createVersion(draft.id, { audio_asset_key: media.asset_key, duration_ms: Number(form.get("durationMs") || 0) || null, metadata_json: { sha256: media.sha256, bytes: media.bytes, mime_type: media.mime_type } });
       setMessage("正在填写创作护照…");
       await api.upsertPassport(draft.id, {
         origin_type: form.get("sourceType"), generation_tool: form.get("aiTool"),
@@ -58,7 +62,7 @@ export default function StudioPage() {
       <section className="studio-card">
         <span className="eyebrow">CREATOR STUDIO</span>
         <h1>发布作品</h1>
-        <p>封面可选。没有封面时，作品使用统一的 Moodify 黑胶视觉。音频上传暂缓（MEDIA_UPLOAD_DEFERRED），先登记现有资产引用。</p>
+        <p>封面可选。没有封面时，作品使用统一的 Moodify 黑胶视觉。音频将流式上传并记录 SHA-256。</p>
         <form onSubmit={submit}>
           <fieldset><legend>音乐馆</legend>
             <input name="handle" required minLength={3} maxLength={64} placeholder="唯一 handle，如 cadeau10" />
@@ -69,7 +73,7 @@ export default function StudioPage() {
             <input name="title" required maxLength={300} placeholder="作品标题" />
             <input name="language" maxLength={16} placeholder="语言，如 fr" />
             <input name="durationMs" type="number" min={0} placeholder="时长（毫秒，可选）" />
-            <input name="audioAssetKey" required maxLength={512} placeholder="音频资产 key，如 cadeau10-album1/je-ne-veux-pas-enfermer-ton-aujourdhui.wav" />
+            <input name="audio" type="file" accept="audio/wav,audio/mpeg,audio/flac,audio/ogg,audio/mp4,audio/aac" required />
           </fieldset>
           <fieldset><legend>创作护照（来源声明，非版权确权）</legend>
             <select name="sourceType" defaultValue="ai_human_hybrid"><option value="ai">AI</option><option value="human">Human</option><option value="ai_human_hybrid">Hybrid</option></select>
