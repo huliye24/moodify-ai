@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>System Status — Moodify Ear</title>
+  <meta name="description" content="Moodify Ear service status: product version, identity, and queue depth.">
+  <link rel="stylesheet" href="/assets/workbench.css">
+</head>
+<body data-page="status">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden>M</span>MOODIFY EAR</a>
+      <nav aria-label="Ear">
+        <a href="/">Home</a>
+        <a href="/new-case.html">New Listening Case</a>
+        <a href="/evidence.html">Evidence Library</a>
+        <a href="/status.html" aria-current="page">System Status</a>
+      </nav>
+      <div class="instrument" aria-live="polite">
+        <span data-instrument="identity"></span>
+        <span data-instrument="queue"></span>
+        <span data-instrument="version"></span>
+      </div>
+    </aside>
+    <main class="content" id="status-host">
+      <p class="eyebrow">SYSTEM STATUS</p>
+      <h1 class="page-title">Ear service health</h1>
+      <div class="cards" style="margin-top:20px">
+        <article class="card">
+          <h3>Service</h3>
+          <p>Product: <b id="status-product">…</b> · Version: <b id="status-version">…</b></p>
+          <p>Identity: <b id="status-identity">…</b></p>
+        </article>
+        <article class="card">
+          <h3>Queue depth</h3>
+          <table class="table">
+            <thead><tr><th>State</th><th>Count</th></tr></thead>
+            <tbody id="queue-rows"></tbody>
+          </table>
+        </article>
+      </div>
+    </main>
+  </div>
+  <script src="/assets/workbench.js"></script>
+</body>
+</html>

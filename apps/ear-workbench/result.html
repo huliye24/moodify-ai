@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Case Result — Moodify Ear</title>
+  <meta name="description" content="Moodify Ear case result — findings first, then representations, then methods and versions.">
+  <link rel="stylesheet" href="/assets/workbench.css">
+</head>
+<body data-page="result">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden>M</span>MOODIFY EAR</a>
+      <nav aria-label="Ear">
+        <a href="/">Home</a>
+        <a href="/new-case.html">New Listening Case</a>
+        <a href="/evidence.html">Evidence Library</a>
+        <a href="/status.html">System Status</a>
+      </nav>
+      <div class="instrument" aria-live="polite">
+        <span data-instrument="identity"></span>
+        <span data-instrument="queue"></span>
+        <span data-instrument="version"></span>
+      </div>
+    </aside>
+    <main class="content">
+      <p class="eyebrow">CASE RESULT</p>
+      <h1 class="page-title">What happened, and why it matters</h1>
+      <div class="instrument-bar">
+        <span class="note">Job state:</span>
+        <span id="case-pill" class="pill neutral"><span class="dot" aria-hidden></span>…</span>
+        <span class="note">Decision authority:</span>
+        <span id="authority-pill" class="pill neutral"><span class="dot" aria-hidden></span>…</span>
+        <span class="note" id="case-id" style="font-variant-numeric:tabular-nums"></span>
+      </div>
+
+      <section class="layer">
+        <h3>Findings</h3>
+        <div id="findings"></div>
+        <p class="note" id="reviewer-line" style="margin-top:12px"></p>
+      </section>
+
+      <section class="layer">
+        <h3>Measurements</h3>
+        <table class="table">
+          <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+          <tbody id="measurements"></tbody>
+        </table>
+        <p class="note" style="margin-top:10px">Charts are views of evidence; the values above come from the frozen measurement profile.</p>
+      </section>
+
+      <section class="layer">
+        <h3>Method &amp; versions</h3>
+        <p class="lede" id="method-version"></p>
+        <p class="lede" id="source-id"></p>
+        <ul id="evidence-list"></ul>
+        <p class="note">Internal paths, private audio and prompts are never exposed on this page.</p>
+        <a class="btn btn-ghost" href="/compare.html" style="margin-top:14px">Compare source / candidates</a>
+      </section>
+
+      <div id="result-host"></div>
+    </main>
+  </div>
+  <script src="/assets/workbench.js"></script>
+</body>
+</html>

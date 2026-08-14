@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compare — Moodify Ear</title>
+  <meta name="description" content="Compare source and candidates in sync; measured change is separated from preference.">
+  <link rel="stylesheet" href="/assets/workbench.css">
+</head>
+<body data-page="compare">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden>M</span>MOODIFY EAR</a>
+      <nav aria-label="Ear">
+        <a href="/">Home</a>
+        <a href="/new-case.html">New Listening Case</a>
+        <a href="/evidence.html">Evidence Library</a>
+        <a href="/status.html">System Status</a>
+      </nav>
+      <div class="instrument" aria-live="polite">
+        <span data-instrument="identity"></span>
+        <span data-instrument="queue"></span>
+        <span data-instrument="version"></span>
+      </div>
+    </aside>
+    <main class="content">
+      <p class="eyebrow">COMPARE</p>
+      <h1 class="page-title">Source · Candidates</h1>
+      <p class="lede">The comparison question is the one declared in the case objective. Measured change, rule judgment and perceptual preference are never merged into one number, and playback is strictly browser-local.</p>
+
+      <div class="notice">
+        Candidate media is exposed only through publish-safe evidence. Until a
+        candidate is approved for display, its playback here is intentionally
+        unavailable — that is a stated fact, not a failure.
+      </div>
+
+      <div id="compare-host" style="margin-top:20px">
+        <p class="note">No publish-safe candidate media is attached to this case yet. Source and candidate playback become available when the evidence manifest exposes approved media (evidence bridge).</p>
+      </div>
+    </main>
+  </div>
+  <script src="/assets/workbench.js"></script>
+</body>
+</html>

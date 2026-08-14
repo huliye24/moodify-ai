@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evidence Library — Moodify Ear</title>
+  <meta name="description" content="Publish-safe Moodify Ear evidence with claim, method, version, authority, limitation and hash.">
+  <link rel="stylesheet" href="/assets/workbench.css">
+</head>
+<body data-page="evidence">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden>M</span>MOODIFY EAR</a>
+      <nav aria-label="Ear">
+        <a href="/">Home</a>
+        <a href="/new-case.html">New Listening Case</a>
+        <a href="/evidence.html" aria-current="page">Evidence Library</a>
+        <a href="/status.html">System Status</a>
+      </nav>
+      <div class="instrument" aria-live="polite">
+        <span data-instrument="identity"></span>
+        <span data-instrument="queue"></span>
+        <span data-instrument="version"></span>
+      </div>
+    </aside>
+    <main class="content">
+      <p class="eyebrow">EVIDENCE LIBRARY</p>
+      <h1 class="page-title">Evidence with limits</h1>
+      <p class="lede">Every item links a claim to reproducible observation: claim, source, method/version, observations, authority state, limitations, integrity hash.</p>
+
+      <div class="cards" id="evidence-host">
+        <article class="card">
+          <h3>Cross-machine measurement repeatability</h3>
+          <span class="maturity verified">Verified · MFY-WSE-SCAN-PROFILE-001</span>
+          <p>52/52 metrics identical across operating systems and Python versions under the frozen scan profile.</p>
+          <div class="meta">Claim: measurement reproducibility · Limitation: profile-scoped · 2026-08</div>
+        </article>
+        <article class="card">
+          <h3>Algorithmic review inside a declared scope</h3>
+          <span class="maturity human-reviewed">Human-reviewed · scope boundary</span>
+          <p>Deterministic technical ranking within a validated, versioned scope; unresolved perceptual cases escalate to human review.</p>
+          <div class="meta">Claim: scoped machine decision · Limitation: not artistic quality · 2026-08</div>
+        </article>
+        <article class="card">
+          <h3>Failure-injection resilience</h3>
+          <span class="maturity verified">Verified · 2026-08</span>
+          <p>Ten injected failures: eight passed with fail-closed evidence; two findings recorded with owners.</p>
+          <div class="meta">Claim: fail-closed evidence · Limitation: not an exhaustive catalogue</div>
+        </article>
+        <article class="card">
+          <h3>Multi-scale representation research</h3>
+          <span class="maturity experimental">Experimental · 2026-08</span>
+          <p>Sixteen operators across time, spectral, phase, cepstral, modulation and topological representations.</p>
+          <div class="meta">Claim: research acceptance · Limitation: thresholds not production-calibrated before September</div>
+        </article>
+      </div>
+      <p class="note" style="margin-top:18px">Not published here: internal file paths, private audio, prompts, or unreviewed judgment logs.</p>
+    </main>
+  </div>
+  <script src="/assets/workbench.js"></script>
+</body>
+</html>

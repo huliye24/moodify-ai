@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Listening Case — Moodify Ear</title>
+  <meta name="description" content="Introduce one audio source and one objective to begin a Moodify Ear Production Case.">
+  <link rel="stylesheet" href="/assets/workbench.css">
+</head>
+<body data-page="new">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden>M</span>MOODIFY EAR</a>
+      <nav aria-label="Ear">
+        <a href="/">Home</a>
+        <a href="/new-case.html" aria-current="page">New Listening Case</a>
+        <a href="/evidence.html">Evidence Library</a>
+        <a href="/status.html">System Status</a>
+      </nav>
+      <div class="instrument" aria-live="polite">
+        <span data-instrument="identity"></span>
+        <span data-instrument="queue"></span>
+        <span data-instrument="version"></span>
+      </div>
+    </aside>
+    <main class="content">
+      <p class="eyebrow">NEW LISTENING CASE</p>
+      <h1 class="page-title">Introduce one sound</h1>
+      <p class="lede">One source, one objective. Supported formats: wav, mp3, flac, m4a, ogg, aac. Uploads are private; the source identity (SHA-256) anchors every later finding.</p>
+
+      <form class="form" id="new-case-form" novalidate>
+        <label for="source-file">Audio source
+          <input id="source-file" name="audio" type="file" accept=".wav,.mp3,.flac,.m4a,.ogg,.aac" required>
+        </label>
+        <label for="objective">Analysis objective
+          <input id="objective" name="prompt" type="text" maxlength="1000" placeholder="What should this case establish? (e.g. loudness balance, spectral density, phase issues)">
+        </label>
+        <div class="note">Uploading means the file is stored privately on the Ear node; it is never published and never leaves the service boundary except as publish-safe evidence you approve.</div>
+        <button class="btn btn-primary" id="submit-case" type="submit" style="justify-self:start">Start listening</button>
+        <output class="output" id="form-output" aria-live="polite"></output>
+      </form>
+    </main>
+  </div>
+  <script src="/assets/workbench.js"></script>
+</body>
+</html>

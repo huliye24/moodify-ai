@@ -87,6 +87,9 @@ outputs/data_factory/
 # Product UI source (required by moodify_runtime.operator_api)
 !moodify_runtime/operator_console.html
 
+# Ear workbench pages are canonical app source (MFY_RELEASE_CANDIDATE_INTEGRITY_001)
+!apps/ear-workbench/*.html
+
 # Music platform source and lightweight brand asset are canonical app inputs.
 !apps/music-web/public/moodify-logo.png
 
