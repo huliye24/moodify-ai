@@ -6,6 +6,7 @@ import hashlib
 from datetime import timedelta
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from moodify_music.models import IdempotencyKey, utcnow
@@ -25,13 +26,26 @@ def begin(db: Session, scope: str, key: str, request_hash: str) -> IdempotencyKe
         IdempotencyKey.scope == scope,
         IdempotencyKey.idempotency_key == key,
     ))
-    if row is None:
-        row = IdempotencyKey(scope=scope, idempotency_key=key, request_hash=request_hash)
-        db.add(row)
-        db.flush()
+    if row is not None:
+        if row.request_hash != request_hash:
+            raise IdempotencyConflict(key)
         return row
-    if row.request_hash != request_hash:
-        raise IdempotencyConflict(key)
+    row = IdempotencyKey(scope=scope, idempotency_key=key, request_hash=request_hash)
+    db.add(row)
+    try:
+        db.flush()
+    except IntegrityError:
+        # Concurrent request claimed the same key first (uq_idempotency).
+        # MFY_PRODUCTION_DATA_PLANE_001: replay the winner instead of failing.
+        db.rollback()
+        row = db.scalar(select(IdempotencyKey).where(
+            IdempotencyKey.scope == scope,
+            IdempotencyKey.idempotency_key == key,
+        ))
+        if row is None:
+            raise
+        if row.request_hash != request_hash:
+            raise IdempotencyConflict(key)
     return row
 
 
