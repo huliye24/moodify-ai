@@ -51,7 +51,8 @@
 | 51 身份隐私 | docs/contracts/music/identity_access_privacy.md（决策/威胁模型/授权矩阵/迁移）+ models AuthSession/UserRole + api/identity.py + routes_auth.py + BFF 服务端 actor/CSRF/CORS/no-store + tests/test_identity.py + test_bff.py 更新 | a7378ae | 90 全绿（music 包）；demo 身份退出公开路径；actor 服务端解析 |
 | 46 官网 | ops/web_origin/site/rongjingmusic/ 七页面（/、/ear、/music、/evidence、/about、/contact、/privacy）+ site.css（design tokens v1）+ robots/sitemap/favicon + check_site.mjs（6/6）+ artifacts/phase1_launch/official_site_001/ 截图（3 路由 × 1440/390） | 90f9aa4 | 6/6 检查绿；无伪入口/无自动播放/无禁语声称；CTA 全部可解析 |
 | 47 Ear 表面 | apps/ear-workbench/ 七页面 + workbench.css/js（tokens）+ dev_proxy.py（同源代理）+ check_workbench.mjs（7/7）+ artifacts/phase1_launch/ear_workbench_001/（真实案例截图 + EVIDENCE.md：job_4b85…→case_df1c…→SUCCEEDED 40s，manifest sha256 328c3a98） | a4927a8 | 7/7 检查绿；真实全链路 ✓；四一级状态；无伪入口；私密不缓存 |
-| 49 Music 聆听 | 播放器错误恢复（onError → .player-error）+ tests/listening-product.test.mjs（7/7：单播放器/无自动播放/幂等/无 Ear 评分/媒体不改造）+ 五曲 Range 矩阵 5/5 206（线上 LA）+ 截图 home-1440/390 + AUDIT.md | 待提交 | 7/7 检查绿；Range 矩阵 5/5；favorite/follow 双层幂等 |
+| 49 Music 聆听 | 播放器错误恢复（onError → .player-error）+ tests/listening-product.test.mjs（7/7：单播放器/无自动播放/幂等/无 Ear 评分/媒体不改造）+ 五曲 Range 矩阵 5/5 206（线上 LA）+ 截图 home-1440/390 + AUDIT.md | 9b5e7eb | 7/7 检查绿；Range 矩阵 5/5；favorite/follow 双层幂等 |
+| 48 Ear 升级 | moodify/authority/（scope_contract + escalation + review_store + pipeline）+ api/routes/reviews.py 四端点 + 工作台 reviews.html（amber 审核队列）+ tests/authority/ 15 测试 | 待提交 | 639 全绿（core）；八类越界均升级；审核不可静默改写；超时无自动通过 |
 
 ## 5. 登记规则
 

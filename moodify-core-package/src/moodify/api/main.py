@@ -14,6 +14,7 @@ from moodify.auditory.errors import AuditoryError
 from moodify.release import PRODUCT_VERSION, analyze_to_case, reopen_case
 from moodify.node.config import NodeConfig
 from moodify.node.queue import JobQueue
+from moodify.api.routes.reviews import router as reviews_router
 
 MAX_SIZE = int(os.environ.get("MOODIFY_MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
 ALLOWED_SUFFIXES = {".wav", ".mp3", ".flac", ".m4a", ".ogg", ".aac"}
@@ -54,6 +55,9 @@ def _safe_json(path: Path) -> dict | list | None:
     if not path.is_file():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+app.include_router(reviews_router)
 
 
 @app.get("/health")

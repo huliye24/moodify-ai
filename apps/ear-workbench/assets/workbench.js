@@ -256,6 +256,60 @@ async function loadResult() {
   if (caseData.source_id) document.getElementById("source-id").textContent = `Source: ${caseData.source_id}`;
 }
 
+async function loadReviews() {
+  const host = document.getElementById("review-host");
+  if (!host) return;
+  host.textContent = "";
+  let reviews = [];
+  try {
+    ({ reviews } = await api("/auditory/reviews?status=pending"));
+  } catch (error) {
+    host.appendChild(el("div", "error-box", error.message));
+    return;
+  }
+  if (reviews.length === 0) {
+    host.appendChild(el("p", "note", "No pending human reviews."));
+    return;
+  }
+  for (const review of reviews) {
+    const card = el("article", "card");
+    card.appendChild(pill({ key: "human", label: "human required" }));
+    card.appendChild(el("h3", null, `Case ${review.case_id}`));
+    card.appendChild(el("p", null, `Reason: ${review.reason}`));
+    card.appendChild(el("div", "meta", `escalated ${(review.created_at || "").slice(0, 19).replace("T", " ")}`));
+    const form = el("form", null);
+    form.innerHTML = `<label style="display:grid;gap:4px;font-size:12px;color:var(--text-muted)">Reviewer
+        <input name="reviewer" required maxlength="120" placeholder="your reviewer identity"></label>
+      <label style="display:grid;gap:4px;font-size:12px;color:var(--text-muted)">Decision
+        <select name="decision"><option value="APPROVE">APPROVE</option><option value="REJECT">REJECT</option><option value="NEEDS_MORE_EVIDENCE">NEEDS_MORE_EVIDENCE</option></select></label>
+      <label style="display:grid;gap:4px;font-size:12px;color:var(--text-muted)">Reason
+        <textarea name="reason" required maxlength="2000" rows="2"></textarea></label>
+      <button class="btn btn-ghost" type="submit" style="justify-self:start">Record decision</button>
+      <output class="output" aria-live="polite"></output>`;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const output = form.querySelector("output");
+      try {
+        await api(`/auditory/reviews/${encodeURIComponent(review.id)}/decide`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            reviewer: data.get("reviewer"), decision: data.get("decision"),
+            reason: data.get("reason"), scope: "ear-review",
+          }),
+        });
+        output.textContent = "Decision recorded.";
+        setTimeout(() => loadReviews(), 800);
+      } catch (error) {
+        output.textContent = error.message;
+      }
+    });
+    card.appendChild(form);
+    host.appendChild(card);
+  }
+}
+
 async function loadStatus() {
   try {
     const health = await api("/health");
@@ -282,6 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (page === "home") loadRecentJobs();
   if (page === "case") loadJob();
   if (page === "result") loadResult();
+  if (page === "reviews") loadReviews();
   if (page === "status") loadStatus();
 
   const form = document.getElementById("new-case-form");

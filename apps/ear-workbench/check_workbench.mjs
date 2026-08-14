@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 const wb = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const pages = ["index.html", "new-case.html", "case.html", "result.html", "compare.html", "evidence.html", "status.html"];
+const pages = ["index.html", "new-case.html", "case.html", "result.html", "compare.html", "evidence.html", "reviews.html", "status.html"];
 
 async function html(name) {
   return readFile(path.join(wb, name), "utf8");
