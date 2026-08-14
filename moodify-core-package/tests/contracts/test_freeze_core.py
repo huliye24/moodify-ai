@@ -21,7 +21,7 @@ def test_case_authority_enumeration_is_frozen():
         "SYSTEM", "ALGORITHM", "HUMAN_REQUIRED", "HUMAN_APPROVED", "HUMAN_REJECTED",
     }
     assert {s.value for s in LifecycleState} == {
-        "ACTIVE", "AWAITING_HUMAN", "COMPLETED", "FAILED", "CANCELLED",
+        "CREATED", "ACTIVE", "AWAITING_HUMAN", "COMPLETED", "FAILED", "CANCELLED",
     }
 
 
