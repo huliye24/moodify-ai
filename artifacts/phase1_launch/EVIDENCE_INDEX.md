@@ -54,7 +54,8 @@
 | 49 Music 聆听 | 播放器错误恢复（onError → .player-error）+ tests/listening-product.test.mjs（7/7：单播放器/无自动播放/幂等/无 Ear 评分/媒体不改造）+ 五曲 Range 矩阵 5/5 206（线上 LA）+ 截图 home-1440/390 + AUDIT.md | 9b5e7eb | 7/7 检查绿；Range 矩阵 5/5；favorite/follow 双层幂等 |
 | 48 Ear 升级 | moodify/authority/（scope_contract + escalation + review_store + pipeline）+ api/routes/reviews.py 四端点 + 工作台 reviews.html（amber 审核队列）+ tests/authority/ 15 测试 | 7eec681 | 639 全绿（core）；八类越界均升级；审核不可静默改写；超时无自动通过 |
 | 50 Creator 发布 | tests/test_creator_publishing.py（4 项：Passport IDOR/发布恢复/媒体保留/幂等重放）+ tests/creator-studio.test.mjs（6 项客户端检查）+ AUDIT.md | 45e7f91 | 94 全绿（music）；Passport 越权 403；发布丢失读权威状态；无媒体静默删除 |
-| 52 证据桥 | models EvidenceBridge 表 + api/routes_bridge.py（requests/update/attach/detach/cancel，单调状态机）+ track 序列化补 approved_evidence_ref + tests/test_evidence_bridge.py（10 项九场景） | 待提交 | 104 全绿（music）；幂等重放/哈希校验/越权/终态/取消保留审计/内部字段不泄漏 |
+| 52 证据桥 | models EvidenceBridge 表 + api/routes_bridge.py（requests/update/attach/detach/cancel，单调状态机）+ track 序列化补 approved_evidence_ref + tests/test_evidence_bridge.py（10 项九场景） | 68811f5 | 104 全绿（music）；幂等重放/哈希校验/越权/终态/取消保留审计/内部字段不泄漏 |
+| 53 生产运维 | ops/web_origin/PRODUCTION_TOPOLOGY.md（组件清单/关键路径/缓存策略/缺口）+ ALERTS_AND_RUNBOOK.md（A1–A10 + R1–R3）+ scan_secrets.sh（clean）+ backup_snapshot.sh + 本地备份/恢复演练（ID/hash 零漂移，backup.sha256 3/3 OK）+ DRILLS.md | 待提交 | secrets clean；隔离恢复演练通过；告警表齐备；真机演练归 54 |
 
 ## 5. 登记规则
 
