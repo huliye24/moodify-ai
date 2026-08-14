@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import Depends, Header, HTTPException, Request
+from fastapi import Depends, Header
 from sqlalchemy.orm import Session
 
 from moodify_music.config import MusicConfig

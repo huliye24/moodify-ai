@@ -14,6 +14,7 @@
 | D-004 | 2026-08-14 | 43 包建立 Phase 1 总账；44 包治理冻结；45–54 依赖图无环 | 执行 | 43 开工盘点 | 波次 0/1 启动 |
 | D-005 | 2026-08-14 | 官方域名沿用 rongjingmusic.com（Ear 工作台）、rongjingwenchuan.com（产品站）、rongjinwenchuan.xyz（Music 聆听站） | 人类产品权威（此前） | docs/contracts/product-boundary.md 命名矩阵 | 46/53 不再变域名 |
 | D-006 | 2026-08-11 | 空间听觉层战略收录（不立项硬件），9 月起实验吸收 | 人类产品权威 | 外部评审吸收记录 | Phase 1 范围外 |
+| D-007 | 2026-08-14 | 包 51 身份方案定案：自托管账号体系（升级邀请制 HMAC）；服务端会话表可撤销；HttpOnly cookie + 双提交 CSRF + 精确 CORS；生产默认 anonymous，demo 仅 dev | 人类产品权威（本会话拍板） | 51 包开工门 | 决策记录 docs/contracts/music/identity_access_privacy.md |
 
 ## 决议记录格式（包 44 要求）
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from sqlalchemy import StaticPool, create_engine, select
+from sqlalchemy import StaticPool, create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 

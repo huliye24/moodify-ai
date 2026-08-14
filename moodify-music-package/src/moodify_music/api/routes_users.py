@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy import func, select
 
 from moodify_music import audit
-from moodify_music.models import Album, CreatorProfile, Track, User, utcnow
+from moodify_music.models import Album, CreatorProfile, Track, User
 from moodify_music.api.deps import Db, actor_user_id, error, require_actor_matches, service_key_required
 from moodify_music.api.idem import idempotent_write, replay_response, request_id
 

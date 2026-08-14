@@ -47,7 +47,8 @@
 
 | 包 | 证据 | commit | P0 结果 |
 |---|---|---|---|
-| 45 设计系统 | docs/design/design_tokens_v1.md（token 单一来源）+ design_system_migration.md（KEEP/ADAPT/COMPLETE/ISOLATE）+ apps/music-web/components/ui/（6 组组件）+ app/design/ 陈列页 + tests/design-system.test.mjs（7/7）+ Android Color.kt/Theme.kt 归并 + artifacts/phase1_launch/design_system_001/ 截图（1440/390 双宽度，深色石墨 + evidence 绿 + amber 已验像素） | 待提交 | 7/7 测试绿；tsc 我的文件零错误 |
+| 45 设计系统 | docs/design/design_tokens_v1.md（token 单一来源）+ design_system_migration.md（KEEP/ADAPT/COMPLETE/ISOLATE）+ apps/music-web/components/ui/（6 组组件）+ app/design/ 陈列页 + tests/design-system.test.mjs（7/7）+ Android Color.kt/Theme.kt 归并 + artifacts/phase1_launch/design_system_001/ 截图（1440/390 双宽度，深色石墨 + evidence 绿 + amber 已验像素） | 06b2e6b | 7/7 测试绿；tsc 我的文件零错误 |
+| 51 身份隐私 | docs/contracts/music/identity_access_privacy.md（决策/威胁模型/授权矩阵/迁移）+ models AuthSession/UserRole + api/identity.py + routes_auth.py + BFF 服务端 actor/CSRF/CORS/no-store + tests/test_identity.py + test_bff.py 更新 | 待提交 | 90 全绿（music 包）；demo 身份退出公开路径；actor 服务端解析 |
 
 ## 5. 登记规则
 

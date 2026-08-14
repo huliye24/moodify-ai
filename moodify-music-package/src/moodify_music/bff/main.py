@@ -19,7 +19,15 @@ import os
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from moodify_music.bff.auth import COOKIE_NAME, authenticate_invite, issue_session, verify_session
+from moodify_music.bff.auth import (
+    COOKIE_NAME,
+    CSRF_COOKIE_NAME,
+    SESSION_TTL_SECONDS,
+    authenticate_invite,
+    csrf_token,
+    csrf_valid,
+    issue_session,
+)
 from moodify_music.bff.media import ALLOWED_MIME, MAX_AUDIO_BYTES, allocate_upload, looks_like_audio, promote_upload, sha256_file
 from starlette.concurrency import run_in_threadpool
 
@@ -27,11 +35,18 @@ UPSTREAM = os.environ.get("MOODIFY_HANGZHOU_BASE", "http://120.55.191.146:8000")
 SERVICE_KEY = os.environ.get("MOODIFY_HANGZHOU_KEY", "")
 TIMEOUT = float(os.environ.get("MOODIFY_BFF_TIMEOUT", "5.0"))
 DEMO_USER_ID = os.environ.get("MOODIFY_BFF_DEMO_USER_ID", "")
-AUTH_MODE = os.environ.get("MOODIFY_BFF_AUTH_MODE", "demo_read_only")
+# Production public path must never carry demo identity; "demo_read_only" is
+# an explicit development-only opt-in (MFY_PLATFORM_IDENTITY_ACCESS_PRIVACY_001).
+AUTH_MODE = os.environ.get("MOODIFY_BFF_AUTH_MODE", "anonymous")
+CORS_ORIGINS = [o.strip() for o in os.environ.get("MOODIFY_BFF_CORS_ORIGINS", "").split(",") if o.strip()]
+_SESSION_CACHE_TTL = 30.0
 
 app = FastAPI(title="Moodify Music Public BFF", version="0.1.0")
 
 _cache: dict[str, tuple[float, dict]] = {}
+_session_cache: dict[str, tuple[float, dict | None]] = {}
+_login_attempts: dict[str, tuple[float, int]] = {}
+_PRIVATE_PREFIXES = ("/api/v1/music/auth", "/api/v1/music/drafts", "/api/v1/music/inbox", "/api/v1/music/library", "/api/v1/music/playlists", "/api/v1/music/media", "/api/v1/music/session")
 _TTL: dict[str, float] = {
     "creator_page": 60.0, "track": 60.0, "album": 300.0, "catalogue": 30.0,
     "bootstrap": 60.0, "inbox": 30.0,
@@ -57,13 +72,42 @@ def _cached(key: str, ttl_key: str):
     return decorator
 
 
+def _validate_session(token: str | None) -> dict | None:
+    """Server-authoritative session validation against the data API."""
+    if not token:
+        return None
+    now = time.monotonic()
+    cached = _session_cache.get(token)
+    if cached and now - cached[0] < _SESSION_CACHE_TTL:
+        return cached[1]
+    try:
+        r = httpx.request(
+            "POST", f"{UPSTREAM}/internal/v1/music/auth/validate",
+            headers={"X-Moodify-Service-Key": SERVICE_KEY, "Content-Type": "application/json"},
+            json={"token": token}, timeout=TIMEOUT,
+        )
+    except httpx.RequestError:
+        return None
+    if r.status_code != 200:
+        _session_cache[token] = (now, None)
+        return None
+    try:
+        user = r.json().get("user")
+    except ValueError:
+        return None
+    _session_cache[token] = (now, user)
+    return user
+
+
 def _actor_user_id(request: Request) -> str | None:
-    # Never accept the internal actor header from a public request. Until real
-    # session authentication is installed, only the server-owned demo identity
-    # may become an upstream actor.
+    # Never accept the internal actor header from a public request; the actor
+    # is resolved exclusively from the server-side session store.
     if AUTH_MODE == "invite_beta":
-        return verify_session(request.cookies.get(COOKIE_NAME))
-    return DEMO_USER_ID or None
+        user = _validate_session(request.cookies.get(COOKIE_NAME))
+        return user["id"] if user else None
+    if AUTH_MODE == "demo_read_only":
+        return DEMO_USER_ID or None
+    return None
 
 
 def _account_actions_enabled(request: Request) -> bool:
@@ -116,15 +160,88 @@ def _forward(method: str, path: str, request: Request, body: dict | None = None,
     return JSONResponse(status_code=504, content={"error": {"code": "UPSTREAM_TIMEOUT", "message": "Hangzhou data API timed out", "request_id": request.headers.get("X-Request-Id", "")}})
 
 
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    # CORS: exact-origin allowlist only; never '*' (production or not).
+    origin = request.headers.get("origin")
+    if origin and origin in CORS_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Vary"] = "Origin"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    # Private responses and anything that sets a cookie must not be cached.
+    if request.url.path.startswith(_PRIVATE_PREFIXES) or response.headers.get("set-cookie"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@app.middleware("http")
+async def csrf_guard(request: Request, call_next):
+    path = request.url.path
+    state_changing = request.method in ("POST", "PUT", "PATCH", "DELETE")
+    login_only = request.method == "POST" and path.endswith("/session")
+    if state_changing and path.startswith("/api/v1/music") and not login_only:
+        if not csrf_valid(request.cookies.get(CSRF_COOKIE_NAME), request.headers.get("x-csrf-token")):
+            return JSONResponse(status_code=403, content={"error": {
+                "code": "CSRF_INVALID",
+                "message": "valid CSRF token required",
+                "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+            }})
+    return await call_next(request)
+
+
+_LOGIN_RATE_LIMIT = (5, 600)  # 5 attempts per 10 minutes per client IP
+
+
+def _login_allowed(client_ip: str) -> bool:
+    now = time.monotonic()
+    record = _login_attempts.get(client_ip)
+    if not record or now - record[0] > _LOGIN_RATE_LIMIT[1]:
+        _login_attempts[client_ip] = (now, 1)
+        return True
+    if record[1] >= _LOGIN_RATE_LIMIT[0]:
+        return False
+    _login_attempts[client_ip] = (now, record[1] + 1)
+    return True
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "moodify-music-bff", "direct_db": False}
+
+
+def _session_service(method: str, path: str, body: dict) -> dict | None:
+    """Call the internal auth service; returns parsed JSON or None on failure."""
+    try:
+        r = httpx.request(
+            method, f"{UPSTREAM}/internal/v1/music/auth{path}",
+            headers={"X-Moodify-Service-Key": SERVICE_KEY, "Content-Type": "application/json"},
+            json=body, timeout=TIMEOUT,
+        )
+    except httpx.RequestError:
+        return None
+    if r.status_code not in (200, 201):
+        return None
+    try:
+        return r.json()
+    except ValueError:
+        return None
 
 
 @app.post("/api/v1/music/session")
 async def create_session(request: Request):
     if AUTH_MODE != "invite_beta":
         return _beta_locked(request)
+    client_ip = request.client.host if request.client else ""
+    if not _login_allowed(client_ip):
+        return JSONResponse(status_code=429, content={"error": {
+            "code": "LOGIN_RATE_LIMITED",
+            "message": "too many login attempts, retry later",
+            "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+        }})
     body = await request.json()
     code = body.get("invite_code") if isinstance(body, dict) else None
     user_id = authenticate_invite(code.strip() if isinstance(code, str) else "")
@@ -134,47 +251,59 @@ async def create_session(request: Request):
             "message": "invite code is invalid",
             "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
         }})
-    try:
-        token = issue_session(user_id)
-    except RuntimeError:
+    token = issue_session(user_id)
+    issued = _session_service("POST", "/sessions", {"user_id": user_id, "ttl_seconds": SESSION_TTL_SECONDS})
+    if not issued:
         return JSONResponse(status_code=503, content={"error": {
-            "code": "SESSION_NOT_CONFIGURED",
-            "message": "beta session service is not configured",
+            "code": "SESSION_SERVICE_UNAVAILABLE",
+            "message": "session service is unavailable",
             "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
         }})
-    response = JSONResponse(content={"authenticated": True})
+    response = JSONResponse(content={"authenticated": True, "user": issued.get("user")})
     response.set_cookie(
-        COOKIE_NAME, token, max_age=12 * 60 * 60, httponly=True,
-        secure=True, samesite="lax", path="/",
+        COOKIE_NAME, token, max_age=SESSION_TTL_SECONDS,
+        httponly=True, secure=True, samesite="lax", path="/",
+    )
+    response.set_cookie(
+        CSRF_COOKIE_NAME, csrf_token(), max_age=SESSION_TTL_SECONDS,
+        httponly=False, secure=True, samesite="lax", path="/",
     )
     return response
 
 
 @app.delete("/api/v1/music/session")
-def delete_session():
+def delete_session(request: Request):
+    token = request.cookies.get(COOKIE_NAME)
+    if token and AUTH_MODE == "invite_beta":
+        _session_service("DELETE", "/sessions", {"token": token})
+        _session_cache.pop(token, None)
     response = JSONResponse(content={"authenticated": False})
-    response.delete_cookie(COOKIE_NAME, path="/", secure=True, httponly=True, samesite="lax")
+    response.delete_cookie(COOKIE_NAME, path="/")
+    response.delete_cookie(CSRF_COOKIE_NAME, path="/")
     return response
+
+
+@app.get("/api/v1/music/auth/me")
+def auth_me(request: Request):
+    user = _validate_session(request.cookies.get(COOKIE_NAME))
+    if user is None:
+        return JSONResponse(status_code=200, content={"user": None, "authenticated": False})
+    return JSONResponse(content={"user": user, "authenticated": True})
 
 
 @app.get("/api/v1/music/bootstrap")
 def bootstrap(request: Request):
-    actor = _actor_user_id(request)
-    if actor:
-        response = _forward("GET", f"/users/{actor}", request, retries=1)
-        if response.status_code != 200:
-            return response
-        import json as _json
-        user = _json.loads(response.body)
-        user["auth_state"] = "BETA_INVITE_AUTHENTICATED" if AUTH_MODE == "invite_beta" else "PUBLIC_USER_AUTH_NOT_PRODUCTION_READY"
-        user["demo_creator_handle"] = "cadeau10"
+    user = _validate_session(request.cookies.get(COOKIE_NAME))
+    if user:
         enabled = _account_actions_enabled(request)
-        user["capabilities"] = {"account_actions": enabled, "creator_writes": enabled}
-        return JSONResponse(content=user)
+        return JSONResponse(content={
+            **user,
+            "auth_state": "SESSION_AUTHENTICATED",
+            "capabilities": {"account_actions": enabled, "creator_writes": enabled},
+        })
     return JSONResponse(status_code=200, content={
-        "id": None, "display_name": "Moodify Creator", "status": "active",
-        "auth_state": "PUBLIC_USER_AUTH_NOT_PRODUCTION_READY",
-        "demo_creator_handle": "cadeau10",
+        "id": None, "display_name": None, "status": "anonymous",
+        "auth_state": "PUBLIC_ANONYMOUS_READ",
         "capabilities": {"account_actions": False, "creator_writes": False},
     })
 

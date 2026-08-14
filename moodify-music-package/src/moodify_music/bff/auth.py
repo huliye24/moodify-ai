@@ -1,4 +1,12 @@
-"""Invite-only beta sessions for the public Music BFF."""
+"""BFF session & invite helpers — MFY_PLATFORM_IDENTITY_ACCESS_PRIVACY_001.
+
+The BFF never owns session authority: it issues opaque tokens that the data
+API validates against the auth_sessions store (server-side revocation). The
+raw token appears only in the HttpOnly cookie; nothing here logs it.
+
+CSRF uses double-submit: a non-HttpOnly `moodify_csrf` cookie is mirrored to
+the `X-CSRF-Token` header by the web client on state-changing requests.
+"""
 
 from __future__ import annotations
 
@@ -6,15 +14,11 @@ import hashlib
 import hmac
 import json
 import os
-import time
+import secrets
 
 COOKIE_NAME = "moodify_music_session"
+CSRF_COOKIE_NAME = "moodify_csrf"
 SESSION_TTL_SECONDS = 12 * 60 * 60
-
-
-def _secret() -> bytes:
-    value = os.environ.get("MOODIFY_BFF_SESSION_SECRET", "")
-    return value.encode("utf-8") if len(value) >= 32 else b""
 
 
 def _invites() -> dict[str, str]:
@@ -33,27 +37,17 @@ def authenticate_invite(code: str) -> str | None:
     return None
 
 
-def issue_session(user_id: str, now: int | None = None) -> str:
-    secret = _secret()
-    if not secret:
-        raise RuntimeError("beta session secret is not configured")
-    expires = (now or int(time.time())) + SESSION_TTL_SECONDS
-    payload = f"{user_id}.{expires}"
-    signature = hmac.new(secret, payload.encode("utf-8"), hashlib.sha256).hexdigest()
-    return f"{payload}.{signature}"
+def issue_session(_user_id: str, _now: int | None = None) -> str:
+    """Opaque token; the data API stores only its SHA-256 hash."""
+    return secrets.token_urlsafe(32)
 
 
-def verify_session(token: str | None, now: int | None = None) -> str | None:
-    secret = _secret()
-    if not token or not secret:
-        return None
-    try:
-        user_id, expires_text, signature = token.rsplit(".", 2)
-        expires = int(expires_text)
-    except (ValueError, TypeError):
-        return None
-    payload = f"{user_id}.{expires}"
-    expected = hmac.new(secret, payload.encode("utf-8"), hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(signature, expected) or expires <= (now or int(time.time())):
-        return None
-    return user_id
+def csrf_token() -> str:
+    """Double-submit CSRF token for the non-HttpOnly mirror cookie."""
+    return secrets.token_urlsafe(24)
+
+
+def csrf_valid(cookie_value: str | None, header_value: str | None) -> bool:
+    if not cookie_value or not header_value:
+        return False
+    return hmac.compare_digest(cookie_value, header_value)

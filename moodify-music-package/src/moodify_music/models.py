@@ -59,6 +59,41 @@ class User(Base, TimestampMixin):
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class AuthSession(Base, TimestampMixin):
+    """Server-side session with revocation (MFY_PLATFORM_IDENTITY_ACCESS_PRIVACY_001).
+
+    Only the SHA-256 hash of the opaque token is stored; the raw token is
+    issued once to the BFF and never persisted or logged.
+    """
+
+    __tablename__ = "auth_sessions"
+
+    id: Mapped[str] = mapped_column(String(ID_LEN), primary_key=True, default=new_id)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    user_id: Mapped[str] = mapped_column(nullable=False, index=True)
+    created_from: Mapped[str] = mapped_column(String(32), nullable=False, default="invite")
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class UserRole(Base, TimestampMixin):
+    """Platform roles independent of Creator status (Ear operator/reviewer etc.).
+
+    Roles are grants, not a parallel identity: a user may hold listener +
+    creator-derived + ear_operator roles without owning a second account.
+    """
+
+    __tablename__ = "user_roles"
+
+    id: Mapped[str] = mapped_column(String(ID_LEN), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(nullable=False, index=True)
+    role: Mapped[str] = mapped_column(String(32), nullable=False)
+    scope: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
+    __table_args__ = (UniqueConstraint("user_id", "role", "scope", name="uq_user_role_scope"),)
+
+
 class CreatorProfile(Base, TimestampMixin):
     __tablename__ = "creator_profiles"
 

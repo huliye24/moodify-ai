@@ -81,7 +81,7 @@ def test_unpublish_cross_creator_forbidden():
     _, _, t1, u2 = _seed()
     _publish(t1, "x") if False else None
     # publish as creator's user first
-    uid = client.get(f"/internal/v1/music/creators/by-handle/alice", headers=AUTH).json()["user_id"]
+    uid = client.get("/internal/v1/music/creators/by-handle/alice", headers=AUTH).json()["user_id"]
     h = {**AUTH, "X-Moodify-Actor-User-Id": uid}
     _publish(t1, uid)
     r = client.post(f"/internal/v1/music/tracks/{t1}/unpublish", headers={**AUTH, "X-Moodify-Actor-User-Id": u2}, json={})

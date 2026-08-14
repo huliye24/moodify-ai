@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from moodify_music.api.deps import ApiError
+from moodify_music.api.routes_auth import router as auth_router
 from moodify_music.api.routes_cwc import router as cwc_router
 from moodify_music.api.routes_intents import router as intents_router
 from moodify_music.api.routes_library import router as library_router
@@ -51,5 +52,5 @@ def health() -> dict:
     return {"status": "ok", "service": "moodify-music-data-api", "version": "0.1.0"}
 
 
-for router in (users_router, tracks_router, social_router, intents_router, cwc_router, ops_router, library_router, search_router, playlists_router):
+for router in (auth_router, users_router, tracks_router, social_router, intents_router, cwc_router, ops_router, library_router, search_router, playlists_router):
     app.include_router(router)

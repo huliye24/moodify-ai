@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from moodify_music.audit import record
 from moodify_music.idempotency import IdempotencyConflict, begin, finish, replay
-from moodify_music.models import AuditEvent, Base, IdempotencyKey
+from moodify_music.models import AuditEvent, Base
 
 ENGINE = create_engine("sqlite://", poolclass=StaticPool, connect_args={"check_same_thread": False})
 Base.metadata.create_all(ENGINE)
