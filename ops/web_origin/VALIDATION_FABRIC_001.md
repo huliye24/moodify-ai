@@ -1,23 +1,23 @@
-# Cloud Resource & Validation Fabric — 设计文档
+# Cloud Resource & Validation Fabric — 设计文档（v1.1）
 
 **Document ID:** MFY-VALIDATION-FABRIC-001
-**Version:** 1.0
+**Version:** 1.1（2026-08-14 更新：补全任务 3 完整字段；57–65 执行状态落地）
 **Date:** 2026-08-14
 **Status:** LIVE — package MFY_CLOUD_RESOURCE_AND_VALIDATION_FABRIC_001 (56)
 **Executor:** DeepSeek（只读盘点；云端写操作需另行授权）
 
-## 1. 资源矩阵
+## 1. 资源矩阵（任务 3 全字段）
 
-| Resource | Current fact（2026-08-14 只读探测） | Authority | Validation use | Access boundary | Backup | Rollback | Owner | Status |
-|---|---|---|---|---|---|---|---|---|
-| Windows 本地开发机 | E:\moodify；Python 3.11/Node 22/AS JBR | 非权威 | LOCAL_DEV 测试、构建、静态检查 | 本地 | git | git | huliye24 | 可用 |
-| LA 服务器 103.144.246.242 | nginx 80/443 + Ear API :8000 + BFF :8100 + worker；/healthz 200 | Ear 权威 + Music BFF | CANARY/PRODUCTION 代理链 | SSH root（~/.ssh/moodify_cloud） | backup_snapshot.sh | rollback_static_origin.sh | huliye24 | 在线 ✓ |
-| LA 媒体根 /opt/moodify/music-media | Range 206（49 包 5/5） | 不可变 asset+sha256 | E2E 播放验证 | nginx alias | media-manifest.sha256 | 引用恢复 | huliye24 | 在线 ✓ |
-| 杭州 ECS 120.55.191.146 | Music Data API :8000 /health 200（公网可达） | Music 数据权威 | CANARY/PRODUCTION 数据面 | service key（internal） | mysqldump（53 脚本） | forward-fix/restore | huliye24 | 在线 ✓ |
-| PolarDB cn-hangzhou | 16 表 + auth_sessions + user_roles + evidence_bridge（XEngine 无 FK） | 唯一权威 DB | 迁移/备份/恢复演练 | VPC（对等阻塞中，R06） | mysqldump 待凭据 | restore + 校验 | huliye24 | **BLOCKED（凭据/VPC）** |
-| cloudflared | 域名证书管理（manage_cert_dns.py） | 域名/证书 | 证书临期告警（A8） | 服务器 | 证书备份 | 重签 | huliye24 | 在线 ✓ |
-| Ear cases/evidence | case 目录 + review.sqlite3 | Evidence manifest | 48/52 升级与桥验证 | 服务器本地 | backup_snapshot.sh | 清单重建 | huliye24 | 在线 ✓ |
-| 域名 | rongjingmusic.com / rongjingwenchuan.com / rongjinwenchuan.xyz | 边界契约 | E2E 入口 | 公网 | DNS | DNS | huliye24 | 在线 ✓ |
+| Resource | 身份/区域 | Current fact（2026-08-14 只读） | 产品归属 | 权威数据 | 禁止数据 | 网络路径 | 运行方式 | 日志 | 备份 | 回滚 | Owner | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Windows 本地开发机 | dev / 本机 | E:\moodify；Py 3.11/Node 22/AS JBR | 全产品 | 无 | 无（仅构建） | 本地 | pytest/node/gradle | 测试输出 | git | git | huliye24 | 可用 |
+| LA 服务器 103.144.246.242 | prod / LA | nginx 80/443 + Ear API :8000 + BFF :8100 + worker；/healthz 200 | Ear + Music BFF | Ear case/evidence、Music BFF 转发 | 私人音频、PolarDB 凭据 | SSH root（~/.ssh/moodify_cloud） | systemd（moodify-api/music/worker/cloudflared） | 脱敏（无 token/路径） | backup_snapshot.sh | rollback_static_origin.sh | huliye24 | 在线 ✓ |
+| LA 媒体根 /opt/moodify/music-media | prod / LA | Range 206（49 包 5/5） | Music | 不可变 asset+sha256 | 重编码/覆盖 | nginx alias（/audio/） | nginx 静态 | 访问日志（无正文） | media-manifest.sha256 | 引用恢复 | huliye24 | 在线 ✓ |
+| 杭州 ECS 120.55.191.146 | prod / cn-hangzhou | Music Data API :8000 /health 200 | Music | users/tracks/versions/bridge | Ear 内部测量 | 公网 :8000（internal service key） | systemd | 结构化（request_id） | mysqldump（53 脚本） | forward-fix/restore | huliye24 | 在线 ✓ |
+| PolarDB cn-hangzhou | prod / cn-hangzhou | 16+4 表（XEngine 无 FK） | Music | 唯一权威 DB | 私人音频 | VPC（对等阻塞中，R06） | MySQL/PolarDB | 慢查询（脱敏） | mysqldump 待凭据 | restore + 校验 | huliye24 | **BLOCKED（凭据/VPC）** |
+| cloudflared | prod / LA | manage_cert_dns.py | 域名/证书 | 证书 | 私钥明文 | 服务器本地 | systemd | 证书日志 | 证书备份 | 重签 | huliye24 | 在线 ✓ |
+| Ear cases/evidence | prod / LA | case 目录 + review.sqlite3 | Ear | evidence manifest | 私人源音频 | 服务器本地 | worker（幂等） | 案例日志（脱敏） | backup_snapshot.sh | 清单重建 | huliye24 | 在线 ✓ |
+| 域名 | 公网 | 三域名（music/ear/xyz） | 全产品 | 边界契约 | — | DNS | cloudflared/DNS | — | DNS | DNS | huliye24 | 在线 ✓ |
 
 ## 2. 真实路径（2026-08-14 已验证）
 
@@ -36,25 +36,23 @@
 |---|---|---|
 | 浏览器→nginx→Ear/Music | **CURRENT（通）** | 本包只读探测全 200 |
 | BFF→杭州 internal | **CURRENT（通）** | service key 场景未注入（探测为匿名 read） |
-| 杭州→PolarDB | **BLOCKED** | R06 凭据/VPC 对等；58 包解除 |
-| 官网静态发布（current symlink） | CURRENT | 46 包静态站待发布（部署归 60/65） |
-| Ear 工作台（apps/ear-workbench） | 待部署 | 47 包产物；随 60 部署 |
+| 杭州→PolarDB | **BLOCKED** | R06；58 包已冻结解除计划（步骤 2–3 待人类授权） |
+| 官网静态发布（current symlink） | 待发布 | 46 静态站完整（57/63 修复 HTML 后）；部署归 60/65 |
+| Ear 工作台 | 待部署 | 47 产物完整（57 修复后）；随 60 部署 |
 
-## 4. 57–65 执行环境分配
+## 4. 57–65 执行状态（v1.1 更新，不再只是分配）
 
-| 包 | 环境 | 用途 |
+| 包 | 环境 | 状态（2026-08-14） |
 |---|---|---|
-| 57 候选完整性 | LOCAL_DEV（本地 clean build）+ CLOUD_VALIDATION（云端干净环境） | 自包含候选重建 |
-| 58 数据面 | CLOUD_VALIDATION（隔离库）→ PRODUCTION 冻结 | R06 解除 + 迁移/备份/恢复 |
-| 59 安全隐私验收 | CANARY（真实代理链） | 身份/权限/隐私/缓存 |
-| 60 产品 E2E | CANARY（用户入口开始） | 官网/Ear/Music/Creator/Bridge 闭环 |
-| 61 可靠性/容量/DR | CLOUD_VALIDATION + CANARY | soak/故障注入/备份恢复/回滚 |
-| 62 季度冻结 | PRODUCTION 发布纪律 | 版本节奏冻结 |
-| 63 DeepSeek 独立验证 | 全部（独立复验） | 只找证据不足，不签 GO |
-| 64 Codex 视觉终审 | CANARY 页面 + 视觉浏览器 | 审美/层级终审 |
-| 65 Canary GO | CANARY → PRODUCTION | 人类签署 GO + 7 天稳定 |
-
-**不得把 LOCAL/CLOUD_VALIDATION 的 PASS 写成 PRODUCTION PASS。**
+| 57 候选完整性 | LOCAL_DEV → CLOUD_VALIDATION | **DONE_LOCAL**（29 文件纳入 + 双 P0 HTML 修复；干净环境可重建） |
+| 58 数据面 | CLOUD_VALIDATION → PRODUCTION | **DONE_LOCAL**（冻结 + 约束测试）；云端 **BLOCKED_ON_AUTH**（凭据/VPC） |
+| 59 安全验收 | CANARY | **DONE_LOCAL**（计划/runbook/扫描）；真机 **BLOCKED_ON_AUTH** |
+| 60 产品 E2E | CANARY | **DONE_LOCAL**（清单/脚本）；真机 **BLOCKED_ON_AUTH** |
+| 61 可靠性/容量/DR | CLOUD_VALIDATION + CANARY | **DONE_LOCAL**（soak 脚本/SLO/矩阵）；真机 **BLOCKED_ON_AUTH** |
+| 62 季度冻结 | PRODUCTION 纪律 | **DONE**（v1.0.0 冻结文档） |
+| 63 独立验证 | 全部 | **DONE**（干净环境全绿 + P0 修复 + READY_FOR_VISUAL_REVIEW） |
+| 64 Codex 视觉终审 | CANARY 页面 + 视觉浏览器 | **BLOCKED_ON_CODEX**（证据包已备） |
+| 65 Canary GO | CANARY → PRODUCTION | **BLOCKED_ON_AUTH + BLOCKED_ON_HUMAN**（授权 A–E + GO 签署） |
 
 ## 5. 验证数据集
 
@@ -63,7 +61,7 @@
 | 合成 fixture | 基准 wav（clipped/dual_tone/impulse/mono/pink_noise，192KB） | Ear 案例/升级/桥测试 | — |
 | 公开 Music | cadeau10 专辑五曲（线上 LA） | 播放/Range/E2E | 重新编码 |
 | 专用测试账号 | invite 制测试 user（51 包） | 身份/权限/创建者流程 | 生产用户数据 |
-| 私人数据 | — | — | **禁止云端未经授权测试**（56 包禁止项） |
+| 私人数据 | — | — | **禁止云端未经授权测试**（56 禁止项） |
 
 ## 6. 资源隔离与命名
 
@@ -79,12 +77,13 @@
 | 并发 worker | 1（既有 2C2G 单 worker，KEEP_2C2G 裁决） |
 | 磁盘余量 | 媒体+证据 ≥3GB（worker 守卫） |
 | 本地验证窗口 | 每包 ≤10min 全量回归 |
-| 云端 soak | 61 包 ≥72h 连续观察 |
-| 备份 RPO | 24h；恢复 RTO 目标 ≤4h（53 包定义） |
+| 云端 soak | 61 包 ≥72h 连续观察（soak_probe.sh 已备） |
+| 备份 RPO | 24h；恢复 RTO 目标 ≤4h（53/58 定义） |
 | 测试账号 | ≤5 个（invite 制） |
 
-## 8. 事实边界
+## 8. 事实边界（v1.1）
 
 - 本包只读探测于 2026-08-14 执行；未写入任何云端资源。
-- R06（PolarDB 凭据/VPC 对等）保持 BLOCKED，58 包解除。
-- 凭据不得写入仓库/日志/交接（56 包禁止项）。
+- R06 保持 BLOCKED（计划已冻结于 58）；凭据/VPC 授权待人类提供。
+- 凭据不得写入仓库/日志/交接（56 禁止项）。
+- 57–65 本地面已完成（63 独立验证确认）；剩余阻塞均为授权/Codex/人类签署类。
