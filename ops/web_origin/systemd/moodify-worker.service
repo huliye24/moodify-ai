@@ -1,0 +1,23 @@
+[Unit]
+Description=Moodify Ear unattended auditory worker
+After=network-online.target moodify-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=moodify
+Group=moodify
+EnvironmentFile=/etc/moodify/node.env
+WorkingDirectory=/opt/moodify/current
+ExecStart=/opt/moodify/venv/bin/moodify-node worker
+Restart=always
+RestartSec=10
+TimeoutStopSec=90
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/moodify
+
+[Install]
+WantedBy=multi-user.target

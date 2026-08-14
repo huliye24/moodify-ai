@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloudflare Tunnel for Moodify web origins
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/cloudflared --no-autoupdate --config /root/.cloudflared/config.yml tunnel run
+Restart=always
+RestartSec=5s
+TimeoutStopSec=30s
+
+[Install]
+WantedBy=multi-user.target
