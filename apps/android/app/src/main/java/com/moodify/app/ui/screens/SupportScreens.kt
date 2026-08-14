@@ -84,7 +84,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) = SupportPage("è®¾ç½
                     com.moodify.app.data.TokenStore(context).clear()
                     com.moodify.app.data.BaseUrlStore(context).baseUrl = com.moodify.app.data.BaseUrlPolicy.DEFAULT
                     showResetDialog = false
-                }) { Text(stringResource(R.string.support_reset_confirm), color = Color(0xFFE05B5B)) }
+                }) { Text(stringResource(R.string.support_reset_confirm), color = Blocking) }
             },
             dismissButton = { TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.common_cancel), color = MoodifyMuted) } },
         )

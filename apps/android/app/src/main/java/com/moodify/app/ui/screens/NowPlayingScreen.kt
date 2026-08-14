@@ -28,6 +28,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moodify.app.R
 import com.moodify.app.data.PlaybackManager
 import com.moodify.app.data.QueueItem
+import com.moodify.app.ui.theme.Blocking
+import com.moodify.app.ui.theme.Evidence
+import com.moodify.app.ui.theme.HumanAttention
 import com.moodify.app.ui.theme.MoodifyBlue
 import com.moodify.app.ui.theme.MoodifyMuted
 import com.moodify.app.ui.theme.MoodifyNavy
@@ -91,8 +94,8 @@ fun NowPlayingScreen(onClose: () -> Unit) {
             }
             current?.let {
                 Spacer(Modifier.width(8.dp))
-                Surface(color = if (it.gatePassed) Color(0xFFE8F8EE) else Color(0xFFFFF2E8), shape = RoundedCornerShape(8.dp)) {
-                    Text(if (it.gatePassed) stringResource(R.string.works_gate_passed) else stringResource(R.string.works_gate_failed), color = if (it.gatePassed) Color(0xFF31A35E) else Color(0xFFE08A3C), fontSize = 11.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                Surface(color = if (it.gatePassed) Evidence.copy(alpha = 0.14f) else HumanAttention.copy(alpha = 0.14f), shape = RoundedCornerShape(8.dp)) {
+                    Text(if (it.gatePassed) stringResource(R.string.works_gate_passed) else stringResource(R.string.works_gate_failed), color = if (it.gatePassed) Evidence else HumanAttention, fontSize = 11.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
                 }
             }
         }

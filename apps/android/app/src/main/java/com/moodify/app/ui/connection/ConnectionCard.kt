@@ -80,7 +80,7 @@ fun ConnectionCard(viewModel: ConnectionViewModel = viewModel()) {
                 }
                 is ConnectionState.Error -> {
                     val err = (state as ConnectionState.Error).error
-                    Text(err.message ?: stringResource(R.string.conn_failed), color = Color(0xFFE05B5B), fontSize = 12.sp)
+                    Text(err.message ?: stringResource(R.string.conn_failed), color = Blocking, fontSize = 12.sp)
                     Spacer(Modifier.height(8.dp))
                     Button(onClick = { viewModel.connect() }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = MoodifyBlue), shape = RoundedCornerShape(16.dp)) {
                         Text(stringResource(R.string.conn_retry))
@@ -103,8 +103,8 @@ fun ConnectionCard(viewModel: ConnectionViewModel = viewModel()) {
 @Composable
 private fun ConnectionBadge(state: ConnectionState, paired: Boolean) {
     val (bg, tint, label) = when (state) {
-        is ConnectionState.Connected -> Triple(Color(0xFFE8F8EE), Color(0xFF31A35E), stringResource(R.string.conn_badge_connected))
-        is ConnectionState.Error -> Triple(Color(0xFFFFE9EA), Color(0xFFE05B5B), stringResource(R.string.conn_badge_error))
+        is ConnectionState.Connected -> Triple(Evidence.copy(alpha = 0.14f), Evidence, stringResource(R.string.conn_badge_connected))
+        is ConnectionState.Error -> Triple(Blocking.copy(alpha = 0.14f), Blocking, stringResource(R.string.conn_badge_error))
         is ConnectionState.Connecting -> Triple(Color(0xFFE9F0FF), MoodifyBlue, stringResource(R.string.conn_badge_connecting))
         else -> Triple(Color(0xFFF1F3F8), MoodifyMuted, stringResource(R.string.conn_badge_disconnected))
     }

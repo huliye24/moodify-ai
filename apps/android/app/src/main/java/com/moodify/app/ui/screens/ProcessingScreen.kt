@@ -54,6 +54,9 @@ import com.moodify.app.data.TokenStore
 import com.moodify.app.data.WorkLibrary
 import com.moodify.app.ui.components.GradientButton
 import com.moodify.app.ui.components.ProgressRing
+import com.moodify.app.ui.theme.Blocking
+import com.moodify.app.ui.theme.Evidence
+import com.moodify.app.ui.theme.HumanAttention
 import com.moodify.app.ui.theme.MoodifyBlue
 import com.moodify.app.ui.theme.MoodifyMuted
 import com.moodify.app.ui.theme.MoodifyNavy
@@ -198,12 +201,12 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                 Text(stringResource(R.string.analysis_save_to_works), color = MoodifyBlue, fontSize = 13.sp)
             }
             is DemoProcessState.Done -> {
-                Text(stringResource(R.string.analysis_real_completed), fontSize = 12.sp, color = Color(0xFF31A35E))
+                Text(stringResource(R.string.analysis_real_completed), fontSize = 12.sp, color = Evidence)
                 Spacer(Modifier.height(18.dp))
                 SurfaceCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.size(76.dp).background(Color(0xFFE8F8EE), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Outlined.CheckCircle, null, tint = Color(0xFF31A35E), modifier = Modifier.size(42.dp))
+                        Box(Modifier.size(76.dp).background(Evidence.copy(alpha = 0.14f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Outlined.CheckCircle, null, tint = Evidence, modifier = Modifier.size(42.dp))
                         }
                         Column(Modifier.padding(start = 16.dp).weight(1f)) {
                             Text(s.summary.filename, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = MoodifyNavy)
@@ -237,11 +240,11 @@ fun ProcessingScreen(uri: Uri?, onBackHome: () -> Unit, onDone: (DemoResultSumma
                 GradientButton(stringResource(R.string.works_view_library), onClick = { onDone(doneSummary) })
             }
             is DemoProcessState.Failed -> {
-                Text(stringResource(R.string.analysis_failed), fontSize = 12.sp, color = Color(0xFFE05B5B))
+                Text(stringResource(R.string.analysis_failed), fontSize = 12.sp, color = Blocking)
                 Spacer(Modifier.height(18.dp))
                 SurfaceCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.ErrorOutline, null, tint = Color(0xFFE05B5B), modifier = Modifier.size(26.dp))
+                        Icon(Icons.Outlined.ErrorOutline, null, tint = Blocking, modifier = Modifier.size(26.dp))
                         Text(s.message, Modifier.padding(start = 12.dp), color = MoodifyNavy, fontSize = 14.sp)
                     }
                 }

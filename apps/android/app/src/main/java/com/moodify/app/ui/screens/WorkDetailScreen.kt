@@ -198,8 +198,8 @@ private fun JudgeCard(work: ProcessedWork) {
                     else -> stringResource(R.string.judge_outcome_inconclusive)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(color = if (current.outcome == "INCONCLUSIVE") Color(0xFFFFF2E8) else Color(0xFFE8F8EE), shape = RoundedCornerShape(9.dp)) {
-                        Text(outcomeLabel, color = if (current.outcome == "INCONCLUSIVE") Color(0xFFE08A3C) else Color(0xFF31A35E), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+                    Surface(color = if (current.outcome == "INCONCLUSIVE") HumanAttention.copy(alpha = 0.14f) else Evidence.copy(alpha = 0.14f), shape = RoundedCornerShape(9.dp)) {
+                        Text(outcomeLabel, color = if (current.outcome == "INCONCLUSIVE") HumanAttention else Evidence, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
                     }
                     Spacer(Modifier.width(10.dp))
                     Text(stringResource(R.string.judge_confidence, current.confidenceLevel), color = MoodifyMuted, fontSize = 11.sp)
@@ -230,7 +230,7 @@ private fun JudgeCard(work: ProcessedWork) {
         }
         error?.let {
             Spacer(Modifier.height(8.dp))
-            Text(it, color = Color(0xFFE05B5B), fontSize = 11.sp)
+            Text(it, color = Blocking, fontSize = 11.sp)
         }
     }
 }
@@ -263,7 +263,7 @@ private fun CompareButton(label: String, selected: Boolean, modifier: Modifier =
 }
 
 @Composable private fun DetailCard(content: @Composable ColumnScope.() -> Unit) { Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(5.dp)) { Column(Modifier.padding(18.dp), content = content) } }
-@Composable private fun StatusPill(text: String) { Surface(color = Color(0xFFE8F8EE), shape = RoundedCornerShape(7.dp)) { Text(text, color = Color(0xFF32A763), fontSize = 12.sp, modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp)) } }
+@Composable private fun StatusPill(text: String) { Surface(color = Evidence.copy(alpha = 0.14f), shape = RoundedCornerShape(7.dp)) { Text(text, color = Evidence, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp)) } }
 @Composable private fun ResultChip(icon: ImageVector, text: String, selected: Boolean = false) { Surface(shape = RoundedCornerShape(9.dp), border = androidx.compose.foundation.BorderStroke(1.dp, if (selected) MoodifyPurple.copy(.25f) else MoodifyOutline), color = if (selected) Color(0xFFF7F5FF) else Color.White) { Row(Modifier.padding(horizontal = 8.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = if (selected) MoodifyPurple else MoodifyMuted, modifier = Modifier.size(16.dp)); Text("  $text", color = if (selected) MoodifyPurple else MoodifyMuted, fontSize = 11.sp) } } }
 @Composable private fun Metric(icon: ImageVector, label: String, value: String) { Column(horizontalAlignment = Alignment.CenterHorizontally) { Icon(icon, null, tint = MoodifyBlue, modifier = Modifier.size(25.dp)); Text(label, color = MoodifyMuted, fontSize = 10.sp, modifier = Modifier.padding(top = 6.dp)); Text(value, color = MoodifyNavy, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp)) } }
 @Composable private fun ExportAction(icon: ImageVector, title: String, subtitle: String, modifier: Modifier, onClick: () -> Unit) { OutlinedCard(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, MoodifyOutline)) { Column(Modifier.fillMaxWidth().padding(vertical = 13.dp), horizontalAlignment = Alignment.CenterHorizontally) { Icon(icon, null, tint = MoodifyBlue, modifier = Modifier.size(25.dp)); Text(title, color = MoodifyNavy, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 5.dp)); Text(subtitle, color = MoodifyMuted, fontSize = 9.sp) } } }

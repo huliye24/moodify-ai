@@ -43,7 +43,13 @@
 | AGENTS.md、README.md | 判断权威与公开声明修正 | 包44 修订 |
 | docs/contracts/product-boundary.md | 产品边界与共享契约 | FROZEN（ec5aac1） |
 
-## 4. 登记规则
+## 4. 45–54 包登记
+
+| 包 | 证据 | commit | P0 结果 |
+|---|---|---|---|
+| 45 设计系统 | docs/design/design_tokens_v1.md（token 单一来源）+ design_system_migration.md（KEEP/ADAPT/COMPLETE/ISOLATE）+ apps/music-web/components/ui/（6 组组件）+ app/design/ 陈列页 + tests/design-system.test.mjs（7/7）+ Android Color.kt/Theme.kt 归并 + artifacts/phase1_launch/design_system_001/ 截图（1440/390 双宽度，深色石墨 + evidence 绿 + amber 已验像素） | 待提交 | 7/7 测试绿；tsc 我的文件零错误 |
+
+## 5. 登记规则
 
 - 包 45–54 每包完成：追加一行（证据路径 + commit hash + P0 结果）。
 - Gate D/E 审查时以本索引为检查清单；找不到证据的声称视为不存在。
