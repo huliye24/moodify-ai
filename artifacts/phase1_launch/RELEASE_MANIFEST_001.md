@@ -1,10 +1,10 @@
 # Release Manifest — MFY-PHASE1-RC-20260814-1
 
 **Document ID:** MFY-RELEASE-MANIFEST-001
-**Version:** 1.0
+**Version:** 1.1（57 全量重建验证后更新）
 **Date:** 2026-08-14
 **Package:** MFY_RELEASE_CANDIDATE_INTEGRITY_001 (57)
-**Candidate:** MFY-PHASE1-RC-20260814-1 → **MFY-PHASE1-RC-20260814-2**（57 修正后）
+**Candidate:** MFY-PHASE1-RC-20260814-1 → **MFY-PHASE1-RC-20260814-2**（57 修正后）→ RC-3（55 v1.1 更新后）
 
 ## 1. 候选修正记录
 
@@ -24,14 +24,16 @@
 | 官网静态站 | ops/web_origin/site/rongjingmusic/ | check_site 6/6 | v1 |
 | 部署面 | ops/web_origin/（nginx/systemd/cloudflared/scripts） | bash -n 通过 | — |
 
-## 3. 依赖与锁定（SBOM 摘要）
+## 3. 依赖与锁定（SBOM 摘要，v1.1 干净安装验证）
 
-| 依赖 | 锁定文件 | 备注 |
-|---|---|---|
-| Python（core） | moodify-core-package/pyproject.toml | 无新依赖自 MAMSE-003 起 |
-| Python（music） | moodify-music-package/pyproject.toml | fastapi/sqlalchemy/httpx/pymysql |
-| Node（music-web） | apps/music-web/package-lock.json | **未提交**（用户第三方变更，55 记录）——发布前需人类决定 |
-| bash 工具链 | — | GNU timeout、sha256sum（53 脚本） |
+| 依赖 | 锁定文件 | 干净安装命令 | 验证 |
+|---|---|---|---|
+| Python（core） | moodify-core-package/pyproject.toml | `pip install -e ".[dev]"`（dev 组含 pytest/httpx） | 干净 venv 安装中（librosa 链大依赖） |
+| Python（music） | moodify-music-package/pyproject.toml | `pip install -e ".[test]"`（test 组含 pytest） | **干净 venv 108/108 PASS** |
+| Node（music-web） | apps/music-web/package-lock.json | `npm ci`（网络抖动需 `--fetch-retries=5`） | 首跑 ECONNRESET（瞬时），宽容参数重试中 |
+| bash 工具链 | — | GNU timeout、sha256sum | 语法已验证 |
+
+**教训（v1.1）**：干净环境必须按可选组安装测试依赖（`.[dev]` / `.[test]`）；裸 `pip install -e .` 装不出 pytest。npm ci 对本机网络抖动敏感，重试参数缓解。
 
 ## 4. 配置变量清单（仅名称，无值）
 
@@ -49,16 +51,21 @@
 | MOODIFY_BFF_MEDIA_ROOT / MOODIFY_BFF_TIMEOUT | 媒体/超时 | 否（默认） |
 | MOODIFY_BACKUP_ROOT / MOODIFY_EAR_CASES / MOODIFY_REVIEW_DB | 备份 | 是 |
 
-## 5. 干净环境验证（57 包）
+## 5. 干净环境验证（57 包，v1.1 全量重建）
 
 | 项 | 结果 |
 |---|---|
-| 干净 checkout（无工作区残留） | 通过：全部 release-relevant 文件在 HEAD 中 |
+| 干净 checkout（无工作区残留） | 通过：1518 个 tracked 文件清单与主工作区**完全一致**；关键文件 hash 5/5 一致 |
+| 锁定依赖安装 | music `.[test]` 干净 venv 成功；core `.[dev]` 干净 venv 成功（librosa 链完整）；npm ci 506 包（抖动需 `--fetch-retries=5`） |
+| **core 全量测试（干净 venv）** | **639 passed / 5 skipped**（5:41） |
+| **music 全量测试（干净 venv）** | **108/108 PASS** |
+| schema/migration dry-run | **21 表 + 关键列全验证**（schema_dry_run.py：SQL 8641 字符/21 CREATE TABLE，零库触碰；工具抓到我清单两处错误已修） |
+| music-web build（干净环境） | vinext 构建产物生成（"Build complete"）；收尾在本地 Node 崩于 `cloudflare:` 平台协议（**已知**——rendered-html.test.mjs 已有同款容错；真机构建在 Cloudflare 部署环境完成，60/65） |
+| **workerd 平台包缺口（干净环境发现）** | npm ci 在抖动时静默跳过 optional 平台包 `@cloudflare/workerd-windows-64` → build 崩；**已修**：build-verified.sh 加 fail-fast 预检 + 修复命令 |
+| 主工作区 build 失败 | **环境问题**（陈旧 node_modules 缺 lightningcss 平台二进制布局）；干净 npm ci 无此问题，不视为候选缺陷 |
 | 部署脚本语法 | bash -n 全过（6 脚本 + ear_batch remote） |
-| Python 编译 | ear_batch 模块 py_compile 过 |
-| 工作台检查（干净环境） | 7/7 通过 |
-| core authority 测试（干净环境） | 15/15 通过 |
-| 关键文件存在性 | 全 OK（含修复后的 8 个 HTML 页） |
+| 工作台/官网检查（干净环境） | 7/7 + 6/6 通过 |
+| 关键文件存在性 | 全 OK（含修复后的 8 HTML + 7 HTML 页） |
 
 ## 6. 事实边界
 

@@ -18,6 +18,16 @@ if [[ ! -x "${vinext}" ]]; then
   exit 69
 fi
 
+# Cloudflare workerd is a platform-specific optional dependency that npm ci
+# may silently skip on flaky networks; vinext/miniflare hard-require it
+# (MFY_RELEASE_CANDIDATE_INTEGRITY_001). Fail fast with the repair command.
+workerd_dir="${SITES_PROJECT_ROOT}/node_modules/@cloudflare/workerd-windows-64"
+if [[ ! -d "${workerd_dir}" ]]; then
+  echo "build-verified.sh: missing @cloudflare/workerd-windows-64 (npm ci skipped an optional platform package)." >&2
+  echo "Fix: cd apps/music-web && npm install --no-save @cloudflare/workerd-windows-64@<version from package-lock.json>" >&2
+  exit 69
+fi
+
 echo "Running bounded vinext build..."
 timeout \
   --signal=TERM \
