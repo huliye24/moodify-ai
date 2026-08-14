@@ -64,7 +64,10 @@ def run_forever(config: NodeConfig | None = None) -> int:
             case_dir = run_data_factory(job.source_path, job.output_root, config.scan_profile_id)
         except Exception as exc:
             LOG.exception("job_failed job_id=%s", job.job_id)
-            queue.fail(job.job_id, f"{type(exc).__name__}: {exc}")
+            status = queue.retry_or_fail(
+                job.job_id, f"{type(exc).__name__}: {exc}", config.max_attempts
+            )
+            LOG.warning("job_failure_disposition job_id=%s status=%s", job.job_id, status)
         else:
             queue.succeed(job.job_id, case_dir)
             LOG.info("job_succeeded job_id=%s case_dir=%s", job.job_id, case_dir)

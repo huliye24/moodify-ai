@@ -89,6 +89,22 @@ class JobQueue:
                 (JobStatus.FAILED.value, error[-8000:], now, now, job_id),
             )
 
+    def retry_or_fail(self, job_id: str, error: str, max_attempts: int = 3) -> str:
+        """Requeue a failed attempt until the bounded unattended retry limit."""
+        now = _iso()
+        with connect(self.db_path) as con:
+            row = con.execute("SELECT attempts FROM jobs WHERE job_id=?", (job_id,)).fetchone()
+            if row is None:
+                raise KeyError(job_id)
+            retry = int(row["attempts"]) < int(max_attempts)
+            status = JobStatus.QUEUED.value if retry else JobStatus.FAILED.value
+            con.execute(
+                "UPDATE jobs SET status=?, last_error=?, finished_at=?, updated_at=?, "
+                "started_at=NULL, lease_until=NULL WHERE job_id=?",
+                (status, error[-8000:], None if retry else now, now, job_id),
+            )
+        return status
+
     def requeue(self, job_id: str) -> None:
         now = _iso()
         with connect(self.db_path) as con:

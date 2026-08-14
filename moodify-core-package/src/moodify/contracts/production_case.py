@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import StrEnum
+from moodify.compat import StrEnum
 
 from pydantic import field_validator, model_validator
 

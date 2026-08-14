@@ -57,3 +57,15 @@ def test_recover_interrupted_worker_without_waiting_for_lease(tmp_path):
     assert recovered.status == "QUEUED"
     assert recovered.lease_until is None
     assert "worker process restart" in recovered.last_error
+
+
+def test_retry_or_fail_is_bounded(tmp_path):
+    q = JobQueue(tmp_path / "node.sqlite3", lease_seconds=60)
+    job = q.enqueue(_source(tmp_path), tmp_path / "out")
+    for attempt in range(1, 4):
+        q.lease_next()
+        status = q.retry_or_fail(job.job_id, f"failure {attempt}", max_attempts=3)
+        assert status == ("QUEUED" if attempt < 3 else "FAILED")
+    failed = q.get(job.job_id)
+    assert failed.attempts == 3
+    assert failed.last_error == "failure 3"

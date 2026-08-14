@@ -16,6 +16,7 @@ class NodeConfig:
     min_available_memory_mb: int = 300
     min_free_disk_gb: float = 3.0
     scan_profile_id: str = "MFY-WSE-SCAN-PROFILE-001"
+    max_attempts: int = 3
 
     @property
     def db_path(self) -> Path:
@@ -31,4 +32,5 @@ class NodeConfig:
             min_available_memory_mb=int(os.getenv("MOODIFY_NODE_MIN_AVAILABLE_MB", "300")),
             min_free_disk_gb=float(os.getenv("MOODIFY_NODE_MIN_FREE_DISK_GB", "3")),
             scan_profile_id=os.getenv("MOODIFY_NODE_SCAN_PROFILE", "MFY-WSE-SCAN-PROFILE-001"),
+            max_attempts=int(os.getenv("MOODIFY_NODE_MAX_ATTEMPTS", "3")),
         )

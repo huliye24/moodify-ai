@@ -91,7 +91,7 @@ def generate_spectrogram(
 
     spec = profile.spectrogram
     fscale = "lin" if view == "linear" else "log"
-    filter_expr = (
+    filter_base = (
         f"aresample={profile.analysis_sample_rate},"
         f"showspectrumpic=s={spec['width']}x{spec['height']}:"
         f"mode={spec['channel_mode']}:"
@@ -99,7 +99,10 @@ def generate_spectrogram(
         f"scale={spec['amplitude_scale']}:"
         f"fscale={fscale}:"
         f"win_func={spec['window_function']}:"
-        f"legend={1 if spec['legend'] else 0}:"
+        f"legend={1 if spec['legend'] else 0}"
+    )
+    filter_expr = (
+        filter_base + ":"
         f"drange={spec['dynamic_range_db']}:"
         f"limit={spec['upper_limit_dbfs']}"
     )
@@ -110,6 +113,16 @@ def generate_spectrogram(
     ]
     started_at = datetime.now(timezone.utc).isoformat()
     proc = subprocess.run(command, capture_output=True, text=True, timeout=timeout_s)
+    # Ubuntu 22.04 ships FFmpeg 4.4, whose showspectrumpic filter predates
+    # drange/limit. Preserve the profile values on capable runtimes, but use
+    # the older filter's fixed range when it explicitly rejects those options.
+    if proc.returncode != 0 and "Option 'drange' not found" in proc.stderr:
+        filter_expr = filter_base
+        command = [
+            _ffmpeg(), "-v", "error", "-y", "-i", str(input_path),
+            "-lavfi", filter_expr, str(output_path),
+        ]
+        proc = subprocess.run(command, capture_output=True, text=True, timeout=timeout_s)
     completed_at = datetime.now(timezone.utc).isoformat()
 
     run = SpectrogramRun(

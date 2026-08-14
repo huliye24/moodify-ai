@@ -4,14 +4,19 @@ from __future__ import annotations
 
 import os
 import tempfile
+from dataclasses import asdict
 from pathlib import Path
+from uuid import uuid4
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 
 from moodify.auditory.errors import AuditoryError
 from moodify.release import PRODUCT_VERSION, analyze_to_case, reopen_case
+from moodify.node.config import NodeConfig
+from moodify.node.queue import JobQueue
 
-MAX_SIZE = 100 * 1024 * 1024
+MAX_SIZE = int(os.environ.get("MOODIFY_MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
+ALLOWED_SUFFIXES = {".wav", ".mp3", ".flac", ".m4a", ".ogg", ".aac"}
 
 app = FastAPI(
     title="Moodify — The Ear of AI",
@@ -24,13 +29,108 @@ def _cases_root() -> Path:
     return Path(os.environ.get("MOODIFY_CASES_ROOT", "outputs/moodify_cases"))
 
 
+def _node_config() -> NodeConfig:
+    return NodeConfig.from_env()
+
+
+def _queue() -> JobQueue:
+    config = _node_config()
+    return JobQueue(config.db_path, lease_seconds=config.lease_seconds)
+
+
+def _public_job(job) -> dict:
+    payload = asdict(job)
+    payload.pop("source_path", None)
+    payload.pop("output_root", None)
+    payload.pop("case_dir", None)
+    if payload.get("last_error"):
+        payload["last_error"] = "Auditory processing failed; the evidence was retained for operator review."
+    payload["result_ready"] = job.status == "SUCCEEDED" and bool(job.case_dir)
+    return payload
+
+
+def _safe_json(path: Path) -> dict | list | None:
+    import json
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 @app.get("/health")
 async def health() -> dict:
+    counts = _queue().counts()
     return {
         "status": "ok",
         "product": "Moodify",
         "version": PRODUCT_VERSION,
         "identity": "The Ear of AI",
+        "queue": counts,
+    }
+
+
+@app.get("/api/v1/health")
+async def api_health() -> dict:
+    return await health()
+
+
+@app.post("/api/v1/auditory/jobs", status_code=202)
+async def create_job(audio: UploadFile = File(...), prompt: str = Form(default="")) -> dict:
+    """Persist an upload and enqueue it in the canonical unattended node queue."""
+    config = _node_config()
+    queue = _queue()
+    if sum(queue.counts().values()) >= int(os.environ.get("MOODIFY_MAX_RETAINED_JOBS", "500")):
+        raise HTTPException(status_code=503, detail={"code": "QUEUE_CAPACITY_REACHED"})
+    suffix = Path(audio.filename or "upload.wav").suffix.lower()
+    if suffix not in ALLOWED_SUFFIXES:
+        raise HTTPException(status_code=415, detail={"code": "AUDIO_TYPE_UNSUPPORTED"})
+    upload_root = config.state_dir / "uploads"
+    upload_root.mkdir(parents=True, exist_ok=True)
+    path = upload_root / f"upload_{uuid4().hex}{suffix}"
+    size = 0
+    try:
+        with path.open("xb") as handle:
+            while chunk := await audio.read(1024 * 1024):
+                size += len(chunk)
+                if size > MAX_SIZE:
+                    raise HTTPException(status_code=413, detail={"code": "AUDIO_TOO_LARGE"})
+                handle.write(chunk)
+        if size == 0:
+            raise HTTPException(status_code=422, detail={"code": "AUDIO_EMPTY"})
+        job = queue.enqueue(path, config.output_root)
+    except Exception:
+        path.unlink(missing_ok=True)
+        raise
+    return {
+        "job": _public_job(job),
+        "request": {"filename": Path(audio.filename or "upload").name, "prompt": prompt[:1000]},
+    }
+
+
+@app.get("/api/v1/auditory/jobs/{job_id}")
+async def get_job(job_id: str) -> dict:
+    job = _queue().get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail={"code": "JOB_NOT_FOUND"})
+    return {"job": _public_job(job)}
+
+
+@app.get("/api/v1/auditory/jobs/{job_id}/result")
+async def get_job_result(job_id: str) -> dict:
+    job = _queue().get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail={"code": "JOB_NOT_FOUND"})
+    if job.status != "SUCCEEDED" or not job.case_dir:
+        raise HTTPException(status_code=409, detail={"code": "RESULT_NOT_READY", "status": job.status})
+    case_dir = Path(job.case_dir).resolve()
+    output_root = Path(job.output_root).resolve()
+    if output_root not in case_dir.parents:
+        raise HTTPException(status_code=500, detail={"code": "RESULT_PATH_INVALID"})
+    return {
+        "job": _public_job(job),
+        "case_manifest": _safe_json(case_dir / "case_manifest.json"),
+        "production_case": _safe_json(case_dir / "production_case.json"),
+        "algorithmic_review": _safe_json(case_dir / "06_human_review" / "review.json"),
+        "algorithmic_scores": _safe_json(case_dir / "06_human_review" / "algorithmic_scores.json"),
     }
 
 
