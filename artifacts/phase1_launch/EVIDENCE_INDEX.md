@@ -27,7 +27,7 @@
 | 证据 | 内容 | 关键 commit | 状态 |
 |---|---|---|---|
 | artifacts/mfy_music_creator_lifecycle_001 | 创作者生命周期（版本/护照/发布） | 062c760 等（包30） | 完成 |
-| artifacts/mfy_music_listening_first_web_001 | 聆听优先 Web 收敛 | a9e7524（包31） | 完成 |
+| artifacts/mfy_music_listening_first_web_001 | 聆听优先 Web 收敛 | a9e752e4（包31） | 完成 |
 | apps/music-web（库/控制台/搜索） | 包32 四个 checkpoint | a072e3a, 9939ae7, f3612fd, a9ab4e7 | 完成 |
 | apps/music-web PWA 地基 | 包33 | 7334da9 | 完成 |
 | docs/contracts/music/（6 份契约） | 身份/所有权/发布/API/生命周期/共享客户端 | ec5aac1（包35） | FROZEN |
