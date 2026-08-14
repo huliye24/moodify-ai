@@ -49,6 +49,7 @@ export default function Home() {
   const [duration, setDuration] = useState(0);
   const [liveTracks, setLiveTracks] = useState<Track[] | null>(null);
   const [me, setMe] = useState<BootstrapUser | null>(null);
+  const [mediaError, setMediaError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [sessionId] = useState(() => `s${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`);
   const [searchResults, setSearchResults] = useState<{ tracks: { id: string; title: string; creator_id: string; primary_language: string | null; duration_ms: number | null; audio_asset_key: string | null }[] } | null>(null);
@@ -86,6 +87,7 @@ export default function Home() {
     else audio.pause();
   }, [active, playing]);
   const play = (index: number) => {
+    setMediaError(null);
     if (index === active) setPlaying((value) => !value);
     else { setActive(index); setCurrentTime(0); setPlaying(true); }
   };
@@ -170,7 +172,8 @@ export default function Home() {
 
     </section>
 
-    <audio ref={audioRef} src={all[active].src} preload="metadata" onPlay={onPlay} onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)} onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)} onEnded={() => skip(1)} />
+    <audio ref={audioRef} src={all[active].src} preload="metadata" onPlay={onPlay} onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)} onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)} onEnded={() => skip(1)} onError={() => { setPlaying(false); setMediaError("媒体无法播放——请稍后重试，或换一首作品。"); }} />
     <div className="player"><div className="now"><RecordArtwork track={all[active]} spinning={playing} /><div><strong>{all[active].title}</strong><span>{all[active].artist}</span></div><button onClick={() => toggleLike(active)} aria-label={liked.includes(active) ? "取消收藏" : "收藏"}>{liked.includes(active) ? "♥" : "♡"}</button></div><div className="controls"><div><button onClick={() => skip(-1)} aria-label="上一首">◀</button><button className="play" onClick={() => setPlaying(!playing)} aria-label={playing ? "暂停" : "播放"}>{playing ? "Ⅱ" : "▶"}</button><button onClick={() => skip(1)} aria-label="下一首">▶</button></div><div className="timeline"><span>{formatTime(currentTime)}</span><input aria-label="播放进度" type="range" min="0" max={duration || 0} step="0.1" value={Math.min(currentTime, duration || 0)} onChange={(event) => { const nextTime = Number(event.target.value); if (audioRef.current) audioRef.current.currentTime = nextTime; setCurrentTime(nextTime); }} /><span>{duration ? formatTime(duration) : all[active].length}</span></div></div><div className="utilities"><span aria-hidden="true">◉</span></div></div>
+    {mediaError && <div className="player-error" role="alert">{mediaError}</div>}
   </main>;
 }

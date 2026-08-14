@@ -52,3 +52,6 @@
   .floating-note,.orb,.orbit{animation:none !important;transition:none !important}
   *{transition-duration:.01ms !important;animation-duration:.01ms !important}
 }
+
+/* MFY_MUSIC_LISTENING_PRODUCT_V1_001: honest media error, never a silent spinner */
+.player-error{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:20;background:var(--blocking-soft);border:1px solid var(--blocking);border-left:3px solid var(--blocking);color:var(--text);border-radius:12px;padding:12px 18px;font-size:12px;max-width:min(420px,calc(100vw - 32px));text-align:center}
