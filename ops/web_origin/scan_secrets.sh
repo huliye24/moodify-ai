@@ -26,6 +26,7 @@ EXCLUDE=(
   ':!artifacts'
   ':!moodify-core-package/benchmarks'
   ':!ops/web_origin/site/rongjingmusic/app-workspace.js'
+  ':!ops/web_origin/scan_secrets.sh'
 )
 
 violations=0
