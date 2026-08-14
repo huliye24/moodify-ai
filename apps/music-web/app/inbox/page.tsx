@@ -29,7 +29,7 @@ export default function InboxPage() {
 
   return (
     <main className="public-track">
-      <a href="/">← Moodify</a>
+      <a href="/studio">← 返回创作者中心</a>
       <article>
         <span className="eyebrow">CREATOR INBOX</span>
         <h1>授权意向</h1>

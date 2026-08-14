@@ -85,7 +85,7 @@ export default function ConsolePage() {
 
   return (
     <main className="public-track">
-      <Link href="/">← Moodify</Link>
+      <Link href="/studio">← 返回创作者中心</Link>
       <article>
         <span className="eyebrow">CREATOR CONSOLE</span>
         <h1>创作者控制台</h1>

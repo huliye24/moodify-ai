@@ -8,6 +8,8 @@
 
 **Approval record:** approved 2026-08-14 by human product authority (huliye24) as Phase 1 baseline, no modification; see DECISION_LOG D-003 and GOVERNANCE_RECONCILIATION_REPORT.
 
+> **SUPERSEDED IN PART — Constitution v2.0 (MFY-PRODUCT-CONSTITUTION-001 v2.0, 2026-08-14) and Release Topology v1.0 (MFY-PUBLIC-INTERNAL-TOPOLOGY-001, 2026-08-14) supersede the dual-public-product narrative in this document. The official website is the public entrance to one product, Moodify Music; Moodify Ear is an internal research and production system and must not be presented as a consumer product. This notice is a classification change, not a rewrite of the historical baseline.**
+
 ## 1. Website mission
 
 The official website must make one idea clear:

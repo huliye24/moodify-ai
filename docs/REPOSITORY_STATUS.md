@@ -6,6 +6,15 @@ This document separates current verified capability from target architecture.
 
 > Moodify is The Ear of AI — an Auditory Intelligence System.
 
+## Brand / Core Identity vs Public Product (2026-08-14)
+
+Per Constitution v2.0 and Release Topology v1.0:
+
+- **Brand and core identity:** "The Ear of AI — an Auditory Intelligence System." This is Moodify's identity, not a consumer product.
+- **Public product:** Moodify Music (web/PWA in `apps/music-web`, mobile candidate in `apps/music-android`, service in `moodify-music-package`). Public axis: Library → Track → Now Playing → Play.
+- **Internal systems:** Moodify Ear (`moodify-core-package`, `apps/android`, `apps/ear-workbench`) and the Auditory Intervention Laboratory are internal research/production authority, not public launch surfaces.
+- The verified-capability tables below describe internal capability; they are not public product claims.
+
 ## Current Verified Mainline
 
 ```text

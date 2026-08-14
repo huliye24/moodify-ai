@@ -6,6 +6,8 @@
 **Status:** LIVE — package MFY_PRODUCTION_OPERATIONS_OBSERVABILITY_001 (53)
 **Owner:** Human product authority + ops (huliye24)
 
+> **CLASSIFICATION (2026-08-14) — Per Constitution v2.0: the PUBLIC product topology is the official website → Moodify Music (`rongjinwenchuan.xyz`, Music BFF, PolarDB, media root). Moodify Ear API/worker, ProductionCase/Evidence storage, human review, Workbench and the Intervention Laboratory are INTERNAL production dependencies that stay release-blocking only where they affect Music playback. This document does not assert any deployment beyond what is recorded.**
+
 ## 1. 组件清单（owner / region / port / health / data authority / backup / rollback）
 
 | 组件 | 位置/region | port | health | 数据权威 | 备份 | 回滚 |

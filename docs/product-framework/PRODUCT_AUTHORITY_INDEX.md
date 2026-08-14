@@ -1,7 +1,7 @@
 # Product Authority Index
 
 **Document ID:** MFY-PRODUCT-AUTHORITY-INDEX-001  
-**Version:** 1.0  
+**Version:** 2.0  
 **Date:** 2026-08-14  
 **Status:** LIVE — package MFY_PRODUCT_GOVERNANCE_FREEZE_001 (44)  
 **Owner:** Human product authority (huliye24)  
@@ -11,9 +11,14 @@
 
 | 主题 | 权威文档 | 版本/状态 | 变更流程 |
 |---|---|---|---|
-| 产品身份与边界 | `docs/product-framework/01_MOODIFY_PRODUCT_CONSTITUTION.md` | 1.0 APPROVED（2026-08-14） | 人类批准 + 记录 |
-| 官网信息架构与 claim 规则 | `docs/product-framework/02_OFFICIAL_WEBSITE_BLUEPRINT.md` | 1.0 APPROVED | 人类批准 + 记录 |
-| Ear 产品范围 | `docs/product-framework/03_MOODIFY_EAR_PRODUCT_FRAMEWORK.md` | 1.0 APPROVED | 人类批准 + 记录 |
+| 产品身份与边界 | `docs/product-framework/01_MOODIFY_PRODUCT_CONSTITUTION.md` | 2.0 APPROVED NEXT PHASE（2026-08-14） | 人类批准 + 记录 |
+| Public/Internal 发布拓扑 | `docs/product-framework/05_PUBLIC_INTERNAL_RELEASE_TOPOLOGY.md` | 1.0 ACTIVE | 人类批准 + 记录 |
+| 当前产品资料入口 | `docs/product-framework/00_CURRENT_PRODUCT_DIRECTION_20260815.md` | CURRENT（2026-08-15） | 随产品方向更新 |
+| 公开产品设计 | `docs/product-framework/06_MOODIFY_PUBLIC_PRODUCT_DESIGN_20260815.md` | APPROVED DIRECTION（2026-08-15） | 人类批准 + 真实产品验证 |
+| 声音优先理念 | `docs/product-framework/07_SOUND_FIRST_PRODUCT_DOCTRINE_20260815.md` | CURRENT PHILOSOPHY（2026-08-15） | 盲听证据 + 人类批准 |
+| v1 范围与减法 | `docs/product-framework/08_MOODIFY_V1_SCOPE_AND_SUBTRACTION_20260815.md` | CURRENT V1 SCOPE（2026-08-15） | 上线门 + 减法审计 |
+| 官网信息架构与 claim 规则 | `docs/product-framework/02_OFFICIAL_WEBSITE_BLUEPRINT.md` | 1.0 HISTORICAL WHERE CONFLICTING；双产品叙事被宪章 2.0 取代 | 按 05 拓扑重发 |
+| Ear 产品范围 | `docs/product-framework/03_MOODIFY_EAR_PRODUCT_FRAMEWORK.md` | 1.0 INTERNALIZED；能力保留，公开产品描述被宪章 2.0 取代 | 内部系统变更流程 |
 | Music 产品范围 | `docs/product-framework/04_MOODIFY_MUSIC_PRODUCT_FRAMEWORK.md` | 1.0 APPROVED | 人类批准 + 记录 |
 | 本索引 + 术语表 | `docs/product-framework/PRODUCT_AUTHORITY_INDEX.md`、`TERMINOLOGY_AND_CLAIMS.md` | 1.0 LIVE | 包 44 后按冲突处理流程 |
 | 仓库工程宪法 | `docs/PHASE1_CONSTITUTION.md` | 1.1（判断权威修正） | 紧急变更流程 |

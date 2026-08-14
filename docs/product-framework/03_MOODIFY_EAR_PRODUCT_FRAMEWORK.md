@@ -8,6 +8,8 @@
 
 **Approval record:** approved 2026-08-14 by human product authority (huliye24) as Phase 1 baseline, no modification; see DECISION_LOG D-003 and GOVERNANCE_RECONCILIATION_REPORT.
 
+> **RECLASSIFIED — Constitution v2.0 (2026-08-14) classifies Moodify Ear as an INTERNAL RESEARCH AND PRODUCTION framework, not a public consumer product. The public product is Moodify Music (see 04_MOODIFY_MUSIC_PRODUCT_FRAMEWORK.md and 05_PUBLIC_INTERNAL_RELEASE_TOPOLOGY.md). Ear capabilities, authority, evidence and state machines are retained in full; this notice changes only the public/internal classification.**
+
 ## 1. Product definition
 
 > **Moodify Ear is an auditory intelligence product that turns sound into inspectable judgment, controlled intervention, verification, and reusable evidence.**

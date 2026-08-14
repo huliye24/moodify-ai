@@ -8,6 +8,8 @@
 
 **Approval record:** approved 2026-08-14 by human product authority (huliye24) as Phase 1 baseline, no modification; see DECISION_LOG D-003 and GOVERNANCE_RECONCILIATION_REPORT.
 
+> **CONFIRMED AS THE ONLY PUBLIC PRODUCT — Constitution v2.0 (2026-08-14) designates Moodify Music as the sole public product. Its first public axis is Library → Track → Now Playing → Play, with Source → Moodify → Play as the priority ordering: hearing and preparation happen inside Moodify, and the public experience stays simple. Ear measurements, experimental rankings, DSP graphs, presets and internal confidence must not become a consumer burden (see 05_PUBLIC_INTERNAL_RELEASE_TOPOLOGY.md).**
+
 ## 1. Product definition
 
 > **Moodify Music is a listening and publishing environment centered on musical works, creators, provenance, and meaningful connection.**

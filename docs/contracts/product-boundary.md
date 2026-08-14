@@ -2,6 +2,8 @@
 
 Status: FROZEN — MFY_PRODUCT_BOUNDARY_AND_SHARED_CONTRACTS_001
 
+> **CLASSIFICATION UPDATE (2026-08-14) — Per Constitution v2.0 and Release Topology v1.0: Moodify Music is the only PUBLIC_PRODUCT; Moodify Ear is INTERNAL_CANONICAL (internal research and production authority, not a public consumer product). Contract rules below are unchanged; only the public/internal classification labels are updated.**
+
 ## 产品组合
 
 | 产品 | 核心任务 | 主要用户 | 客户端 | 权威数据 |
@@ -14,10 +16,10 @@ Status: FROZEN — MFY_PRODUCT_BOUNDARY_AND_SHARED_CONTRACTS_001
 
 | 目录 | 分类 | 说明 |
 |---|---|---|
-| moodify-core-package | **EAR_CANONICAL** | Ear 权威后端（job queue/cases/measurements/evidence） |
-| apps/android | **EAR_CANONICAL** | Ear 原生客户端（pairing/jobs/results；CreatorCenter 等 UI = EXPERIMENTAL 标注） |
-| apps/music-web | **MUSIC_CANONICAL** | Music Web/PWA |
-| apps/music-android | **MUSIC_CANONICAL** | Music 最小移动壳（33D） |
+| moodify-core-package | **INTERNAL_CANONICAL** | Ear 权威后端（job queue/cases/measurements/evidence） |
+| apps/android | **INTERNAL_CANONICAL** | Ear 原生客户端（pairing/jobs/results；CreatorCenter 等 UI = EXPERIMENTAL 标注） |
+| apps/music-web | **PUBLIC_PRODUCT** | Music Web/PWA |
+| apps/music-android | **PUBLIC_PRODUCT CANDIDATE** | Music 最小移动壳（33D） |
 | apps/tools | SHARED / EXPERIMENTAL | 工具脚本 |
 | ops/ | SHARED | 部署/运维（web_origin、ear_batch、data_node） |
 | docs/contracts/music | SHARED | Music 契约（身份/所有权/发布/公开 API/生命周期/共享客户端） |

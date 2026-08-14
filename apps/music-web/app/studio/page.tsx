@@ -205,6 +205,11 @@ export default function StudioPage() {
       <section className="studio-card">
         <span className="eyebrow">CREATOR STUDIO</span>
         <h1>发布作品</h1>
+        <nav className="hero-buttons" aria-label="创作者中心">
+          {me?.capabilities?.creator_writes && <Link className="glass" href="/drafts">草稿</Link>}
+          {me?.capabilities?.creator_writes && <Link className="glass" href="/console">控制台</Link>}
+          {me?.capabilities?.account_actions && <Link className="glass" href="/inbox">授权意向</Link>}
+        </nav>
         <p>封面可选。没有封面时，作品使用统一的 Moodify 黑胶视觉。音频将流式上传并记录 SHA-256。</p>
         <form onSubmit={submit}>
           <fieldset><legend>音乐馆</legend>

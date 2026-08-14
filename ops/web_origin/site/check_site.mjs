@@ -37,12 +37,14 @@ test("all required pages exist with meta essentials", async () => {
   }
 });
 
-test("homepage carries the identity hero and Chinese core sentence", async () => {
+test("homepage carries the single public Music product and sound-first test", async () => {
   const home = await html("index.html");
   assert.match(home, /MOODIFY/);
-  assert.match(home, /THE\s*<em>EAR<\/em>\s*OF\s*AI/i);
-  assert.match(home, /让机器不只会生成声音，也真正学会听/);
-  assert.match(home, /Generation is not hearing/);
+  assert.match(home, /LISTEN\. THEN\s*<em>PLAY\.<\/em>/i);
+  assert.match(home, /Moodify 先听，再为你播放/);
+  assert.match(home, /Does the sound stand on its own/);
+  assert.doesNotMatch(home, /href="\/ear\.html"/);
+  assert.doesNotMatch(home, /One ear\. Two products/);
 });
 
 test("no forbidden positive claims on any page", async () => {
@@ -88,4 +90,49 @@ test("robots and sitemap exist", async () => {
   await stat(path.join(site, "robots.txt"));
   const sitemap = await readFile(path.join(site, "sitemap.xml"), "utf8");
   assert.match(sitemap, /<loc>https:\/\/rongjingmusic\.com\/[^<]+<\/loc>/);
+});
+
+test("sitemap keeps public pages and excludes Ear", async () => {
+  const sitemap = await readFile(path.join(site, "sitemap.xml"), "utf8");
+  for (const page of ["/", "/music.html", "/evidence.html", "/about.html", "/contact.html", "/privacy.html"]) {
+    assert.match(sitemap, new RegExp(`<loc>https://rongjingmusic\\.com${page}</loc>`), `sitemap must keep ${page}`);
+  }
+  assert.doesNotMatch(sitemap, /ear\.html/, "sitemap must not list /ear.html");
+});
+
+test("every public page carries the three-item primary nav", async () => {
+  const NAV = ["/", "/music.html", "/evidence.html"];
+  for (const page of pages) {
+    const content = await html(page);
+    const block = content.match(/<nav class="site-nav" aria-label="Primary">\r?\n([\s\S]*?)\r?\n\s*<\/nav>/);
+    assert.ok(block, `${page} missing primary nav`);
+    const links = [...block[1].matchAll(/<a href="([^"]+)"[^>]*>/g)].map((m) => m[1]);
+    assert.deepEqual(links, NAV, `${page} primary nav must be exactly ${NAV.join(", ")}`);
+  }
+});
+
+test("no public page links Ear as a consumer entry", async () => {
+  for (const page of pages) {
+    const content = await html(page);
+    assert.doesNotMatch(content, /<a\b[^>]*href="\/ear\.html"/, `${page} must not link /ear.html in the public site`);
+    assert.doesNotMatch(content, /Enter Ear|Explore Ear|Enter Moodify Ear|One ear\. Two products|Ear and Music are separate products/i, `${page} contains a forbidden dual-product expression`);
+  }
+});
+
+test("the Ear explanation page is retained but internalized", async () => {
+  const ear = await html("ear.html");
+  assert.match(ear, /<meta name="robots" content="noindex,nofollow">/, "ear.html must carry noindex,nofollow");
+  assert.match(ear, /INTERNAL CAPABILITY · HISTORICAL EXPLANATION/, "ear.html must be marked as internal/historical");
+  assert.doesNotMatch(ear, /href="https?:\/\/[^"]*workbench|href="\/apps\//i, "ear.html must not link to the public Workbench");
+});
+
+test("footer keeps legal and contact pages reachable", async () => {
+  for (const page of pages) {
+    const content = await html(page);
+    const footer = content.match(/<footer[\s\S]*?<\/footer>/);
+    assert.ok(footer, `${page} missing footer`);
+    for (const href of ["/about.html", "/contact.html", "/privacy.html"]) {
+      assert.match(footer[0], new RegExp(`href="${href}"`), `${page} footer must keep ${href}`);
+    }
+  }
 });

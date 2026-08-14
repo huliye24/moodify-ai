@@ -1,254 +1,325 @@
 # Moodify Product Constitution
 
 **Document ID:** MFY-PRODUCT-CONSTITUTION-001  
-**Version:** 1.0  
+**Version:** 2.0  
 **Date:** 2026-08-14  
-**Status:** APPROVED BASELINE — approved by human product authority 2026-08-14  
-**Scope:** Moodify brand, official website, Moodify Ear, Moodify Music, and their shared boundaries
+**Status:** APPROVED NEXT PHASE — approved by human product authority 2026-08-14  
+**Scope:** Moodify public product, internal auditory system, playback result, authority and release boundaries
 
 ## 1. Purpose
 
-This constitution defines what Moodify is before further technical expansion. It is the product-level frame within which product design, research, engineering, operations, and communication must operate.
+This constitution defines what Moodify is before further technical or visual expansion. It supersedes the v1 public topology in which Moodify Ear and Moodify Music were presented as parallel public products.
 
-It does not discard the repository's existing technical assets. It assigns them to the correct product role and prevents implementation history from deciding future product identity.
+The change is a reclassification, not a deletion:
+
+```text
+PUBLIC
+Official Website -> Moodify Music
+
+INTERNAL
+Moodify Ear + Auditory Intervention Laboratory + rendering/playback infrastructure
+```
+
+Existing research, Production Cases, Evidence, measurements, interventions, tests and recovery systems remain valuable. They no longer require ordinary users to understand or operate them.
 
 ## 2. Core identity
 
-Moodify is:
+Moodify remains:
 
 > **The Ear of AI — an Auditory Intelligence System.**
 
-Its foundational question is:
+Its foundational internal question remains:
 
 > **Can machines learn to hear?**
 
-Its canonical auditory loop is:
+Its canonical internal loop remains:
 
 ```text
 Listen -> Represent -> Judge -> Intervene -> Verify -> Learn
 ```
 
-Moodify exists because generating sound and hearing sound are different capabilities. A system that produces audio is not thereby able to understand what happened, judge it responsibly, verify an intervention, or learn from evidence.
+For ordinary users, the product promise is simpler:
 
-## 3. Product family
-
-Moodify has one master brand, one official website, and two products.
+> **Moodify listens before you do.**
 
 ```text
-Moodify
-├── Official Website — explains the category, vision, products, and evidence
-├── Moodify Ear — auditory intelligence, judgment, verification, and learning
-└── Moodify Music — discovery, listening, creation, publication, and connection
+SOURCE -> MOODIFY -> PLAY
 ```
 
-The official website is the public entrance to the product family. It is not a third application and must not duplicate the working surfaces of Ear or Music.
+The internal loop explains how Moodify works. It is not a burden placed on the user.
 
-### 3.1 Official Website
+## 3. Supreme product test
 
-**Purpose:** make Moodify understandable and credible.
+Moodify must first stand when the screen is removed.
 
-The website owns:
+> **If brand story, visual polish, technical reports and feature count disappear, leaving only sound, is Moodify still worth using?**
 
-- category definition and brand narrative;
-- the relationship between Moodify, Ear, and Music;
-- public explanation of the auditory loop;
-- carefully qualified research and evidence communication;
-- navigation into the two products.
+The product stands only when the answer is **YES**.
 
-It does not own production cases, music publication state, or application workflows.
+Value order:
 
-### 3.2 Moodify Ear
+```text
+1. Sound result
+2. Result stability and repeatability
+3. Playback experience
+4. Internal evidence, authority and recovery
+5. Visual and brand expression
+```
 
-**Purpose:** enable machines and people to listen, represent, judge, intervene, verify, and learn from sound through traceable evidence.
+Visual design earns the first opening. Sound earns the return.
+
+Claims about better listening require level-matched, randomized and identity-blind listening evidence. Brand, filenames, processing labels and technical metrics must not reveal the candidate during judgment.
+
+## 4. Product topology
+
+### 4.1 Official Website
+
+The official website is the public entrance, not a third product.
+
+It owns:
+
+- the shortest truthful explanation of Moodify;
+- entry into Moodify Music;
+- a small amount of qualified, publish-safe evidence;
+- contact, privacy and company context.
+
+It must not:
+
+- present Ear as a parallel consumer product;
+- require users to understand WSE, MSE, PPE, ProductionCase or Evidence internals;
+- use technical complexity as a substitute for audible value;
+- claim an automated per-track rendering capability that the deployed path does not yet provide.
+
+### 4.2 Moodify Music — the only public product
+
+Moodify Music is:
+
+> **A player that listens to music before it plays music.**
+
+Its first public axis is:
+
+```text
+Library -> Track -> Now Playing -> Play
+```
+
+Music owns public identity, catalogue, immutable track versions, library, playback and the minimum creator/source intake required to supply listening-ready works.
+
+Community, social, licensing, playlists and creator administration are subordinate capabilities. They do not receive public prominence unless evidence shows they directly strengthen the Source-to-Play experience.
+
+Music must not expose Ear measurements, experimental rankings, DSP graphs, presets or internal confidence as a consumer burden.
+
+### 4.3 Moodify Ear — internal research and production system
+
+Moodify Ear is:
+
+> **Moodify's internal system for auditory research, source analysis, Production Cases, judgment, intervention, verification, evidence and playback decisions.**
 
 Ear owns:
 
 - source identity and ingest integrity;
 - auditory and musical representation;
-- measurement, diagnosis, uncertainty, and judgment;
-- controlled intervention experiments;
+- measurement, diagnosis, uncertainty and bounded machine judgment;
+- controlled intervention and BYPASS decisions;
 - before/after verification;
-- Production Cases, Measurement Records, Evidence Artifacts, and Rules;
-- failure, recovery, reproducibility, and learning loops.
+- Production Cases, Measurement Records, Evidence Artifacts and Rules;
+- failure, recovery, reproducibility and learning;
+- internal operator and reviewer workflows.
 
-Ear is not an automatic-mastering product, preset browser, generic audio editor, or a black-box quality score.
+Ear Workbench, Case, Result, Compare, Evidence, Human Review and System Status remain internal operator/research surfaces. They are not public consumer launch surfaces.
 
-### 3.3 Moodify Music
+Internalization must be implemented through classification, routing, identity and access control—not by deleting Ear authority or hiding unsecured public endpoints with CSS.
 
-**Purpose:** create a music environment centered on works, creators, listening, provenance, and meaningful connection.
+### 4.4 Auditory Intervention Laboratory
 
-Music owns:
+Existing DSP and post-processing capabilities remain the **Auditory Intervention Laboratory**, an internal Ear subsystem for controlled candidates and evidence.
 
-- user and creator identity within the product experience;
-- tracks, immutable versions, albums, libraries, playlists, and publication;
-- discovery, playback, collection, following, and creator relationships;
-- Creation Passport declarations;
-- support, licensing, or collaboration intent workflows.
+It is not Moodify's public identity, a preset product, or permission to alter every track.
 
-Music is not an Ear dashboard, an audio-processing console, or a public ranking of experimental Ear metrics.
+## 5. Source and playback result
 
-### 3.4 Auditory Intervention Laboratory
+The source is immutable and must not be irreversibly overwritten.
 
-Existing DSP and post-processing capabilities are retained as the:
+```text
+SOURCE AUDIO
+    -> internal listening and judgment
+    -> optional intervention or BYPASS
+    -> verification
+    -> PLAYBACK-READY VERSION
+    -> PLAY
+```
 
-> **Auditory Intervention Laboratory**
+A playback-ready version may include a processed asset, rendering profile, playback metadata, device/output policy and verification provenance. The exact implementation must follow verified repository reality; this constitution does not authorize inventing a second rendering system.
 
-It is an Ear subsystem used to create controlled candidates and evidence. It is not Moodify's product identity and is not the backend parent of Moodify Music.
+Every track is judged independently. Valid outcomes include:
 
-## 4. Shared product promise
+- meaningful intervention;
+- gain-only preparation;
+- subtle rendering;
+- **BYPASS**.
 
-All Moodify surfaces must express the following promises:
+Every track should be judged does not mean every track must be changed. Moodify must not create a fixed house coloration.
+
+## 6. Shared promises
 
 1. **Hearing before intervention.** Do not change sound without a stated reason.
-2. **Evidence before claims.** Do not call a result better without inspectable support.
-3. **Uncertainty before false confidence.** State limits, missing evidence, and unresolved judgment.
-4. **Human authority where required.** Machine judgment may recommend or decide within an approved scope; unresolved listening judgment must escalate rather than disappear.
-5. **Traceability before convenience.** Important state changes and claims must be attributable and recoverable.
-6. **Learning before feature accumulation.** A case should leave reusable knowledge, not only an output file.
-7. **Product boundaries before code reuse.** Shared infrastructure must not create shared authority by accident.
+2. **Sound before story.** Brand and technical language cannot substitute for audible value.
+3. **Evidence before claims.** Do not call a result better without suitable evidence.
+4. **BYPASS before forced difference.** No change is a successful result when change is not justified.
+5. **Uncertainty before false confidence.** State limits and unresolved judgment internally.
+6. **Human authority where required.** Machine authority is limited to validated, versioned and authorized scope.
+7. **Source preservation before convenience.** Original assets remain identifiable and recoverable.
+8. **Traceability before scale.** Important decisions and outputs must be reproducible.
+9. **Learning before feature accumulation.** Cases should leave reusable knowledge.
+10. **Quiet public surface, rigorous internal system.** Complexity belongs inside Moodify.
 
-## 5. Authority model
-
-Authority is divided by domain.
+## 7. Authority model
 
 | Domain | Authority |
 |---|---|
-| Product identity and boundary | This constitution after human approval |
+| Product identity and public/internal boundary | This constitution after human approval |
+| Public product | Moodify Music |
 | Ear case lifecycle | Canonical `ProductionCase` state machine |
 | Ear measurements | Versioned measurement contracts and implementations |
-| Ear machine judgment | Versioned algorithm/rule within its declared validation scope |
-| Unresolved perceptual judgment | Designated human reviewer or explicit `human_required` state |
-| Music publication | Music publication state and authorized creator action |
-| Music ownership | Music identity and ownership service |
-| Public claims | Product owner plus publish-safe evidence gate |
+| Machine judgment | Versioned rule within its declared validated scope |
+| Unresolved perceptual judgment | Designated human reviewer or explicit `human_required` |
+| Music publication and ownership | Music service and authorized creator action |
+| Source integrity | Immutable ID/version plus cryptographic integrity evidence |
+| Playback-ready selection | One declared, versioned authority; no client guessing |
+| Public claims | Human product authority plus publish-safe evidence gate |
+| Public release GO | Human product authority |
 
-No subsystem may silently promote an experimental metric into production truth, public music certification, copyright judgment, or creator ranking.
+No experimental metric may silently become production truth, a public quality score, copyright judgment or creator ranking.
 
-## 6. Ear–Music boundary
+## 8. Music–Ear boundary
 
-Ear and Music are separate products with limited, explicit exchange.
+Music depends on Ear as an internal production capability, not through direct code or database coupling.
 
-Permitted shared references:
+Permitted exchange:
 
-- immutable asset or version ID;
-- SHA-256 integrity value;
+- immutable asset/version ID and SHA-256;
 - Ear Production Case external reference;
 - publish-safe Evidence Artifact reference and authority state;
-- compatible request ID, error model, and contract versions.
+- processing/request status, request ID, error and contract version;
+- declared playback-ready asset/profile reference when implemented and verified.
 
 Forbidden coupling:
 
-- Music importing Ear internal auditory, orchestration, or intervention modules;
+- Music importing Ear auditory, orchestration or intervention internals;
 - Music reading or mutating Ear databases or case state;
 - Ear mutating Music publication state;
-- Ear experimental scores becoming public rankings or quality certification;
-- Creation Passport being represented as Ear verification or legal ownership proof.
+- Music clients inventing a rendering decision;
+- Ear experimental scores becoming public rankings or certification;
+- Creation Passport being represented as Ear verification or legal proof.
 
-Cross-product analysis follows an exchange workflow only:
+Existing bounded exchange states remain valid until intentionally superseded:
 
 ```text
 requested -> processing -> evidence_ready -> human_reviewed -> optionally_attached
 ```
 
-This workflow does not replace either product's authoritative state machine.
+They do not replace either system's authoritative state machine.
 
-## 7. Product experience principles
+## 9. Release model
 
-Every primary surface must answer:
+The public release candidate contains:
 
-- Which user is this for?
-- What single decision or action dominates this surface?
-- Which product state is authoritative here?
-- What evidence is visible now?
-- What complexity is progressively disclosed?
-- What happens when data is missing, uncertain, or failed?
-- How does the user recover?
+- Official Website;
+- Moodify Music public web surface;
+- verified public media and playback path;
+- Music mobile only when independently ready.
 
-Moodify's visual character is quiet, exact, durable, and authoritative without spectacle. It uses restrained proportions, graphite fields, mineral text colors, one evidence/progress accent, low visual pressure, and charts that answer one question at a time.
+Internal production dependencies may include:
 
-## 8. Product development sequence
+- Ear API and worker;
+- ProductionCase and Evidence storage;
+- human review;
+- intervention/verification pipeline;
+- playback-ready asset preparation;
+- backup, recovery, security and observability.
 
-New development should follow this sequence:
+Ear consumer landing pages and public Workbench reachability are not public release criteria. Ear reliability, evidence integrity, security, recovery and correct output remain release-blocking whenever they affect Music playback.
+
+## 10. Development and subtraction rule
+
+Every public feature must answer:
+
+> **Does this directly improve Source -> Moodify -> Play?**
+
+If not, it must be internalized, deferred, demoted or removed from the public surface. Existing implementation effort is not a reason for public prominence.
+
+Development sequence:
 
 ```text
-Product constitution
--> information architecture
--> critical user journeys
--> interaction prototype
--> state and evidence contracts
--> technical architecture
--> implementation
--> verification
--> reusable asset
+Sound hypothesis
+-> blind listening protocol
+-> source/result contract
+-> internal production path
+-> playback path
+-> failure and recovery
+-> minimal public interaction
+-> visual refinement
 ```
 
-A feature is not ready for implementation until it has:
-
-- a named product and canonical subsystem;
-- a user and case served;
-- a dominant decision or outcome;
-- authoritative state ownership;
-- evidence and verification requirements;
-- failure and recovery behavior;
-- explicit non-goals.
-
-## 9. Non-regression rules
+## 11. Non-regression rules
 
 Moodify must not regress into:
 
-- automatic mastering as the master brand;
-- a collection of presets presented as intelligence;
-- a generic AI music feed;
-- a social platform without an auditory or musical thesis;
-- a dashboard of unvalidated metrics;
-- a second authoritative state machine;
-- a system that removes required human listening authority by omission;
-- a product that hides failure or uncertainty behind visual polish.
+- automatic mastering as the public identity;
+- presets presented as intelligence;
+- a fixed Moodify sound;
+- forced processing where BYPASS is correct;
+- a generic AI music feed or social platform;
+- an Ear metrics dashboard exposed as Music;
+- a second authoritative rendering or state machine;
+- public technical theatre unsupported by blind listening;
+- visual polish that hides failure, uncertainty or raw playback;
+- deletion of internal evidence merely because Ear is no longer public.
 
-## 10. Repository placement
+## 12. Repository placement
 
-| Surface or capability | Canonical location |
-|---|---|
-| Product framework | `docs/product-framework/` |
-| Ear backend | `moodify-core-package/` |
-| Ear native client | `apps/android/` |
-| Music web/PWA | `apps/music-web/` |
-| Music mobile | `apps/music-android/` |
-| Music service | `moodify-music-package/` |
-| Shared contracts | `docs/contracts/`, `schemas/canonical/` |
-| Operations | `ops/` |
-| Historical task packs | `补丁包/` |
+| Surface or capability | Classification | Canonical location |
+|---|---|---|
+| Product framework | AUTHORITY | `docs/product-framework/` |
+| Official website | PUBLIC ENTRY | `ops/web_origin/site/rongjingmusic/` |
+| Music web/PWA | PUBLIC PRODUCT | `apps/music-web/` |
+| Music Android | PUBLIC CANDIDATE | `apps/music-android/` |
+| Music service | PUBLIC PRODUCT SERVICE | `moodify-music-package/` |
+| Ear backend | INTERNAL CANONICAL | `moodify-core-package/` |
+| Ear native client | INTERNAL OPERATOR | `apps/android/` |
+| Ear Workbench | INTERNAL OPERATOR | `apps/ear-workbench/` |
+| Intervention Laboratory | INTERNAL RESEARCH/PRODUCTION | Ear intervention modules and tools |
+| Shared contracts | SHARED BOUNDARY | `docs/contracts/`, `schemas/canonical/` |
+| Operations | SHARED/INTERNAL | `ops/` |
+| Historical task packs | PROCESS/HISTORICAL | `补丁包/` |
 
-## 11. Approval and precedence
+## 13. Approval and precedence
 
-The full product framework is an **approved baseline** (human product authority, 2026-08-14). It must still never silently override a frozen scientific or data contract; any conflict requires the recorded-decision process below.
-
-### Approval record
+Version 2.0 supersedes version 1.0 wherever v1 describes Ear and Music as parallel public products. It does not silently override frozen scientific, data, state-machine or authority contracts.
 
 | Field | Value |
 |---|---|
-| Document | MFY-PRODUCT-CONSTITUTION-001 v1.0 |
+| Document | MFY-PRODUCT-CONSTITUTION-001 v2.0 |
 | Approved by | Human product authority (huliye24) |
 | Date | 2026-08-14 |
-| Resolution | Accepted as Phase 1 baseline without modification |
-| Evidence | Four framework files reviewed and accepted together (43/44 包审阅)；DECISION_LOG D-002/D-003；artifacts/phase1_launch/GOVERNANCE_RECONCILIATION_REPORT.md |
-| Next review | On any material change to product identity, boundary, or authority model |
+| Resolution | Moodify Music is the only public product; Moodify Ear is internal research and production authority |
+| Supreme test | Product value must survive removal of brand, UI, reports and feature count |
+| Next review | Any material change to sound promise, public topology, rendering authority or human authority |
 
-### Judgment-authority decision (approved 2026-08-14, D-002)
+The approved judgment boundary remains:
 
 > Machine authority is limited to a validated, versioned and explicitly authorized scope. Out-of-scope, insufficient-evidence, uncertain or unresolved perceptual cases escalate to human judgment or close as inconclusive/failed.
 
-This decision resolves the prior conflict between `docs/PHASE1_CONSTITUTION.md` and root `AGENTS.md`. The affected authority documents and public README were amended together; the deterministic reviewer remains canonical within its approved technical scope.
-
-## 12. Definition of done
+## 14. Definition of done
 
 Work is complete only when it can answer:
 
-- What user and case does this serve?
-- Which product owns it?
-- What is measured or observed?
+- Does it improve the sound result, playback path or their reliability?
+- What source and user case does it serve?
+- Is it public product or internal capability?
+- Which system owns the authoritative state?
 - What evidence is produced?
-- How is the result verified?
-- Who or what has authority?
+- How is the audible result verified without identity bias?
+- Is BYPASS allowed?
 - What happens on uncertainty or failure?
+- Is the source preserved?
 - Can the result improve the next case?

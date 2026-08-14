@@ -146,14 +146,14 @@ export default function Home() {
       <nav>
         <button className="nav-active" aria-current="page">◉　发现音乐</button>
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-        <a href="/library" className="nav-link">▥　我的音乐</a>
+        {me?.capabilities?.account_actions && <a href="/library" className="nav-link">▥　我的音乐</a>}
       </nav>
-      <div className="nav-group"><span>你的音乐</span><a href="/inbox" className="nav-link">✉　授权意向</a><a href="/studio" className="nav-link">＋　创作者中心</a></div>
-      <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>创作者</span></div><button>•••</button></div>
+      {me?.capabilities?.creator_writes && <div className="nav-group"><span>你的音乐</span><a href="/studio" className="nav-link">＋　创作者中心</a></div>}
+      {me && <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>{me.capabilities?.creator_writes ? "创作者" : "聆听者"}</span></div></div>}
     </aside>
 
     <section className="content">
-      <header><div className="mobile-brand"><img src="/moodify-logo.png" alt="" />Moodify</div><div className="history"><button>‹</button><button>›</button></div><div className="header-actions"><a href="/studio">上传作品</a><button className="round">◎</button></div></header>
+      <header><div className="mobile-brand"><img src="/moodify-logo.png" alt="" />Moodify</div><div className="history"><button>‹</button><button>›</button></div>{me?.capabilities?.creator_writes && <div className="header-actions"><a href="/studio">上传作品</a></div>}</header>
       <div className="hero">
         <div className="hero-copy"><span className="eyebrow">CADEAU10 · 专辑 1</span><h1>{all[active].title}</h1><p>{all[active].artist}</p><div className="hero-buttons"><button onClick={() => setPlaying((value) => !value)} className="primary"><span>{playing ? "Ⅱ" : "▶"}</span>{playing ? "暂停" : "开始聆听"}</button><button className="glass" aria-label={liked.includes(active) ? "取消收藏" : "收藏"} onClick={() => toggleLike(active)}>{liked.includes(active) ? "♥" : "♡"}</button></div></div>
         <div className="orb-wrap"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="hero-vinyl"><RecordArtwork track={all[active]} spinning={playing} /></div><span className="floating-note note-a">♪</span><span className="floating-note note-b">♫</span></div>

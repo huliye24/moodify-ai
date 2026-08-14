@@ -87,3 +87,38 @@ test("assets exist", async () => {
   await stat(path.join(wb, "assets", "workbench.css"));
   await stat(path.join(wb, "assets", "workbench.js"));
 });
+
+test("all eight workbench pages are explicitly internal and excluded from public indexing", async () => {
+  for (const page of pages) {
+    const content = await html(page);
+    assert.match(content, /<meta name="robots" content="noindex,nofollow">/, `${page} missing robots noindex`);
+    assert.match(content, /INTERNAL OPERATOR SYSTEM/, `${page} missing INTERNAL OPERATOR SYSTEM marker`);
+  }
+});
+
+test("sidebar primary nav is exactly four items with identical links on all eight pages", async () => {
+  const NAV = ["/", "/new-case.html", "/evidence.html", "/status.html"];
+  for (const page of pages) {
+    const content = await html(page);
+    const block = content.match(/<nav aria-label="Ear">\r?\n([\s\S]*?)\r?\n\s*<\/nav>/);
+    assert.ok(block, `${page} missing sidebar nav`);
+    const links = [...block[1].matchAll(/<a href="([^"]+)"[^>]*>/g)].map((m) => m[1]);
+    assert.deepEqual(links, NAV, `${page} sidebar nav must be exactly ${NAV.join(", ")}`);
+  }
+});
+
+test("human review is a deep-link surface, not a first-class sidebar entry", async () => {
+  const reviews = await html("reviews.html");
+  const block = reviews.match(/<nav aria-label="Ear">\r?\n([\s\S]*?)\r?\n\s*<\/nav>/);
+  assert.ok(block, "reviews.html missing sidebar nav");
+  assert.doesNotMatch(block[1], /reviews\.html/, "reviews.html must not list itself in the sidebar");
+  // the page itself stays reachable and functional via its deep link
+  assert.match(reviews, /data-page="reviews"/);
+  assert.match(reviews, /id="review-host"/);
+  const js = await readFile(path.join(wb, "assets", "workbench.js"), "utf8");
+  assert.match(js, /page === "reviews"/, "workbench.js must keep loading the review queue on the reviews deep link");
+  // no other workbench page links into reviews as a first-class entry
+  for (const page of pages.filter((p) => p !== "reviews.html")) {
+    assert.doesNotMatch(await html(page), /href="\/reviews\.html"/, `${page} must not link to Human Review in the sidebar`);
+  }
+});

@@ -6,6 +6,8 @@
 **Status:** LIVE — package MFY_CLOUD_RESOURCE_AND_VALIDATION_FABRIC_001 (56)
 **Executor:** DeepSeek（只读盘点；云端写操作需另行授权）
 
+> **CLASSIFICATION (2026-08-14) — This fabric validates INTERNAL systems (Moodify Ear API/worker, Workbench, evidence) and the PUBLIC Music product path (`rongjinwenchuan.xyz` + Music BFF). Validation of internal systems is not a public product claim; the public launch surface is Moodify Music only (Constitution v2.0).**
+
 ## 1. 资源矩阵（任务 3 全字段）
 
 | Resource | 身份/区域 | Current fact（2026-08-14 只读） | 产品归属 | 权威数据 | 禁止数据 | 网络路径 | 运行方式 | 日志 | 备份 | 回滚 | Owner | Status |

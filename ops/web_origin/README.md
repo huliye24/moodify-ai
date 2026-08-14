@@ -1,9 +1,13 @@
 # Moodify Web Origin
 
+> **PUBLIC/INTERNAL CLASSIFICATION (2026-08-14) — Per Constitution v2.0 and Release Topology v1.0: the PUBLIC product entry is `rongjingmusic.com` official website pointing to Moodify Music (`rongjinwenchuan.xyz`). `rongjingwenchuan.com` is a legacy public host awaiting an explicit disposition (redirect/alias/retire) before GO. Moodify Ear and its Workbench are INTERNAL systems; their operator routes must not be presented as public product and are not public launch surfaces.**
+
 This directory defines the reproducible origin-server layer for:
 
-- `rongjingmusic.com` — Moodify Ear workspace
-- `rongjingwenchuan.com` — Moodify auditory-intelligence product site
+- `rongjingmusic.com` — official website (public entry; serves the Music product story, no Ear consumer CTA)
+- `rongjinwenchuan.xyz` — Moodify Music (public product)
+- `rongjingwenchuan.com` — legacy public host (disposition pending)
+- Ear workbench / Ear API proxy — INTERNAL (operator/research only; `noindex` is discovery hygiene, not access control)
 
 The current frontends are static prototypes. Hosting them on the origin does
 not by itself create an auditory-analysis backend. API wiring is a separate,

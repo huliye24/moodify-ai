@@ -76,7 +76,7 @@ export default function TrackPage({ params }: { params: Promise<{ id: string }> 
           {me?.capabilities?.account_actions && (
             <button className="glass" onClick={toggleFavorite}>{favorited ? "♥ 已收藏" : "♡ 收藏"}</button>
           )}
-          <a className="glass" href={`/c/${""}`} style={{ display: "none" }}>创作者</a>
+          {track.creator_handle && <a className="glass" href={`/c/${track.creator_handle}`}>创作者</a>}
         </div>
         <h2>授权此作品</h2>
         <form className="license-form" onSubmit={submitLicense}>

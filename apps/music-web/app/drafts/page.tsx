@@ -46,7 +46,7 @@ export default function DraftsPage() {
 
   return (
     <main className="public-track">
-      <Link href="/">← Moodify</Link>
+      <Link href="/studio">← 返回创作者中心</Link>
       <article>
         <span className="eyebrow">MY DRAFTS</span>
         <h1>我的草稿</h1>
