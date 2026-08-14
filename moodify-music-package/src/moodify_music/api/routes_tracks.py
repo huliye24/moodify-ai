@@ -45,6 +45,7 @@ def _track_dict(t: Track, current_version: TrackVersion | None = None, creator_h
         "published_at": t.published_at.isoformat() if t.published_at else None,
         "updated_at": t.updated_at.isoformat() if t.updated_at else None,
         "ear_production_case_ref": t.ear_production_case_ref,
+        "approved_evidence_ref": t.approved_evidence_ref,
         "creator_handle": creator_handle,
         "version": {
             "id": v.id, "version_no": v.version_no, "audio_asset_key": v.audio_asset_key,

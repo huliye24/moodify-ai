@@ -77,6 +77,43 @@ class AuthSession(Base, TimestampMixin):
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class EvidenceBridge(Base, TimestampMixin):
+    """Ear↔Music evidence exchange — MFY_EAR_MUSIC_EVIDENCE_BRIDGE_001.
+
+    The bridge owns only the *exchange* state, never Ear measurements or
+    Music publication authority. Music never stores Ear internal copies as
+    authority; Ear never stores Music publication state.
+    """
+
+    __tablename__ = "evidence_bridge"
+
+    id: Mapped[str] = mapped_column(String(ID_LEN), primary_key=True, default=new_id)
+    request_key: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    user_id: Mapped[str] = mapped_column(nullable=False)
+    creator_id: Mapped[str] = mapped_column(nullable=False)
+    track_id: Mapped[str] = mapped_column(nullable=False, index=True)
+    version_id: Mapped[str] = mapped_column(nullable=False)
+    asset_ref: Mapped[str] = mapped_column(String(512), nullable=False)
+    asset_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    ear_case_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    exchange_status: Mapped[str] = mapped_column(String(24), nullable=False, default="requested")
+    approved_evidence_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    authority_state: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    publish_safe: Mapped[bool] = mapped_column(nullable=False, default=False)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    reviewer: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    failure_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    attached: Mapped[bool] = mapped_column(nullable=False, default=False)
+
+    __table_args__ = (
+        CheckConstraint(
+            "exchange_status IN ('requested','processing','evidence_ready','human_reviewed',"
+            "'optionally_attached','cancelled','failed','inconclusive')",
+            name="ck_bridge_exchange_status",
+        ),
+    )
+
+
 class UserRole(Base, TimestampMixin):
     """Platform roles independent of Creator status (Ear operator/reviewer etc.).
 
