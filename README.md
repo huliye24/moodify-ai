@@ -32,11 +32,12 @@ A generative model may create a track without having a reliable engineering syst
 - If an intervention is made, did it actually improve the target condition?
 - Can the evidence from this case improve the next case?
 
-Moodify does not outsource judgment to subjective listening. Since 2026-08-11,
-case ranking is produced by a deterministic algorithmic reviewer
-(`moodify.data_factory.algorithmic_review`, formula `MFY-ALGO-REVIEW-FORMULA-001`)
-over frozen measurement judgments — Moodify is the ear of AI, and the loop is
-fully machine-operated.
+Moodify makes machine judgment explicit and reproducible. Its deterministic
+algorithmic reviewer (`moodify.data_factory.algorithmic_review`, formula
+`MFY-ALGO-REVIEW-FORMULA-001`) may rank cases inside its validated, versioned
+scope. Cases outside that scope, with insufficient evidence, or involving
+unresolved perceptual judgment must escalate to human review or close as
+inconclusive; automation does not manufacture certainty.
 
 Moodify is designed around those questions.
 
@@ -143,7 +144,8 @@ Current capabilities:
 - deterministic reference audio suite (10 fixtures, hashes, expected values) —
   [Reference Suite](moodify-core-package/benchmarks/reference_audio/REFERENCE_SUITE.md);
 - diagnosis-derived ABC intervention plans and reproducible DSP candidates;
-- deterministic algorithmic review replacing human blind ranking;
+- deterministic algorithmic review within an approved scope, with explicit
+  human escalation for unresolved perceptual judgment;
 - evidence manifests with artifact hashes; failed jobs fail closed;
 - 24/7 unattended data node (single worker, queue survives restarts);
 - cross-machine repeatability: 52/52 metrics identical across OS/Python
@@ -229,8 +231,9 @@ See:
 - Metrics are trustworthy only under the frozen scan profile
   (`MFY-WSE-SCAN-PROFILE-001`); any profile change requires a new version and
   explicit data separation.
-- The algorithmic reviewer is a deterministic technical ranking, not a claim
-  about artistic quality.
+- The algorithmic reviewer is a deterministic technical ranking within its
+  declared validation scope, not a claim about artistic quality. Out-of-scope
+  or unresolved perceptual cases require human review or an inconclusive result.
 - No private audio, API keys or unauthorized datasets are committed.
 
 ---

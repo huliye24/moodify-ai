@@ -1,8 +1,8 @@
 # Moodify Phase I Constitution
 
-**Version:** 1.0
-**Date:** 2026-08-11
-**Status:** LIVE — replaces scattered architectural notes as the canonical repository constitution
+**Version:** 1.1
+**Date:** 2026-08-14
+**Status:** LIVE — amended by human decision on judgment authority; replaces scattered architectural notes as the canonical repository constitution
 **Related:** [DATA_PROTOCOL_V1.md](contracts/DATA_PROTOCOL_V1.md), [LEGACY_AND_EXPERIMENTAL_POLICY.md](LEGACY_AND_EXPERIMENTAL_POLICY.md), [Production Authority Map](../artifacts/pr15_extraction_001/PRODUCTION_AUTHORITY_MAP.md)
 
 ---
@@ -36,7 +36,7 @@ SOURCE → LISTEN → REPRESENT → JUDGE → ABC INTERVENTION → VERIFY → AL
 | ABC intervention plan | `moodify.data_factory.plan_generator` | `MFY-ABC-HEURISTIC-001` |
 | Candidate processing | `moodify.data_factory.runner` + `moodify.data_factory.intervention` | `MFY-DATA-FACTORY-001` |
 | Comparison / judgment | `moodify.auditory.service.compare_scans` + `moodify.auditory.judgment` | judgment-rules-v1.0 |
-| Review authority | `moodify.data_factory.algorithmic_review` | `MFY-ALGORITHMIC-REVIEW-001` |
+| Review authority | `moodify.data_factory.algorithmic_review` inside its approved scope; designated human reviewer outside that scope | `MFY-ALGORITHMIC-REVIEW-001` + review record |
 | Dataset export | `moodify.data_factory.dataset_builder` | `MFY-DATASET-SCHEMA-001` |
 | Runtime queue | `moodify.node` worker on the Aliyun 2C2G node | `MFY-ALIYUN-DATA-NODE-001` |
 
@@ -45,7 +45,7 @@ Anything not listed here is either an execution adapter or experimental/legacy; 
 ## 3. Authority
 
 - **Case state** is owned by `ProductionCase` (lifecycle + authority state). No parallel state graph may define case lifecycle.
-- **Judgment authority** is `ALGORITHM` by decision of 2026-08-11: Moodify is the ear of AI; no human listening step exists in the loop. `HUMAN_REQUIRED` states remain valid in the contract for historical records and future opt-in review but are never produced by the canonical runner.
+- **Judgment authority** follows the human decision of 2026-08-14: the algorithm may decide only inside a validated, versioned and explicitly authorized scope. An out-of-scope, insufficient-evidence, uncertain or unresolved perceptual case must produce `HUMAN_REQUIRED`, `INCONCLUSIVE` or a defined failure state. A human decision records reviewer, scope, time and supporting evidence. The canonical runner must not suppress escalation to preserve unattended operation.
 - Execution adapters (CLI, Android, cloud workers, queues) consume case IDs and evidence; none may define competing states or mutate case state directly.
 
 ## 4. Data semantics
@@ -57,7 +57,7 @@ Anything not listed here is either an execution adapter or experimental/legacy; 
 ## 5. Phase boundaries
 
 - **Phase I (now → 2026-08-31):** freeze the loop above; 10-song pilot; failure-injection evidence; cross-machine repeatability; scientific GitHub release.
-- **Phase II (September →):** data production, labeling-free algorithmic review, aggregation, statistics, notebooks, ranking models, response curves, threshold calibration. Core metric changes, schema renames, ABC/DSP semantic changes are forbidden without the emergency-change procedure.
+- **Phase II (September →):** data production, scoped algorithmic review, human review where escalated, aggregation, statistics, notebooks, ranking models, response curves, and threshold calibration. Core metric changes, schema renames, ABC/DSP semantic changes are forbidden without the emergency-change procedure.
 - **Not in any phase:** product features unrelated to the auditory loop.
 
 ## 6. Consequence of conflict

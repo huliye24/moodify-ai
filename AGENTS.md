@@ -76,6 +76,16 @@ Do not:
 - remove human authority where the system still depends on listening judgment;
 - introduce secrets, private audio or generated heavy artifacts.
 
+## Judgment Authority
+
+Moodify uses **scoped machine authority with explicit human escalation**:
+
+- a machine may decide only inside a validated, versioned and explicitly authorized scope;
+- an out-of-scope, insufficient-evidence, uncertain or unresolved perceptual case must produce
+  `HUMAN_REQUIRED`, `INCONCLUSIVE` or a defined failure state;
+- automation must not suppress escalation merely to keep the loop unattended;
+- a human decision must record its reviewer, scope, time and supporting evidence.
+
 ## Definition of Done
 
 A code change is not complete merely because it runs.
