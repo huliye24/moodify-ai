@@ -91,10 +91,16 @@
 
 ## 6. 覆盖空洞（无产品表达的技术能力）
 
-- **判断权威状态 UI**：契约与运行时支持 `HUMAN_REQUIRED`/`INCONCLUSIVE`，但没有任何产品表面消费它 → 包 47/48。
-- **Ear 证据对外展示**：证据图/清单完备，无 publish-safe 的对外索引 → 包 46/52。
-- **身份**：三处 PARTIAL 认证没有统一产品表达 → 包 51。
-- **Music Android**：壳存在但无产品价值主张 → 包 49/50 按需决定留或退。
+- **判断权威状态 UI**：契约与运行时支持 `HUMAN_REQUIRED`/`INCONCLUSIVE`；48 包已交付工作台 reviews 页（amber 审核队列）→ **已填补**（7eec681）。
+- **Ear 证据对外展示**：47 工作台 evidence 页 + 52 证据桥 publish-safe 门 → **已填补**（a4927a8 + 68811f5）。
+- **身份**：51 自托管账号体系（会话/CSRF/CORS）→ **已填补**（a7378ae）；真机验证归 59。
+- **Music Android**：壳保持 EXPERIMENTAL（33 包既定）；V1 不阻塞 Web 上线（54 P1 项）。
+
+## 7. 55 包状态更新（RELEASE_TRUTH_RECONCILIATION_001）
+
+- 本矩阵 45–53 已实施能力的状态以各包 commit 为准（见 EVIDENCE_INDEX §4 登记行）；
+- 遗留的 MISSING 项仅限真机待办（⚠ 清单见 LAUNCH_ACCEPTANCE_001 §3）与 R06 阻塞项（58 包解除）；
+- 维护规则：状态变化必须带证据路径与 commit hash；PASS_LOCAL 不得标记为 PASS_LIVE。
 
 ---
 *维护规则：每包完成时更新本矩阵；状态变化必须带证据路径与 commit hash。*

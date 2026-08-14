@@ -56,7 +56,8 @@
 | 50 Creator 发布 | tests/test_creator_publishing.py（4 项：Passport IDOR/发布恢复/媒体保留/幂等重放）+ tests/creator-studio.test.mjs（6 项客户端检查）+ AUDIT.md | 45e7f91 | 94 全绿（music）；Passport 越权 403；发布丢失读权威状态；无媒体静默删除 |
 | 52 证据桥 | models EvidenceBridge 表 + api/routes_bridge.py（requests/update/attach/detach/cancel，单调状态机）+ track 序列化补 approved_evidence_ref + tests/test_evidence_bridge.py（10 项九场景） | 68811f5 | 104 全绿（music）；幂等重放/哈希校验/越权/终态/取消保留审计/内部字段不泄漏 |
 | 53 生产运维 | ops/web_origin/PRODUCTION_TOPOLOGY.md（组件清单/关键路径/缓存策略/缺口）+ ALERTS_AND_RUNBOOK.md（A1–A10 + R1–R3）+ scan_secrets.sh（clean）+ backup_snapshot.sh + 本地备份/恢复演练（ID/hash 零漂移，backup.sha256 3/3 OK）+ DRILLS.md | 8031c0f | secrets clean；隔离恢复演练通过；告警表齐备；真机演练归 54 |
-| 54 上线验收 | LAUNCH_ACCEPTANCE_001.md（候选冻结/场景映射/P0 门/P1/上线步骤/回滚条件）+ GO_NO_GO_RECORD.md 更新（Wave 6：NOT SIGNED，待真机 + 人类签署） | 待提交 | 候选冻结完成；本地门 PASS；⚠ 真机项清单明确；GO 未签署 |
+| 54 上线验收 | LAUNCH_ACCEPTANCE_001.md（候选冻结/场景映射/P0 门/P1/上线步骤/回滚条件）+ GO_NO_GO_RECORD.md 更新（Wave 6：NOT SIGNED，待真机 + 人类签署） | 9d12858 | 候选冻结完成；本地门 PASS；⚠ 真机项清单明确；GO 未签署 |
+| 55 发布真相 | RELEASE_TRUTH_RECONCILIATION_001.md（候选标识 MFY-PHASE1-RC-20260814-1/13 commits/统一测试口径/Gate 标记/风险更新）+ 账本修正（EVIDENCE/CAPABILITY/RISK/GO-NOGO/LAUNCH-ACCEPTANCE） | 待提交 | 只读审计完成；PASS_LOCAL 不冒充 PASS_LIVE；GO 未签署 |
 
 ## 5. 登记规则
 

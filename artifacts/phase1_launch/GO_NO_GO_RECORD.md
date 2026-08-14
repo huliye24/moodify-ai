@@ -34,11 +34,12 @@
   残余风险 owner 确认：____________
 ```
 
-## Wave 6 状态（2026-08-14，包 54）
+## Wave 6 状态（2026-08-14，包 54 + 55 核对）
 
-- **候选冻结完成**：43–53 全部提交（见 LAUNCH_ACCEPTANCE_001.md §1 与 EVIDENCE_INDEX）。
-- 阶段门：Gate A **PASS**（44）；Gate B–E **未到**——待真机部署 + 端到端执行 + 人类签署。
-- **GO/NO-GO：NOT SIGNED**。自动化不得自行签署；本记录保持未签署直到人类产品权威确认。
+- **候选冻结完成**：43–54 共 13 commits（见 RELEASE_TRUTH_RECONCILIATION_001.md §3 与 EVIDENCE_INDEX）。
+- 候选标识：**MFY-PHASE1-RC-20260814-1**（HEAD 9d12858）。
+- 阶段门（55 包基线）：Gate A **PASS_LOCAL**；Gate B/C **PASS_LOCAL**（组件级）；Gate D **PARTIAL**（本地演练通过，R06 未解除）；Gate E **NOT_RUN**。
+- **GO/NO-GO：NOT SIGNED**。自动化不得自行签署；本记录保持未签署直到人类产品权威确认（65 包时间线）。
 
 ## 当前确认的事实边界（2026-08-14 更新）
 

@@ -37,23 +37,23 @@
 | Bridge 全流程 | 52 十测试（attach/detach/终态/审计） |
 | Operations smoke/告警/回滚/备份 | 53 拓扑 + 告警表 + 本地恢复演练（ID/hash 零漂移）+ ⚠ 真机演练 |
 
-## 3. P0 门检查（54 包 §3）
+## 3. P0 门检查（54 包 §3，55 包统一 Gate 标记口径）
 
-| 门 | 状态 | 证据 |
+| 门 | 标记 | 证据 |
 |---|---|---|
-| 产品身份与边界正确 | **PASS** | 44 治理冻结 + 身份回归守卫 |
-| 无伪功能和误导 claim | **PASS** | 46/47/49/50 静态检查（无伪入口/无禁语） |
-| 身份/所有权/隐私/CSRF/CORS/TLS | **PASS（本地）** | 51 测试套件；⚠ 真机 TLS/HSTS 验证 |
-| Ear 判断权威与人工升级 | **PASS（本地）** | 48 十五测试；⚠ 真机升级队列 |
-| Music 播放与 Creator 发布 | **PASS（本地+线上媒体）** | 49/50 测试 + Range 矩阵 |
-| 私人音频/证据/秘密不泄露 | **PASS（本地）** | 53 secrets scan clean + 47/51 no-store 断言；⚠ 真机扫描 |
-| Range/缓存/PWA 正确 | **PASS（本地+线上媒体）** | 49 Range 5/5 + sw.js 断言 |
-| 数据备份可恢复 / release 可回滚 | **PASS（本地演练）** | 53 ID/hash 零漂移；⚠ 真机 PolarDB 恢复 |
-| 关键页面可访问/移动可用 | **PASS（本地）** | 45 a11y 基线 + 46/47/49 宽度截图；⚠ 真机人工验证 |
-| 监控/告警/owner/incident 通道 | **PARTIAL** | 53 告警表齐；⚠ cron 挂载与告警通道 |
-| 全部 P0 证据进入统一索引 | **PASS** | EVIDENCE_INDEX（43–53 全部登记） |
+| 产品身份与边界正确 | **PASS_LOCAL** | 44 治理冻结 + 身份回归守卫 |
+| 无伪功能和误导 claim | **PASS_LOCAL** | 46/47/49/50 静态检查（无伪入口/无禁语） |
+| 身份/所有权/隐私/CSRF/CORS/TLS | **PASS_LOCAL** | 51 测试套件；⚠ 真机 TLS/HSTS（59 包） |
+| Ear 判断权威与人工升级 | **PASS_LOCAL** | 48 十五测试；⚠ 真机升级队列（59/60 包） |
+| Music 播放与 Creator 发布 | **PASS_LOCAL**（媒体链 PASS_LIVE：Range 5/5） | 49/50 测试 + 线上 Range 矩阵 |
+| 私人音频/证据/秘密不泄露 | **PASS_LOCAL** | 53 secrets scan clean + 47/51 no-store 断言；⚠ 真机扫描（59 包） |
+| Range/缓存/PWA 正确 | **PASS_LOCAL**（媒体链 PASS_LIVE） | 49 Range 5/5 + sw.js 断言 |
+| 数据备份可恢复 / release 可回滚 | **PASS_LOCAL** | 53 ID/hash 零漂移；⚠ 真机 PolarDB 恢复（58/61 包） |
+| 关键页面可访问/移动可用 | **PASS_LOCAL** | 45 a11y 基线 + 46/47/49 宽度截图；⚠ 真机人工验证（64 包） |
+| 监控/告警/owner/incident 通道 | **PARTIAL** | 53 告警表齐；⚠ cron 挂载与告警通道（61 包） |
+| 全部 P0 证据进入统一索引 | **PASS** | EVIDENCE_INDEX（43–55 全部登记，55 包核对） |
 
-**结论：任一 ⚠ 真机项未过即 NO_GO。**
+**结论：PASS_LOCAL 不得覆盖 PASS_LIVE；任一 ⚠ 真机项未过即 NO_GO。**
 
 ## 4. P1 条件接受（候选清单）
 
