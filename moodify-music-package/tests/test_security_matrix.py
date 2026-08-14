@@ -122,13 +122,12 @@ def test_listener_cannot_write_creator_surface():
     assert r.json()["error"]["code"] == "OWNERSHIP_DENIED"
 
 
-def test_reviewer_cannot_decide_without_identity():
-    """Reviewer role requires an explicit reviewer identity (48 contract)."""
-    from moodify.authority.review_store import ReviewStore  # noqa: F401  (Ear side; import guard only)
-    # BFF/internal: no review endpoints exist on Music side; the Ear review
-    # API requires reviewer in the body — covered by 48 tests. This test
-    # asserts the matrix records the boundary.
-    assert True
+def test_reviewer_boundary_is_recorded():
+    """Reviewer decisions live on the Ear side (48 package), never on the
+    Music BFF. This test records the boundary without importing Ear modules
+    (music package must not depend on core in a clean environment)."""
+    routes = {r.path for r in bff_app.routes if hasattr(r, "path")}
+    assert not any("review" in path for path in routes), "Music BFF must not expose review endpoints"
 
 
 def test_service_key_required_on_internal_api():
