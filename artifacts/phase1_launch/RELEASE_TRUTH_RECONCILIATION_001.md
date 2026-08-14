@@ -1,39 +1,43 @@
-# Release Truth Reconciliation — 差异报告
+# Release Truth Reconciliation — 差异报告（v1.1 最新真相）
 
 **Document ID:** MFY-RELEASE-TRUTH-001
-**Version:** 1.0
+**Version:** 1.1（2026-08-14 更新：纳入 56–65 完成事实与两项 P0 修复）
 **Date:** 2026-08-14
 **Package:** MFY_RELEASE_TRUTH_RECONCILIATION_001 (55)
 **Executor:** DeepSeek（只读审计 + 文档账本修正；未改产品代码、未部署、未签署 GO）
 
-## 1. 候选标识
+## 1. 候选标识（最新）
 
 ```text
-Candidate ID:      MFY-PHASE1-RC-20260814-1
+Candidate ID:      MFY-PHASE1-RC-20260814-3（43–65 全序列 + 两项 P0 修复后）
 Branch:            codex/mfy-data-foundation-001-rev2
-HEAD:              9d128588b329dcf7827200fd66c6249d584b4252
-Package count:     12（43–54）
-Commit count:      13（含 47 先决 088b25e，本包 55 前共 13 个发布 commit）
+HEAD:              e106b1f18aa50706755e927b7f20a63376646c8b
+Package count:     23（43–65）
+Commit count:      25（含 47 先决 088b25e、57 三连 80b3c5c/7d4982b/a28ab02、63 修复 47c4db2）
+P0 修复 commit:    2（7d4982b 工作台 HTML、47c4db2 官网 HTML — 均因 *.html gitignore 吞源码）
 Tracked dirty:     1（apps/music-web/package-lock.json — 第三方变更，未提交）
-Untracked release-relevant: ops/web_origin 部署脚本族、ops/ear_batch、docs/contracts/music/music_public_api.md（见 §4）
-Local gates:       Gate A PASS_LOCAL；Gate B–D 组件级 PASS_LOCAL（见 §6）
-Live gates:        ALL NOT_RUN（真机部署/验证归 59–61/65）
-Blocking risks:    R06（PolarDB 凭据/VPC 对等，58 包解除）
-Next package readiness: 56（云资源盘点）与 57（候选完整性）可并行开工
+Untracked release-relevant: 0（57 已全部纳入候选）
+Ignored release-relevant:    0（ignored 分类见 §4，无候选必需文件被忽略）
+Local gates:       Gate A PASS_LOCAL；Gate B–D 非视觉 P0 全过（63 独立验证）
+Live gates:        ALL NOT_RUN（真机部署/验证待授权，归 59–61/65）
+Blocking risks:    R06（PolarDB 凭据/VPC 对等，58 包已冻结计划，云端解除待授权）
+Next package readiness: 64（Codex 视觉终审，证据包已备）→ 65（Canary GO，待授权 A–E）
 ```
 
-## 2. 每项旧记录差异说明
+## 2. 每项旧记录差异说明（v1.0 → v1.1）
 
-| 旧记录 | 差异 | 修正 |
+| 旧记录（v1.0） | 差异 | 修正（v1.1） |
 |---|---|---|
-| Evidence Index 54 行「待提交」 | 54 实际已提交 9d12858 | 更新为 9d12858 |
-| 「43–54 是 12 个包」 | 实际 13 个 commit | 55 起口径 = 13 commits / 12 packages |
-| Capability Matrix 仍留 MISSING/PARTIAL | 45–53 已实施 | 按提交证据更新为 READY/明示待真机 |
-| GO/NO-GO Gate B–D 状态滞后 | 组件级本地证据已具备 | 标 PASS_LOCAL（不覆盖 PASS_LIVE） |
-| 测试口径混写（music 94/104、前端 4/5 套） | 各包提交时快照不同 | 统一为 55 包全量口径（§5） |
-| 工作区未提交部署/契约/测试/证据 | 部署脚本族未跟踪（57 处理）；package-lock 未提交 | 记录不删除不移动 |
+| 候选 RC-20260814-1（HEAD 9d12858） | 55 后完成 56–65（12 commits）+ 2 修复 | RC-20260814-3 / HEAD e106b1f |
+| commit 13 / 包 12 | 全序列 25 commits / 23 包 | §3 更新 |
+| untracked release-relevant 19 个 | 57 包已纳入候选（80b3c5c） | 0 个 |
+| 工作台 HTML 被忽略（55 未发现） | 57 发现并修复（7d4982b） | 已跟踪 |
+| 官网 HTML 被忽略（55 未发现） | 63 独立验证发现并修复（47c4db2） | 已跟踪 |
+| 测试口径 music 104 | 58 包 +4（数据面约束） | music 108 |
+| Gate B–D「组件级 PASS_LOCAL」 | 63 干净环境独立复验全绿 | 非视觉 P0 全过 → READY_FOR_VISUAL_REVIEW |
+| ignored 分类缺失 | 55 执行步骤 3 要求三分列 | §4 补齐 |
 
-## 3. Commit 序列（43–54，父子顺序）
+## 3. Commit 序列（43–65，父子顺序，25 commits）
 
 | # | commit | 包 |
 |---|---|---|
@@ -50,48 +54,61 @@ Next package readiness: 56（云资源盘点）与 57（候选完整性）可并
 | 11 | 68811f5 | 52 证据桥 |
 | 12 | 8031c0f | 53 生产运维 |
 | 13 | 9d12858 | 54 上线验收 |
+| 14 | 7506bdc8 | 55 真相核对（v1.0） |
+| 15 | dcc7a36 | 56 验证织网 |
+| 16 | 80b3c5c | 57 候选完整性（纳入 29 文件） |
+| 17 | 7d4982b | **57/63 P0 修复：工作台 HTML 纳入** |
+| 18 | a28ab02 | 57 release manifest |
+| 19 | 5424c66 | 58 数据面冻结 |
+| 20 | ab5968d | 59 安全验收 |
+| 21 | 90ac3a7 | 60/61 E2E+可靠性 |
+| 22 | e2be112 | 62 季度冻结 |
+| 23 | 47c4db2 | **63 P0 修复：官网 HTML 纳入** |
+| 24 | a0bbd17 | 63 独立验证报告 |
+| 25 | e106b1f | 64/65 视觉包+Canary |
 
-## 4. 工作区分类（只读列出）
+## 4. 工作区三分列（v1.1 补齐 ignored）
 
-- **tracked modified（1）**：apps/music-web/package-lock.json
-- **untracked release-relevant（19）**：ops/web_origin/（deploy_moodify_service.sh、deploy_static_origins.sh、rollback_static_origin.sh、verify_origins.sh、nginx/moodify-api-limits.conf、node.env.example、cloudflared/、systemd/、README.md）、ops/ear_batch/、docs/contracts/music/music_public_api.md、artifacts/（ear_batch、ear_pilot_001、mfy_data_foundation_001_rev2、mfy_infra_foundation_001、mfy_music_creator_lifecycle_001、web_origin）
-- **untracked 非 release-relevant**：.claude/、.codex_tmp/、tsconfig.tsbuildinfo、temp/、tests/、moodify-core-package/outputs/ear_wb_demo/（本地演示）
+- **tracked modified（1）**：apps/music-web/package-lock.json（第三方，55 不处理、57 不处理，发布前需人类决定）。
+- **untracked（0 release-relevant）**：57 已纳入部署脚本族/契约/ear_batch；其余 untracked（.claude/、.codex_tmp/、outputs/ear_wb_demo/、tsbuildinfo）非候选必需。
+- **ignored（候选相关为 0）**：`*.html` 规则曾吞工作台/官网页面（双 P0 已修，例外规则已加）；其余 ignored 均为缓存/构建产物/历史素材（node_modules、__pycache__、build/、dist/、.venv、07Music/、RJWC_VideoPack_System/、android-studio-quail2-windows.exe、apps/tools/、artifacts/audits/ 等）——无候选必需文件。
 
-→ 57 包必须把部署脚本族纳入候选（自包含候选），55 只记录。
-
-## 5. 统一测试口径（55 包基线，本地，2026-08-14）
+## 5. 统一测试口径（v1.1，干净环境独立重跑，2026-08-14）
 
 | 套件 | 数量 | 类型 | 运行环境 |
 |---|---|---|---|
-| moodify-core-package 全量 | 639 passed / 5 skipped | pytest | 本地 Windows + Python 3.11 |
-| moodify-music-package 全量 | 104 passed | pytest | 本地 Windows + Python 3.11 |
-| 前端静态 checks（5 套） | design 7/7、site 6/6、workbench 7/7、listening 7/7、creator-studio 6/6 | node --test | 本地 Node 22 |
-| ruff | clean（本包引入代码） | — | 本地 |
+| moodify-core-package 全量 | 639 passed / 5 skipped | pytest | 干净 checkout（63 独立重跑）+ 本地 |
+| moodify-music-package 全量 | 108 passed（55 后 +4 数据面） | pytest | 干净 checkout + 本地 |
+| 前端静态 checks（5 套） | design 7/7、site 6/6、workbench 7/7、listening 7/7、creator-studio 6/6 | node --test | 干净 checkout（63 重跑，site 修复后 6/6） |
+| ruff | clean | — | 本地 |
 
-口径规则：最终全量（639/104）与包内增量（15/14/10…）分列；静态检查按套计数；环境与日期随行记录；禁止混写。
+口径规则：最终全量与包内增量分列；静态检查按套计数；环境与日期随行记录；禁止混写。
 
-## 6. Gate 标记（55 包基线）
+## 6. Gate 标记（v1.1，63 独立验证后）
 
 | Gate | 标记 | 证据 |
 |---|---|---|
 | A 产品框架冻结 | **PASS_LOCAL**（人类批准 2026-08-14） | 四框架 APPROVED v1.0（7319c93） |
-| B 可交互产品壳 | **PASS_LOCAL**（组件级） | 45/46/47/49 截图 + 静态检查；真机视觉归 64/65 |
-| C 关键闭环 | **PASS_LOCAL**（组件级） | 47 真实案例、49 Range 5/5、50/52 测试 |
-| D 生产准备 | **PARTIAL**（本地演练通过，真机未执行） | 53 secrets clean + 恢复演练；R06 未解除 |
+| B 可交互产品壳 | **PASS_LOCAL**（非视觉 P0 全过） | 45–49 检查 + 63 干净环境重跑；视觉终审归 64（Codex） |
+| C 关键闭环 | **PASS_LOCAL**（非视觉 P0 全过） | 47 真实案例、49 Range 5/5、50/52 测试、63 复验 |
+| D 生产准备 | **PARTIAL**（本地演练通过；真机未执行） | 53 演练 + 58 计划；R06 未解除 |
 | E 公共上线 | **NOT_RUN**（GO 未签署，禁止自动化） | GO_NO_GO_RECORD NOT SIGNED |
 
-## 7. 风险账更新（对照 43 包 Risk Register）
+63 输出：**READY_FOR_VISUAL_REVIEW**（全部非视觉 P0 通过）。
 
-| 风险 | 43 状态 | 55 状态 | 依据 |
-|---|---|---|---|
-| R01 身份（三处 PARTIAL） | OPEN | **CLOSED_LOCAL**（51 已实施，生产默认匿名+会话） | a7378ae；真机验证归 59 |
-| R11 判断权威漂移 | MONITOR | **MONITOR**（48 已实施范围合同+升级） | 7eec681 |
-| R12 人工评审资源 | OPEN | **OPEN**（reviewer 角色待指定；48 记录格式已具） | 7eec681；真机归 59/65 |
-| R06 跨域（PolarDB 凭据/VPC 对等） | BLOCKED | **BLOCKED**（58 包解除） | 凭据未到位 |
-| R05–R10 运维 | OPEN | **PARTIAL_LOCAL**（53 告警/备份/回滚演练） | 8031c0f；真机归 61 |
+## 7. 风险账更新（对照 43 包 Risk Register，v1.1）
 
-## 8. 事实边界
+| 风险 | 状态 | 依据 |
+|---|---|---|
+| R01 身份 | **CLOSED_LOCAL** | a7378ae；真机归 59 |
+| R03 证据权威 | **MONITOR** | 68811f5（桥 publish-safe 门） |
+| R05–R10 运维 | **PARTIAL_LOCAL** | 8031c0f + 90ac3a7（soak/SLO） |
+| R06 跨域 | **BLOCKED（计划已冻结）** | 5424c66；凭据/VPC 授权待人类 |
+| R11 判断权威漂移 | **MONITOR** | 7eec681 |
+| R12 人工评审资源 | **OPEN** | reviewer 待指定；真机归 59/65 |
 
-- 本报告基于 55 包开工时（2026-08-14）工作树；55 不处理未跟踪文件（57 处理）。
-- 任何 Gate 不得以本报告 PASS_LOCAL 冒充 PASS_LIVE；GO 签署仅限人类。
-- 56–58 为后续包；59–65 依赖真机/Codex/人类 GO，本包不预支其结论。
+## 8. 事实边界（v1.1）
+
+- 本报告基于 2026-08-14 全序列完成后的工作树；只读审计，未部署、未签署 GO。
+- 55 为「可签署的发布事实」：任何 Gate 不得以 PASS_LOCAL 冒充 PASS_LIVE；GO 仅限人类。
+- 后续变更（64 Codex 结论、65 真机）将再次更新本报告（v1.2+）。
