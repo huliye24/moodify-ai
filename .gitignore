@@ -90,6 +90,9 @@ outputs/data_factory/
 # Ear workbench pages are canonical app source (MFY_RELEASE_CANDIDATE_INTEGRITY_001)
 !apps/ear-workbench/*.html
 
+# Official website pages are canonical static source (MFY_DEEPSEEK_INDEPENDENT_RELEASE_VERIFICATION_001)
+!ops/web_origin/site/rongjingmusic/*.html
+
 # Music platform source and lightweight brand asset are canonical app inputs.
 !apps/music-web/public/moodify-logo.png
 
