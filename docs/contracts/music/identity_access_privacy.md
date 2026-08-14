@@ -71,10 +71,11 @@
 ```
 MOODIFY_BFF_AUTH_MODE=anonymous            # anonymous | invite_beta | demo_read_only(仅dev)
 MOODIFY_BFF_CORS_ORIGINS=https://…         # 逗号分隔精确 origin
-MOODIFY_BFF_SESSION_SECRET=<≥32字符>        # 已有
-MOODIFY_BFF_BETA_INVITES={"<sha256>":"<user_id>"}   # 已有
+MOODIFY_BFF_BETA_INVITES={"<sha256>":"<user_id>"}   # 已有（会话为服务端存储，无需 secret）
 MOODIFY_INTERNAL_API_KEY=<service key>      # 已有（内部）
 ```
+
+注：`MOODIFY_BFF_SESSION_SECRET` 已于 51 重写（opaque 服务端会话）后退役——无代码读取（62 冻结守卫发现并移除）。
 
 ## 7. 事实边界
 
