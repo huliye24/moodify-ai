@@ -160,6 +160,27 @@ section:last-of-type { border-bottom: 0; }
 .product-card ul { margin: 0; padding-left: 18px; color: var(--text-muted); font-size: 13px; }
 @media (max-width: 800px) { .products { grid-template-columns: 1fr; } }
 
+/* Android release download */
+.download-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 36px;
+  align-items: center;
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px solid rgba(123, 92, 255, 0.32);
+  border-radius: 20px;
+  background: radial-gradient(circle at 85% 15%, rgba(23, 190, 244, 0.12), transparent 38%), var(--surface-subtle);
+}
+.download-card h2 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px); margin: 8px 0 12px; }
+.download-card p { color: var(--text-muted); max-width: 620px; }
+.download-qr { margin: 0; text-align: center; }
+.download-qr img { width: 176px; height: 176px; padding: 10px; border-radius: 16px; background: #fff; image-rendering: pixelated; }
+.download-qr figcaption { margin-top: 9px; color: var(--text-faint); font-size: 12px; }
+@media (max-width: 680px) {
+  .download-card { grid-template-columns: 1fr; }
+  .download-qr { justify-self: start; }
+}
+
 /* evidence list */
 .evidence-list { display: grid; gap: 14px; margin-top: 28px; }
 .evidence-item {

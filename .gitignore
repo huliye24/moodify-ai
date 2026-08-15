@@ -84,6 +84,12 @@ outputs/data_factory/
 *.html
 *.bak
 
+# Canonical Android brand assets must remain versioned.
+!apps/android/app/src/main/res/drawable/ic_launcher_foreground.png
+!apps/android/app/src/main/res/drawable/moodify_logo_symbol.png
+!apps/android/app/src/main/res/drawable/moodify_lockscreen_artwork.png
+!ops/web_origin/site/rongjingmusic/assets/moodify-android-2.0-download-qr.png
+
 # Product UI source (required by moodify_runtime.operator_api)
 !moodify_runtime/operator_console.html
 

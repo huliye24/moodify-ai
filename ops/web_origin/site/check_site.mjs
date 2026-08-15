@@ -63,12 +63,17 @@ test("no forbidden positive claims on any page", async () => {
 test("every CTA resolves to a real route or approved external target", async () => {
   const internal = new Set(pages);
   const approvedExternal = [/^https:\/\/rongjinwenchuan\.xyz(\/|$)/, /^mailto:/, /^#/];
+  const approvedDownloads = [
+    /^\/downloads\/Moodify_Music_\d+\.\d+\.\d+_Android_\d{8}\.apk$/,
+    /^\/downloads\/Moodify_Music_\d+_\d+_\d+_Android_\d{8}\.zip$/,
+  ];
   for (const page of pages) {
     const content = await html(page);
     // CTA check applies to <a href> navigation links, not meta/canonical/og:url.
     const links = [...content.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map((m) => m[1]).filter((h) => !h.startsWith("/assets/"));
     for (const href of links) {
       if (href.startsWith("/")) {
+        if (approvedDownloads.some((re) => re.test(href))) continue;
         const target = href.slice(1) || "index.html";
         assert.ok(internal.has(target), `${page} links to missing route: ${href}`);
       } else if (!approvedExternal.some((re) => re.test(href))) {

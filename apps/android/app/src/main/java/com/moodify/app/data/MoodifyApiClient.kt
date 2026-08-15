@@ -1,8 +1,6 @@
 package com.moodify.app.data
 
-import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -47,92 +45,6 @@ class MoodifyApiClient(
         Capabilities.fromJson(JSONObject(body))
     }
 
-    /** Create a project; server auto-starts the pipeline job (DSK-MFY-DEMO-001). */
-    fun createProject(title: String, sourceAudioIds: List<String>, token: String): ProjectCreated {
-        val payload = JSONObject()
-            .put("title", title)
-            .put("source_audio_ids", JSONArray().apply { sourceAudioIds.forEach(::put) })
-            .toString()
-        return request("POST", "/projects", payload, token = token) { body ->
-            ProjectCreated.fromJson(JSONObject(body))
-        }
-    }
-
-    fun getJob(jobId: String, token: String): DemoJobStatus =
-        request("GET", "/jobs/$jobId", null, token = token) { body ->
-            DemoJobStatus.fromJson(JSONObject(body))
-        }
-
-    fun getJobResult(jobId: String, token: String): DemoResultSummary =
-        request("GET", "/jobs/$jobId/result", null, token = token) { body ->
-            DemoResultSummary.fromJson(JSONObject(body))
-        }
-
-    fun requestCatalog(token: String): String =
-        request("GET", "/catalog", null, token = token) { it }
-
-    /** Pairwise Auditory Judge: compare two candidates (DSK-MFY-PAIRWISE-JUDGE-001). */
-    fun judgePair(
-        candidateAUploadId: String,
-        candidateBArtifactId: String?,
-        candidateBUploadId: String?,
-        token: String,
-    ): PairwiseJudgmentResult {
-        val payload = JSONObject()
-            .put("candidate_a_upload_id", candidateAUploadId)
-            .apply {
-                if (candidateBUploadId != null) put("candidate_b_upload_id", candidateBUploadId)
-                if (candidateBArtifactId != null) put("candidate_b_artifact_id", candidateBArtifactId)
-            }
-            .toString()
-        return request("POST", "/pairwise-judgments", payload, token = token) { body ->
-            PairwiseJudgmentResult.fromJson(JSONObject(body))
-        }
-    }
-
-    /** Record a human confirm/override for a pairwise judgment. */
-    fun submitHumanDecision(judgmentId: String, decision: String, reason: String, token: String): String {
-        val payload = JSONObject()
-            .put("decision", decision)
-            .put("reason", reason)
-            .toString()
-        return request("POST", "/pairwise-judgments/$judgmentId/human-decision", payload, token = token) { it }
-    }
-
-    /**
-     * Multipart upload of a real audio file. Returns the upload_id.
-     * Uses a longer read timeout since 50 MB over USB/LAN can take a while.
-     */
-    fun uploadAudio(
-        token: String,
-        projectId: String,
-        filename: String,
-        sizeBytes: Long,
-        sha256: String,
-        fileBytes: ByteArray,
-        mime: String,
-    ): String {
-        val boundary = "moodify-${System.nanoTime()}"
-        val body = buildMultipart(fields = mapOf(
-            "project_id" to projectId,
-            "filename" to filename,
-            "size_bytes" to sizeBytes.toString(),
-            "sha256" to sha256,
-        ), fileBytes = fileBytes, filename = filename, mime = mime, boundary = boundary)
-
-        val url = URL(endpoint("/uploads"))
-        val connection = open(url, "POST", readTimeoutMs = 120_000)
-        try {
-            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-            connection.setRequestProperty("Authorization", "Bearer $token")
-            connection.outputStream.use { it.write(body) }
-        } catch (e: java.io.IOException) {
-            connection.disconnect()
-            throw ConnectionError.Offline(e)
-        }
-        return requestFinished(connection, "upload") { JSONObject(it).getString("upload_id") }
-    }
-
     private fun open(url: URL, method: String, readTimeoutMs: Int): HttpURLConnection {
         val connection = try {
             url.openConnection() as HttpURLConnection
@@ -173,31 +85,6 @@ class MoodifyApiClient(
             throw toApiError(status, responseText)
         }
         return parse(responseText)
-    }
-
-    private fun buildMultipart(
-        fields: Map<String, String>,
-        fileBytes: ByteArray,
-        filename: String,
-        mime: String,
-        boundary: String,
-    ): ByteArray {
-        val out = ByteArrayOutputStream()
-        fun write(s: String) = out.write(s.toByteArray(Charsets.UTF_8))
-        fun write(b: ByteArray) = out.write(b)
-        val crlf = "\r\n"
-        fields.forEach { (key, value) ->
-            write("--$boundary$crlf")
-            write("Content-Disposition: form-data; name=\"$key\"$crlf$crlf")
-            write("$value$crlf")
-        }
-        write("--$boundary$crlf")
-        write("Content-Disposition: form-data; name=\"file\"; filename=\"$filename\"$crlf")
-        write("Content-Type: $mime$crlf$crlf")
-        write(fileBytes)
-        write(crlf)
-        write("--$boundary--$crlf")
-        return out.toByteArray()
     }
 
     private fun <T> request(
