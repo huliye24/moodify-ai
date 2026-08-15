@@ -33,6 +33,9 @@ def clean_tables():
 def test_auth_required():
     assert client.post("/internal/v1/music/users", json={"display_name": "x"}).status_code == 401
     assert client.get("/health").status_code == 200  # health public
+    ready = client.get("/ready")
+    assert ready.status_code == 200
+    assert ready.json()["database_authority"] == "polardb"
 
 
 def test_error_model():
@@ -84,6 +87,53 @@ def test_full_track_flow():
     assert p["status"] == "published"
     assert p["published_at"] is not None
     return u, c, t, v
+
+
+def test_catalogue_returns_playable_metadata_and_stable_pages():
+    u, c = _seed_user_creator()
+    published = []
+    for index in range(3):
+        track = client.post(
+            "/internal/v1/music/tracks",
+            headers=AUTH,
+            json={"creator_id": c["id"], "title": f"Cloud Song {index}"},
+        ).json()
+        client.post(
+            f"/internal/v1/music/tracks/{track['id']}/versions",
+            headers=AUTH,
+            json={"audio_asset_key": f"owned/cloud-{index}.wav", "duration_ms": 180000},
+        )
+        client.put(
+            f"/internal/v1/music/tracks/{track['id']}/passport",
+            headers=AUTH,
+            json={"origin_type": "ai", "rights_statement": "owned"},
+        )
+        published.append(client.post(
+            f"/internal/v1/music/tracks/{track['id']}/publish",
+            headers=AUTH,
+            json={},
+        ).json())
+
+    first = client.get("/internal/v1/music/catalogue?limit=2", headers=AUTH).json()
+    assert len(first["tracks"]) == 2
+    assert first["next_cursor"]
+    assert all(item["version"]["audio_asset_key"].startswith("owned/") for item in first["tracks"])
+    assert all(item["creator_handle"] == "alice" for item in first["tracks"])
+
+    second = client.get(
+        "/internal/v1/music/catalogue",
+        headers=AUTH,
+        params={"limit": 2, "cursor": first["next_cursor"]},
+    ).json()
+    assert len(second["tracks"]) == 1
+    assert second["next_cursor"] is None
+    assert {item["id"] for item in first["tracks"] + second["tracks"]} == {
+        item["id"] for item in published
+    }
+
+    invalid = client.get("/internal/v1/music/catalogue?cursor=broken", headers=AUTH)
+    assert invalid.status_code == 400
+    assert invalid.json()["error"]["code"] == "INVALID_CURSOR"
 
 
 def test_social_and_intents():

@@ -34,17 +34,20 @@ python ops/schema_dry_run.py || exit 1
 echo "[5/7] backup: mysqldump -> backup root"
 BACKUP="${MOODIFY_BACKUP_ROOT:-/var/backups/moodify}/$STAMP"
 mkdir -p "$BACKUP"
+export MYSQL_PWD="${MOODIFY_DB_PASSWORD:-}"
 mysqldump --single-transaction --routines \
-  -h "$MOODIFY_DB_HOST" -u "$MOODIFY_DB_USER" "${MOODIFY_DB_PASSWORD:+ -p$MOODIFY_DB_PASSWORD}" \
+  -h "$MOODIFY_DB_HOST" -u "$MOODIFY_DB_USER" \
   "$MOODIFY_DB_NAME" > "$BACKUP/music-db.sql"
+test -s "$BACKUP/music-db.sql"
 sha256sum "$BACKUP/music-db.sql" > "$BACKUP/music-db.sql.sha256"
 echo "  backup: $BACKUP/music-db.sql"
 
 echo "[6/7] restore into isolated database"
-mysql -h "$MOODIFY_DB_HOST" -u "$MOODIFY_DB_USER" "${MOODIFY_DB_PASSWORD:+ -p$MOODIFY_DB_PASSWORD}" \
+mysql -h "$MOODIFY_DB_HOST" -u "$MOODIFY_DB_USER" \
   -e "CREATE DATABASE IF NOT EXISTS ${MOODIFY_DB_NAME}_restore_${STAMP}"
-mysql -h "$MOODIFY_DB_HOST" -u "$MOODIFY_DB_USER" "${MOODIFY_DB_PASSWORD:+ -p$MOODIFY_DB_PASSWORD}" \
+mysql -h "$MOODIFY_DB_HOST" -u "$MOODIFY_DB_USER" \
   "${MOODIFY_DB_NAME}_restore_${STAMP}" < "$BACKUP/music-db.sql"
+unset MYSQL_PWD
 
 echo "[7/7] entity reconciliation (zero drift required)"
 # export both schemas to sqlite-compatible dumps or run reconcile against a

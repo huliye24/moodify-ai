@@ -15,6 +15,7 @@ import functools
 import time
 import uuid
 import os
+from urllib.parse import urlencode
 
 import httpx
 from fastapi import FastAPI, Request
@@ -58,7 +59,11 @@ def _cached(key: str, ttl_key: str):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             now = time.monotonic()
-            hit = _cache.get(key)
+            request = kwargs.get("request") or next(
+                (value for value in args if isinstance(value, Request)), None
+            )
+            cache_key = f"{key}?{request.url.query}" if request and request.url.query else key
+            hit = _cache.get(cache_key)
             if hit and now - hit[0] < _TTL[ttl_key]:
                 return JSONResponse(content=hit[1])
             result = func(*args, **kwargs)
@@ -66,7 +71,7 @@ def _cached(key: str, ttl_key: str):
                 import json as _json
 
                 body = _json.loads(result.body)
-                _cache[key] = (now, body)
+                _cache[cache_key] = (now, body)
             return result
         return wrapper
     return decorator
@@ -213,6 +218,36 @@ def health():
     return {"status": "ok", "service": "moodify-music-bff", "direct_db": False}
 
 
+@app.get("/ready")
+def ready(request: Request):
+    """BFF readiness follows the authoritative Hangzhou/PolarDB data path."""
+    try:
+        response = httpx.get(
+            f"{UPSTREAM}/ready",
+            headers=_upstream_headers(request),
+            timeout=TIMEOUT,
+        )
+    except httpx.RequestError:
+        return JSONResponse(status_code=503, content={
+            "status": "not_ready",
+            "service": "moodify-music-bff",
+            "upstream": "unreachable",
+        })
+    if response.status_code != 200:
+        return JSONResponse(status_code=503, content={
+            "status": "not_ready",
+            "service": "moodify-music-bff",
+            "upstream": "not_ready",
+        })
+    return {
+        "status": "ready",
+        "service": "moodify-music-bff",
+        "upstream": "ready",
+        "database_authority": "polardb",
+        "direct_db": False,
+    }
+
+
 def _session_service(method: str, path: str, body: dict) -> dict | None:
     """Call the internal auth service; returns parsed JSON or None on failure."""
     try:
@@ -310,8 +345,11 @@ def bootstrap(request: Request):
 
 @app.get("/api/v1/music/catalogue")
 @_cached("catalogue", "catalogue")
-def catalogue(request: Request):
-    return _forward("GET", "/catalogue", request, retries=1)
+def catalogue(request: Request, limit: int = 50, cursor: str | None = None):
+    query = {"limit": min(max(limit, 1), 100)}
+    if cursor:
+        query["cursor"] = cursor
+    return _forward("GET", f"/catalogue?{urlencode(query)}", request, retries=1)
 
 
 @app.put("/api/v1/music/media")

@@ -34,15 +34,20 @@ def fetch_references(api: str) -> set[str]:
 
 
 def scan_root(root: str) -> list[tuple[str, str, float]]:
-    """Return [(asset_key, absolute_path, mtime)] for files directly under root."""
+    """Return every media object using its root-relative canonical asset key."""
     found: list[tuple[str, str, float]] = []
-    for name in os.listdir(root):
-        path = os.path.join(root, name)
-        if not os.path.isfile(path):
-            continue
-        if name.startswith("."):
-            continue
-        found.append((name, path, os.path.getmtime(path)))
+    allowed_extensions = {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".aac"}
+    root = os.path.realpath(root)
+    for directory, subdirectories, names in os.walk(root, followlinks=False):
+        subdirectories[:] = [name for name in subdirectories if not name.startswith(".")]
+        for name in names:
+            if name.startswith(".") or os.path.splitext(name)[1].lower() not in allowed_extensions:
+                continue
+            path = os.path.join(directory, name)
+            if os.path.islink(path) or not os.path.isfile(path):
+                continue
+            asset_key = os.path.relpath(path, root).replace(os.sep, "/")
+            found.append((asset_key, path, os.path.getmtime(path)))
     return found
 
 
