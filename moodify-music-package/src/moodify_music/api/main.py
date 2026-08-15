@@ -7,8 +7,9 @@ import logging
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
-from moodify_music.api.deps import ApiError
+from moodify_music.api.deps import ApiError, Db
 from moodify_music.api.routes_auth import router as auth_router
 from moodify_music.api.routes_bridge import router as bridge_router
 from moodify_music.api.routes_cwc import router as cwc_router
@@ -50,7 +51,20 @@ async def error_normalization(request: Request, call_next):
 
 @app.get("/health")
 def health() -> dict:
+    """Process liveness only; it does not claim that PolarDB is reachable."""
     return {"status": "ok", "service": "moodify-music-data-api", "version": "0.1.0"}
+
+
+@app.get("/ready")
+def ready(db: Db) -> dict:
+    """Production readiness requires the authoritative database to answer."""
+    db.execute(text("SELECT 1"))
+    return {
+        "status": "ready",
+        "service": "moodify-music-data-api",
+        "database": "reachable",
+        "database_authority": "polardb",
+    }
 
 
 for router in (auth_router, users_router, tracks_router, social_router, intents_router, cwc_router, ops_router, library_router, search_router, playlists_router, bridge_router):

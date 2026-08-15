@@ -36,10 +36,14 @@ fi
 
 # Music DB dump (MySQL/PolarDB); skipped when credentials are absent
 if [ -n "${MOODIFY_DB_USER:-}" ] && [ -n "${MOODIFY_DB_NAME:-}" ]; then
-  mysqldump --single-transaction --routines \
+  export MYSQL_PWD="${MOODIFY_DB_PASSWORD:-}"
+  mysqldump --single-transaction --routines --set-gtid-purged=OFF \
     -h "${MOODIFY_DB_HOST:-127.0.0.1}" -u "$MOODIFY_DB_USER" \
-    "${MOODIFY_DB_PASSWORD:+ -p$MOODIFY_DB_PASSWORD}" \
-    "$MOODIFY_DB_NAME" > "$DEST/music-db.sql" 2>/dev/null || echo "db dump skipped (creds)" > "$DEST/db-skip.log"
+    "$MOODIFY_DB_NAME" > "$DEST/music-db.sql"
+  unset MYSQL_PWD
+  test -s "$DEST/music-db.sql"
+else
+  echo "database credentials were not provided" > "$DEST/db-skip.log"
 fi
 
 # release metadata

@@ -36,12 +36,15 @@ data class CatalogueTrack(
     }
 }
 
-data class Catalogue(val tracks: List<CatalogueTrack>) {
+data class Catalogue(val tracks: List<CatalogueTrack>, val nextCursor: String? = null) {
     companion object {
-        fun from(json: JSONObject): Catalogue = Catalogue(buildList {
-            val array = json.optJSONArray("tracks") ?: return@buildList
-            for (index in 0 until array.length()) add(CatalogueTrack.from(array.getJSONObject(index)))
-        })
+        fun from(json: JSONObject): Catalogue = Catalogue(
+            tracks = buildList {
+                val array = json.optJSONArray("tracks") ?: return@buildList
+                for (index in 0 until array.length()) add(CatalogueTrack.from(array.getJSONObject(index)))
+            },
+            nextCursor = json.optString("next_cursor", "").ifEmpty { null },
+        )
     }
 }
 
@@ -84,7 +87,21 @@ class CatalogueClient(private val baseUrl: String = "https://rongjinwenchuan.xyz
         }
     }
 
-    fun catalogue(): Catalogue = Catalogue.from(getJson("/catalogue"))
+    fun catalogue(): Catalogue {
+        val tracks = mutableListOf<CatalogueTrack>()
+        var cursor: String? = null
+        do {
+            val suffix = if (cursor == null) {
+                "/catalogue?limit=100"
+            } else {
+                "/catalogue?limit=100&cursor=${java.net.URLEncoder.encode(cursor, "UTF-8")}"
+            }
+            val page = Catalogue.from(getJson(suffix))
+            tracks += page.tracks
+            cursor = page.nextCursor
+        } while (cursor != null)
+        return Catalogue(tracks)
+    }
 
     /**
      * Catalogue rows intentionally omit the media version. Resolve each public
@@ -93,7 +110,8 @@ class CatalogueClient(private val baseUrl: String = "https://rongjinwenchuan.xyz
      */
     fun playableCatalogue(): Catalogue = Catalogue(
         catalogue().tracks.mapNotNull { summary ->
-            runCatching { track(summary.id) }.getOrNull()?.takeIf { it.audioAssetKey != null }
+            if (summary.audioAssetKey != null) summary
+            else runCatching { track(summary.id) }.getOrNull()?.takeIf { it.audioAssetKey != null }
         }
     )
 

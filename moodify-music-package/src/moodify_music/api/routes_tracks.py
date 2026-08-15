@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import base64
+import json
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, Header, Request
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 
 from moodify_music import audit
 from moodify_music.models import (
@@ -53,14 +57,56 @@ def _track_dict(t: Track, current_version: TrackVersion | None = None, creator_h
     }
 
 
+def _encode_catalogue_cursor(published_at: datetime, track_id: str) -> str:
+    payload = json.dumps(
+        {"published_at": published_at.isoformat(), "id": track_id},
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
+
+
+def _decode_catalogue_cursor(cursor: str) -> tuple[datetime, str]:
+    try:
+        padding = "=" * (-len(cursor) % 4)
+        payload = json.loads(base64.urlsafe_b64decode(cursor + padding))
+        published_at = datetime.fromisoformat(payload["published_at"])
+        track_id = str(payload["id"])
+        if not track_id:
+            raise ValueError
+        return published_at, track_id
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+        raise error(400, "INVALID_CURSOR", "catalogue cursor is invalid")
+
+
 @router.get("/catalogue")
-def catalogue(db: Db, limit: int = 50):
+def catalogue(db: Db, limit: int = 50, cursor: str | None = None):
     """Published tracks for discovery — newest first."""
-    rows = db.scalars(
-        select(Track).where(Track.status == "published", Track.deleted_at.is_(None))
-        .order_by(Track.published_at.desc()).limit(min(limit, 100))
-    )
-    return {"tracks": [_track_dict(t) for t in rows]}
+    page_size = min(max(limit, 1), 100)
+    conditions = [Track.status == "published", Track.deleted_at.is_(None)]
+    if cursor:
+        published_at, track_id = _decode_catalogue_cursor(cursor)
+        conditions.append(or_(
+            Track.published_at < published_at,
+            and_(Track.published_at == published_at, Track.id < track_id),
+        ))
+    rows = db.execute(
+        select(Track, TrackVersion, CreatorProfile.handle)
+        .outerjoin(TrackVersion, TrackVersion.id == Track.current_version_id)
+        .outerjoin(CreatorProfile, CreatorProfile.id == Track.creator_id)
+        .where(*conditions)
+        .order_by(Track.published_at.desc(), Track.id.desc())
+        .limit(page_size + 1)
+    ).all()
+    page = rows[:page_size]
+    next_cursor = None
+    if len(rows) > page_size and page:
+        last_track = page[-1][0]
+        if last_track.published_at is not None:
+            next_cursor = _encode_catalogue_cursor(last_track.published_at, last_track.id)
+    return {
+        "tracks": [_track_dict(track, version, handle) for track, version, handle in page],
+        "next_cursor": next_cursor,
+    }
 
 
 @router.post("/tracks", status_code=201)
