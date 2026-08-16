@@ -18,6 +18,10 @@ def test_release_identity_and_routes():
     assert "/api/v1/auditory/cases/{case_id}" in paths
     assert "/api/v1/auditory/jobs" in paths
     assert "/api/v1/auditory/jobs/{job_id}" in paths
+    assert "/api/v1/stems/jobs" in paths
+    assert "/api/v1/stems/jobs/{job_id}" in paths
+    assert "/api/v1/stems/jobs/{job_id}/download/{stem}" in paths
+    assert "/api/v1/stems/usage" in paths
     assert "/process" not in paths
     assert not any("feed" in path or "cwc" in path or "marketplace" in path for path in paths)
 
