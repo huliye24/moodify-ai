@@ -1,0 +1,21 @@
+{
+  "task": "TP-201",
+  "verified_at": "2026-08-12T00:55:25.092534+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "alignment/repository_capabilities.json",
+      "exists": true,
+      "bytes": 2489,
+      "sha256": "daff526ca65b850d86496d541f8a1356de000fe6f1ca53d7b03ba3804709c5da",
+      "passed": true
+    },
+    {
+      "path": "alignment/repository_capabilities.md",
+      "exists": true,
+      "bytes": 1504,
+      "sha256": "95e0c9332730af2e56e63df69abed8e28bd815a97dc3e0b85ee5dd49853f7bd8",
+      "passed": true
+    }
+  ]
+}

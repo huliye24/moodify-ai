@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "planning/work_items.jsonl",
+    "planning/work_items.md"
+  ],
+  "non_empty": true
+}

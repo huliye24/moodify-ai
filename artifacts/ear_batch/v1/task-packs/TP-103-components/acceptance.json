@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "knowledge/component_candidates.json",
+    "knowledge/component_candidates.md"
+  ],
+  "non_empty": true
+}

@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "knowledge/truth_labels.jsonl",
+    "knowledge/truth_label_review.md"
+  ],
+  "non_empty": true
+}

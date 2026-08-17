@@ -22,7 +22,7 @@ from moodify.auditory.measurement_layers import (
     resolve_tier_profile,
 )
 from moodify.auditory.profiles import get_profile
-from moodify.auditory.service import load_scan_evidence, scan_audio
+from moodify.auditory.service import scan_audio
 from moodify.contracts.machine_finding import FindingType, FORBIDDEN_CONCLUSIONS
 
 

@@ -1,0 +1,29 @@
+{
+  "work_item": {
+    "id": "WI-005",
+    "epic": "EPIC-06",
+    "title": "Create Ear v1 contract validator CLI",
+    "deps": [
+      "WI-001",
+      "WI-002",
+      "WI-003",
+      "WI-004"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "tools/ear_v1_contracts",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "tools/ear_v1_contracts/validate.py",
+      "tests/ear_v1_contracts/test_validator_cli.py"
+    ],
+    "acceptance": "CLI validates one artifact or a directory, returns nonzero on invalid input, and emits deterministic JSON evidence."
+  },
+  "dependencies": [
+    "IMP-001",
+    "IMP-002",
+    "IMP-003",
+    "IMP-004"
+  ]
+}

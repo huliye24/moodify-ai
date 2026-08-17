@@ -1,0 +1,21 @@
+{
+  "task": "TP-002",
+  "verified_at": "2026-08-12T00:47:20.490677+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "corpus/source_authority.json",
+      "exists": true,
+      "bytes": 794,
+      "sha256": "30e0f87a78b4b246f2d7f27a416c31d9e52975498ae528123a9e52906df642cb",
+      "passed": true
+    },
+    {
+      "path": "corpus/duplicate_analysis.md",
+      "exists": true,
+      "bytes": 858,
+      "sha256": "e22c51321b9a1af5585904a2518ec57202e69ba6e5f1adf4bb13726712ad859c",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "knowledge/disciplines.json",
+    "knowledge/disciplines.md"
+  ],
+  "non_empty": true
+}

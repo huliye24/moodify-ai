@@ -16,6 +16,31 @@ from moodify.auditory.profiles import MFY_WSE_SCAN_PROFILE_001
 from moodify.auditory.service import compare_scans, load_scan_evidence, scan_audio
 
 
+def test_format_invariants_are_blocking():
+    before = {
+        "duration": {"value": 92.6},
+        "channels": {"value": 2},
+        "sample_rate": {"value": 48000},
+    }
+    after = {
+        "duration": {"value": 92.8},
+        "channels": {"value": 1},
+        "sample_rate": {"value": 44100},
+    }
+    metric_delta = {
+        "duration": {"absolute_delta": 0.2},
+        "channels": {"absolute_delta": -1},
+        "sample_rate": {"absolute_delta": -3900},
+    }
+
+    flags = evaluate_risk_flags(metric_delta, before, after)
+
+    assert {flag.code for flag in flags} >= {
+        "DURATION_CHANGED", "CHANNEL_LAYOUT_CHANGED", "SAMPLE_RATE_CHANGED",
+    }
+    assert all(flag.severity == "BLOCKING" for flag in flags)
+
+
 def _evidence(path, case, stage, tmp_path):
     scan_dir = tmp_path / f"{stage}"
     scan_audio(case, stage, path, scan_dir)

@@ -1,111 +1,103 @@
 package com.moodify.music
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-import com.moodify.music.data.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.moodify.music.data.BffClient
+import com.moodify.music.player.PlaybackController
+import com.moodify.music.ui.MoodifyMusicApp
+import com.moodify.music.ui.MoodifyMusicTheme
+
+data class ExternalAudio(val uri: Uri, val displayName: String)
 
 class MainActivity : ComponentActivity() {
-
     private val client = BffClient()
-    private var player: ExoPlayer? = null
+    private lateinit var playback: PlaybackController
+    private var externalAudio by mutableStateOf<List<ExternalAudio>>(emptyList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        playback = PlaybackController(this)
+        externalAudio = readExternalAudio(intent)
         setContent {
-            MaterialTheme {
-                MusicApp(
+            MoodifyMusicTheme {
+                MoodifyMusicApp(
                     client = client,
-                    onPlay = { track -> playTrack(track) },
-                    onStop = { player?.stop() },
+                    playback = playback,
+                    externalAudio = externalAudio,
+                    onExternalAudioConsumed = { externalAudio = emptyList() },
                 )
             }
         }
     }
 
-    private fun playTrack(track: Track) {
-        val url = track.audioAssetKey?.let { "https://rongjinwenchuan.xyz/audio/$it" } ?: return
-        val p = player ?: ExoPlayer.Builder(this).build().also { player = it }
-        p.setMediaItem(MediaItem.fromUri(url))
-        p.prepare()
-        p.playWhenReady = true
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        externalAudio = readExternalAudio(intent)
     }
 
-    override fun onDestroy() {
-        player?.release()
-        player = null
-        super.onDestroy()
-    }
-}
-
-@Composable
-fun MusicApp(client: BffClient, onPlay: (Track) -> Unit, onStop: () -> Unit) {
-    val scope = rememberCoroutineScope()
-    var tracks by remember { mutableStateOf<List<Track>?>(null) }
-    var selected by remember { mutableStateOf<Track?>(null) }
-    var error by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(Unit) {
-        error = withContext(Dispatchers.IO) {
-            try {
-                tracks = client.catalogue().tracks
-                null
-            } catch (e: Exception) {
-                e.message ?: "网络错误"
+    private fun readExternalAudio(intent: Intent?): List<ExternalAudio> {
+        if (intent == null) return emptyList()
+        val uris = buildList {
+            when (intent.action) {
+                Intent.ACTION_VIEW -> intent.data?.let(::add)
+                Intent.ACTION_SEND -> intent.streamUri()?.let(::add)
+                Intent.ACTION_SEND_MULTIPLE -> addAll(intent.streamUris())
             }
+            intent.clipData?.let { clip ->
+                repeat(clip.itemCount) { index -> clip.getItemAt(index).uri?.let(::add) }
+            }
+        }.distinct()
+
+        return uris.mapNotNull { uri ->
+            if (uri.scheme != "content" && uri.scheme != "file") return@mapNotNull null
+            persistReadPermission(uri, intent.flags)
+            ExternalAudio(uri, displayName(uri))
         }
     }
 
-    Scaffold(topBar = {
-        CenterAlignedTopAppBar(title = { Text("Moodify Music") })
-    }) { padding ->
-        Column(Modifier.padding(padding).padding(16.dp)) {
-            if (error != null) {
-                Text("加载失败：$error（离线时不会展示伪曲库）", color = MaterialTheme.colorScheme.error)
-            }
-            when {
-                selected != null -> TrackDetail(selected!!, onBack = { selected = null }, onPlay = onPlay)
-                tracks == null && error == null -> Text("加载中…")
-                tracks != null -> LazyColumn {
-                    items(tracks!!) { track ->
-                        Card(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-                            Column(Modifier.clickable { selected = track }.padding(12.dp)) {
-                                Text(track.title, style = MaterialTheme.typography.titleMedium)
-                                Text("${track.creatorHandle ?: "—"} · ${track.primaryLanguage ?: "—"}", style = MaterialTheme.typography.bodySmall)
-                            }
-                        }
-                    }
+    private fun persistReadPermission(uri: Uri, flags: Int) {
+        if (uri.scheme != "content") return
+        val requested = flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        if (requested and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION == 0) return
+        runCatching { contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+    }
+
+    private fun displayName(uri: Uri): String {
+        if (uri.scheme == "content") {
+            runCatching {
+                contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) cursor.getString(0)?.takeIf(String::isNotBlank)?.let { return it }
                 }
             }
         }
+        return uri.lastPathSegment?.substringAfterLast('/')?.takeIf(String::isNotBlank) ?: "外部音频"
     }
-}
 
-@Composable
-fun TrackDetail(track: Track, onBack: () -> Unit, onPlay: (Track) -> Unit) {
-    Column {
-        TextButton(onClick = onBack) { Text("← 返回") }
-        Text(track.title, style = MaterialTheme.typography.headlineSmall)
-        Text("${track.creatorHandle ?: "—"} · ${track.primaryLanguage ?: "—"}", style = MaterialTheme.typography.bodyMedium)
-        track.durationMs?.let { Text("时长 ${it / 1000}s", style = MaterialTheme.typography.bodySmall) }
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = { onPlay(track) }) { Text("播放") }
-        if (track.audioAssetKey == null) {
-            Text("此曲目暂无可播放媒体", style = MaterialTheme.typography.bodySmall)
-        }
+    @Suppress("DEPRECATION")
+    private fun Intent.streamUri(): Uri? = if (Build.VERSION.SDK_INT >= 33) {
+        getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+    } else {
+        getParcelableExtra(Intent.EXTRA_STREAM)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun Intent.streamUris(): List<Uri> = if (Build.VERSION.SDK_INT >= 33) {
+        getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java).orEmpty()
+    } else {
+        getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM).orEmpty()
+    }
+
+    override fun onDestroy() {
+        playback.release()
+        super.onDestroy()
     }
 }

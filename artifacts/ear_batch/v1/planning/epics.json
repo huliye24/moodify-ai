@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "epics": [
+    {
+      "id": "EPIC-01",
+      "title": "Evidence contracts",
+      "outcome": "Versioned, separately addressable source, measurement, judgment, uncertainty, and evidence records.",
+      "gaps": [
+        "GAP-003",
+        "GAP-004"
+      ]
+    },
+    {
+      "id": "EPIC-02",
+      "title": "WSE representation baseline",
+      "outcome": "A narrow Auditory Representation v1 assembled from verified physical metrics.",
+      "gaps": [
+        "GAP-001"
+      ]
+    },
+    {
+      "id": "EPIC-03",
+      "title": "Controlled verification",
+      "outcome": "Sensitivity, invariance, and before/after checks produce reproducible evidence.",
+      "gaps": [
+        "GAP-005"
+      ]
+    },
+    {
+      "id": "EPIC-04",
+      "title": "Production Case evidence loop",
+      "outcome": "Cases preserve attempts, decisions, evidence, and reusable failure history.",
+      "gaps": [
+        "GAP-004",
+        "GAP-006"
+      ]
+    },
+    {
+      "id": "EPIC-05",
+      "title": "Human listening authority",
+      "outcome": "Listening decisions remain explicit, versioned, and non-overwritable.",
+      "gaps": [
+        "GAP-007"
+      ]
+    },
+    {
+      "id": "EPIC-06",
+      "title": "PPE reliability",
+      "outcome": "Validation, recovery, and traceability are machine-checkable.",
+      "gaps": [
+        "GAP-006"
+      ]
+    }
+  ]
+}

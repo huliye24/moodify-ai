@@ -1,0 +1,8 @@
+{
+  "output_root": "workspace",
+  "required_outputs": [
+    "tools/ear_v1_contracts/validate.py",
+    "tests/ear_v1_contracts/test_validator_cli.py"
+  ],
+  "non_empty": true
+}

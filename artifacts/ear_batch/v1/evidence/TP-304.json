@@ -1,0 +1,21 @@
+{
+  "task": "TP-304",
+  "verified_at": "2026-08-12T01:14:52.431234+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "planning/execution_dag.json",
+      "exists": true,
+      "bytes": 1366,
+      "sha256": "ddc796d140b464f46bd006d30e9289c1caa1ae654caf4f6c4102987aca32ec66",
+      "passed": true
+    },
+    {
+      "path": "planning/execution_dag.md",
+      "exists": true,
+      "bytes": 405,
+      "sha256": "cb5258d29e35dc6d3c6b186945334c3265f081d476ddb23b5cdc812d0c71a04e",
+      "passed": true
+    }
+  ]
+}

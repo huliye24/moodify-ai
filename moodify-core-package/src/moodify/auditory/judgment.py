@@ -116,6 +116,24 @@ def evaluate_risk_flags(metric_delta: dict, before_metrics: dict, after_metrics:
                               "silence structure changed", "silence_ratio",
                               val(before_metrics, "silence_ratio"), val(after_metrics, "silence_ratio")))
 
+    duration_d = delta("duration")
+    if duration_d is not None and abs(duration_d) > t["duration_changed"]["max_abs_delta_s"]:
+        flags.append(RiskFlag("DURATION_CHANGED", "BLOCKING",
+                              "candidate duration changed beyond tolerance", "duration",
+                              val(before_metrics, "duration"), val(after_metrics, "duration")))
+
+    channels_d = delta("channels")
+    if channels_d is not None and abs(channels_d) > t["channel_layout_changed"]["max_delta"]:
+        flags.append(RiskFlag("CHANNEL_LAYOUT_CHANGED", "BLOCKING",
+                              "candidate channel layout changed", "channels",
+                              val(before_metrics, "channels"), val(after_metrics, "channels")))
+
+    sample_rate_d = delta("sample_rate")
+    if sample_rate_d is not None and sample_rate_d != 0:
+        flags.append(RiskFlag("SAMPLE_RATE_CHANGED", "BLOCKING",
+                              "candidate sample rate changed", "sample_rate",
+                              val(before_metrics, "sample_rate"), val(after_metrics, "sample_rate")))
+
     invalid_a = val(after_metrics, "invalid_sample_count")
     if invalid_a is not None and invalid_a > 0:
         flags.append(RiskFlag("INVALID_AUDIO_SAMPLES", "BLOCKING",
@@ -144,6 +162,9 @@ _CLASSIFICATION_BY_CODE = {
     "NEW_HIGH_FREQUENCY_CUTOFF": "LIKELY_ARTIFACT",
     "STEREO_PHASE_RISK_INCREASED": "TECHNICAL_RISK",
     "NEGATIVE_CORRELATION_INCREASED": "TECHNICAL_RISK",
+    "DURATION_CHANGED": "TECHNICAL_RISK",
+    "CHANNEL_LAYOUT_CHANGED": "TECHNICAL_RISK",
+    "SAMPLE_RATE_CHANGED": "TECHNICAL_RISK",
 }
 
 _UNIT_BY_METRIC = {
@@ -159,6 +180,9 @@ _UNIT_BY_METRIC = {
     "negative_correlation_ratio": "ratio",
     "silence_ratio": "ratio",
     "finite_sample_ratio": "ratio",
+    "duration": "s",
+    "channels": "count",
+    "sample_rate": "Hz",
 }
 
 

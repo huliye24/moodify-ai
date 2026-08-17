@@ -7,7 +7,6 @@ objective verification enums, human-review triggers.
 from __future__ import annotations
 
 import pytest
-from pydantic import ValidationError
 
 from moodify.contracts.machine_finding import FindingType, FORBIDDEN_CONCLUSIONS
 from moodify.data_factory.verification_contract import (

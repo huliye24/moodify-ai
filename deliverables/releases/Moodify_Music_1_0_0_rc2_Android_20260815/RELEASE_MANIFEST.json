@@ -1,0 +1,12 @@
+{
+  "product": "Moodify Music",
+  "versionName": "1.0.0-rc.2",
+  "versionCode": 2,
+  "releaseDate": "2026-08-15",
+  "packageId": "com.moodify.app",
+  "gitRevision": "09bac4c6d72c",
+  "artifact": "Moodify_Music_1.0.0-rc.2_Android_20260815.apk",
+  "artifactSha256": "784405e74bbd98494640c09d60dd2338fa85c5acf6dfc2f0c18b84a9b9d4a29a",
+  "frozen": true,
+  "overwritePolicy": "never"
+}

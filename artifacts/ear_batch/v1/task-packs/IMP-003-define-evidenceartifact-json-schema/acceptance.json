@@ -1,0 +1,8 @@
+{
+  "output_root": "workspace",
+  "required_outputs": [
+    "schemas/ear_v1/evidence_artifact.schema.json",
+    "tests/ear_v1_contracts/test_evidence_artifact_schema.py"
+  ],
+  "non_empty": true
+}

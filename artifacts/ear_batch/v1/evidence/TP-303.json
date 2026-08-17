@@ -1,0 +1,21 @@
+{
+  "task": "TP-303",
+  "verified_at": "2026-08-12T01:14:51.299541+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "planning/verification_matrix.csv",
+      "exists": true,
+      "bytes": 2492,
+      "sha256": "31a9c43014b1784765f15e12d4b04b54b41133c0fc8089238673b342cb0ec6a7",
+      "passed": true
+    },
+    {
+      "path": "planning/verification_matrix.md",
+      "exists": true,
+      "bytes": 181,
+      "sha256": "6edd6716751b469960030788bf53862025dfb5ad9493a5eb013c5695ab2f15f4",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "work_item": {
+    "id": "WI-008",
+    "epic": "EPIC-03",
+    "title": "Add deterministic synthetic fixture definitions",
+    "deps": [
+      "WI-007"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "configs/ear_v1",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "configs/ear_v1/synthetic_fixtures.json",
+      "tests/ear_v1_contracts/test_fixture_definitions.py"
+    ],
+    "acceptance": "Definitions are parameter-only, reproducible, contain no private audio, and cover silence, tone, impulse, clipping, phase inversion, and lossless rewrap controls."
+  },
+  "dependencies": [
+    "IMP-007"
+  ]
+}

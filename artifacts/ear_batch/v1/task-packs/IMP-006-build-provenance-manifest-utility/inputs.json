@@ -1,0 +1,23 @@
+{
+  "work_item": {
+    "id": "WI-006",
+    "epic": "EPIC-06",
+    "title": "Build provenance manifest utility",
+    "deps": [
+      "WI-001"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "tools/ear_v1_contracts",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "tools/ear_v1_contracts/provenance.py",
+      "tests/ear_v1_contracts/test_provenance.py"
+    ],
+    "acceptance": "Utility hashes immutable inputs, records versions and parameters, writes atomically, and detects later source drift."
+  },
+  "dependencies": [
+    "IMP-001"
+  ]
+}

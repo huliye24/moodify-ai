@@ -1,0 +1,23 @@
+Alembic revision chain (verified locally and on PolarDB moodify_dev):
+
+Rev: 003_cwc_idempotency_audit (head)
+Parent: 002_relationships_intents
+Path: alembic/versions/003_cwc_idempotency_audit.py
+Tables: cwc_accounts, cwc_ledger, idempotency_keys, audit_events
+
+Rev: 002_relationships_intents
+Parent: 001_identity_creator_catalog
+Path: alembic/versions/002_relationships_intents.py
+Tables: follows, favorites, play_events, license_intents, support_intents
+
+Rev: 001_identity_creator_catalog
+Parent: <base>
+Path: alembic/versions/001_identity_creator_catalog.py
+Tables: users, creator_profiles, tracks, track_versions, creation_passports, albums, album_tracks
+
+Migration verification:
+- Local SQLite: upgrade head -> downgrade base -> upgrade head = OK (16 tables)
+- PolarDB MySQL B (moodify_dev, moodify_migration identity):
+  upgrade head = OK (003 head)
+  downgrade base = OK
+  upgrade head = OK (final head)

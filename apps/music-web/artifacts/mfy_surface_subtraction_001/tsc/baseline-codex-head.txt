@@ -1,0 +1,21 @@
+app/api/v1/tracks/[id]/audio/route.ts(27,15): error TS2339: Property 'MEDIA' does not exist on type 'Env'.
+app/api/v1/tracks/[id]/audio/route.ts(41,30): error TS2339: Property 'MEDIA' does not exist on type 'Env'.
+app/api/v1/tracks/[id]/audio/route.ts(56,30): error TS2339: Property 'MEDIA' does not exist on type 'Env'.
+app/library/page.tsx(16,13): error TS2345: Argument of type 'BootstrapUser' is not assignable to parameter of type 'SetStateAction<{ id: string; capabilities?: { account_actions?: boolean | undefined; } | undefined; } | null>'.
+  Type 'BootstrapUser' is not assignable to type '{ id: string; capabilities?: { account_actions?: boolean | undefined; } | undefined; }'.
+    Types of property 'id' are incompatible.
+      Type 'string | null' is not assignable to type 'string'.
+        Type 'null' is not assignable to type 'string'.
+app/library/page.tsx(22,18): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+app/library/page.tsx(79,24): error TS2339: Property 'audio_asset_key' does not exist on type 'TrackDto'.
+app/library/page.tsx(80,80): error TS2339: Property 'audio_asset_key' does not exist on type 'TrackDto'.
+app/playlists/page.tsx(16,13): error TS2345: Argument of type 'BootstrapUser' is not assignable to parameter of type 'SetStateAction<{ id: string; capabilities?: { account_actions?: boolean | undefined; } | undefined; } | null>'.
+  Type 'BootstrapUser' is not assignable to type '{ id: string; capabilities?: { account_actions?: boolean | undefined; } | undefined; }'.
+    Types of property 'id' are incompatible.
+      Type 'string | null' is not assignable to type 'string'.
+        Type 'null' is not assignable to type 'string'.
+app/playlists/page.tsx(22,18): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+db/index.ts(6,12): error TS2339: Property 'DB' does not exist on type 'Env'.
+db/index.ts(12,22): error TS2339: Property 'DB' does not exist on type 'Env'.

@@ -143,7 +143,7 @@ moodify-core-package/outputs/
 !docs/experiments/*/
 !docs/experiments/*/**
 
-# Local Tencent Cloud / SSH material must never enter git.
+# Local cloud / SSH material must never enter git.
 tc_key*
 id_*
 *.ppk
@@ -210,3 +210,13 @@ third_party/*
 
 # Keep experiment notes, but never bundle archives in source control
 docs/experiments/**/*.zip
+
+# Claude Code local session state
+.claude/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Music Android launcher icons are required for a clean-clone build (un-ignore below res/)
+!apps/music-android/app/src/main/res/
+!apps/music-android/app/src/main/res/**

@@ -1,0 +1,754 @@
+{
+  "schema_version": 1,
+  "run_id": "ear-v1-2026-08-12T00:45:17.474469+00:00",
+  "source": "E:\\Moodify ear",
+  "source_policy": "read-only",
+  "created_at": "2026-08-12T00:45:17.474469+00:00",
+  "updated_at": "2026-08-12T01:15:46.493509+00:00",
+  "tasks": [
+    {
+      "id": "TP-001",
+      "slug": "corpus-inventory",
+      "title": "Inventory and hash the v1 corpus",
+      "deps": [],
+      "risk": "safe",
+      "outputs": [
+        "corpus/inventory.json",
+        "corpus/inventory.md"
+      ],
+      "instructions": "Build a complete v1 file inventory with relative paths, sizes, SHA-256 hashes, formats, and duplicate candidates. Exclude Moodify Ear v2 from the v1 corpus.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:46:23.628442+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-002",
+      "slug": "duplicate-authority",
+      "title": "Resolve duplicate chapter sources",
+      "deps": [
+        "TP-001"
+      ],
+      "risk": "human-review",
+      "outputs": [
+        "corpus/source_authority.json",
+        "corpus/duplicate_analysis.md"
+      ],
+      "instructions": "Compare duplicate Chapter 02-04 directories and packages byte-for-byte and semantically. Recommend the authoritative copy without deleting anything. Mark unresolved differences for human review.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:47:20.495664+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-003",
+      "slug": "version-isolation",
+      "title": "Define v1 and v2 isolation rules",
+      "deps": [
+        "TP-001"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "corpus/version_boundaries.md"
+      ],
+      "instructions": "Document deterministic inclusion and exclusion rules so v2 material can never enter the v1 batch accidentally.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:46:23.767745+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-004",
+      "slug": "package-consistency",
+      "title": "Verify package consistency",
+      "deps": [
+        "TP-002",
+        "TP-003"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "quality/package_consistency.json",
+        "quality/package_consistency.md"
+      ],
+      "instructions": "Verify manifest, Markdown, PDF, README, references, and ZIP membership consistency for every authoritative v1 chapter package.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:49:15.778727+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-005",
+      "slug": "text-integrity",
+      "title": "Scan text integrity and references",
+      "deps": [
+        "TP-002"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "quality/text_integrity.json",
+        "quality/text_integrity.md"
+      ],
+      "instructions": "Detect encoding damage, mojibake, broken references, missing files, malformed headings, and chapter metadata conflicts. Do not silently rewrite scholarly content.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:49:16.398203+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-006",
+      "slug": "normalized-corpus",
+      "title": "Create normalized read-only corpus index",
+      "deps": [
+        "TP-004",
+        "TP-005"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "corpus/normalized_manifest.json",
+        "corpus/README.md"
+      ],
+      "instructions": "Create a normalized manifest pointing to authoritative immutable source files. Preserve hashes and provenance; do not copy heavy PDFs unless required.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:49:17.439877+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-101",
+      "slug": "claims",
+      "title": "Extract chapter claims",
+      "deps": [
+        "TP-006"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "knowledge/claims.jsonl",
+        "knowledge/claims_summary.md"
+      ],
+      "instructions": "Extract atomic claims from all 20 chapters with chapter, section, source path, claim type, and confidence. Preserve the distinction between proposal and verified fact.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:52:02.173767+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-102",
+      "slug": "disciplines",
+      "title": "Extract WSE MSE PPE concepts",
+      "deps": [
+        "TP-006"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "knowledge/disciplines.json",
+        "knowledge/disciplines.md"
+      ],
+      "instructions": "Build a sourced concept map for WSE, MSE, and PPE, including definitions, inputs, outputs, boundaries, and cross-discipline dependencies.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:52:11.862012+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-103",
+      "slug": "components",
+      "title": "Extract component and interface candidates",
+      "deps": [
+        "TP-101",
+        "TP-102"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "knowledge/component_candidates.json",
+        "knowledge/component_candidates.md"
+      ],
+      "instructions": "Extract candidate components, contracts, schemas, and interfaces. Label them as textual proposals rather than implemented architecture.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:56:46.620415+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-104",
+      "slug": "evidence-requirements",
+      "title": "Extract measurement and evidence requirements",
+      "deps": [
+        "TP-101"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "knowledge/evidence_requirements.json",
+        "knowledge/evidence_requirements.md"
+      ],
+      "instructions": "Extract what is measured, what evidence is produced, how results are verified, and what happens on failure.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:56:48.661768+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-105",
+      "slug": "truth-labels",
+      "title": "Classify theory experiment and verified capability",
+      "deps": [
+        "TP-101",
+        "TP-104"
+      ],
+      "risk": "human-review",
+      "outputs": [
+        "knowledge/truth_labels.jsonl",
+        "knowledge/truth_label_review.md"
+      ],
+      "instructions": "Classify every material claim as theory, hypothesis, experimental evidence, current verified capability, historical statement, or unresolved. Never promote a claim from documentation alone.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:56:51.431578+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-106",
+      "slug": "traceability",
+      "title": "Build chapter requirement evidence traceability",
+      "deps": [
+        "TP-103",
+        "TP-104",
+        "TP-105"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "knowledge/traceability.csv",
+        "knowledge/traceability.md"
+      ],
+      "instructions": "Link chapter claims to requirements, proposed components, measurements, evidence, validation, and failure semantics.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:56:53.845603+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-201",
+      "slug": "implementation-inventory",
+      "title": "Inventory current repository capabilities",
+      "deps": [
+        "TP-006"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "alignment/repository_capabilities.json",
+        "alignment/repository_capabilities.md"
+      ],
+      "instructions": "Inspect verified mainline code and tests. Record CANONICAL, EXPERIMENTAL, LEGACY, HISTORICAL, ABSENT, or UNRESOLVED with concrete paths and test evidence.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:55:25.095527+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-202",
+      "slug": "gap-analysis",
+      "title": "Compare material requirements to implementation",
+      "deps": [
+        "TP-106",
+        "TP-201"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "alignment/gap_analysis.json",
+        "alignment/gap_analysis.md"
+      ],
+      "instructions": "Compare sourced Ear v1 requirements with verified repository capabilities. Do not treat planned architecture as implemented.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:58:24.012915+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-203",
+      "slug": "authority-classification",
+      "title": "Classify canonical experimental and legacy areas",
+      "deps": [
+        "TP-201"
+      ],
+      "risk": "human-review",
+      "outputs": [
+        "alignment/authority_map.json",
+        "alignment/authority_review.md"
+      ],
+      "instructions": "Apply repository authority rules and identify classifications that require a human decision.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:56:49.825938+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-204",
+      "slug": "orchestration-risks",
+      "title": "Identify orchestration authority conflicts",
+      "deps": [
+        "TP-201",
+        "TP-203"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "alignment/orchestration_risks.md"
+      ],
+      "instructions": "Locate duplicate or competing orchestration systems and explain risks without modifying or deleting them.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:56:52.564418+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-205",
+      "slug": "engineering-scope",
+      "title": "Define Ear 1.0 engineering scope",
+      "deps": [
+        "TP-202",
+        "TP-203",
+        "TP-204"
+      ],
+      "risk": "human-review",
+      "outputs": [
+        "planning/ear_v1_engineering_scope.md"
+      ],
+      "instructions": "Draft an evidence-backed implementation scope, non-goals, human-authority points, and unresolved architecture decisions.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T00:58:24.665687+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-301",
+      "slug": "epics",
+      "title": "Generate engineering epics",
+      "deps": [
+        "TP-202",
+        "TP-205"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "planning/epics.json",
+        "planning/epics.md"
+      ],
+      "instructions": "Generate outcome-oriented epics tied to traceability identifiers and repository authority.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T01:14:50.179288+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-302",
+      "slug": "work-items",
+      "title": "Decompose epics into verifiable work items",
+      "deps": [
+        "TP-301"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "planning/work_items.jsonl",
+        "planning/work_items.md"
+      ],
+      "instructions": "Create small work items with inputs, allowed paths, outputs, acceptance criteria, dependencies, recovery behavior, and evidence requirements.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T01:14:50.594802+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-303",
+      "slug": "verification-design",
+      "title": "Design tests and evidence for work items",
+      "deps": [
+        "TP-302"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "planning/verification_matrix.csv",
+        "planning/verification_matrix.md"
+      ],
+      "instructions": "For every work item specify automated tests, evidence artifacts, failure handling, and any required human listening judgment.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T01:14:51.302533+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-304",
+      "slug": "execution-dag",
+      "title": "Build prioritized execution DAG",
+      "deps": [
+        "TP-302",
+        "TP-303"
+      ],
+      "risk": "safe",
+      "outputs": [
+        "planning/execution_dag.json",
+        "planning/execution_dag.md"
+      ],
+      "instructions": "Build a cycle-free dependency graph and prioritize foundational, low-risk, high-evidence tasks.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T01:14:52.438216+00:00",
+      "last_error": null
+    },
+    {
+      "id": "TP-305",
+      "slug": "safe-batch",
+      "title": "Select unattended-safe implementation batch",
+      "deps": [
+        "TP-304"
+      ],
+      "risk": "human-review",
+      "outputs": [
+        "planning/unattended_batch.json",
+        "planning/unattended_batch.md"
+      ],
+      "instructions": "Select only reversible, bounded, testable work that requires no listening judgment, external authorization, secrets, publishing, deletion, or authority change.",
+      "state": "PASSED",
+      "attempts": 1,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T00:45:17.474469+00:00",
+      "updated_at": "2026-08-12T01:14:53.394075+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-001",
+      "work_item_id": "WI-001",
+      "slug": "define-sourceidentity-json-schema",
+      "title": "Define SourceIdentity JSON Schema",
+      "deps": [
+        "TP-305"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "schemas/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "schemas/ear_v1/source_identity.schema.json",
+        "tests/ear_v1_contracts/test_source_identity_schema.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Valid and invalid fixtures prove immutable identity, path-independent digest, media metadata, and schema version fields.",
+      "state": "READY",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:44.648023+00:00",
+      "updated_at": "2026-08-12T01:15:46.493509+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-002",
+      "work_item_id": "WI-002",
+      "slug": "define-measurementrecord-json-schema",
+      "title": "Define MeasurementRecord JSON Schema",
+      "deps": [
+        "IMP-001"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "schemas/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "schemas/ear_v1/measurement_record.schema.json",
+        "tests/ear_v1_contracts/test_measurement_record_schema.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Schema separates measured value, unit, time support, parameters, implementation version, source identity, and tolerance policy.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:44.826409+00:00",
+      "updated_at": "2026-08-12T01:15:44.826409+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-003",
+      "work_item_id": "WI-003",
+      "slug": "define-evidenceartifact-json-schema",
+      "title": "Define EvidenceArtifact JSON Schema",
+      "deps": [
+        "IMP-001",
+        "IMP-002"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "schemas/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "schemas/ear_v1/evidence_artifact.schema.json",
+        "tests/ear_v1_contracts/test_evidence_artifact_schema.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Evidence links immutable inputs and measurement records, carries provenance, and cannot masquerade as a judgment.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:44.983044+00:00",
+      "updated_at": "2026-08-12T01:15:44.983044+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-004",
+      "work_item_id": "WI-004",
+      "slug": "define-judgment-and-uncertainty-schemas",
+      "title": "Define Judgment and Uncertainty schemas",
+      "deps": [
+        "IMP-002",
+        "IMP-003"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "schemas/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "schemas/ear_v1/judgment_record.schema.json",
+        "schemas/ear_v1/uncertainty.schema.json",
+        "tests/ear_v1_contracts/test_judgment_schema.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Judgment references but never overwrites measurements; UNCERTAIN and INSUFFICIENT_EVIDENCE are valid outputs; severity and confidence are separate.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:45.050575+00:00",
+      "updated_at": "2026-08-12T01:15:45.050575+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-005",
+      "work_item_id": "WI-005",
+      "slug": "create-ear-v1-contract-validator-cli",
+      "title": "Create Ear v1 contract validator CLI",
+      "deps": [
+        "IMP-001",
+        "IMP-002",
+        "IMP-003",
+        "IMP-004"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "tools/ear_v1_contracts",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "tools/ear_v1_contracts/validate.py",
+        "tests/ear_v1_contracts/test_validator_cli.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "CLI validates one artifact or a directory, returns nonzero on invalid input, and emits deterministic JSON evidence.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:45.774510+00:00",
+      "updated_at": "2026-08-12T01:15:45.774510+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-006",
+      "work_item_id": "WI-006",
+      "slug": "build-provenance-manifest-utility",
+      "title": "Build provenance manifest utility",
+      "deps": [
+        "IMP-001"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "tools/ear_v1_contracts",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "tools/ear_v1_contracts/provenance.py",
+        "tests/ear_v1_contracts/test_provenance.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Utility hashes immutable inputs, records versions and parameters, writes atomically, and detects later source drift.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:46.358483+00:00",
+      "updated_at": "2026-08-12T01:15:46.358483+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-007",
+      "work_item_id": "WI-007",
+      "slug": "define-controlled-wse-experiment-manifest",
+      "title": "Define controlled WSE experiment manifest",
+      "deps": [
+        "IMP-002",
+        "IMP-003"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "schemas/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "schemas/ear_v1/wse_experiment.schema.json",
+        "tests/ear_v1_contracts/test_wse_experiment_schema.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Manifest distinguishes transform, expected sensitivity/invariance, tolerances, negative controls, and evidence outputs.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:46.384321+00:00",
+      "updated_at": "2026-08-12T01:15:46.384321+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-008",
+      "work_item_id": "WI-008",
+      "slug": "add-deterministic-synthetic-fixture-definitions",
+      "title": "Add deterministic synthetic fixture definitions",
+      "deps": [
+        "IMP-007"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "configs/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "configs/ear_v1/synthetic_fixtures.json",
+        "tests/ear_v1_contracts/test_fixture_definitions.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Definitions are parameter-only, reproducible, contain no private audio, and cover silence, tone, impulse, clipping, phase inversion, and lossless rewrap controls.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:46.403159+00:00",
+      "updated_at": "2026-08-12T01:15:46.403159+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-009",
+      "work_item_id": "WI-009",
+      "slug": "define-experimental-before-after-comparison-contract",
+      "title": "Define experimental before-after comparison contract",
+      "deps": [
+        "IMP-002",
+        "IMP-003",
+        "IMP-007"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "schemas/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "schemas/ear_v1/before_after_comparison.schema.json",
+        "tests/ear_v1_contracts/test_before_after_schema.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Contract is explicitly EXPERIMENTAL and records pairing, alignment, changed parameters, metrics, tolerance, and verification outcome.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:46.438486+00:00",
+      "updated_at": "2026-08-12T01:15:46.438486+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-010",
+      "work_item_id": "WI-010",
+      "slug": "define-experimental-productioncase-record",
+      "title": "Define experimental ProductionCase record",
+      "deps": [
+        "IMP-003",
+        "IMP-004"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "schemas/ear_v1",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "schemas/ear_v1/production_case.schema.json",
+        "tests/ear_v1_contracts/test_production_case_schema.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Case preserves attempts, failures, evidence, rule/model versions, and human decision without claiming autonomous learning.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:46.455445+00:00",
+      "updated_at": "2026-08-12T01:15:46.455445+00:00",
+      "last_error": null
+    },
+    {
+      "id": "IMP-012",
+      "work_item_id": "WI-012",
+      "slug": "create-traceability-integrity-checker",
+      "title": "Create traceability integrity checker",
+      "deps": [
+        "IMP-005"
+      ],
+      "risk": "safe",
+      "allowed_paths": [
+        "tools/ear_v1_contracts",
+        "tests/ear_v1_contracts"
+      ],
+      "outputs": [
+        "tools/ear_v1_contracts/check_traceability.py",
+        "tests/ear_v1_contracts/test_traceability_checker.py"
+      ],
+      "output_root": "workspace",
+      "instructions": "Checker rejects missing source, measurement, evidence, schema-version, or verification links and produces a reusable evidence report.",
+      "state": "PENDING",
+      "attempts": 0,
+      "max_attempts": 3,
+      "created_at": "2026-08-12T01:15:46.478432+00:00",
+      "updated_at": "2026-08-12T01:15:46.478432+00:00",
+      "last_error": null
+    }
+  ],
+  "phase": "implementation"
+}

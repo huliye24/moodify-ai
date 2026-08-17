@@ -1,0 +1,25 @@
+{
+  "work_item": {
+    "id": "WI-010",
+    "epic": "EPIC-04",
+    "title": "Define experimental ProductionCase record",
+    "deps": [
+      "WI-003",
+      "WI-004"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "schemas/ear_v1",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "schemas/ear_v1/production_case.schema.json",
+      "tests/ear_v1_contracts/test_production_case_schema.py"
+    ],
+    "acceptance": "Case preserves attempts, failures, evidence, rule/model versions, and human decision without claiming autonomous learning."
+  },
+  "dependencies": [
+    "IMP-003",
+    "IMP-004"
+  ]
+}

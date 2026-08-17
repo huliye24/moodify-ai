@@ -1,6 +1,5 @@
 """Public Moodify 1.0 API contract."""
 
-from pathlib import Path
 
 from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
