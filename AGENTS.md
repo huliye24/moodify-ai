@@ -4,36 +4,39 @@ This file defines the canonical context for AI coding agents working in this rep
 
 ## Product Identity
 
-Moodify is:
+**External product:** Moodify Music / Moodify Player
 
-> **A reconstruction-first listening environment.**
-
-用户体验为 `Choose -> Reconstruct -> Play`（对外产品定义见
-[Classic Reconstruction Constitution](docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md)）。
-
-内部智力层（internal foundation）仍是:
-
-> **The Ear of AI — an Auditory Intelligence System.**
-
-Canonical internal loop:
+**Core user action:** PLAY
 
 ```text
-Listen -> Represent -> Judge -> Intervene -> Verify -> Learn
+Source / Cloud-prepared Track -> Moodify -> PLAY
 ```
 
-Do not regress the repository identity back to “AI music post-processing”, “automatic mastering”, or a preset/DSP product.
-Reconstruction is the primary product objective; Ear is its internal intelligence,
-not the outward product surface.
+**Internal systems:**
+
+- Moodify Ear / Auditory Intelligence — 内部听觉、判断、验证与研究系统
+- Cloud Production System — Intake → Analyze → Stem → Judge → Intervene → Render → Verify → Evidence
+- Classic Reconstruction — 内部生产哲学（宪法 v1.0，决策驱动受控重建）
+
+Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress the repository identity back to "The Ear of AI" as a public product, "AI music post-processing", "automatic mastering", or a preset/DSP product. Do not create a second public product identity alongside Moodify Music / Player.
+
+## Canon Reference
+
+进入本仓库先读：
+
+1. `AGENTS.md`（本文件）
+2. `docs/canon/CURRENT_CANON.md`
+3. `docs/canon/PRODUCT_BOUNDARY.md`
+4. `docs/canon/AUTHORITY_ORDER.md`
+5. `docs/REPOSITORY_STATUS.md`
+
+内部系统权威与既有政策见 `docs/canon/INTERNAL_SYSTEMS.md`、`docs/LEGACY_AND_EXPERIMENTAL_POLICY.md`。
 
 ## Important Distinction
 
-Existing post-processing code is retained as:
-
-> **Auditory Intervention Laboratory**
-
-It is a subsystem used to create controlled changes and evidence.
-
-It is not the product identity.
+- 对外：Moodify Music / Player，用户只做 PLAY。
+- 内部：Ear / analysis / stem / judgment / intervention / preset decision / verification / evidence / learning / cloud production。复杂度由 Moodify 承担。
+- 内部处理复杂度不是对外卖点。
 
 ## Three Disciplines
 
@@ -56,17 +59,40 @@ Production Case
 
 When instructions conflict, prefer:
 
-1. current explicit human task;
+1. current explicit human instruction;
 2. root `AGENTS.md`;
-3. `docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md` (product objective and
-   reconstruction boundaries) + its policy documents;
-4. canonical architecture docs;
-5. verified current mainline behavior and tests;
-6. current package docs;
-7. experimental docs;
-8. historical/legacy docs.
+3. `docs/canon/*`（CURRENT_CANON / PRODUCT_BOUNDARY / INTERNAL_SYSTEMS / AUTHORITY_ORDER / CURRENT_ARCHITECTURE）;
+4. verified runtime evidence（W01-P00 Evidence Index 等）;
+5. canonical main behavior and tests;
+6. current subsystem documentation;
+7. experimental documentation;
+8. historical / legacy documentation.
 
-Historical documents do not override current architecture.
+Historical documents do not override current Canon. A LEGACY / HISTORICAL document cannot promote itself back to Canon through its own text.
+
+## Agent Rules
+
+- 不创建第二个公开产品身份（Ear 不得再次升级为公开产品）。
+- 不创建第二套 authoritative state machine。
+- 不创建第二套 Job authority。
+- 不以"功能很多"作为产品价值。
+- 不把内部处理复杂度暴露给用户作为卖点。
+- 不因文档冲突而自行做产品哲学决策——写 `HUMAN_DECISION_REQUIRED`。
+- 不把历史文档当作当前 authority。
+- 不虚构云端/生产能力：未验证不写成已运行（Canon 与事实分离，R6/R10）。
+
+## Canon Change Rule
+
+改变以下任何内容的任务必须声明 `CANON_CHANGE = YES`，并说明 why / evidence / affected authority files / migration / rollback：
+
+- 对外产品身份
+- 内部/外部能力边界
+- state machine authority
+- evidence authority
+- cloud control authority
+- data authority
+
+普通功能任务不能静默修改 Canon。变更记录进入 `docs/canon/CANON_CHANGELOG.md`。
 
 ## Change Discipline
 

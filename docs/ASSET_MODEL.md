@@ -1,5 +1,8 @@
 # Moodify Asset Model
 
+> **Status: INTERNAL**（W01-P01 Canon，2026-08-17）
+> 资产模型属于内部认知基础设施，不构成对外产品表述；不覆盖 [docs/canon/](canon/CURRENT_CANON.md)。
+
 ## Principle
 
 A functioning feature is useful.
