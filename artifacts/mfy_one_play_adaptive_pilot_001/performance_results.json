@@ -1,0 +1,23 @@
+{
+  "package_id": "MFY_ONE_PLAY_ADAPTIVE_PILOT_001",
+  "sequence": 73,
+  "gate": "performance_and_stability",
+  "status": "BUDGET_VERIFIED_JVM + DEVICE_BASELINE_REUSED; long-duration device tests SKIPPED per user",
+  "device_evidence_reused": {
+    "source": "MFY_ON_DEVICE_DSP_RUNTIME_001 (69) on Xiaomi M2102J2SC Android 12",
+    "identity_processor_throughput": "54 ns/frame (819,200 frames / 44 ms)",
+    "cpu_budget_at_44100hz": "~0.24% of one core",
+    "underruns": 0,
+    "thermal": "NONE",
+    "latency": "identity graph adds 0 ms"
+  },
+  "pilot_overhead": {
+    "decision_recording": "one JSON record per played item; no audio-path work",
+    "measurement_snapshot": "existing DspGraphRuntime.snapshot (observers already attached in 69)",
+    "estimated_added_cpu": "negligible (JSON serialization per track start, not per buffer)"
+  },
+  "battery_and_thermal": "not re-measured in 73 (no device run per user); 69 observed NONE thermal / 0 underruns on device; long-play battery evidence pending device matrix",
+  "background_playback": "PlaybackService + MediaSession unchanged from 3.1 (background playback path preserved); no device verification in 73",
+  "audio_focus": "NOT_OBSERVABLE passive state (68 boundary); focus handling unchanged (3.1)",
+  "boundary": "performance/long-play/background/focus/low-battery/thermal device evidence REQUIRED by acceptance; this package records implementation + JVM + 69 reuse, device matrix pending"
+}

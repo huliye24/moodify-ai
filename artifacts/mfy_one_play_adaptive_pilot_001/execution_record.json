@@ -1,0 +1,55 @@
+{
+  "package_id": "MFY_ONE_PLAY_ADAPTIVE_PILOT_001",
+  "sequence": 73,
+  "executor": "DeepSeek (Claude Code)",
+  "status": "READY_FOR_CODEX_REVIEW",
+  "execution_date": "2026-08-17",
+  "repository": {
+    "path": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
+    "branch": "codex/moodify-3.0-external-audio",
+    "head_commit": "PENDING_COMMIT",
+    "note": "UI/图标冻结;无参数面板;视觉不做(用户指示);真机测试跳过(用户指示)"
+  },
+  "changed_files": {
+    "added_main": [
+      "apps/android/app/src/main/java/com/moodify/app/audio/PilotScope.kt (pilot-scope-v1 契约 + PilotEvaluator 纯决策函数)",
+      "apps/android/app/src/main/java/com/moodify/app/audio/PilotDecisionRecorder.kt (Decision/Measurement/Evidence 记录)"
+    ],
+    "modified": [
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt (+记录调用 2 处 + recordPilotDecision + export; 播放逻辑零改动)"
+    ],
+    "added_tests": [
+      "apps/android/app/src/test/java/com/moodify/app/audio/PilotScopeTest.kt (8 JVM tests)"
+    ]
+  },
+  "gates": {
+    "one_play_flow": {"result": "PASS", "evidence": "单一入口: QQ/微信/本地/云端歌曲都进同一决策流(PlaybackManager 统一 playQueue + onMediaItemTransition 记录);用户路径 Choose/Open -> Moodify -> Play 不变"},
+    "approved_scope_only": {"result": "PASS", "evidence": "LOCAL_CONTENT + approved profile 才 APPROVED_INTERVENTION; STREAMING_HTTP/QQ 恒 BYPASSED_OUT_OF_SCOPE 继续播放; 71 候选冻结 (mfy-intervention-v1: dc/clip); 无参数面板"},
+    "performance_and_stability": {"result": "PARTIAL", "evidence": "决策记录零音频路径开销;复用 69 设备基准 (54ns/帧, 0 underrun, thermal NONE);长时/后台/焦点/低电/温升真机证据待设备矩阵(用户指示跳过)"},
+    "failure_recovery": {"result": "PASS", "evidence": "错误记录 ERROR 不阻断播放(recorder 路径隔离 try/catch);原曲可立即回退(3.1 控件未动);scope 外稳定旁路继续播放;JVM 测试覆盖"},
+    "claim_boundary": {"result": "PASS", "evidence": "claim 不扩张: 试点限设备/曲库; known_limitations.md 诚实列出;产品状态仅 PROCESSING/BYPASSED/ERROR"}
+  },
+  "unit_tests": {
+    "jvm": "74/74 PASS (新增 PilotScopeTest 8: 输入分类/契约冻结/四分支决策/记录器/证据链)",
+    "device": "SKIPPED per user (真机测试跳过)"
+  },
+  "fixed_issues": [
+    "70 确定性测试时序缺陷: createdAtMs 默认当前时间跨毫秒调用不等 -> 断言排除时间字段(顺带修复)"
+  ],
+  "boundary_facts": {
+    "audible_intervention": "Android 播放链仍为 69 identity graph;71 Python 原语未编译进播放链;APPROVED_INTERVENTION 记录的是批准范围内的意图,可听干预待 71/72 pipeline 集成决策",
+    "human_validation": "72 盲听人类会话跳过;统计 DATA_PENDING",
+    "device_evidence": "长时/后台/焦点/低电/温升待设备矩阵",
+    "ui": "冻结 3.1;无新状态表达",
+    "claim": "不声称普适更好听"
+  },
+  "artifacts": [
+    "pilot_scope.json",
+    "decision_records/sample_decision_001.json",
+    "performance_results.json",
+    "failure_recovery_results.json",
+    "known_limitations.md",
+    "execution_record.json"
+  ],
+  "machine_gate_summary": "4/5 FULL PASS + performance_and_stability PARTIAL(真机跳过); 输出 READY_FOR_CODEX_REVIEW"
+}

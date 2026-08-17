@@ -1,0 +1,24 @@
+{
+  "package_id": "MFY_ONE_PLAY_ADAPTIVE_PILOT_001",
+  "sequence": 73,
+  "schema": "pilot-scope-v1",
+  "approved_candidates": "mfy-intervention-v1",
+  "approved_primitives": ["dc_offset_fix", "clip_peak_repair"],
+  "intervention_scope": "LOCAL_CONTENT only; STREAMING_HTTP and QQ_SHARE always bypass (stable, playback continues)",
+  "entry_points": "single path: Choose/Open -> Moodify -> Play (QQ share, WeChat share, local file, cloud song all enter the same decision flow)",
+  "product_states_allowed": ["PROCESSING", "BYPASSED", "ERROR"],
+  "complex_metrics_exposed": false,
+  "original_always_available": "user can always switch back to original (stop/next/previous/toggle unchanged from 3.1)",
+  "failure_never_blocks": "playback error records ERROR decision and never blocks playback",
+  "claim_boundary": "pilot is device/library limited; NEVER claims universal improvement",
+  "no_param_ui": "no parameter panel added; UI/icon frozen (3.1)",
+  "decision_model": {
+    "input": "uri -> LOCAL_CONTENT / STREAMING_HTTP / QQ_SHARE",
+    "profile": "OutputCapabilityProfile from 70 (route/spatializer/offload/thermal/underrun)",
+    "decision": "APPROVED_INTERVENTION | BYPASSED_OUT_OF_SCOPE | BYPASSED_SAFETY | ERROR",
+    "measurement": "DspGraphState snapshot from 69",
+    "evidence": "PlaybackPathRecord id from 68 (path_<ts>_<hash>)"
+  },
+  "implementation": "apps/android/app/src/main/java/com/moodify/app/audio/{PilotScope,PilotDecisionRecorder}.kt + PlaybackManager.recordPilotDecision (playback logic unchanged)",
+  "tests": "PilotScopeTest 8/8 JVM; suite 74/74"
+}
