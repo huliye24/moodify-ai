@@ -1,16 +1,24 @@
-# P06 Source Manifest
+# MFY-CR-P06 — Source Manifest
 
-| Field | Value |
-|---|---|
-| alias | cadeau10-ne-vivons-pas-seulement-de-souvenirs |
-| SOURCE_SHA256 | ecef89a227fea4c44abac4fe07d5139c... (full in GOLDEN_RECONSTRUCTION_RECORD.json) |
-| SOURCE_DURATION | 219.4s |
-| SOURCE_SAMPLE_RATE | 48000 |
-| SOURCE_BIT_DEPTH | 24 (PCM) |
-| SOURCE_CHANNELS | 2 |
-| SOURCE_CODEC | wav (WAVE_FORMAT_EXTENSIBLE) |
-| SOURCE_ORIGIN | Moodify-owned cadeau10-album1, LA media server |
-| RIGHTS_STATUS | OWNED |
-| SOURCE_HASH | immutable reference; candidates trace to it |
+```text
+TRACK_ID          = CAD10-05_VIEILLIR
+TITLE_INTERNAL    = "Vieillir et devenir nouveau avec toi" (cadeau10 album track 5)
+ERA_HINT          = 2026 production with HF-limited character (thematic: aging)
+REGION_HINT       = Moodify original production (荣景文川), French-language
+SOURCE_FORMAT     = WAV (PCM 24-bit, WAVE_FORMAT_EXTENSIBLE)
+DURATION          = 182.16 s
+SAMPLE_RATE       = 48000
+BIT_DEPTH         = 24
+CHANNELS          = 2
+SOURCE_SHA256     = aa1542c00866efa8e438cfcaf6b40b2325abe2285e5896e8751151459700e9e5
+RIGHTS_STATUS     = OWNED
+WHY_SELECTED      = legal for internal testing; full-length with clear vocal;
+                    genuine measured era character (HF cutoff ~14.1 kHz,
+                    rolloff-95 ~9.3 kHz); familiar project asset (ear-workbench case)
+KNOWN_ARTISTIC_CHARACTER = gentle French vocal, warm mid-forward mix, narrow-ish
+                    stereo (corr 0.71), long dynamic range (LRA 12.7 LU)
+KNOWN_TECHNICAL_SUSPECTS = bandwidth limit ~14 kHz, elevated noise floor without
+                    quiet windows (noise-vs-texture unresolved), no clipping
+```
 
-Audio body NOT committed to git (hash/metadata/measurement only).
+The source is immutable: all candidates trace to this hash.
