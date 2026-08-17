@@ -5,7 +5,7 @@
 ```text
 STATUS = P05_COMPLETE
 BRANCH = codex/moodify-classic-reconstruction-001
-HEAD   = 36f2a721 (implementation) + <evidence commit>
+HEAD   = 36f2a721 (implementation) + 39d6854f (evidence)
 ```
 
 Identity Guard v0.1 已实现、验证并提交：多维身份保护 + veto + 人类升级，无单一身份分数。
