@@ -5,7 +5,7 @@
 ```text
 STATUS = P02_COMPLETE
 BRANCH = codex/moodify-classic-reconstruction-001
-HEAD   = 99c9efa2 (constitution docs) + <evidence commit>
+HEAD   = 99c9efa2 (constitution docs) + d4db652a (evidence)
 ```
 
 Moodify 的正式产品与技术宪法已在 P01 锁定的唯一基线上建立，后续 P03–P12 引用该
