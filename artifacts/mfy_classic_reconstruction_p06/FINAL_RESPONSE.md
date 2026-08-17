@@ -5,7 +5,7 @@
 ```text
 STATUS = P06_COMPLETE_WITH_BLOCKERS (listening is a human step, not a technical failure)
 BRANCH = codex/moodify-classic-reconstruction-001
-HEAD   = ef21e523 (implementation) + <evidence commit>
+HEAD   = ef21e523 (implementation) + a41547bd (evidence)
 GOLDEN_STATUS = PENDING_LISTENING (kit ready; machine portion complete)
 ```
 
