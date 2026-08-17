@@ -18,6 +18,33 @@ from pathlib import Path
 SUPPORTED_EXTENSIONS = {'.wav', '.mp3', '.flac', '.aiff', '.aif', '.m4a', '.ogg'}
 
 
+def cmd_identity_guard(args):
+    """[MFY-CR-P05] Identity Guard v0.1 — source vs candidate 身份保护"""
+    import json
+    from pathlib import Path as _Path
+
+    from moodify.identity_guard.guard import guard_candidate
+
+    source = json.loads(_Path(args.source).read_text(encoding="utf-8"))
+    candidate = json.loads(_Path(args.candidate).read_text(encoding="utf-8"))
+    verdict = guard_candidate(source, candidate,
+                              candidate_id=args.candidate_id, source_id=args.source_id)
+    out_dir = _Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "identity_guard.v0.1.json").write_text(
+        json.dumps(verdict.to_dict(), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(f"overall: {verdict.state.value}")
+    for d in verdict.deltas:
+        nd = d.normalized_delta if d.normalized_delta is not None else "-"
+        print(f"  [{d.dimension.value}] {d.guard_state.value} (norm={nd}) — {d.notes[:60]}")
+    if verdict.human_review_question:
+        print(f"human review: {verdict.human_review_question[:80]}...")
+    print(f"wrote {out_dir / 'identity_guard.v0.1.json'}")
+    return 0
+
+
 def cmd_era_diagnostic(args):
     """[MFY-CR-P03] Era Diagnostic v0.1 — 年代技术限制诊断（只诊断，不授权处理）"""
     import json
@@ -428,6 +455,15 @@ def main():
     p_analyze.add_argument("--output-dir", default="outputs", help="输出目录")
     p_analyze.add_argument("--json", action="store_true", help="JSON 格式输出")
 
+    # identity-guard (MFY-CR-P05)
+    p_ig = sub.add_parser("identity-guard",
+                          help="[MFY-CR-P05] 原作身份保护（source vs candidate，多维 + veto）")
+    p_ig.add_argument("--source", required=True, help="source metrics JSON")
+    p_ig.add_argument("--candidate", required=True, help="candidate metrics JSON")
+    p_ig.add_argument("--source-id", default="source", help="source id")
+    p_ig.add_argument("--candidate-id", default="candidate", help="candidate id")
+    p_ig.add_argument("--out-dir", default="outputs", help="输出目录")
+
     # era-diagnostic (MFY-CR-P03)
     p_era = sub.add_parser("era-diagnostic",
                            help="[MFY-CR-P03] 年代技术限制诊断（只诊断，不授权处理）")
@@ -525,6 +561,8 @@ def main():
         return 0
 
     handlers = {
+        # identity guard (MFY-CR-P05)
+        "identity-guard": cmd_identity_guard,
         # era diagnostic (MFY-CR-P03)
         "era-diagnostic": cmd_era_diagnostic,
         # v0.1.0 mainline
