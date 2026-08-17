@@ -5,7 +5,7 @@
 ```text
 STATUS = P03_COMPLETE
 BRANCH = codex/moodify-classic-reconstruction-001
-HEAD   = b7e44d0b (implementation) + <evidence commit>
+HEAD   = b7e44d0b (implementation) + a48031a9 (evidence)
 ```
 
 第一版 Era Diagnostic v0.1 已实现、验证并提交：只诊断，不授权处理。
