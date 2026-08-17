@@ -1,0 +1,41 @@
+{
+  "package_id": "MFY_DEVICE_AWARE_RENDERING_001",
+  "sequence": 70,
+  "gate": "privacy",
+  "reviewer": "DeepSeek (Claude Code), pending Codex_and_Human",
+  "date": "2026-08-17",
+  "verdict": "PASS — no device unique identifier persisted, no device fingerprint uploaded without consent",
+  "checks": [
+    {
+      "id": "NO_UNIQUE_IDENTIFIERS",
+      "result": "PASS",
+      "evidence": "codebase search: no IMEI, serial, Android ID, MAC address, hardware UUID read or referenced anywhere in apps/android; OutputCapabilityObserver reads only AudioManager properties, AudioDeviceInfo type/sample-rates, Build.VERSION.MEDIA_PERFORMANCE_CLASS, thermal status, underrun count",
+      "risk_note": "profileId is a hash of capability facts (route class, sample rates, performance class) — a coarse capability fingerprint, not a device identifier; documented in schema as deterministic decision key"
+    },
+    {
+      "id": "NO_UPLOAD_WITHOUT_CONSENT",
+      "result": "PASS",
+      "evidence": "OutputCapabilityProfile is consumed locally only (DspGraphRuntime.applyPolicy); no network transport of profile exists in 70; PlaybackManager exposes policy via in-app getter only",
+      "risk_note": "if a future package syncs policy telemetry, consent flow must be added then"
+    },
+    {
+      "id": "NO_DEVICE_IMAGING",
+      "result": "PASS",
+      "evidence": "profile stores capability sets (sample-rate lists, route class), not user data, audio content, or personal information; no location, contacts, or account data involved",
+      "risk_note": "capability sets are low-reidentifiability aggregates"
+    },
+    {
+      "id": "DATA_MINIMIZATION",
+      "result": "PASS",
+      "evidence": "fields limited to what the policy resolver needs; thermal/underrun counters are aggregate state, no timestamps or trajectories",
+      "risk_note": "underrunCount is a session counter, not a usage log"
+    },
+    {
+      "id": "CONSERVATIVE_UNKNOWN",
+      "result": "PASS",
+      "evidence": "APIs gated by SDK version return null/UNKNOWN rather than probing restricted info; unknown facts resolve to INCONCLUSIVE conservative policy"
+    }
+  ],
+  "persistence": "no profile persisted to disk in 70; state lives in memory for the process lifetime",
+  "boundary": "human/Codex review of the profile telemetry decision pending if upload is ever introduced"
+}

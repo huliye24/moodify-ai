@@ -1,0 +1,81 @@
+{
+  "package_id": "MFY_DEVICE_AWARE_RENDERING_001",
+  "sequence": 70,
+  "policy": "deterministic decision table (RenderingPolicyResolver, fixed priority order; first match wins)",
+  "rules": [
+    {
+      "priority": 1,
+      "id": "HARDWARE_OFFLOAD_CONFLICT",
+      "condition": "offloadSupported == true",
+      "decision": {"allowedDsp": false, "bypassReason": "HARDWARE_OFFLOAD_ACTIVE", "precision": "PCM_16", "bufferMs": 100, "confidence": "FULL"},
+      "rationale": "offload and app DSP are mutually exclusive (69); never both claimed"
+    },
+    {
+      "priority": 2,
+      "id": "SYSTEM_SPATIALIZER_CONFLICT",
+      "condition": "spatializerActive == true",
+      "decision": {"allowedDsp": false, "bypassReason": "SYSTEM_SPATIALIZER_ACTIVE", "precision": "PCM_16", "bufferMs": 100, "confidence": "FULL"},
+      "rationale": "no double spatialization; system takes over"
+    },
+    {
+      "priority": 3,
+      "id": "UNKNOWN_ROUTE",
+      "condition": "routeClass == null or UNKNOWN",
+      "decision": {"allowedDsp": false, "bypassReason": "UNKNOWN_ROUTE_CAPABILITY", "precision": "PCM_16", "bufferMs": 250, "confidence": "INCONCLUSIVE"},
+      "rationale": "missing device evidence -> INCONCLUSIVE, conservative bypass (acceptance gate)"
+    },
+    {
+      "priority": 4,
+      "id": "THERMAL_STRESS",
+      "condition": "thermalStatus in {SEVERE, CRITICAL, EMERGENCY, SHUTDOWN}",
+      "decision": {"allowedDsp": false, "bypassReason": "THERMAL_STRESS_<state>", "precision": "PCM_16", "bufferMs": 300, "confidence": "FULL"},
+      "rationale": "explainable degradation; playback continues"
+    },
+    {
+      "priority": 5,
+      "id": "UNDERRUN_STRESS",
+      "condition": "underrunCount >= 5",
+      "decision": {"allowedDsp": false, "bypassReason": "UNDERRUN_STRESS_COUNT_<n>", "precision": "PCM_16", "bufferMs": 300, "confidence": "FULL"},
+      "rationale": "explainable degradation; playback continues"
+    },
+    {
+      "priority": 6,
+      "id": "BLUETOOTH_ROUTE",
+      "condition": "routeClass in {BLUETOOTH_A2DP, BLUETOOTH_SCO}",
+      "decision": {"allowedDsp": true, "bypassReason": null, "precision": "PCM_16", "bufferMs": 200, "confidence": "PARTIAL if spatializer null else FULL"},
+      "rationale": "codec-transformed link: float precision meaningless; larger buffer for jitter"
+    },
+    {
+      "priority": 7,
+      "id": "USB_DAC_ROUTE",
+      "condition": "routeClass == WIRED_USB",
+      "decision": {"allowedDsp": true, "bypassReason": null, "precision": "PCM_16", "bufferMs": 100, "confidence": "PARTIAL if no sample-rate matrix else FULL"},
+      "rationale": "external DAC manages conversion; no forced resample (native-rate passthrough)"
+    },
+    {
+      "priority": 8,
+      "id": "LOW_PERFORMANCE_CLASS",
+      "condition": "performanceClass == LOW",
+      "decision": {"allowedDsp": true, "bypassReason": null, "precision": "PCM_16", "bufferMs": 250, "confidence": "FULL"},
+      "rationale": "conservative budget for low-tier hardware"
+    },
+    {
+      "priority": 9,
+      "id": "DEFAULT_SPEAKER",
+      "condition": "otherwise (speaker route, healthy evidence)",
+      "decision": {"allowedDsp": true, "bypassReason": null, "precision": "FLOAT_32", "bufferMs": 100, "confidence": "PARTIAL if spatializer null else FULL"},
+      "rationale": "lossless speaker path can use float precision; headroom stays -1.0 dB"
+    }
+  ],
+  "headroom": "fixed -1.0 dB across all rules (never tuned by brand)",
+  "cpu_budget": "0.05 fraction when DSP allowed; 0.02 when bypassed",
+  "explicitly_excluded": [
+    "no headphone frequency-response guessing by device model",
+    "no uncalibrated device-compensation EQ",
+    "no brand-name presets"
+  ],
+  "jvm_gate_evidence": {
+    "tests": "OutputCapabilityPolicyTest 14/14 PASS (each rule, priority, determinism, unknown-conservative, json roundtrip)",
+    "total_jvm": "66/66 PASS"
+  }
+}

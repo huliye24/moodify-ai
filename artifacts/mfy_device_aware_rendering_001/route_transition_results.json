@@ -1,0 +1,33 @@
+{
+  "package_id": "MFY_DEVICE_AWARE_RENDERING_001",
+  "sequence": 70,
+  "gate": "route_transition",
+  "device_evidence_status": "DEVICE_TEST_SKIPPED_PER_USER — no new instrumented device run in 70; device facts reused from MFY_ON_DEVICE_DSP_RUNTIME_001 (69) observed evidence",
+  "observable_facts_from_69": {
+    "device": "Xiaomi M2102J2SC (Redmi), Android 12, SDK 31, arm64-v8a",
+    "active_route": {"type": "TYPE_BUILTIN_SPEAKER", "routeClass": "SPEAKER", "deviceType": "M2102J2SC"},
+    "system_output": {"sampleRate": 48000, "framesPerBuffer": 144},
+    "decoded_input": {"sampleRate": 44100, "bitDepth": 16, "channels": 1},
+    "observed_resample": "input 44.1kHz -> system output 48kHz (mixer resamples; 68 evidence)",
+    "spatializer": "null (Android 12 < API 33; API unavailable)",
+    "offload": "UNKNOWN (no callback fired with identity processor installed)",
+    "thermal": "NONE (observed)",
+    "underrun": 0
+  },
+  "expected_policy_on_this_device": {
+    "facts_input": "routeClass=SPEAKER, spatializer=null, offload=null, performanceClass=MEDIA_PERFORMANCE_CLASS(API31, value device-dependent), thermal=NONE, underrun=0",
+    "predicted_decision": "rule 9 DEFAULT_SPEAKER -> allowedDsp=true, FLOAT_32, bufferMs=100, confidence=PARTIAL (spatializer null), OR rule 3 INCONCLUSIVE if route read fails",
+    "note": "prediction from resolver logic (pure function); not re-verified on device in 70 (device test skipped)"
+  },
+  "hot_switch_behaviour": {
+    "implementation": "resolver is a pure function; re-resolution is re-invokable (PlaybackManager.init resolves and applies once; route-change re-resolution entry exists); DspGraphRuntime.applyPolicy applies bypass/restore without touching playback",
+    "no_stale_profile": "policy application is idempotent: bypassReason==null && !bypassActive -> no-op; no profile mutation mid-playback",
+    "device_exercise": "NOT_EXERCISED on device (no BT/wired attached during window; device tests skipped per user)",
+    "pipeline_safety": "route change rebuild handled by Media3 sink (69 verified: pause/resume/seek cycles, identity graph active, 0 underruns)"
+  },
+  "boundaries": [
+    "BT A2DP / wired / USB DAC hot-switch device evidence pending (device matrix + user availability)",
+    "thermal/underrun stress triggering on device pending",
+    "MEDIA_PERFORMANCE_CLASS value of M2102J2SC not recorded (no device run in 70)"
+  ]
+}

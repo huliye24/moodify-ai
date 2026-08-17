@@ -1,0 +1,54 @@
+{
+  "package_id": "MFY_DEVICE_AWARE_RENDERING_001",
+  "sequence": 70,
+  "executor": "DeepSeek (Claude Code)",
+  "status": "READY_FOR_CODEX_REVIEW",
+  "execution_date": "2026-08-17",
+  "repository": {
+    "path": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
+    "branch": "codex/moodify-3.0-external-audio",
+    "head_commit": "c1f0c2d9",
+    "note": "UI/图标/包名未动;不暴露新 UI;视觉部分不做(用户指示);真机测试跳过(用户指示)"
+  },
+  "changed_files": {
+    "added_main": [
+      "apps/android/app/src/main/java/com/moodify/app/audio/OutputCapability.kt (output-capability-v1 契约 + OutputCapabilityProfile)",
+      "apps/android/app/src/main/java/com/moodify/app/audio/RenderingPolicyResolver.kt (确定性决策表, 9 条规则固定优先级, 纯函数)",
+      "apps/android/app/src/main/java/com/moodify/app/audio/OutputCapabilityObserver.kt (Android API 事实观测: route/采样率/spatializer/offload/performance class)"
+    ],
+    "modified": [
+      "apps/android/app/src/main/java/com/moodify/app/audio/DspGraphRuntime.kt (+applyPolicy: bypass/restore 应用)",
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt (+3 行: resolve + applyPolicy 启动决策)"
+    ],
+    "added_tests": [
+      "apps/android/app/src/test/java/com/moodify/app/audio/OutputCapabilityPolicyTest.kt (14 JVM tests)"
+    ]
+  },
+  "gates": {
+    "capability_truth": {"result": "PASS", "evidence": "facts 只来自 Android API 或 69 实测(route class/采样率/spatializer/offload/performance class/thermal/underrun);无机型启发式;无未校准 EQ;API 缺失 -> null -> 保守"},
+    "deterministic_policy": {"result": "PASS", "evidence": "纯函数: 同 facts 同 profile(profileId 哈希), JVM 测试确定性断言;决策表 9 规则固定优先级"},
+    "route_transition": {"result": "PARTIAL", "evidence": "热切换逻辑实现(resolver 纯函数可重解析 + applyPolicy 幂等不串用旧 profile);真机热切换未实测(用户指示跳过);69 已验证 route 变化时 pipeline 安全(0 underrun)"},
+    "privacy": {"result": "PASS", "evidence": "不读唯一标识(无 IMEI/serial/Android ID/MAC),不上传画像,能力集合本地消费;privacy_review.json 全项 PASS"}
+  },
+  "unit_tests": {
+    "jvm": "66/66 PASS (新增 OutputCapabilityPolicyTest 14: schema/确定性/9 规则/优先级/未知保守/roundtrip)"
+  },
+  "device_tests": "SKIPPED per user instruction (视觉不用做, 真机测试跳过); 设备事实复用 69 观测 (M2102J2SC: SPEAKER 48kHz/144frames, spatializer null API31, offload UNKNOWN, thermal NONE, underrun 0)",
+  "boundary_facts": {
+    "route_hot_switch": "实现就绪未实测;BT/USB 设备矩阵待补",
+    "thermal_underrun_stress": "降级逻辑 JVM 验证;设备压力触发未实测",
+    "performance_class": "M2102J2SC 的 MEDIA_PERFORMANCE_CLASS 值未记录(设备测试跳过)",
+    "spatializer_conflict": "API 33+ 才可观测;M2102J2SC (API 31) 上 spatializer=null -> 决策 confidence PARTIAL",
+    "offload_support": "API 34+ 才可观测;M2102J2SC (API 31) 上 offload=null",
+    "no_ui": "无新 UI;无新控件;无用户可见变化",
+    "dsp_identity_only": "策略只影响 69 的 identity graph 的 bypass/restore;无听感参数"
+  },
+  "artifacts": [
+    "output_capability_schema.json",
+    "policy_decision_table.json",
+    "route_transition_results.json",
+    "privacy_review.json",
+    "execution_record.json"
+  ],
+  "machine_gate_summary": "3/4 FULL PASS + route_transition PARTIAL(实现就绪真机未测, 用户指示跳过); 输出 READY_FOR_CODEX_REVIEW"
+}
