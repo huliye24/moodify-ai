@@ -1,14 +1,30 @@
 # Moodify
 
-> **The Ear of AI.**
->
-> Moodify is an **Auditory Intelligence System** for AI-generated audio and music.
+> **A reconstruction-first listening environment.**
 
-Its primary question is: **Can machines learn to hear?**
+**中文定位：以云端重建为核心的听觉环境。**
 
-**中文定位：Moodify 是 AI 的耳朵。**
+Moodify's public experience is:
 
-Moodify is built to help AI systems **listen, represent, judge, intervene, verify, and learn from sound**. It does not generate another song on top of a song. It develops a structured understanding of what is happening in audio, preserves evidence, and turns repeated production cases into reusable auditory knowledge.
+```text
+Choose
+  -> Reconstruct
+  -> Play
+```
+
+Classic Reconstruction is the **controlled modernization of a recording's
+technical realization while preserving its artistic identity, historical
+character, and essential musical intent** — decision-led, not preset-led.
+See the [Classic Reconstruction Constitution](docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md).
+
+Its internal intelligence layer remains:
+
+> **The Ear of AI — an Auditory Intelligence System.**
+
+Its primary question is: **Can machines learn to hear?** Moodify is built to help
+systems **listen, represent, judge, intervene, verify, and learn from sound**.
+The Ear is the internal foundation that understands, judges and decides when **not**
+to intervene; it is not the outward product surface.
 
 ```text
 Listen
@@ -19,6 +35,25 @@ Listen
   -> Learn
   -> Next Case
 ```
+
+## Product Structure
+
+```text
+Moodify Ear                  internal intelligence: listen, represent, judge, evidence, uncertainty
+Moodify Reconstruction Cloud controlled reconstruction: diagnose, decide, stereo-first, verify, render
+Moodify Listening Environment playback: decode, device/output adaptation, song-specific rendering
+```
+
+Boundaries and decision rules live in
+[RECONSTRUCTION_BOUNDARIES.md](docs/RECONSTRUCTION_BOUNDARIES.md),
+[ARTISTIC_IDENTITY_POLICY.md](docs/ARTISTIC_IDENTITY_POLICY.md),
+[STEREO_FIRST_POLICY.md](docs/STEREO_FIRST_POLICY.md) and
+[LISTENING_ENVIRONMENT_ARCHITECTURE.md](docs/LISTENING_ENVIRONMENT_ARCHITECTURE.md).
+
+> The current implementation remains partial: Classic Reconstruction is not yet
+> production-proven. Existing auditory, data-factory and playback code is the
+> foundation this phase builds on; the product claim above is the direction, not
+> a shipping claim.
 
 ## Why Moodify Exists
 

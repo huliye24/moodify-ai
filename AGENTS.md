@@ -6,15 +6,24 @@ This file defines the canonical context for AI coding agents working in this rep
 
 Moodify is:
 
+> **A reconstruction-first listening environment.**
+
+用户体验为 `Choose -> Reconstruct -> Play`（对外产品定义见
+[Classic Reconstruction Constitution](docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md)）。
+
+内部智力层（internal foundation）仍是:
+
 > **The Ear of AI — an Auditory Intelligence System.**
 
-Canonical loop:
+Canonical internal loop:
 
 ```text
 Listen -> Represent -> Judge -> Intervene -> Verify -> Learn
 ```
 
 Do not regress the repository identity back to “AI music post-processing”, “automatic mastering”, or a preset/DSP product.
+Reconstruction is the primary product objective; Ear is its internal intelligence,
+not the outward product surface.
 
 ## Important Distinction
 
@@ -49,11 +58,13 @@ When instructions conflict, prefer:
 
 1. current explicit human task;
 2. root `AGENTS.md`;
-3. canonical architecture docs;
-4. verified current mainline behavior and tests;
-5. current package docs;
-6. experimental docs;
-7. historical/legacy docs.
+3. `docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md` (product objective and
+   reconstruction boundaries) + its policy documents;
+4. canonical architecture docs;
+5. verified current mainline behavior and tests;
+6. current package docs;
+7. experimental docs;
+8. historical/legacy docs.
 
 Historical documents do not override current architecture.
 
