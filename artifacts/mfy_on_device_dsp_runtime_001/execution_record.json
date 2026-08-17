@@ -7,7 +7,7 @@
   "repository": {
     "path": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
     "branch": "codex/moodify-3.0-external-audio",
-    "head_commit": "db92b65b",
+    "head_commit": "db92b65b (+05ba0d32 gitignore fixtures exception)",
     "note": "UI/图标/包名未动(3.1 冻结遵守);无新增用户 DSP 控件;只建可旁路 runtime + identity processor"
   },
   "changed_files": {
