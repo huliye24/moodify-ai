@@ -7,7 +7,7 @@
   "repository": {
     "path": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
     "branch": "codex/moodify-3.0-external-audio",
-    "head_commit": "PENDING_COMMIT",
+    "head_commit": "096d5f8f",
     "note": "UI/图标冻结;无参数面板;视觉不做(用户指示);真机测试跳过(用户指示)"
   },
   "changed_files": {
