@@ -1,0 +1,81 @@
+{
+  "package_id": "MFY_ANDROID_AUDIO_PATH_OBSERVABILITY_001",
+  "sequence": 68,
+  "executor": "DeepSeek (Claude Code)",
+  "status": "READY_FOR_CODEX_REVIEW",
+  "execution_date": "2026-08-16",
+  "repository": {
+    "path": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
+    "branch": "codex/moodify-3.0-external-audio",
+    "head_commit": "23b13d35",
+    "commit_date": "2026-08-17",
+    "note": "HEAD 未动 UI/图标/包名(3.1 冻结遵守);只新增观测层 + 测试;代码已提交(commit 23b13d35)"
+  },
+  "changed_files": {
+    "modified": [
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt (+29/-2: 挂 PlaybackPathObserver, 追加 capturePathRecord/exportPathRecordsJson; 播放逻辑零改动)"
+    ],
+    "added_main": [
+      "apps/android/app/src/main/java/com/moodify/app/data/InputMetadataExtractor.kt (MediaExtractor 只读 staging 元数据)",
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackPath.kt (PlaybackPathRecord schema mfy-playback-path-v1)",
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackPathObserver.kt (offload/underrun/route/spatializer 观测)"
+    ],
+    "added_tests": [
+      "apps/android/app/src/test/java/com/moodify/app/data/PlaybackPathRecordTest.kt (5 tests)",
+      "apps/android/app/src/androidTest/java/com/moodify/app/audio/BypassEquivalenceTest.kt (5 tests)",
+      "apps/android/app/src/androidTest/java/com/moodify/app/audio/PlaybackPathRecordDeviceTest.kt (2 tests, 本包新增)",
+      "apps/android/app/src/androidTest/assets/audio/{tone.wav,tone.flac,tone.mp3,tone.aac}"
+    ]
+  },
+  "inherited_from_67": {
+    "note": "先行实现(InputMetadataExtractor/PlaybackPath/PlaybackPathObserver/PlaybackManager 改动/BypassEquivalenceTest)由 67 续作会话记录,本包以其为输入完成验收与修复",
+    "fixed_issues": [
+      "BypassEquivalenceTest.loadAsset 读取 target context assets → FileNotFoundException;改为 InstrumentationRegistry instrumentation context (androidTest APK assets)",
+      "BypassEquivalenceTest.decodeAsset dequeue 循环将 INFO_TRY_AGAIN_LATER(-1) 误入 releaseOutputBuffer → MediaCodec CodecException 0xffffffde + 进程崩溃;改为 when 显式 continue",
+      "PlaybackPathRecordDeviceTest 未用主线程访问 ExoPlayer → IllegalStateException;改为 runOnMainSync"
+    ],
+    "schema_extended": [
+      "audioTrackRequestedFormat (derived from decode format; ExoPlayer configures AudioTrack with it)",
+      "audioTrackActualFormat = NOT_OBSERVABLE (constant; post-mixer write format not exposed)",
+      "audioFocusState default = NOT_OBSERVABLE (defined constant, no passive API)"
+    ]
+  },
+  "gates": {
+    "bypass_equivalence": {
+      "result": "PASS",
+      "evidence": "BypassEquivalenceTest 5/5 on Xiaomi M2102J2SC Android 12: WAV byte-exact, FLAC byte-exact vs source PCM, MP3/AAC valid PCM, metadata parse OK"
+    },
+    "format_coverage": {
+      "result": "PASS",
+      "evidence": "wav/flac/mp3/aac 全部有成功证据;lossy 格式如实不做 byte-exact 声称"
+    },
+    "route_evidence": {
+      "result": "PASS",
+      "evidence": "PlaybackPathRecordDeviceTest 2/2: 真实播放 file:// WAV 产生完整 PathRecord(扬声器 route TYPE_1, systemOutput 48kHz/144frames, decoded 44.1kHz/16bit/mono, underruns=0, offloadStatus UNKNOWN);记录导出 artifacts/device_path_records/"
+    },
+    "failure_recovery": {
+      "result": "PASS",
+      "evidence": "failure_matrix.json 定义 9 类状态(route add/remove/focus/underrun/BT switch/permission lost/decode error/offload/observation incomplete);本地播放+云端播放+失败回退保留(PlaybackManager 播放逻辑零改动)"
+    }
+  },
+  "unit_tests": {
+    "jvm": "46/46 PASS (含 PlaybackPathRecordTest 5, schema 30 字段; 2026-08-17 --rerun-tasks 强制重跑确认)",
+    "device": "7/7 PASS (BypassEquivalenceTest 5 + PlaybackPathRecordDeviceTest 2; 2026-08-17 重跑确认, 期间 MIUI USB 安装限制需用户开启后通过)",
+    "ui_tests_skipped": "MiniPlayerGestureTest / LanguageSwitchTest 未跑:用户指示先做与视觉无关部分;由 Codex/人工复核补"
+  },
+  "boundary_facts": {
+    "post_mixer_bit_perfect": "不声称:设备观测输入 44.1kHz → 系统输出 48kHz(mixer 重采样可见),mixer 后格式 NOT_OBSERVABLE",
+    "qq_content_uri_e2e": "未做端到端 QQ 分享测试(需真机 QQ 交互,视觉相关);代码路径未变(MainActivity.handleExternalAudio 零改动)+ LOCAL_CONTENT 播放路径已由设备测试验证;QQ 端到端留 Codex/人工",
+    "audio_focus": "NOT_OBSERVABLE 是定义状态而非失败",
+    "bluetooth_route_switch": "观测代码已实现,本轮设备未连接蓝牙未触发;留待设备矩阵扩展",
+    "no_dsp_added": "无 EQ/响度/空间化/AI 效果;无用户 DSP 控件;bypassReason=NO_DSP_ACTIVE 恒定"
+  },
+  "artifacts": [
+    "playback_path_schema.json",
+    "fixture_results.json",
+    "device_path_records/path_record_wav_m2102j2sc_android12.json",
+    "failure_matrix.json",
+    "execution_record.json"
+  ],
+  "machine_gate_summary": "4/4 PASS (bypass_equivalence / format_coverage / route_evidence / failure_recovery); 输出 READY_FOR_CODEX_REVIEW"
+}
