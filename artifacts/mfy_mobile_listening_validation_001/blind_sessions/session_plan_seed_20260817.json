@@ -1,0 +1,29 @@
+{
+  "plan": [
+    {
+      "session_id": "session_000",
+      "trial_id": "trial_0_0",
+      "sample_id": "legit_dc_clip_01",
+      "play_a": "legit_dc_clip_01.wav",
+      "play_b": "legit_dc_clip_01_processed.wav",
+      "order_randomized": false
+    },
+    {
+      "session_id": "session_001",
+      "trial_id": "trial_1_0",
+      "sample_id": "negative_control_01",
+      "play_a": "negative_control_01_processed.wav",
+      "play_b": "negative_control_01.wav",
+      "order_randomized": true
+    },
+    {
+      "session_id": "session_002",
+      "trial_id": "trial_2_0",
+      "sample_id": "placebo_bypass_01",
+      "play_a": "legit_dc_clip_01.wav",
+      "play_b": "legit_dc_clip_01.wav",
+      "order_randomized": true
+    }
+  ],
+  "note": "machine-generated blinded plan; human judgments not filled (skipped per user)"
+}
