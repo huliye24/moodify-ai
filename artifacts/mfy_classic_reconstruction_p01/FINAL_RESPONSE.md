@@ -5,7 +5,7 @@
 ```text
 STATUS = P01_COMPLETE
 BRANCH = codex/moodify-classic-reconstruction-001
-HEAD   = 5bbc4972 (branch base) + b01762b7 (convergence commit) + <evidence commit>
+HEAD   = 5bbc4972 (branch base) + b01762b7 (convergence commit) + fa7ae7bd (evidence commit)
 ```
 
 新的 Classic Reconstruction 工程基线已建立并验证：从真实工作主线
