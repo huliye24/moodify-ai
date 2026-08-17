@@ -1,0 +1,13 @@
+{
+  "package_id": "MFY_PRESERVE_IDENTITY_INTERVENTION_001",
+  "sequence": 71,
+  "experiment": "stems (separated tracks) as optional offline/cloud experiment",
+  "status": "DEFERRED_NOT_RUN",
+  "reason": "stem experiment is explicitly OPTIONAL offline/cloud work; this package delivered full-mix primitives + gates only. Stems would require the separation backend (audiolla/lalal) wired into an experiment harness with stem leakage, phase, recombination-residual and identity gates.",
+  "policy_recorded": [
+    "if stems fail stem-leakage / phase / recombination-residual / identity gates -> fall back to full-mix",
+    "MIDI never enters the finished-record playback chain"
+  ],
+  "required_gates_for_future": ["stem_leakage", "phase_coherence", "recombination_residual", "identity_gate"],
+  "boundary": "no stem pipeline exists in cloud production (see MOODIFY_CLOUD_CURRENT_STATE_2026-08-17.md section 3)"
+}
