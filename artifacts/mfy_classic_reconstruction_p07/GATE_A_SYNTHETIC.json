@@ -1,0 +1,190 @@
+{
+  "gate": "A",
+  "note": "synthetic stand-in corpus (30s); real 10-track corpus pending human-provided material",
+  "records": [
+    {
+      "record_id": "rlr_45d1e4b274f46951",
+      "case_id": "SYNTH_T01",
+      "source_hash": "346752ab7de4dc75cf5f726a3357f2baa909faa7c8984d1b1094334f946d1f97",
+      "rights": {
+        "rights_status": "INTERNAL_TEST_ALLOWED",
+        "processing_permission": true,
+        "training_permission": false,
+        "retention_policy": "internal_research_only",
+        "public_demo_permission": false,
+        "notes": ""
+      },
+      "source_characteristics": {
+        "era_hint": "1980s",
+        "recording_character": {
+          "noise": "high",
+          "bandwidth": "limited"
+        },
+        "duration_s": 30,
+        "synthetic": true
+      },
+      "diagnostic_findings": {
+        "ED-02": {
+          "severity": "high"
+        }
+      },
+      "diagnostic_confidences": {},
+      "objective_ids": [
+        "obj_minimal"
+      ],
+      "candidate_plan_hashes": [
+        "plan_a"
+      ],
+      "candidate_parameter_distance": {},
+      "technical_rank": "B",
+      "identity_guard_results": {
+        "verdict": "PASS"
+      },
+      "human_rank": "B",
+      "identity_preservation_rank": "B",
+      "source_vs_winner_result": "CANDIDATE",
+      "hardware_observations": [],
+      "stem_escalation_status": "NOT_ATTEMPTED",
+      "golden_status": "IMPROVED",
+      "failure_or_bypass_reason": null,
+      "versions": {
+        "diagnostic": "era-diag-v1",
+        "objective": "obj-v1",
+        "identity_guard": "ig-v1",
+        "engine": "recon-v1"
+      },
+      "training_permission_granted": false,
+      "record_version": "reconstruction-learning-record-v1"
+    },
+    {
+      "record_id": "rlr_cad434bd1a276629",
+      "case_id": "SYNTH_T02",
+      "source_hash": "5b08fb17423f702f14c6c5556a4a8419573446425f8334969c4bbd44ac19ae7f",
+      "rights": {
+        "rights_status": "INTERNAL_TEST_ALLOWED",
+        "processing_permission": true,
+        "training_permission": false,
+        "retention_policy": "internal_research_only",
+        "public_demo_permission": false,
+        "notes": ""
+      },
+      "source_characteristics": {
+        "era_hint": "1990s",
+        "recording_character": {
+          "noise": "moderate",
+          "bandwidth": "normal"
+        },
+        "duration_s": 30,
+        "synthetic": true
+      },
+      "diagnostic_findings": {
+        "ED-02": {
+          "severity": "moderate"
+        }
+      },
+      "diagnostic_confidences": {},
+      "objective_ids": [
+        "obj_minimal"
+      ],
+      "candidate_plan_hashes": [
+        "plan_a"
+      ],
+      "candidate_parameter_distance": {},
+      "technical_rank": "A",
+      "identity_guard_results": {
+        "verdict": "PASS"
+      },
+      "human_rank": "A",
+      "identity_preservation_rank": "A",
+      "source_vs_winner_result": "CANDIDATE",
+      "hardware_observations": [],
+      "stem_escalation_status": "NOT_ATTEMPTED",
+      "golden_status": "SUBTLE_IMPROVEMENT",
+      "failure_or_bypass_reason": null,
+      "versions": {
+        "diagnostic": "era-diag-v1",
+        "objective": "obj-v1",
+        "identity_guard": "ig-v1",
+        "engine": "recon-v1"
+      },
+      "training_permission_granted": false,
+      "record_version": "reconstruction-learning-record-v1"
+    },
+    {
+      "record_id": "rlr_77187300da201ac2",
+      "case_id": "SYNTH_T03",
+      "source_hash": "e7404cb78a29f5f71099c16fd735fe27985373c7b384085e9c280329d7211f43",
+      "rights": {
+        "rights_status": "INTERNAL_TEST_ALLOWED",
+        "processing_permission": true,
+        "training_permission": false,
+        "retention_policy": "internal_research_only",
+        "public_demo_permission": false,
+        "notes": ""
+      },
+      "source_characteristics": {
+        "era_hint": "modern",
+        "recording_character": {
+          "noise": "low",
+          "bandwidth": "wide"
+        },
+        "duration_s": 30,
+        "synthetic": true
+      },
+      "diagnostic_findings": {
+        "ED-02": {
+          "severity": "low"
+        }
+      },
+      "diagnostic_confidences": {},
+      "objective_ids": [
+        "obj_minimal"
+      ],
+      "candidate_plan_hashes": [
+        "plan_a"
+      ],
+      "candidate_parameter_distance": {},
+      "technical_rank": "SOURCE",
+      "identity_guard_results": {
+        "verdict": "PASS"
+      },
+      "human_rank": "SOURCE",
+      "identity_preservation_rank": "SOURCE",
+      "source_vs_winner_result": "SOURCE_WINS",
+      "hardware_observations": [],
+      "stem_escalation_status": "NOT_ATTEMPTED",
+      "golden_status": "SOURCE_WINS",
+      "failure_or_bypass_reason": null,
+      "versions": {
+        "diagnostic": "era-diag-v1",
+        "objective": "obj-v1",
+        "identity_guard": "ig-v1",
+        "engine": "recon-v1"
+      },
+      "training_permission_granted": false,
+      "record_version": "reconstruction-learning-record-v1"
+    }
+  ],
+  "metrics": {
+    "tracks_total": 3,
+    "golden_count": 0,
+    "improved_count": 1,
+    "subtle_count": 1,
+    "source_wins": 1,
+    "human_required": 0,
+    "stem_recommended": 0,
+    "unsupported": 0,
+    "failed": 0
+  },
+  "failures": [],
+  "agreement": {
+    "n": 3,
+    "technical_top_matches_human_top": 3,
+    "technical_top_matches_identity_top": 3,
+    "source_technical_rank": null,
+    "source_human_rank": null,
+    "patterns": [
+      "SOURCE_WINS"
+    ]
+  }
+}
