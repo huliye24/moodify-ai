@@ -5,6 +5,7 @@ Track / Job / Object / Hash / Version / Evidence 的唯一关系。
 """
 
 from moodify.data_plane.adapter import LocalFileAdapter, ObjectStoreAdapter, OSSAdapter
+from moodify.data_plane.control import JobControlPlane
 from moodify.data_plane.ids import new_id, uuid7
 from moodify.data_plane.manifest import ObjectManifest
 from moodify.data_plane.object_key import build_object_key, parse_object_key
@@ -12,6 +13,7 @@ from moodify.data_plane.repository import DataPlaneRepository
 
 __all__ = [
     "DataPlaneRepository",
+    "JobControlPlane",
     "LocalFileAdapter",
     "OSSAdapter",
     "ObjectManifest",
