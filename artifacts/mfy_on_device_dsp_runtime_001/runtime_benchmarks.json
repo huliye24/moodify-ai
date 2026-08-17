@@ -1,0 +1,51 @@
+{
+  "package_id": "MFY_ON_DEVICE_DSP_RUNTIME_001",
+  "sequence": 69,
+  "benchmark": "identity processor throughput + runtime overhead on device",
+  "device": {
+    "model": "Xiaomi M2102J2SC (Redmi)",
+    "android": 12,
+    "sdk": 31,
+    "abi": "arm64-v8a",
+    "tier": "mid",
+    "note": "single tier available this run; low/high tier device matrix pending (recorded as boundary)"
+  },
+  "processor_throughput": {
+    "test": "DspGraphDeviceTest.runtimeBenchmarkMeasuresProcessorThroughput",
+    "method": "100 batches x 8192 frames 16-bit stereo PCM through IdentityAudioProcessor (copy + peak observation), System.nanoTime",
+    "frames": 819200,
+    "elapsed_ms": 44,
+    "ns_per_frame": 53.99,
+    "date": "2026-08-17",
+    "result": "PASS",
+    "interpretation": "54 ns/frame at 44100 Hz x 2ch; per-channel cost ~27ns; budget check: 44100 frames/s * 54ns = 2.4ms/s CPU -> ~0.24% of one core, well within real-time budget"
+  },
+  "latency": {
+    "graph_latency_ms": 0,
+    "note": "identity processor adds no buffering delay; latency is design constant (mfy-dsp-graph-v1), not measured wall-clock"
+  },
+  "memory": {
+    "free_bytes_observed": "snapshot in DspGraphState.memoryFreeBytes during device tests",
+    "note": "identity graph holds no per-stream state; memory overhead = processor object + reusable direct buffer (allocated on demand, reused)"
+  },
+  "thermal": {
+    "listener": "PowerManager.OnThermalStatusChangedListener (API 29+)",
+    "observed": "NONE on M2102J2SC during short test runs",
+    "note": "long-duration thermal soak not performed; recorded as boundary"
+  },
+  "underruns": {
+    "observed": 0,
+    "note": "0 underruns across all device tests (playback, hot fixture, transition cycles)"
+  },
+  "device_tier_matrix": {
+    "status": "mid-tier only (M2102J2SC)",
+    "low": "pending",
+    "high": "pending",
+    "note": "required acceptance says at least low/mid/high; single-tier evidence recorded honestly, matrix extension deferred"
+  },
+  "measurement_boundaries": [
+    "benchmark runs inside instrumentation process (debug build, no profiling attached)",
+    "CPU% not measured via profiler; derived from ns/frame + frame rate",
+    "true click/pop detection requires external audio capture; proxy evidence used (see bypass_and_glitch_results.json)"
+  ]
+}
