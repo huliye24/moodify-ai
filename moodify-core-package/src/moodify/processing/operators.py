@@ -87,12 +87,14 @@ def apply_eq(audio: np.ndarray, sr: int,
             Y = X * response
             y_chunk = np.fft.irfft(Y, n=block_len * 2)[:chunk_len]
 
-            # 重叠相加
+            # 重叠相加（最后一块可能短于 overlap，必须裁剪）
             fade = np.ones(chunk_len)
             if pos > 0:
-                fade[:overlap] = np.linspace(0, 1, overlap)
+                n_fade = min(overlap, chunk_len)
+                fade[:n_fade] = np.linspace(0, 1, n_fade)
             if end < n:
-                fade[-overlap:] = np.linspace(1, 0, overlap)
+                n_fade = min(overlap, chunk_len)
+                fade[-n_fade:] = np.linspace(1, 0, n_fade)
             out[pos:end] += y_chunk * fade
 
             pos += block_len - overlap
