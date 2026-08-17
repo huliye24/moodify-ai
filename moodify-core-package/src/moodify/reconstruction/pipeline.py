@@ -100,11 +100,17 @@ def run_golden_pipeline(
     era_hint: str | None = None,
     blind_seed: int = 20260817,
     created_at: str | None = None,
+    record_id: str | None = None,
+    case_id: str | None = None,
+    skip_blind_kit: bool = False,
+    candidates_dir: Path | None = None,
+    include_low_confidence: bool = True,
 ) -> PipelineResult:
     source_wav = Path(source_wav)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     created_at = created_at or datetime.now(timezone.utc).isoformat(timespec="seconds")
+    case_ref = case_id or source_alias
 
     # ---- Source freeze ----
     source_sha = sha256_file(source_wav)
@@ -123,27 +129,31 @@ def run_golden_pipeline(
         json.dumps(source, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # ---- Stage 1: Era Diagnostic ----
-    findings = run_era_diagnostic(source_metrics, production_case_id=source_alias,
+    findings = run_era_diagnostic(source_metrics, production_case_id=case_ref,
                                   created_at=created_at)
     (out_dir / "era_diagnostic.v0.1.json").write_text(
         json.dumps([f.to_dict() for f in findings], ensure_ascii=False, indent=2),
         encoding="utf-8")
 
     # ---- Stage 2: Objective (A/B/C + SOURCE) ----
-    plans = plan_from_findings(findings, source_sha256=source_sha)
+    plans = plan_from_findings(
+        findings, source_sha256=source_sha,
+        include_low_confidence=include_low_confidence,
+    )
 
     # ---- Stage 3: Render + hard gates ----
     candidates: dict[str, dict] = {"SOURCE": {
         "path": str(source_wav), "sha256": source_sha, "metrics": source_metrics,
         "gates": [], "plan_hash": "source", "intensity": 0.0,
     }}
-    candidates_dir = out_dir / "candidates"
+    candidates_dir = Path(candidates_dir) if candidates_dir else out_dir / "candidates"
+    candidates_dir.mkdir(parents=True, exist_ok=True)
     for plan in plans:
         if plan["candidate_id"] == "SOURCE":
             continue
         cand_path = candidates_dir / f"{plan['candidate_id']}.wav"
         ip = InterventionPlan(
-            case_id=source_alias, plan_id=plan["plan_hash"],
+            case_id=case_ref, plan_id=plan["plan_hash"],
             candidate_label=plan["label"], candidate_id=plan["candidate_id"],
             strategy="era-objective", intensity=plan["intensity"],
             source_sha256=source_sha, scan_profile_id="MFY-WSE-SCAN-PROFILE-001",
@@ -182,13 +192,15 @@ def run_golden_pipeline(
     auto_eligible = [r for r in ranking if r["candidate_id"] != "SOURCE" and r["auto_approvable"]]
     technical_top = auto_eligible[0]["candidate_id"] if auto_eligible else "SOURCE"
 
-    # ---- Blind kit ----
-    candidate_wavs = {cid: Path(c["path"]) for cid, c in candidates.items() if cid != "SOURCE"}
-    kit = make_blind_kit(source_wav, candidate_wavs, out_dir, seed=blind_seed)
-    blind_kit = kit.to_dict()
+    # ---- Blind kit (research protocol; product jobs skip it) ----
+    blind_kit: dict = {}
+    if not skip_blind_kit:
+        candidate_wavs = {cid: Path(c["path"]) for cid, c in candidates.items() if cid != "SOURCE"}
+        kit = make_blind_kit(source_wav, candidate_wavs, out_dir, seed=blind_seed)
+        blind_kit = kit.to_dict()
 
     record = GoldenReconstructionRecord(
-        record_id=f"GOLDEN-001-{source_alias}",
+        record_id=record_id or f"GOLDEN-001-{source_alias}",
         source_hash=source_sha,
         rights_status=rights_status,
         diagnostic_version="era-diagnostic-v0.1",

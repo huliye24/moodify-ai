@@ -13,7 +13,11 @@ import hashlib
 import json
 from typing import Any
 
-from moodify.era_diagnostic.contract import DiagnosticCategory, FindingStatus
+from moodify.era_diagnostic.contract import (
+    ConfidenceLevel,
+    DiagnosticCategory,
+    FindingStatus,
+)
 
 RECONSTRUCTION_OBJECTIVE_POLICY_V1 = {
     "version": "reconstruction-objective-policy-v1",
@@ -81,6 +85,7 @@ def plan_from_findings(
     *,
     source_sha256: str = "unknown",
     plan_generator_version: str = RECONSTRUCTION_OBJECTIVE_POLICY_V1["version"],
+    include_low_confidence: bool = True,
 ) -> list[dict[str, Any]]:
     """Build deterministic A/B/C plans for the golden experiment.
 
@@ -88,6 +93,11 @@ def plan_from_findings(
     BYPASS decisions: findings with status LIKELY_ARTISTIC_CHARACTER or
     NOT_APPLICABLE never appear in objective refs; ED-06 (NOT_SUPPORTED)
     produces no objective. SOURCE is always plan #0.
+
+    ``include_low_confidence=False`` applies P04 production semantics:
+    LOW-confidence findings never authorise candidates; when no safe finding
+    remains, only the SOURCE plan is produced (BYPASS on weak evidence).
+    The golden experiment keeps the default (bounded candidates).
     """
     safe_refs: list[str] = []
     for f in findings:
@@ -98,6 +108,10 @@ def plan_from_findings(
             continue
         if f.category == DiagnosticCategory.ED_06_TRANSFER_ENCODING_DEGRADATION:
             continue  # no validated detector -> no objective
+        if not include_low_confidence and f.category == DiagnosticCategory.ED_02_PERSISTENT_NOISE:
+            continue  # NOISE_REDUCTION unsupported in v0.1 engine (P04)
+        if not include_low_confidence and f.confidence == ConfidenceLevel.LOW:
+            continue  # diagnosis != authorisation on weak evidence (P04)
         safe_refs.append(f"{f.category.value}:{f.status.value}:{f.confidence.value if f.confidence else '-'}")
 
     plans: list[dict[str, Any]] = [{
@@ -108,6 +122,8 @@ def plan_from_findings(
         "objective_refs": [],
         "plan_hash": "source",
     }]
+    if not safe_refs and not include_low_confidence:
+        return plans  # BYPASS: no authorised objective
     for candidate_id, cfg in _POLICY["candidates"].items():
         params = dict(cfg["params"])
         plans.append({
