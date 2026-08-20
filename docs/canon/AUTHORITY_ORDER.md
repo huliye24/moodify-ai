@@ -1,6 +1,6 @@
 # AUTHORITY ORDER — Moodify
 
-**Canon v1.0（W01-P01, 2026-08-17）**
+**Canon v1.1（Public Form Package 01, 2026-08-19）**
 
 当指令冲突时，按以下顺序判断。低级来源可以说明「意图」，不能覆盖高级来源证明的「现实」。
 
@@ -12,6 +12,8 @@
 6. **Current subsystem documentation**
 7. **Experimental documentation**
 8. **Historical / legacy documentation**
+
+主题细化：Public Brand 问题在第 3 级 Canon 之后进入 `docs/brand/public/`；其中 `PUBLIC_BRAND_CONSTITUTION.md` 是最高主题权威。部署是否真实存在仍由第 4 级 verified runtime evidence 判断。
 
 ## Clarification
 
@@ -26,6 +28,7 @@
 |---|---|---|
 | AGENTS.md | CANONICAL（第 2 级） | 根级最高认知入口 |
 | docs/canon/* | CANONICAL（第 3 级） | 本包建立 |
+| docs/brand/public/* | CANONICAL（Public Brand 主题权威） | 品牌信念、公共语言、站点职责；由 Canon v1.1 纳入 |
 | docs/LEGACY_AND_EXPERIMENTAL_POLICY.md | CANONICAL（政策） | 分类政策，属 canon 体系 |
 | docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md | CANONICAL（内部生产域） | 重建生产哲学；对外表述被 CURRENT_CANON 覆盖 |
 | docs/REPOSITORY_STATUS.md | 状态入口（第 5-6 级之间） | 指向 canon + 事实状态，非独立权威 |

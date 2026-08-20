@@ -3,8 +3,11 @@
 **Document ID:** MFY-PRODUCT-CONSTITUTION-001  
 **Version:** 2.0  
 **Date:** 2026-08-14  
-**Status:** APPROVED NEXT PHASE — approved by human product authority 2026-08-14  
+**Status:** SUPERSEDED FOR PRODUCT IDENTITY AND BOUNDARY — retained as 2026-08-14 governance history
+
 **Scope:** Moodify public product, internal auditory system, playback result, authority and release boundaries
+
+> **Authority notice (2026-08-20):** `AGENTS.md` and `docs/canon/*` supersede this document for current product identity and external/internal boundaries. Current external product: **Moodify Music / Moodify Player**; Ear remains internal. Non-conflicting engineering and judgment principles remain reference material.
 
 ## 1. Purpose
 

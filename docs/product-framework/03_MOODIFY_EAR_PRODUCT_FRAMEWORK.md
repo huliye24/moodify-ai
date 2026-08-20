@@ -3,12 +3,13 @@
 **Document ID:** MFY-EAR-PRODUCT-FRAMEWORK-001  
 **Version:** 1.0  
 **Date:** 2026-08-14  
-**Status:** APPROVED BASELINE — approved by human product authority 2026-08-14  
-**Product:** Moodify Ear
+**Status:** INTERNAL / HISTORICAL FRAMEWORK — public classification superseded by Canon v1.1
+
+**System:** Moodify Ear / Auditory Intelligence (internal)
 
 **Approval record:** approved 2026-08-14 by human product authority (huliye24) as Phase 1 baseline, no modification; see DECISION_LOG D-003 and GOVERNANCE_RECONCILIATION_REPORT.
 
-> **RECLASSIFIED — Constitution v2.0 (2026-08-14) classifies Moodify Ear as an INTERNAL RESEARCH AND PRODUCTION framework, not a public consumer product. The public product is Moodify Music (see 04_MOODIFY_MUSIC_PRODUCT_FRAMEWORK.md and 05_PUBLIC_INTERNAL_RELEASE_TOPOLOGY.md). Ear capabilities, authority, evidence and state machines are retained in full; this notice changes only the public/internal classification.**
+> **RECLASSIFIED — Current authority is `AGENTS.md` → `docs/canon/*`. Moodify Ear is an INTERNAL listening, judgment, verification and research system, not a public consumer product. The external product is Moodify Music / Moodify Player. Ear capabilities, authority, evidence and state machines are retained where they do not conflict with current Canon.**
 
 ## 1. Product definition
 
@@ -329,4 +330,3 @@ An Ear feature may enter development only if it states:
 - verification and failure behavior;
 - authority and escalation boundary;
 - how the result can improve a later case.
-

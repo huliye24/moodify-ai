@@ -30,6 +30,8 @@ Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress t
 4. `docs/canon/AUTHORITY_ORDER.md`
 5. `docs/REPOSITORY_STATUS.md`
 
+Public brand language and public-site roles then resolve through `docs/brand/public/README.md` and its authority set. The highest topic-specific Public Brand authority is `docs/brand/public/PUBLIC_BRAND_CONSTITUTION.md`.
+
 内部系统权威与既有政策见 `docs/canon/INTERNAL_SYSTEMS.md`、`docs/LEGACY_AND_EXPERIMENTAL_POLICY.md`。
 
 ## Important Distinction
@@ -37,6 +39,8 @@ Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress t
 - 对外：Moodify Music / Player，用户只做 PLAY。
 - 内部：Ear / analysis / stem / judgment / intervention / preset decision / verification / evidence / learning / cloud production。复杂度由 Moodify 承担。
 - 内部处理复杂度不是对外卖点。
+- Public Form 品牌信念：**每一种声音，都值得被世界听见。 / Every voice deserves to be heard.**
+- 产品原则：**Listen. Then Play.**；用户动作：**Play.**
 
 ## Three Disciplines
 

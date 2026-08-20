@@ -3,12 +3,13 @@
 **Document ID:** MFY-OFFICIAL-WEBSITE-BLUEPRINT-001  
 **Version:** 1.0  
 **Date:** 2026-08-14  
-**Status:** APPROVED BASELINE — approved by human product authority 2026-08-14  
+**Status:** HISTORICAL WEBSITE BASELINE — superseded by Public Brand v0.1
+
 **Product role:** Public brand and product-family entrance
 
 **Approval record:** approved 2026-08-14 by human product authority (huliye24) as Phase 1 baseline, no modification; see DECISION_LOG D-003 and GOVERNANCE_RECONCILIATION_REPORT.
 
-> **SUPERSEDED IN PART — Constitution v2.0 (MFY-PRODUCT-CONSTITUTION-001 v2.0, 2026-08-14) and Release Topology v1.0 (MFY-PUBLIC-INTERNAL-TOPOLOGY-001, 2026-08-14) supersede the dual-public-product narrative in this document. The official website is the public entrance to one product, Moodify Music; Moodify Ear is an internal research and production system and must not be presented as a consumer product. This notice is a classification change, not a rewrite of the historical baseline.**
+> **SUPERSEDED — `docs/canon/*` and `docs/brand/public/*` govern the current website identity, language and three-site roles. The current public product is Moodify Music / Player; Ear is internal. This document is retained as the 2026-08-14 historical baseline and must not drive current public pages.**
 
 ## 1. Website mission
 
@@ -336,4 +337,3 @@ The official website is ready for implementation only when a reviewer can answer
 - Does the site avoid presenting Moodify as mastering software or a generic music platform?
 - Are the next actions appropriate to product readiness?
 - Would the site remain credible without decorative effects?
-

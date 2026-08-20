@@ -3,8 +3,11 @@
 **Document ID:** MFY-TERMINOLOGY-AND-CLAIMS-001  
 **Version:** 1.0  
 **Date:** 2026-08-14  
-**Status:** LIVE — package MFY_PRODUCT_GOVERNANCE_FREEZE_001 (44)  
+**Status:** HISTORICAL TERMINOLOGY BASELINE — superseded for public language and product identity
+
 **Owner:** Human product authority (huliye24)  
+
+> **Authority notice (2026-08-20):** Public identity and language now resolve through `AGENTS.md`, `docs/canon/*`, and `docs/brand/public/*`. The table below preserves the 2026-08-14 terminology baseline for migration and provenance. It is not a current public-language registry. Current external product: **Moodify Music / Moodify Player**; Ear is an internal system; “The Ear of AI” is retired from the first public narrative.
 
 ## 1. 权威术语表
 

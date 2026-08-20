@@ -1,10 +1,10 @@
 # CURRENT CANON — Moodify
 
-**Version:** 1.0（W01-P01）
-**Date:** 2026-08-17
+**Version:** 1.1（Public Form Package 01）
+**Date:** 2026-08-19
 **Authority:** root `AGENTS.md` → `docs/canon/*`
 **Supersedes for product identity:** any earlier document that claims Moodify's outward product is "The Ear of AI" or that presents Ear as a public product surface.
-**Related:** [PRODUCT_BOUNDARY.md](PRODUCT_BOUNDARY.md) · [INTERNAL_SYSTEMS.md](INTERNAL_SYSTEMS.md) · [AUTHORITY_ORDER.md](AUTHORITY_ORDER.md) · [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md) · [Classic Reconstruction Constitution](../CLASSIC_RECONSTRUCTION_CONSTITUTION.md)（内部生产哲学）
+**Related:** [PRODUCT_BOUNDARY.md](PRODUCT_BOUNDARY.md) · [INTERNAL_SYSTEMS.md](INTERNAL_SYSTEMS.md) · [AUTHORITY_ORDER.md](AUTHORITY_ORDER.md) · [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md) · [Public Brand Authority](../brand/public/README.md) · [Classic Reconstruction Constitution](../CLASSIC_RECONSTRUCTION_CONSTITUTION.md)（内部生产哲学）
 
 ---
 
@@ -30,6 +30,14 @@ Source / Cloud-prepared Track
 
 用户不需要理解内部音频工程、Ear、分轨、后处理、Evidence 或状态机。
 
+Public Form 冻结：
+
+- 品牌信念：**每一种声音，都值得被世界听见。 / Every voice deserves to be heard.**
+- 产品原则：**Listen. Then Play.**
+- 产品动作：**Play.**
+- 研究问题 `Can machines learn to hear?` 属于 Research / internal layer，不承担首屏产品定义。
+- 主题权威见 [`docs/brand/public/`](../brand/public/README.md)。
+
 ## 2. Internal Systems（内部系统）
 
 Moodify Ear / Auditory Intelligence 是**内部听觉、判断、验证与研究系统**：
@@ -53,6 +61,7 @@ Moodify Ear / Auditory Intelligence 是**内部听觉、判断、验证与研究
 4. **Canon 不虚构现实**：云端/生产能力以 P00 现实快照与运行时证据为准，未验证不写成已运行。
 5. **历史文档不能反向覆盖当前 Canon**（见 [AUTHORITY_ORDER.md](AUTHORITY_ORDER.md)）。
 6. **Canon 变更必须可见**：进入 `docs/canon/CHANGELOG.md`（见 [CANON_CHANGELOG.md](CANON_CHANGELOG.md)）。
+7. **一个站点一个角色**：`rongjingmusic.com` = Product Home；`rongjingwenchuan.com` = Company Home；`.xyz` = 过渡 Player / 历史入口，目标优先评估 `play.rongjingmusic.com`。
 
 ## 4. Canon Change Rule
 

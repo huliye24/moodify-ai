@@ -1,7 +1,7 @@
 # Repository Status
 
-**Status:** 当前 Canon 与事实状态入口（W01-P01 更新，2026-08-17）。
-**Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](docs/canon/AUTHORITY_ORDER.md)）。
+**Status:** 当前 Canon 与事实状态入口（Canon v1.1 / Public Form v0.1，2026-08-20 更新）。
+**Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](canon/AUTHORITY_ORDER.md)）。
 
 ## Canonical Identity（P01 Canon，2026-08-17）
 
@@ -27,7 +27,7 @@ SOURCE -> LISTEN -> REPRESENT -> JUDGE -> ABC INTERVENTION -> VERIFY
 ## Reality Snapshot Pointer（2026-08-17，W01-P00）
 
 - 云端现状：2 VPS（LA 核心 + 杭州数据工厂）+ PolarDB（核验 BLOCKED）+ 无对象存储 + 无云端 AI 推理 + 队列近空；完整 Ear 链路仅仓库代码。
-- 详见 W01-P00 报告（审查包/W01-P00_REPORTS_2026-08-17）与 [docs/canon/CURRENT_ARCHITECTURE.md](docs/canon/CURRENT_ARCHITECTURE.md)。
+- 详见 W01-P00 报告（审查包/W01-P00_REPORTS_2026-08-17）与 [docs/canon/CURRENT_ARCHITECTURE.md](canon/CURRENT_ARCHITECTURE.md)。
 - **事实规则：** 本文件与 Canon 不得虚构云端/生产能力；未验证能力不写成已运行。
 
 ## Verification Baseline（历史记录，2026-08-08）
@@ -40,7 +40,7 @@ ruff: all checks passed
 date: 2026-08-08
 ```
 
-> 该基线与当前 HEAD（98f7b96e，2026-08-17，领先 main 154 commits）已不一致；
+> 该基线与当前专题分支已不一致；分支领先数量会持续变化，不作为能力或权威声明；
 > 它是历史记录，不作为当前状态声明。当前测试证据见各包 TEST_RESULTS 与 CI 历史。
 
 ## Capability Table（当前事实状态，2026-08-17）

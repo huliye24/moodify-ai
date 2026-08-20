@@ -2,20 +2,22 @@
 
 **Version:** 1.1
 **Date:** 2026-08-14
-**Status:** LIVE — amended by human decision on judgment authority; replaces scattered architectural notes as the canonical repository constitution
+**Status:** INTERNAL ENGINEERING CONSTITUTION — public identity and product-boundary sections superseded by Canon v1.1
 **Related:** [DATA_PROTOCOL_V1.md](contracts/DATA_PROTOCOL_V1.md), [LEGACY_AND_EXPERIMENTAL_POLICY.md](LEGACY_AND_EXPERIMENTAL_POLICY.md), [Production Authority Map](../artifacts/pr15_extraction_001/PRODUCTION_AUTHORITY_MAP.md)
+
+> **Authority notice (2026-08-20):** `AGENTS.md` and `docs/canon/*` now govern repository identity and product boundaries. Section 1 below is preserved as the historical Phase I research framing; it must not be used to present Ear as a public product or to exclude Moodify Music / Player from the current repository scope. Engineering contracts remain applicable where they do not conflict with current Canon.
 
 ---
 
 ## 1. Identity
 
-Moodify is **The Ear of AI**.
+At the time of Phase I, Moodify was framed as **The Ear of AI**. This is no longer the public product identity.
 
 One organizing question: **Can machines learn to hear?**
 
 August 2026 mission: freeze a trustworthy data-production framework. September 2026 mission: stop expanding the framework and analyze the data it produces.
 
-This is an auditory research infrastructure, not a consumer product. Product surfaces, social features, marketplaces, and recommendation systems are out of scope until the data foundation is frozen (see [CODE_FREEZE_POLICY.md](CODE_FREEZE_POLICY.md)).
+This section recorded the Phase I research scope. It does not describe the current external product boundary; see `docs/canon/PRODUCT_BOUNDARY.md`.
 
 ## 2. What is canonical?
 

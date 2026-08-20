@@ -1,5 +1,9 @@
 # Moodify Aesthetic System v0.1
 
+> **Status: HISTORICAL / INTERNAL DESIGN REFERENCE**
+>
+> Superseded for public identity, first-layer information order, and public-site design by `docs/canon/CURRENT_CANON.md` and `docs/brand/public/PUBLIC_BRAND_CONSTITUTION.md`. The quiet-authority visual principles may still inform internal operator and evidence surfaces; the public Moodify Music / Player surface is governed by Public Brand authority.
+
 > The Ear of AI - an auditory instrument with quiet authority.
 
 This is the canonical product-design interpretation of *Moodify Aesthetic

@@ -1,8 +1,14 @@
 # Moodify
 
-> **Moodify Music / Moodify Player.**
+> **Every voice deserves to be heard.**
+>
+> **每一种声音，都值得被世界听见。**
 
-Moodify 的唯一对外产品面是 **Moodify Music / Player**，第一阶段核心用户动作是 **PLAY**。
+**Moodify Music / Moodify Player** 是 Moodify 唯一的对外产品面。
+
+产品原则：**Listen. Then Play.**
+
+核心用户动作：**Play.**
 
 ```text
 Source / Cloud-prepared Track
@@ -12,149 +18,105 @@ Source / Cloud-prepared Track
        PLAY
 ```
 
-用户不需要理解内部音频工程、Ear、分轨、后处理、Evidence 或状态机。复杂度由 Moodify 承担，不转嫁给用户。
+Moodify 把声音分析、判断、受控处理、验证和生产复杂度留在系统内部。用户不需要理解 Ear、分轨、预设、Evidence 或状态机，才能获得核心播放体验。
 
-产品与内部边界、权威顺序见 [docs/canon/](docs/canon/)（`CURRENT_CANON.md`、`PRODUCT_BOUNDARY.md`）。
+## Product Surfaces
+
+- `apps/music-android/` — Moodify Music Android 播放器。
+- `apps/music-web/` — Moodify Web Player / PWA。
+- `moodify-music-package/` — Music API、身份、目录与 BFF。
+- `ops/web_origin/site/rongjingmusic/` — Moodify Product Home。
+- `ops/web_origin/site/rongjingwenchuan/` — 荣景文川 Company Home。
+
+公开品牌语言和站点职责以 [Public Brand Authority](docs/brand/public/README.md) 为准。
 
 ## Internal Systems
 
-Moodify 内部包含听觉智力与云端生产系统，它们不构成对外产品面：
+以下系统支撑 Moodify，但不构成第二个公开产品身份：
 
-- **Moodify Ear / Auditory Intelligence** — 内部听觉、判断、验证与研究系统：listen → represent → judge → evidence → uncertainty → learn → verify → controlled intervention。它决定何时**不**干预；它不是对外产品。
-- **Cloud Production System** — 内部生产环节：Intake → Identify → Analyze → Stem → Judge → Intervene → Preset Decision → Render → Verify → Evidence → Delivery。
-- **Classic Reconstruction** — 内部生产哲学（宪法 v1.0）：以决策而非预设驱动的受控重建（诊断 → 决策 → 立体声优先 → 验证 → 渲染）。它是云端如何准备曲目的方式，不是第二个产品。
+- **Moodify Ear / Auditory Intelligence** — 内部听觉、判断、验证与研究系统。
+- **Cloud Production System** — Intake → Analyze → Stem → Judge → Intervene → Render → Verify → Evidence。
+- **Classic Reconstruction** — 决策驱动的受控重建；属于内部生产哲学，不是公开产品面。
 
-## Why Moodify Exists
+内部复杂度不是对外卖点。Ear 不是公开工作台，Moodify 也不是自动母带、预设浏览器或 AI 音乐后处理产品。
 
-AI 可以生成海量音频，但生成与聆听是不同能力。一个生成模型可能产出一首曲子，却没有可靠的工程系统回答：
+## Current Reality
 
-- 波形与频谱里实际发生了什么？
-- 结果是否稳定、失真、不平衡、有相位问题、过度密集或结构不一致？
-- 判断的哪些部分可测量？
-- 如果做了干预，是否真的改善了目标状况？
-- 本案例的证据能否改进下一个案例？
+当前事实状态以 [Repository Status](docs/REPOSITORY_STATUS.md) 和 [Current Architecture](docs/canon/CURRENT_ARCHITECTURE.md) 为入口。
 
-Moodify 让机器判断显式且可复现。其确定性算法评审器（`moodify.data_factory.algorithmic_review`，公式 `MFY-ALGO-REVIEW-FORMULA-001`）可在其验证过的、版本化的范围内为案例排名；范围外、证据不足或涉及未决感知判断的案例必须升级到人类评审或以 inconclusive 关闭——自动化不制造确定性。
+截至最近一次有证据的运行时核验（W01-P00，2026-08-17）：
 
-## Three Engineering / Research Disciplines
+- Android、Web Player、Music platform / BFF 和静态音乐托管已存在于仓库或已核验运行环境；
+- 两台 VPS 承载核心服务与数据工厂批处理；
+- 完整 Ear / reconstruction 链路存在于仓库代码，但尚无已验证的云端生产流量；
+- 对象存储、云端 AI 推理和部分数据基础设施仍未验证或尚未部署。
 
-### WSE — Wave-Spectral Evolution
-**问题：** 声音里发生了什么？研究波形、频谱、响度、相位、声道、残差、瞬态等可测量声学行为。
+仓库代码、路线图或文档中的能力不自动等于已上线能力。未经运行时证据验证，不应写成生产事实。
 
-### MSE — Musical-Structural Engineering
-**问题：** 音乐结构是什么？研究 MIDI、乐谱、节奏、乐句、段落、歌词、角色与结构关系。
+## Repository Authority
 
-### PPE — Production Process Engineering
-**问题：** 如何可靠地生产并验证？研究生产案例、状态转换、证据工件、质量门、可复现性、权威边界、打包、失败与恢复。
+进入仓库后按以下顺序阅读：
 
-## The Learning / Asset Loop
+1. [AGENTS.md](AGENTS.md)
+2. [Current Canon](docs/canon/CURRENT_CANON.md)
+3. [Product Boundary](docs/canon/PRODUCT_BOUNDARY.md)
+4. [Authority Order](docs/canon/AUTHORITY_ORDER.md)
+5. [Repository Status](docs/REPOSITORY_STATUS.md)
+
+历史文档可以保留其原始语言，但不能覆盖当前 Canon。改变公开产品身份、内部/外部边界、状态机、证据、云控制或数据权威时，必须显式声明 `CANON_CHANGE = YES` 并记录迁移与回滚。
+
+## Engineering Model
+
+Moodify 的内部研究与生产使用三项学科：
+
+- **WSE — Wave-Spectral Evolution:** 声音里发生了什么？
+- **MSE — Musical-Structural Engineering:** 音乐结构是什么？
+- **PPE — Production Process Engineering:** 如何可靠生产、验证与恢复？
+
+证据资产循环：
 
 ```text
 Production Case
   -> Measurement Record
   -> Evidence Artifact
   -> Theory Update
-  -> Moodify Rule Update
+  -> Rule Update
   -> Next Production Case
 ```
 
-Moodify 的长期价值来自**可追溯听觉证据与可复用生产知识**的积累。
+机器只能在经过验证、版本化且明确授权的范围内作出决定。范围外、证据不足、不确定或未解决的感知案例必须进入 `HUMAN_REQUIRED`、`INCONCLUSIVE` 或定义好的失败状态。
 
-## Current Implementation Status
+## Core Packages
 
-**当前状态入口：** [docs/REPOSITORY_STATUS.md](docs/REPOSITORY_STATUS.md)（指向 Canon + 事实状态；不再是静态历史快照）。
+- `moodify-core-package/` — 测量、诊断、判断、干预、验证与证据能力。
+- `moodify-music-package/` — Music 产品的数据和服务层。
+- `moodify-core-package/src/moodify/data_factory/` — 数据工厂与算法评审。
+- `schemas/canonical/` — Production Case、Measurement、Evidence 等规范。
+- `docs/canon/` — 当前产品与系统权威。
 
-现实快照（2026-08-17，W01-P00 只读扫描）要点：
-
-- **对外产品面**：Moodify Music Android 3.1（APK 已发布，deliverables/releases）、music-web（PWA）、云端 music-platform / BFF（LA）。
-- **云端现状**：2 台 VPS（LA 核心 + 杭州数据工厂）运行静态音乐托管 + API 壳 + 数据工厂批处理 + lalal 分离代理容器；无对象存储、无云端 AI 推理、队列近空。
-- **仓库能力**：`moodify-core-package` 承载测量（BS.1770-4 响度、EBU 3342 LRA、true-peak 等）、诊断、A/B/C 干预方案、算法评审、证据清单、24/7 数据节点、API/CLI 与本地优先 Android 客户端。完整 Listen→Judge→Intervene→Verify 链路在仓库代码完整，云端尚无生产流量。
-- **未合并工作**：重建系列（objective / identity guard / era diagnostic / reconstruction factory）与 Music 产品面位于未合并分支（领先 main 154 commits）。
-- 实验与遗留系统与 canonical mainline 显式区分（[Legacy & Experimental Policy](docs/LEGACY_AND_EXPERIMENTAL_POLICY.md)）。
-
-## What Moodify Is Not
-
-- 文本转音乐生成模型；
-- DAW 替代品；
-- 自动母带承诺；
-- 保证每个处理过的文件都"更好"；
-- 以预设堆砌冒充智能；
-- 没有证据的黑箱评分。
-
-## Repository Authority
-
-仓库权威顺序固定（详见 [docs/canon/AUTHORITY_ORDER.md](docs/canon/AUTHORITY_ORDER.md)）：
-
-1. current explicit human instruction
-2. root `AGENTS.md`
-3. `docs/canon/*`
-4. verified runtime evidence
-5. canonical main behavior + tests
-6. current subsystem docs
-7. experimental docs
-8. historical / legacy docs
-
-历史文档不能反向覆盖当前 Canon。
-
-## Scientific Release Assets
-
-- **Product / internal boundary:** [docs/canon/](docs/canon/)（CURRENT_CANON / PRODUCT_BOUNDARY / INTERNAL_SYSTEMS / AUTHORITY_ORDER / CURRENT_ARCHITECTURE）
-- **Classic Reconstruction Constitution:** [docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md](docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md)（内部生产哲学）
-- **Data protocol:** [DATA_PROTOCOL_V1.md](docs/contracts/DATA_PROTOCOL_V1.md) (frozen)
-- **Metric registry:** [METRIC_REGISTRY_V1.md](docs/metrics/METRIC_REGISTRY_V1.md)
-- **Reference audio suite:** [REFERENCE_SUITE.md](moodify-core-package/benchmarks/reference_audio/REFERENCE_SUITE.md)
-- **Golden Production Case:** [examples/golden_case](examples/golden_case/)
-- **Citation:** [CITATION.cff](CITATION.cff)
-
-## Scope and Limitations
-
-- 当前主链测量并干预**音频**；音乐结构（MSE）与研究/实验模块不在冻结的 1.0 表面。
-- 指标仅在冻结扫描配置（`MFY-WSE-SCAN-PROFILE-001`）下可信；配置变更需要新版本与显式数据分离。
-- 算法评审器是已验证范围内的确定性技术排名，不是艺术质量声明；范围外或未决感知案例需要人类评审或 inconclusive。
-- 不提交私人音频、API Key 或未授权数据集。
-
-## Core Python Package
-
-当前稳定的本地引擎位于：
-
-```text
-moodify-core-package/
-```
+核心 Python 包的本地开发安装：
 
 ```bash
 cd moodify-core-package
-pip install -e .
 pip install -e ".[dev]"
 ```
 
+CLI 示例：
+
 ```bash
-moodify presets
 moodify analyze song.wav
 moodify process song.wav --preset clean_master
 ```
 
-CLI 示例代表当前窄实现，不是 Moodify 的最终边界。
+这些命令是内部窄实现入口，不是 Moodify 的公开产品定义。
 
-## Development Principle
+## Scope and Safety
 
-> Identity comes before feature expansion.
-
-新增子系统前先问：
-
-1. 它服务于听觉智能的哪一部分？
-2. 它产生什么证据？
-3. 证据存在哪里？
-4. 它是 canonical、experimental 还是 legacy？
-5. 它是否改进下一个生产案例？
-
-无法回答这些问题的功能不应自动进入 mainline。改变产品身份、内部/外部边界、状态机权威、证据权威、云控制权威或数据权威的任务必须声明 `CANON_CHANGE = YES`（见 [docs/canon/CURRENT_CANON.md](docs/canon/CURRENT_CANON.md)）。
-
-## Data and Privacy
-
-核心工作流可以本地优先。不提交：私人音频、API Key、未授权数据集、生成的重量级工件、本地 IDE 状态。外部模型、API、音频与数据集保留其自身许可与权利。
+- 不把实验指标宣传为生产事实或艺术质量结论。
+- 不保证每个处理结果都会“更好”；BYPASS 是合法成功结果。
+- 不提交私人音频、API Key、未授权数据集或生成的重型工件。
+- 代码变更应说明服务的案例、测量、证据、验证方式、失败行为和复用路径。
 
 ## License
 
-Moodify is licensed under **GNU GPL v3.0 only** unless otherwise stated.
-
-See `LICENSE`.
+Moodify is licensed under **GNU GPL v3.0 only** unless otherwise stated. See [LICENSE](LICENSE).

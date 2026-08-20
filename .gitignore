@@ -20,6 +20,9 @@ Thumbs.db
 !.vscode/extensions.json
 .codex-work/
 _github_moodify_ai/
+.codex_tmp/
+.workbuddy/
+/temp/
 
 # Local installers, archives, model weights, and databases
 *.exe
@@ -27,6 +30,10 @@ _github_moodify_ai/
 *.zip
 *.7z
 *.rar
+*.tar
+*.tar.gz
+*.tgz
+*.apk
 *.ckpt
 *.safetensors
 *.onnx
@@ -35,6 +42,7 @@ _github_moodify_ai/
 *.duckdb
 *.aup3
 *.mscz~
+*.npz
 
 # Exported office / publication artifacts (keep editable source files)
 *.pdf
@@ -71,6 +79,11 @@ listening_test/
 
 # Data-factory production cases (real-audio evidence, never committed)
 outputs/data_factory/
+
+# Local pilot/runtime evidence stores. Curated summaries may be copied into a
+# bounded evidence package, but raw case stores and idempotency state stay local.
+artifacts/ear_pilot_001/
+artifacts/production_cases/
 
 # Generated audio / visual files
 *.wav
@@ -176,7 +189,7 @@ data/calibration/mrs_002/source/
 # ── Generated outputs (never track) ──
 outputs/
 reports/daily_runs/
-data/
+/data/
 .pytest_cache/
 *.pyc
 __pycache__/
@@ -220,3 +233,12 @@ docs/experiments/**/*.zip
 # Music Android launcher icons are required for a clean-clone build (un-ignore below res/)
 !apps/music-android/app/src/main/res/
 !apps/music-android/app/src/main/res/**
+
+# Music Android source/test packages named "data" are code, not root runtime data.
+!apps/music-android/app/src/main/java/com/moodify/music/data/
+!apps/music-android/app/src/main/java/com/moodify/music/data/**
+!apps/music-android/app/src/test/java/com/moodify/music/data/
+!apps/music-android/app/src/test/java/com/moodify/music/data/**
+
+# Company Home static HTML is canonical public-site source.
+!ops/web_origin/site/rongjingwenchuan/*.html

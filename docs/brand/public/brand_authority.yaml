@@ -1,0 +1,88 @@
+version: "0.1"
+status: "public-form-working-authority"
+effective_date: "2026-08-19"
+
+company:
+  public_name_cn: "荣景文川"
+  public_name_en: "Rongjing Wenchuan"
+  primary_site: "https://rongjingwenchuan.com/"
+
+brand:
+  public_name: "Moodify"
+  founding_belief_cn: "弱者的声音也值得被世界听见。"
+  public_belief_cn: "每一种声音，都值得被世界听见。"
+  public_belief_en: "Every voice deserves to be heard."
+  product_principle: "Listen. Then Play."
+  primary_action: "Play."
+  research_question: "Can machines learn to hear?"
+
+identity:
+  current_public_category: "listening_product"
+  product_first: true
+  developer_infrastructure_first: false
+  creator_platform_first: false
+  research_project_first: false
+
+sites:
+  product_home:
+    url: "https://rongjingmusic.com/"
+    authority: "Moodify public product definition"
+  company_home:
+    url: "https://rongjingwenchuan.com/"
+    authority: "Rongjing Wenchuan company definition"
+  player_transition:
+    url: "https://rongjinwenchuan.xyz/"
+    authority: "Web Player / historical entry only"
+    target_url: "https://play.rongjingmusic.com/"
+    migration_status: "UNVERIFIED"
+
+public_language:
+  tier_a:
+    - "Moodify"
+    - "每一种声音，都值得被世界听见。"
+    - "Every voice deserves to be heard."
+    - "Listen. Then Play."
+    - "Play."
+    - "Original"
+    - "Moodify"
+  tier_b:
+    - "Can machines learn to hear?"
+    - "Evidence"
+    - "Research"
+    - "Listening experience"
+  technical_only:
+    - "Listen / Represent / Judge / Intervene / Verify / Learn"
+    - "Auditory representation"
+    - "Measurement science"
+    - "BYPASS"
+    - "Pipeline"
+    - "Model"
+    - "Evidence chain"
+  retired_from_primary_public_narrative:
+    - "Auditory Intelligence Infrastructure"
+    - "Give machines the ability to hear."
+    - "The Ear of AI"
+    - "Build with Moodify"
+    - "ACU"
+    - "Developers"
+    - "API"
+    - "Creator Platform"
+    - "AI 音乐后处理平台"
+    - "老歌修复平台"
+
+public_form_rules:
+  - "Internal complexity may grow; public complexity must not."
+  - "Sound proof before technical explanation."
+  - "One site, one role."
+  - "One public brand authority."
+  - "Do not make users understand the pipeline in order to understand Moodify."
+  - "Do not publish claims that cannot be demonstrated or bounded."
+
+package_01:
+  code_changes_allowed: false
+  docs_index_changes_allowed: true
+  production_site_changes_allowed: false
+  dns_changes_allowed: false
+  cloudflare_changes_allowed: false
+  database_changes_allowed: false
+  app_changes_allowed: false
