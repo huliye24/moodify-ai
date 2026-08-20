@@ -9,10 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      MOODIFY_NODE_STATE_DIR: ${{ runner.temp }}/moodify-state
-      MOODIFY_NODE_OUTPUT_ROOT: ${{ runner.temp }}/moodify-data-factory
-      MOODIFY_CASES_ROOT: ${{ runner.temp }}/moodify-cases
     steps:
       - uses: actions/checkout@v4
 
@@ -39,6 +35,10 @@ jobs:
           ruff check moodify-core-package/src/moodify moodify-core-package/tests
 
       - name: Test
+        env:
+          MOODIFY_NODE_STATE_DIR: ${{ runner.temp }}/moodify-state
+          MOODIFY_NODE_OUTPUT_ROOT: ${{ runner.temp }}/moodify-data-factory
+          MOODIFY_CASES_ROOT: ${{ runner.temp }}/moodify-cases
         run: |
           cd moodify-core-package
           python -m pytest tests/ -v --tb=short
