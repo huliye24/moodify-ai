@@ -1,0 +1,29 @@
+company_name_cn:
+  value: "荣景文川"
+  status: "HUMAN_CONFIRMED"
+company_name_en:
+  value: "Rongjing Wenchuan"
+  status: "HUMAN_CONFIRMED"
+founded_year:
+  value: null
+  status: "UNVERIFIED"
+location:
+  value: null
+  status: "UNVERIFIED"
+primary_product:
+  value: "Moodify"
+  status: "HUMAN_CONFIRMED"
+product_url:
+  value: "https://rongjingmusic.com/"
+  status: "HTTPS_VERIFIED_2026-08-19"
+general_contact:
+  value: "hello@rongjingwenchuan.com"
+  status: "CURRENT_PUBLIC_SOURCE_VERIFIED"
+research_route:
+  value: "#research"
+  status: "IMPLEMENTED_LOCAL_SOURCE"
+privacy_route:
+  value: "/privacy.html"
+  status: "IMPLEMENTED_LOCAL_SOURCE"
+verified_at: "2026-08-19"
+verified_by: "Codex repository and public-surface audit"

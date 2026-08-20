@@ -111,6 +111,14 @@ artifacts/production_cases/
 
 # Official website pages are canonical static source (MFY_DEEPSEEK_INDEPENDENT_RELEASE_VERIFICATION_001)
 !ops/web_origin/site/rongjingmusic/*.html
+!ops/web_origin/site/rongjingmusic/favicon.png
+!ops/web_origin/site/rongjingmusic/assets/moodify-logo.png
+!ops/web_origin/site/rongjingmusic/assets/moodify-open-graph.png
+!ops/web_origin/site/rongjingmusic/assets/rongjingwenchuan-seal-wordmark.png
+
+# Public Form review evidence is intentionally bounded to accepted screenshot packages.
+!docs/public-form/package-02/screenshots/*.png
+!docs/public-form/package-03/screenshots/*.png
 
 # Music platform source and lightweight brand asset are canonical app inputs.
 !apps/music-web/public/moodify-logo.png

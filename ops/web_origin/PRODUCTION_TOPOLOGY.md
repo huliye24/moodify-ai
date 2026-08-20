@@ -3,10 +3,10 @@
 **Document ID:** MFY-PRODUCTION-TOPOLOGY-001
 **Version:** 1.0
 **Date:** 2026-08-14
-**Status:** LIVE — package MFY_PRODUCTION_OPERATIONS_OBSERVABILITY_001 (53)
+**Status:** RUNTIME TOPOLOGY BASELINE — deployment facts require current evidence
 **Owner:** Human product authority + ops (huliye24)
 
-> **CLASSIFICATION (2026-08-14) — Per Constitution v2.0: the PUBLIC product topology is the official website → Moodify Music (`rongjinwenchuan.xyz`, Music BFF, PolarDB, media root). Moodify Ear API/worker, ProductionCase/Evidence storage, human review, Workbench and the Intervention Laboratory are INTERNAL production dependencies that stay release-blocking only where they affect Music playback. This document does not assert any deployment beyond what is recorded.**
+> **CLASSIFICATION (Canon v1.1 / Public Form v0.1):** `rongjingmusic.com` is Product Home, `rongjingwenchuan.com` is Company Home, and `rongjinwenchuan.xyz` is the transition Player. Moodify Ear API/worker, ProductionCase/Evidence storage, human review, Workbench and the Intervention Laboratory are internal dependencies. The table below is a 2026-08-14 topology baseline, not proof that every component remains deployed or reachable.
 
 ## 1. 组件清单（owner / region / port / health / data authority / backup / rollback）
 

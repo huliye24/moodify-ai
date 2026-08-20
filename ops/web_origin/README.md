@@ -1,12 +1,12 @@
 # Moodify Web Origin
 
-> **PUBLIC/INTERNAL CLASSIFICATION (2026-08-14) — Per Constitution v2.0 and Release Topology v1.0: the PUBLIC product entry is `rongjingmusic.com` official website pointing to Moodify Music (`rongjinwenchuan.xyz`). `rongjingwenchuan.com` is a legacy public host awaiting an explicit disposition (redirect/alias/retire) before GO. Moodify Ear and its Workbench are INTERNAL systems; their operator routes must not be presented as public product and are not public launch surfaces.**
+> **CURRENT CLASSIFICATION (Canon v1.1 / Public Form v0.1):** `rongjingmusic.com` is the Moodify Product Home; `rongjingwenchuan.com` is the 荣景文川 Company Home; `rongjinwenchuan.xyz` is the transition Web Player / historical entry. The long-term `play.rongjingmusic.com` migration remains `UNVERIFIED`. Moodify Ear and its Workbench are internal operator/research systems and are not public product surfaces.
 
 This directory defines the reproducible origin-server layer for:
 
-- `rongjingmusic.com` — official website (public entry; serves the Music product story, no Ear consumer CTA)
-- `rongjinwenchuan.xyz` — Moodify Music (public product)
-- `rongjingwenchuan.com` — legacy public host (disposition pending)
+- `rongjingmusic.com` — Moodify Product Home
+- `rongjingwenchuan.com` — 荣景文川 Company Home
+- `rongjinwenchuan.xyz` — transition Moodify Web Player / historical entry
 - Ear workbench / Ear API proxy — INTERNAL (operator/research only; `noindex` is discovery hygiene, not access control)
 
 The current frontends are static prototypes. Hosting them on the origin does
@@ -44,7 +44,7 @@ records are currently absent; add CNAME records to each apex if `www` should be
 supported. HTTPS cutover requires an origin certificate compatible with the
 Cloudflare SSL mode before traffic is switched. Do not weaken SSL mode just to
 make a cutover pass.
-# Moodify Web Origin and Ear Service
+## Internal services
 
 The static origin deployment is extended by `deploy_moodify_service.sh`, which
 installs the canonical `moodify-core-package`, FastAPI, the existing SQLite

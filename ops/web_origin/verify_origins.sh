@@ -15,15 +15,12 @@ check() {
 }
 
 check rongjingmusic.com /healthz '"site":"rongjingmusic.com"'
-check rongjingmusic.com / 'Moodify Ear — Auditory Intelligence Workspace'
-check rongjingmusic.com /app-workspace.css '.workspace'
-check rongjingmusic.com /app-workspace.js 'newSession'
-check rongjingmusic.com /assets/moodify-symbol.png 'PNG'
+check rongjingmusic.com / 'Every voice deserves to be heard.'
+check rongjingmusic.com /assets/site-public-form-20260820.css '.site-header'
+check rongjingmusic.com /assets/moodify-logo.png 'PNG'
 check rongjingwenchuan.com /healthz '"site":"rongjingwenchuan.com"'
-check rongjingwenchuan.com / 'Moodify — Auditory Intelligence Infrastructure'
-check rongjingwenchuan.com /styles.css '.page-shell'
-check rongjingwenchuan.com /app.js 'listenButton'
-check rongjingwenchuan.com /assets/moodify-symbol.png 'PNG'
+check rongjingwenchuan.com / 'We build things worth hearing.'
+check rongjingwenchuan.com /styles.css '.company-shell'
 
 nginx -t
 systemctl is-enabled nginx
