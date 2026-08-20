@@ -1,0 +1,38 @@
+{
+  "case": "case_9961e07_transient",
+  "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+  "duration_s": 184.32,
+  "tensor_id": "tensor-185caf95dcfe6224",
+  "scale_feature_shape": [
+    1844,
+    3,
+    12
+  ],
+  "scale_feature_valid_fraction": 0.3886,
+  "channel_spectral_shape": [
+    2160,
+    99,
+    2
+  ],
+  "hosvd_ranks": [
+    8,
+    8,
+    2
+  ],
+  "hosvd_model_id": "tucker-3fcc62c80c8751ac",
+  "hosvd_relative_error": 0.1800545559185011,
+  "localization_candidates": [
+    {
+      "time_s": 58.730666666666664,
+      "relative_residual": 0.9999252750440158
+    },
+    {
+      "time_s": 161.984,
+      "relative_residual": 0.9999268803241133
+    },
+    {
+      "time_s": 162.66666666666666,
+      "relative_residual": 0.9999425083183061
+    }
+  ]
+}

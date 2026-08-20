@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "alignment/gap_analysis.json",
+    "alignment/gap_analysis.md"
+  ],
+  "non_empty": true
+}

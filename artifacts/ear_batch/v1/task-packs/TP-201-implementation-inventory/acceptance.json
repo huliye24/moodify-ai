@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "alignment/repository_capabilities.json",
+    "alignment/repository_capabilities.md"
+  ],
+  "non_empty": true
+}

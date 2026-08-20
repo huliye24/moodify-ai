@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Active Case — Moodify Ear</title>
+  <meta name="description" content="Follow the authoritative state of a Moodify Ear Production Case.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/assets/workbench.css">
+</head>
+<body data-page="case">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden>M</span>MOODIFY EAR</a>
+      <nav aria-label="Ear">
+        <a href="/">Home</a>
+        <a href="/new-case.html">New Listening Case</a>
+        <a href="/evidence.html">Evidence Library</a>
+        <a href="/status.html">System Status</a>
+      </nav>
+      <div class="instrument" aria-live="polite">
+        <span data-instrument="identity"></span>
+        <span data-instrument="queue"></span>
+        <span data-instrument="version"></span>
+      </div>
+    </aside>
+    <main class="content">
+      <p class="eyebrow">INTERNAL OPERATOR SYSTEM / ACTIVE CASE</p>
+      <h1 class="page-title">Case in progress</h1>
+      <div class="instrument-bar">
+        <span class="note">Authoritative state:</span>
+        <span id="case-pill" class="pill neutral"><span class="dot" aria-hidden></span>…</span>
+        <span class="note" id="case-id" style="font-variant-numeric:tabular-nums"></span>
+      </div>
+
+      <div class="loop" id="stepper" aria-label="Case stage progress"></div>
+
+      <div class="notice" style="margin-top:20px" id="human-notice" hidden>
+        This case is waiting for a designated human reviewer. It will not be
+        auto-approved, and it will never be presented as a machine success.
+      </div>
+
+      <div class="layer" style="margin-top:20px">
+        <h3>Recovery</h3>
+        <p class="lede">If this page loses connection, the case continues on the Ear node. Refresh to resume — the authoritative state is read from the server, never guessed locally.</p>
+        <p class="note">Keep this case id for support: <b id="case-id-ref"></b></p>
+      </div>
+
+      <div id="poll" style="margin-top:20px"></div>
+      <div id="job-host"></div>
+    </main>
+  </div>
+  <script src="/assets/workbench.js"></script>
+</body>
+</html>

@@ -7,7 +7,8 @@
 对比当前 baseline_metrics.json 和上次运行的基准数据, 检测退化。
 """
 
-import json, sys
+import json
+import sys
 from pathlib import Path
 
 BASELINE_FILE = Path(__file__).resolve().parent / "baseline_metrics.json"

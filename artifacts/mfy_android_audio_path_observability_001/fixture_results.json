@@ -1,0 +1,78 @@
+{
+  "package_id": "MFY_ANDROID_AUDIO_PATH_OBSERVABILITY_001",
+  "sequence": 68,
+  "gate": "bypass_equivalence",
+  "device": {"model": "Xiaomi M2102J2SC (Redmi)", "android": 12, "sdk": 31, "abi": "arm64-v8a"},
+  "run": {
+    "command": "./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.moodify.app.audio.BypassEquivalenceTest",
+    "date": "2026-08-16",
+    "rerun_2026_08_17": "ALL_PASS (5/5; --rerun-tasks JVM 46/46 + device 7/7 reconfirmed after USB install re-grant)",
+    "status": "ALL_PASS"
+  },
+  "fixtures": [
+    {
+      "file": "tone.wav",
+      "container": "wav",
+      "codec": "audio/raw",
+      "sample_rate": 44100,
+      "channels": 1,
+      "bit_depth": 16,
+      "test": "wavFixtureDecodesByteExact",
+      "method": "byte-exact comparison of decoded PCM vs WAV data chunk",
+      "result": "PASS",
+      "detail": "decoded PCM byte-exact equal to source WAV payload"
+    },
+    {
+      "file": "tone.flac",
+      "container": "flac",
+      "codec": "audio/flac",
+      "sample_rate": 44100,
+      "channels": 1,
+      "test": "flacFixtureDecodesToSourcePcm",
+      "method": "byte-exact comparison of decoded PCM vs reference WAV PCM",
+      "result": "PASS",
+      "detail": "FLAC lossless: decoded PCM byte-exact equal to source WAV PCM (same audio content)"
+    },
+    {
+      "file": "tone.mp3",
+      "container": "mp3",
+      "codec": "audio/mpeg",
+      "sample_rate": 44100,
+      "channels": 1,
+      "test": "mp3FixtureDecodesToValidPcm",
+      "method": "valid non-empty PCM + declared format assertion (lossy: no byte-exact claim)",
+      "result": "PASS",
+      "detail": "decoded non-empty PCM at 44100Hz/1ch"
+    },
+    {
+      "file": "tone.aac",
+      "container": "aac",
+      "codec": "audio/mp4",
+      "sample_rate": 44100,
+      "channels": 1,
+      "test": "aacFixtureDecodesToValidPcm",
+      "method": "valid non-empty PCM + declared format assertion (lossy: no byte-exact claim)",
+      "result": "PASS",
+      "detail": "decoded non-empty PCM at 44100Hz/1ch"
+    },
+    {
+      "file": "all four",
+      "container": "wav+flac+mp3+aac",
+      "test": "inputMetadataParsesFixtures",
+      "method": "InputMetadataExtractor via MediaExtractor",
+      "result": "PASS",
+      "detail": "container/sample-rate correctly parsed for wav, flac, mp3"
+    }
+  ],
+  "format_coverage": {
+    "wav": "PASS (byte-exact)",
+    "flac": "PASS (byte-exact vs source PCM)",
+    "mp3": "PASS (valid PCM; lossy, no byte-exact claim)",
+    "aac": "PASS (valid PCM; lossy, no byte-exact claim)",
+    "unsupported_formats": "no unsupported format encountered on this device"
+  },
+  "boundary_declaration": {
+    "bit_transparent_scope": "input bytes handed to decoder == fixture PCM, verified byte-exact for lossless formats",
+    "post_mixer_not_claimed": "bit-perfect after the Android mixer is NOT claimed; mixer resampling to 48kHz observed on device (input 44.1kHz), post-mixer format recorded as NOT_OBSERVABLE"
+  }
+}

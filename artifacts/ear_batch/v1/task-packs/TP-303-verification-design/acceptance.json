@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "planning/verification_matrix.csv",
+    "planning/verification_matrix.md"
+  ],
+  "non_empty": true
+}

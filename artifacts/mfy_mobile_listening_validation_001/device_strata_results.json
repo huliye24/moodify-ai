@@ -1,0 +1,23 @@
+{
+  "status": "DATA_PENDING",
+  "strata_defined": [
+    {
+      "era": "old_record",
+      "source_quality": "degraded",
+      "music_type": "synthetic_fixture",
+      "device_route": "SPEAKER",
+      "listening_env": "quiet_room"
+    },
+    {
+      "era": "modern_master",
+      "source_quality": "clean",
+      "music_type": "synthetic_fixture",
+      "device_route": "SPEAKER",
+      "listening_env": "quiet_room"
+    }
+  ],
+  "device_routes_covered": [
+    "SPEAKER (device evidence from 68/69 scans)"
+  ],
+  "results": {}
+}

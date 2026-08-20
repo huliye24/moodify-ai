@@ -1,0 +1,21 @@
+{
+  "task": "TP-006",
+  "verified_at": "2026-08-12T00:49:17.427908+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "corpus/normalized_manifest.json",
+      "exists": true,
+      "bytes": 27175,
+      "sha256": "9d6964cd5ac6018f96b3b36fa62c991da35fb0254a94f3e577470ffabb1c9c6f",
+      "passed": true
+    },
+    {
+      "path": "corpus/README.md",
+      "exists": true,
+      "bytes": 391,
+      "sha256": "1cb9fb91447db89893c107282c4f83794f0577ec052ee299d105702a4e024ebc",
+      "passed": true
+    }
+  ]
+}

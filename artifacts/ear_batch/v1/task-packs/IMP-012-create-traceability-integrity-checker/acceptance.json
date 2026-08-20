@@ -1,0 +1,8 @@
+{
+  "output_root": "workspace",
+  "required_outputs": [
+    "tools/ear_v1_contracts/check_traceability.py",
+    "tests/ear_v1_contracts/test_traceability_checker.py"
+  ],
+  "non_empty": true
+}

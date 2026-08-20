@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "pilot-scope-v1",
+  "decisionId": "pilot_1786939xxxxx_2129623012",
+  "uri": "file:/data/user/0/com.moodify.app/cache/path_record_tone.wav",
+  "inputCategory": "LOCAL_CONTENT",
+  "routeClass": "SPEAKER",
+  "policyConfidence": "PARTIAL",
+  "decision": "APPROVED_INTERVENTION",
+  "bypassReason": null,
+  "measurement": {
+    "processorActive": true,
+    "bypassActive": false,
+    "peakDb": -18.1,
+    "underruns": 0,
+    "offloadStatus": "UNKNOWN",
+    "thermalState": "NONE"
+  },
+  "evidenceRef": "path_1786894568921_2129623012",
+  "createdAtMs": 1786939615031,
+  "_note": "structurally representative record produced from JVM-verified decision logic; real device decision records pending device matrix"
+}

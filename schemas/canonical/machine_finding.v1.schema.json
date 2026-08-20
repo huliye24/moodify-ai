@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "FindingType": {
+      "enum": [
+        "ENERGY_CHANGE",
+        "CLIPPING_EVENT",
+        "TRUE_PEAK_EVENT",
+        "DYNAMIC_CHANGE",
+        "TRANSIENT_CHANGE",
+        "CORRELATION_CHANGE",
+        "BASELINE_DEVIATION",
+        "EVIDENCE_CONFLICT",
+        "OUT_OF_DOMAIN",
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "title": "FindingType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {
+      "title": "Case Id",
+      "type": "string"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confidence"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "domain": {
+      "title": "Domain",
+      "type": "string"
+    },
+    "evidence_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "finding_id": {
+      "title": "Finding Id",
+      "type": "string"
+    },
+    "finding_type": {
+      "$ref": "#/$defs/FindingType"
+    },
+    "measurement_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Measurement Ids",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "uncertainty_note": {
+      "default": "",
+      "title": "Uncertainty Note",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "finding_id",
+    "case_id",
+    "finding_type",
+    "domain"
+  ],
+  "title": "MachineFinding",
+  "type": "object"
+}

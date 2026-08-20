@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "knowledge/traceability.csv",
+    "knowledge/traceability.md"
+  ],
+  "non_empty": true
+}

@@ -1,0 +1,17 @@
+{
+  "package_id": "MFY_PRESERVE_IDENTITY_INTERVENTION_001",
+  "sequence": 71,
+  "gate": "human_listening_approval",
+  "authority": "Human",
+  "status": "PENDING_HUMAN",
+  "reason": "71 is the first package that permits audible intervention; listening approval is an authority gate owned by the human. DeepSeek never approves listening quality (manifest: human_listening_approval required).",
+  "machine_gates_completed": ["registered_scope", "objective_safety", "negative_control_bypass", "identity_escalation"],
+  "what_to_listen": [
+    "legit_dc_clip_01: full-mix with DC offset + short clip, pipeline selects dc_offset_fix + clip_peak_repair",
+    "negative control (clean modern mix): must be inaudibly unchanged (fully bypassed)"
+  ],
+  "notes": [
+    "tonal_balance_very_conservative is REGISTERED but default OFF until human listening approval",
+    "no claim of 'better sounding' is made anywhere in this package"
+  ]
+}

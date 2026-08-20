@@ -1,0 +1,51 @@
+{
+  "package_id": "MFY_MOBILE_LISTENING_VALIDATION_001",
+  "sequence": 72,
+  "executor": "DeepSeek (Claude Code)",
+  "status": "READY_FOR_CODEX_REVIEW",
+  "execution_date": "2026-08-17",
+  "repository": {
+    "path": "E:\\moodify\\moodify-core-package",
+    "head_commit": "7bf0f594",
+    "note": "core package; human listening sessions skipped per user instruction; machine side complete"
+  },
+  "changed_files": {
+    "added": [
+      "src/moodify/listening/__init__.py",
+      "src/moodify/listening/protocol.py (pre-registered protocol, frozen+hashed before sessions; 71 candidates frozen)",
+      "src/moodify/listening/blinding.py (seeded deterministic randomisation, dedup, blinded labels)",
+      "src/moodify/listening/loudness_match.py (A/B level-match + switch-latency validation)",
+      "src/moodify/listening/session_store.py (reviewer/scope/time/route/evidence records; never auto-fill)",
+      "src/moodify/listening/stats.py (3 endpoints SEPARATE: preference/identity/difference; Cohen's h, Wilson CI, exact binomial)",
+      "tests/listening/test_protocol.py (6 tests)",
+      "tests/listening/test_blinding.py (4 tests)",
+      "tests/listening/test_loudness_match.py (4 tests)",
+      "tests/listening/test_stats.py (6 tests)"
+    ]
+  },
+  "gates": {
+    "protocol_frozen": {"result": "PASS", "evidence": "protocol frozen + sha256 before sessions (preregistered_protocol.json); candidates from 71 frozen (mfy-intervention-v1); hash deterministic (tests)"},
+    "level_matched": {"result": "PASS", "evidence": "verify_level_match: shape/duration/loudness ≤0.5dB/switch ≤100ms thresholds; tests cover matched/mismatched/shape/latency"},
+    "human_identity_judgment": {"result": "SKIPPED_PER_USER", "evidence": "user instructed to skip human listening; identity_judgments.json empty + PENDING_HUMAN_SKIPPED; DeepSeek never fabricates judgments (07 prompt discipline)"},
+    "statistical_integrity": {"result": "PASS", "evidence": "3 endpoints reported separately (never merged); effect size + Wilson CI + exact binomial p; DATA_PENDING when n=0; INSUFFICIENT -> return to 71, threshold never lowered; engine self-tested on synthetic data"}
+  },
+  "tests": {
+    "listening": "20/20 PASS",
+    "full": "816 passed, 5 skipped (509s, 0 failed; incl. 20 new listening tests)"
+  },
+  "boundary_facts": {
+    "human_data": "NONE collected (skipped per user); statistical_report.md marks DATA_PENDING",
+    "device_sessions": "device route coverage defined (SPEAKER from 68/69 evidence); WIRED_USB/BT strata defined in protocol, pending device matrix",
+    "no_threshold_changes": "no algorithm/threshold changes from 71; missing threshold -> return to 71, never lower",
+    "placebo_and_negative_control": "in protocol: negative control + placebo bypass + fallback verification (identity gate fallback semantics from 71)"
+  },
+  "artifacts": [
+    "preregistered_protocol.json",
+    "blind_sessions/session_plan_seed_20260817.json",
+    "device_strata_results.json",
+    "identity_judgments.json",
+    "statistical_report.md",
+    "execution_record.json"
+  ],
+  "machine_gate_summary": "3/4 PASS + human_identity_judgment SKIPPED_PER_USER; output READY_FOR_CODEX_REVIEW"
+}

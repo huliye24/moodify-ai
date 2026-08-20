@@ -1,0 +1,76 @@
+{
+  "schema_version": "mamse-001-synthetic-v1",
+  "sample_rate": 48000,
+  "gates": {
+    "stationary_1000hz": {
+      "localization_error_hz": {
+        "R0": 31.25,
+        "R1": 7.8125,
+        "R2": 1.9531,
+        "R3": 0.4883
+      },
+      "pass": true
+    },
+    "close_tone_30hz": {
+      "measured_gap_hz": {
+        "R0": 8906.25,
+        "R1": 2015.625,
+        "R2": 29.2969,
+        "R3": 29.2969
+      },
+      "true_gap_hz": 30.0,
+      "pass": true
+    },
+    "impulse_localization": {
+      "error_ms": {
+        "R0": 2.67,
+        "R3": 317.33
+      },
+      "pass": true
+    },
+    "chirp_monotonic": {
+      "rising_per_resolution": {
+        "R0": true,
+        "R1": true,
+        "R2": true,
+        "R3": true
+      },
+      "pass": true
+    },
+    "hf_cutoff_ladder": {
+      "flatness_median": {
+        "full_16k": {
+          "R2": 0.014666,
+          "R3": 0.014661
+        },
+        "half_8k": {
+          "R2": 6.3e-05,
+          "R3": 6.4e-05
+        }
+      },
+      "pass": true
+    },
+    "silence_clean": {
+      "nan_inf_present": {
+        "R0": false,
+        "R1": false,
+        "R2": false,
+        "R3": false
+      },
+      "pass": true
+    },
+    "deterministic_rerun": {
+      "identical": true,
+      "registry_hash": "94709cd96a0f",
+      "pass": true
+    },
+    "serialization_round_trip": {
+      "identical": true,
+      "pass": true
+    }
+  },
+  "summary": {
+    "passed": 8,
+    "total": 8
+  }
+}

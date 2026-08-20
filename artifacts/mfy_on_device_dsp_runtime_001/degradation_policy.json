@@ -1,0 +1,40 @@
+{
+  "package_id": "MFY_ON_DEVICE_DSP_RUNTIME_001",
+  "sequence": 69,
+  "policy": "degradation and automatic bypass policy for the on-device DSP graph (mfy-dsp-graph-v1)",
+  "rules": [
+    {
+      "id": "HEADROOM_LIMIT_EXCEEDED",
+      "condition": "any sample peak exceeds headroom linear (10^(-1.0/20) = 0.8913), i.e. above -1.0 dBFS",
+      "action": "automatic bypass (processor reports inactive at next reconfigure), reason recorded in autoBypassEvents",
+      "playback": "continues uninterrupted; mid-stream data passes through until reconfigure",
+      "restore": "DspGraphRuntime.requestRestore() resets processor (next media session starts fresh)",
+      "note": "conservative protection reserved for future DSP stages; identity graph output == input so the trip is deterministic and harmless"
+    },
+    {
+      "id": "UNSUPPORTED_FORMAT",
+      "condition": "decoder output encoding not in {PCM_8BIT, PCM_16BIT, PCM_24BIT, PCM_32BIT, PCM_FLOAT}",
+      "action": "UnhandledAudioFormatException; Media3 drops the processor from the chain",
+      "playback": "continues on the direct path (no DSP), no error surfaced to user",
+      "reason_recorded": "processorActive=false in graph state"
+    },
+    {
+      "id": "HARDWARE_OFFLOAD_CONFLICT",
+      "condition": "hardware audio offload active while processor installed",
+      "policy": "mutually exclusive; policy records HARDWARE_OFFLOAD_DISABLED_WHEN_PROCESSOR_ACTIVE; never report both active",
+      "evidence": "offloadStatus observed UNKNOWN on this device with processor installed; no dual-active claim"
+    },
+    {
+      "id": "NO_DSP_PARAMETERS",
+      "condition": "n/a",
+      "policy": "69 ships zero aesthetic DSP parameters; no user DSP controls; UI frozen (3.1)"
+    }
+  ],
+  "escalation": "any unhandled runtime error in the graph surfaces as PlaybackException (surfaced by PlaybackManager state.error); graph never silently drops audio",
+  "next_steps_for_future_packages": [
+    "true-peak via oversampling before any limiting stage ships (recorded, not implemented)",
+    "device tier matrix low/high",
+    "BT/wired route-change device evidence",
+    "external-capture click/pop audition"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "mamse-004-manifest-v1",
+  "operator_id": "mamse004-phase-geometry",
+  "operator_version": "mamse004-phase-geometry-v0.1",
+  "config_version": "mamse004-phase-geometry-v0.1",
+  "config_hash": "c7730ef9483a61dace751f153e035b3d22022b5b0fe6fcbbbdf0ddf4d2f54d63",
+  "config": {
+    "n_fft": 8192,
+    "hop_length": 2048,
+    "window": "hann",
+    "f_min_hz": 80.0,
+    "f_max_hz": 18000.0,
+    "magnitude_floor_db": -45.0,
+    "unwrap_axis": "frequency",
+    "stereo_cross_convention": "R*conj(L)",
+    "gcc_max_delay_ms": 5.0
+  },
+  "source_sha256": "06249dc76e4b9b0dd07021f542f9cdde0f25e9974096fbdac537fabe9d63453f",
+  "sample_rate": 48000,
+  "git_commit": "5e6de72792b1b53545d12f7fa41c52d627053010",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "resource": {
+    "runtime_seconds": 9.571337700000186
+  },
+  "authority_class": "EXPERIMENTAL_DESCRIPTOR_ESTIMATOR",
+  "judgment_eligible": false,
+  "limitations": [
+    "nonzero group delay is not automatically a defect",
+    "low-magnitude bins are masked by relative threshold, not encoded as 0",
+    "STFT/window/cross-spectrum conventions are part of the versioned result"
+  ],
+  "generated_at_utc": "2026-08-11T10:45:24+00:00"
+}

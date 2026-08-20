@@ -1,0 +1,118 @@
+{
+  "schema_version": "mamse-001-benchmark-v1",
+  "source": "/var/lib/moodify/sources/sha256/c3/c3886611711d6e657e2180eec16ca6b54e0c3e9afcf908c3dff0d83010c16c63/10_viens_chez_moi.wav",
+  "sample_rate": 48000,
+  "measurements": [
+    {
+      "label": "slice_10s",
+      "duration_s": 10.0,
+      "wall_time_s": 1.602,
+      "cpu_time_s": 1.463,
+      "peak_rss_kb": 254156,
+      "rss_delta_kb": 0,
+      "swap_before_kb": 144200,
+      "swap_after_kb": 144200,
+      "swap_delta_kb": 0,
+      "artifact_bytes": 256658,
+      "frames_per_resolution": {
+        "R0": 3747,
+        "R1": 934,
+        "R2": 231,
+        "R3": 55
+      },
+      "payload_bytes_per_resolution": {
+        "R0": 284772,
+        "R1": 70984,
+        "R2": 17556,
+        "R3": 4180
+      },
+      "manifest": {
+        "operator_id": "MAMSE-001",
+        "operator_version": "0.1.0",
+        "git_commit": "unknown",
+        "python": "3.14.4",
+        "numpy": "2.4.6",
+        "scipy": "1.18.0",
+        "fft_backend": {
+          "backend": "numpy.fft.rfft",
+          "numpy_version": "2.4.6"
+        },
+        "resolution_registry_hash": "94709cd96a0fb8988f3c99afce4b36a51ebd38486075e63b37ae47ff0fb4ad74"
+      }
+    },
+    {
+      "label": "slice_45s",
+      "duration_s": 45.0,
+      "wall_time_s": 6.529,
+      "cpu_time_s": 6.421,
+      "peak_rss_kb": 254156,
+      "rss_delta_kb": 0,
+      "swap_before_kb": 144200,
+      "swap_after_kb": 144200,
+      "swap_delta_kb": 0,
+      "artifact_bytes": 1189514,
+      "frames_per_resolution": {
+        "R0": 16872,
+        "R1": 4215,
+        "R2": 1051,
+        "R3": 260
+      },
+      "payload_bytes_per_resolution": {
+        "R0": 1282272,
+        "R1": 320340,
+        "R2": 79876,
+        "R3": 19760
+      },
+      "manifest": {
+        "operator_id": "MAMSE-001",
+        "operator_version": "0.1.0",
+        "git_commit": "unknown",
+        "python": "3.14.4",
+        "numpy": "2.4.6",
+        "scipy": "1.18.0",
+        "fft_backend": {
+          "backend": "numpy.fft.rfft",
+          "numpy_version": "2.4.6"
+        },
+        "resolution_registry_hash": "94709cd96a0fb8988f3c99afce4b36a51ebd38486075e63b37ae47ff0fb4ad74"
+      }
+    },
+    {
+      "label": "full",
+      "duration_s": 188.52,
+      "wall_time_s": 34.877,
+      "cpu_time_s": 34.758,
+      "peak_rss_kb": 254156,
+      "rss_delta_kb": 0,
+      "swap_before_kb": 144200,
+      "swap_after_kb": 144200,
+      "swap_delta_kb": 0,
+      "artifact_bytes": 5031076,
+      "frames_per_resolution": {
+        "R0": 70692,
+        "R1": 17670,
+        "R2": 4415,
+        "R3": 1101
+      },
+      "payload_bytes_per_resolution": {
+        "R0": 5372592,
+        "R1": 1342920,
+        "R2": 335540,
+        "R3": 83676
+      },
+      "manifest": {
+        "operator_id": "MAMSE-001",
+        "operator_version": "0.1.0",
+        "git_commit": "unknown",
+        "python": "3.14.4",
+        "numpy": "2.4.6",
+        "scipy": "1.18.0",
+        "fft_backend": {
+          "backend": "numpy.fft.rfft",
+          "numpy_version": "2.4.6"
+        },
+        "resolution_registry_hash": "94709cd96a0fb8988f3c99afce4b36a51ebd38486075e63b37ae47ff0fb4ad74"
+      }
+    }
+  ]
+}

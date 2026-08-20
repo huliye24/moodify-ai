@@ -1,0 +1,22 @@
+[Unit]
+Description=Moodify Atomic Inbox Ingest
+After=network.target
+
+[Service]
+Type=oneshot
+User=moodify
+Group=moodify
+WorkingDirectory=/opt/moodify
+ExecStart=/opt/moodify/.venv/bin/python /opt/moodify/ops/data_node/inbox_ingest.py \
+  --inbox /var/lib/moodify/inbox \
+  --source-store /var/lib/moodify/sources \
+  --ledger-db /var/lib/moodify/ops/ingest.sqlite3 \
+  --node-cli /opt/moodify/.venv/bin/moodify-node \
+  --min-age-seconds 120
+Nice=12
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/moodify

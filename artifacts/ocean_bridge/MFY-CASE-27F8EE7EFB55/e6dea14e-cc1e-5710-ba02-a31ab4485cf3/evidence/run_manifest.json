@@ -1,0 +1,10 @@
+{
+  "status": "COMPLETED_WITH_SENSOR_EVIDENCE",
+  "run_id": "e6dea14e-cc1e-5710-ba02-a31ab4485cf3",
+  "source_sha256": "c726d333dd159a31423f3480dbb1c5c4a9dfcd30efe1f7e12ade390dc92e8908",
+  "authority": {
+    "sensor_output_only": true,
+    "may_approve_artistic_decision": false,
+    "may_transition_to_technically_validated": false
+  }
+}

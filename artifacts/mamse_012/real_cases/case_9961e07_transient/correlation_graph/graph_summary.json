@@ -1,0 +1,75 @@
+{
+  "algebraic_connectivity": -4.635582681617779e-16,
+  "algorithm_version": "mamse012-gsp-v0.1",
+  "component_labels": [
+    0,
+    0,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    1,
+    1,
+    1
+  ],
+  "connected_components": 7,
+  "degree_max": 2.214464636924665,
+  "degree_mean": 0.8800698898223002,
+  "degree_min": 0.0,
+  "edge_authority": "DATA_DERIVED",
+  "edge_count": 7,
+  "edge_semantic": "positive empirical correlation",
+  "graph_family": "positive_correlation_graph",
+  "graph_id": "agraph-1501165644e405f5",
+  "laplacian_eigenvalues": [
+    -5.545152011177112e-16,
+    -4.635582681617779e-16,
+    -2.6585808964845527e-16,
+    -6.012983601600892e-17,
+    2.9780260700446017e-33,
+    1.2044227496177239e-32,
+    7.278013759502978e-17,
+    0.5848239015562346,
+    2.1485943048825282,
+    2.284532758378879,
+    2.548333896708415,
+    2.9945538163415466
+  ],
+  "node_count": 12,
+  "provenance": {
+    "negative_edges_policy": "omitted; signed graph deferred",
+    "threshold": 0.5
+  },
+  "schema_version": "mamse012-graph-v0.1",
+  "semantic_boundaries": [
+    "graph frequency is topology frequency, not acoustic Hz",
+    "edges express selected relation, not causality",
+    "high graph-frequency energy is structural variation candidate, not bad audio"
+  ],
+  "signal": {
+    "dc_energy_ratio": 0.24999999999997924,
+    "dirichlet_energy": -1.1102230246251565e-16,
+    "high_graph_frequency_ratio": 2.388153131039972e-32,
+    "high_start_eigenvalue": 2.1485943048825282,
+    "local_variation": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "low_graph_frequency_ratio": 0.9999999999999166,
+    "total_energy": 12.000000000001007
+  },
+  "zero_eigenvalue_count": 7
+}

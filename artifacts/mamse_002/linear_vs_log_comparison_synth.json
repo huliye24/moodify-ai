@@ -1,0 +1,85 @@
+{
+  "A_low_semitone_pair": {
+    "linear": {
+      "integrated_lufs": {
+        "value": -14.35,
+        "unit": "LUFS",
+        "method": "BS1770",
+        "status": "VALID",
+        "warnings": []
+      },
+      "spectral_centroid_hz": {
+        "value": 56.6,
+        "unit": "Hz",
+        "method": "stft",
+        "status": "VALID",
+        "warnings": []
+      },
+      "band_energy_sub_bass": null
+    },
+    "log": {
+      "status": "OK",
+      "top_peaks_hz": [
+        55.0,
+        58.27
+      ],
+      "dominant_hz": 55.0,
+      "median_dominant_midi": 55.21
+    }
+  },
+  "B_harmonic_sustained": {
+    "linear": {
+      "integrated_lufs": {
+        "value": -13.03,
+        "unit": "LUFS",
+        "method": "BS1770",
+        "status": "VALID",
+        "warnings": []
+      },
+      "spectral_centroid_hz": {
+        "value": 290.6,
+        "unit": "Hz",
+        "method": "stft",
+        "status": "VALID",
+        "warnings": []
+      },
+      "band_energy_sub_bass": null
+    },
+    "log": {
+      "status": "OK",
+      "top_peaks_hz": [
+        220.0,
+        440.0
+      ],
+      "dominant_hz": 220.0,
+      "median_dominant_midi": 220.01
+    }
+  },
+  "C_note_locked_narrowband": {
+    "linear": {
+      "integrated_lufs": {
+        "value": -14.14,
+        "unit": "LUFS",
+        "method": "BS1770",
+        "status": "VALID",
+        "warnings": []
+      },
+      "spectral_centroid_hz": {
+        "value": 440.0,
+        "unit": "Hz",
+        "method": "stft",
+        "status": "VALID",
+        "warnings": []
+      },
+      "band_energy_sub_bass": null
+    },
+    "log": {
+      "status": "OK",
+      "top_peaks_hz": [
+        440.0
+      ],
+      "dominant_hz": 440.0,
+      "median_dominant_midi": 440.02
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "case": "case_9056391_harmonic",
+  "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+  "duration_s": 128.52,
+  "tensor_id": "tensor-50bd63449cfad7d7",
+  "scale_feature_shape": [
+    1286,
+    3,
+    12
+  ],
+  "scale_feature_valid_fraction": 0.3886,
+  "channel_spectral_shape": [
+    1506,
+    99,
+    2
+  ],
+  "hosvd_ranks": [
+    8,
+    8,
+    2
+  ],
+  "hosvd_model_id": "tucker-c13f9ed1e78c7065",
+  "hosvd_relative_error": 0.20968576389566193,
+  "localization_candidates": [
+    {
+      "time_s": 42.00533333333333,
+      "relative_residual": 0.9999971884918624
+    },
+    {
+      "time_s": 94.31466666666667,
+      "relative_residual": 0.9999903412790649
+    },
+    {
+      "time_s": 116.33066666666667,
+      "relative_residual": 0.999954171590479
+    }
+  ]
+}

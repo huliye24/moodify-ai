@@ -1,0 +1,56 @@
+{
+  "package_id": "MFY_DEVICE_AWARE_RENDERING_001",
+  "sequence": 70,
+  "schema": "output-capability-v1",
+  "source": "apps/android/app/src/main/java/com/moodify/app/audio/{OutputCapability,RenderingPolicyResolver,OutputCapabilityObserver}.kt",
+  "principle": "profile is built ONLY from Android APIs and measured evidence; no brand heuristics, no uncalibrated device-compensation EQ; unknown capabilities default conservative; missing route evidence resolves INCONCLUSIVE",
+  "observable_facts": [
+    {"name": "routeClass", "source": "AudioDeviceInfo active sink type -> SPEAKER/WIRED_USB/BLUETOOTH_A2DP/BLUETOOTH_SCO/UNKNOWN"},
+    {"name": "deviceType", "source": "AudioDeviceInfo.productName-like type name"},
+    {"name": "systemOutputSampleRate", "source": "AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE (mixer side)"},
+    {"name": "systemFramesPerBuffer", "source": "AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER"},
+    {"name": "outputSampleRates", "source": "AudioDeviceInfo.getSampleRates (active sink)"},
+    {"name": "spatializerActive", "source": "AudioManager.getSpatializer().isEnabled; API 33+, null below"},
+    {"name": "offloadSupported", "source": "AudioManager.isOffloadedPlaybackSupported(AudioFormat, AudioAttributes); API 34+, null below"},
+    {"name": "performanceClass", "source": "Build.VERSION.MEDIA_PERFORMANCE_CLASS (1/2/3 -> LOW/MID/HIGH); API 31+, else UNKNOWN"},
+    {"name": "thermalStatus", "source": "PowerManager.OnThermalStatusChangedListener (69 runtime observation)"},
+    {"name": "underrunCount", "source": "AnalyticsListener.onAudioUnderrun (69 runtime observation)"}
+  ],
+  "strategy_outputs": [
+    {"name": "allowedDsp", "values": ["true", "false"], "note": "false = safe bypass with reason"},
+    {"name": "processingPrecision", "values": ["PCM_16", "FLOAT_32"], "note": "float only meaningful on lossless speaker path"},
+    {"name": "bufferSizeMs", "values": ["100 (default)", "200 (BT)", "250 (low perf / inconclusive)", "300 (stressed)"], "note": "buffer target for the load control / sink"},
+    {"name": "headroomDb", "value": -1.0, "note": "fixed conservative headroom (matches 69), never tuned by brand"},
+    {"name": "runtimeBudgetCpuFraction", "values": ["0.05 (dsp)", "0.02 (bypassed)"], "note": "budget for future DSP stages"},
+    {"name": "bypassReason", "values": ["HARDWARE_OFFLOAD_ACTIVE", "SYSTEM_SPATIALIZER_ACTIVE", "UNKNOWN_ROUTE_CAPABILITY", "THERMAL_STRESS_<state>", "UNDERRUN_STRESS_COUNT_<n>", null]},
+    {"name": "confidence", "values": ["FULL", "PARTIAL", "INCONCLUSIVE"]}
+  ],
+  "conflict_policies": [
+    "SYSTEM_SPATIALIZER_ACTIVE: system spatialization + app DSP -> app DSP bypassed (no double spatialization)",
+    "HARDWARE_OFFLOAD_ACTIVE: offload + app DSP mutually exclusive -> DSP bypassed; never both claimed (69 policy)",
+    "EXTERNAL_DAC_MANAGED: USB DAC route -> no forced resample, native-rate passthrough"
+  ],
+  "determinism": "same DeviceFacts + same rule priority -> identical profile (profileId = hash of facts+decision); pure function, no hidden state",
+  "fields": [
+    {"name": "schemaVersion", "type": "string"},
+    {"name": "profileId", "type": "string"},
+    {"name": "routeClass", "type": "string"},
+    {"name": "deviceType", "type": "string"},
+    {"name": "systemOutputSampleRate", "type": "int|null"},
+    {"name": "systemFramesPerBuffer", "type": "int|null"},
+    {"name": "outputSampleRates", "type": "array"},
+    {"name": "spatializerActive", "type": "bool|null"},
+    {"name": "offloadSupported", "type": "bool|null"},
+    {"name": "performanceClass", "type": "string"},
+    {"name": "thermalStatus", "type": "string|null"},
+    {"name": "underrunCount", "type": "int"},
+    {"name": "allowedDsp", "type": "bool"},
+    {"name": "processingPrecision", "type": "string"},
+    {"name": "bufferSizeMs", "type": "int"},
+    {"name": "headroomDb", "type": "double"},
+    {"name": "runtimeBudgetCpuFraction", "type": "double"},
+    {"name": "bypassReason", "type": "string|null"},
+    {"name": "confidence", "type": "string"},
+    {"name": "createdAtMs", "type": "long"}
+  ]
+}

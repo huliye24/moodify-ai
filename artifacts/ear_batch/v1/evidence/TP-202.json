@@ -1,0 +1,21 @@
+{
+  "task": "TP-202",
+  "verified_at": "2026-08-12T00:58:24.004945+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "alignment/gap_analysis.json",
+      "exists": true,
+      "bytes": 42813,
+      "sha256": "07fa2d345d337eb2678be22dca93d212b9e0010f9c642c06053dd3b02d672674",
+      "passed": true
+    },
+    {
+      "path": "alignment/gap_analysis.md",
+      "exists": true,
+      "bytes": 800,
+      "sha256": "025e98b79881e5811db7621a1658b090ef8b18e399e2f5dde3345e99717e667a",
+      "passed": true
+    }
+  ]
+}

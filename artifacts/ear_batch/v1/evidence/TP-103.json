@@ -1,0 +1,21 @@
+{
+  "task": "TP-103",
+  "verified_at": "2026-08-12T00:56:46.617420+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "knowledge/component_candidates.json",
+      "exists": true,
+      "bytes": 11316,
+      "sha256": "0882f7e6092d9042635583be5c912cccf3ac247599f6e299b33a8df766e66c7a",
+      "passed": true
+    },
+    {
+      "path": "knowledge/component_candidates.md",
+      "exists": true,
+      "bytes": 1172,
+      "sha256": "bbb77578ccf0a6d6ccc946e0199869da441235065d2f1596d0ea89654a92e6b2",
+      "passed": true
+    }
+  ]
+}

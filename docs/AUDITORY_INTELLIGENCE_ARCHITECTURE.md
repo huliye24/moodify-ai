@@ -1,8 +1,12 @@
 # Auditory Intelligence Architecture
 
+> **Status: INTERNAL**（W01-P01 Canon，2026-08-17）
+> Moodify Ear / Auditory Intelligence 是内部听觉、判断、验证与研究系统，不是对外产品面。
+> 对外产品身份见 [docs/canon/CURRENT_CANON.md](canon/CURRENT_CANON.md)；本文档为内部系统参考，不覆盖当前 Canon。
+
 ## 1. System Identity
 
-Moodify is an Auditory Intelligence System.
+Moodify's internal auditory intelligence is an Auditory Intelligence System.
 
 Its purpose is not merely to alter audio. Its purpose is to establish a repeatable loop for hearing, representing, judging, intervening, verifying and learning.
 
@@ -132,6 +136,9 @@ It owns:
 - failure/recovery;
 - packaging;
 - production readiness.
+
+> 参考：Chapter II《What Hearing Means for a Machine》的理念蒸馏与差距审计见
+> `docs/reference/MOODIFY_EAR_V1_CH02_ABSORPTION.md` 与 `docs/audits/DSK-MFY-EAR-V1-CH02-ABSORB-001/REPORT.md`（2026-08-12）。
 
 ## 4. Current vs Target Architecture
 

@@ -1,0 +1,56 @@
+{
+  "protocol": "MFY-24X7-DATA-PIPELINE-001",
+  "notes": "Replace paths. Every rights_ok must remain true. Prefer complete 3\u20135 minute tracks.",
+  "songs": [
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_01.wav",
+      "rights_ok": true,
+      "label": "pilot-01"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_02.wav",
+      "rights_ok": true,
+      "label": "pilot-02"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_03.wav",
+      "rights_ok": true,
+      "label": "pilot-03"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_04.wav",
+      "rights_ok": true,
+      "label": "pilot-04"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_05.wav",
+      "rights_ok": true,
+      "label": "pilot-05"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_06.wav",
+      "rights_ok": true,
+      "label": "pilot-06"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_07.wav",
+      "rights_ok": true,
+      "label": "pilot-07"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_08.wav",
+      "rights_ok": true,
+      "label": "pilot-08"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_09.wav",
+      "rights_ok": true,
+      "label": "pilot-09"
+    },
+    {
+      "path": "/var/lib/moodify/pilot_sources/song_10.wav",
+      "rights_ok": true,
+      "label": "pilot-10"
+    }
+  ]
+}

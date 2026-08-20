@@ -12,6 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install and verify FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version
+          ffprobe -version
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -22,10 +29,16 @@ jobs:
           cd moodify-core-package
           pip install -e ".[dev]"
 
-      - name: Lint
-        run: pip install ruff==0.15.15 && ruff check moodify-core-package/src/moodify
+      - name: Lint source and verification code
+        run: |
+          pip install ruff==0.15.15
+          ruff check moodify-core-package/src/moodify moodify-core-package/tests
 
       - name: Test
+        env:
+          MOODIFY_NODE_STATE_DIR: ${{ runner.temp }}/moodify-state
+          MOODIFY_NODE_OUTPUT_ROOT: ${{ runner.temp }}/moodify-data-factory
+          MOODIFY_CASES_ROOT: ${{ runner.temp }}/moodify-cases
         run: |
           cd moodify-core-package
           python -m pytest tests/ -v --tb=short

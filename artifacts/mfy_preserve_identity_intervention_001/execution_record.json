@@ -1,0 +1,65 @@
+{
+  "package_id": "MFY_PRESERVE_IDENTITY_INTERVENTION_001",
+  "sequence": 71,
+  "executor": "DeepSeek (Claude Code)",
+  "status": "READY_FOR_CODEX_REVIEW",
+  "execution_date": "2026-08-17",
+  "repository": {
+    "path": "E:\\moodify\\moodify-core-package",
+    "head_commit": "55bd01d0",
+    "note": "core package (Python); first package permitting audible intervention, strictly bounded"
+  },
+  "changed_files": {
+    "added": [
+      "src/moodify/intervention/__init__.py",
+      "src/moodify/intervention/primitives.py (3 versioned primitives + contracts + detectors)",
+      "src/moodify/intervention/identity_gate.py (deterministic feature identity gate, HUMAN_REQUIRED escalation)",
+      "src/moodify/intervention/pipeline.py (Measure->Classify->Propose->Render->Verify->Select/Bypass)",
+      "src/moodify/intervention/registry.py (pre-registration contract)",
+      "tests/intervention/test_primitives.py (9 tests)",
+      "tests/intervention/test_pipeline.py (8 tests)"
+    ]
+  },
+  "primitives": {
+    "dc_offset_fix": {"version": "v1", "risk": "NONE", "default_enabled": true},
+    "clip_peak_repair": {"version": "v1", "risk": "LOW", "default_enabled": true, "max_segment": 16},
+    "tonal_balance_very_conservative": {"version": "v1", "risk": "MEDIUM", "default_enabled": false}
+  },
+  "gates": {
+    "registered_scope": {"result": "PASS", "evidence": "3 pre-registered primitives with scope/max_strength/identity_risk/failure_state; tonal default OFF until human approval; no generative/remix/unified-master operations"},
+    "objective_safety": {"result": "PASS", "evidence": "verify per candidate + final chain: loudness diff <=0.5dB, no clipping, no NaN, shape/duration match; tests assert each"},
+    "negative_control_bypass": {"result": "PASS", "evidence": "5/5 negative controls fully bypassed (bypass_rate 1.0); 'processing more is not success'"},
+    "identity_escalation": {"result": "PASS", "evidence": "identity gate deterministic; drift -> HUMAN_REQUIRED (never guessed); test_identity_gate_detects_drift"},
+    "human_listening_approval": {"result": "PENDING_HUMAN", "evidence": "human_listening_approval.json; authority gate, DeepSeek never approves listening"}
+  },
+  "tests": {
+    "intervention": "17/17 PASS (2.3s)",
+    "v01": "20 passed, 5 skipped (baseline)",
+    "full": "770 passed, 5 skipped (343s, 0 failed; incl. 17 new intervention tests)"
+  },
+  "fixed_issues": [
+    "spectral centroid broadcast bug (freqs[:,None]*spec -> 22051x22051 matrix; 43s + OOM) -> elementwise",
+    "spectral centroid sensitive to broadband leakage from local flat (clipped) segments -> centroid recorded as reference, band-energy + corr gate",
+    "serialised re-measurement made detectors order-dependent (clip undetectable after DC removal) -> measure all limitations on original input once, fixed render order clip->dc->tonal",
+    "corr must be mean-centered (DC not musical content)",
+    "clean fixture needed low+high content so tonal detector can distinguish 'by-design no low end' from defect"
+  ],
+  "boundary_facts": {
+    "no_generative": "no generative re-singing, melody rewriting, unified modern-master templates",
+    "no_midi": "MIDI outside scope",
+    "stems": "deferred optional experiment (stem_experiment_report.json)",
+    "listening": "no 'better sounding' claim; tonal off until human approval",
+    "escalation": "identity uncertainty -> HUMAN_REQUIRED/INCONCLUSIVE, never guessed",
+    "device_visual": "N/A (core package, no UI; no device tests needed for Python package)"
+  },
+  "artifacts": [
+    "intervention_registry.json",
+    "case_measurements/legit_dc_clip_01.json",
+    "candidate_evidence/legit_dc_clip_01.json",
+    "bypass_rate.json",
+    "stem_experiment_report.json",
+    "human_listening_approval.json",
+    "execution_record.json"
+  ],
+  "machine_gate_summary": "4/4 machine gates PASS + human_listening_approval PENDING_HUMAN; output READY_FOR_CODEX_REVIEW"
+}

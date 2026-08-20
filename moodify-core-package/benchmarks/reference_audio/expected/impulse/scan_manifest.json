@@ -1,0 +1,52 @@
+{
+  "case_id": "ref_suite",
+  "stage": "ref",
+  "input_path": "benchmarks\\reference_audio\\fixtures\\impulse.wav",
+  "input_sha256": "1f7a36b714a710b350a08fd6df453d9c1a27f30e2b5f9a9ad6bea7baa8d5bca3",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "benchmarks\\reference_audio\\expected\\impulse\\spectrum_linear.png",
+      "sha256": "95a5adcbc111b1e94791e6d05cb7a8085266268273cf74a9e8c332005e63792b",
+      "size_bytes": 17367
+    },
+    "spectrum_log": {
+      "path": "benchmarks\\reference_audio\\expected\\impulse\\spectrum_log.png",
+      "sha256": "d424ea5cb0fbda5d3c847469c0cf3457195995f1d2ca91128f540d50ed8170a1",
+      "size_bytes": 17014
+    },
+    "metrics": {
+      "path": "benchmarks\\reference_audio\\expected\\impulse\\metrics.json",
+      "sha256": "5509230ccaf98e576df0a6c136af90c52abe61b37d12eb0aecb17903b11a772b",
+      "size_bytes": 8047
+    },
+    "timeline": {
+      "path": "benchmarks\\reference_audio\\expected\\impulse\\timeline_metrics.jsonl",
+      "sha256": "8a2ac31a8cc353ad645f42c0ea6d96b15423cac8cf2db701bf69189cc6c3b4b9",
+      "size_bytes": 1110
+    },
+    "analysis_data": {
+      "path": "benchmarks\\reference_audio\\expected\\impulse\\analysis_data.npz",
+      "sha256": "526292daa60044307ea293742404a79d441c44b675429e9920995a62cfd6d51e",
+      "size_bytes": 3709
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\impulse.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\impulse\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\impulse.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\impulse\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:10:07.294846+00:00"
+}

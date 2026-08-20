@@ -1,0 +1,114 @@
+{
+  "schema_version": "mamse-008-real-cases-v1",
+  "input": "S1 band-energy ratios",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "input": "S1 band-energy ratios",
+      "features": 8,
+      "frames": 1282,
+      "rank": 3,
+      "iterations": 300,
+      "relative_error": 0.2998077812063941,
+      "basis_id": "nmfbasis-6f88d4cc2555b1ca",
+      "runtime_seconds": 0.0748890000013489,
+      "components": [
+        {
+          "component_id": "C00",
+          "semantic_label": null,
+          "activation_peak_time_s": 115.6,
+          "activation_sparsity_hoyer": 0.2233112628027322,
+          "total_activation": 577.8227054609247
+        },
+        {
+          "component_id": "C01",
+          "semantic_label": null,
+          "activation_peak_time_s": 50.1,
+          "activation_sparsity_hoyer": 0.29411120309297256,
+          "total_activation": 372.9134910940138
+        },
+        {
+          "component_id": "C02",
+          "semantic_label": null,
+          "activation_peak_time_s": 44.5,
+          "activation_sparsity_hoyer": 0.37113856592048394,
+          "total_activation": 298.5988176146416
+        }
+      ]
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "input": "S1 band-energy ratios",
+      "features": 8,
+      "frames": 1840,
+      "rank": 3,
+      "iterations": 240,
+      "relative_error": 0.42257853244385785,
+      "basis_id": "nmfbasis-93bf6eaec9d54afe",
+      "runtime_seconds": 0.10151539999969827,
+      "components": [
+        {
+          "component_id": "C00",
+          "semantic_label": null,
+          "activation_peak_time_s": 177.3,
+          "activation_sparsity_hoyer": 0.2799506319882981,
+          "total_activation": 635.1919058488593
+        },
+        {
+          "component_id": "C01",
+          "semantic_label": null,
+          "activation_peak_time_s": 175.4,
+          "activation_sparsity_hoyer": 0.33270201174193376,
+          "total_activation": 596.1712704298254
+        },
+        {
+          "component_id": "C02",
+          "semantic_label": null,
+          "activation_peak_time_s": 2.0,
+          "activation_sparsity_hoyer": 0.33689833800811486,
+          "total_activation": 594.6991934333848
+        }
+      ]
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "input": "S1 band-energy ratios",
+      "features": 8,
+      "frames": 1976,
+      "rank": 3,
+      "iterations": 300,
+      "relative_error": 0.41854301010399164,
+      "basis_id": "nmfbasis-ceed88bd0a9069a3",
+      "runtime_seconds": 0.10026170000128332,
+      "components": [
+        {
+          "component_id": "C00",
+          "semantic_label": null,
+          "activation_peak_time_s": 110.5,
+          "activation_sparsity_hoyer": 0.21457639360211972,
+          "total_activation": 809.6356843920375
+        },
+        {
+          "component_id": "C01",
+          "semantic_label": null,
+          "activation_peak_time_s": 197.5,
+          "activation_sparsity_hoyer": 0.2600316788618027,
+          "total_activation": 664.8538799617472
+        },
+        {
+          "component_id": "C02",
+          "semantic_label": null,
+          "activation_peak_time_s": 19.9,
+          "activation_sparsity_hoyer": 0.34954388760481103,
+          "total_activation": 482.08069393183354
+        }
+      ]
+    }
+  ]
+}

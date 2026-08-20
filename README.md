@@ -1,269 +1,122 @@
 # Moodify
 
-> **The Ear of AI.**
+> **Every voice deserves to be heard.**
 >
-> Moodify is an **Auditory Intelligence System** for AI-generated audio and music.
+> **每一种声音，都值得被世界听见。**
 
-**中文定位：Moodify 是 AI 的耳朵。**
+**Moodify Music / Moodify Player** 是 Moodify 唯一的对外产品面。
 
-Moodify is built to help AI systems **listen, represent, judge, intervene, verify, and learn from sound**. It does not generate another song on top of a song. It develops a structured understanding of what is happening in audio, preserves evidence, and turns repeated production cases into reusable auditory knowledge.
+产品原则：**Listen. Then Play.**
+
+核心用户动作：**Play.**
 
 ```text
-Listen
-  -> Represent
-  -> Judge
-  -> Intervene
-  -> Verify
-  -> Learn
-  -> Next Case
+Source / Cloud-prepared Track
+        ↓
+      Moodify
+        ↓
+       PLAY
 ```
 
-## Why Moodify Exists
+Moodify 把声音分析、判断、受控处理、验证和生产复杂度留在系统内部。用户不需要理解 Ear、分轨、预设、Evidence 或状态机，才能获得核心播放体验。
 
-AI can generate enormous amounts of audio, but generation and listening are different capabilities.
+## Product Surfaces
 
-A generative model may create a track without having a reliable engineering system that can answer:
+- `apps/music-android/` — Moodify Music Android 播放器。
+- `apps/music-web/` — Moodify Web Player / PWA。
+- `moodify-music-package/` — Music API、身份、目录与 BFF。
+- `ops/web_origin/site/rongjingmusic/` — Moodify Product Home。
+- `ops/web_origin/site/rongjingwenchuan/` — 荣景文川 Company Home。
 
-- What actually happened in the waveform and spectrum?
-- Is the result stable, distorted, unbalanced, phase-problematic, overly dense, or structurally inconsistent?
-- What parts of the judgment are measurable?
-- What requires human listening authority?
-- If an intervention is made, did it actually improve the target condition?
-- Can the evidence from this case improve the next case?
+公开品牌语言和站点职责以 [Public Brand Authority](docs/brand/public/README.md) 为准。
 
-Moodify is designed around those questions.
+## Internal Systems
 
-## Auditory Intelligence
+以下系统支撑 Moodify，但不构成第二个公开产品身份：
 
-Moodify treats listening as an engineering and research problem.
+- **Moodify Ear / Auditory Intelligence** — 内部听觉、判断、验证与研究系统。
+- **Cloud Production System** — Intake → Analyze → Stem → Judge → Intervene → Render → Verify → Evidence。
+- **Classic Reconstruction** — 决策驱动的受控重建；属于内部生产哲学，不是公开产品面。
 
-### 1. Listen
+内部复杂度不是对外卖点。Ear 不是公开工作台，Moodify 也不是自动母带、预设浏览器或 AI 音乐后处理产品。
 
-Acquire the audio and establish a trustworthy source identity.
+## Current Reality
 
-### 2. Represent
+当前事实状态以 [Repository Status](docs/REPOSITORY_STATUS.md) 和 [Current Architecture](docs/canon/CURRENT_ARCHITECTURE.md) 为入口。
 
-Convert sound into measurable and structured representations:
+截至最近一次有证据的运行时核验（W01-P00，2026-08-17）：
 
-- waveform;
-- spectrum;
-- loudness;
-- dynamics;
-- phase;
-- channel relationships;
-- residuals;
-- transients;
-- musical structure where available.
+- Android、Web Player、Music platform / BFF 和静态音乐托管已存在于仓库或已核验运行环境；
+- 两台 VPS 承载核心服务与数据工厂批处理；
+- 完整 Ear / reconstruction 链路存在于仓库代码，但尚无已验证的云端生产流量；
+- 对象存储、云端 AI 推理和部分数据基础设施仍未验证或尚未部署。
 
-### 3. Judge
+仓库代码、路线图或文档中的能力不自动等于已上线能力。未经运行时证据验证，不应写成生产事实。
 
-Produce explicit, inspectable judgments rather than hiding the result behind a single “quality score”.
+## Repository Authority
 
-### 4. Intervene
+进入仓库后按以下顺序阅读：
 
-Apply controlled changes only when there is a reason to do so.
+1. [AGENTS.md](AGENTS.md)
+2. [Current Canon](docs/canon/CURRENT_CANON.md)
+3. [Product Boundary](docs/canon/PRODUCT_BOUNDARY.md)
+4. [Authority Order](docs/canon/AUTHORITY_ORDER.md)
+5. [Repository Status](docs/REPOSITORY_STATUS.md)
 
-Existing DSP and post-processing functions belong here. They are the **Auditory Intervention Laboratory**, not the identity of Moodify itself.
+历史文档可以保留其原始语言，但不能覆盖当前 Canon。改变公开产品身份、内部/外部边界、状态机、证据、云控制或数据权威时，必须显式声明 `CANON_CHANGE = YES` 并记录迁移与回滚。
 
-### 5. Verify
+## Engineering Model
 
-Compare before and after states, preserve evidence, and reject unsupported claims of improvement.
+Moodify 的内部研究与生产使用三项学科：
 
-### 6. Learn
+- **WSE — Wave-Spectral Evolution:** 声音里发生了什么？
+- **MSE — Musical-Structural Engineering:** 音乐结构是什么？
+- **PPE — Production Process Engineering:** 如何可靠生产、验证与恢复？
 
-Convert production cases into reusable measurements, evidence, rules, benchmarks and research questions.
-
----
-
-## Three Engineering / Research Disciplines
-
-### WSE — Wave-Spectral Evolution
-
-**Question:** What happened in the sound?
-
-WSE studies waveform, spectrum, loudness, phase, channels, residuals, transients and other measurable acoustic behavior.
-
-### MSE — Musical-Structural Engineering
-
-**Question:** What is the musical structure?
-
-MSE studies MIDI, score, rhythm, phrases, sections, lyrics, roles and structural relationships.
-
-### PPE — Production Process Engineering
-
-**Question:** How can this be produced and verified reliably?
-
-PPE studies production cases, state transitions, evidence artifacts, quality gates, reproducibility, authority boundaries, packaging, failure and recovery.
-
----
-
-## The Learning / Asset Loop
+证据资产循环：
 
 ```text
 Production Case
   -> Measurement Record
   -> Evidence Artifact
   -> Theory Update
-  -> Moodify Rule Update
+  -> Rule Update
   -> Next Production Case
 ```
 
-Moodify is not only a collection of functions. Its long-term value comes from the accumulation of **traceable auditory evidence and reusable production knowledge**.
+机器只能在经过验证、版本化且明确授权的范围内作出决定。范围外、证据不足、不确定或未解决的感知案例必须进入 `HUMAN_REQUIRED`、`INCONCLUSIVE` 或定义好的失败状态。
 
----
+## Core Packages
 
-## Current Implementation Status
+- `moodify-core-package/` — 测量、诊断、判断、干预、验证与证据能力。
+- `moodify-music-package/` — Music 产品的数据和服务层。
+- `moodify-core-package/src/moodify/data_factory/` — 数据工厂与算法评审。
+- `schemas/canonical/` — Production Case、Measurement、Evidence 等规范。
+- `docs/canon/` — 当前产品与系统权威。
 
-Moodify is an **alpha research and engineering system**.
-
-The current stable Python mainline is intentionally narrower than the full Auditory Intelligence architecture. Its v0.1 flow is approximately:
-
-```text
-Import
-  -> Analyze
-  -> Diagnose
-  -> Process
-  -> Export
-```
-
-This working mainline should be preserved while the broader auditory-intelligence architecture is integrated incrementally.
-
-Current capabilities include, depending on the active branch/version:
-
-- local audio loading;
-- acoustic metrics and spectrum analysis;
-- rule-based diagnosis;
-- controlled DSP processing;
-- WAV export;
-- API/CLI interfaces;
-- treatment records and human listening feedback;
-- experimental reality/quality metrics;
-- research and production-process tooling.
-
-Not every research concept in this repository is production-ready. Experimental and legacy systems are explicitly distinguished from the canonical mainline.
-
----
-
-## What Moodify Is Not
-
-Moodify is not:
-
-- a text-to-music generation model;
-- a DAW replacement;
-- an automatic-mastering promise;
-- a guarantee that every processed file becomes “better”;
-- a collection of presets presented as intelligence;
-- a black-box score without evidence.
-
----
-
-## Repository Authority
-
-The repository is organized conceptually into four layers:
-
-```text
-Moodify
-├── Auditory Intelligence Core
-│   ├── WSE
-│   ├── MSE
-│   └── PPE
-│
-├── Production Runtime
-│   ├── Cases
-│   ├── Evidence
-│   ├── Rules
-│   ├── Gates
-│   └── Recovery
-│
-├── Application Layer
-│   ├── API
-│   ├── App
-│   └── Cloud
-│
-└── Asset Layer
-    ├── Measurement Records
-    ├── Production Cases
-    ├── Treatment Records
-    ├── Benchmarks
-    └── Research Corpus
-```
-
-See:
-
-- `docs/AUDITORY_INTELLIGENCE_ARCHITECTURE.md`
-- `docs/ASSET_MODEL.md`
-- `docs/LEGACY_AND_EXPERIMENTAL_POLICY.md`
-- `docs/REPOSITORY_STATUS.md`
-
----
-
-## Core Python Package
-
-The currently stable local engine lives in:
-
-```text
-moodify-core-package/
-```
-
-Install:
+核心 Python 包的本地开发安装：
 
 ```bash
 cd moodify-core-package
-pip install -e .
-```
-
-Development installation:
-
-```bash
 pip install -e ".[dev]"
 ```
 
-Example CLI usage:
+CLI 示例：
 
 ```bash
-moodify presets
 moodify analyze song.wav
 moodify process song.wav --preset clean_master
 ```
 
-The CLI examples above represent the current narrow implementation, not the final boundary of Moodify.
+这些命令是内部窄实现入口，不是 Moodify 的公开产品定义。
 
----
+## Scope and Safety
 
-## Development Principle
-
-> Identity comes before feature expansion.
-
-Before adding a new subsystem, ask:
-
-1. Which part of auditory intelligence does it serve?
-2. What evidence does it create?
-3. Where does that evidence live?
-4. Is it canonical, experimental or legacy?
-5. Does it improve the next production case?
-
-A new feature that cannot answer these questions should not automatically become part of the mainline.
-
----
-
-## Data and Privacy
-
-The core workflow can be local-first.
-
-Do not commit:
-
-- private audio;
-- API keys;
-- unauthorized datasets;
-- generated heavy artifacts;
-- local IDE state.
-
-External models, APIs, audio and datasets retain their own licenses and rights.
-
----
+- 不把实验指标宣传为生产事实或艺术质量结论。
+- 不保证每个处理结果都会“更好”；BYPASS 是合法成功结果。
+- 不提交私人音频、API Key、未授权数据集或生成的重型工件。
+- 代码变更应说明服务的案例、测量、证据、验证方式、失败行为和复用路径。
 
 ## License
 
-Moodify is licensed under **GNU GPL v3.0 only** unless otherwise stated.
-
-See `LICENSE`.
+Moodify is licensed under **GNU GPL v3.0 only** unless otherwise stated. See [LICENSE](LICENSE).

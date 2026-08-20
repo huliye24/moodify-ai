@@ -1,0 +1,77 @@
+{
+  "schema_version": "mamse-012-real-cases-v1",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "band_graph": {
+        "graph_id": "agraph-6878bd9cfa0d4ad6",
+        "dirichlet_energy": 1.044913,
+        "high_graph_frequency_ratio": 0.1018,
+        "dc_energy_ratio": 0.3478,
+        "max_local_variation_node": 3
+      },
+      "event_graph": {
+        "graph_id": "agraph-f4c64f07e7102cb8",
+        "nodes": 46,
+        "edges": 72,
+        "connected_components": 10
+      },
+      "correlation_graph": {
+        "graph_id": "agraph-b97d435551d8ccbc",
+        "nodes": 12,
+        "edges": 5,
+        "edge_authority": "DATA_DERIVED"
+      }
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "band_graph": {
+        "graph_id": "agraph-6878bd9cfa0d4ad6",
+        "dirichlet_energy": 1.026566,
+        "high_graph_frequency_ratio": 0.1005,
+        "dc_energy_ratio": 0.4706,
+        "max_local_variation_node": 4
+      },
+      "event_graph": {
+        "graph_id": "agraph-2c71b5b7ce7fdd42",
+        "nodes": 95,
+        "edges": 194,
+        "connected_components": 14
+      },
+      "correlation_graph": {
+        "graph_id": "agraph-1501165644e405f5",
+        "nodes": 12,
+        "edges": 7,
+        "edge_authority": "DATA_DERIVED"
+      }
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "band_graph": {
+        "graph_id": "agraph-6878bd9cfa0d4ad6",
+        "dirichlet_energy": 1.300971,
+        "high_graph_frequency_ratio": 0.1986,
+        "dc_energy_ratio": 0.5568,
+        "max_local_variation_node": 4
+      },
+      "event_graph": {
+        "graph_id": "agraph-c3a0411016ed0ac5",
+        "nodes": 51,
+        "edges": 47,
+        "connected_components": 18
+      },
+      "correlation_graph": {
+        "graph_id": "agraph-230c12a2bc289766",
+        "nodes": 12,
+        "edges": 6,
+        "edge_authority": "DATA_DERIVED"
+      }
+    }
+  ]
+}

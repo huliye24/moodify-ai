@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "corpus/inventory.json",
+    "corpus/inventory.md"
+  ],
+  "non_empty": true
+}

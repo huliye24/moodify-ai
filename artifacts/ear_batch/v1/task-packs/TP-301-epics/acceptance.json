@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "planning/epics.json",
+    "planning/epics.md"
+  ],
+  "non_empty": true
+}

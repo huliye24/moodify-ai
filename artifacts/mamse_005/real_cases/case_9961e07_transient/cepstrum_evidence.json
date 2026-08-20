@@ -1,0 +1,39 @@
+{
+  "authority_class": "EXPERIMENTAL_DESCRIPTOR_ESTIMATOR",
+  "availability": "AVAILABLE",
+  "config": {
+    "f0_max_hz": 500.0,
+    "f0_min_hz": 60.0,
+    "hop_length": 1024,
+    "lifter_cutoff_ms": 2.5,
+    "magnitude_floor": 1e-10,
+    "max_resonance_candidates": 8,
+    "max_resonance_hz": 6000.0,
+    "min_periodicity_score": 0.85,
+    "min_rms_dbfs": -55.0,
+    "n_fft": 4096,
+    "resonance_prominence_db": 1.5,
+    "window": "hann"
+  },
+  "config_hash": "24c749524d4e1803bb299d17ea625deec4f95536796bc31381e726eb3f496ed7",
+  "config_version": "mamse005-cepstrum-v0.1",
+  "fine_to_envelope_energy_ratio": 0.031739733335467396,
+  "frame_count": 8637,
+  "judgment_eligible": false,
+  "limitations": [
+    "source-filter interpretation is strongest for controlled voiced/single-source signals and is not universal for full mixes",
+    "f0 is a cepstral candidate, not ground-truth pitch",
+    "resonance candidates are envelope peaks, not automatically formants",
+    "lifter cutoff and frame size are versioned modeling choices"
+  ],
+  "median_f0_candidate_hz": 390.2439024390244,
+  "median_periodicity_score": 0.7744570976912674,
+  "operator_id": "mamse005-cepstrum",
+  "operator_version": "mamse005-cepstrum-v0.1",
+  "periodicity_available_ratio": 0.14495773995600325,
+  "raw_log_spectrum_roughness": 1.2124513325574748,
+  "runtime_seconds": 48.118609999999535,
+  "sample_rate": 48000,
+  "source_sha256": "859dea8a0ab02422f06010befb49029ff134829f06f51118f272e0a6911041e1",
+  "spectral_envelope_roughness": 0.00482320495133777
+}

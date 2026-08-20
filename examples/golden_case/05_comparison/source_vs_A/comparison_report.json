@@ -1,0 +1,569 @@
+{
+  "case_id": "case_00000000000000000000000000000001",
+  "candidate_id": "case_00000000000000000000000000000001__CAND_A",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "processing_plan_id": "case_00000000000000000000000000000001__PLAN_A",
+  "normalization": {
+    "before_integrated_lufs": -11.64,
+    "after_integrated_lufs": -12.23,
+    "normalization_gain_db": 0.59,
+    "normalization_valid": true,
+    "method": "gain-to-before-LUFS"
+  },
+  "raw_band_deltas": {
+    "sub_20_60_hz": 0.0,
+    "bass_60_120_hz": 0.0,
+    "low_mid_120_250_hz": -1.9e-07,
+    "mid_250_500_hz": 9e-08,
+    "core_mid_500_2000_hz": 1e-07,
+    "presence_2000_5000_hz": 0.0,
+    "brilliance_5000_10000_hz": 0.0,
+    "air_10000_16000_hz": 0.0,
+    "ultrasonic_16000_24000_hz": 0.0
+  },
+  "normalized_band_deltas": {
+    "sub_20_60_hz": -0.0,
+    "bass_60_120_hz": -0.0,
+    "low_mid_120_250_hz": -2e-07,
+    "mid_250_500_hz": 9e-08,
+    "core_mid_500_2000_hz": 1e-07,
+    "presence_2000_5000_hz": 0.0,
+    "brilliance_5000_10000_hz": 0.0,
+    "air_10000_16000_hz": 0.0,
+    "ultrasonic_16000_24000_hz": 0.0
+  },
+  "metrics_delta": {
+    "air_10000_16000_hz": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "band_energy_air_10000_16000_hz": {
+      "before": 0.00024559,
+      "after": 0.0002741,
+      "absolute_delta": 2.9e-05,
+      "unit": "linear-power",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.116088
+    },
+    "band_energy_bass_60_120_hz": {
+      "before": 0.02422653,
+      "after": 0.02115987,
+      "absolute_delta": -0.003067,
+      "unit": "linear-power",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.126583
+    },
+    "band_energy_brilliance_5000_10000_hz": {
+      "before": 0.00020402,
+      "after": 0.00022159,
+      "absolute_delta": 1.8e-05,
+      "unit": "linear-power",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.086119
+    },
+    "band_energy_core_mid_500_2000_hz": {
+      "before": 0.00115613,
+      "after": 0.09447796,
+      "absolute_delta": 0.093322,
+      "unit": "linear-power",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 80.719149
+    },
+    "band_energy_low_mid_120_250_hz": {
+      "before": 1030206.08627734,
+      "after": 900156.94116231,
+      "absolute_delta": -130049.145115,
+      "unit": "linear-power",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.126236
+    },
+    "band_energy_mid_250_500_hz": {
+      "before": 5.26986502,
+      "after": 4.68674003,
+      "absolute_delta": -0.583125,
+      "unit": "linear-power",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.110653
+    },
+    "band_energy_presence_2000_5000_hz": {
+      "before": 0.00012928,
+      "after": 0.00017155,
+      "absolute_delta": 4.2e-05,
+      "unit": "linear-power",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.326965
+    },
+    "band_energy_sub_20_60_hz": {
+      "before": 0.00439773,
+      "after": 0.00382545,
+      "absolute_delta": -0.000572,
+      "unit": "linear-power",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.130131
+    },
+    "band_energy_ultrasonic_16000_24000_hz": {
+      "before": 0.00032686,
+      "after": 0.00037053,
+      "absolute_delta": 4.4e-05,
+      "unit": "linear-power",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.133605
+    },
+    "bass_60_120_hz": {
+      "before": 2e-08,
+      "after": 2e-08,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "brilliance_5000_10000_hz": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "channels": {
+      "before": 1,
+      "after": 1,
+      "absolute_delta": 0,
+      "unit": "ch",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "clipping_sample_count": {
+      "before": 0,
+      "after": 0,
+      "absolute_delta": 0,
+      "unit": "samples",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "clipping_sample_ratio": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "core_mid_500_2000_hz": {
+      "before": 0.0,
+      "after": 1e-07,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "crest_factor_db": {
+      "before": 9.55,
+      "after": 9.34,
+      "absolute_delta": -0.21,
+      "unit": "dB",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.02199
+    },
+    "dc_offset_left": {
+      "before": -6.65e-05,
+      "after": -6.39e-05,
+      "absolute_delta": 3e-06,
+      "unit": "linear",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.039098
+    },
+    "duration": {
+      "before": 4.0,
+      "after": 4.0,
+      "absolute_delta": 0.0,
+      "unit": "s",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "estimated_high_frequency_cutoff_hz": {
+      "before": 228.5,
+      "after": 228.5,
+      "absolute_delta": 0.0,
+      "unit": "Hz",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "estimated_noise_floor_dbfs": {
+      "before": -23.5,
+      "after": -23.7,
+      "absolute_delta": -0.2,
+      "unit": "dBFS",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.008511
+    },
+    "finite_sample_ratio": {
+      "before": 1.0,
+      "after": 1.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "integrated_lufs": {
+      "before": -11.64,
+      "after": -12.23,
+      "absolute_delta": -0.59,
+      "unit": "LUFS",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.050687
+    },
+    "invalid_sample_count": {
+      "before": 0,
+      "after": 0,
+      "absolute_delta": 0,
+      "unit": "samples",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "longest_silence_seconds": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "s",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "loudness_range_lu": {
+      "before": 0.89,
+      "after": 0.9,
+      "absolute_delta": 0.01,
+      "unit": "LU",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.011236
+    },
+    "low_mid_120_250_hz": {
+      "before": 0.99999485,
+      "after": 0.99999466,
+      "absolute_delta": -0.0,
+      "unit": "ratio",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.0
+    },
+    "mid_250_500_hz": {
+      "before": 5.12e-06,
+      "after": 5.21e-06,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "INCREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.017578
+    },
+    "near_clipping_sample_count": {
+      "before": 0,
+      "after": 0,
+      "absolute_delta": 0,
+      "unit": "samples",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "plr_db": {
+      "before": 9.56,
+      "after": 9.35,
+      "absolute_delta": -0.21,
+      "unit": "dB",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.021967
+    },
+    "presence_2000_5000_hz": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "rms_dbfs": {
+      "before": -11.03,
+      "after": -11.61,
+      "absolute_delta": -0.58,
+      "unit": "dBFS",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.052584
+    },
+    "sample_peak_dbfs": {
+      "before": -1.47,
+      "after": -2.27,
+      "absolute_delta": -0.8,
+      "unit": "dBFS",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.544218
+    },
+    "sample_rate": {
+      "before": 48000,
+      "after": 48000,
+      "absolute_delta": 0,
+      "unit": "Hz",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "silence_ratio": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "spectral_centroid_hz": {
+      "before": 220.0,
+      "after": 220.0,
+      "absolute_delta": 0.0,
+      "unit": "Hz",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "spectral_flatness": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "spectral_flux": {
+      "before": 89.192,
+      "after": 83.2089,
+      "absolute_delta": -5.9831,
+      "unit": "mag/frame",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.067081
+    },
+    "spectral_rolloff_85_hz": {
+      "before": 222.7,
+      "after": 222.7,
+      "absolute_delta": 0.0,
+      "unit": "Hz",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "spectral_rolloff_95_hz": {
+      "before": 222.7,
+      "after": 222.7,
+      "absolute_delta": 0.0,
+      "unit": "Hz",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": 0.0
+    },
+    "sub_20_60_hz": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    },
+    "true_peak_dbfs": {
+      "before": -1.47,
+      "after": -2.26,
+      "absolute_delta": -0.79,
+      "unit": "dBFS",
+      "direction": "DECREASE",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": -0.537415
+    },
+    "ultrasonic_16000_24000_hz": {
+      "before": 0.0,
+      "after": 0.0,
+      "absolute_delta": 0.0,
+      "unit": "ratio",
+      "direction": "UNCHANGED",
+      "significance_threshold": null,
+      "significant": null,
+      "relative_delta": null,
+      "relative_delta_reason": "baseline near zero"
+    }
+  },
+  "judgment": {
+    "technical_assessment": "IMPROVED",
+    "workflow_decision": "PASS_TO_LISTENING",
+    "reasons": [
+      "goal met: PRESERVE_DYNAMICS"
+    ],
+    "goals_met": [
+      "PRESERVE_DYNAMICS"
+    ],
+    "guardrail_failures": [],
+    "risk_flags": [],
+    "human_listening_required": true,
+    "artistic_approval_granted": false
+  },
+  "judgment_rules": {
+    "judgment_rules_version": "1.0",
+    "universal_thresholds": {
+      "true_peak_margin_reduced": {
+        "metric": "true_peak_dbfs",
+        "min_margin_db": 0.5
+      },
+      "excessive_loudness_increase": {
+        "metric": "integrated_lufs",
+        "max_increase_db": 4.0
+      },
+      "excessive_dynamic_compression": {
+        "metric": "crest_factor_db",
+        "max_reduction_db": 4.0
+      },
+      "crest_factor_collapse": {
+        "metric": "crest_factor_db",
+        "min_crest_db": 4.0
+      },
+      "new_clipping": {
+        "metric": "clipping_sample_count",
+        "max_count": 0
+      },
+      "low_frequency_overaccumulation": {
+        "metric": "bass_60_120_hz",
+        "max_increase_ratio": 0.03
+      },
+      "high_frequency_overaccumulation": {
+        "metric": "brilliance_5000_10000_hz",
+        "max_increase_ratio": 0.05
+      },
+      "new_high_frequency_cutoff": {
+        "metric": "estimated_high_frequency_cutoff_hz",
+        "max_reduction_hz": 3000.0
+      },
+      "stereo_phase_risk_increased": {
+        "metric": "phase_risk_ratio",
+        "max_increase": 0.02
+      },
+      "negative_correlation_increased": {
+        "metric": "negative_correlation_ratio",
+        "max_increase": 0.02
+      },
+      "duration_changed": {
+        "metric": "duration",
+        "max_abs_delta_s": 0.05
+      },
+      "channel_layout_changed": {
+        "metric": "channels",
+        "max_delta": 0
+      },
+      "sample_rate_changed": {
+        "metric": "sample_rate",
+        "max_delta": 0
+      },
+      "silence_structure_changed": {
+        "metric": "silence_ratio",
+        "max_abs_delta": 0.05
+      },
+      "invalid_audio_samples": {
+        "metric": "invalid_sample_count",
+        "max_count": 0
+      },
+      "analysis_confidence_low": {
+        "metric": "finite_sample_ratio",
+        "min_ratio": 0.999
+      }
+    }
+  },
+  "source_sha256": "e8e61feabb008ee6d695ed93608c2dfcbf4519d119217dab14ba734dbfb0e885",
+  "candidate_sha256": "6eca2361a06b460bd449bbf46d45f583bbb4ce4b55cd71527d0d916bbad87a93",
+  "human_listening_required": true,
+  "artistic_approval_granted": false,
+  "generated_at": "2026-08-10T23:42:09.761376+00:00"
+}

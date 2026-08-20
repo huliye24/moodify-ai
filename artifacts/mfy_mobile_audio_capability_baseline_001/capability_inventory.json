@@ -1,0 +1,60 @@
+{
+  "package_id": "MFY_MOBILE_AUDIO_CAPABILITY_BASELINE_001",
+  "sequence": 67,
+  "kind": "read_only_mobile_audio_baseline",
+  "date": "2026-08-16",
+  "repository": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
+  "branch": "codex/moodify-3.0-external-audio",
+  "head_commit": "f6316612",
+  "classification_legend": {
+    "KEEP": "直接复用,生产级且已接线",
+    "ADAPT": "可复用但需改造/重新接线",
+    "BUILD": "不存在,需新建",
+    "HUMAN_REQUIRED": "依赖人类听感/审美判断,机器不可单独裁决"
+  },
+  "inventory": {
+    "android_playback": {
+      "media3_exoplayer": {"status": "KEEP", "path": "apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt", "maturity": "PRODUCTION", "notes": "Media3 1.10.1, queue/prev/next/seek/A-B 就绪"},
+      "media_session_service": {"status": "KEEP", "path": "apps/android/app/src/main/java/com/moodify/app/PlaybackService.kt", "maturity": "PRODUCTION", "notes": "MediaSessionService + 前台服务,锁屏控制默认提供"},
+      "playback_cache": {"status": "KEEP", "path": "apps/android/app/src/main/java/com/moodify/app/data/PlaybackAudioCache.kt", "maturity": "PRODUCTION", "notes": "SimpleCache 512MB LRU + 10x2MB prefetch"},
+      "local_uri_ingest": {"status": "KEEP", "path": "apps/android/app/src/main/java/com/moodify/app/MainActivity.kt", "maturity": "PRODUCTION", "notes": "VIEW/SEND intent + takePersistableUriPermission,无 SAF 选择器"},
+      "ab_comparison": {"status": "KEEP", "path": "apps/android/app/src/main/java/com/moodify/app/ui/screens/NowPlayingScreen.kt", "maturity": "PRODUCTION", "notes": "原版/处理版相邻入队 + 双按钮,但 NowPlayingScreen 未接线(死代码)"},
+      "custom_audio_sink": {"status": "NOT_FOUND", "path": null, "maturity": null, "notes": "无 AudioTrack/Equalizer/AudioEffect/offload/AudioSink/AudioProcessor 定制,纯 ExoPlayer 默认栈"},
+      "format_transcoding": {"status": "NOT_FOUND", "path": null, "maturity": null, "notes": "无 re-encode/转码/采样率协商"},
+      "playback_tests": {"status": "BUILD", "path": "apps/android/app/src/test, app/src/androidTest", "maturity": null, "notes": "现有测试零覆盖 PlaybackManager/缓存/Service/本地 URI"},
+      "miniapp_components": {"status": "ADAPT", "path": "apps/android/app/src/main/java/com/moodify/app/ui/components/MiniPlayer.kt, ui/screens/NowPlayingScreen.kt, ui/components/PlaybackBar.kt", "maturity": "UNWIRED", "notes": "完整拖拽手势/播放条/NowPlaying 组件已写但未接线,可复用"}
+    },
+    "auditory_core": {
+      "wse_scan": {"status": "KEEP", "path": "moodify-core-package/src/moodify/auditory/service.py", "maturity": "PRODUCTION", "notes": "WSE 扫描链 + FAST/STANDARD/DEEP 三档(profiles.py),FAST 档适合移动端"},
+      "measurement_registry": {"status": "KEEP", "path": "moodify-core-package/configs/measurement_registry_v1.yaml", "maturity": "PRODUCTION", "notes": "judgment_eligible 12 项白名单,权威矩阵"},
+      "events_8": {"status": "KEEP", "path": "moodify-core-package/src/moodify/auditory/events/models.py", "maturity": "PRODUCTION", "notes": "8 类 P0 时间定位事件,FORBIDDEN_LABELS 防审美结论"},
+      "judgment": {"status": "KEEP", "path": "moodify-core-package/src/moodify/auditory/judgment.py", "maturity": "PRODUCTION", "notes": "15 条阈值, REJECT_TECHNICAL/INCONCLUSIVE/PASS_TO_LISTENING"},
+      "authority_fail_closed": {"status": "KEEP", "path": "moodify-core-package/src/moodify/authority/pipeline.py", "maturity": "PRODUCTION", "notes": "fail-closed,非 MACHINE_DECIDED 一律 HUMAN_REQUIRED 且不写 review.json"},
+      "plan_abc": {"status": "KEEP", "path": "moodify-core-package/src/moodify/data_factory/plan_generator.py", "maturity": "PRODUCTION", "notes": "确定性 A/B/C 三强度计划 + P01-P15 工艺卡 + guardrails"},
+      "intervention": {"status": "KEEP", "path": "moodify-core-package/src/moodify/data_factory/intervention.py", "maturity": "PRODUCTION", "notes": "MoodifyDSPChain 执行,24-bit PCM 输出"},
+      "pedalboard_chain": {"status": "KEEP", "path": "moodify-core-package/src/moodify/processing/pedalboard_chain.py", "maturity": "PRODUCTION", "notes": "15 参数链 + process_with_fingerprint/audit"},
+      "algorithmic_review": {"status": "KEEP", "path": "moodify-core-package/src/moodify/data_factory/algorithmic_review.py", "maturity": "PRODUCTION", "notes": "冻结公式 SOURCE/A/B/C 排名"},
+      "comparison_delta": {"status": "KEEP", "path": "moodify-core-package/src/moodify/auditory/comparison.py", "maturity": "PRODUCTION", "notes": "before/after delta + 增量门"},
+      "hpsp_separation": {"status": "EXPERIMENTAL", "path": "moodify-core-package/src/moodify/processing/spectral_chain.py", "maturity": "EXPERIMENTAL", "notes": "HPSS 谐波/打击乐分离,无生产接线,注释声明替代 Demucs"},
+      "stem_separation": {"status": "BUILD", "path": null, "maturity": null, "notes": "3.0 分支无 stems/demucs 模块;LALAL 集成在 E:\\moodify 的 android-2.0 分支(已部署 LA,未进本分支)"},
+      "fingerprint_phys003": {"status": "EXPERIMENTAL", "path": "moodify-core-package/src/moodify/fingerprint.py", "maturity": "EXPERIMENTAL/UNWIRED", "notes": "PHYS-003 处理器效应指纹,无生产调用方"},
+      "reality_metrics": {"status": "EXPERIMENTAL", "path": "moodify-core-package/src/moodify/reality_metrics.py", "maturity": "EXPERIMENTAL/UNWIRED", "notes": "MRS=100*exp(-D_R),无生产调用方"},
+      "case_contracts": {"status": "KEEP", "path": "moodify-core-package/src/moodify/contracts/", "maturity": "PRODUCTION", "notes": "production_case/evidence_artifact/machine_finding/measurement_record 全套"},
+      "node_queue": {"status": "KEEP", "path": "moodify-core-package/src/moodify/node/queue.py", "maturity": "PRODUCTION", "notes": "SQLite JobQueue, 6h lease, retry 3"}
+    },
+    "identity_protection": {
+      "identity_guard": {"status": "BUILD", "path": null, "maturity": null, "notes": "无 DO_NOT_TOUCH/ARTISTIC_INTENT 概念;identity.py 仅逻辑 ID 哈希"},
+      "judgment_increment_gates": {"status": "KEEP", "path": "moodify-core-package/src/moodify/auditory/judgment.py", "maturity": "PRODUCTION", "notes": "before/after 增量门(NEW_CLIPPING/DURATION_CHANGED 等 BLOCKING)是现有最接近的保护"},
+      "device_profile_mapping": {"status": "BUILD", "path": null, "maturity": null, "notes": "禁止把手机型号映射成未测量参数,需设备能力观测层(68/70)"}
+    },
+    "cloud_runtime": {
+      "lalal_stems": {"status": "EXTERNAL", "path": "E:\\moodify\\moodify-core-package\\src\\moodify\\stems(未进 3.0 分支)", "maturity": "PRODUCTION(已部署 LA)", "notes": "/api/v1/stems/* 10 轨异步分离,实测通过,按分钟计费,密钥仅存服务器"},
+      "audiolla_runtime": {"status": "EXTERNAL", "path": "LA /srv/moodify/audiolla(补丁包 66)", "maturity": "PRODUCTION(已部署,未接入生产链)", "notes": "psyb0t/audiolla 0.3.0 docker, 5 引擎, smoke/async/matchering 通过, 127.0.0.1:18080"},
+      "ear_api": {"status": "KEEP", "path": "moodify-core-package/src/moodify/api/main.py", "maturity": "PRODUCTION", "notes": "auditory jobs/analyze/cases + reviews/sessions/calibration 端点"}
+    },
+    "human_gates": {
+      "aesthetic_approval": {"status": "HUMAN_REQUIRED", "path": "moodify-core-package/src/moodify/authority/scope_contract.py", "maturity": "PRODUCTION", "notes": "scope 明确禁止 perceptual preference / artistic quality 结论,艺术批准永远人类"},
+      "blind_listening": {"status": "BUILD", "path": null, "maturity": null, "notes": "无盲听评审设施(72 包做多设备盲听验证)"}
+    }
+  }
+}

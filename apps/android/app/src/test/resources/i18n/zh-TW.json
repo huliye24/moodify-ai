@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "languageName": "中文（繁體）",
+    "locale": "zh-TW"
+  },
+  "common": {
+    "appName": "Moodify",
+    "confirm": "確認",
+    "cancel": "取消",
+    "save": "儲存",
+    "done": "完成",
+    "back": "返回",
+    "next": "下一步",
+    "close": "關閉",
+    "retry": "重試",
+    "delete": "刪除",
+    "edit": "編輯",
+    "search": "搜尋",
+    "loading": "載入中…",
+    "unknownError": "發生了一些問題。",
+    "networkError": "目前無法連線至網路。",
+    "required": "必填",
+    "optional": "選填"
+  },
+  "nav": {
+    "home": "首頁",
+    "process": "聽覺檢測",
+    "works": "作品",
+    "profile": "我的",
+    "discover": "探索音樂",
+    "tasks": "處理任務",
+    "cloud": "雲端空間",
+    "creatorCenter": "創作者中心",
+    "dataCenter": "資料中心",
+    "copyright": "版權與發佈",
+    "partnership": "合作計畫",
+    "settings": "設定",
+    "help": "幫助與回饋",
+    "cases": "案例"
+  },
+  "home": {
+    "title": "聽見別人聽不見的。",
+    "subtitle": "用於音樂分析、判斷、干預與驗證的聽覺智慧。",
+    "startAnalysis": "開始聽覺檢測",
+    "importAudio": "匯入音訊",
+    "recentWorks": "最近作品",
+    "noRecentWorks": "尚無作品"
+  },
+  "analysis": {
+    "title": "音訊分析",
+    "upload": "上傳音訊",
+    "analyzing": "正在聆聽與分析…",
+    "completed": "分析完成",
+    "failed": "分析失敗",
+    "source": "來源檔案",
+    "waveform": "波形",
+    "loudness": "響度",
+    "stereo": "立體聲",
+    "phase": "相位",
+    "spectrum": "頻譜",
+    "transients": "瞬態",
+    "residual": "殘差",
+    "highFrequencyCutoff": "高頻截止",
+    "report": "分析報告",
+    "exportReport": "匯出報告",
+    "processingTitle": "聽覺干預實驗"
+  },
+  "works": {
+    "all": "全部",
+    "drafts": "草稿",
+    "processed": "已處理",
+    "published": "已發佈",
+    "empty": "你的作品會顯示在這裡。",
+    "version": "版本 {{version}}",
+    "updatedAt": "更新於 {{date}}"
+  },
+  "settings": {
+    "title": "設定",
+    "language": "語言",
+    "languageDescription": "選擇 Moodify 的顯示語言。",
+    "followSystem": "跟隨系統語言",
+    "appearance": "外觀",
+    "notifications": "通知",
+    "privacy": "隱私",
+    "about": "關於 Moodify",
+    "languageChanged": "語言已切換為{{language}}。"
+  },
+  "auth": {
+    "signIn": "登入",
+    "signUp": "建立帳戶",
+    "signOut": "登出",
+    "email": "電子郵件",
+    "forgotPassword": "忘記密碼？"
+  },
+  "accessibility": {
+    "openLanguageMenu": "開啟語言選單",
+    "selectedLanguage": "已選擇{{language}}"
+  }
+}

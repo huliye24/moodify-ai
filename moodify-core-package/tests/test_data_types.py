@@ -5,7 +5,6 @@
 """
 
 import json
-import pytest
 from moodify.data_types import (
     ParameterWithUncertainty,
     SpectrumDiagnosis,
@@ -95,9 +94,9 @@ class TestSpaceDiagnosis:
 
 class TestLayersDiagnosis:
     def test_l4_level(self):
-        l = LayersDiagnosis()
-        assert l.L4_LayerCount.level == "L2"
-        assert l.L4_LayerCount.value == 3.0
+        layers = LayersDiagnosis()
+        assert layers.L4_LayerCount.level == "L2"
+        assert layers.L4_LayerCount.value == 3.0
 
 
 class TestEmotionDiagnosis:

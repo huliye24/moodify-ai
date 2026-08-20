@@ -1,0 +1,50 @@
+{
+  "schema_version": "mamse-005-real-cases-v1",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "source_sha256": "06249dc76e4b9b0dd07021f542f9cdde0f25e9974096fbdac537fabe9d63453f",
+      "availability": "AVAILABLE",
+      "frame_count": 6021,
+      "periodicity_available_ratio": 0.010297292808503571,
+      "median_f0_candidate_hz": 333.3333333333333,
+      "median_periodicity_score": 0.7505608833456578,
+      "spectral_envelope_roughness": 0.004228537055810248,
+      "raw_log_spectrum_roughness": 1.2098408929207543,
+      "fine_to_envelope_energy_ratio": 0.031446946611261614,
+      "runtime_seconds": 21.46907959999953
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "source_sha256": "859dea8a0ab02422f06010befb49029ff134829f06f51118f272e0a6911041e1",
+      "availability": "AVAILABLE",
+      "frame_count": 8637,
+      "periodicity_available_ratio": 0.14495773995600325,
+      "median_f0_candidate_hz": 390.2439024390244,
+      "median_periodicity_score": 0.7744570976912674,
+      "spectral_envelope_roughness": 0.00482320495133777,
+      "raw_log_spectrum_roughness": 1.2124513325574748,
+      "fine_to_envelope_energy_ratio": 0.031739733335467396,
+      "runtime_seconds": 48.118609999999535
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "source_sha256": "a52a80eceb292ff788b5502bb9df0f0abd96cc3a26c0a750d9499a6670fe81ed",
+      "availability": "AVAILABLE",
+      "frame_count": 9276,
+      "periodicity_available_ratio": 0.13626563173781803,
+      "median_f0_candidate_hz": 347.82608695652175,
+      "median_periodicity_score": 0.7782232678654285,
+      "spectral_envelope_roughness": 0.0045533300843324616,
+      "raw_log_spectrum_roughness": 1.2192679514774247,
+      "fine_to_envelope_energy_ratio": 0.029945489694379917,
+      "runtime_seconds": 51.47269700000106
+    }
+  ]
+}

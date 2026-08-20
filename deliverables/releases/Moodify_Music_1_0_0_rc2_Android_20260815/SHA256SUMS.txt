@@ -1,0 +1,5 @@
+784405e74bbd98494640c09d60dd2338fa85c5acf6dfc2f0c18b84a9b9d4a29a  Moodify_Music_1.0.0-rc.2_Android_20260815.apk
+929b69450c9d6655838b820691bb0d5ecd0e6a60a5f63d106bd8cec0cc09f4d8  Release Notes.txt
+6448f4634caf6f09af28611218474bd85b886a14e5f73e2bd0a6d1d18eec48aa  Disclaimer.txt
+ab0eac34a87ac2210d64724894f396cf79f56f0c4ca600587ca1a4c8b51e2a29  RELEASE_MANIFEST.json
+f370e32abe8d8bcdbe6de3d8e4428101bd3df88ae115bdd5666f9837ac230b33  Moodify Music Android 安装与版本说明 1.0.0-rc.2.pdf

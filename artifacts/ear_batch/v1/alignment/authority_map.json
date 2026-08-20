@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "authority_source": "AGENTS.md and docs/REPOSITORY_STATUS.md",
+  "allowed_statuses": [
+    "CANONICAL",
+    "EXPERIMENTAL",
+    "LEGACY",
+    "HISTORICAL",
+    "ABSENT",
+    "UNRESOLVED"
+  ],
+  "capabilities": [
+    {
+      "capability": "Audio ingest",
+      "status": "CANONICAL",
+      "implementation": [
+        "moodify-core-package/src/moodify/audio_io.py"
+      ],
+      "evidence": [
+        "moodify-core-package/tests/test_v01_audio_io.py"
+      ]
+    },
+    {
+      "capability": "Wave/spectral analysis",
+      "status": "CANONICAL",
+      "implementation": [
+        "moodify-core-package/src/moodify/v01_analyzer.py"
+      ],
+      "evidence": [
+        "moodify-core-package/tests/test_v01_analyzer_diagnostics_exporter.py"
+      ]
+    },
+    {
+      "capability": "Diagnosis",
+      "status": "CANONICAL",
+      "implementation": [
+        "moodify-core-package/src/moodify/v01_diagnostics.py"
+      ],
+      "evidence": [
+        "moodify-core-package/tests/test_v01_analyzer_diagnostics_exporter.py"
+      ]
+    },
+    {
+      "capability": "Controlled intervention / DSP",
+      "status": "CANONICAL",
+      "implementation": [
+        "moodify-core-package/src/moodify/v01_pipeline.py",
+        "moodify-core-package/src/moodify/processing/pedalboard_chain.py"
+      ],
+      "evidence": [
+        "moodify-core-package/tests/test_v01_pipeline.py"
+      ]
+    },
+    {
+      "capability": "Before/after verification",
+      "status": "EXPERIMENTAL",
+      "implementation": [
+        "inspector_reports",
+        "treatment_records"
+      ],
+      "evidence": [
+        "docs/REPOSITORY_STATUS.md"
+      ],
+      "limitation": "No single canonical comparison contract is verified."
+    },
+    {
+      "capability": "Treatment records",
+      "status": "EXPERIMENTAL",
+      "implementation": [
+        "treatment_records"
+      ],
+      "evidence": [
+        "docs/treatment_records/README.md"
+      ]
+    },
+    {
+      "capability": "Human feedback",
+      "status": "EXPERIMENTAL",
+      "implementation": [
+        "treatment_records"
+      ],
+      "evidence": [
+        "docs/REPOSITORY_STATUS.md"
+      ]
+    },
+    {
+      "capability": "Production-case state machine",
+      "status": "LEGACY",
+      "implementation": [
+        "moodify-core-package/src/moodify/orchestration/workflow_engine.py"
+      ],
+      "evidence": [
+        "docs/REPOSITORY_STATUS.md"
+      ],
+      "limitation": "Must not become authority through this batch."
+    },
+    {
+      "capability": "MSE structural analysis",
+      "status": "ABSENT",
+      "implementation": [],
+      "evidence": [
+        "docs/REPOSITORY_STATUS.md"
+      ]
+    },
+    {
+      "capability": "Cloud runtime",
+      "status": "UNRESOLVED",
+      "implementation": [],
+      "evidence": [
+        "docs/REPOSITORY_STATUS.md"
+      ]
+    },
+    {
+      "capability": "App integration",
+      "status": "UNRESOLVED",
+      "implementation": [],
+      "evidence": [
+        "docs/REPOSITORY_STATUS.md"
+      ]
+    }
+  ],
+  "human_decisions": [
+    "Cloud runtime",
+    "App integration"
+  ]
+}

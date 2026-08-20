@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evidence — Moodify 的证据与成熟度</title>
+  <meta name="description" content="A curated set of publish-safe Moodify evidence items, each with method, version, maturity state, limitation, and date.">
+  <link rel="canonical" href="https://rongjingmusic.com/evidence.html">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <meta property="og:title" content="Moodify Evidence — claims with limits">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/assets/site-public-form-20260820.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Moodify home">
+      <img src="/assets/moodify-logo.png" alt="" width="48" height="32"><span>MOODIFY</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/music.html">Moodify Music</a>
+      <a href="/evidence.html" aria-current="page">Evidence</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" style="border-bottom:0">
+      <p class="eyebrow">EVIDENCE</p>
+      <h1>Claims with limits</h1>
+      <p class="lede">Every public claim on this site carries one of four maturity states — Concept, Experimental, Verified, Human-reviewed — plus method, scope, and limitation. Anything here is reproducible from a stable reference where public release permits.</p>
+    </section>
+
+    <section aria-labelledby="items" style="border-bottom:0">
+      <div class="section-head">
+        <p class="eyebrow">PUBLISH-SAFE ITEMS</p>
+        <h2 id="items">Curated evidence index</h2>
+      </div>
+      <div class="evidence-list">
+        <article class="evidence-item">
+          <h3>Cross-machine measurement repeatability</h3>
+          <p>52/52 metrics identical across operating systems and Python versions under the frozen scan profile. Method: MFY-WSE-SCAN-PROFILE-001. Limitation: profile-scoped; any profile change requires a new version.</p>
+          <span class="maturity verified">Verified · MFY-WSE-SCAN-PROFILE-001 · 2026-08</span>
+        </article>
+        <article class="evidence-item">
+          <h3>Algorithmic review inside a declared scope</h3>
+          <p>Deterministic technical ranking within a validated, versioned scope (MFY-ALGORITHMIC-REVIEW-001). Out-of-scope or unresolved perceptual cases escalate to human review or close as inconclusive. Limitation: technical ranking is not artistic quality or copyright conclusion.</p>
+          <span class="maturity human-reviewed">Human-reviewed · scope boundary · 2026-08</span>
+        </article>
+        <article class="evidence-item">
+          <h3>Failure-injection resilience</h3>
+          <p>Ten injected failures across upload, queue, and verification paths: eight passed with fail-closed evidence; two findings recorded with owners. Limitation: injected scenarios are not an exhaustive failure catalogue.</p>
+          <span class="maturity verified">Verified · 2026-08</span>
+        </article>
+        <article class="evidence-item">
+          <h3>24×7 unattended data node</h3>
+          <p>Ten complete tracks processed with zero out-of-memory and zero deferred jobs on a 2C/2G node; queue survives restarts. Limitation: single-instance deployment; memory policy is under review.</p>
+          <span class="maturity verified">Verified · 2026-08</span>
+        </article>
+        <article class="evidence-item">
+          <h3>Multi-scale auditory representation research</h3>
+          <p>Sixteen operators across time, spectral, phase, cepstral, modulation, and topological representations accepted as experimental research. Limitation: research-grade thresholds are not production calibrations before September.</p>
+          <span class="maturity experimental">Experimental · 2026-08</span>
+        </article>
+      </div>
+      <p class="note" style="margin-top:18px">Not published: internal file paths, private audio, prompts, unreviewed judgment logs, or experimental scores presented as rankings.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>© 2024–2026 荣景文川 · Moodify</span>
+    <nav aria-label="Footer">
+      <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy</a>
+    </nav>
+  </footer>
+</body>
+</html>

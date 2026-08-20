@@ -1,0 +1,14 @@
+{
+  "task": "TP-204",
+  "verified_at": "2026-08-12T00:56:52.548461+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "alignment/orchestration_risks.md",
+      "exists": true,
+      "bytes": 1018,
+      "sha256": "e9246e4368fb0c648eb4ba46b04146f197a53a6513a46b18695907844c54f935",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "work_item": {
+    "id": "WI-007",
+    "epic": "EPIC-03",
+    "title": "Define controlled WSE experiment manifest",
+    "deps": [
+      "WI-002",
+      "WI-003"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "schemas/ear_v1",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "schemas/ear_v1/wse_experiment.schema.json",
+      "tests/ear_v1_contracts/test_wse_experiment_schema.py"
+    ],
+    "acceptance": "Manifest distinguishes transform, expected sensitivity/invariance, tolerances, negative controls, and evidence outputs."
+  },
+  "dependencies": [
+    "IMP-002",
+    "IMP-003"
+  ]
+}

@@ -1,292 +1,184 @@
-"""Moodify API -- v0.1.0 mainline.
-
-v0.1.0 API contract:
-    GET  /health
-    GET  /presets
-    POST /process
-
-Mainline:
-    upload audio -> v01_pipeline.process_audio() -> WAV output
-
-Important:
-    The legacy WorkflowOrchestrator is intentionally NOT used here.
-    It is preserved in moodify.orchestration.workflow_engine for future v1.x.
-"""
+"""Canonical Moodify 1.0 API — The Ear of AI."""
 
 from __future__ import annotations
 
-import json
 import os
 import tempfile
-import time
+from dataclasses import asdict
 from pathlib import Path
-from typing import Optional
+from uuid import uuid4
 
-from fastapi import FastAPI, File, Form, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 
-from moodify.v01_pipeline import process_audio
-from moodify.v01_presets import PRESETS, list_presets
+from moodify.auditory.errors import AuditoryError
+from moodify.release import PRODUCT_VERSION, analyze_to_case, reopen_case
+from moodify.node.config import NodeConfig
+from moodify.node.queue import JobQueue
+from moodify.api.routes.reviews import router as reviews_router
+from moodify.api.routes.stems import router as stems_router
+from moodify.reconstruction_job.routes_reconstruction import router as reconstruction_router
 
-
-APP_VERSION = "0.1.0"
-API_MODE = "v01"
-MAX_SIZE = 50 * 1024 * 1024  # 50 MB
-DEFAULT_OUTPUT_DIR = "outputs"
-DEFAULT_PRESET = "clean_master"
-
+MAX_SIZE = int(os.environ.get("MOODIFY_MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
+ALLOWED_SUFFIXES = {".wav", ".mp3", ".flac", ".m4a", ".ogg", ".aac"}
 
 app = FastAPI(
-    title="Moodify",
-    version=APP_VERSION,
-    description="Moodify v0.1.0 -- AI music post-processing engine",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    title="Moodify — The Ear of AI",
+    version=PRODUCT_VERSION,
+    description="Can machines learn to hear? Evidence-backed auditory intelligence.",
 )
 
 
-# Legacy emotion compatibility.
-# v0.1.0 canonical API uses `preset`.
-# `emotion` is accepted only to avoid breaking old frontend/API calls.
-EMOTION_TO_PRESET = {
-    "gentle_awakening": "warm_vocal",
-    "温柔觉醒": "warm_vocal",
-    "sacred_ethereal": "warm_vocal",
-    "神圣空灵": "warm_vocal",
-    "warm": "warm_vocal",
-    "vocal": "warm_vocal",
-
-    "dark_romance": "wide_space",
-    "黑暗浪漫": "wide_space",
-    "cinematic": "wide_space",
-    "电影感": "wide_space",
-    "space": "wide_space",
-    "wide": "wide_space",
-
-    "clean": "clean_master",
-    "master": "clean_master",
-    "default": "clean_master",
-    "clean_master": "clean_master",
-}
+def _cases_root() -> Path:
+    return Path(os.environ.get("MOODIFY_CASES_ROOT", "outputs/moodify_cases"))
 
 
-def _resolve_preset(preset: Optional[str], emotion: Optional[str]) -> tuple[str, str]:
-    """Resolve API input to one v0.1.0 preset.
-
-    Priority:
-        1. preset
-        2. emotion -> preset compatibility mapping
-        3. clean_master fallback
-
-    Returns:
-        (resolved_preset, source)
-    """
-    valid_presets = set(list_presets())
-
-    if preset:
-        key = preset.strip()
-        if key not in valid_presets:
-            raise HTTPException(
-                status_code=400,
-                detail={
-                    "error": f"Unknown preset: {key}",
-                    "valid_presets": sorted(valid_presets),
-                },
-            )
-        return key, "preset"
-
-    if emotion:
-        key = emotion.strip()
-        mapped = EMOTION_TO_PRESET.get(key)
-
-        # Also allow users to pass a preset in the old emotion field.
-        if key in valid_presets:
-            return key, "emotion_as_preset"
-
-        if mapped:
-            return mapped, "emotion_mapping"
-
-        return DEFAULT_PRESET, "emotion_fallback"
-
-    return DEFAULT_PRESET, "default"
+def _node_config() -> NodeConfig:
+    return NodeConfig.from_env()
 
 
-def _result_header(result, elapsed_ms: float, preset_source: str) -> str:
-    """Compact JSON metadata for response header."""
-    payload = {
-        "success": result.success,
-        "preset": result.preset,
-        "preset_source": preset_source,
-        "elapsed_ms": round(elapsed_ms, 1),
-        "output": Path(result.output_path).name if result.output_path else "",
-        "health": result.diagnosis.overall_health if result.diagnosis else "",
-        "issues": result.diagnosis.issues[:3] if result.diagnosis else [],
-    }
-    return json.dumps(payload, ensure_ascii=True)[:1000]
+def _queue() -> JobQueue:
+    config = _node_config()
+    return JobQueue(config.db_path, lease_seconds=config.lease_seconds)
+
+
+def _public_job(job) -> dict:
+    payload = asdict(job)
+    payload.pop("source_path", None)
+    payload.pop("output_root", None)
+    payload.pop("case_dir", None)
+    if payload.get("last_error"):
+        payload["last_error"] = "Auditory processing failed; the evidence was retained for operator review."
+    payload["result_ready"] = job.status == "SUCCEEDED" and bool(job.case_dir)
+    return payload
+
+
+def _safe_json(path: Path) -> dict | list | None:
+    import json
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+app.include_router(reviews_router)
+app.include_router(stems_router)
+app.include_router(reconstruction_router)
 
 
 @app.get("/health")
-async def health():
+async def health() -> dict:
+    counts = _queue().counts()
     return {
         "status": "ok",
-        "version": APP_VERSION,
-        "mode": API_MODE,
-        "mainline": "v01_pipeline",
+        "product": "Moodify",
+        "version": PRODUCT_VERSION,
+        "identity": "The Ear of AI",
+        "queue": counts,
     }
 
 
-@app.get("/presets")
-async def presets():
-    """List v0.1.0 processing presets."""
-    return {
-        "version": APP_VERSION,
-        "mode": API_MODE,
-        "default": DEFAULT_PRESET,
-        "presets": [
-            {
-                "key": key,
-                "name": value["name"],
-                "name_zh": value["name_zh"],
-                "description": value["description"],
-            }
-            for key, value in PRESETS.items()
-        ],
-    }
+@app.get("/api/v1/health")
+async def api_health() -> dict:
+    return await health()
 
 
-@app.post("/process")
-async def process(
-    audio: UploadFile = File(...),
-    preset: Optional[str] = Form(
-        None,
-        description="v0.1.0 preset: warm_vocal / clean_master / wide_space",
-    ),
-    emotion: Optional[str] = Form(
-        None,
-        description="Legacy emotion parameter. Accepted for compatibility only.",
-    ),
-    platform: str = Form(
-        "spotify",
-        description="Legacy field. Accepted but ignored in v0.1.0.",
-    ),
-    output_dir: str = Form(
-        DEFAULT_OUTPUT_DIR,
-        description="Output directory for processed audio and report.",
-    ),
-    return_json: bool = Form(
-        False,
-        description="If true, return JSON metadata instead of WAV file.",
-    ),
-):
-    """Process one audio file through the v0.1.0 pipeline.
-
-    v0.1.0 flow:
-        upload -> analyze -> diagnose -> preset DSP -> export WAV
-
-    Success default:
-        returns audio/wav FileResponse
-
-    Optional:
-        return_json=true returns metadata JSON instead of file.
-    """
-    resolved_preset, preset_source = _resolve_preset(preset, emotion)
-
-    ext = Path(audio.filename or "upload.wav").suffix or ".wav"
-
-    with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tf:
-        content = await audio.read()
-
-        if len(content) > MAX_SIZE:
-            raise HTTPException(
-                status_code=413,
-                detail=f"File too large. Max {MAX_SIZE // 1024**2} MB",
-            )
-
-        tf.write(content)
-        tmp_path = tf.name
-
-    t0 = time.perf_counter()
-
+@app.post("/api/v1/auditory/jobs", status_code=202)
+async def create_job(audio: UploadFile = File(...), prompt: str = Form(default="")) -> dict:
+    """Persist an upload and enqueue it in the canonical unattended node queue."""
+    config = _node_config()
+    queue = _queue()
+    if sum(queue.counts().values()) >= int(os.environ.get("MOODIFY_MAX_RETAINED_JOBS", "500")):
+        raise HTTPException(status_code=503, detail={"code": "QUEUE_CAPACITY_REACHED"})
+    suffix = Path(audio.filename or "upload.wav").suffix.lower()
+    if suffix not in ALLOWED_SUFFIXES:
+        raise HTTPException(status_code=415, detail={"code": "AUDIO_TYPE_UNSUPPORTED"})
+    upload_root = config.state_dir / "uploads"
+    upload_root.mkdir(parents=True, exist_ok=True)
+    path = upload_root / f"upload_{uuid4().hex}{suffix}"
+    size = 0
     try:
-        result = process_audio(
-            input_path=tmp_path,
-            preset=resolved_preset,
-            output_dir=output_dir,
-        )
-        elapsed_ms = (time.perf_counter() - t0) * 1000
-
-        if not result.success:
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "success": False,
-                    "version": APP_VERSION,
-                    "mode": API_MODE,
-                    "preset": resolved_preset,
-                    "preset_source": preset_source,
-                    "error": result.error,
-                    "elapsed_ms": round(elapsed_ms, 1),
-                },
-            )
-
-        diagnosis = result.diagnosis.to_dict() if result.diagnosis else {}
-        metrics = (
-            result.metrics_before.to_dict()
-            if result.metrics_before
-            else {}
-        )
-
-        response_payload = {
-            "success": True,
-            "version": APP_VERSION,
-            "mode": API_MODE,
-            "preset": result.preset,
-            "preset_source": preset_source,
-            "legacy_platform_ignored": platform,
-            "output_path": result.output_path,
-            "elapsed_ms": round(elapsed_ms, 1),
-            "diagnosis": diagnosis,
-            "metrics_before": metrics,
-        }
-
-        if return_json:
-            return response_payload
-
-        if not result.output_path or not Path(result.output_path).exists():
-            raise HTTPException(
-                status_code=500,
-                detail="Processing succeeded but output file was not found.",
-            )
-
-        return FileResponse(
-            result.output_path,
-            media_type="audio/wav",
-            filename=Path(result.output_path).name,
-            headers={
-                "X-Moodify-Version": APP_VERSION,
-                "X-Moodify-Mode": API_MODE,
-                "X-Moodify-Preset": result.preset,
-                "X-Moodify-Preset-Source": preset_source,
-                "X-Process-Result": _result_header(
-                    result=result,
-                    elapsed_ms=elapsed_ms,
-                    preset_source=preset_source,
-                ),
-            },
-        )
-
-    except HTTPException:
+        with path.open("xb") as handle:
+            while chunk := await audio.read(1024 * 1024):
+                size += len(chunk)
+                if size > MAX_SIZE:
+                    raise HTTPException(status_code=413, detail={"code": "AUDIO_TOO_LARGE"})
+                handle.write(chunk)
+        if size == 0:
+            raise HTTPException(status_code=422, detail={"code": "AUDIO_EMPTY"})
+        job = queue.enqueue(path, config.output_root)
+    except Exception:
+        path.unlink(missing_ok=True)
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "job": _public_job(job),
+        "request": {"filename": Path(audio.filename or "upload").name, "prompt": prompt[:1000]},
+    }
+
+
+@app.get("/api/v1/auditory/jobs/{job_id}")
+async def get_job(job_id: str) -> dict:
+    job = _queue().get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail={"code": "JOB_NOT_FOUND"})
+    return {"job": _public_job(job)}
+
+
+@app.get("/api/v1/auditory/jobs/{job_id}/result")
+async def get_job_result(job_id: str) -> dict:
+    job = _queue().get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail={"code": "JOB_NOT_FOUND"})
+    if job.status != "SUCCEEDED" or not job.case_dir:
+        raise HTTPException(status_code=409, detail={"code": "RESULT_NOT_READY", "status": job.status})
+    case_dir = Path(job.case_dir).resolve()
+    output_root = Path(job.output_root).resolve()
+    if output_root not in case_dir.parents:
+        raise HTTPException(status_code=500, detail={"code": "RESULT_PATH_INVALID"})
+    return {
+        "job": _public_job(job),
+        "case_manifest": _safe_json(case_dir / "case_manifest.json"),
+        "production_case": _safe_json(case_dir / "production_case.json"),
+        "algorithmic_review": _safe_json(case_dir / "06_human_review" / "review.json"),
+        "algorithmic_scores": _safe_json(case_dir / "06_human_review" / "algorithmic_scores.json"),
+    }
+
+
+@app.post("/api/v1/auditory/analyze")
+async def analyze(audio: UploadFile = File(...)) -> dict:
+    content = await audio.read(MAX_SIZE + 1)
+    if len(content) > MAX_SIZE:
+        raise HTTPException(status_code=413, detail={"code": "AUDIO_TOO_LARGE"})
+    suffix = Path(audio.filename or "upload.wav").suffix or ".wav"
+    tmp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as handle:
+            handle.write(content)
+            tmp_path = Path(handle.name)
+        return analyze_to_case(
+            tmp_path,
+            _cases_root(),
+            display_name=Path(audio.filename or "upload.wav").name,
+        )
+    except AuditoryError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={"code": type(exc).__name__.upper(), "message": str(exc)},
+        ) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "ANALYSIS_FAILED", "message": str(exc)},
+        ) from exc
     finally:
-        try:
-            os.unlink(tmp_path)
-        except OSError:
-            pass
+        if tmp_path is not None:
+            tmp_path.unlink(missing_ok=True)
+
+
+@app.get("/api/v1/auditory/cases/{case_id}")
+async def get_case(case_id: str) -> dict:
+    try:
+        return reopen_case(_cases_root(), case_id)
+    except (OSError, ValueError) as exc:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "CASE_NOT_FOUND", "message": "case not found"},
+        ) from exc

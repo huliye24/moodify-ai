@@ -18,6 +18,85 @@ from pathlib import Path
 SUPPORTED_EXTENSIONS = {'.wav', '.mp3', '.flac', '.aiff', '.aif', '.m4a', '.ogg'}
 
 
+def cmd_identity_guard(args):
+    """[MFY-CR-P05] Identity Guard v0.1 — source vs candidate 身份保护"""
+    import json
+    from pathlib import Path as _Path
+
+    from moodify.identity_guard.guard import guard_candidate
+
+    source = json.loads(_Path(args.source).read_text(encoding="utf-8"))
+    candidate = json.loads(_Path(args.candidate).read_text(encoding="utf-8"))
+    verdict = guard_candidate(source, candidate,
+                              candidate_id=args.candidate_id, source_id=args.source_id)
+    out_dir = _Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "identity_guard.v0.1.json").write_text(
+        json.dumps(verdict.to_dict(), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(f"overall: {verdict.state.value}")
+    for d in verdict.deltas:
+        nd = d.normalized_delta if d.normalized_delta is not None else "-"
+        print(f"  [{d.dimension.value}] {d.guard_state.value} (norm={nd}) — {d.notes[:60]}")
+    if verdict.human_review_question:
+        print(f"human review: {verdict.human_review_question[:80]}...")
+    print(f"wrote {out_dir / 'identity_guard.v0.1.json'}")
+    return 0
+
+
+def cmd_era_diagnostic(args):
+    """[MFY-CR-P03] Era Diagnostic v0.1 — 年代技术限制诊断（只诊断，不授权处理）"""
+    import json
+
+    from moodify.era_diagnostic.engine import run_era_diagnostic
+    from moodify.era_diagnostic.report import dump_json, dump_markdown
+
+    if args.metrics and args.audio:
+        print("ERROR: choose --metrics OR --audio, not both")
+        return 2
+
+    if args.metrics:
+        with open(args.metrics, encoding="utf-8") as fh:
+            metrics = json.load(fh)
+        source = args.metrics
+    elif args.audio:
+        from moodify.auditory.decode import decode
+        from moodify.auditory.metrics import compute_metrics
+        from moodify.auditory.stereo import compute_stereo_metrics
+
+        audio = decode(Path(args.audio), 48000, 300)
+        metrics = compute_metrics(audio.samples, audio.sample_rate, audio.probe)
+        metrics.update(compute_stereo_metrics(audio.samples))
+        metrics["sample_rate"] = {"value": audio.probe.sample_rate, "unit": "Hz",
+                                  "method": "ffprobe", "status": "VALID", "warnings": []}
+        metrics["channels"] = {"value": (audio.samples.shape[1] if audio.samples.ndim > 1 else 1),
+                               "unit": "ch", "method": "ffprobe", "status": "VALID", "warnings": []}
+        source = args.audio
+    else:
+        print("ERROR: provide --audio PATH or --metrics FILE")
+        return 2
+
+    findings = run_era_diagnostic(
+        metrics, production_case_id=args.case_id, scope="era-diagnostic-v0.1"
+    )
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    dump_json(findings, out_dir / "era_diagnostic.v0.1.json", source_identifier=source,
+              era_hint=args.era_hint)
+    dump_markdown(findings, out_dir / "ERA_DIAGNOSTIC_REPORT.md", source_identifier=source,
+                  era_hint=args.era_hint)
+
+    for finding in findings:
+        conf = finding.confidence.value if finding.confidence else "-"
+        print(f"[{finding.category.value}] {finding.status.value} (conf={conf}) — "
+              f"{finding.reasoning_summary}")
+    print(f"wrote {out_dir / 'era_diagnostic.v0.1.json'} + "
+          f"{out_dir / 'ERA_DIAGNOSTIC_REPORT.md'}")
+    print("note: no reconstruction action was authorized by this diagnostic alone.")
+    return 0
+
+
 def cmd_legacy_analyze(args):
     """[legacy] 旧系统诊断分析"""
     from moodify.diagnosis.engine import DiagnosisEngine
@@ -376,6 +455,24 @@ def main():
     p_analyze.add_argument("--output-dir", default="outputs", help="输出目录")
     p_analyze.add_argument("--json", action="store_true", help="JSON 格式输出")
 
+    # identity-guard (MFY-CR-P05)
+    p_ig = sub.add_parser("identity-guard",
+                          help="[MFY-CR-P05] 原作身份保护（source vs candidate，多维 + veto）")
+    p_ig.add_argument("--source", required=True, help="source metrics JSON")
+    p_ig.add_argument("--candidate", required=True, help="candidate metrics JSON")
+    p_ig.add_argument("--source-id", default="source", help="source id")
+    p_ig.add_argument("--candidate-id", default="candidate", help="candidate id")
+    p_ig.add_argument("--out-dir", default="outputs", help="输出目录")
+
+    # era-diagnostic (MFY-CR-P03)
+    p_era = sub.add_parser("era-diagnostic",
+                           help="[MFY-CR-P03] 年代技术限制诊断（只诊断，不授权处理）")
+    p_era.add_argument("--metrics", help="metrics JSON 文件（scan 输出格式）")
+    p_era.add_argument("--audio", help="直接对音频文件计算指标并诊断")
+    p_era.add_argument("--out-dir", default="outputs", help="输出目录")
+    p_era.add_argument("--case-id", default=None, help="ProductionCase id（可选）")
+    p_era.add_argument("--era-hint", default=None, help="年代 metadata（仅 context，不进入决策）")
+
     # process (v0.1.0 mainline)
     p_process = sub.add_parser("process", help="一键处理音频 [v0.1.0]")
     p_process.add_argument("audio_path", help="音频文件路径")
@@ -464,6 +561,10 @@ def main():
         return 0
 
     handlers = {
+        # identity guard (MFY-CR-P05)
+        "identity-guard": cmd_identity_guard,
+        # era diagnostic (MFY-CR-P03)
+        "era-diagnostic": cmd_era_diagnostic,
         # v0.1.0 mainline
         "analyze": cmd_v01_analyze,
         "process": cmd_v01_process,

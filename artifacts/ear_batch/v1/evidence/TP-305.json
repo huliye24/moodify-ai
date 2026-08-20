@@ -1,0 +1,21 @@
+{
+  "task": "TP-305",
+  "verified_at": "2026-08-12T01:14:53.384102+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "planning/unattended_batch.json",
+      "exists": true,
+      "bytes": 6765,
+      "sha256": "d53d1d0f2bbafbc463c9224ab70dacd266fae3bfdebfcf72761acbad27627d93",
+      "passed": true
+    },
+    {
+      "path": "planning/unattended_batch.md",
+      "exists": true,
+      "bytes": 910,
+      "sha256": "084c156f7dd59c67db112089d59476d6d808b4c42d462cbb6777f7fd7ea931b6",
+      "passed": true
+    }
+  ]
+}

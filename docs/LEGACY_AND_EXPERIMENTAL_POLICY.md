@@ -1,5 +1,11 @@
 # Legacy and Experimental Policy
 
+**Status:** CANONICAL classification policy
+
+**Public identity authority:** `AGENTS.md` → `docs/canon/*` → `docs/brand/public/*`
+
+**Updated:** 2026-08-20
+
 ## Purpose
 
 Moodify has evolved through multiple architectures.
@@ -48,7 +54,7 @@ The useful processing code remains active as the:
 
 Historical papers can retain their original terminology.
 
-Current entry points must use the canonical “The Ear of AI / Auditory Intelligence” identity.
+Current public entry points must use the canonical **Moodify Music / Moodify Player** identity, the product principle **Listen. Then Play.**, and the primary action **Play**. Moodify Ear / Auditory Intelligence may appear only as an explicitly internal system or in research, evidence, and historical contexts.
 
 Recommended current entry points:
 
@@ -58,4 +64,4 @@ Recommended current entry points:
 - architecture docs;
 - current API/package metadata.
 
-Historical documents should be clearly identifiable as historical if they contradict the current identity.
+Historical documents should be clearly identifiable as `HISTORICAL`, `SUPERSEDED`, or `INTERNAL` if they contradict the current public identity. A historical document's original wording may be preserved for provenance, but its header must point readers to `docs/canon/CURRENT_CANON.md`.

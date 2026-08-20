@@ -1,0 +1,13 @@
+{
+  "product": "Moodify Music",
+  "versionName": "3.0.0",
+  "versionCode": 30,
+  "packageName": "com.moodify.app",
+  "releaseDate": "2026-08-16",
+  "baselineCommit": "91e99e87",
+  "feature": "external_audio_open_with",
+  "uiChanged": false,
+  "launcherIconChanged": false,
+  "apk": "Moodify_Music_3.0.0_Android_20260816.apk",
+  "sha256": "5b519a1604ab07621941b44da2aab67f3547ba295df256a18be7e4ffe24b3e9f"
+}

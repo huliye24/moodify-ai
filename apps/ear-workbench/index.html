@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moodify Ear — 听觉工作台</title>
+  <meta name="description" content="Moodify Ear workbench — introduce one sound and trace the full auditory loop with evidence.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/assets/workbench.css">
+</head>
+<body data-page="home">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden>M</span>MOODIFY EAR</a>
+      <nav aria-label="Ear">
+        <a href="/" aria-current="page">Home</a>
+        <a href="/new-case.html">New Listening Case</a>
+        <a href="/evidence.html">Evidence Library</a>
+        <a href="/status.html">System Status</a>
+      </nav>
+      <div class="instrument" aria-live="polite">
+        <span data-instrument="identity"></span>
+        <span data-instrument="queue"></span>
+        <span data-instrument="version"></span>
+      </div>
+    </aside>
+    <main class="content">
+      <p class="eyebrow">INTERNAL OPERATOR SYSTEM / THE EAR OF AI</p>
+      <h1 class="page-title">Listening, as an instrument</h1>
+      <p class="lede">Introduce one sound. Follow it through Listen → Represent → Judge → Intervene → Verify → Learn — with evidence at every step and human authority where required.</p>
+
+      <div class="instrument-bar">
+        <span class="note">Instrument state:</span>
+        <span id="home-state" class="pill neutral"><span class="dot" aria-hidden></span>ready</span>
+        <a class="btn btn-primary" href="/new-case.html" style="margin-left:auto">Introduce a sound</a>
+      </div>
+
+      <div class="loop" aria-label="Canonical auditory loop">
+        <div class="stage"><b>Listen</b><span>acquire with identity</span></div>
+        <div class="stage"><b>Represent</b><span>measure and structure</span></div>
+        <div class="stage"><b>Judge</b><span>finding with evidence</span></div>
+        <div class="stage"><b>Intervene</b><span>controlled candidates</span></div>
+        <div class="stage"><b>Verify</b><span>before / after</span></div>
+        <div class="stage"><b>Learn</b><span>reuse and rules</span></div>
+      </div>
+
+      <h2 style="font-size:20px;margin:36px 0 12px">Recent cases</h2>
+      <div class="cards" id="recent-jobs"></div>
+    </main>
+  </div>
+  <script src="/assets/workbench.js"></script>
+</body>
+</html>

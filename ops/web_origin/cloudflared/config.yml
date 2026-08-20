@@ -1,0 +1,19 @@
+tunnel: 92f54925-3754-4093-9ac9-1702a14e2a70
+credentials-file: /root/.cloudflared/92f54925-3754-4093-9ac9-1702a14e2a70.json
+
+ingress:
+  - hostname: origin-test.rongjingmusic.com
+    service: http://127.0.0.1:80
+    originRequest:
+      httpHostHeader: rongjingmusic.com
+  - hostname: origin-test.rongjingwenchuan.com
+    service: http://127.0.0.1:80
+    originRequest:
+      httpHostHeader: rongjingwenchuan.com
+  - hostname: rongjingmusic.com
+    service: http://127.0.0.1:80
+  - hostname: rongjingwenchuan.com
+    service: http://127.0.0.1:80
+  - hostname: rongjinwenchuan.xyz
+    service: http://127.0.0.1:80
+  - service: http_status:404

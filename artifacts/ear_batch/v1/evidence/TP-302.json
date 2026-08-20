@@ -1,0 +1,21 @@
+{
+  "task": "TP-302",
+  "verified_at": "2026-08-12T01:14:50.592805+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "planning/work_items.jsonl",
+      "exists": true,
+      "bytes": 5403,
+      "sha256": "6d642ec6d2506b1f03d4e50260eb5be7f7f65b8a2fca5f97185c41158fd2f85c",
+      "passed": true
+    },
+    {
+      "path": "planning/work_items.md",
+      "exists": true,
+      "bytes": 1102,
+      "sha256": "d370c095c65aad154afc59835e4daa9a11cee0283c350e6b480e8cb4f44f3a4d",
+      "passed": true
+    }
+  ]
+}

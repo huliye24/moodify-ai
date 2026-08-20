@@ -5,10 +5,9 @@
       estimate_cr_eff, compute_icc
 """
 
-import pytest
 from moodify.uncertainty import UncertaintyResult, ConfidenceLevel
 from moodify.protocol import MeasurementRecord, PROTOCOL_VERSION, STFT_CONFIG_STANDARD
-from moodify.fingerprint import ProcessorFingerprint, estimate_cr_eff
+from moodify.fingerprint import estimate_cr_eff
 from moodify.conservation import ConservationReport, audit_conservation
 from moodify.icc import compute_icc
 

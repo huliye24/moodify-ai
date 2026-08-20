@@ -1,0 +1,46 @@
+# Temporal analysis profile v1 (MFY-PHASE1-DEPTH-002).
+# One canonical, versioned profile for time-localized auditory events.
+# Different phenomena need different scales; values are engineering
+# defaults, not immutable truths. Changing the profile invalidates
+# compatible derived events.
+profile_id: temporal-hearing-v1
+sample_rate_policy: preserve_input
+
+analysis_domains:
+  integrity:
+    window_ms: 100
+    hop_ms: 50
+    # clipping/near-clipping/silence are short-scale phenomena
+  level:
+    window_ms: 400
+    hop_ms: 100
+    # loudness spikes/drops need medium scale to avoid noise sensitivity
+  spectrum:
+    window_ms: 1000
+    hop_ms: 250
+    # spectral dropout needs stable long-window energy estimates
+  stereo:
+    window_ms: 500
+    hop_ms: 100
+    # correlation stability requires enough samples per window
+
+event_merge:
+  default_gap_tolerance_ms: 150
+  minimum_event_duration_ms: 100
+
+detector_thresholds:
+  clipping_ratio_min: 0.02
+  clipping_min_windows: 2
+  near_clipping_ratio_min: 0.10
+  near_clipping_min_windows: 2
+  silence_rms_dbfs_max: -60.0
+  silence_min_duration_ms: 500
+  negative_correlation_max: -0.5
+  negative_corr_min_windows: 2
+  phase_risk_min_windows: 2
+  hf_dropout_ratio_threshold: 0.5
+  hf_dropout_min_windows: 3
+  level_spike_db: 6.0
+  level_spike_min_windows: 1
+  level_drop_db: 6.0
+  level_drop_min_windows: 2

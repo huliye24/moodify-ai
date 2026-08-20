@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "alignment/authority_map.json",
+    "alignment/authority_review.md"
+  ],
+  "non_empty": true
+}

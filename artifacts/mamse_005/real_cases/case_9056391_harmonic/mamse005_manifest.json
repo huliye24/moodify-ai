@@ -1,0 +1,42 @@
+{
+  "schema_version": "mamse-005-manifest-v1",
+  "operator_id": "mamse005-cepstrum",
+  "operator_version": "mamse005-cepstrum-v0.1",
+  "config_version": "mamse005-cepstrum-v0.1",
+  "config_hash": "24c749524d4e1803bb299d17ea625deec4f95536796bc31381e726eb3f496ed7",
+  "config": {
+    "n_fft": 4096,
+    "hop_length": 1024,
+    "window": "hann",
+    "magnitude_floor": 1e-10,
+    "lifter_cutoff_ms": 2.5,
+    "f0_min_hz": 60.0,
+    "f0_max_hz": 500.0,
+    "min_rms_dbfs": -55.0,
+    "min_periodicity_score": 0.85,
+    "max_resonance_hz": 6000.0,
+    "resonance_prominence_db": 1.5,
+    "max_resonance_candidates": 8
+  },
+  "source_sha256": "06249dc76e4b9b0dd07021f542f9cdde0f25e9974096fbdac537fabe9d63453f",
+  "sample_rate": 48000,
+  "git_commit": "8e291b2c0dbcb372a854d537980eb7a668ba6203",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "resource": {
+    "runtime_seconds": 21.46907959999953
+  },
+  "availability": "AVAILABLE",
+  "authority_class": "EXPERIMENTAL_DESCRIPTOR_ESTIMATOR",
+  "judgment_eligible": false,
+  "limitations": [
+    "source-filter interpretation is strongest for controlled voiced/single-source signals and is not universal for full mixes",
+    "f0 is a cepstral candidate, not ground-truth pitch",
+    "resonance candidates are envelope peaks, not automatically formants",
+    "lifter cutoff and frame size are versioned modeling choices"
+  ],
+  "generated_at_utc": "2026-08-11T11:18:24+00:00"
+}

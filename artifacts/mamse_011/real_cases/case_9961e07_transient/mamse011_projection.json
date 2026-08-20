@@ -1,0 +1,37 @@
+{
+  "case": "case_9961e07_transient",
+  "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+  "duration_s": 184.32,
+  "n_rows": 1840,
+  "reference_model_id": "covmodel-2112890b9e3887fc",
+  "complete_rows": 920,
+  "shrinkage_alpha": 0.007922783793048019,
+  "effective_rank": 5.554501499247509,
+  "lag1_by_feature": {
+    "band_air": 0.592,
+    "band_bass": 0.842,
+    "band_brilliance": 0.576,
+    "band_core_mid": 0.826,
+    "band_low_mid": 0.847,
+    "band_mid": 0.868,
+    "band_presence": 0.729,
+    "band_sub": 0.796,
+    "peak_db": 0.935,
+    "rms_db": 0.962,
+    "spectral_centroid_hz": 0.68,
+    "stereo_correlation": 0.905
+  },
+  "neff_ratio_min": 0.019,
+  "mahalanobis_second_half": {
+    "median_d2": 20.23,
+    "frac_above_q95": 0.0576,
+    "frac_above_q99": 0.0163
+  },
+  "relation_break_injection": {
+    "feature": "rms_db",
+    "median_d2": 22.692,
+    "frac_above_q95": 0.1989,
+    "frac_above_q99": 0.1337,
+    "increment": "RELATION_BREAK_CANDIDATE"
+  }
+}

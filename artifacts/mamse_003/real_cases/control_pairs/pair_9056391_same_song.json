@@ -1,0 +1,21 @@
+{
+  "label": "9056391_same_song",
+  "a": {
+    "path": "..\\outputs\\mamse001_sources\\case_9056391_candidate_A.wav",
+    "sha256": "65b3298b30dcf2e1e0b69c5ace29dd03be8b20a642592e4de111652dd456a61c",
+    "high_modulation_ratio": 0.16834092084591099,
+    "texture_entropy": 0.8578539156653998,
+    "stationarity_index": 0.4086065930922745,
+    "texture_sparsity": 0.33410717806172746
+  },
+  "b": {
+    "path": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+    "sha256": "9671437aa1238c1d157bbc698416d6a073cbe073a9a6bca8289aa52c00f6626a",
+    "high_modulation_ratio": 0.1688476738502468,
+    "texture_entropy": 0.8511591245498822,
+    "stationarity_index": 0.40746926067056505,
+    "texture_sparsity": 0.34294741155110425
+  },
+  "first_order_cosine": 0.9994994589829562,
+  "modulation_cosine": 0.999998273147293
+}

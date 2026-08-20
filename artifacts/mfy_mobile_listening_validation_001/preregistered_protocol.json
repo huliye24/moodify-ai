@@ -1,0 +1,57 @@
+{
+  "version": "mfy-listening-protocol-v1",
+  "candidates_frozen": "mfy-intervention-v1",
+  "primitives": [
+    "dc_offset_fix",
+    "clip_peak_repair"
+  ],
+  "level_match_db_max": 0.5,
+  "switch_latency_ms_max": 100.0,
+  "alpha": 0.05,
+  "min_sessions_per_stratum": 3,
+  "endpoints": [
+    "preference",
+    "identity_kept",
+    "difference_audible"
+  ],
+  "strata": [
+    {
+      "era": "old_record",
+      "source_quality": "degraded",
+      "music_type": "synthetic_fixture",
+      "device_route": "SPEAKER",
+      "listening_env": "quiet_room"
+    },
+    {
+      "era": "modern_master",
+      "source_quality": "clean",
+      "music_type": "synthetic_fixture",
+      "device_route": "SPEAKER",
+      "listening_env": "quiet_room"
+    }
+  ],
+  "samples": [
+    {
+      "sample_id": "legit_dc_clip_01",
+      "kind": "legitimate",
+      "input_wav": "legit_dc_clip_01.wav",
+      "processed_wav": "legit_dc_clip_01_processed.wav",
+      "expected_decision": "SELECTED"
+    },
+    {
+      "sample_id": "negative_control_01",
+      "kind": "negative_control",
+      "input_wav": "negative_control_01.wav",
+      "processed_wav": "negative_control_01_processed.wav",
+      "expected_decision": "BYPASSED"
+    },
+    {
+      "sample_id": "placebo_bypass_01",
+      "kind": "placebo_bypass",
+      "input_wav": "legit_dc_clip_01.wav",
+      "processed_wav": null,
+      "expected_decision": "BYPASSED"
+    }
+  ],
+  "frozen_sha256": "f2fd3a8268b37ec884fbf8703d737b5e19d70c018d36845f7558f6de8cb6fd3d"
+}
