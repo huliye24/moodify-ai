@@ -1,8 +1,10 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { api, BootstrapUser, TrackDto } from "../../../lib/music-client";
 
+// Package 04: Legacy fallback — replace after play.rongjingmusic.com origin is live.
 const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
 
 export default function TrackPage({ params }: { params: Promise<{ id: string }> }) {
@@ -12,7 +14,7 @@ export default function TrackPage({ params }: { params: Promise<{ id: string }> 
   const [playing, setPlaying] = useState(false);
   const [licenseMsg, setLicenseMsg] = useState("");
   const audioRef = useRef<HTMLAudioElement>(null);
-  const sessionId = useRef(Math.random().toString(36).slice(2));
+  const sessionId = useRef("");
 
   useEffect(() => {
     void params.then(({ id }) => {
@@ -26,6 +28,7 @@ export default function TrackPage({ params }: { params: Promise<{ id: string }> 
 
   function onPlay() {
     if (!track) return;
+    if (!sessionId.current) sessionId.current = crypto.randomUUID();
     setPlaying(true);
     void api.playEvent({ track_id: track.id, user_id: me?.id ?? null, session_id: sessionId.current, played_ms: 0, source: "track_page" }).catch(() => {});
   }
@@ -58,12 +61,12 @@ export default function TrackPage({ params }: { params: Promise<{ id: string }> 
     }
   }
 
-  if (!track) return <main className="public-track"><a href="/">← Moodify</a><p>作品不存在或尚未发布。</p></main>;
+  if (!track) return <main className="public-track"><Link href="/">← Moodify</Link><p>作品不存在或尚未发布。</p></main>;
   const audioUrl = track.version?.audio_asset_key ? `${audioBaseUrl}/${track.version.audio_asset_key}` : null;
 
   return (
     <main className="public-track">
-      <a href="/">← Moodify</a>
+      <Link href="/">← Moodify</Link>
       <article>
         <div className="hero-vinyl"><div className="vinyl is-spinning"><img src="/moodify-logo.png" alt="Moodify 默认黑胶" /><i /></div></div>
         <span className="eyebrow">PUBLISHED · {track.primary_language ?? "—"}</span>
@@ -76,7 +79,7 @@ export default function TrackPage({ params }: { params: Promise<{ id: string }> 
           {me?.capabilities?.account_actions && (
             <button className="glass" onClick={toggleFavorite}>{favorited ? "♥ 已收藏" : "♡ 收藏"}</button>
           )}
-          {track.creator_handle && <a className="glass" href={`/c/${track.creator_handle}`}>创作者</a>}
+          {track.creator_handle && <Link className="glass" href={`/c/${track.creator_handle}`}>创作者</Link>}
         </div>
         <h2>授权此作品</h2>
         <form className="license-form" onSubmit={submitLicense}>

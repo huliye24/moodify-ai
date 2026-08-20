@@ -1,5 +1,9 @@
 # Moodify Product Architecture Audit
 
+> **Status: HISTORICAL AUDIT — SUPERSEDED FOR PRODUCT IDENTITY AND BOUNDARY**
+>
+> This document records the repository assessment made on 2026-08-13. Its two-public-product model and “The Ear of AI” public identity were superseded by `docs/canon/CURRENT_CANON.md` and `docs/canon/PRODUCT_BOUNDARY.md`. Current external product: **Moodify Music / Moodify Player**. Ear is an internal system. Engineering observations remain historical evidence unless reverified.
+
 Task: `MFY-MUSIC-COMMERCIAL-V1-001`  
 Date: 2026-08-13  
 Phase: A — read-only architecture audit
@@ -13,7 +17,7 @@ Moodify should be delivered as two user-facing products on one shared platform:
 - **Moodify Music** — listening and creator-network product for publishing,
   discovery, following, collecting, support intent, and licensing intent.
 
-The canonical product identity remains **The Ear of AI**. Moodify Music is a
+At the time of this audit, the then-canonical product identity was **The Ear of AI**. Moodify Music was treated as a
 distribution and relationship surface; it must not replace the auditory
 intelligence core or turn experimental measurements into public truth.
 

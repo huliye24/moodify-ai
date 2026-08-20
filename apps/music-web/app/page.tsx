@@ -14,6 +14,8 @@ type Track = {
   userCover?: string;
 };
 
+// Package 04 Migration: Audio base URL — override via NEXT_PUBLIC_AUDIO_BASE_URL.
+// Legacy fallback (.xyz) will be removed after play.rongjingmusic.com origin is live.
 const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
 const albumAudio = (file: string) => `${audioBaseUrl}/cadeau10-album1/${file}`;
 
@@ -50,6 +52,7 @@ export default function Home() {
   const [liveTracks, setLiveTracks] = useState<Track[] | null>(null);
   const [me, setMe] = useState<BootstrapUser | null>(null);
   const [mediaError, setMediaError] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [sessionId] = useState(() => `s${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`);
   const [searchResults, setSearchResults] = useState<{ tracks: { id: string; title: string; creator_id: string; primary_language: string | null; duration_ms: number | null; audio_asset_key: string | null }[] } | null>(null);
@@ -141,19 +144,42 @@ export default function Home() {
   };
 
   return <main>
+    {/* Package 04: Surface convergence — Player focuses on Play */}
     <aside className="sidebar">
-      <div className="brand"><img src="/moodify-logo.png" alt="Moodify" /><span>Moodify</span></div>
+      <div className="brand">
+        <a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" title="About Moodify" className="brand-link">
+          <img src="/moodify-logo.png" alt="Moodify" /><span>Moodify</span>
+        </a>
+        <button className="menu-toggle" onClick={() => setMenuOpen((v) => !v)} aria-label="菜单" aria-expanded={menuOpen}>☰</button>
+      </div>
       <nav>
         <button className="nav-active" aria-current="page">◉　发现音乐</button>
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
         {me?.capabilities?.account_actions && <a href="/library" className="nav-link">▥　我的音乐</a>}
       </nav>
-      {me?.capabilities?.creator_writes && <div className="nav-group"><span>你的音乐</span><a href="/studio" className="nav-link">＋　创作者中心</a></div>}
       {me && <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>{me.capabilities?.creator_writes ? "创作者" : "聆听者"}</span></div></div>}
     </aside>
 
+    {/* Package 04: Menu Drawer — secondary surface (Library, Creator tools, About, etc.) */}
+    {menuOpen && (
+      <div className="drawer-overlay" onClick={() => setMenuOpen(false)} role="presentation" />
+    )}
+    <nav className={`drawer ${menuOpen ? "is-open" : ""}`} aria-label="菜单">
+      <div className="drawer-header"><strong>菜单</strong><button onClick={() => setMenuOpen(false)} aria-label="关闭">✕</button></div>
+      {me?.capabilities?.account_actions && (<><a href="/library" className="drawer-item" onClick={() => setMenuOpen(false)}>▥　我的音乐</a><hr className="drawer-divider" /></>)}
+      {me?.capabilities?.creator_writes && (<><span className="drawer-label">你的音乐</span><a href="/studio" className="drawer-item" onClick={() => setMenuOpen(false)}>＋　创作者中心</a><hr className="drawer-divider" /></>)}
+      <span className="drawer-label">关于</span>
+      <a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏠 Moodify 官网</a>
+      <a href="https://rongjingwenchuan.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏢 荣景文川</a>
+      <hr className="drawer-divider" />
+    </nav>
+
     <section className="content">
-      <header><div className="mobile-brand"><img src="/moodify-logo.png" alt="" />Moodify</div><div className="history"><button>‹</button><button>›</button></div>{me?.capabilities?.creator_writes && <div className="header-actions"><a href="/studio">上传作品</a></div>}</header>
+      <header>
+        <div className="mobile-brand"><a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" title="About Moodify"><img src="/moodify-logo.png" alt="" />Moodify</a></div>
+        <div className="history"><button>‹</button><button>›</button></div>
+        <button className="menu-toggle" onClick={() => setMenuOpen((v) => !v)} aria-label="菜单" aria-expanded={menuOpen}>☰</button>
+      </header>
       <div className="hero">
         <div className="hero-copy"><span className="eyebrow">CADEAU10 · 专辑 1</span><h1>{all[active].title}</h1><p>{all[active].artist}</p><div className="hero-buttons"><button onClick={() => setPlaying((value) => !value)} className="primary"><span>{playing ? "Ⅱ" : "▶"}</span>{playing ? "暂停" : "开始聆听"}</button><button className="glass" aria-label={liked.includes(active) ? "取消收藏" : "收藏"} onClick={() => toggleLike(active)}>{liked.includes(active) ? "♥" : "♡"}</button></div></div>
         <div className="orb-wrap"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="hero-vinyl"><RecordArtwork track={all[active]} spinning={playing} /></div><span className="floating-note note-a">♪</span><span className="floating-note note-b">♫</span></div>
@@ -173,7 +199,7 @@ export default function Home() {
     </section>
 
     <audio ref={audioRef} src={all[active].src} preload="metadata" onPlay={onPlay} onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)} onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)} onEnded={() => skip(1)} onError={() => { setPlaying(false); setMediaError("媒体无法播放——请稍后重试，或换一首作品。"); }} />
-    <div className="player"><div className="now"><RecordArtwork track={all[active]} spinning={playing} /><div><strong>{all[active].title}</strong><span>{all[active].artist}</span></div><button onClick={() => toggleLike(active)} aria-label={liked.includes(active) ? "取消收藏" : "收藏"}>{liked.includes(active) ? "♥" : "♡"}</button></div><div className="controls"><div><button onClick={() => skip(-1)} aria-label="上一首">◀</button><button className="play" onClick={() => setPlaying(!playing)} aria-label={playing ? "暂停" : "播放"}>{playing ? "Ⅱ" : "▶"}</button><button onClick={() => skip(1)} aria-label="下一首">▶</button></div><div className="timeline"><span>{formatTime(currentTime)}</span><input aria-label="播放进度" type="range" min="0" max={duration || 0} step="0.1" value={Math.min(currentTime, duration || 0)} onChange={(event) => { const nextTime = Number(event.target.value); if (audioRef.current) audioRef.current.currentTime = nextTime; setCurrentTime(nextTime); }} /><span>{duration ? formatTime(duration) : all[active].length}</span></div></div><div className="utilities"><span aria-hidden="true">◉</span></div></div>
+    <div className="player"><div className="now"><RecordArtwork track={all[active]} spinning={playing} /><div><strong>{all[active].title}</strong><span>{all[active].artist}</span></div><button onClick={() => toggleLike(active)} aria-label={liked.includes(active) ? "取消收藏" : "收藏"}>{liked.includes(active) ? "♥" : "♡"}</button></div><div className="controls"><div><button onClick={() => skip(-1)} aria-label="上一首">◀</button><button className="play" onClick={() => setPlaying(!playing)} aria-label={playing ? "暂停" : "播放"}>{playing ? "Ⅱ" : "▶"}</button><button onClick={() => skip(1)} aria-label="下一首">▶</button></div><div className="timeline"><span>{formatTime(currentTime)}</span><input aria-label="播放进度" type="range" min="0" max={duration || 0} step="0.1" value={Math.min(currentTime, duration || 0)} onChange={(event) => { const nextTime = Number(event.target.value); if (audioRef.current) audioRef.current.currentTime = nextTime; setCurrentTime(nextTime); }} /><span>{duration ? formatTime(duration) : all[active].length}</span></div></div><div className="utilities"><a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" title="Moodify 官网" className="utility-link">About</a><span aria-hidden="true">◉</span></div></div>
     {mediaError && <div className="player-error" role="alert">{mediaError}</div>}
   </main>;
 }

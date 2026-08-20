@@ -3,10 +3,11 @@ import "./globals.css";
 import SwRegister from "./sw-register";
 
 export const metadata: Metadata = {
-  title: "Moodify Music",
-  description: "听见此刻与你更接近的音乐。",
+  title: "Moodify — Play",
+  description: "正在播放。Moodify 让每一种声音都值得被世界听见。",
   icons: { icon: "/moodify-logo.png" },
   manifest: "/manifest.webmanifest",
+  alternates: { canonical: "https://play.rongjingmusic.com/" },
   other: { "codex-preview": "development" },
 };
 

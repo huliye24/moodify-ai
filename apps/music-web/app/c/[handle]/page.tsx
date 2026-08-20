@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { api } from "../../../lib/music-client";
 import type { BootstrapUser, CreatorPage as CreatorPageDto } from "../../../lib/music-client";
-
-const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
 
 export default function CreatorPage({ params }: { params: Promise<{ handle: string }> }) {
   const [page, setPage] = useState<CreatorPageDto | null>(null);
@@ -35,11 +34,11 @@ export default function CreatorPage({ params }: { params: Promise<{ handle: stri
     }
   }
 
-  if (!page) return <main className="public-track"><a href="/">← Moodify</a><p>音乐馆不存在或尚未公开。</p></main>;
+  if (!page) return <main className="public-track"><Link href="/">← Moodify</Link><p>音乐馆不存在或尚未公开。</p></main>;
   const { profile } = page;
   return (
     <main className="public-track">
-      <a href="/">← Moodify</a>
+      <Link href="/">← Moodify</Link>
       <article>
         <div className="avatar creator-avatar">{profile.display_name.slice(0, 1)}</div>
         <span className="eyebrow">@{profile.handle}</span>
@@ -54,10 +53,10 @@ export default function CreatorPage({ params }: { params: Promise<{ handle: stri
         <h2>作品</h2>
         <div className="creator-works">
           {page.tracks.map((track) => (
-            <a key={track.id} href={`/t/${track.id}`}>
+            <Link key={track.id} href={`/t/${track.id}`}>
               <span>{track.title}</span>
               <small>{track.primary_language ?? "—"}</small>
-            </a>
+            </Link>
           ))}
         </div>
       </article>

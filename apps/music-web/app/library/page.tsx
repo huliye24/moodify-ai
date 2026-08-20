@@ -48,6 +48,7 @@ export default function LibraryPage() {
     void load(me.id, which);
   }
 
+  // Package 04: Legacy fallback — replace after play.rongjingmusic.com origin is live.
   const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
 
   return (
