@@ -1,0 +1,29 @@
+{
+  "package_id": "MFY-WIN-W03-PLAYLIST-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w02_status": "",
+  "w03_gate": "",
+  "authorities": {
+    "track": "",
+    "library": "",
+    "playlist": "",
+    "playlist_item": "",
+    "persistence": "",
+    "player": ""
+  },
+  "duplicate_policy": "",
+  "migration_required": null,
+  "commands": [],
+  "tests": [],
+  "manual_flows": [],
+  "data_migration": {},
+  "screenshots": [],
+  "logs": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w03_status": "BLOCKED",
+  "w04_gate": "BLOCKED"
+}

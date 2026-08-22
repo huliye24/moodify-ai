@@ -1,0 +1,64 @@
+{
+  "package_id": "MFD-002",
+  "title": "Electron Foundation",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-001 must be GO or resolved CONDITIONAL GO",
+  "default_stack": [
+    "Electron",
+    "TypeScript",
+    "React",
+    "Vite",
+    "Electron Forge"
+  ],
+  "scope": [
+    "desktop foundation",
+    "secure Electron runtime",
+    "typed preload/IPC boundary",
+    "build/test baseline",
+    "Windows packaging proof"
+  ],
+  "forbidden": [
+    "production Cloud integration",
+    "real authentication",
+    "real playback",
+    "DSP",
+    "WASAPI",
+    "service keys",
+    "installer productization",
+    "auto-update production setup"
+  ],
+  "next_package": "MFD-003 — Desktop–Cloud Contract",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "5595a01f6fcc365c28509926a49a65871caf7c3b7cf37ff716d16b3d9aac4e36"
+    },
+    {
+      "name": "01_MFD-002_TASK.md",
+      "sha256": "0b4ca4ecca3a91d559250e38fa00c45930ae7d93ccc6dfd72e2222b12ee4246c"
+    },
+    {
+      "name": "02_ARCHITECTURE_BASELINE.md",
+      "sha256": "531f621c9ad9b884e139ffa51e1093f3a03c88c822f7949be0585d1deea12887"
+    },
+    {
+      "name": "03_SECURITY_BASELINE.md",
+      "sha256": "9c20ee8597927e85c7e21793ac5f7a8c4416990d605d840b2ebba58ff4c82b9b"
+    },
+    {
+      "name": "04_IMPLEMENTATION_SEQUENCE.md",
+      "sha256": "4098fccda082e987e0ecd92c39f46c8bcbc74274e801942e80bc952c7f7bc097"
+    },
+    {
+      "name": "05_ACCEPTANCE_GATE.md",
+      "sha256": "eebaf4eb2d30e339a4f4bec455508e54b893822883c81abf189116c7fc32f046"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "4c1b0b9185a06e176b47b18f647e1f385b71aae476594a118e06308db3fe852d"
+    }
+  ]
+}

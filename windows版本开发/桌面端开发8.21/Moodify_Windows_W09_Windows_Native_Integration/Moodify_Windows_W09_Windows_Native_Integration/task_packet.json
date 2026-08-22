@@ -1,0 +1,27 @@
+{
+  "package_id": "MFY-WIN-W09-WINDOWS-NATIVE-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 9,
+  "total_packages": 12,
+  "title": "Windows Native Integration 系统融合",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w08/W09_HANDOFF.md => W09_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "focus": [
+    "runtime capability audit",
+    "media keys",
+    "system media controls",
+    "system metadata",
+    "single instance",
+    "second-instance handoff",
+    "open file handling",
+    "file association seam",
+    "tray/taskbar",
+    "native security",
+    "recovery-aware quit"
+  ],
+  "next_package": "W10 Moodify Cloud Bridge 云端入口"
+}

@@ -1,0 +1,27 @@
+{
+  "package_id": "MFY-WIN-W04-PLAYBACK-CORE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w03_status": "",
+  "w04_gate": "",
+  "authorities": {
+    "track": "",
+    "playlist": "",
+    "playback": "",
+    "audio_engine": "",
+    "source_resolver": ""
+  },
+  "playback_status_model": [],
+  "commands": [],
+  "tests": [],
+  "race_tests": [],
+  "manual_flows": [],
+  "screenshots": [],
+  "logs": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w04_status": "BLOCKED",
+  "w05_gate": "BLOCKED"
+}

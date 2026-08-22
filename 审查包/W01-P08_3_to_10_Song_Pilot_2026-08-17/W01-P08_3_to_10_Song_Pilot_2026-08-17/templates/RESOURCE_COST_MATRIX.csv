@@ -1,0 +1,1 @@
+﻿pilot_case_id,queue_wait_ms,wall_clock_ms,compute_ms,stem_ms,analysis_ms,render_ms,verify_ms,external_ms,human_review_ms,cpu_summary,ram_peak_mb,swap_peak_mb,scratch_peak_mb,input_bytes,output_bytes,external_cost,currency

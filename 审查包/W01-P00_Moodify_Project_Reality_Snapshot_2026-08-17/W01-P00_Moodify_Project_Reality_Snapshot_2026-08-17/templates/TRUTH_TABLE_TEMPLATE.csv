@@ -1,0 +1,2 @@
+﻿id,domain,capability,claimed_state,observed_state,main_status,canonical_relevance,code_ref,runtime_ref,evidence_ref,authority_conflict,confidence,notes
+EXAMPLE-001,repo,Example only,,,UNKNOWN,UNCLEAR,,,,false,LOW,Delete example row in final output

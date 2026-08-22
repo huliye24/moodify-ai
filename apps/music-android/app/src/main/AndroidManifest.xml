@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- P09: background playback (MediaSessionService) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- P09: lock-screen controls show a notification (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:label="Moodify Music"
@@ -9,6 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@android:style/Theme.Material.NoActionBar"
         android:usesCleartextTraffic="false">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -40,5 +46,15 @@
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
+
+        <!-- P09: MediaSessionService for background playback + lock-screen controls -->
+        <service
+            android:name=".player.MoodifyMediaSessionService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="android.media.session.MediaSessionService" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

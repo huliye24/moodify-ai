@@ -1,0 +1,25 @@
+flowchart TD
+    %% W01-P00 CURRENT SYSTEM MAP TEMPLATE
+    %% Replace UNKNOWN only with observed facts.
+    %% Solid = verified runtime
+    %% Dashed = exists but unverified
+    %% Dotted = planned only
+
+    GH["GitHub main\nUNKNOWN"]
+    PR["Open PR / branches\nUNKNOWN"]
+    APP["Android\nUNKNOWN"]
+    API["Cloud API\nUNKNOWN"]
+    WORKER["Worker\nUNKNOWN"]
+    DB["Database\nUNKNOWN"]
+    OSS["Object Storage\nUNKNOWN"]
+    EXT["External Audio Services\nUNKNOWN"]
+    DATA["Audio / Evidence Assets\nUNKNOWN"]
+
+    GH -.-> APP
+    PR -.-> WORKER
+    APP -.-> API
+    API -.-> DB
+    API -.-> WORKER
+    WORKER -.-> OSS
+    WORKER -.-> EXT
+    DATA -.-> WORKER

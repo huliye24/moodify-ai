@@ -1,0 +1,35 @@
+{
+  "package_id": "MFY-WIN-W01-DESKTOP-AUDIT-001",
+  "canon_change": false,
+  "visual_redesign": false,
+  "branch": "",
+  "commit_sha": "",
+  "machine": {
+    "os": "",
+    "windows_version": "",
+    "arch": ""
+  },
+  "runtime": {
+    "desktop_stack": "",
+    "node": "",
+    "python": "",
+    "package_manager": ""
+  },
+  "repository": {
+    "windows_app_root": "",
+    "bootstrap": "",
+    "renderer_root": "",
+    "player": "",
+    "persistence": "",
+    "packaging": ""
+  },
+  "commands": [],
+  "tests": [],
+  "manual_flows": [],
+  "artifacts": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w01_status": "BLOCKED",
+  "w02_gate": "BLOCKED"
+}

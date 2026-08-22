@@ -2,10 +2,10 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { api, playlists, PlaylistDto } from "../../lib/music-client";
+import { api, playlists, type BootstrapUser, type PlaylistDto } from "../../lib/music-client";
 
 export default function PlaylistsPage() {
-  const [me, setMe] = useState<{ id: string; capabilities?: { account_actions?: boolean } } | null>(null);
+  const [me, setMe] = useState<BootstrapUser | null>(null);
   const [list, setList] = useState<PlaylistDto[] | null>(null);
   const [error, setError] = useState("");
   const [open, setOpen] = useState<PlaylistDto | null>(null);
@@ -14,7 +14,7 @@ export default function PlaylistsPage() {
   useEffect(() => {
     void api.bootstrap().then(async (user) => {
       setMe(user);
-      if (!user.capabilities?.account_actions) {
+      if (!user.capabilities?.account_actions || !user.id) {
         setError("歌单需要登录。未登录时聆听保持开放。");
         setList([]);
         return;
@@ -60,16 +60,20 @@ export default function PlaylistsPage() {
   }
 
   async function toggleVisibility(p: PlaylistDto) {
+    const userId = me?.id;
+    if (!userId) return;
     await playlists.update(p.id, { visibility: p.visibility === "private" ? "public" : "private" });
-    await load(me!.id);
+    await load(userId);
     if (open?.id === p.id) setOpen(await playlists.get(p.id));
   }
 
   async function removePlaylist(p: PlaylistDto) {
+    const userId = me?.id;
+    if (!userId) return;
     if (!confirm(`删除歌单「${p.title}」？仅删除歌单容器，曲目与媒体不受影响。`)) return;
     await playlists.remove(p.id);
     if (open?.id === p.id) setOpen(null);
-    await load(me!.id);
+    await load(userId);
   }
 
   return (

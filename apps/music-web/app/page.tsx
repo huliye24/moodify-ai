@@ -16,7 +16,7 @@ type Track = {
 
 // Package 04 Migration: Audio base URL — override via NEXT_PUBLIC_AUDIO_BASE_URL.
 // Legacy fallback (.xyz) will be removed after play.rongjingmusic.com origin is live.
-const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
+const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://play.rongjingmusic.com/audio").replace(/\/$/, "");
 const albumAudio = (file: string) => `${audioBaseUrl}/cadeau10-album1/${file}`;
 
 const tracks: Track[] = [
@@ -157,7 +157,7 @@ export default function Home() {
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
         {me?.capabilities?.account_actions && <a href="/library" className="nav-link">▥　我的音乐</a>}
       </nav>
-      {me && <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>{me.capabilities?.creator_writes ? "创作者" : "聆听者"}</span></div></div>}
+      {me && <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>聆听者</span></div></div>}
     </aside>
 
     {/* Package 04: Menu Drawer — secondary surface (Library, Creator tools, About, etc.) */}
@@ -167,11 +167,14 @@ export default function Home() {
     <nav className={`drawer ${menuOpen ? "is-open" : ""}`} aria-label="菜单">
       <div className="drawer-header"><strong>菜单</strong><button onClick={() => setMenuOpen(false)} aria-label="关闭">✕</button></div>
       {me?.capabilities?.account_actions && (<><a href="/library" className="drawer-item" onClick={() => setMenuOpen(false)}>▥　我的音乐</a><hr className="drawer-divider" /></>)}
-      {me?.capabilities?.creator_writes && (<><span className="drawer-label">你的音乐</span><a href="/studio" className="drawer-item" onClick={() => setMenuOpen(false)}>＋　创作者中心</a><hr className="drawer-divider" /></>)}
       <span className="drawer-label">关于</span>
       <a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏠 Moodify 官网</a>
       <a href="https://rongjingwenchuan.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏢 荣景文川</a>
       <hr className="drawer-divider" />
+      <span className="drawer-label">信息</span>
+      <a href="https://rongjingmusic.com/terms.html" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>使用条款</a>
+      <a href="https://rongjingmusic.com/privacy.html" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>隐私说明</a>
+      <a href="https://rongjingmusic.com/contact.html" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>联系我们</a>
     </nav>
 
     <section className="content">

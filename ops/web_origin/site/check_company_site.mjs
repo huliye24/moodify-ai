@@ -37,7 +37,8 @@ test("Research remains a section rather than a product", async () => {
 test("Company facts expose verified values only", async () => {
   const html = await home();
   assert.match(html, /荣景文川 \/ Rongjing Wenchuan/);
-  assert.match(html, /hello@rongjingwenchuan\.com/);
+  assert.match(html, /荣景文川（深圳）科技有限公司/);
+  assert.match(html, /hello@rongjingmusic\.com/);
   assert.doesNotMatch(html, /Founded|Location|funding|valuation|revenue|users|GPU/i);
 });
 
@@ -49,16 +50,32 @@ test("metadata, navigation and footer are coherent", async () => {
   assert.match(html, /<meta property="og:description" content="We build things worth hearing\.">/);
   for (const target of ["#research", "#company", "#contact"]) assert.match(html, new RegExp(`href="${target}"`));
   const footer = html.match(/<footer>[\s\S]*?<\/footer>/)?.[0] ?? "";
-  for (const label of ["Moodify", "Research", "Company", "Privacy", "Contact"]) assert.match(footer, new RegExp(`>${label}<`));
+  for (const label of ["Moodify", "Research", "Company", "Terms", "Privacy", "Contact"]) assert.match(footer, new RegExp(`>${label}<`));
 });
 
 test("local pages, styles, robots and sitemap exist", async () => {
-  for (const file of ["index.html", "privacy.html", "styles.css", "robots.txt", "sitemap.xml"]) await stat(path.join(site, file));
+  for (const file of ["index.html", "privacy.html", "terms.html", "styles.css", "robots.txt", "sitemap.xml"]) await stat(path.join(site, file));
   const privacy = await readFile(path.join(site, "privacy.html"), "utf8");
-  assert.match(privacy, /hello@rongjingwenchuan\.com/);
+  assert.match(privacy, /荣景文川（深圳）科技有限公司/);
+  assert.match(privacy, /hello@rongjingmusic\.com/);
+  const terms = await readFile(path.join(site, "terms.html"), "utf8");
+  assert.match(terms, /荣景文川（深圳）科技有限公司/);
+  assert.match(terms, /hello@rongjingmusic\.com/);
+  assert.match(terms, /Moodify 知识产权声明/);
   const sitemap = await readFile(path.join(site, "sitemap.xml"), "utf8");
   assert.match(sitemap, /https:\/\/rongjingwenchuan\.com\//);
+  assert.match(sitemap, /terms\.html/);
   assert.doesNotMatch(sitemap, /developers|api|acu|docs/);
+});
+
+test("Company secondary pages preserve the complete company navigation", async () => {
+  for (const page of ["privacy.html", "terms.html"]) {
+    const html = await readFile(path.join(site, page), "utf8");
+    const header = html.match(/<header[\s\S]*?<\/header>/)?.[0] ?? "";
+    for (const target of ["https://rongjingmusic.com/", "/#research", "/#company", "/#contact"]) assert.match(header, new RegExp(`href="${target.replaceAll("/", "\\/")}"`), `${page} missing ${target}`);
+    const footer = html.match(/<footer>[\s\S]*?<\/footer>/)?.[0] ?? "";
+    for (const label of ["Moodify", "Research", "Company", "Terms", "Privacy", "Contact"]) assert.match(footer, new RegExp(`>${label}<`), `${page} missing ${label}`);
+  }
 });
 
 test("accessibility and responsive safeguards are present", async () => {

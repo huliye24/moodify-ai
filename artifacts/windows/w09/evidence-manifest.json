@@ -1,0 +1,30 @@
+{
+  "package_id": "MFY-WIN-W09-WINDOWS-NATIVE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w08_status": "PASS",
+  "w09_gate": "PASS",
+  "desktop_runtime": "Electron + Chromium + React",
+  "native_bridge": "context-isolated allowlisted preload/IPC",
+  "capabilities": {
+    "media_keys": "SUPPORTED_WITH_ADAPTER",
+    "system_media_controls": "SUPPORTED_WITH_ADAPTER",
+    "metadata": "SUPPORTED",
+    "timeline_seek": "SUPPORTED_WITH_ADAPTER",
+    "tray": "SUPPORTED",
+    "taskbar": "SUPPORTED",
+    "single_instance": "SUPPORTED",
+    "open_file": "SUPPORTED_WITH_ADAPTER",
+    "file_association": "INSTALLER_REQUIRED"
+  },
+  "commands": ["npm run verify"],
+  "tests": ["14/14 files", "137/137 tests", "W09 5/5"],
+  "security_tests": ["spaces", "Chinese/Unicode", "ampersand/parentheses", "duplicates", "unsupported", "overlong argv"],
+  "manual_flows": [],
+  "changed_files": ["src/shared/windows-native.ts", "src/services/library/index.ts", "src/shared/ipc-channels.ts", "src/preload/index.ts", "src/vite-env.d.ts", "src/main/ipc/index.ts", "src/main/index.ts", "src/main/tray.ts", "src/renderer/components/player/MinimalPlayer.tsx", "tests/unit/windows-native.test.ts"],
+  "blockers": [],
+  "unknowns": ["packaged media flyout/lock-screen behavior", "installer association registration deferred to W12"],
+  "w09_status": "PASS",
+  "w10_gate": "PASS"
+}

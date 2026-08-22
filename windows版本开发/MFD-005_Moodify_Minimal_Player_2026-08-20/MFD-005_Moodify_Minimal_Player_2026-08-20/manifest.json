@@ -1,0 +1,74 @@
+{
+  "package_id": "MFD-005",
+  "title": "Moodify Minimal Player",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-004 must be GO",
+  "scope": [
+    "first product-facing Desktop UI",
+    "minimal player interaction",
+    "play/pause/next/previous/seek/volume UI",
+    "vinyl/disc visual",
+    "keyboard interaction",
+    "accessibility",
+    "debug UI separation",
+    "real playback regression smoke"
+  ],
+  "forbidden": [
+    "library browser",
+    "upload",
+    "search",
+    "favorites",
+    "recommendation",
+    "lyrics",
+    "visualizer",
+    "DSP/EQ",
+    "WASAPI",
+    "tray",
+    "media keys",
+    "auto-update",
+    "installer productization",
+    "skin marketplace"
+  ],
+  "next_package": "MFD-006 — Reliability & Local State",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "56ca925e18de3f525a8928abf578a9a4323467fe5b7f2848b78f21602221844f"
+    },
+    {
+      "name": "01_MFD-005_TASK.md",
+      "sha256": "98d19685ca21eb85955779862c98bc7b826f3a60e528bcfbf7d40c6995356911"
+    },
+    {
+      "name": "02_UI_CONTRACT.md",
+      "sha256": "e93e6a8a1d07c3dd6584635c29aa133855e0165f51fb38cce5deb255619a9f03"
+    },
+    {
+      "name": "03_INTERACTION_MAP.md",
+      "sha256": "9d08c43536c815d5ea811ecebacdda367ebfb2e13be5be2b5a4c6ab746afdfdb"
+    },
+    {
+      "name": "04_VISUAL_SYSTEM_BASELINE.md",
+      "sha256": "605d83a85365ca2a732d166765fd9e1f7f9da78808974c77d9e4cda3bb5b8afe"
+    },
+    {
+      "name": "05_UI_TEST_MATRIX.md",
+      "sha256": "c4829633a102d38b2a137a7595411e370f31973e31c755a9f703507d568ffd20"
+    },
+    {
+      "name": "06_IMPLEMENTATION_SEQUENCE.md",
+      "sha256": "87c15ee963e6bcea734ef2fbe25a303e93ebdca50cc8e278b42afff178bb841c"
+    },
+    {
+      "name": "07_ACCEPTANCE_GATE.md",
+      "sha256": "7bcf6a8dd86dbc1930eb9b79919fc6bca2ce4d27e256cf3c855bfa7f2ff4e02a"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "182244eabc76c8805379a598553892c44c4605c42b50d79c5bfd577bf370e62d"
+    }
+  ]
+}

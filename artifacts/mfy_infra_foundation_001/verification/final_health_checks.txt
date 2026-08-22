@@ -1,0 +1,32 @@
+MFY-INFRA-FOUNDATION-001 — Final health checks
+==============================================
+Date: 2026-08-13 (after all Phase C changes)
+
+LA (103.144.246.242):
+  https://rongjingmusic.com/healthz        -> 200
+  https://rongjingwenchuan.xyz/             -> 200 (retry x3 after transient 000)
+  https://rongjingwenchuan.com/healthz      -> 200
+  http://127.0.0.1:8000/health (LA API)    -> 200
+  http://127.0.0.1:3100/  (music SSR)      -> 200
+  systemd: moodify-api/moodify-music/moodify-worker/nginx/cloudflared-moodify
+           all active
+
+Hangzhou (120.55.191.146):
+  http://127.0.0.1:8000/health             -> 200 (public, unauthenticated by design)
+  GET /presets no-key                      -> 401 (auth enforced)
+  systemd: moodify-api active (restarted once during C1), moodify-data-worker active
+  timers: 4 moodify timers intact (inbox/resource/daily/backup)
+
+PolarDB:
+  moodify_dev: 0 business tables (unchanged)
+  moodify_app@172.21.10.9: connects, minimal grants verified
+  admin mylab/mylab2: rotated passwords verified working
+
+SCOPE INTEGRITY:
+  No business schema created (AC-07)
+  No Shanghai PG integration (out of scope)
+  No MySQL A activation (out of scope)
+  No Redis/Kafka/Celery added (out of scope)
+  LA production untouched (AC-03): no deploy, no symlink change, no restart
+
+RESULT: ALL GREEN

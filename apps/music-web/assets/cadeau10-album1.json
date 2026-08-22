@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "album": "Cadeau10 / 专辑 1",
   "productionSource": "E:/Cadeau 曲库/Cadeau10/专辑1/作品/新建文件夹",
-  "publicBaseUrl": "https://rongjinwenchuan.xyz/audio/cadeau10-album1/",
+  "publicBaseUrl": "https://play.rongjingmusic.com/audio/cadeau10-album1/",
   "storagePolicy": "Audio binaries are deployment assets and are not committed to Git.",
   "tracks": [
     { "title": "Je ne veux pas enfermer ton aujourd'hui", "file": "je-ne-veux-pas-enfermer-ton-aujourdhui.wav", "duration": "2:44", "bytes": 47451230, "sha256": "cb79417242cf8ef8f1749bfacc9325362819ce225d9f493135d0ae58398f3c0e" },

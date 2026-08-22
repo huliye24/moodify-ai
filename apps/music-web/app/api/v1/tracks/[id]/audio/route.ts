@@ -61,8 +61,17 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     headers.set("accept-ranges", "bytes");
     if (request.headers.has("range") && "range" in object && object.range) {
       const range = object.range;
-      headers.set("content-range", `bytes ${range.offset}-${range.offset + range.length - 1}/${object.size}`);
-      headers.set("content-length", String(range.length));
+      let offset: number;
+      let length: number;
+      if ("suffix" in range) {
+        length = Math.min(range.suffix, object.size);
+        offset = object.size - length;
+      } else {
+        offset = range.offset ?? 0;
+        length = range.length ?? object.size - offset;
+      }
+      headers.set("content-range", `bytes ${offset}-${offset + length - 1}/${object.size}`);
+      headers.set("content-length", String(length));
       return new Response(object.body, { status: 206, headers });
     }
     headers.set("content-length", String(object.size));

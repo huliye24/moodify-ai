@@ -1,0 +1,124 @@
+[
+  {
+    "finding_id": "ED-01-1",
+    "production_case_id": "CAD10-05_VIEILLIR",
+    "category": "ED-01",
+    "category_name": "Bandwidth Limitation",
+    "status": "POSSIBLE_TECHNICAL_LIMITATION",
+    "confidence": "LOW",
+    "evidence_refs": [],
+    "measurement_refs": [
+      "estimated_high_frequency_cutoff_hz",
+      "spectral_rolloff_95_hz"
+    ],
+    "scope": "era-diagnostic-v0.1",
+    "reasoning_summary": "HF cutoff ~14086 Hz corroborated by rolloff-95 (9281 Hz); consistent with bandwidth-limited chain",
+    "known_ambiguities": [
+      "could be arrangement-dependent (dark production); cutoff estimator is a proxy, not a universal truth"
+    ],
+    "requires_human_review": true,
+    "uncertainty_reason": null,
+    "created_at": "2026-08-17T04:58:44+00:00",
+    "version": "era-diagnostic-v0.1"
+  },
+  {
+    "finding_id": "ED-02-2",
+    "production_case_id": "CAD10-05_VIEILLIR",
+    "category": "ED-02",
+    "category_name": "Persistent Noise Floor",
+    "status": "INSUFFICIENT_EVIDENCE",
+    "confidence": "LOW",
+    "evidence_refs": [],
+    "measurement_refs": [
+      "estimated_noise_floor_dbfs",
+      "silence_ratio"
+    ],
+    "scope": "era-diagnostic-v0.1",
+    "reasoning_summary": "elevated floor (~-29.3 dBFS) but no reliable quiet windows (silence_ratio insufficient); cannot separate noise from music texture",
+    "known_ambiguities": [
+      "music without quiet regions makes noise-vs-texture distinction unreliable"
+    ],
+    "requires_human_review": false,
+    "uncertainty_reason": null,
+    "created_at": "2026-08-17T04:58:44+00:00",
+    "version": "era-diagnostic-v0.1"
+  },
+  {
+    "finding_id": "ED-03-3",
+    "production_case_id": "CAD10-05_VIEILLIR",
+    "category": "ED-03",
+    "category_name": "Dynamic Constraint / Damage",
+    "status": "NOT_APPLICABLE",
+    "confidence": null,
+    "evidence_refs": [],
+    "measurement_refs": [
+      "clipping_sample_ratio"
+    ],
+    "scope": "era-diagnostic-v0.1",
+    "reasoning_summary": "no dynamic constraint/damage evidence (no clipping, normal dynamics)",
+    "known_ambiguities": [],
+    "requires_human_review": false,
+    "uncertainty_reason": null,
+    "created_at": "2026-08-17T04:58:44+00:00",
+    "version": "era-diagnostic-v0.1"
+  },
+  {
+    "finding_id": "ED-04-4",
+    "production_case_id": "CAD10-05_VIEILLIR",
+    "category": "ED-04",
+    "category_name": "Stereo / Phase Limitation",
+    "status": "NOT_APPLICABLE",
+    "confidence": null,
+    "evidence_refs": [],
+    "measurement_refs": [
+      "stereo_correlation"
+    ],
+    "scope": "era-diagnostic-v0.1",
+    "reasoning_summary": "no stereo/phase limitation evidence (correlation 0.707)",
+    "known_ambiguities": [],
+    "requires_human_review": false,
+    "uncertainty_reason": null,
+    "created_at": "2026-08-17T04:58:44+00:00",
+    "version": "era-diagnostic-v0.1"
+  },
+  {
+    "finding_id": "ED-05-5",
+    "production_case_id": "CAD10-05_VIEILLIR",
+    "category": "ED-05",
+    "category_name": "Masking / Spectral Congestion",
+    "status": "NOT_APPLICABLE",
+    "confidence": null,
+    "evidence_refs": [],
+    "measurement_refs": [
+      "spectral_flatness"
+    ],
+    "scope": "era-diagnostic-v0.1",
+    "reasoning_summary": "no congestion signal observed",
+    "known_ambiguities": [],
+    "requires_human_review": false,
+    "uncertainty_reason": null,
+    "created_at": "2026-08-17T04:58:44+00:00",
+    "version": "era-diagnostic-v0.1"
+  },
+  {
+    "finding_id": "ED-06-6",
+    "production_case_id": "CAD10-05_VIEILLIR",
+    "category": "ED-06",
+    "category_name": "Transfer / Encoding Degradation",
+    "status": "NOT_SUPPORTED_IN_V0_1",
+    "confidence": null,
+    "evidence_refs": [],
+    "measurement_refs": [
+      "sample_rate"
+    ],
+    "scope": "era-diagnostic-v0.1",
+    "reasoning_summary": "no validated transfer/encoding detector in v0.1; codec/transcode degradation is NOT_SUPPORTED",
+    "known_ambiguities": [
+      "reliable block/codec artifact detection is deferred"
+    ],
+    "requires_human_review": false,
+    "uncertainty_reason": null,
+    "created_at": "2026-08-17T04:58:44+00:00",
+    "version": "era-diagnostic-v0.1"
+  }
+]

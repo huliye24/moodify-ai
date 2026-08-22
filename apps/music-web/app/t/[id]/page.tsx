@@ -5,7 +5,7 @@ import Link from "next/link";
 import { api, BootstrapUser, TrackDto } from "../../../lib/music-client";
 
 // Package 04: Legacy fallback — replace after play.rongjingmusic.com origin is live.
-const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
+const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://play.rongjingmusic.com/audio").replace(/\/$/, "");
 
 export default function TrackPage({ params }: { params: Promise<{ id: string }> }) {
   const [track, setTrack] = useState<TrackDto | null>(null);

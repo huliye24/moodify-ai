@@ -1,0 +1,11 @@
+﻿stage,required,input_types,output_types,evidence,bypass_allowed,timeout_seconds,retry_safe,executor,notes
+ACQUIRE,true,object_ref,scratch_audio,integrity,false,,true,,
+VALIDATE,true,scratch_audio,audio_metadata,validation,false,,true,,
+STEM,false,source,stem,stem_manifest,true,,depends,,
+ANALYZE,true,source/stems,analysis,metrics,false,,true,,
+JUDGE,true,analysis,judgment,judgment_evidence,false,,true,,
+INTERVENE,false,source/stems+judgment,intermediate,processing_manifest,true,,depends,,
+PROFILE,true,judgment,profile_decision,decision_evidence,false,,true,,
+RENDER,true,selected_audio+profile,render_candidate,render_manifest,false,,depends,,
+VERIFY,true,render+source,verification,verification_evidence,false,,true,,
+REGISTER,true,durable_outputs,object_refs,registration_evidence,false,,true,,

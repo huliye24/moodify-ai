@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { api, library, TrackDto } from "../../lib/music-client";
+import { api, library, type BootstrapUser, type TrackDto } from "../../lib/music-client";
 
 export default function LibraryPage() {
-  const [me, setMe] = useState<{ id: string; capabilities?: { account_actions?: boolean } } | null>(null);
+  const [me, setMe] = useState<BootstrapUser | null>(null);
   const [tab, setTab] = useState<"favorites" | "recent">("favorites");
   const [tracks, setTracks] = useState<TrackDto[] | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -14,7 +14,7 @@ export default function LibraryPage() {
   useEffect(() => {
     void api.bootstrap().then(async (user) => {
       setMe(user);
-      if (!user.capabilities?.account_actions) {
+      if (!user.capabilities?.account_actions || !user.id) {
         setError("音乐库需要登录。未登录时聆听保持开放。");
         setTracks([]);
         return;
@@ -49,7 +49,7 @@ export default function LibraryPage() {
   }
 
   // Package 04: Legacy fallback — replace after play.rongjingmusic.com origin is live.
-  const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://rongjinwenchuan.xyz/audio").replace(/\/$/, "");
+  const audioBaseUrl = (process.env.NEXT_PUBLIC_AUDIO_BASE_URL ?? "https://play.rongjingmusic.com/audio").replace(/\/$/, "");
 
   return (
     <main className="public-track">

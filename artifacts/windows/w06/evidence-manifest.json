@@ -1,0 +1,42 @@
+{
+  "package_id": "MFY-WIN-W06-LIBRARY-EXPERIENCE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w05_status": "PASS",
+  "w06_gate": "PASS",
+  "authorities": {
+    "track": "LibraryTrack",
+    "library": "LibraryService + LocalState.library.tracks",
+    "favorite": "LibraryExperienceService + LocalState.favorites",
+    "history": "LibraryExperienceService + LocalState.history",
+    "playlist": "PlaylistService",
+    "playback": "PlaybackService",
+    "queue": "QueueService"
+  },
+  "history_policy": "engine-confirmed PLAYING, once per playback generation",
+  "search_fields": ["title", "artist", "album"],
+  "sort_keys": ["TITLE", "ARTIST", "ADDED_AT", "DURATION"],
+  "performance": { "100": "PASS", "1000": "PASS", "5000": "PASS" },
+  "commands": ["npm run verify", "npx vitest run tests/unit/library-experience.test.ts --reporter=verbose"],
+  "tests": ["11/11 files", "119/119 tests", "W06 9/9"],
+  "manual_flows": [],
+  "screenshots": [],
+  "logs": ["test-report.md", "performance-baseline.md"],
+  "changed_files": [
+    "src/shared/library-experience.ts",
+    "src/services/library-experience/index.ts",
+    "src/services/state/store.ts",
+    "src/shared/ipc-channels.ts",
+    "src/preload/index.ts",
+    "src/main/ipc/index.ts",
+    "src/main/index.ts",
+    "src/vite-env.d.ts",
+    "src/renderer/components/player/MinimalPlayer.tsx",
+    "tests/unit/library-experience.test.ts"
+  ],
+  "blockers": [],
+  "unknowns": ["packaged-app visual evidence is outside W06"],
+  "w06_status": "PASS",
+  "w07_gate": "PASS"
+}

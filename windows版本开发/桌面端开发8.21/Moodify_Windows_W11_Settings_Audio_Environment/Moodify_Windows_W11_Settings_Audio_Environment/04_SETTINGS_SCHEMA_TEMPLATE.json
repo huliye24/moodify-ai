@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "playback": {
+    "preferred_output_device": "SYSTEM_DEFAULT",
+    "restore_volume": true,
+    "autoplay_policy": "OFF_ON_APP_LAUNCH"
+  },
+  "app": {
+    "close_behavior": "QUIT",
+    "launch_at_startup": false
+  },
+  "storage": {
+    "cache_policy": "AUTOMATIC",
+    "cache_location": "DEFAULT"
+  },
+  "cloud": {
+    "preparation_trigger": "MANUAL",
+    "fallback_to_local": true,
+    "network_policy": "DEFAULT"
+  }
+}

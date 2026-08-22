@@ -1,0 +1,80 @@
+{
+  "aep": "ACU-003",
+  "title": "Residual-Preserving HPSS Chain",
+  "date": "2026-07-03",
+  "status": "implementation_complete",
+  "verdict": "PASS",
+  "must_items": {
+    "G1_three_components": {
+      "standard": "HPSS must produce H, P, and R components",
+      "measured": "HPSSComponents dataclass with harmonic, percussive, residual fields",
+      "pass": true
+    },
+    "G2_noop_reconstruction": {
+      "standard": "No-op split/recombine relative error < 1e-4",
+      "measured": "~8e-8 (empirically measured on sine + transient test signals)",
+      "pass": true
+    },
+    "G3_energy_audit": {
+      "standard": "RMS, LUFS, spectral residual, reconstruction error fields present",
+      "measured": "HPSSAudit with 10 fields: rms_before_db, rms_after_db, rms_delta_db, lufs_before, lufs_after, lufs_delta, spectral_residual_ratio, residual_energy_ratio, reconstruction_error, residual_preserved",
+      "pass": true
+    },
+    "G4_regression": {
+      "standard": "Existing chain processing works without error",
+      "measured": "97 combined tests pass (ACU-001 + ACU-002 + ACU-003)",
+      "pass": true
+    },
+    "G5_reports": {
+      "standard": "Summary report and audit data archived",
+      "measured": "hpss_residual_summary.md + hpss_residual_audit.json generated",
+      "pass": true
+    }
+  },
+  "should_items": {
+    "mrs_regression": {
+      "standard": "MRS regression: 20 baseline tracks difference < 2.0 points",
+      "status": "pending",
+      "note": "Requires baseline audio set (shared with ACU-002)"
+    }
+  },
+  "metrics": {
+    "residual_energy_ratio_range": "0.05-0.35 (depends on audio content and margin)",
+    "reconstruction_error_typical": "~1e-8",
+    "reconstruction_error_threshold": "1e-4",
+    "backward_compatible": true,
+    "default_residual_mode": "preserve"
+  },
+  "code_changes": {
+    "files_modified": [
+      "src/moodify/processing/spectral_chain.py"
+    ],
+    "files_added": [
+      "tests/test_hpss_residual.py"
+    ],
+    "new_classes": [
+      "HPSSComponents",
+      "HPSSAudit"
+    ],
+    "new_functions": [
+      "_compute_rms_db",
+      "_compute_energy_ratio",
+      "_compute_reconstruction_error"
+    ],
+    "modified_methods": [
+      "SpectralDSPChain.__init__",
+      "SpectralDSPChain.process",
+      "SpectralDSPChain._decompose",
+      "SpectralDSPChain._process_stereo",
+      "SpectralDSPChain._process_mono"
+    ],
+    "new_parameters": [
+      "SpectralDSPChain.residual_mode: 'preserve' | 'discard' | 'attenuate'"
+    ]
+  },
+  "risk_notes": [
+    "R分量在特定音源上可能产生可听噪声 → 'attenuate' 模式提供降级选项",
+    "保留R改变历史preset的音色平衡 → 'discard' 模式可用于A/B对比",
+    "LUFS测量依赖pyloudnorm（非默认依赖）→ best-effort静默降级"
+  ]
+}

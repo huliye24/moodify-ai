@@ -1,0 +1,68 @@
+Execute MFY-WIN-W04-PLAYBACK-CORE-001 in the Moodify repository.
+
+This is W04 of the Windows Desktop Completion sequence.
+
+Read:
+00_README.md
+01_CODEX_TASK.md
+02_ACCEPTANCE_CRITERIA.md
+03_PLAYBACK_STATE_CONTRACT.md
+04_COMMAND_EVENT_MATRIX.csv
+05_SOURCE_RESOLUTION_CONTRACT.md
+06_ENDED_ERROR_POLICY.md
+07_RACE_CONDITION_TESTS.md
+08_UI_PLAYBACK_CONTRACT.md
+09_PLAYBACK_PERSISTENCE_SEAM.md
+10_EVIDENCE_MANIFEST_TEMPLATE.json
+11_W04_IMPLEMENTATION_REPORT_TEMPLATE.md
+12_W05_HANDOFF_GATE.md
+
+Critical rules:
+- First read W03 artifacts under artifacts/windows/w03/.
+- If W04_GATE is not PASS, stop and report BLOCKED.
+- Reuse Track, Library, Playlist, PlaylistItem, persistence and source resolution from W02/W03.
+- Establish ONE playback business authority.
+- Do not create the formal Queue in W04.
+- UI must command/subscribe to Playback authority; do not let components directly own raw player truth.
+- Audio engine executes playback but must not become Track/Playlist authority.
+- Implement stable load/play/pause/toggle/seek/volume/previous/next.
+- Define deterministic ended behavior.
+- Handle source unavailable, load/decode/play/engine errors safely.
+- Protect against stale async events and rapid track switching with generation/request identity or equivalent.
+- Preserve the current Windows Alpha visual direction.
+- Only minimal progress/time/volume/loading/error UI is allowed.
+- No Ear, DSP, Evidence, cloud internals, recommendation or social UI.
+- Do not silently alter Canon.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W05.
+- Do not commit secrets, credentials, private audio, or large fixtures.
+
+Write artifacts under:
+artifacts/windows/w04/
+
+At the end report:
+1. W03 preflight,
+2. old player reality,
+3. playback authority,
+4. state model,
+5. source resolution,
+6. play/pause/seek/volume,
+7. previous/next,
+8. ended policy,
+9. error policy,
+10. race protection,
+11. files changed,
+12. commands,
+13. tests and results,
+14. manual flows,
+15. evidence,
+16. blockers/unknowns,
+17. W04_STATUS,
+18. W05_GATE.
+
+Finish with:
+W04_STATUS = PASS | BLOCKED
+W05_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

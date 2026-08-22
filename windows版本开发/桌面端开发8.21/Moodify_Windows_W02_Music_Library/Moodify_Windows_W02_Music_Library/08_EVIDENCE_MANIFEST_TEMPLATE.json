@@ -1,0 +1,28 @@
+{
+  "package_id": "MFY-WIN-W02-MUSIC-LIBRARY-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w01_gate": "",
+  "branch": "",
+  "commit_sha_start": "",
+  "commit_sha_end": "",
+  "authorities": {
+    "track": "",
+    "library": "",
+    "persistence": "",
+    "player": ""
+  },
+  "migration_required": null,
+  "commands": [],
+  "tests": [],
+  "manual_flows": [],
+  "data_migration": {},
+  "screenshots": [],
+  "logs": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w02_status": "BLOCKED",
+  "w03_gate": "BLOCKED"
+}

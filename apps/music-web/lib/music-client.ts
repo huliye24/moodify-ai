@@ -33,6 +33,7 @@ export type TrackDto = {
   primary_language: string | null;
   duration_ms: number | null;
   cover_asset_key: string | null;
+  audio_asset_key?: string | null;
   current_version_id: string | null;
   published_at: string | null;
   version: { id: string; version_no: number; audio_asset_key: string | null } | null;

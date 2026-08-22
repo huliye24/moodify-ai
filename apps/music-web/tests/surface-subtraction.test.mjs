@@ -13,14 +13,25 @@ test("legacy track route redirects instead of maintaining a second renderer", as
   assert.doesNotMatch(legacy, /<audio|fetch\(|license/i);
 });
 
-test("listener and creator navigation is driven by server capabilities", async () => {
+test("public home exposes listener navigation without creator operations", async () => {
   const home = await read("app/page.tsx");
   assert.match(home, /capabilities\?\.account_actions[^]*?href="\/library"/);
-  assert.match(home, /capabilities\?\.creator_writes[^]*?href="\/studio"/);
-  assert.doesNotMatch(home, /href="\/inbox"/);
-  for (const route of ["/design", "/playlists", "/offline"]) {
+  for (const route of ["/studio", "/inbox", "/drafts", "/console", "/design", "/playlists", "/offline"]) {
     assert.doesNotMatch(home, new RegExp(`href=["']${route}`));
   }
+  assert.doesNotMatch(home, /上传作品|授权意向|创作者中心|你的音乐/);
+  assert.match(home, />聆听者</);
+});
+
+test("player drawer preserves the complete public trust path", async () => {
+  const home = await read("app/page.tsx");
+  for (const target of [
+    "https://rongjingmusic.com/",
+    "https://rongjingwenchuan.com/",
+    "https://rongjingmusic.com/terms.html",
+    "https://rongjingmusic.com/privacy.html",
+    "https://rongjingmusic.com/contact.html",
+  ]) assert.match(home, new RegExp(`href="${target.replaceAll("/", "\\/")}"`), `missing ${target}`);
 });
 
 test("canonical track surface links the real creator and has no hidden empty route", async () => {

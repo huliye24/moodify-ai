@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify W01-P00 Truth Table Row",
+  "type": "object",
+  "required": [
+    "id",
+    "domain",
+    "capability",
+    "observed_state",
+    "main_status",
+    "canonical_relevance",
+    "authority_conflict",
+    "confidence"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "enum": [
+        "repo",
+        "cloud",
+        "data",
+        "app",
+        "external",
+        "task",
+        "database",
+        "storage",
+        "other"
+      ]
+    },
+    "capability": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claimed_state": {
+      "type": "string"
+    },
+    "observed_state": {
+      "type": "string"
+    },
+    "main_status": {
+      "enum": [
+        "PLANNED_ONLY",
+        "IMPLEMENTED_NOT_MERGED",
+        "MERGED_NOT_DEPLOYED",
+        "DEPLOYED_NOT_VERIFIED",
+        "VERIFIED",
+        "OBSOLETE",
+        "BLOCKED",
+        "UNKNOWN"
+      ]
+    },
+    "canonical_relevance": {
+      "enum": [
+        "CURRENT",
+        "LEGACY",
+        "EXPERIMENTAL",
+        "UNCLEAR"
+      ]
+    },
+    "code_ref": {
+      "type": "string"
+    },
+    "runtime_ref": {
+      "type": "string"
+    },
+    "evidence_ref": {
+      "type": "string"
+    },
+    "authority_conflict": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

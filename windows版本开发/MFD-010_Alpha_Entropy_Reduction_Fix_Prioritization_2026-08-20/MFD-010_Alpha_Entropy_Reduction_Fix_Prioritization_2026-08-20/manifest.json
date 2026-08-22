@@ -1,0 +1,99 @@
+{
+  "package_id": "MFD-010",
+  "title": "Alpha Entropy Reduction & Fix Prioritization",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Alpha Validation",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-009 must be GO",
+  "scope": [
+    "normalize alpha evidence",
+    "deduplicate issues and feedback",
+    "root cause grouping",
+    "evidence strength assessment",
+    "core flow impact assessment",
+    "product fit assessment",
+    "complexity and entropy cost",
+    "listening pattern analysis",
+    "second-session interpretation",
+    "feature request compression",
+    "device failure matrix",
+    "fix/defer/reject decisions",
+    "MFD-FIX package proposals",
+    "Phase 2 recommendation"
+  ],
+  "decision_states": [
+    "FIX_NOW",
+    "FIX_NEXT",
+    "OBSERVE",
+    "EXPERIMENT",
+    "DEFER",
+    "REJECT",
+    "NEEDS_MORE_EVIDENCE"
+  ],
+  "next_states": [
+    "FIX",
+    "MORE_ALPHA",
+    "PHASE_2_DEFINITION",
+    "HOLD"
+  ],
+  "forbidden": [
+    "implementing fixes inside MFD-010",
+    "implementing feature requests",
+    "vote-driven roadmap",
+    "ignoring negative listening evidence",
+    "forcing Phase 2",
+    "inflating issue severity",
+    "inventing missing evidence"
+  ],
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "10040fa2f3258c9c081e07f2602fb8603af261afc1d7eacaf338fed8b6cd3d21"
+    },
+    {
+      "name": "01_MFD-010_TASK.md",
+      "sha256": "60374a1eeeb8321da69196ef9fac51f02e3f0a82c751b27d5be1bf1a919b90c0"
+    },
+    {
+      "name": "02_PRIORITY_FRAMEWORK.md",
+      "sha256": "9cb126adffb36c2397df4db85ac4d9f02ec622a742aace2a9c2c444224cb8d6d"
+    },
+    {
+      "name": "03_ENTROPY_REDUCTION_TABLE_TEMPLATE.md",
+      "sha256": "f4c4ed4c431803d448e9f0b9fc1c7d30b4a7857e7d64ff578b67d641870e5cc9"
+    },
+    {
+      "name": "04_ROOT_CAUSE_TEMPLATE.md",
+      "sha256": "0b2edfb338139811a19debb39295fd582b8a04b319fce34424c630eb41a4cb8a"
+    },
+    {
+      "name": "05_LISTENING_PATTERN_TEMPLATE.md",
+      "sha256": "167871a61d907939419f462defb03dc7cdbb65357f4c768c7846d0815baba4ed"
+    },
+    {
+      "name": "06_FEATURE_REQUEST_COMPRESSION.md",
+      "sha256": "93d6b36fd9b2b6d92f455078b50fd9460b4f528967f3c459e21b2ee66a44de02"
+    },
+    {
+      "name": "07_FIX_PACKAGE_TEMPLATE.md",
+      "sha256": "868c8dbf29681847e6e2a27bd52f25b264a2d31f2237745bc2df4bda83ad582b"
+    },
+    {
+      "name": "08_PHASE_2_DECISION_TEMPLATE.md",
+      "sha256": "8ecdeecec5c75d5a6b12c7a3bfc7d7b746883993d67a866210713adac18fe1f5"
+    },
+    {
+      "name": "09_ACCEPTANCE_GATE.md",
+      "sha256": "f0cc46ecaa1f048b18eea09d61a41f8a8227b033ed88b5e30ba883ced7dd79ee"
+    },
+    {
+      "name": "10_FINAL_DECISION_REPORT_TEMPLATE.md",
+      "sha256": "9230d0b6528c2a94ac55980049d201ac36d95d99f90bebb164a886d63417563c"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "6d12504c46542746e0f092b0588371d08486ecfa656abd2518d722b02cf7f685"
+    }
+  ]
+}

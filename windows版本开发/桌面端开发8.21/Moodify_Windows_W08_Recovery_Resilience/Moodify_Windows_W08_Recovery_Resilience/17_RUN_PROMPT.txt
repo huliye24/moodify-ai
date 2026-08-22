@@ -1,0 +1,61 @@
+Execute MFY-WIN-W08-RECOVERY-RESILIENCE-001 in the Moodify repository.
+
+This is W08 of the Windows Desktop Completion sequence.
+
+Read all files in this package.
+
+Critical rules:
+- First read W07 artifacts under artifacts/windows/w07/.
+- Also read W04 playback-persistence-seam and W05 queue-persistence-seam.
+- If W08_GATE is not PASS, stop and report BLOCKED.
+- Establish one clear Recovery/AppState persistence authority; do not create another shadow persistence system.
+- Restore useful session state, but NEVER auto-start audio on app launch.
+- Persist only serializable product state, not runtime objects.
+- Snapshot writes must be throttled/debounced; no per-timeupdate disk writes.
+- Use atomic/transaction-safe persistence.
+- Recovery snapshot corruption must not wipe Library, Playlist, Favorite or History durable data.
+- Support partial recovery.
+- Validate Track IDs, QueueItems, positions, enums and window bounds before restore.
+- Window restore must keep the app visible after monitor/resolution changes.
+- Add schema_version and migration handling.
+- Future/unknown snapshot versions must fail safely.
+- Simulate interrupted writes / crash cases as far as the runtime allows.
+- Keep recovery UX minimal and silent.
+- Preserve the current Windows Alpha visual direction.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W09.
+- Do not commit secrets, credentials, private audio, or large fixtures.
+
+Write artifacts under:
+artifacts/windows/w08/
+
+At the end report:
+1. W07 preflight,
+2. current recovery reality,
+3. recovery authority map,
+4. snapshot contract,
+5. write policy,
+6. atomicity/LKG strategy,
+7. graceful exit behavior,
+8. abnormal exit behavior,
+9. restore order,
+10. playback restore,
+11. queue restore,
+12. navigation/window restore,
+13. schema migration,
+14. corruption recovery,
+15. crash tests,
+16. files changed,
+17. commands,
+18. tests,
+19. evidence,
+20. blockers/unknowns,
+21. W08_STATUS,
+22. W09_GATE.
+
+Finish with:
+W08_STATUS = PASS | BLOCKED
+W09_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

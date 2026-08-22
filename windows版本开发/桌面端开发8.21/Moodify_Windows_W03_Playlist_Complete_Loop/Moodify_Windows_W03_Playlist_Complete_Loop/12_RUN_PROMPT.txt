@@ -1,0 +1,63 @@
+Execute MFY-WIN-W03-PLAYLIST-001 in the Moodify repository.
+
+This is W03 of the Windows Desktop Completion sequence.
+
+Read:
+00_README.md
+01_CODEX_TASK.md
+02_ACCEPTANCE_CRITERIA.md
+03_PLAYLIST_INVARIANTS.md
+04_TEST_MATRIX.csv
+05_ADD_TRACK_CONTRACT.md
+06_REORDER_CONTRACT.md
+07_REFERENTIAL_SAFETY.md
+08_UI_INTERACTION_CONTRACT.md
+09_EVIDENCE_MANIFEST_TEMPLATE.json
+10_W03_IMPLEMENTATION_REPORT_TEMPLATE.md
+11_W04_HANDOFF_GATE.md
+
+Critical rules:
+- First read W02 artifacts from artifacts/windows/w02/.
+- If W03_GATE is not PASS, stop and report BLOCKED.
+- Reuse Track, Library, Persistence from W02.
+- Do not create shadow Track/Library stores.
+- Establish one Playlist authority and one PlaylistItem relation authority.
+- PlaylistItem references stable Track identity; do not duplicate Track metadata as business truth.
+- Highest priority: make “Add Track to Playlist” truly work end-to-end and persist after restart.
+- Explicitly define duplicate-add policy.
+- Delete Playlist must not delete Tracks or original audio files.
+- Remove from Playlist must not remove from Library.
+- Reorder must persist and survive restart.
+- Unavailable Tracks may remain in Playlists and must not crash the app.
+- Do not create the formal Queue system in W03.
+- Preserve the current Windows Alpha visual direction.
+- No Ear / DSP / Evidence / cloud internal UI.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W04.
+- Do not commit private audio, secrets, credentials, or generated media.
+
+Write artifacts under:
+artifacts/windows/w03/
+
+At the end report:
+1. W02 preflight,
+2. playlist authority,
+3. PlaylistItem contract,
+4. root-cause fix for Add Track,
+5. duplicate policy,
+6. files changed,
+7. migration,
+8. commands,
+9. tests,
+10. manual flows,
+11. referential safety evidence,
+12. blockers/unknowns,
+13. W03_STATUS,
+14. W04_GATE.
+
+Finish with:
+W03_STATUS = PASS | BLOCKED
+W04_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

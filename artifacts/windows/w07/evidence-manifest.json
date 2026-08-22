@@ -1,0 +1,38 @@
+{
+  "package_id": "MFY-WIN-W07-DESKTOP-INTERACTION-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w06_status": "PASS",
+  "w07_gate": "PASS",
+  "desktop_runtime": "Electron + React",
+  "native_bridge": "context-isolated allowlisted preload/IPC",
+  "interaction_surfaces": {
+    "context_menu": "PASS",
+    "double_click": "PASS",
+    "file_drop": "PASS",
+    "track_to_playlist_drag": "PASS",
+    "multi_select": "PASS",
+    "batch_actions": "PASS",
+    "keyboard": "PASS",
+    "explorer_reveal": "PASS"
+  },
+  "commands": ["npm run verify"],
+  "tests": ["12/12 test files", "123/123 tests", "W07 selection and aggregate batch tests"],
+  "manual_flows": [],
+  "screenshots": [],
+  "logs": ["interaction-test-report.md"],
+  "changed_files": [
+    "src/shared/desktop-interaction.ts",
+    "src/shared/ipc-channels.ts",
+    "src/preload/index.ts",
+    "src/main/ipc/index.ts",
+    "src/vite-env.d.ts",
+    "src/renderer/components/player/MinimalPlayer.tsx",
+    "tests/unit/desktop-interaction.test.ts"
+  ],
+  "blockers": [],
+  "unknowns": ["packaged-window manual visual evidence not run"],
+  "w07_status": "PASS",
+  "w08_gate": "PASS"
+}

@@ -1,0 +1,24 @@
+flowchart TD
+    %% W01-P02 TARGET One Song Topology
+    %% Replace placeholders only after P00/P01 inputs are loaded.
+    %% Mark planned components explicitly.
+
+    CLIENT["Client / Operator"]
+    CONTROL["CONTROL/API\nNODE: TBD"]
+    DB["METADATA DB\nTBD"]
+    OSS["OBJECT STORAGE\nTBD"]
+    WORKER["CPU WORKER\nNODE: TBD"]
+    EXT["EXTERNAL AUDIO SERVICE\nif used"]
+    PLAY["PLAYBACK DELIVERY\nTBD"]
+
+    CLIENT -->|control| CONTROL
+    CONTROL -->|job + metadata| DB
+    CONTROL -->|object refs| OSS
+    CONTROL -->|dispatch| WORKER
+    OSS -->|source audio| WORKER
+    WORKER -->|optional API call| EXT
+    WORKER -->|render / evidence| OSS
+    WORKER -->|state update| DB
+    DB -->|READY metadata| CONTROL
+    OSS -->|playable object| PLAY
+    CONTROL -->|authorized playback info| PLAY

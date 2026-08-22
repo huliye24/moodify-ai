@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Pilot Case Result",
+  "type": "object",
+  "required": [
+    "pilot_case_id",
+    "freeze_id",
+    "engineering_verdict",
+    "listening_verdict",
+    "first_pass_acceptance",
+    "traceability"
+  ],
+  "properties": {
+    "pilot_case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "freeze_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "engineering_verdict": {
+      "enum": [
+        "PASS",
+        "PASS_WITH_RECOVERY",
+        "PASS_WITH_BLOCKER_FIX",
+        "FAIL"
+      ]
+    },
+    "listening_verdict": {
+      "enum": [
+        "RENDER_PREFERRED",
+        "SOURCE_PREFERRED",
+        "NO_MEANINGFUL_DIFFERENCE",
+        "MIXED_TRADEOFF",
+        "BYPASS_CORRECT",
+        "INVALID_REVIEW"
+      ]
+    },
+    "first_pass_acceptance": {
+      "type": "boolean"
+    },
+    "retry_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "recovery_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "traceability": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BROKEN"
+      ]
+    },
+    "playback_pass": {
+      "type": "boolean"
+    },
+    "version_split": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

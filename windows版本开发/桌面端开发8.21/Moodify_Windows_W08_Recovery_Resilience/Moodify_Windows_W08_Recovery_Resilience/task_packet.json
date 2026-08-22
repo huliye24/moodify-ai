@@ -1,0 +1,42 @@
+{
+  "package_id": "MFY-WIN-W08-RECOVERY-RESILIENCE-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 8,
+  "total_packages": 12,
+  "title": "Recovery & Resilience 状态恢复与韧性",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w07/W08_HANDOFF.md => W08_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "starts_next_package": false,
+  "focus": [
+    "Recovery snapshot",
+    "Playback restore",
+    "Queue restore",
+    "Position restore",
+    "Volume restore",
+    "Navigation restore",
+    "Window restore",
+    "Graceful exit checkpoint",
+    "Crash recovery",
+    "Schema versioning",
+    "Snapshot migration",
+    "Corruption fallback",
+    "Atomic persistence",
+    "No autoplay on launch"
+  ],
+  "out_of_scope": [
+    "cloud sync",
+    "cross-device restore",
+    "account session restore",
+    "media keys",
+    "tray",
+    "file association",
+    "updater",
+    "cloud bridge",
+    "visual redesign"
+  ],
+  "next_package": "W09 Windows Native Integration 系统融合"
+}

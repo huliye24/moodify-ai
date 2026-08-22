@@ -19,6 +19,10 @@ test("public audio uses partial status only for an explicit range request", asyn
 
 test("self-hosted builds fail closed for Cloudflare-only bindings", async () => {
   const config = await readFile(new URL("../vite.config.ts", import.meta.url), "utf8");
+  const selfHostedBuild = await readFile(
+    new URL("../scripts/build-self-hosted.sh", import.meta.url),
+    "utf8",
+  );
   const adapter = await readFile(
     new URL("../lib/cloudflare-workers-self-hosted.ts", import.meta.url),
     "utf8",
@@ -26,4 +30,6 @@ test("self-hosted builds fail closed for Cloudflare-only bindings", async () => 
   assert.match(config, /MOODIFY_SELF_HOSTED/);
   assert.match(config, /cloudflare:workers/);
   assert.match(adapter, /CLOUDFLARE_BINDING_UNAVAILABLE/);
+  assert.match(selfHostedBuild, /export MOODIFY_SELF_HOSTED=1/);
+  assert.match(selfHostedBuild, /build-verified\.sh/);
 });

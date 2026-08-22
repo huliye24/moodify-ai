@@ -1,0 +1,12 @@
+component,current_version,target_version,migration_required,migration_entry,verification,rollback_or_fallback,status,evidence
+Library DB,,,,,,,TODO,
+Playlist/PlaylistItem,,,,,,,TODO,
+Favorite,,,,,,,TODO,
+History,,,,,,,TODO,
+Queue Snapshot,,,,,,,TODO,
+Recovery Snapshot,,,,,,,TODO,
+Settings,,,,,,,TODO,
+CloudPreparation,,,,,,,TODO,
+File Associations,,,,,,,TODO,
+Startup Registration,,,,,,,TODO,
+Cache Metadata,,,,,,,TODO,

@@ -1,0 +1,2 @@
+﻿id,object,current_claim,p00_observed_reality,human_direction,decision,classification,affected_paths,evidence_refs,human_review_required,notes
+EXAMPLE-001,Example,,,,,HUMAN_DECISION_REQUIRED,,,true,Delete example row

@@ -4,9 +4,9 @@
 
 **Primary action:** Play
 
-**Canonical long-term host:** `play.rongjingmusic.com` (`UNVERIFIED` until deployment evidence exists)
+**Canonical public host:** `play.rongjingmusic.com` (verified live 2026-08-22)
 
-**Current transition host:** `rongjinwenchuan.xyz`
+**Compatibility host:** `rongjinwenchuan.xyz` (temporarily retained; redirect policy pending)
 
 This application is the browser listening surface for Moodify. The default experience is playback: discover a track, press Play, and continue listening. Internal Ear, reconstruction, evidence, jobs, and processing controls are not public product navigation.
 
@@ -36,7 +36,7 @@ Real audio is a deployment asset and must not enter ordinary Git history. Publis
 The player reads from `NEXT_PUBLIC_AUDIO_BASE_URL`. Its transition fallback is:
 
 ```text
-https://rongjinwenchuan.xyz/audio
+https://play.rongjingmusic.com/audio
 ```
 
 Expected media layout:
@@ -69,6 +69,16 @@ npm ci
 npm run build
 npm test
 ```
+
+For the LA Node production service, use the explicit self-hosted build command:
+
+```bash
+npm run build:self-hosted
+```
+
+Do not deploy a plain `npm run build` artifact to the Node service: that mode
+may retain Cloudflare-only virtual imports and is intended for the Worker/Sites
+target.
 
 Useful targeted checks:
 

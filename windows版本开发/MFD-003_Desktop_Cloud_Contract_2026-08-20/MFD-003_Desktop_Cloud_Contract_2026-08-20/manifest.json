@@ -1,0 +1,63 @@
+{
+  "package_id": "MFD-003",
+  "title": "Desktop–Cloud Contract",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-002 must be GO",
+  "scope": [
+    "Player API/BFF contract",
+    "user-level auth",
+    "library/track contract",
+    "PlaybackManifest contract",
+    "Desktop typed API client",
+    "contract/security tests",
+    "real backend smoke without full playback"
+  ],
+  "forbidden": [
+    "service-key in Desktop",
+    "direct DB access",
+    "OSS secret in Desktop",
+    "Ear internal API exposure",
+    "full playback engine implementation",
+    "DSP",
+    "WASAPI",
+    "final player UI"
+  ],
+  "next_package": "MFD-004 — Playback Vertical Slice",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "c38acf274fe0f7d346003f2ff05f999ce626bc7ea0e0ad39fce47959c34f9a58"
+    },
+    {
+      "name": "01_MFD-003_TASK.md",
+      "sha256": "e8552b84f19d6587da088052eaa752ae44f0c61f8d7a0a94f0e797a04eabab53"
+    },
+    {
+      "name": "02_PLAYER_API_CONTRACT_DRAFT.md",
+      "sha256": "2bbc135e2a6362dc2f06a2df91826f109d75e307e41e9bfd314665858986d63d"
+    },
+    {
+      "name": "03_SECURITY_AND_AUTH_BOUNDARY.md",
+      "sha256": "7a064917918214204b5dab967aa11f746d036654cb6e491904363fd6f712f8a2"
+    },
+    {
+      "name": "04_CONTRACT_TEST_MATRIX.md",
+      "sha256": "8cca4957439909e4bf010db5ce650a696c94b0b36375a62f7c47c239f7fdd582"
+    },
+    {
+      "name": "05_IMPLEMENTATION_SEQUENCE.md",
+      "sha256": "74707e5dad26527b539833959a899bb5276ea606a1221f79dd60f9cbfc2f9bd5"
+    },
+    {
+      "name": "06_ACCEPTANCE_GATE.md",
+      "sha256": "34f3557b4b406bdb96c2d57ddb667c9a8d616b10f725e07cb69300a9218574dd"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "2d3b6c429a30bfa01059339d18580cc3565a53d519c46626bf02a6c9b53314d4"
+    }
+  ]
+}

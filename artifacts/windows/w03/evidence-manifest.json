@@ -1,0 +1,16 @@
+{
+  "package_id": "MFY-WIN-W03-PLAYLIST-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "implementation_root": "E:\\moodify-desktop",
+  "desktop_git_metadata": false,
+  "schema": {"old": 2, "new": 3, "relations": ["playlists", "playlistItems"]},
+  "authority": {"track": "LocalStateStore.library.tracks", "playlist": "LocalStateStore.playlists", "playlist_item": "LocalStateStore.playlistItems", "mutations": "PlaylistService", "queue_created": false},
+  "verification": {"command": "npm run verify", "typecheck": "PASS", "lint": "PASS", "test_files": 8, "tests_passed": 94, "tests_failed": 0},
+  "changed_code": ["src/shared/playlist.ts", "src/services/playlist/index.ts", "src/services/state/store.ts", "src/services/library/index.ts", "src/shared/ipc-channels.ts", "src/main/ipc/index.ts", "src/main/index.ts", "src/preload/index.ts", "src/vite-env.d.ts", "src/renderer/components/player/MinimalPlayer.tsx", "tests/unit/playlist.test.ts", "tests/unit/library.test.ts", "tests/unit/reliability.test.ts"],
+  "migration": {"local_state_backup": "local-state.json.v2.bak", "legacy_renderer_backup": "moodify.playlists.v2.backup", "idempotent": true},
+  "known_limits": ["Formal Queue deferred", "Drag-and-drop deferred; persisted up/down reorder provided", "Final package directory remains locked by running Moodify processes"],
+  "w03_status": "PASS",
+  "w04_gate": "PASS"
+}

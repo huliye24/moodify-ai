@@ -1,0 +1,53 @@
+{
+  "package_id": "MFD-001",
+  "title": "Moodify Desktop Authority & Boundary",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "mode": [
+    "read-only audit",
+    "authority reconciliation",
+    "documentation-only boundary design"
+  ],
+  "forbidden": [
+    "Electron feature implementation",
+    "production cloud changes",
+    "database changes",
+    "Android behavior changes",
+    "audio algorithm changes",
+    "mass deletion of Ear/legacy assets",
+    "secret/service-key exposure"
+  ],
+  "next_package": "MFD-002 — Electron Foundation",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "4b1b348866b07b935df6592bd05de7980ff721bf72e651a184c74d02451f3d11"
+    },
+    {
+      "name": "01_MFD-001_TASK.md",
+      "sha256": "99bcddbf3db982cf5f41d7a17648df687726ab03f884099503f7ea18d3fea71a"
+    },
+    {
+      "name": "02_HUMAN_AUTHORITY_BASELINE.md",
+      "sha256": "99fd67b5f076e3c79c3019b5042ba70f8c6bde4fbd5ee466decd8ce422b09956"
+    },
+    {
+      "name": "03_AUDIT_CHECKLIST.md",
+      "sha256": "97a3b379b7960e78979002ab3ef3bbd90c8e2e2e12d750ba4a10e1989c825ff3"
+    },
+    {
+      "name": "04_DELIVERABLE_CONTRACT.md",
+      "sha256": "e2ce6b669af05d1cdadf2038b072a77963377a8ecb49a6c071b998da756ee8d0"
+    },
+    {
+      "name": "05_ACCEPTANCE_GATE.md",
+      "sha256": "1a604998ca74c190b457a538f9653a66aaffaab645e5320402225bb4a0978b8b"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "0e3551e96db1f82c78d37dccafedd177b184d6a92448b289c2bdb548556c8b35"
+    }
+  ]
+}

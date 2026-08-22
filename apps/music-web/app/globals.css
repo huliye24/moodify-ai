@@ -66,3 +66,11 @@
 .drawer-item{display:flex;align-items:center;gap:12px;height:44px;padding:0 20px;color:#8e95b2;text-decoration:none;font-size:14px;transition:background .15s}.drawer-item:hover{color:white;background:rgba(255,255,255,.04)}
 .drawer-divider{border:0;border-top:1px solid var(--line);margin:6px 0}
 @media(max-width:760px){.drawer{width:100vw}}
+
+/* P3-02: the public home is listener-first; creator operations remain off-surface. */
+.sidebar > .nav-group,
+.content > header .header-actions,
+.sidebar > .profile button,
+.sidebar > .profile span {
+  display: none !important;
+}

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 const site = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "rongjingmusic");
-const pages = ["index.html", "ear.html", "music.html", "evidence.html", "about.html", "contact.html", "privacy.html"];
+const pages = ["index.html", "ear.html", "music.html", "evidence.html", "about.html", "contact.html", "privacy.html", "terms.html", "intellectual-property.html"];
 
 async function html(name) {
   return readFile(path.join(site, name), "utf8");
@@ -29,7 +29,7 @@ test("Product Home implements the frozen Public Form identity", async () => {
   assert.match(home, /每一种声音，(?:<br>)?都值得被世界听见。/);
   assert.match(home, /href="#download">Download<\/a>/);
   assert.match(home, /href="https:\/\/github\.com\/huliye24\/moodify-ai"/);
-  assert.match(home, /href="https:\/\/rongjinwenchuan\.xyz">Play/);
+  assert.match(home, /href="https:\/\/play\.rongjingmusic\.com">Play/);
   assert.match(home, /href="https:\/\/rongjingwenchuan\.com\/">Company<\/a>/);
   assert.match(home, /src="\/assets\/moodify-logo\.png"/);
   assert.doesNotMatch(home, /The Ear of AI|Auditory Intelligence Infrastructure|Give machines the ability to hear|\bACU\b|Developers|Creator Platform/);
@@ -58,7 +58,7 @@ test("Product Home does not present a non-functional Listen action", async () =>
   const home = await html("index.html");
   assert.doesNotMatch(home, /href="#listen"|id="listen"|>Listen<\/a>/);
   assert.doesNotMatch(home, /Listen\. Then Play\.|The principle|aria-labelledby="product-title"/);
-  assert.match(home, /href="https:\/\/rongjinwenchuan\.xyz">Play/);
+  assert.match(home, /href="https:\/\/play\.rongjingmusic\.com">Play/);
   assert.doesNotMatch(home, /<audio\b|data-original-src|data-moodify-src/);
 });
 
@@ -69,6 +69,9 @@ test("download metadata and targets remain internally consistent", async () => {
   assert.match(home, new RegExp(apk.replaceAll(".", "\\.")));
   assert.match(home, new RegExp(release.replaceAll(".", "\\.")));
   assert.match(home, /Version 2\.0\.0 · Android 8\.0\+/);
+  assert.match(home, /Current public stable/);
+  assert.match(home, /7fc6c95f04cb9ed7063cf4f50c8eebcd461748640367490493f270c712ff6175/);
+  assert.match(home, /acb9ef240418e387d45b55a6b50bfed5962da48bde66a00fbabc29155395a14f/);
   assert.match(home, /moodify-android-2\.0-download-qr\.png/);
   assert.doesNotMatch(home, /\biOS\b|Coming soon/i);
 });
@@ -91,7 +94,7 @@ test("Product Home metadata and footer match Public Brand authority", async () =
   assert.match(home, /<meta property="og:url" content="https:\/\/rongjingmusic\.com\/">/);
   assert.match(home, /<meta property="og:image" content="https:\/\/rongjingmusic\.com\/assets\/moodify-open-graph\.png">/);
   const footer = home.match(/<footer[\s\S]*?<\/footer>/)?.[0] ?? "";
-  for (const label of ["Product", "Web Player", "Company", "Research", "Privacy", "Contact", "GitHub"]) assert.match(footer, new RegExp(`>${label}<`));
+  for (const label of ["Product", "Web Player", "Company", "Research", "Terms", "IP", "Privacy", "Contact", "GitHub"]) assert.match(footer, new RegExp(`>${label}<`));
   assert.doesNotMatch(footer, /The Ear of AI|Infrastructure|\bAPI\b|\bACU\b|Creator Platform/);
 });
 
@@ -116,7 +119,18 @@ test("secondary-page footers no longer repeat the retired public identity", asyn
     const content = await html(page);
     const footer = content.match(/<footer[\s\S]*?<\/footer>/)?.[0] ?? "";
     assert.ok(footer, `${page} missing footer`);
+    for (const label of ["Product", "Web Player", "Company", "Research", "Terms", "IP", "Privacy", "Contact"]) assert.match(footer, new RegExp(`>${label}<`), `${page} missing ${label}`);
     assert.doesNotMatch(footer, /The Ear of AI/);
+  }
+});
+
+test("all Product pages share the same public return paths", async () => {
+  for (const page of pages) {
+    const content = await html(page);
+    const header = content.match(/<header[\s\S]*?<\/header>/)?.[0] ?? "";
+    assert.match(header, /href="https:\/\/play\.rongjingmusic\.com">Play/, `${page} missing Play`);
+    assert.match(header, /href="(?:#download|\/#download)">Download<\/a>/, `${page} missing Download`);
+    assert.match(header, /href="https:\/\/rongjingwenchuan\.com\/">Company<\/a>/, `${page} missing Company`);
   }
 });
 
@@ -126,6 +140,22 @@ test("Ear explanation remains internal and excluded from sitemap", async () => {
   assert.match(ear, /INTERNAL CAPABILITY · HISTORICAL EXPLANATION/);
   const sitemap = await readFile(path.join(site, "sitemap.xml"), "utf8");
   assert.doesNotMatch(sitemap, /ear\.html/);
+});
+
+test("legal pages state the operating entity and preserve creator rights boundaries", async () => {
+  const terms = await html("terms.html");
+  const ip = await html("intellectual-property.html");
+  for (const content of [terms, ip]) {
+    assert.match(content, /荣景文川（深圳）科技有限公司/);
+    assert.match(content, /hello@rongjingmusic\.com/);
+  }
+  assert.match(terms, /不构成已经提供的服务承诺/);
+  assert.match(terms, /不等同于版权登记、权属证明或法律意见/);
+  assert.match(ip, /不因内容被播放、上传或处理而主张其作品权属/);
+  assert.match(ip, /不构成版权登记、司法鉴定、权属裁决或法律意见/);
+  const sitemap = await readFile(path.join(site, "sitemap.xml"), "utf8");
+  assert.match(sitemap, /terms\.html/);
+  assert.match(sitemap, /intellectual-property\.html/);
 });
 
 test("reduced motion and mobile layout are present", async () => {
@@ -138,7 +168,7 @@ test("reduced motion and mobile layout are present", async () => {
 test("public pages use a versioned stylesheet so old browser CSS cannot mix with new HTML", async () => {
   for (const page of pages) {
     const content = await html(page);
-    assert.match(content, /href="\/assets\/site-public-form-20260820\.css"/);
+    assert.match(content, /href="\/assets\/site-public-form-20260820\.css(?:\?[^\"]+)?"/);
     assert.doesNotMatch(content, /href="\/assets\/site\.css"/);
   }
 });

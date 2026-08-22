@@ -1,0 +1,2 @@
+﻿asset_id,asset_type,current_location,current_identity,target_classification,target_registration,migration_status,evidence_ref,notes
+EXAMPLE-001,source,,,,,HUMAN_DECISION_REQUIRED,,Delete example row
