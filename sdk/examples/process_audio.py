@@ -1,10 +1,16 @@
+#!/usr/bin/env python3
 """
-Example: Process Audio
+Example: Process audio file
 
-Demonstrates how to process audio with intelligent operations.
+Demonstrates how to use Moodify SDK to process audio.
 """
 
+import sys
 from pathlib import Path
+
+# Add sdk to path (in real usage: pip install moodify-sdk)
+sdk_path = Path(__file__).parent.parent / "python"
+sys.path.insert(0, str(sdk_path))
 
 from moodify import MoodifyClient
 from moodify.exceptions import ValidationError, APIError, ProcessingError
@@ -15,77 +21,66 @@ def main():
 
     # Initialize client
     client = MoodifyClient(
-        api_key="your-api-key-here",  # Replace with your key
+        api_key="your-api-key-here",
         base_url="https://api.moodify.ai"
     )
 
-    # Path to input audio
-    input_path = Path("input.wav")  # Replace with your file
-
-    if not input_path.exists():
-        print(f"Error: Input file not found: {input_path}")
-        return
-
-    # Choose operation
-    operation = "reconstruct"  # Options: reconstruct, enhance, normalize
-
-    print(f"Processing: {input_path}")
-    print(f"Operation: {operation}")
-    print("-" * 40)
+    # Path to audio file
+    input_path = "path/to/your/audio.wav"
 
     try:
-        # Process audio
+        print(f"Processing: {input_path}")
+        print("-" * 40)
+
+        # Process audio with reconstruction
         result = client.process_audio(
             audio_path=input_path,
-            operation=operation,
+            operation="reconstruct",
             options={
                 "quality": "high",
                 "preserve_dynamics": True
             }
         )
 
-        # Print processing info
         print(f"Processing ID: {result.id}")
+        print(f"Operation: {result.operation}")
         print(f"Status: {result.status}")
-        print(f"Input: {result.input_path}")
-        print(f"Output: {result.output_path}")
 
-        # Check status
         if result.is_completed:
-            print("\n✓ Processing completed successfully!")
+            print(f"\n✓ Processing complete!")
+            print(f"Output: {result.output_path}")
 
-            # Print metadata
-            if result.metadata:
-                print("\nProcessing Metadata:")
-                for key, value in result.metadata.items():
-                    print(f"  {key}: {value}")
-
-            # Calculate duration
             if result.duration_seconds:
-                print(f"\nProcessing time: {result.duration_seconds:.2f} seconds")
-
-            print("\nNext steps:")
-            print(f"  - Download processed audio from: {result.output_path}")
-            print("  - Evaluate quality with client.evaluate_audio()")
+                print(f"Processing time: {result.duration_seconds:.2f}s")
 
         elif result.is_failed:
-            print(f"\n✗ Processing failed: {result.error}")
+            print(f"\n✗ Processing failed")
+            if result.error:
+                print(f"Error: {result.error}")
 
         else:
-            print(f"\nProcessing status: {result.status}")
+            print(f"\n⏳ Processing in progress...")
             print(f"Progress: {result.progress}%")
+
+        # Print metadata
+        if result.metadata:
+            print("\nMetadata:")
+            for key, value in result.metadata.items():
+                print(f"  {key}: {value}")
 
     except ValidationError as e:
         print(f"Validation error: {e}")
+        sys.exit(1)
     except ProcessingError as e:
         print(f"Processing error: {e}")
+        sys.exit(1)
     except APIError as e:
         print(f"API error: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-
-    finally:
-        client.close()
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"File not found: {input_path}")
+        print("Please update the input_path variable with a valid file path.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

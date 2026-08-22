@@ -1,5 +1,9 @@
 # Moodify SDK Design
 
+## Overview
+
+This document describes the SDK architecture for Moodify auditory intelligence platform.
+
 ## Architecture
 
 ```
@@ -17,116 +21,96 @@ Auditory Intelligence Engine
 ### 1. Developer Experience
 
 - Simple, intuitive API
-- Clear error messages
-- Type hints for IDE support
-- Comprehensive documentation
+- Clear documentation
+- Type hints throughout
+- Helpful error messages
 
-### 2. Flexibility
+### 2. Future Compatibility
 
-- Sync and async clients
-- Customizable configuration
-- Pluggable components
-- Framework integrations
+- Extensible models
+- Versioned API support
+- Backward compatibility
+- Graceful degradation
 
-### 3. Reliability
+### 3. Language Support
 
-- Automatic retries
-- Connection pooling
-- Timeout handling
-- Error recovery
+**Phase 1**: Python (current)
+**Phase 2**: JavaScript/TypeScript
+**Phase 3**: Go, Rust
+**Phase 4**: Mobile SDKs (iOS, Android)
 
 ## SDK Structure
 
+### Python SDK
+
 ```
-sdk/
-├── python/
-│   ├── __init__.py
-│   ├── client.py         # Main client classes
-│   ├── models.py         # Data models
-│   ├── exceptions.py     # Error classes
-│   └── utils.py          # Helper functions
-├── javascript/           # Future
-│   └── ...
-├── go/                   # Future
-│   └── ...
-└── examples/
-    ├── python/
-    └── javascript/
+sdk/python/
+├── __init__.py          # Package exports
+├── client.py            # Main client classes
+├── models.py            # Data models
+└── exceptions.py          # Error handling
 ```
 
-## Client Design
-
-### Synchronous Client
+### Client Design
 
 ```python
-from moodify import MoodifyClient
+class MoodifyClient:
+    """Synchronous client."""
 
-client = MoodifyClient(api_key="xxx")
-result = client.analyze_audio("audio.wav")
+    def analyze_audio(self, path) -> AudioAnalysisResult
+    def evaluate_audio(self, path) -> MRSResult
+    def process_audio(self, path, operation) -> ProcessingResult
 ```
-
-### Asynchronous Client
 
 ```python
-from moodify import AsyncMoodifyClient
+class AsyncMoodifyClient:
+    """Asynchronous client (future)."""
 
-async with AsyncMoodifyClient(api_key="xxx") as client:
-    result = await client.analyze_audio("audio.wav")
+    async def analyze_audio(self, path) -> AudioAnalysisResult
+    async def evaluate_audio(self, path) -> MRSResult
+    async def process_audio(self, path, operation) -> ProcessingResult
 ```
 
-### Context Manager
+## Data Models
+
+### AudioAnalysisResult
 
 ```python
-with MoodifyClient(api_key="xxx") as client:
-    result = client.analyze_audio("audio.wav")
-# Client automatically closed
+@dataclass
+class AudioAnalysisResult:
+    id: str
+    audio_path: str
+    duration: float
+    sample_rate: int
+    features: Dict[str, Any]
+    metadata: Dict[str, Any]
 ```
 
-## API Mapping
+### MRSResult
 
-| SDK Method | API Endpoint | Description |
-|------------|--------------|-------------|
-| `analyze_audio()` | POST /api/v1/analyze | Extract features |
-| `evaluate_audio()` | POST /api/v1/evaluate | MRS scoring |
-| `process_audio()` | POST /api/v1/process | Process audio |
-| `health_check()` | GET /health | Service status |
-
-## Data Flow
-
-### Analysis Flow
-
-```
-User Code
-    ↓
-client.analyze_audio()
-    ↓
-HTTP POST /api/v1/analyze
-    ↓
-API Server
-    ↓
-Feature Extraction
-    ↓
-AudioAnalysisResult
-    ↓
-User Code
+```python
+@dataclass
+class MRSResult:
+    id: str
+    audio_path: str
+    overall: float      # 0-100
+    fidelity: float     # 0-100
+    balance: float      # 0-100
+    clarity: float      # 0-100
+    version: str
 ```
 
-### Evaluation Flow
+### ProcessingResult
 
-```
-User Code
-    ↓
-client.evaluate_audio()
-    ↓
-HTTP POST /api/v1/evaluate
-    ↓
-API Server
-    ↓
-MRS Engine
-    ↓
-MRSResult
-    ↓
-User Code
+```python
+@dataclass
+class ProcessingResult:
+    id: str
+    input_path: str
+    output_path: str
+    operation: str
+    status: str         # pending/processing/completed/failed
+    progress: float     # 0-100
 ```
 
 ## Error Handling
@@ -136,65 +120,54 @@ User Code
 ```
 MoodifyError (base)
 ├── APIError
-│   ├── AuthenticationError
 │   ├── RateLimitError
-│   ├── NotFoundError
 │   ├── ServerError
-│   └── TimeoutError
+│   ├── NotFoundError
+│   └── ConflictError
 ├── ValidationError
-├── ProcessingError
-├── NetworkError
-├── FileError
-└── ConfigurationError
+├── AuthenticationError
+├── TimeoutError
+├── ConnectionError
+└── ProcessingError
 ```
 
-### Error Handling Pattern
+### Usage
 
 ```python
+from moodify import MoodifyClient
+from moodify.exceptions import ValidationError, APIError
+
+client = MoodifyClient(api_key="xxx")
+
 try:
     result = client.analyze_audio("audio.wav")
 except ValidationError as e:
-    # Invalid input
-    print(f"Invalid: {e}")
-except RateLimitError as e:
-    # Too many requests
-    time.sleep(e.retry_after)
+    print(f"Invalid input: {e}")
 except APIError as e:
-    # API error
-    print(f"API {e.status_code}: {e.message}")
+    print(f"API error: {e.status_code}")
 ```
 
-## Type Safety
+## Authentication
 
-### Type Hints
+### API Key
 
 ```python
-def analyze_audio(
-    audio_path: Union[str, Path],
-    options: Optional[Dict[str, Any]] = None
-) -> AudioAnalysisResult:
-    ...
+client = MoodifyClient(api_key="mk_live_xxx")
 ```
 
-### Model Types
+### Environment Variable
 
-- `AudioAnalysisResult`
-- `MRSResult`
-- `ProcessingResult`
-- `BatchResult`
+```bash
+export MOODIFY_API_KEY="mk_live_xxx"
+```
+
+```python
+client = MoodifyClient()  # Reads from env
+```
 
 ## Configuration
 
-### Environment Variables
-
-```bash
-MOODIFY_API_KEY=xxx
-MOODIFY_BASE_URL=https://api.moodify.ai
-MOODIFY_TIMEOUT=30
-MOODIFY_MAX_RETRIES=3
-```
-
-### Code Configuration
+### Client Options
 
 ```python
 client = MoodifyClient(
@@ -205,40 +178,72 @@ client = MoodifyClient(
 )
 ```
 
-## Future Extensions
+## API Mapping
 
-### Planned Features
+| SDK Method | API Endpoint | Method |
+|------------|--------------|--------|
+| `analyze_audio()` | `/api/v1/analyze` | POST |
+| `evaluate_audio()` | `/api/v1/evaluate` | POST |
+| `process_audio()` | `/api/v1/process` | POST |
+| `health_check()` | `/health` | GET |
 
-| Feature | Priority | Timeline |
-|---------|----------|----------|
-| JavaScript SDK | High | Phase 2 |
-| Streaming API | Medium | Phase 2 |
-| Batch Operations | High | Phase 2 |
-| Webhooks | Medium | Phase 3 |
-| CLI Tool | Low | Phase 3 |
+## Future Enhancements
 
-### Framework Integrations
+### Batch Operations
 
-- Django integration
-- Flask integration
-- FastAPI integration
-- Celery tasks
+```python
+results = client.analyze_batch([
+    "file1.wav",
+    "file2.wav",
+    "file3.wav"
+])
+```
+
+### Webhooks
+
+```python
+client.register_webhook(
+    url="https://my-app.com/webhook",
+    events=["processing.completed"]
+)
+```
+
+### Streaming
+
+```python
+for chunk in client.stream_analysis("large-file.wav"):
+    print(chunk.progress)
+```
+
+### Caching
+
+```python
+client = MoodifyClient(
+    cache_enabled=True,
+    cache_ttl=3600
+)
+```
 
 ## Versioning
 
-### SDK Versioning
+### SDK Version
 
-- Follows Semantic Versioning
-- Major: Breaking changes
-- Minor: New features
-- Patch: Bug fixes
+- Semantic versioning (MAJOR.MINOR.PATCH)
+- Version in `__version__`
+- Changelog maintained
 
-### API Compatibility
+### API Version
 
-| SDK Version | API Version | Status |
-|-------------|-------------|--------|
-| 1.x | v1 | Current |
-| 2.x | v2 | Future |
+- SDK supports multiple API versions
+- Default to latest stable
+- Version can be specified:
+
+```python
+client = MoodifyClient(
+    api_key="xxx",
+    api_version="v1"
+)
+```
 
 ## Testing
 
@@ -251,59 +256,55 @@ def test_analyze_audio():
     assert result.duration > 0
 ```
 
-### Integration Tests
+### Mock Client
 
-- Mock API responses
-- Test error scenarios
-- Verify retries
+```python
+from moodify.testing import MockMoodifyClient
 
-## Security
-
-### API Key Handling
-
-- Never hardcode keys
-- Use environment variables
-- Support key rotation
-
-### Data Protection
-
-- TLS for all requests
-- No local storage of audio
-- Secure temp file handling
-
-## Performance
-
-### Optimizations
-
-- Connection pooling
-- Request batching
-- Lazy loading
-- Result caching
-
-### Benchmarks
-
-| Operation | Target |
-|-----------|--------|
-| Analysis | < 100ms overhead |
-| Upload | Streaming upload |
-| Download | Streaming download |
+client = MockMoodifyClient()
+result = client.analyze_audio("test.wav")
+# Returns mock data
+```
 
 ## Documentation
 
 ### Code Documentation
 
-- Docstrings for all public APIs
+- Docstrings for all public methods
 - Type hints
-- Usage examples
+- Examples in docstrings
 
-### External Documentation
+### User Documentation
 
-- README.md
-- API Reference
-- Migration Guide
-- Changelog
+- README with quick start
+- Examples directory
+- API reference
+- Migration guides
 
-## License
+## Distribution
 
-Copyright © 2024-2026 荣景文川
-SPDX-License-Identifier: GPL-3.0-only
+### PyPI
+
+```bash
+pip install moodify-sdk
+```
+
+### Conda
+
+```bash
+conda install -c moodify moodify-sdk
+```
+
+### Source
+
+```bash
+git clone https://github.com/huliye24/moodify-ai.git
+cd moodify-ai/sdk/python
+pip install -e .
+```
+
+## References
+
+- [Python SDK README](../sdk/python/README.md)
+- [Examples](../sdk/examples/)
+- [API Documentation](../docs/api-reference.md) (future)

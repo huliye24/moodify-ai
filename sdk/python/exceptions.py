@@ -4,8 +4,6 @@ Moodify SDK Exceptions
 Custom exceptions for error handling.
 """
 
-from __future__ import annotations
-
 from typing import Any, Dict, Optional
 
 
@@ -27,7 +25,7 @@ class MoodifyError(Exception):
     ):
         super().__init__(message)
         self.message = message
-        self.code = code
+        self.code = code or "unknown_error"
         self.details = details or {}
 
     def __str__(self) -> str:
@@ -46,7 +44,7 @@ class MoodifyError(Exception):
 
 class APIError(MoodifyError):
     """
-    API request error.
+    API request failed.
 
     Attributes:
         status_code: HTTP status code
@@ -56,11 +54,11 @@ class APIError(MoodifyError):
     def __init__(
         self,
         message: str,
-        status_code: int = 500,
+        status_code: int,
         response_body: Optional[str] = None,
         code: Optional[str] = None
     ):
-        super().__init__(message, code=code)
+        super().__init__(message, code or f"http_{status_code}")
         self.status_code = status_code
         self.response_body = response_body
 
@@ -70,40 +68,43 @@ class APIError(MoodifyError):
 
 class ValidationError(MoodifyError):
     """
-    Input validation error.
+    Input validation failed.
 
-    Raised when input parameters or files are invalid.
+    Raised when:
+    - File not found
+    - Invalid file format
+    - Missing required parameters
+    - Invalid parameter values
     """
 
-    def __init__(
-        self,
-        message: str,
-        field: Optional[str] = None,
-        code: Optional[str] = None
-    ):
-        super().__init__(message, code=code or "VALIDATION_ERROR")
+    def __init__(self, message: str, field: Optional[str] = None):
+        super().__init__(message, code="validation_error")
         self.field = field
 
     def __str__(self) -> str:
         if self.field:
-            return f"Validation error in '{self.field}': {self.message}"
-        return f"Validation error: {self.message}"
+            return f"Validation Error ({self.field}): {self.message}"
+        return f"Validation Error: {self.message}"
 
 
 class AuthenticationError(MoodifyError):
     """
-    Authentication error.
+    Authentication failed.
 
-    Raised when API key is invalid or expired.
+    Raised when:
+    - API key is invalid
+    - API key is expired
+    - Missing authentication
+    - Insufficient permissions
     """
 
     def __init__(self, message: str = "Authentication failed"):
-        super().__init__(message, code="AUTH_ERROR")
+        super().__init__(message, code="authentication_error")
 
 
 class RateLimitError(APIError):
     """
-    Rate limit exceeded error.
+    Rate limit exceeded.
 
     Attributes:
         retry_after: Seconds to wait before retry
@@ -114,7 +115,7 @@ class RateLimitError(APIError):
         message: str = "Rate limit exceeded",
         retry_after: Optional[int] = None
     ):
-        super().__init__(message, status_code=429, code="RATE_LIMIT")
+        super().__init__(message, status_code=429, code="rate_limit")
         self.retry_after = retry_after
 
     def __str__(self) -> str:
@@ -123,102 +124,95 @@ class RateLimitError(APIError):
         return self.message
 
 
+class ServerError(APIError):
+    """
+    Server error (5xx).
+
+    Raised when Moodify API returns server error.
+    """
+
+    def __init__(self, message: str = "Server error", status_code: int = 500):
+        super().__init__(message, status_code, code="server_error")
+
+
+class TimeoutError(MoodifyError):
+    """
+    Request timeout.
+
+    Raised when request exceeds timeout limit.
+    """
+
+    def __init__(self, message: str = "Request timeout", timeout: Optional[float] = None):
+        super().__init__(message, code="timeout")
+        self.timeout = timeout
+
+
+class ConnectionError(MoodifyError):
+    """
+    Connection failed.
+
+    Raised when unable to connect to API.
+    """
+
+    def __init__(self, message: str = "Failed to connect to API"):
+        super().__init__(message, code="connection_error")
+
+
 class ProcessingError(MoodifyError):
     """
-    Audio processing error.
+    Audio processing failed.
 
-    Raised when audio processing fails.
+    Raised when audio processing operation fails.
     """
 
     def __init__(
         self,
         message: str,
-        job_id: Optional[str] = None,
-        code: Optional[str] = None
+        operation: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None
     ):
-        super().__init__(message, code=code or "PROCESSING_ERROR")
-        self.job_id = job_id
+        super().__init__(message, code="processing_error", details=details)
+        self.operation = operation
 
 
 class NotFoundError(APIError):
-    """Resource not found error."""
+    """
+    Resource not found.
+
+    Raised when requested resource does not exist.
+    """
 
     def __init__(self, message: str = "Resource not found"):
-        super().__init__(message, status_code=404, code="NOT_FOUND")
+        super().__init__(message, status_code=404, code="not_found")
 
 
-class ServerError(APIError):
-    """Internal server error."""
+class ConflictError(APIError):
+    """
+    Resource conflict.
 
-    def __init__(self, message: str = "Internal server error"):
-        super().__init__(message, status_code=500, code="SERVER_ERROR")
+    Raised when request conflicts with existing state.
+    """
 
-
-class TimeoutError(APIError):
-    """Request timeout error."""
-
-    def __init__(self, message: str = "Request timeout"):
-        super().__init__(message, status_code=408, code="TIMEOUT")
-
-
-class NetworkError(MoodifyError):
-    """Network connection error."""
-
-    def __init__(self, message: str = "Network error"):
-        super().__init__(message, code="NETWORK_ERROR")
-
-
-class FileError(MoodifyError):
-    """File operation error."""
-
-    def __init__(
-        self,
-        message: str,
-        path: Optional[str] = None,
-        code: Optional[str] = None
-    ):
-        super().__init__(message, code=code or "FILE_ERROR")
-        self.path = path
-
-    def __str__(self) -> str:
-        if self.path:
-            return f"File error for '{self.path}': {self.message}"
-        return f"File error: {self.message}"
-
-
-class ConfigurationError(MoodifyError):
-    """SDK configuration error."""
-
-    def __init__(self, message: str):
-        super().__init__(message, code="CONFIG_ERROR")
+    def __init__(self, message: str = "Resource conflict"):
+        super().__init__(message, status_code=409, code="conflict")
 
 
 # Error code mapping for HTTP status codes
-HTTP_ERROR_MAP = {
+HTTP_ERROR_CODES = {
     400: ValidationError,
     401: AuthenticationError,
     403: AuthenticationError,
     404: NotFoundError,
-    408: TimeoutError,
+    409: ConflictError,
     429: RateLimitError,
     500: ServerError,
     502: ServerError,
     503: ServerError,
-    504: TimeoutError,
+    504: ServerError,
 }
 
 
-def raise_for_status(status_code: int, message: str, response_body: Optional[str] = None) -> None:
-    """
-    Raise appropriate exception based on HTTP status code.
-
-    Args:
-        status_code: HTTP status code
-        message: Error message
-        response_body: Raw response body
-
-    Raises:
-        APIError or subclass
-    """
-    error_class = HTTP_ERROR_MAP.get(status_code, APIError)
-    raise error_class(message, status_code=status_code, response_body=response_body)
+def raise_for_status(status_code: int, message: str, response_body: Optional[str] = None):
+    """Raise appropriate exception based on status code."""
+    error_class = HTTP_ERROR_CODES.get(status_code, APIError)
+    raise error_class(message=message, status_code=status_code, response_body=response_body)

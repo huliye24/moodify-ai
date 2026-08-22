@@ -1,84 +1,78 @@
+#!/usr/bin/env python3
 """
-Example: Evaluate Audio Quality
+Example: Evaluate audio quality with MRS
 
-Demonstrates how to evaluate audio quality using MRS.
+Demonstrates how to use Moodify SDK to evaluate audio quality.
 """
 
+import sys
 from pathlib import Path
+
+# Add sdk to path (in real usage: pip install moodify-sdk)
+sdk_path = Path(__file__).parent.parent / "python"
+sys.path.insert(0, str(sdk_path))
 
 from moodify import MoodifyClient
 from moodify.exceptions import ValidationError, APIError
 
 
 def main():
-    """Evaluate audio quality example."""
+    """Evaluate audio example."""
 
     # Initialize client
     client = MoodifyClient(
-        api_key="your-api-key-here",  # Replace with your key
+        api_key="your-api-key-here",
         base_url="https://api.moodify.ai"
     )
 
     # Path to audio file
-    audio_path = Path("audio.wav")  # Replace with your file
-
-    if not audio_path.exists():
-        print(f"Error: File not found: {audio_path}")
-        return
-
-    print(f"Evaluating: {audio_path}")
-    print("-" * 40)
+    audio_path = "path/to/your/audio.wav"
 
     try:
+        print(f"Evaluating: {audio_path}")
+        print("-" * 40)
+
         # Evaluate audio quality
         result = client.evaluate_audio(audio_path)
 
         # Print MRS scores
-        print("MRS Evaluation Results")
-        print("=" * 40)
-        print(f"Overall Score: {result.overall:.1f}/100")
-        print(f"Fidelity:      {result.fidelity:.1f}/100")
-        print(f"Balance:       {result.balance:.1f}/100")
-        print(f"Clarity:       {result.clarity:.1f}/100")
-        print(f"Version:       {result.version}")
+        print(f"Evaluation ID: {result.id}")
+        print(f"MRS Version: {result.version}")
+        print()
+        print("Scores (0-100):")
+        print(f"  Overall:   {result.overall:.1f}")
+        print(f"  Fidelity:  {result.fidelity:.1f}")
+        print(f"  Balance:   {result.balance:.1f}")
+        print(f"  Clarity:   {result.clarity:.1f}")
 
         # Quality assessment
-        print("\nQuality Assessment:")
-        print("-" * 40)
-
+        print()
         if result.is_high_quality:
-            print("✓ High Quality Audio")
+            print("✓ High quality audio")
         elif result.is_acceptable:
-            print("○ Acceptable Quality")
+            print("✓ Acceptable quality")
         else:
-            print("✗ Low Quality - Improvements Recommended")
+            print("⚠ Quality needs improvement")
 
         # Get recommendations
         recommendations = result.get_recommendations()
         if recommendations:
             print("\nRecommendations:")
-            for i, rec in enumerate(recommendations, 1):
-                print(f"  {i}. {rec}")
-        else:
-            print("\nNo specific recommendations - audio looks good!")
-
-        # Print additional details if available
-        if result.details:
-            print("\nAdditional Details:")
-            for key, value in result.details.items():
-                print(f"  {key}: {value}")
+            for rec in recommendations:
+                print(f"  - {rec}")
 
         print("\nEvaluation complete!")
 
     except ValidationError as e:
         print(f"Validation error: {e}")
+        sys.exit(1)
     except APIError as e:
         print(f"API error: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-
-    finally:
-        client.close()
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"File not found: {audio_path}")
+        print("Please update the audio_path variable with a valid file path.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

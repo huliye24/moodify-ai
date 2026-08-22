@@ -1,38 +1,38 @@
+#!/usr/bin/env python3
 """
-Example: Analyze Audio
+Example: Analyze audio file
 
-Demonstrates how to analyze audio and extract features.
+Demonstrates how to use Moodify SDK to analyze audio.
 """
 
+import sys
 from pathlib import Path
+
+# Add sdk to path (in real usage: pip install moodify-sdk)
+sdk_path = Path(__file__).parent.parent / "python"
+sys.path.insert(0, str(sdk_path))
 
 from moodify import MoodifyClient
 from moodify.exceptions import ValidationError, APIError
 
 
 def main():
-    """Analyze audio file example."""
+    """Analyze audio example."""
 
     # Initialize client
-    # In production, use your actual API key
+    # In production, use environment variable for API key
     client = MoodifyClient(
-        api_key="your-api-key-here",  # Replace with your key
+        api_key="your-api-key-here",
         base_url="https://api.moodify.ai"
     )
 
     # Path to audio file
-    audio_path = Path("audio.wav")  # Replace with your file
-
-    # Check if file exists
-    if not audio_path.exists():
-        print(f"Error: File not found: {audio_path}")
-        print("Please provide a valid audio file path.")
-        return
-
-    print(f"Analyzing: {audio_path}")
-    print("-" * 40)
+    audio_path = "path/to/your/audio.wav"
 
     try:
+        print(f"Analyzing: {audio_path}")
+        print("-" * 40)
+
         # Analyze audio
         result = client.analyze_audio(audio_path)
 
@@ -45,10 +45,8 @@ def main():
         if result.features:
             print("\nFeatures:")
             for key, value in result.features.items():
-                if isinstance(value, dict):
-                    print(f"  {key}:")
-                    for sub_key, sub_value in value.items():
-                        print(f"    {sub_key}: {sub_value}")
+                if isinstance(value, (int, float)):
+                    print(f"  {key}: {value:.4f}")
                 else:
                     print(f"  {key}: {value}")
 
@@ -63,14 +61,14 @@ def main():
 
     except ValidationError as e:
         print(f"Validation error: {e}")
+        sys.exit(1)
     except APIError as e:
         print(f"API error: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-
-    finally:
-        # Close client
-        client.close()
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"File not found: {audio_path}")
+        print("Please update the audio_path variable with a valid file path.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
