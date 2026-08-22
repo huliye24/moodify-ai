@@ -3,68 +3,74 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contact — 联系 Moodify</title>
-  <meta name="description" content="Contact Moodify for Ear access, partnerships, and product questions.">
+  <title>Contact — Moodify</title>
+  <meta name="description" content="Contact Moodify for product questions, support, and inquiries. Email: hello@rongjingmusic.com">
   <link rel="canonical" href="https://rongjingmusic.com/contact.html">
   <link rel="icon" href="/favicon.png" type="image/png">
-  <meta property="og:title" content="Contact Moodify">
+  <meta property="og:title" content="Contact — Moodify">
+  <meta property="og:description" content="Contact Moodify for product questions and support.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="/assets/site-public-form-20260820.css">
+  <meta property="og:url" content="https://rongjingmusic.com/contact.html">
+  <meta property="og:image" content="https://rongjingmusic.com/assets/moodify-og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact Moodify",
+    "url": "https://rongjingmusic.com/contact.html",
+    "isPartOf": {
+      "@type": "Product",
+      "name": "Moodify",
+      "url": "https://rongjingmusic.com/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="/assets/site-public-form-20260820.css?v=20260822-email-only">
 </head>
-<body>
-  <header class="site-header">
+<body class="contact-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header wrap">
     <a class="brand" href="/" aria-label="Moodify home">
       <img src="/assets/moodify-logo.png" alt="" width="48" height="32"><span>MOODIFY</span>
     </a>
     <nav class="site-nav" aria-label="Primary">
-      <a href="/">Home</a>
-      <a href="/music.html">Moodify Music</a>
-      <a href="/evidence.html">Evidence</a>
+      <a class="nav-play" href="https://play.rongjingmusic.com">Play <span aria-hidden="true">↗</span></a>
+      <a href="/#download">Download</a>
+      <a href="https://rongjingwenchuan.com/">Company</a>
     </nav>
   </header>
 
-  <main>
-    <section class="hero" style="border-bottom:0">
-      <p class="eyebrow">CONTACT</p>
-      <h1>Talk to Moodify</h1>
-      <p class="lede">Ear access is waitlisted. Music is open at rongjinwenchuan.xyz. For partnerships, research collaboration, or questions, write to us below.</p>
+  <main id="main">
+    <section class="contact-hero wrap" aria-labelledby="contact-title">
+      <p class="eyebrow">Contact</p>
+      <h1 id="contact-title">Say hello.</h1>
+      <p class="contact-intro">联系 Moodify，了解产品、寻求支持，或讨论合作。<br>Tell us what you have in mind.</p>
     </section>
 
-    <section style="border-bottom:0">
-      <form class="contact-form" id="contact-form" novalidate>
-        <label for="cf-name">Name</label>
-        <input id="cf-name" name="name" type="text" maxlength="120" required>
-        <label for="cf-email">Email</label>
-        <input id="cf-email" name="email" type="email" maxlength="320" required>
-        <label for="cf-topic">Topic</label>
-        <select id="cf-topic" name="topic">
-          <option value="ear-access">Ear access request</option>
-          <option value="partnership">Partnership / research</option>
-          <option value="music">Moodify Music</option>
-          <option value="other">Other</option>
-        </select>
-        <label for="cf-message">Message</label>
-        <textarea id="cf-message" name="message" rows="5" maxlength="2000" required></textarea>
-        <button class="btn btn-primary" type="submit" style="justify-self:start;border:0;cursor:pointer">Send inquiry</button>
-        <output id="cf-output" aria-live="polite">This form does not yet submit to a server; use the email address below for now.</output>
-      </form>
-      <p class="note" style="margin-top:24px">Email: <a href="mailto:hello@rongjingwenchuan.com">hello@rongjingwenchuan.com</a> · Privacy: <a href="/privacy.html">privacy policy</a></p>
+    <section class="contact-section">
+      <div class="wrap contact-email-only">
+        <p class="contact-kicker">Email</p>
+        <a class="contact-email" href="mailto:hello@rongjingmusic.com">hello@rongjingmusic.com</a>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <span>© 2024–2026 荣景文川 · Moodify</span>
-    <nav aria-label="Footer">
-      <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy</a>
-    </nav>
+    <div class="wrap footer-grid">
+      <div class="footer-brand"><a class="brand" href="/"><img src="/assets/moodify-logo.png" alt="" width="48" height="32"><span>MOODIFY</span></a><span>Every voice deserves to be heard.</span></div>
+      <nav aria-label="Footer">
+        <a href="/">Product</a>
+        <a href="https://play.rongjingmusic.com">Web Player</a>
+        <a href="https://rongjingwenchuan.com/">Company</a>
+        <a href="/evidence.html">Research</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/intellectual-property.html">IP</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <p>© 2024–2026 荣景文川（深圳）科技有限公司</p>
+    </div>
   </footer>
-
-  <script>
-    document.getElementById("contact-form").addEventListener("submit", function (event) {
-      event.preventDefault();
-      var output = document.getElementById("cf-output");
-      output.textContent = "Thank you — inquiries are read at hello@rongjingwenchuan.com. (Server form is not live in Phase I.)";
-    });
-  </script>
 </body>
 </html>
