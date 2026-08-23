@@ -154,9 +154,9 @@ class QAAPIService:
 
         This would be run as a background task in FastAPI.
         """
-        from moodify_qa.core.analyzer import AudioAnalyzer
-        from moodify_qa.core.scoring import QAScorer
-        from moodify_qa.core.report import QAReport
+        from core.analyzer import AudioAnalyzer
+        from core.scoring import QAScorer
+        from core.report import QAReport
 
         job = self.jobs.get(analysis_id)
         if job is None:

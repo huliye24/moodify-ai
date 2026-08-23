@@ -16,13 +16,16 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from moodify_qa.core.analyzer import AudioAnalyzer
-from moodify_qa.core.scoring import QAScorer
-from moodify_qa.core.report import QAReport
+from core.analyzer import AudioAnalyzer
+from core.scoring import QAScorer
+from core.report import QAReport
 
 # Initialize CLI
 app = typer.Typer(

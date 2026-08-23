@@ -1,0 +1,80 @@
+{
+  "track": "example.wav",
+  "duration_seconds": 10.0,
+  "sample_rate_hz": 44100,
+  "channels": 2,
+  "qa_score": 77.8,
+  "technical_score": 65.4,
+  "musical_score": 96.5,
+  "issues": [
+    {
+      "category": "loudness",
+      "severity": "warning",
+      "message": "Audio is very loud (-6.9 LUFS). May cause listener fatigue.",
+      "metric": "integrated_lufs",
+      "value": -6.87,
+      "threshold": -9.0
+    },
+    {
+      "category": "dynamics",
+      "severity": "warning",
+      "message": "Low dynamic range (0.0 dB). Audio may sound compressed.",
+      "metric": "dynamic_range_db",
+      "value": 0.0,
+      "threshold": 8.0
+    },
+    {
+      "category": "noise",
+      "severity": "warning",
+      "message": "High noise floor (-6.6 dBFS). Significant background noise.",
+      "metric": "noise_floor_dbfs",
+      "value": -6.6,
+      "threshold": -50.0
+    },
+    {
+      "category": "frequency",
+      "severity": "info",
+      "message": "Limited high-frequency content (cutoff at 1324 Hz).",
+      "metric": "high_freq_cutoff_hz",
+      "value": 1324.3,
+      "threshold": 15000.0
+    }
+  ],
+  "recommendations": [
+    {
+      "issue_category": "dynamics",
+      "priority": 1,
+      "action": "Increase dynamic range",
+      "details": "Current: 0.0 dB. Target: >8.0 dB. Reduce compression or use parallel processing."
+    },
+    {
+      "issue_category": "loudness",
+      "priority": 2,
+      "action": "Reduce overall loudness",
+      "details": "Current: -6.9 LUFS. Target: -14.0 LUFS. Consider reducing gain by 7.1 dB."
+    },
+    {
+      "issue_category": "noise",
+      "priority": 3,
+      "action": "Reduce noise floor",
+      "details": "Current: -6.6 dBFS. Consider noise reduction or better recording environment."
+    }
+  ],
+  "breakdown": {
+    "technical": {
+      "overall": 65.41666666666666,
+      "loudness": 60.0,
+      "dynamics": 46.666666666666664,
+      "clipping": 85.0,
+      "noise": 50.0,
+      "stereo": 100.0
+    },
+    "musical": {
+      "overall": 96.5,
+      "balance": 100.0,
+      "frequency": 90.0,
+      "energy": 100.0
+    }
+  },
+  "generated_at": "2026-08-23T16:52:58.009204"
+}

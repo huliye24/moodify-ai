@@ -37,6 +37,8 @@ class QAReport:
     @classmethod
     def from_scoring_result(cls, scoring_result, analysis_result) -> QAReport:
         """Create report from scoring and analysis results."""
+        from core.analyzer import AudioAnalysisResult
+        from core.scoring import QAScoringResult
         return cls(
             track=scoring_result.track,
             duration_seconds=analysis_result.duration_seconds,

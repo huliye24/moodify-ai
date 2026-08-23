@@ -153,7 +153,7 @@ class QAScorer:
 
     def score(self, analysis_result) -> QAScoringResult:
         """Calculate QA score from analysis result."""
-        from moodify_qa.core.analyzer import AudioAnalysisResult
+        from core.analyzer import AudioAnalysisResult
 
         if not isinstance(analysis_result, AudioAnalysisResult):
             raise TypeError("Expected AudioAnalysisResult")

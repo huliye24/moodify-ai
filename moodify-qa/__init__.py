@@ -16,8 +16,15 @@ __version__ = "0.1.0"
 __author__ = "Moodify AI"
 __license__ = "GPL-3.0-only"
 
-from moodify_qa.core.analyzer import AudioAnalyzer
-from moodify_qa.core.scoring import QAScorer
-from moodify_qa.core.report import QAReport
+# Use relative imports for standalone execution
+import sys
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from core.analyzer import AudioAnalyzer
+from core.scoring import QAScorer
+from core.report import QAReport
 
 __all__ = ["AudioAnalyzer", "QAScorer", "QAReport"]
