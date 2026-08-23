@@ -1,0 +1,2 @@
+﻿node_id,observed_identity,provider,region,primary_role,secondary_roles,forbidden_roles,capacity_limit,concurrency_limit,data_locality,failure_domain,recovery_owner,evidence_ref,decision_reason,revisit_trigger
+EXAMPLE-001,,,,RESERVE_UNUSED,,,,,,,,,,

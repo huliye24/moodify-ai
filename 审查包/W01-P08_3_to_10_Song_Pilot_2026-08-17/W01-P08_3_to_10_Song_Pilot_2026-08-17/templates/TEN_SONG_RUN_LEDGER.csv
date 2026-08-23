@@ -1,0 +1,1 @@
+﻿pilot_case_id,run_id,job_id,attempts,freeze_id,first_pass_acceptance,engineering_verdict,listening_verdict,retry_count,recovery_count,wall_clock_ms,compute_ms,external_ms,human_review_ms,traceability,playback_pass,notes

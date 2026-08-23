@@ -1,0 +1,38 @@
+Execute MFY-WIN-W11-SETTINGS-AUDIO-ENV-001 in the Moodify repository.
+
+This is W11 of the Windows Desktop Completion sequence.
+
+Critical rules:
+- First read W10, W09 and W08 artifacts.
+- W10 may be PASS or PARTIAL, but W11_GATE must be PASS.
+- Establish ONE Settings authority.
+- Settings represent user preference only; do not move Track/Queue/Playback truth into Settings.
+- Add schema version, defaults, validation, migration and corruption fallback.
+- Audit real audio-output capabilities before building a selector.
+- If output selection is unsupported, hide the control or only show System Default; never fake it.
+- Device disappearance/hotplug must fail safely.
+- Never jump volume to 100% due to output change.
+- Preserve W08 rule: app launch does not autoplay.
+- Explicit Open With may still play according to W09.
+- Cloud READY must not surprise-play.
+- Close=Quit remains default; minimize-to-tray is optional only if W09 tray capability exists.
+- Launch at startup is OFF by default and never implies autoplay.
+- Define cache vs durable data. “Clear cache” must never delete Library, Playlist, Favorite, History or original music files.
+- Storage relocation must validate, migrate, verify and rollback on failure.
+- Do not move users' original music as a settings migration.
+- Only expose W10-verified cloud preferences. Do not expose service keys, endpoints, providers, Ear, Stem, DSP, worker or model controls.
+- Hide unsupported settings rather than showing fake disabled features.
+- Keep Settings UI small: Playback / App / Storage / Moodify Cloud.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W12.
+- Do not commit secrets, credentials, private audio or large fixtures.
+
+Write artifacts under:
+artifacts/windows/w11/
+
+Finish with:
+W11_STATUS = PASS | PARTIAL | BLOCKED
+W12_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

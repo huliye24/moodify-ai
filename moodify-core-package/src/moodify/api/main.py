@@ -14,6 +14,9 @@ from moodify.auditory.errors import AuditoryError
 from moodify.release import PRODUCT_VERSION, analyze_to_case, reopen_case
 from moodify.node.config import NodeConfig
 from moodify.node.queue import JobQueue
+from moodify.api.routes.analyze import router as intelligence_analyze_router
+from moodify.api.routes.evaluate import router as intelligence_evaluate_router
+from moodify.api.routes.process import router as intelligence_process_router
 from moodify.api.routes.reviews import router as reviews_router
 from moodify.api.routes.stems import router as stems_router
 from moodify.reconstruction_job.routes_reconstruction import router as reconstruction_router
@@ -62,6 +65,9 @@ def _safe_json(path: Path) -> dict | list | None:
 app.include_router(reviews_router)
 app.include_router(stems_router)
 app.include_router(reconstruction_router)
+app.include_router(intelligence_analyze_router)
+app.include_router(intelligence_evaluate_router)
+app.include_router(intelligence_process_router)
 
 
 @app.get("/health")
@@ -79,6 +85,38 @@ async def health() -> dict:
 @app.get("/api/v1/health")
 async def api_health() -> dict:
     return await health()
+
+
+@app.post("/api/v1/auditory/analyze")
+async def analyze(audio: UploadFile = File(...)) -> dict:
+    """Preserve the existing production-case analysis contract."""
+    content = await audio.read(MAX_SIZE + 1)
+    if len(content) > MAX_SIZE:
+        raise HTTPException(status_code=413, detail={"code": "AUDIO_TOO_LARGE"})
+    suffix = Path(audio.filename or "upload.wav").suffix or ".wav"
+    tmp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as handle:
+            handle.write(content)
+            tmp_path = Path(handle.name)
+        return analyze_to_case(
+            tmp_path,
+            _cases_root(),
+            display_name=Path(audio.filename or "upload.wav").name,
+        )
+    except AuditoryError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={"code": type(exc).__name__.upper(), "message": str(exc)},
+        ) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "ANALYSIS_FAILED", "message": str(exc)},
+        ) from exc
+    finally:
+        if tmp_path is not None:
+            tmp_path.unlink(missing_ok=True)
 
 
 @app.post("/api/v1/auditory/jobs", status_code=202)
@@ -140,37 +178,6 @@ async def get_job_result(job_id: str) -> dict:
         "algorithmic_review": _safe_json(case_dir / "06_human_review" / "review.json"),
         "algorithmic_scores": _safe_json(case_dir / "06_human_review" / "algorithmic_scores.json"),
     }
-
-
-@app.post("/api/v1/auditory/analyze")
-async def analyze(audio: UploadFile = File(...)) -> dict:
-    content = await audio.read(MAX_SIZE + 1)
-    if len(content) > MAX_SIZE:
-        raise HTTPException(status_code=413, detail={"code": "AUDIO_TOO_LARGE"})
-    suffix = Path(audio.filename or "upload.wav").suffix or ".wav"
-    tmp_path: Path | None = None
-    try:
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as handle:
-            handle.write(content)
-            tmp_path = Path(handle.name)
-        return analyze_to_case(
-            tmp_path,
-            _cases_root(),
-            display_name=Path(audio.filename or "upload.wav").name,
-        )
-    except AuditoryError as exc:
-        raise HTTPException(
-            status_code=422,
-            detail={"code": type(exc).__name__.upper(), "message": str(exc)},
-        ) from exc
-    except (OSError, ValueError) as exc:
-        raise HTTPException(
-            status_code=400,
-            detail={"code": "ANALYSIS_FAILED", "message": str(exc)},
-        ) from exc
-    finally:
-        if tmp_path is not None:
-            tmp_path.unlink(missing_ok=True)
 
 
 @app.get("/api/v1/auditory/cases/{case_id}")

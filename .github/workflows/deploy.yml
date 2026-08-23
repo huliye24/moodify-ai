@@ -16,10 +16,10 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: apps/music-web/package-lock.json
+          cache-dependency-path: apps/web/package-lock.json
 
       - name: Build and verify Web Player artifact
-        working-directory: apps/music-web
+        working-directory: apps/web
         run: |
           npm ci
           npm test

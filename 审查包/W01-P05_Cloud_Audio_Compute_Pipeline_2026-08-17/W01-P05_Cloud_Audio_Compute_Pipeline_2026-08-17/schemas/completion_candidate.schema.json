@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify CompletionCandidate",
+  "type": "object",
+  "required": [
+    "job_id",
+    "track_id",
+    "attempt_id",
+    "pipeline_version",
+    "production_fingerprint",
+    "source_object_id",
+    "ready_candidate_object_id",
+    "evidence_refs",
+    "verification_result",
+    "stage_results",
+    "completed_at"
+  ],
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "track_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lease_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fencing_token": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ]
+    },
+    "pipeline_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "production_fingerprint": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "source_object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ready_candidate_object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supporting_object_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "verification_result": {
+      "const": "PASS"
+    },
+    "stage_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object"
+      }
+    },
+    "resource_summary": {
+      "type": "object"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

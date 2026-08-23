@@ -1,0 +1,19 @@
+{
+  "product": "Moodify Music / Moodify Player",
+  "version": "0.1.0-beta.2",
+  "build": "0.1.0.6",
+  "commit": "UNKNOWN",
+  "channel": "BETA_CANDIDATE",
+  "platform": "win32-x64",
+  "installer": {
+    "path": "E:\\moodify-desktop\\out-w12\\make\\squirrel.windows\\x64\\Moodify-Windows-0.1.0-beta.2-Setup.exe",
+    "size_bytes": 109033984,
+    "sha256": "A571D54CD3666675DF7DA903E436A565B25DF74698AF034CB9F40ECC9EA58702",
+    "signed": false
+  },
+  "package": {
+    "path": "E:\\moodify-desktop\\out-w12\\make\\squirrel.windows\\x64\\Moodify-0.1.0-beta2-full.nupkg",
+    "size_bytes": 108247991,
+    "sha256": "E918C77AA8283E29F22372897A7B088F989542A578C855AB283C034850D43692"
+  }
+}

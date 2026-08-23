@@ -1,0 +1,13 @@
+{
+  "version": "blind-kit-v0.1",
+  "listening_dir": "E:\\moodify\\moodify-core-package\\golden_run_out\\listening",
+  "mapping": {
+    "X2": "SOURCE",
+    "X1": "A",
+    "X3": "B",
+    "X4": "C"
+  },
+  "level_target_lufs": -13.936411373992222,
+  "level_method": "linear-gain-to-source-lufs",
+  "finalized": false
+}

@@ -1,0 +1,85 @@
+{
+  "package_id": "MFD-007",
+  "title": "Windows Productization",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-006 must be GO",
+  "scope": [
+    "Windows app identity",
+    "installer and Squirrel lifecycle",
+    "single-instance packaged behavior",
+    "tray and background playback",
+    "Windows media controls",
+    "packaged logging",
+    "update service and channel boundary",
+    "code-signing readiness",
+    "reproducible release build",
+    "checksums and build info",
+    "clean install, upgrade, uninstall"
+  ],
+  "release_policy": {
+    "internal_alpha": "unsigned allowed if signing unavailable, clearly marked internal-only",
+    "public_alpha": "signing and release gate required",
+    "publishing": "requires explicit human authorization"
+  },
+  "forbidden": [
+    "WASAPI",
+    "ASIO",
+    "native audio addon",
+    "DSP/EQ",
+    "offline full library",
+    "background mass audio download",
+    "macOS/Linux packaging",
+    "public publishing without authorization",
+    "signing credential commit"
+  ],
+  "next_package": "MFD-008 — Alpha Release Gate",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "cdb2c882611b81e75b67eede3d85ddd4538ff4d289d0fb5db836dcc88294d8b1"
+    },
+    {
+      "name": "01_MFD-007_TASK.md",
+      "sha256": "6601b52597148bcf1affe01be07d4c851b6f3cb466f34548371db431cf6d7674"
+    },
+    {
+      "name": "02_WINDOWS_PRODUCT_CONTRACT.md",
+      "sha256": "ad8cced14b93ab3282196a831f62360619d15fad5fde4c88e019e5f05ef137de"
+    },
+    {
+      "name": "03_RELEASE_AND_UPDATE_POLICY.md",
+      "sha256": "fb4d9972573d9d45de8b5afe1c6b427cfb2ccea2dc691e29fed2f286894738f9"
+    },
+    {
+      "name": "04_SIGNING_READINESS.md",
+      "sha256": "4c699d3be2867eea64e876a806e8b1405365e60a4cfc4c7c799286a91c6cee4f"
+    },
+    {
+      "name": "05_WINDOWS_TEST_MATRIX.md",
+      "sha256": "143f614b5b08f63ca40850145d62d6264ea4c80fb77200fbd472eafd76b52743"
+    },
+    {
+      "name": "06_RELEASE_ARTIFACT_CONTRACT.md",
+      "sha256": "40eaf1d7d52cf1967c3a7e4dc8585d11530607afd28b3a052be8e285520b3d5a"
+    },
+    {
+      "name": "07_IMPLEMENTATION_SEQUENCE.md",
+      "sha256": "10117bf812778e9c0ab5f26cf03dcd57198d15b48a11ac8af72889253dd3650d"
+    },
+    {
+      "name": "08_ACCEPTANCE_GATE.md",
+      "sha256": "23975fdb3036ce506d7e09e9dfcd552e3d67bd46913b6f0ac7bfb1ec81fd1f9f"
+    },
+    {
+      "name": "09_EVIDENCE_TEMPLATE.md",
+      "sha256": "bc18af6b2345e5910f2f4a09f2ae685ff5181ae1795201a5f31181369a2edf5a"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "0aa0b643879ee001e4057afd0f52f6b7a8e3d77c7a3b21e887c6c26ca51529c1"
+    }
+  ]
+}

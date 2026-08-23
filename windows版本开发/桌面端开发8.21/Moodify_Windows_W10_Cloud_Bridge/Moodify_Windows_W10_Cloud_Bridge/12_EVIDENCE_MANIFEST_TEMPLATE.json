@@ -1,0 +1,30 @@
+{
+  "package_id": "MFY-WIN-W10-CLOUD-BRIDGE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w09_status": "",
+  "w10_gate": "",
+  "cloud_chain": "",
+  "capabilities": {},
+  "authorities": {
+    "track": "",
+    "playback": "",
+    "recovery": "",
+    "cloud_client": ""
+  },
+  "auth_model": "",
+  "idempotency": "",
+  "trigger_policy": "",
+  "source_policy": "",
+  "commands": [],
+  "tests": [],
+  "manual_flows": [],
+  "network_failure_tests": [],
+  "security_tests": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w10_status": "BLOCKED",
+  "w11_gate": "BLOCKED"
+}

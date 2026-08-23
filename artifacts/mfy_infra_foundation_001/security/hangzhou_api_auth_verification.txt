@@ -1,0 +1,36 @@
+MFY-INFRA-FOUNDATION-001 C1 — Hangzhou API authentication
+=========================================================
+Date: 2026-08-13
+Host: 120.55.191.146 (Hangzhou ECS)
+
+CHANGE
+------
+- File: /root/moodify-core-package/src/moodify/api/main.py
+  Backup: main.py.bak-20260813 (sha256 fe12e64dd03a596267979d49a11a078854ea3ae11f89aba911c7dbcdafc6ffab)
+  Pre-change checksum: fe12e64dd03a596267979d49a11a078854ea3ae11f89aba911c7dbcdafc6ffab
+  Added: service-key middleware (X-Moodify-Service-Key or Authorization: Bearer)
+  Public path: /health only. All other paths require key when env set.
+- Env injection: /root/moodify-api.env (0600, root) via EnvironmentFile in
+  /etc/systemd/system/moodify-api.service
+  Unit backup: /etc/systemd/system/moodify-api.service.bak-20260813
+- Key: independent random 64-hex, stored local-only (0600), not in git, not printed.
+
+VERIFICATION
+------------
+From Hangzhou localhost:
+  GET /health               -> 200 (public)
+  GET /presets (no key)     -> 401
+From public internet (local machine):
+  GET /health               -> 200
+  GET /presets no-key       -> 401
+  GET /presets bad-key      -> 401
+  GET /presets X-Moodify-Service-Key good -> 200
+  GET /presets Bearer good  -> 200
+From LA server (103.144.246.242):
+  GET /health               -> 200
+  GET /presets no-key       -> 401
+  GET /presets good-key     -> 200
+
+RESULT: PASS
+ROLLBACK: restore main.py.bak-20260813, remove EnvironmentFile line,
+restore unit backup, systemctl daemon-reload && restart moodify-api.

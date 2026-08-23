@@ -1,0 +1,2 @@
+﻿golden_case_id,run_id,job_id,attempt_id,stage,started_at,finished_at,status,input_refs,output_refs,evidence_refs,duration_ms,notes
+GOLDEN-001,,,,,,,HUMAN_REVIEW_REQUIRED,,,,,Replace during execution

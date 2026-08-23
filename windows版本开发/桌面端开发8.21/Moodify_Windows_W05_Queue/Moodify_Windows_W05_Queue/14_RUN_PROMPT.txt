@@ -1,0 +1,73 @@
+Execute MFY-WIN-W05-QUEUE-001 in the Moodify repository.
+
+This is W05 of the Windows Desktop Completion sequence.
+
+Read:
+00_README.md
+01_CODEX_TASK.md
+02_ACCEPTANCE_CRITERIA.md
+03_QUEUE_INVARIANTS.md
+04_QUEUE_COMMAND_MATRIX.csv
+05_QUEUE_ITEM_CONTRACT.md
+06_QUEUE_SOURCE_POLICY.md
+07_MUTATION_POLICY.md
+08_ENDED_ERROR_INTEGRATION.md
+09_UI_QUEUE_CONTRACT.md
+10_QUEUE_PERSISTENCE_SEAM.md
+11_EVIDENCE_MANIFEST_TEMPLATE.json
+12_W05_IMPLEMENTATION_REPORT_TEMPLATE.md
+13_W06_HANDOFF_GATE.md
+
+Critical rules:
+- First read W04 artifacts under artifacts/windows/w04/.
+- If W05_GATE is not PASS, stop and report BLOCKED.
+- Reuse W04 Playback authority; do not create a second player.
+- Establish ONE Queue sequencing authority.
+- Queue != Playlist.
+- Queue != Playback.
+- QueueItem references stable Track identity.
+- Queue mutations must never mutate Playlist/Library/original files.
+- Prefer Playlist → Queue SNAPSHOT semantics unless current repo evidence requires otherwise.
+- Implement Play Next, Add to Queue, Remove, Reorder, Clear, Previous/Next integration.
+- Ended must advance Queue exactly once.
+- Error skip must be bounded and cannot loop forever.
+- Current Queue item mutation behavior must be explicit.
+- Queue duplicate Track policy must be explicit.
+- Preserve the current Windows Alpha visual direction.
+- Use minimal Queue UI, preferably current sidebar/secondary surface.
+- No recommendation autoplay, social features, DSP, Ear, cloud internals.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W06.
+- Do not commit secrets, credentials, private audio, or large fixtures.
+
+Write all artifacts under:
+artifacts/windows/w05/
+
+At the end report:
+1. W04 preflight,
+2. old queue reality,
+3. Queue authority,
+4. QueueItem contract,
+5. source/materialization policy,
+6. Play Now,
+7. Play Next,
+8. Append,
+9. Previous/Next,
+10. ended/error integration,
+11. remove/reorder/clear policies,
+12. files changed,
+13. commands,
+14. tests,
+15. race tests,
+16. referential safety,
+17. evidence,
+18. blockers/unknowns,
+19. W05_STATUS,
+20. W06_GATE.
+
+Finish with:
+W05_STATUS = PASS | BLOCKED
+W06_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

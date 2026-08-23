@@ -1,0 +1,59 @@
+Execute MFY-WIN-W02-MUSIC-LIBRARY-001 in the Moodify repository.
+
+This is W02 of the Windows Desktop Completion sequence.
+
+Read:
+00_README.md
+01_CODEX_TASK.md
+02_ACCEPTANCE_CRITERIA.md
+03_TRACK_LIBRARY_INVARIANTS.md
+04_TEST_MATRIX.csv
+05_IMPORT_RESULT_CONTRACT.md
+06_MIGRATION_RULES.md
+07_UI_INTERACTION_CONTRACT.md
+08_EVIDENCE_MANIFEST_TEMPLATE.json
+09_W02_IMPLEMENTATION_REPORT_TEMPLATE.md
+10_W03_HANDOFF_GATE.md
+
+Critical rules:
+- First read W01 artifacts from artifacts/windows/w01/.
+- If W01 W02_GATE is not PASS, STOP implementation and report BLOCKED.
+- Use the ACTUAL desktop stack and architecture proven by W01.
+- Do not assume Electron, SQLite, React, Zustand, Redux, or any specific technology.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W03.
+- Establish or repair ONE Track authority and ONE Library authority.
+- Do not create shadow stores or duplicate persistence.
+- Import must become durable Library state.
+- Restart is a hard acceptance boundary.
+- Duplicate import must be deterministic.
+- Same filename does not imply same Track.
+- Missing/moved/deleted local source must fail safely without destroying Track identity.
+- “Remove from Library” must never delete the user's original audio file.
+- Player should consume Library Track via the existing/approved source resolution path.
+- Preserve current UI direction; only minimal interaction changes are allowed.
+- Do not expose Moodify Ear / stem / DSP / Evidence internals.
+- Do not commit secrets, credentials, private user audio, or large media fixtures.
+
+Write all execution artifacts under:
+artifacts/windows/w02/
+
+At the end report:
+1. preflight and W01 gate,
+2. authorities reused/repaired/migrated,
+3. files changed,
+4. migration performed,
+5. commands run,
+6. tests and results,
+7. manual flows,
+8. evidence,
+9. blockers/unknowns,
+10. W02_STATUS,
+11. W03_GATE.
+
+Finish with:
+W02_STATUS = PASS | BLOCKED
+W03_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

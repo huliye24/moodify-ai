@@ -1,0 +1,127 @@
+version: "3.8"
+
+services:
+  # Moodify API Service
+  # Main entry point for audio analysis and processing requests
+  moodify-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: moodify/api:latest
+    container_name: moodify-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MOODIFY_ENV=${MOODIFY_ENV:-production}
+      - MOODIFY_LOG_LEVEL=${MOODIFY_LOG_LEVEL:-INFO}
+      - MOODIFY_DATA_PATH=/app/data
+      - MOODIFY_TEMP_PATH=/app/temp
+      - MOODIFY_MODEL_PATH=/app/models
+      - MOODIFY_CASES_ROOT=/app/data/cases
+      - MOODIFY_NODE_STATE_DIR=/app/data/node
+      - MOODIFY_NODE_OUTPUT_ROOT=/app/data/output
+      - MOODIFY_MAX_UPLOAD_BYTES=${MOODIFY_MAX_UPLOAD_BYTES:-52428800}
+      - MOODIFY_WORKER_URL=http://moodify-worker:8001
+    volumes:
+      - moodify-data:/app/data
+      - moodify-logs:/app/logs
+      - moodify-temp:/app/temp
+      - moodify-models:/app/models:ro
+    networks:
+      - moodify-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      - moodify-worker
+
+  # Moodify Worker Service
+  # Background audio processing tasks
+  # Supports future horizontal scaling
+  moodify-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: moodify/worker:latest
+    container_name: moodify-worker
+    restart: unless-stopped
+    command: ["python", "-m", "moodify.node.cli", "worker", "--port", "8001"]
+    ports:
+      - "8001:8001"
+    environment:
+      - MOODIFY_ENV=${MOODIFY_ENV:-production}
+      - MOODIFY_LOG_LEVEL=${MOODIFY_LOG_LEVEL:-INFO}
+      - MOODIFY_DATA_PATH=/app/data
+      - MOODIFY_TEMP_PATH=/app/temp
+      - MOODIFY_MODEL_PATH=/app/models
+      - MOODIFY_NODE_STATE_DIR=/app/data/node
+      - MOODIFY_NODE_OUTPUT_ROOT=/app/data/output
+      - MOODIFY_WORKER_THREADS=${MOODIFY_WORKER_THREADS:-4}
+      - MOODIFY_GPU_ENABLED=${MOODIFY_GPU_ENABLED:-false}
+    volumes:
+      - moodify-data:/app/data
+      - moodify-logs:/app/logs
+      - moodify-temp:/app/temp
+      - moodify-models:/app/models:ro
+    networks:
+      - moodify-network
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+
+  # Redis for task queue (future)
+  # Uncomment when queue system is implemented
+  # moodify-queue:
+  #   image: redis:7-alpine
+  #   container_name: moodify-queue
+  #   restart: unless-stopped
+  #   volumes:
+  #     - moodify-queue:/data
+  #   networks:
+  #     - moodify-network
+
+  # Nginx reverse proxy (future)
+  # Uncomment for production load balancing
+  # moodify-gateway:
+  #   image: nginx:alpine
+  #   container_name: moodify-gateway
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./deployment/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - moodify-ssl:/etc/nginx/ssl:ro
+  #   networks:
+  #     - moodify-network
+  #   depends_on:
+  #     - moodify-api
+
+volumes:
+  moodify-data:
+    driver: local
+  moodify-logs:
+    driver: local
+  moodify-temp:
+    driver: local
+  moodify-models:
+    driver: local
+  # moodify-queue:
+  #   driver: local
+  # moodify-ssl:
+  #   driver: local
+
+networks:
+  moodify-network:
+    driver: bridge

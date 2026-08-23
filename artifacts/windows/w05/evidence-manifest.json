@@ -1,0 +1,15 @@
+{
+  "package_id": "MFY-WIN-W05-QUEUE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "implementation_root": "E:\\moodify-desktop",
+  "desktop_git_metadata": false,
+  "authority": {"queue": "QueueService", "playback": "PlaybackService", "track": "LocalStateStore.library.tracks", "playlist": "LocalStateStore.playlists/playlistItems", "persistence": "NONE_W05_SNAPSHOT_SEAM_ONLY"},
+  "policy": {"playlist_to_queue": "SNAPSHOT", "duplicates": "ALLOW_WITH_UNIQUE_ITEM_ID", "play_next": "LATEST_FIRST", "remove_current": "DETACH_AND_CONTINUE", "clear": "KEEP_CURRENT", "max_error_advances": 3},
+  "verification": {"command": "npm run verify", "typecheck": "PASS", "lint": "PASS", "test_files": 10, "tests_passed": 110, "tests_failed": 0},
+  "changed_code": ["src/domain/queue/service.ts", "src/domain/playback/service.ts", "src/renderer/components/player/MinimalPlayer.tsx", "tests/unit/queue.test.ts", "tests/unit/playback-core.test.ts"],
+  "known_limits": ["Queue restart restore deferred to W08", "Drag-and-drop deferred; persisted session up/down reorder provided", "No autoplay recommendations", "Final package directory remains locked by running Moodify processes"],
+  "w05_status": "PASS",
+  "w06_gate": "PASS"
+}

@@ -3,16 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Moodify — Every voice deserves to be heard.</title>
-  <meta name="description" content="Moodify is a listening product. Every voice deserves to be heard.">
+  <title>Moodify — AI Audio Player</title>
+  <meta name="description" content="Moodify is an AI audio player that makes every song sound better. Listen to music with enhanced audio quality.">
   <link rel="canonical" href="https://rongjingmusic.com/">
   <link rel="icon" href="/favicon.png" type="image/png">
-  <meta property="og:title" content="Moodify — Every voice deserves to be heard.">
-  <meta property="og:description" content="Every voice deserves to be heard.">
+  <meta property="og:title" content="Moodify — AI Audio Player">
+  <meta property="og:description" content="Make every song sound better. Moodify is an AI audio player focused on listening experience.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://rongjingmusic.com/">
-  <meta property="og:image" content="https://rongjingmusic.com/assets/moodify-open-graph.png">
+  <meta property="og:image" content="https://rongjingmusic.com/assets/moodify-og-default.png">
   <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Moodify",
+    "description": "AI audio player that makes every song sound better",
+    "url": "https://rongjingmusic.com/",
+    "brand": {
+      "@type": "Organization",
+      "name": "荣景文川（深圳）科技有限公司",
+      "alternateName": "Rongjing Wenchuan",
+      "url": "https://rongjingwenchuan.com/"
+    },
+    "applicationCategory": "MusicApplication",
+    "operatingSystem": "Android, Web"
+  }
+  </script>
   <link rel="stylesheet" href="/assets/site-public-form-20260820.css">
 </head>
 <body>
@@ -20,28 +37,137 @@
   <header class="site-header wrap">
     <a class="brand" href="/" aria-label="Moodify home"><img src="/assets/moodify-logo.png" alt="" width="48" height="32"> <span>MOODIFY</span></a>
     <nav class="site-nav" aria-label="Primary">
-      <a class="nav-play" href="https://rongjinwenchuan.xyz">Play <span aria-hidden="true">↗</span></a>
+      <a href="/research.html">Research</a>
+      <a href="/technology.html">Technology</a>
+      <a class="nav-play" href="https://play.rongjingmusic.com">Play <span aria-hidden="true">↗</span></a>
       <a href="#download">Download</a>
-      <a href="https://github.com/huliye24/moodify-ai" target="_blank" rel="noreferrer">GitHub</a>
       <a href="https://rongjingwenchuan.com/">Company</a>
     </nav>
   </header>
 
   <main id="main">
+    <!-- Hero: What is Moodify -->
     <section class="hero wrap" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow">Moodify Music</p>
-        <h1 id="hero-title"><span>Every voice</span><span>deserves to be heard.</span></h1>
+        <p class="eyebrow">Moodify</p>
+        <h1 id="hero-title">AI Audio Player</h1>
+        <p class="hero-tagline">Make every song sound better.</p>
         <div class="hero-lower">
-          <p class="hero-cn">每一种声音，<br>都值得被世界听见。</p>
+          <p class="hero-cn">让每一首歌，都值得被听见。</p>
           <div class="actions">
-            <a class="button button-primary" href="https://rongjinwenchuan.xyz">Play <span aria-hidden="true">↗</span></a>
-            <a class="button button-quiet" href="https://github.com/huliye24/moodify-ai" target="_blank" rel="noreferrer">View on GitHub <span aria-hidden="true">↗</span></a>
+            <a class="button button-primary" href="https://play.rongjingmusic.com">Play <span aria-hidden="true">↗</span></a>
+            <a class="button button-quiet" href="#problem">Learn more</a>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Problem: Why Moodify exists -->
+    <section class="section" id="problem" aria-labelledby="problem-title">
+      <div class="wrap narrow">
+        <p class="eyebrow">The Problem</p>
+        <h2 id="problem-title">Music entered the streaming era.<br>Playback stayed in the fixed era.</h2>
+        <p class="lede">Every song is different. Every device is different. Every listener is different. Yet playback treats them all the same.</p>
+        <p>The same audio file plays the same way on headphones, speakers, and phones. The same volume level for quiet acoustic tracks and loud electronic productions. The same signal path regardless of the room, the time, or the listener.</p>
+        <p class="note">This is not a complaint about streaming services. It is a recognition that playback can be better.</p>
+      </div>
+    </section>
+
+    <!-- Solution: What Moodify does -->
+    <section class="section" id="solution" aria-labelledby="solution-title">
+      <div class="wrap narrow">
+        <p class="eyebrow">The Approach</p>
+        <h2 id="solution-title">Moodify uses AI audio technology to find better ways to play each song.</h2>
+        <p class="lede">Not by changing the music. By understanding it first.</p>
+        <p>Moodify listens before it plays. It analyzes the audio signal — dynamics, spectrum, phase, structure — and determines how that specific track can sound best on that specific device, for that specific listener.</p>
+        <p>The complexity stays inside. The experience stays simple: press Play, hear better.</p>
+      </div>
+    </section>
+
+    <!-- Product: What we offer -->
+    <section class="section" id="product" aria-labelledby="product-title">
+      <div class="wrap">
+        <p class="eyebrow">Products</p>
+        <h2 id="product-title">Three ways to experience Moodify</h2>
+        <div class="product-grid">
+          <article>
+            <h3>Moodify Player</h3>
+            <p>A minimal music player for Android and web. Cloud-connected, personally adapted, focused on Play.</p>
+            <a class="text-link" href="https://play.rongjingmusic.com">Enter Player <span aria-hidden="true">→</span></a>
+          </article>
+          <article>
+            <h3>Cloud Audio</h3>
+            <p>Audio processing infrastructure that adapts playback to content, device, and context. For partners who want Moodify intelligence in their products.</p>
+            <span class="note">Contact for access</span>
+          </article>
+          <article>
+            <h3>Personalized Listening</h3>
+            <p>Learning playback preferences from listening patterns. Not genres or artists — how you like to hear sound.</p>
+            <span class="note">In development</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technology: How it works (high level) -->
+    <section class="section" id="technology" aria-labelledby="technology-title">
+      <div class="wrap">
+        <p class="eyebrow">Technology</p>
+        <h2 id="technology-title">From audio file to better listening</h2>
+        <div class="tech-flow">
+          <div class="tech-step">
+            <span class="step-num">01</span>
+            <h3>Input</h3>
+            <p>Original audio</p>
+          </div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-step">
+            <span class="step-num">02</span>
+            <h3>Analysis</h3>
+            <p>Audio feature extraction</p>
+          </div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-step">
+            <span class="step-num">03</span>
+            <h3>Processing</h3>
+            <p>AI audio enhancement</p>
+          </div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-step">
+            <span class="step-num">04</span>
+            <h3>Optimization</h3>
+            <p>Playback adaptation</p>
+          </div>
+          <div class="tech-arrow">→</div>
+          <div class="tech-step">
+            <span class="step-num">05</span>
+            <h3>Output</h3>
+            <p>Better listening</p>
+          </div>
+        </div>
+        <p class="note" style="text-align:center;margin-top:2rem">This is the direction, not the implementation. <a href="/research.html">See research</a> for how we think about audio understanding.</p>
+      </div>
+    </section>
+
+    <!-- Research: Long-term vision -->
+    <section class="section" id="research" aria-labelledby="research-title">
+      <div class="wrap narrow">
+        <p class="eyebrow">Research</p>
+        <h2 id="research-title">Can machines learn to hear?</h2>
+        <p class="lede">This is the question Moodify exists to explore.</p>
+        <p>Humans developed visual intelligence — the ability to recognize, understand, and interpret images. We believe machines need auditory intelligence: the ability to understand what happens in sound, not just process it.</p>
+        <p>Our research explores:</p>
+        <ul class="research-list">
+          <li><b>Audio Understanding</b> — What is happening in this sound?</li>
+          <li><b>Signal Analysis</b> — What can we measure and how reliably?</li>
+          <li><b>Perceptual Evaluation</b> — What do listeners actually prefer?</li>
+          <li><b>Playback Intelligence</b> — How should this sound be played?</li>
+        </ul>
+        <a class="button" href="/research.html">Explore research <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <!-- Download -->
     <section class="section" id="download" aria-labelledby="download-title">
       <div class="wrap download-layout">
         <div>
@@ -52,7 +178,8 @@
             <a class="button button-primary" href="/downloads/Moodify_Music_2.0.0_Android_20260815.apk" download>Download APK</a>
             <a class="button" href="/downloads/Moodify_Music_2_0_0_Android_20260815.zip" download>Release package</a>
           </div>
-          <p class="release-meta">Version 2.0.0 · Android 8.0+ · verified live 2026-08-19</p>
+          <p class="release-meta">Current public stable · Version 2.0.0 · Android 8.0+ · verified live 2026-08-22</p>
+          <details class="release-integrity"><summary>Verify download integrity</summary><p>APK SHA-256<br><code>7fc6c95f04cb9ed7063cf4f50c8eebcd461748640367490493f270c712ff6175</code></p><p>Release package SHA-256<br><code>acb9ef240418e387d45b55a6b50bfed5962da48bde66a00fbabc29155395a14f</code></p></details>
         </div>
         <figure class="download-qr">
           <img src="/assets/moodify-android-2.0-download-qr.png" alt="Scan to download Moodify Music 2.0 for Android" width="220" height="220">
@@ -61,35 +188,7 @@
       </div>
     </section>
 
-    <section class="section" aria-labelledby="evidence-title">
-      <div class="wrap">
-        <p class="eyebrow">Evidence</p>
-        <h2 id="evidence-title">Claims with limits.</h2>
-        <p class="lede">Moodify publishes evidence with scope, version and limitation.</p>
-        <div class="evidence-grid">
-          <article>
-            <h3>Measurement repeatability</h3>
-            <p>Scope: frozen scan profile across recorded operating-system and Python combinations.</p>
-            <p class="limitation">Limitation: measurement agreement does not prove perceptual preference.</p>
-            <span class="maturity verified">Verified · 2026-08</span>
-          </article>
-          <article>
-            <h3>Declared-scope review</h3>
-            <p>Scope: deterministic technical ranking inside a versioned, authorized rule boundary.</p>
-            <p class="limitation">Limitation: unresolved perceptual cases still require a human reviewer.</p>
-            <span class="maturity human-reviewed">Human-reviewed · 2026-08</span>
-          </article>
-          <article>
-            <h3>Failure-injection resilience</h3>
-            <p>Scope: ten recorded injected-failure scenarios in the reviewed test run.</p>
-            <p class="limitation">Limitation: two findings remain recorded; this is not a universal uptime claim.</p>
-            <span class="maturity verified">Verified · 2026-08</span>
-          </article>
-        </div>
-        <a class="text-link" href="/evidence.html">View evidence <span aria-hidden="true">→</span></a>
-      </div>
-    </section>
-
+    <!-- Company -->
     <section class="section company" aria-labelledby="company-title">
       <div class="wrap split">
         <div>
@@ -99,7 +198,7 @@
             <span class="seal-crop" aria-hidden="true"><img src="/assets/rongjingwenchuan-seal-wordmark.png" alt="" width="746" height="307"></span>
           </h2>
         </div>
-        <div class="section-copy"><p>Moodify is a product of 荣景文川.</p><a class="button" href="https://rongjingwenchuan.com/">About the company</a></div>
+        <div class="section-copy"><p>Moodify is a product of 荣景文川.</p><p>Building future audio intelligence.</p><a class="button" href="https://rongjingwenchuan.com/">About the company <span aria-hidden="true">→</span></a></div>
       </div>
     </section>
   </main>
@@ -109,14 +208,22 @@
       <div class="footer-brand"><a class="brand" href="/"><img src="/assets/moodify-logo.png" alt="" width="48" height="32"><span>MOODIFY</span></a><span>Every voice deserves to be heard.</span></div>
       <nav aria-label="Footer">
         <a href="/">Product</a>
-        <a href="https://rongjinwenchuan.xyz">Web Player</a>
+        <a href="/research.html">Research</a>
+        <a href="/technology.html">Technology</a>
+        <a href="/release.html">Releases</a>
+        <a href="/research-log.html">Research Log</a>
+        <a href="/letter.html">Letter</a>
+        <a href="/press.html">Press</a>
+        <a href="/developers.html">Technical</a>
+        <a href="https://play.rongjingmusic.com">Web Player</a>
         <a href="https://rongjingwenchuan.com/">Company</a>
-        <a href="/evidence.html">Research</a>
+        <a href="/evidence.html">Evidence</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/intellectual-property.html">IP</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/contact.html">Contact</a>
-        <a href="https://github.com/huliye24/moodify-ai" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
-      <p>© 2024–2026 荣景文川</p>
+      <p>© 2024–2026 荣景文川（深圳）科技有限公司</p>
     </div>
   </footer>
 </body>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Research Log — Moodify</title>
+  <meta name="description" content="Moodify 关于声音理解、感知聆听与播放优化的公开实验记录。">
+  <link rel="canonical" href="https://rongjingmusic.com/research-log.html"><link rel="icon" href="/favicon.png" type="image/png">
+  <meta property="og:title" content="Research Log — Moodify"><meta property="og:description" content="公开、有限且可复核的 Moodify 研究记录。"><meta property="og:type" content="website"><meta property="og:url" content="https://rongjingmusic.com/research-log.html"><meta property="og:image" content="https://rongjingmusic.com/assets/moodify-open-graph.png"><meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Moodify Research Log","description":"Public experiment notes on listening and playback.","url":"https://rongjingmusic.com/research-log.html","isPartOf":{"@type":"WebSite","name":"Moodify","url":"https://rongjingmusic.com/"}}</script>
+  <link rel="stylesheet" href="/assets/site-public-form-20260820.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header wrap"><a class="brand" href="/" aria-label="Moodify home"><img src="/assets/moodify-logo.png" alt="" width="48" height="32"><span>MOODIFY</span></a><nav class="site-nav" aria-label="Primary"><a class="nav-play" href="https://play.rongjingmusic.com">Play <span aria-hidden="true">↗</span></a><a href="/#download">Download</a><a href="https://rongjingwenchuan.com/">Company</a></nav></header>
+  <main id="main">
+    <section class="trust-hero wrap"><div class="hero-copy"><p class="eyebrow">Research Log</p><h1>Questions before claims.</h1><p class="trust-intro">这不是论文，也不是成果宣传。它记录问题、方法、观察与下一步，并明确每个结论的范围。</p></div></section>
+    <nav class="trust-nav" aria-label="Public trust"><div class="wrap"><a href="/release.html">Releases</a><a href="/research-log.html" aria-current="page">Research Log</a><a href="/letter.html">Founder Letter</a><a href="/press.html">Press Kit</a><a href="/developers.html">Technical</a></div></nav>
+    <section class="section"><div class="wrap"><p class="eyebrow">Public Experiments</p><div class="log-list">
+      <article class="log-entry"><p class="record-meta">LOG 001 · 2026.08 · VERIFIED WITHIN DECLARED MATRIX</p><h2>Cross-machine measurement repeatability</h2><dl class="log-fields"><div><dt>Research Question</dt><dd>同一音频测量在不同操作系统和 Python 组合下能否保持一致？</dd></div><div><dt>Method</dt><dd>冻结扫描配置与输入，对记录的运行环境逐一重复测量。</dd></div><div><dt>Experiment</dt><dd>比较完整输出和关键指标，要求差异可解释且结果可复现。</dd></div><div><dt>Observation</dt><dd>在已记录测试矩阵内得到一致结果。这只证明测量重复性，不证明听感偏好。</dd></div><div><dt>Next Step</dt><dd>扩大受控环境矩阵，并继续把感知判断与技术测量分开。</dd></div></dl></article>
+      <article class="log-entry"><p class="record-meta">LOG 002 · 2026.08 · VERIFIED DELIVERY CHECK</p><h2>Partial audio delivery</h2><dl class="log-fields"><div><dt>Research Question</dt><dd>播放器能否只请求需要的音频片段，并保持可预期的交付行为？</dd></div><div><dt>Method</dt><dd>对五首公开测试曲目发送明确的字节范围请求。</dd></div><div><dt>Experiment</dt><dd>检查响应状态、范围与媒体可读取性，不把页面加载等同于播放成功。</dd></div><div><dt>Observation</dt><dd>记录矩阵中的五首曲目均对显式 Range 请求返回部分内容响应。</dd></div><div><dt>Next Step</dt><dd>持续监测不同网络条件下的起播、恢复与错误可见性。</dd></div></dl></article>
+      <article class="log-entry"><p class="record-meta">LOG 003 · 2026.08 · HUMAN-REVIEWED BOUNDARY</p><h2>Bounded algorithmic review</h2><dl class="log-fields"><div><dt>Research Question</dt><dd>机器判断如何在不冒充最终听觉权威的前提下保持一致？</dd></div><div><dt>Method</dt><dd>将规则、版本、适用范围和升级条件同时记录。</dd></div><div><dt>Experiment</dt><dd>只在声明范围内产生技术排序；范围外、证据不足或感知争议进入人工判断。</dd></div><div><dt>Observation</dt><dd>有限规则可以保持确定性，但不能推出普遍的艺术质量或个人偏好。</dd></div><div><dt>Next Step</dt><dd>继续记录人工复核依据，并验证规则在下一批案例中的可复用性。</dd></div></dl></article>
+    </div><p class="note">公开日志省略核心算法、私有音频、商业机密与未验证实现。更完整的结论边界见 <a href="/evidence.html">Evidence</a>。</p></div></section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-grid"><div class="footer-brand"><a class="brand" href="/"><img src="/assets/moodify-logo.png" alt="" width="48" height="32"><span>MOODIFY</span></a><span>Every voice deserves to be heard.</span></div><nav aria-label="Footer"><a href="/">Product</a><a href="/research.html">Research</a><a href="/research-log.html">Research Log</a><a href="/technology.html">Technology</a><a href="/release.html">Releases</a><a href="/press.html">Press</a><a href="/privacy.html">Privacy</a><a href="/contact.html">Contact</a></nav><p>© 2024–2026 荣景文川（深圳）科技有限公司</p></div></footer>
+</body>
+</html>

@@ -1,0 +1,11 @@
+setting,capability_required,default,apply_semantics,fallback,notes
+preferred_output_device,output selection,SYSTEM_DEFAULT,IMMEDIATE_OR_NEXT_TRACK,SYSTEM_DEFAULT,Follow actual runtime
+restore_volume,none,ON,NEXT_LAUNCH,safe default volume,Uses W08 playback restore
+autoplay_on_launch,none,OFF,NEXT_LAUNCH,OFF,Must remain safe
+close_behavior,tray for MINIMIZE,QUIT,IMMEDIATE,QUIT,Do not silently change
+launch_at_startup,startup registration,OFF,IMMEDIATE_OR_INSTALLER,OFF,No autoplay
+cache_policy,cache subsystem,AUTOMATIC,IMMEDIATE,AUTOMATIC,Only if real cache exists
+cache_location,writable relocation,DEFAULT,AFTER_MIGRATION,DEFAULT,Rollback required
+cloud_preparation_trigger,W10 verified cloud,MANUAL,IMMEDIATE,MANUAL,No mass jobs by default
+fallback_to_local,W10 source policy,ON,IMMEDIATE,ON,Recommended invariant
+metered_network_policy,Windows network capability,DEFAULT,IMMEDIATE,DEFAULT,Hide if unsupported

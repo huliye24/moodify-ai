@@ -1,0 +1,27 @@
+# Moodify Supply — AI Music Supply Chain configuration
+product:
+  name: "Moodify Supply"
+  full_name: "AI Music Supply Chain"
+  version: "0.1.0"
+  api_namespace: "/api/v1/supply"
+
+search:
+  similarity: { enabled: true, backend: "engine/recommendation_engine" }
+  semantic: { enabled: false, backend: "pending" }
+
+matching:
+  scene_match: { enabled: true }
+  mood_match: { enabled: true }
+  tempo_match: { enabled: true }
+  license_match: { enabled: true }
+
+pipeline:
+  stages: [intake, process, deliver, verify]
+  verification_contract: "shared/contracts"
+
+stems:
+  separation: { enabled: true, backend: "demucs", models: ["bsroformer"] }
+
+migration:
+  status: "PHASE_A_STRUCTURE_CREATED"
+  source: "moodify-core-package/src/moodify/"

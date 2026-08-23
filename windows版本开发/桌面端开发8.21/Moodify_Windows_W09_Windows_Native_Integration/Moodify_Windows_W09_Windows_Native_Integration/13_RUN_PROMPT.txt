@@ -1,0 +1,37 @@
+Execute MFY-WIN-W09-WINDOWS-NATIVE-001 in the Moodify repository.
+
+This is W09 of the Windows Desktop Completion sequence.
+
+Critical rules:
+- First read W08 artifacts, plus W04 Playback and W05 Queue authority artifacts.
+- If W09_GATE is not PASS, stop and report BLOCKED.
+- Discover the actual Windows runtime; do not assume Electron/Tauri/WebView2/WinUI.
+- Windows native integration is an adapter layer only.
+- Playback authority remains W04.
+- Queue authority remains W05.
+- Track authority remains W02.
+- System metadata is projection only.
+- Use the runtime's safest native media-control APIs.
+- Prefer native media APIs over global keyboard hooks.
+- Establish single-instance behavior before accepting Open With/file args.
+- Second instances hand off and exit; never allow concurrent persistence writers.
+- Open-file handling reuses W02 Import and W05/W04 Queue/Playback.
+- Do not force default app associations; installer registration may wait for W12.
+- Never shell-concatenate user paths.
+- Native IPC must be narrow, allowlisted and structured.
+- Tray remains minimal and must not silently change Close behavior.
+- Quit must flush W08 recovery state.
+- Preserve current Windows Alpha visual direction.
+- No Ear, DSP, Evidence or cloud internals.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W10.
+
+Write artifacts under:
+artifacts/windows/w09/
+
+Finish with:
+W09_STATUS = PASS | BLOCKED
+W10_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

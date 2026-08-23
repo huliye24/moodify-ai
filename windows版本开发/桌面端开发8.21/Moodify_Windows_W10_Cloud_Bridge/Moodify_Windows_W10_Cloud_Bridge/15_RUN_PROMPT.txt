@@ -1,0 +1,37 @@
+Execute MFY-WIN-W10-CLOUD-BRIDGE-001 in the Moodify repository.
+
+This is W10 of the Windows Desktop Completion sequence.
+
+Critical rules:
+- First read W09 artifacts, W02 Track identity, W04 Playback authority, W08 Recovery.
+- Re-audit the CURRENT cloud reality; do not rely on historical architecture claims alone.
+- If W10_GATE is not PASS, stop and report BLOCKED.
+- Classify every cloud capability as VERIFIED_LIVE / VERIFIED_PARTIAL / CODE_ONLY / CONFIG_ONLY / HISTORICAL_ONLY / BLOCKED / UNKNOWN.
+- Only verified live/partial capabilities may enter product code.
+- CloudPreparation references Track; it does not become a second Track system.
+- W04 remains Playback authority.
+- Local playback must keep working when cloud is offline or broken.
+- Never expose Ear/Stem/Judge/Intervene/Verify/Evidence/internal job graph to normal users.
+- Never put service-key, DB credential, third-party provider secret or infrastructure admin token into the Windows client.
+- If the only available API auth is a service-key, mark CLIENT_AUTH_BLOCKED instead of embedding it.
+- Use idempotency and duplicate-click protection.
+- Restart active preparations by refreshing status; never blindly resubmit.
+- READY may only be shown when a real prepared source is resolvable.
+- Cloud source playback failure should fall back to local source when possible.
+- User-facing states remain minimal: 正在准备 / 准备完成 / 准备失败 / 网络不可用.
+- Prefer MANUAL preparation trigger for W10 unless existing product evidence mandates otherwise.
+- Preserve Windows Alpha visual direction.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W11.
+- Do not commit user audio, secrets, signed URLs, credentials, or large fixtures.
+
+Write artifacts under:
+artifacts/windows/w10/
+
+Finish with:
+W10_STATUS = PASS | PARTIAL | BLOCKED
+W11_GATE = PASS | BLOCKED
+CLOUD_CHAIN = VERIFIED_LIVE | VERIFIED_PARTIAL | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

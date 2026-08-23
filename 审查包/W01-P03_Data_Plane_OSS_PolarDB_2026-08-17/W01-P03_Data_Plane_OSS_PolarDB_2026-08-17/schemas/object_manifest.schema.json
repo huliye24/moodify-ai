@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Object Manifest",
+  "type": "object",
+  "required": [
+    "object_id",
+    "track_id",
+    "artifact_type",
+    "bucket",
+    "object_key",
+    "content_hash",
+    "hash_algorithm",
+    "byte_size",
+    "created_at",
+    "producer"
+  ],
+  "properties": {
+    "object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "track_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "job_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "artifact_type": {
+      "enum": [
+        "source",
+        "stem",
+        "analysis",
+        "intermediate",
+        "render",
+        "evidence",
+        "report",
+        "other"
+      ]
+    },
+    "artifact_role": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bucket": {
+      "type": "string",
+      "minLength": 1
+    },
+    "object_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "hash_algorithm": {
+      "const": "sha256"
+    },
+    "byte_size": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "mime_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producer_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pipeline_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_object_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "parent_object_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "immutable": {
+      "type": "boolean"
+    },
+    "retention_class": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_class": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -42,7 +42,7 @@ dependencies = [
 dsp = ["pedalboard>=0.9.0"]
 separation = ["demucs", "torch>=2.0"]
 api = ["fastapi>=0.100.0", "uvicorn", "python-multipart", "httpx>=0.24.0,<1.0.0"]
-dev = ["pytest>=7.0", "httpx>=0.24.0", "matplotlib>=3.5"]
+dev = ["pytest>=7.0", "httpx>=0.24.0", "matplotlib>=3.5", "ruff>=0.6.0"]
 node = ["matplotlib>=3.5"]
 full = ["moodify[dsp,separation,api,dev]"]
 
@@ -56,9 +56,15 @@ where = ["src"]
 
 [tool.ruff]
 target-version = "py310"
+line-length = 100
+
+[tool.ruff.format]
+quote-style = "double"
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"run_agent_b.py" = ["E402"]
+"smoke_test.py" = ["E402"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

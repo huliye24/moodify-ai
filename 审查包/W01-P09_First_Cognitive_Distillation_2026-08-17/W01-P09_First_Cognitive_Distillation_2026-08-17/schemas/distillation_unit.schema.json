@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Distillation Unit",
+  "type": "object",
+  "required": [
+    "distillation_id",
+    "source_evidence",
+    "friction_problem",
+    "proposed_level",
+    "decision",
+    "future_cost_eliminated"
+  ],
+  "properties": {
+    "distillation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "occurrence_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "friction_problem": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_handling": {
+      "type": "string"
+    },
+    "current_level": {
+      "enum": [
+        "D0",
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7"
+      ]
+    },
+    "proposed_level": {
+      "enum": [
+        "D0",
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7"
+      ]
+    },
+    "decision": {
+      "enum": [
+        "KEEP",
+        "REWRITE",
+        "DOWNGRADE",
+        "MERGE",
+        "DELETE_CANDIDATE",
+        "AUTOMATE",
+        "HARDEN",
+        "HUMAN_DECISION_REQUIRED"
+      ]
+    },
+    "target_artifact": {
+      "type": "string"
+    },
+    "future_cost_eliminated": {
+      "type": "string",
+      "minLength": 1
+    },
+    "over_hardening_risk": {
+      "type": "string"
+    },
+    "reversibility": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "review_trigger": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

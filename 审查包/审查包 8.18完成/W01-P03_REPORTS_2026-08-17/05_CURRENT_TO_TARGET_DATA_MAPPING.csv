@@ -1,0 +1,15 @@
+asset,current_location,disposition,status,target,target_type,evidence,notes
+pre-music 真实曲目(~7首),"E:\moodify\pre-music",REGISTER,MAY_APPLY,OSS moodify/tracks/{trk}/source/ + tracks 表,source,P00 E20,Golden Case 候选（P07）; hash 后注册
+lalalai split zips,"pre-music/*/2026-07-24..08-02 split_by_lalalai",MIGRATE_LATER,MAY_APPLY,OSS stems/ 或弃用,stems,P00 E20/E51,多次重试版本; P05 决定是否重做
+outputs/data_factory cases(4 case),"E:\moodify\outputs\data_factory\cases",REGISTER,MAY_APPLY,objects 表 + evidence 表,evidence,P00 E21,已有 cases.jsonl/pairwise
+outputs CAD/calib 产物,"E:\moodify\outputs",LEGACY,UNKNOWN,保留本地(不入 OSS),intermediate,P00 E21,历史处理产物; 按需归档
+moodify-core-package/golden_run_out,"core package 目录",REGISTER,MAY_APPLY,evidence 对象 + versions 表,evidence,P00 E22,golden_record/source_manifest 已有 hash
+artifacts/ 59 证据目录,"E:\moodify\artifacts",KEEP_AS_IS,UNKNOWN,保留(本地证据库),evidence,P00 E23,不入 OSS(仓库内证据)
+/var/lib/moodify(杭州 6.5GB 历史),"杭州 ECS",LEGACY,UNKNOWN,scratch 保留; 按需清理,scratch,P00 E18 §9,10-song pilot 产物
+LA music-media(248MB/5 文件),"LA /opt/moodify/music-media",MIGRATE_LATER,UNKNOWN,OSS renders/ + 播放交付,render,P00 E18 §9,当前生产播放源
+LA music releases(3.6GB),"LA /opt/moodify/music/releases",MIGRATE_LATER,UNKNOWN,OSS(评估),render,P00 E18 §9,部署产物
+PolarDB moodify_dev 19 表,"PolarDB 172.27.118.104",MIGRATE_LATER,BLOCKED,合并/对齐到数据平面模型,metadata,P00 E18/E17,凭据 BLOCKED; 对照后非破坏合并
+PolarDB 空壳/上海 PG,托管实例,LEGACY,UNKNOWN,释放评估,metadata,P00 E18,RESERVE_UNUSED(P02)
+listening_test(34 文件),"E:\moodify\listening_test",REGISTER,MAY_APPLY,evidence 对象,evidence,P00 E55,结果 DATA_PENDING
+local_audio_assets/07Music/music,"E:\moodify\*",LEGACY,UNKNOWN,播放库候选,render,P00 E19,授权未确认
+SQLite 队列数据,"LA/HZ node.sqlite3",KEEP_AS_IS,UNKNOWN,队列保持(ADR-005),job_state,P00 E37,不迁移

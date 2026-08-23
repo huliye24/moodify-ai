@@ -1,0 +1,17 @@
+flowchart TD
+    PRODUCT["External Product\nMoodify Music / Player"]
+    PLAY["Primary User Action\nPLAY"]
+
+    CLOUD["Cloud Production System\nrole only; topology decided in P02"]
+    INTERNAL["Internal Auditory Systems"]
+    EAR["Ear / Auditory Intelligence\nINTERNAL"]
+    PROC["Analysis / Stem / Intervention / Preset / Verify"]
+    CI["Cognitive Infrastructure\nCanon / Evidence / Cases / Rules / Failures"]
+
+    PRODUCT --> PLAY
+    CLOUD --> PRODUCT
+    INTERNAL --> CLOUD
+    EAR --> INTERNAL
+    PROC --> INTERNAL
+    CI --> INTERNAL
+    CI --> CLOUD

@@ -1,0 +1,8 @@
+﻿field,server_required,client_visible,description,notes
+track_id,true,true,Stable track identity,Never replace with URL
+render_object_id,true,false,Internal final render identity,Traceability
+duration_ms,true,true,Duration,
+playback_uri,true,true,Temporary authorized URI,Replaceable
+uri_expires_at,true,true,Expiry,Refreshable
+supports_range,true,true,Seek support,
+etag,recommended,optional,Object/version cache validator,

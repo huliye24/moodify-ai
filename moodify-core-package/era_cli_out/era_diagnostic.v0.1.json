@@ -1,0 +1,128 @@
+{
+  "era_hint": "1987",
+  "findings": [
+    {
+      "category": "ED-01",
+      "category_name": "Bandwidth Limitation",
+      "confidence": null,
+      "created_at": "2026-08-17T02:41:48+00:00",
+      "evidence_refs": [],
+      "finding_id": "ED-01-1",
+      "known_ambiguities": [],
+      "measurement_refs": [
+        "estimated_high_frequency_cutoff_hz"
+      ],
+      "production_case_id": null,
+      "reasoning_summary": "no bandwidth limitation observed (HF cutoff >= 16 kHz)",
+      "requires_human_review": false,
+      "scope": "era-diagnostic-v0.1",
+      "status": "NOT_APPLICABLE",
+      "uncertainty_reason": null,
+      "version": "era-diagnostic-v0.1"
+    },
+    {
+      "category": "ED-02",
+      "category_name": "Persistent Noise Floor",
+      "confidence": null,
+      "created_at": "2026-08-17T02:41:48+00:00",
+      "evidence_refs": [],
+      "finding_id": "ED-02-2",
+      "known_ambiguities": [],
+      "measurement_refs": [
+        "estimated_noise_floor_dbfs"
+      ],
+      "production_case_id": null,
+      "reasoning_summary": "no elevated noise floor observed (p10 frame RMS ~-120.0 dBFS)",
+      "requires_human_review": false,
+      "scope": "era-diagnostic-v0.1",
+      "status": "NOT_APPLICABLE",
+      "uncertainty_reason": null,
+      "version": "era-diagnostic-v0.1"
+    },
+    {
+      "category": "ED-03",
+      "category_name": "Dynamic Constraint / Damage",
+      "confidence": null,
+      "created_at": "2026-08-17T02:41:48+00:00",
+      "evidence_refs": [],
+      "finding_id": "ED-03-3",
+      "known_ambiguities": [],
+      "measurement_refs": [
+        "clipping_sample_ratio"
+      ],
+      "production_case_id": null,
+      "reasoning_summary": "no dynamic constraint/damage evidence (no clipping, normal dynamics)",
+      "requires_human_review": false,
+      "scope": "era-diagnostic-v0.1",
+      "status": "NOT_APPLICABLE",
+      "uncertainty_reason": null,
+      "version": "era-diagnostic-v0.1"
+    },
+    {
+      "category": "ED-04",
+      "category_name": "Stereo / Phase Limitation",
+      "confidence": null,
+      "created_at": "2026-08-17T02:41:48+00:00",
+      "evidence_refs": [],
+      "finding_id": "ED-04-4",
+      "known_ambiguities": [],
+      "measurement_refs": [
+        "stereo_correlation"
+      ],
+      "production_case_id": null,
+      "reasoning_summary": "no stereo/phase limitation evidence (correlation 0.974)",
+      "requires_human_review": false,
+      "scope": "era-diagnostic-v0.1",
+      "status": "NOT_APPLICABLE",
+      "uncertainty_reason": null,
+      "version": "era-diagnostic-v0.1"
+    },
+    {
+      "category": "ED-05",
+      "category_name": "Masking / Spectral Congestion",
+      "confidence": "LOW",
+      "created_at": "2026-08-17T02:41:48+00:00",
+      "evidence_refs": [],
+      "finding_id": "ED-05-5",
+      "known_ambiguities": [
+        "dense arrangement is an artistic choice; congestion cannot be separated from arrangement density in v0.1"
+      ],
+      "measurement_refs": [
+        "spectral_flatness",
+        "core_mid_500_2000_hz"
+      ],
+      "production_case_id": null,
+      "reasoning_summary": "spectrally dense (flatness 0.017, core-mid 0.30); possible congestion observed — no defect claim in v0.1",
+      "requires_human_review": false,
+      "scope": "era-diagnostic-v0.1",
+      "status": "OBSERVED",
+      "uncertainty_reason": null,
+      "version": "era-diagnostic-v0.1"
+    },
+    {
+      "category": "ED-06",
+      "category_name": "Transfer / Encoding Degradation",
+      "confidence": null,
+      "created_at": "2026-08-17T02:41:48+00:00",
+      "evidence_refs": [],
+      "finding_id": "ED-06-6",
+      "known_ambiguities": [
+        "reliable block/codec artifact detection is deferred"
+      ],
+      "measurement_refs": [
+        "sample_rate"
+      ],
+      "production_case_id": null,
+      "reasoning_summary": "no validated transfer/encoding detector in v0.1; codec/transcode degradation is NOT_SUPPORTED",
+      "requires_human_review": false,
+      "scope": "era-diagnostic-v0.1",
+      "status": "NOT_SUPPORTED_IN_V0_1",
+      "uncertainty_reason": null,
+      "version": "era-diagnostic-v0.1"
+    }
+  ],
+  "note": "No reconstruction action was authorized by this diagnostic alone.",
+  "schema": "era_diagnostic.v0.1",
+  "source_identifier": "E:\\moodify\\moodify-core-package\\era_cli_smoke.wav",
+  "version": "era-diagnostic-v0.1"
+}

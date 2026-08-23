@@ -1,0 +1,38 @@
+{
+  "package_id": "MFY-WIN-W02-MUSIC-LIBRARY-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 2,
+  "total_packages": 12,
+  "title": "Music Library 本地音乐库",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w01/W02_HANDOFF.md => W02_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "starts_next_package": false,
+  "focus": [
+    "single Track authority",
+    "single Library authority",
+    "local import",
+    "stable identity",
+    "deduplication",
+    "metadata",
+    "persistence",
+    "restart recovery",
+    "missing source safety",
+    "remove from library",
+    "player integration"
+  ],
+  "out_of_scope": [
+    "playlist completion",
+    "queue",
+    "favorites",
+    "history",
+    "cloud production",
+    "windows native media integration",
+    "release hardening",
+    "visual redesign"
+  ],
+  "next_package": "W03 Playlist 歌单完整闭环"
+}

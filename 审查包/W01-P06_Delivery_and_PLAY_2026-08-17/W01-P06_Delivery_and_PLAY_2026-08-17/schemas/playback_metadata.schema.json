@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Playback Metadata",
+  "type": "object",
+  "required": [
+    "track_id",
+    "duration_ms",
+    "playback_uri",
+    "uri_expires_at",
+    "supports_range"
+  ],
+  "properties": {
+    "track_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "container": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "codec": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sample_rate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "channels": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "content_length": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "playback_uri": {
+      "type": "string",
+      "minLength": 1
+    },
+    "uri_expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "supports_range": {
+      "type": "boolean"
+    },
+    "etag": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "playback_session_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,29 @@
+{
+  "package_id": "MFY-WIN-W11-SETTINGS-AUDIO-ENV-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w10_status": "BLOCKED",
+  "w11_gate": "HUMAN_OVERRIDE_NON_CLOUD_ONLY",
+  "settings_schema_version": "1 (LocalState v6)",
+  "capabilities": {
+    "output_enumeration": "SUPPORTED",
+    "output_selection": "SUPPORTED_IF_SET_SINK_ID",
+    "output_hotplug": "SUPPORTED",
+    "tray": "SUPPORTED",
+    "startup": "INSTALLER_REQUIRED_HIDDEN",
+    "cache": "NOT_IMPLEMENTED_HIDDEN",
+    "storage_relocation": "DEFERRED_HIDDEN",
+    "metered_network_detection": "NOT_IMPLEMENTED_HIDDEN"
+  },
+  "defaults": { "output": "SYSTEM_DEFAULT", "restore_volume": true, "autoplay": false, "close": "QUIT", "startup": false },
+  "commands": ["npm run verify"],
+  "tests": ["15/15 files", "143/143 tests", "W11 6/6"],
+  "manual_flows": [],
+  "migration_tests": ["LocalState v5 to v6", "future/corrupt Settings fallback", "durable Library preservation"],
+  "changed_files": ["src/shared/settings.ts", "src/services/settings/index.ts", "src/services/state/store.ts", "src/domain/playback/types.ts", "src/domain/playback/engine.ts", "src/domain/playback/service.ts", "src/shared/ipc-channels.ts", "src/preload/index.ts", "src/vite-env.d.ts", "src/main/ipc/index.ts", "src/main/index.ts", "src/renderer/components/player/MinimalPlayer.tsx", "tests/unit/settings.test.ts"],
+  "blockers": ["W10 cloud preferences", "startup installer registration", "no cache subsystem"],
+  "unknowns": ["packaged hardware sink labels/switch behavior"],
+  "w11_status": "PARTIAL",
+  "w12_gate": "PASS"
+}

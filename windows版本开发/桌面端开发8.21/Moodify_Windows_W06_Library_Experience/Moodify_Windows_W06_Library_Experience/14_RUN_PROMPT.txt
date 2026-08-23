@@ -1,0 +1,56 @@
+Execute MFY-WIN-W06-LIBRARY-EXPERIENCE-001 in the Moodify repository.
+
+This is W06 of the Windows Desktop Completion sequence.
+
+Read all files in this package.
+
+Critical rules:
+- First read W05 artifacts under artifacts/windows/w05/.
+- If W06_GATE is not PASS, stop and report BLOCKED.
+- Reuse Track, Library, Playlist, Playback and Queue authorities.
+- All Songs, Recently Added, Recently Played, Favorites and Search Results are projections, not new Library authorities.
+- Favorite must be a relation to Track, not a Track copy.
+- History must be driven by playback reality, not merely UI click intent.
+- Explicitly define “meaningful play”.
+- Search must be local, Unicode-safe, null-safe and lightweight.
+- Sort must be deterministic and must not mutate Playlist/Queue ordering.
+- Reuse the same Track actions across all views.
+- Preserve the current Windows Alpha visual direction.
+- Keep Home focused on PLAY; place management in secondary views.
+- No recommendation feed, AI search, social, DSP, Ear or cloud internals.
+- Baseline 100/1000/5000 tracks before introducing heavy optimization.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W07.
+- Do not commit private audio, credentials, secrets, or large fixtures.
+
+Write artifacts under:
+artifacts/windows/w06/
+
+At the end report:
+1. W05 preflight,
+2. current library experience reality,
+3. All Songs,
+4. Recently Added,
+5. History authority and meaningful-play policy,
+6. Recently Played,
+7. Favorite authority,
+8. Search,
+9. Sort,
+10. metadata fallback,
+11. action reuse,
+12. referential safety,
+13. performance baseline,
+14. files changed,
+15. commands,
+16. tests,
+17. evidence,
+18. blockers/unknowns,
+19. W06_STATUS,
+20. W07_GATE.
+
+Finish with:
+W06_STATUS = PASS | BLOCKED
+W07_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

@@ -6,7 +6,9 @@
     --output calibration/proxy_scores.json
 """
 
-import sys, json, argparse
+import sys
+import json
+import argparse
 from pathlib import Path
 import numpy as np
 

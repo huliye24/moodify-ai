@@ -1,0 +1,31 @@
+MFY-INFRA-FOUNDATION-001 C4/C5 — PolarDB privilege & credential summary
+=======================================================================
+Date: 2026-08-13
+Instance B: pc-bp19502y46246gv6n (172.27.118.104, MySQL 8.0.18)
+Instance A: pc-bp1112f8t24wdta5t (172.27.118.106, MySQL 8.0.13)
+
+RUNTIME ACCOUNT (C4) — CREATED
+------------------------------
+User: moodify_app@172.21.10.9  (only reachable from Hangzhou ECS private IP)
+Database: moodify_dev
+Grants (verified via SHOW GRANTS):
+  GRANT USAGE ON *.*
+  GRANT SELECT, INSERT, UPDATE, DELETE, CREATE TEMPORARY TABLES, LOCK TABLES
+    ON moodify_dev.*
+No CREATE USER / GRANT OPTION / SUPER / *.* privileges.
+Negative test: CREATE USER as moodify_app -> ERROR 1227 Access denied (PASS)
+
+ADMIN ACCOUNTS (C5) — ROTATED
+-----------------------------
+Before: mylab@% / mylab2@% shared the ECS root password (credential reuse).
+After:  both passwords rotated to independent 24-char random values,
+        saved local-only at temp/moodify_audit/polardb_admin.env (0600).
+Verification:
+  mylab2 new password  -> connect OK
+  mylab2 old password  -> connect FAILED (ERROR 2013, auth rejected)
+  mylab  new password  -> connect OK
+Admin grants (mylab2@%) were unchanged structurally (admin emergency access
+preserved per rollback plan); only passwords rotated.
+
+MYSQL A: untouched business role (reserved, no business database).
+SHANGHAI PG: untouched (reserved, out of scope).

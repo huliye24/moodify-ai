@@ -1,0 +1,2 @@
+﻿distillation_id,source_evidence,occurrence_count,friction_problem,current_handling,current_level,proposed_level,decision,target_artifact,future_cost_eliminated,over_hardening_risk,reversibility,owner,review_trigger,status
+DST-EXAMPLE,,,,,D1,D2,KEEP,,,,,,,Delete example row

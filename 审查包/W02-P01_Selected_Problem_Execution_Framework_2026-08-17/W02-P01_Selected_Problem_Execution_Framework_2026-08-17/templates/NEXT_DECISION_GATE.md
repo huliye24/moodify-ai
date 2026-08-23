@@ -1,0 +1,27 @@
+# Next Decision Gate
+
+## Current Verdict
+
+## Options
+
+Depending on evidence:
+
+- CLOSE_MINI_CYCLE
+- ONE_MORE_FOCUSED_PACKAGE
+- REVISIT_PROBLEM_MODEL
+- ROLLBACK
+- IMPROVE_MEASUREMENT
+- DISTILL_NOW
+- OPERATE_AND_OBSERVE
+
+## Human Decision
+
+- [ ] CLOSE_MINI_CYCLE
+- [ ] ONE_MORE_FOCUSED_PACKAGE
+- [ ] REVISIT_PROBLEM_MODEL
+- [ ] ROLLBACK
+- [ ] IMPROVE_MEASUREMENT
+- [ ] DISTILL_NOW
+- [ ] OPERATE_AND_OBSERVE
+
+Codex stops until selected.

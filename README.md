@@ -1,122 +1,219 @@
 # Moodify
 
-> **Every voice deserves to be heard.**
+**AI Audio Intelligence Infrastructure — Moodify Music / Moodify Player**
+
+> Moodify builds the intelligence layer for the future of music.
 >
-> **每一种声音，都值得被世界听见。**
+> Moodify 正在构建 AI 时代音乐产业的听觉智能基础设施。
 
-**Moodify Music / Moodify Player** 是 Moodify 唯一的对外产品面。
+[![Test](https://github.com/huliye24/moodify-ai/actions/workflows/test.yml/badge.svg)](https://github.com/huliye24/moodify-ai/actions/workflows/test.yml)
+[![Python](https://img.shields.io/badge/Python-%3E%3D3.10-3776AB?logo=python&logoColor=white)](moodify-core-package/pyproject.toml)
+[![License](https://img.shields.io/badge/License-GPL%20v3-blue)](LICENSE)
 
-产品原则：**Listen. Then Play.**
+---
 
-核心用户动作：**Play.**
+## What Moodify Is
 
-```text
-Source / Cloud-prepared Track
-        ↓
-      Moodify
-        ↓
-       PLAY
+AI can now generate music at scale. The music industry still lacks reliable infrastructure to **listen to, evaluate, and process** that music. Moodify is building the auditory intelligence layer that fills this gap — the "ears" of the AI music economy.
+
+We are not a music app company. We are an **AI audio intelligence infrastructure company**. Our engine measures, understands, scores, and processes audio; our product modules turn that capability into industry-ready services.
+
+## Four Product Pillars
+
+### 1. Moodify QA — AI Music Quality Intelligence
+
+Industrial-grade audio quality assurance.
+
+- LUFS loudness analysis and streaming platform compliance (Spotify / Apple / YouTube)
+- Spectral balance, dynamic range, and true-peak diagnostics
+- Defect detection: clipping, noise, phase issues
+- MRS (Moodify Reality Score) quality scoring with uncertainty bounds
+
+### 2. Moodify Master — AI Music Processing
+
+AI mastering and industrial audio processing.
+
+- Rule-based, evidence-driven DSP intervention (Pedalboard chain)
+- Identity preservation gates — processing never destroys musical identity
+- Commercial release standardization for streaming distribution
+- Audio reconstruction and parameter optimization
+
+### 3. Moodify Rating — AI Music Asset Intelligence
+
+Music as a measurable, tradeable asset class.
+
+- Music value scoring: commercial, artistic, technical dimensions
+- Emotion and scene tagging (game / film / advertising / streaming)
+- S/A/B/C/D asset grading for catalogs and marketplaces
+- Risk assessment: originality, quality, licensing
+
+### 4. Moodify Supply — AI Music Supply Chain
+
+Matching music to where it creates value.
+
+- Audio similarity and semantic music search
+- Scene matching for game, film, and advertising licensing
+- Stem separation (vocals / drums / bass / other)
+- Verified supply pipeline: Intake → Process → Deliver → Verify
+
+## Architecture
+
+```
+                    Moodify
+                       |
+          Moodify Intelligence Engine
+                       |
+        ┌──────────┬──────────┬──────────┬──────────┐
+        │          │          │          │
+       QA        Master      Rating     Supply
+                       |
+        ┌──────────┬──────────┬──────────┐
+        │          │          │          │
+      Web       Android    Desktop    Partner API
 ```
 
-Moodify 把声音分析、判断、受控处理、验证和生产复杂度留在系统内部。用户不需要理解 Ear、分轨、预设、Evidence 或状态机，才能获得核心播放体验。
+### Layered Design
 
-## Product Surfaces
+| Layer | Directory | Role |
+|-------|-----------|------|
+| **Engine Layer** | `engine/` | Shared AI auditory capability: acoustic analysis, audio features, music understanding, scoring, recommendation |
+| **Product Layer** | `products/` | Industry modules: `qa/`, `master/`, `rating/`, `supply/` |
+| **Application Layer** | `apps/` | End-user products: `web/` (Next.js player), Android, desktop |
+| **Research Layer** | `research/` | Papers, benchmarks, whitepapers, experimental modules |
+| **Infrastructure** | `shared/` | Contracts, authority, safety, worker nodes, API gateway |
 
-- `apps/music-android/` — Moodify Music Android 播放器。
-- `apps/music-web/` — Moodify Web Player / PWA。
-- `moodify-music-package/` — Music API、身份、目录与 BFF。
-- `ops/web_origin/site/rongjingmusic/` — Moodify Product Home。
-- `ops/web_origin/site/rongjingwenchuan/` — 荣景文川 Company Home。
+The engine is a pure capability layer — it analyzes, scores, and understands audio. Products package that capability for industry use cases. Applications deliver end-user experiences. **Every judgment produces evidence; every score carries uncertainty; every decision is auditable.**
 
-公开品牌语言和站点职责以 [Public Brand Authority](docs/brand/public/README.md) 为准。
+Full architecture specification: [docs/MOODIFY_ARCHITECTURE_V1.md](docs/MOODIFY_ARCHITECTURE_V1.md)
 
-## Internal Systems
+## Quick Demo
 
-以下系统支撑 Moodify，但不构成第二个公开产品身份：
-
-- **Moodify Ear / Auditory Intelligence** — 内部听觉、判断、验证与研究系统。
-- **Cloud Production System** — Intake → Analyze → Stem → Judge → Intervene → Render → Verify → Evidence。
-- **Classic Reconstruction** — 决策驱动的受控重建；属于内部生产哲学，不是公开产品面。
-
-内部复杂度不是对外卖点。Ear 不是公开工作台，Moodify 也不是自动母带、预设浏览器或 AI 音乐后处理产品。
-
-## Current Reality
-
-当前事实状态以 [Repository Status](docs/REPOSITORY_STATUS.md) 和 [Current Architecture](docs/canon/CURRENT_ARCHITECTURE.md) 为入口。
-
-截至最近一次有证据的运行时核验（W01-P00，2026-08-17）：
-
-- Android、Web Player、Music platform / BFF 和静态音乐托管已存在于仓库或已核验运行环境；
-- 两台 VPS 承载核心服务与数据工厂批处理；
-- 完整 Ear / reconstruction 链路存在于仓库代码，但尚无已验证的云端生产流量；
-- 对象存储、云端 AI 推理和部分数据基础设施仍未验证或尚未部署。
-
-仓库代码、路线图或文档中的能力不自动等于已上线能力。未经运行时证据验证，不应写成生产事实。
-
-## Repository Authority
-
-进入仓库后按以下顺序阅读：
-
-1. [AGENTS.md](AGENTS.md)
-2. [Current Canon](docs/canon/CURRENT_CANON.md)
-3. [Product Boundary](docs/canon/PRODUCT_BOUNDARY.md)
-4. [Authority Order](docs/canon/AUTHORITY_ORDER.md)
-5. [Repository Status](docs/REPOSITORY_STATUS.md)
-
-历史文档可以保留其原始语言，但不能覆盖当前 Canon。改变公开产品身份、内部/外部边界、状态机、证据、云控制或数据权威时，必须显式声明 `CANON_CHANGE = YES` 并记录迁移与回滚。
-
-## Engineering Model
-
-Moodify 的内部研究与生产使用三项学科：
-
-- **WSE — Wave-Spectral Evolution:** 声音里发生了什么？
-- **MSE — Musical-Structural Engineering:** 音乐结构是什么？
-- **PPE — Production Process Engineering:** 如何可靠生产、验证与恢复？
-
-证据资产循环：
-
-```text
-Production Case
-  -> Measurement Record
-  -> Evidence Artifact
-  -> Theory Update
-  -> Rule Update
-  -> Next Production Case
-```
-
-机器只能在经过验证、版本化且明确授权的范围内作出决定。范围外、证据不足、不确定或未解决的感知案例必须进入 `HUMAN_REQUIRED`、`INCONCLUSIVE` 或定义好的失败状态。
-
-## Core Packages
-
-- `moodify-core-package/` — 测量、诊断、判断、干预、验证与证据能力。
-- `moodify-music-package/` — Music 产品的数据和服务层。
-- `moodify-core-package/src/moodify/data_factory/` — 数据工厂与算法评审。
-- `schemas/canonical/` — Production Case、Measurement、Evidence 等规范。
-- `docs/canon/` — 当前产品与系统权威。
-
-核心 Python 包的本地开发安装：
+The Intelligence Engine is live. One command turns any music file into a
+professional AI audio intelligence report:
 
 ```bash
-cd moodify-core-package
-pip install -e ".[dev]"
+pip install -e demo          # or run without installing (repo root):
+moodify analyze demo/input/example.mp3
+# python -m demo.cli analyze demo/input/example.mp3
 ```
 
-CLI 示例：
-
-```bash
-moodify analyze song.wav
-moodify process song.wav --preset clean_master
+```text
+==========================================================
+             Moodify Intelligence Report
+==========================================================
+  Track          : example.mp3
+  Overall Score  : 63 / 100
+  Loudness       : -15.6 LUFS (LRA 3.3 LU)
+  Stereo Image   : Narrow
+  Detected Issues: ...
+  Moodify Analysis:
+   "This track has strong emotional potential but requires additional
+    mastering optimization for commercial release."
+==========================================================
 ```
 
-这些命令是内部窄实现入口，不是 Moodify 的公开产品定义。
+**Input:** a music file. **Output:** a Moodify Intelligence Report —
+`report.json` (unified schema) + `report.md` (human-readable) — with quality
+scores, detected issues with evidence, prioritized recommendations, and a
+commercial release-readiness verdict. The same engine chain powers QA,
+Master, Rating, and Supply. Details: [docs/MOODIFY_DEMO_PIPELINE.md](docs/MOODIFY_DEMO_PIPELINE.md)
 
-## Scope and Safety
+## Core Technology
 
-- 不把实验指标宣传为生产事实或艺术质量结论。
-- 不保证每个处理结果都会“更好”；BYPASS 是合法成功结果。
-- 不提交私人音频、API Key、未授权数据集或生成的重型工件。
-- 代码变更应说明服务的案例、测量、证据、验证方式、失败行为和复用路径。
+- **Acoustic analysis** — LUFS / true-peak / spectral / stereo / dynamic-range measurement (ITU-R BS.1770, EBU R128)
+- **Feature extraction** — wave, spectral, rhythm, and timbre feature pipelines
+- **MRS (Moodify Reality Score)** — reference-based audio quality metric with explicit uncertainty
+- **Controlled DSP** — diagnosis-driven intervention via Pedalboard, with safety bounds and identity gates
+- **Evidence contracts** — provenance, measurement records, and verification artifacts for every processing case
+- **Distributed workers** — SQLite-queued job nodes, Docker-deployed API + worker services
+
+## Repository Structure
+
+```
+moodify-ai/
+├── engine/                  # Moodify Intelligence Engine (core AI capability)
+│   ├── acoustic_analysis/   # LUFS, spectrum, stereo, dynamics, issue detection
+│   ├── audio_features/      # Feature extraction
+│   ├── music_understanding/ # Structure, emotion, commercial insight
+│   ├── scoring_engine/      # MRS, quality scoring, recommendations
+│   └── report_schema/       # Unified Intelligence Report contract
+│
+├── products/                # Industry product modules
+│   ├── qa/                  # AI Music Quality Assurance
+│   ├── master/              # AI Music Mastering Engine
+│   ├── rating/              # AI Music Asset Rating
+│   └── supply/              # AI Music Supply Chain
+│
+├── demo/                    # Intelligence Demo Pipeline (moodify analyze)
+│
+├── apps/                    # End-user applications
+│   └── web/                 # Moodify web player (Next.js)
+│
+├── research/                # Research output
+│   ├── papers/              # WSE-AIM research papers
+│   ├── benchmarks/          # Evaluation protocols & datasets
+│   └── whitepapers/         # Industry whitepapers
+│
+├── shared/                  # Cross-cutting infrastructure
+├── docs/                    # Architecture, strategy, and canon documentation
+├── moodify-core-package/    # Legacy core package (progressive migration in progress)
+└── sdk/                     # Python SDK
+```
+
+> **Migration note:** The platform is moving from a monolithic structure (`moodify-core-package/`) to the layered architecture above. Migration is progressive — no code is deleted, no functionality is broken. See [docs/CURRENT_ARCHITECTURE.md](docs/CURRENT_ARCHITECTURE.md) for the current state and [docs/MOODIFY_ARCHITECTURE_V1.md](docs/MOODIFY_ARCHITECTURE_V1.md) for the target.
+
+## Roadmap
+
+### Phase 1 — Research Foundation ✅
+
+Reproducible analysis, diagnosis, controlled processing, and measurement workflows. 10-song data-factory pilot completed with full evidence chain.
+
+### Phase 2 — Engine Extraction (Current)
+
+Extract the Moodify Intelligence Engine from the monolith. The engine analysis
+facade and unified Intelligence Report schema are **live** (see
+[Quick Demo](#quick-demo)); module migration proceeds progressively with test
+coverage maintained.
+
+### Phase 3 — Product Modules
+
+Stand up QA, Master, Rating, and Supply as independently deployable services with dedicated API namespaces.
+
+### Phase 4 — Industry Platform
+
+Partner-facing infrastructure: SDK access, verified supply chain integrations, and interoperable evaluation standards for the music industry.
+
+## Research Direction
+
+Moodify's research operates on a simple question: **can machines learn to hear?**
+
+- **Wave-Spectral Evolution (WSE)** — how measurable signal properties evolve through production ([papers](research/papers/))
+- **Auditory intelligence architectures** — multi-layer measurement, bounded judgment, uncertainty quantification
+- **Human preference learning** — how listening judgments can inform machine evaluation
+- **Music asset valuation** — turning subjective quality into measurable, comparable asset metrics
+
+We maintain an evidence-first engineering posture: machine decisions stay scoped, versioned, and reviewable; insufficient evidence produces uncertainty or human escalation — never invented certainty.
+
+## For Partners & Investors
+
+Moodify is building foundational infrastructure for the AI music economy:
+
+- **Quality infrastructure** — as AI-generated music explodes, QA becomes the bottleneck; we automate it
+- **Asset intelligence** — music catalogs need machine-readable valuation; we provide the scoring layer
+- **Supply chain** — game/film/advertising music licensing is fragmented; we build the matching layer
+
+Documentation: [Product Strategy](docs/01_PRODUCT_STRATEGY.md) · [Business Model](docs/04_BUSINESS_MODEL.md) · [Industrial Roadmap](docs/03_INDUSTRIAL_ROADMAP.md)
+
+## Contributing
+
+We welcome contributions from audio researchers, AI engineers, music producers, and acoustic engineers.
+
+Before contributing, read [AGENTS.md](AGENTS.md), the [current Canon](docs/canon/CURRENT_CANON.md), and [repository status](docs/REPOSITORY_STATUS.md). Contributions should preserve reproducibility, distinguish research work from verified production capability, and avoid introducing private audio or secrets.
 
 ## License
 
-Moodify is licensed under **GNU GPL v3.0 only** unless otherwise stated. See [LICENSE](LICENSE).
+Moodify is licensed under **GNU GPL v3.0 only**. See [LICENSE](LICENSE).
+
+---
+
+**Moodify — The Intelligence Layer for the Future of Music.**

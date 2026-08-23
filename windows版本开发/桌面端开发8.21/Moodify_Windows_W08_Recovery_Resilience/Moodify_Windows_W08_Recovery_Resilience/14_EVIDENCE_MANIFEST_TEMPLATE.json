@@ -1,0 +1,30 @@
+{
+  "package_id": "MFY-WIN-W08-RECOVERY-RESILIENCE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w07_status": "",
+  "w08_gate": "",
+  "authorities": {
+    "app_state": "",
+    "playback": "",
+    "queue": "",
+    "persistence": ""
+  },
+  "snapshot_schema_version": "",
+  "write_policy": "",
+  "restore_policy": "",
+  "atomicity_strategy": "",
+  "last_known_good_strategy": "",
+  "commands": [],
+  "tests": [],
+  "crash_tests": [],
+  "manual_flows": [],
+  "screenshots": [],
+  "logs": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w08_status": "BLOCKED",
+  "w09_gate": "BLOCKED"
+}

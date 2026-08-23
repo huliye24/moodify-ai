@@ -1,0 +1,182 @@
+name: Plugin CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'plugins/**'
+      - '.github/workflows/plugin-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'plugins/**'
+
+env:
+  MOODIFY_PLUGIN_SDK_VERSION: "1.0.0"
+
+jobs:
+  # Validate plugin manifests
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Plugin Manifests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install jsonschema pyyaml
+
+      - name: Validate plugin.json files
+        run: |
+          python -c "
+          import json
+          import jsonschema
+          from pathlib import Path
+
+          schema = json.load(open('plugins/sdk/plugin.schema.json'))
+          errors = []
+
+          for plugin_json in Path('plugins').rglob('plugin.json'):
+              try:
+                  manifest = json.load(open(plugin_json))
+                  jsonschema.validate(manifest, schema)
+                  print(f'✓ {plugin_json}')
+              except Exception as e:
+                  errors.append(f'{plugin_json}: {e}')
+                  print(f'✗ {plugin_json}: {e}')
+
+          if errors:
+              print(f'\n{len(errors)} validation errors')
+              exit(1)
+          "
+
+  # Test Python plugins
+  test-python:
+    runs-on: ubuntu-latest
+    name: Test Python Plugins
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-cov
+          pip install -e plugins/sdk/python/
+
+      - name: Run tests
+        run: |
+          pytest plugins/ -v --tb=short
+
+  # Build VST3 plugins
+  build-vst3:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    name: Build VST3 (${{ matrix.os }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+
+      - name: Setup dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja
+
+      - name: Setup dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install cmake ninja
+
+      - name: Build VST3 plugins
+        run: |
+          mkdir -p plugins/vst/build
+          cd plugins/vst/build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vst3-${{ matrix.os }}
+          path: plugins/vst/build/*.vst3
+
+  # Security scan
+  security:
+    runs-on: ubuntu-latest
+    name: Security Scan
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Bandit (Python security)
+        run: |
+          pip install bandit
+          bandit -r plugins/sdk/python/ -f json -o bandit-report.json || true
+
+      - name: Run npm audit (JavaScript)
+        run: |
+          if [ -f plugins/sdk/javascript/package.json ]; then
+            cd plugins/sdk/javascript
+            npm audit || true
+          fi
+
+  # Package plugins
+  package:
+    needs: [validate, test-python, build-vst3]
+    runs-on: ubuntu-latest
+    name: Package Plugins
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Package plugins
+        run: |
+          mkdir -p packages/
+
+          # Package each plugin
+          for plugin_dir in plugins/*/; do
+            if [ -f "${plugin_dir}plugin.json" ]; then
+              plugin_name=$(basename "$plugin_dir")
+              echo "Packaging $plugin_name..."
+
+              # Create package
+              mkdir -p "packages/$plugin_name"
+              cp -r "$plugin_dir"* "packages/$plugin_name/"
+
+              # Add platform binaries
+              if [ -d "artifacts/vst3-ubuntu-latest" ]; then
+                mkdir -p "packages/$plugin_name/bin/linux"
+                cp artifacts/vst3-ubuntu-latest/*.vst3 "packages/$plugin_name/bin/linux/" 2>/dev/null || true
+              fi
+
+              # Create archive
+              cd packages
+              zip -r "${plugin_name}-${{ github.sha }}.zip" "$plugin_name"
+              cd ..
+            fi
+          done
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-packages
+          path: packages/*.zip

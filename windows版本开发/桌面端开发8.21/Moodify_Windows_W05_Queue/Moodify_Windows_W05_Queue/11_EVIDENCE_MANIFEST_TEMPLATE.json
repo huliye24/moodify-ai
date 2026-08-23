@@ -1,0 +1,29 @@
+{
+  "package_id": "MFY-WIN-W05-QUEUE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w04_status": "",
+  "w05_gate": "",
+  "authorities": {
+    "track": "",
+    "playlist": "",
+    "playback": "",
+    "queue": ""
+  },
+  "queue_source_policy": "",
+  "duplicate_policy": "",
+  "current_item_policy": "",
+  "clear_policy": "",
+  "commands": [],
+  "tests": [],
+  "race_tests": [],
+  "manual_flows": [],
+  "screenshots": [],
+  "logs": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w05_status": "BLOCKED",
+  "w06_gate": "BLOCKED"
+}
