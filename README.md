@@ -1,6 +1,6 @@
 # Moodify
 
-**AI Audio Intelligence Infrastructure**
+**AI Audio Intelligence Infrastructure — Moodify Music / Moodify Player**
 
 > Moodify builds the intelligence layer for the future of music.
 >
