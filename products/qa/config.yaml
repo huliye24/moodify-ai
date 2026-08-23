@@ -1,0 +1,30 @@
+# Moodify QA — AI Music Quality Assurance configuration
+product:
+  name: "Moodify QA"
+  full_name: "AI Music Quality Assurance"
+  version: "0.1.0"
+  api_namespace: "/api/v1/qa"
+
+standards:
+  streaming:
+    spotify: { target_lufs: -14.0, tolerance: 1.0 }
+    apple_music: { target_lufs: -16.0, tolerance: 1.0 }
+    youtube: { target_lufs: -14.0, tolerance: 1.0 }
+  broadcast:
+    ebu_r128: { target_lufs: -23.0, tolerance: 0.5 }
+    atsc_a85: { target_lufs: -24.0, tolerance: 2.0 }
+  mastering:
+    true_peak_dbtp: -1.0
+    max_short_term_lufs: -9.0
+
+scoring:
+  mrs:
+    enabled: true
+    reference_based: true
+  quality_gate:
+    fail_clipping: true
+    fail_noise_above_db: -60.0
+
+migration:
+  status: "PHASE_A_STRUCTURE_CREATED"
+  source: "moodify-core-package/src/moodify/"

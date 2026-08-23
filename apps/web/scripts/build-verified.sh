@@ -38,7 +38,7 @@ esac
 workerd_dir="${SITES_PROJECT_ROOT}/node_modules/${workerd_package}"
 if [[ ! -d "${workerd_dir}" ]]; then
   echo "build-verified.sh: missing ${workerd_package} (npm ci skipped an optional platform package)." >&2
-  echo "Fix: cd apps/music-web && npm install --no-save ${workerd_package}@<version from package-lock.json>" >&2
+  echo "Fix: cd apps/web && npm install --no-save ${workerd_package}@<version from package-lock.json>" >&2
   exit 69
 fi
 

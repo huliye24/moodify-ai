@@ -93,7 +93,7 @@ npm run validate:no-deploy-audio
 
 ## Evidence and failure behavior
 
-- Deployment and media checks live under `apps/music-web/docs/` and the relevant evidence artifacts.
+- Deployment and media checks live under `apps/web/docs/` and the relevant evidence artifacts.
 - Catalogue failure falls back only to the bounded demo catalogue; it must not fabricate account or deployment state.
 - Media errors remain visible and must not be converted into a successful playback claim.
 - Public capability claims require runtime evidence, not only routes or UI code.

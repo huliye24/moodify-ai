@@ -4,15 +4,15 @@ export function Reports() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h1 style={styles.title}>Reports</h1>
-        <p style={styles.subtitle}>Catalog intelligence and analytics</p>
+        <h1 style={styles.title}>报告</h1>
+        <p style={styles.subtitle}>目录智能与分析</p>
       </header>
 
       <div style={styles.comingSoon}>
         <div style={styles.icon}>◈</div>
-        <h2 style={styles.comingSoonTitle}>Coming Soon</h2>
+        <h2 style={styles.comingSoonTitle}>即将上线</h2>
         <p style={styles.comingSoonText}>
-          Advanced reporting and analytics for enterprise users.
+          为企业用户提供高级报告和分析功能。
         </p>
       </div>
     </div>

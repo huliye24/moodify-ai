@@ -26,8 +26,8 @@ export function Library() {
     <div style={styles.container}>
       {/* Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>Audio Library</h1>
-        <p style={styles.subtitle}>{mockAssets.length} audio assets</p>
+        <h1 style={styles.title}>音频库</h1>
+        <p style={styles.subtitle}>{mockAssets.length} 个音频资产</p>
       </header>
 
       {/* Filters */}
@@ -36,7 +36,7 @@ export function Library() {
           <span style={styles.searchIcon}>◈</span>
           <input
             type="text"
-            placeholder="Search audio assets..."
+            placeholder="搜索音频资产..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={styles.searchInput}
@@ -51,7 +51,7 @@ export function Library() {
           >
             {genres.map(genre => (
               <option key={genre} value={genre}>
-                {genre === 'all' ? 'All Genres' : genre}
+                {genre === 'all' ? '全部流派' : genre}
               </option>
             ))}
           </select>
@@ -61,9 +61,9 @@ export function Library() {
             onChange={(e) => setSortBy(e.target.value)}
             style={styles.select}
           >
-            <option value="mrs">Sort by MRS</option>
-            <option value="title">Sort by Title</option>
-            <option value="date">Sort by Date</option>
+            <option value="mrs">按 MRS 排序</option>
+            <option value="title">按标题排序</option>
+            <option value="date">按日期排序</option>
           </select>
         </div>
       </div>
@@ -103,7 +103,7 @@ export function Library() {
 
               <div style={styles.aiHistory}>
                 <span style={styles.aiIcon}>◆</span>
-                <span style={styles.aiText}>AI Analyzed</span>
+                <span style={styles.aiText}>AI 已分析</span>
                 <span style={styles.aiDate}>{asset.lastModified}</span>
               </div>
             </div>
@@ -112,15 +112,15 @@ export function Library() {
             <div style={styles.cardActions}>
               <button style={styles.actionButton}>
                 <span style={styles.actionIcon}>▶</span>
-                Listen
+                播放
               </button>
               <button style={styles.actionButton}>
                 <span style={styles.actionIcon}>◈</span>
-                Analyze
+                分析
               </button>
               <button style={styles.actionButton}>
                 <span style={styles.actionIcon}>▣</span>
-                Process
+                处理
               </button>
             </div>
           </div>
@@ -131,8 +131,8 @@ export function Library() {
       {filteredAssets.length === 0 && (
         <div style={styles.emptyState}>
           <div style={styles.emptyIcon}>◈</div>
-          <h3 style={styles.emptyTitle}>No assets found</h3>
-          <p style={styles.emptyText}>Try adjusting your search or filters</p>
+          <h3 style={styles.emptyTitle}>未找到资产</h3>
+          <p style={styles.emptyText}>尝试调整搜索或筛选条件</p>
         </div>
       )}
     </div>

@@ -4,35 +4,35 @@ export function Plugins() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h1 style={styles.title}>Plugin Marketplace</h1>
-        <p style={styles.subtitle}>Extend Moodify with plugins</p>
+        <h1 style={styles.title}>插件市场</h1>
+        <p style={styles.subtitle}>扩展沐脉功能</p>
       </header>
 
       <div style={styles.grid}>
         <div style={styles.card}>
           <div style={styles.cardIcon}>◆</div>
-          <h3 style={styles.cardTitle}>Featured</h3>
-          <p style={styles.cardText}>Discover top-rated plugins</p>
+          <h3 style={styles.cardTitle}>精选</h3>
+          <p style={styles.cardText}>发现高评分插件</p>
         </div>
 
         <div style={styles.card}>
           <div style={styles.cardIcon}>◇</div>
-          <h3 style={styles.cardTitle}>Installed</h3>
-          <p style={styles.cardText}>Manage your plugins</p>
+          <h3 style={styles.cardTitle}>已安装</h3>
+          <p style={styles.cardText}>管理您的插件</p>
         </div>
 
         <div style={styles.card}>
           <div style={styles.cardIcon}>◈</div>
-          <h3 style={styles.cardTitle}>Developer Center</h3>
-          <p style={styles.cardText}>Build and publish plugins</p>
+          <h3 style={styles.cardTitle}>开发者中心</h3>
+          <p style={styles.cardText}>构建和发布插件</p>
         </div>
       </div>
 
       <div style={styles.comingSoon}>
         <div style={styles.comingSoonIcon}>◊</div>
-        <h2 style={styles.comingSoonTitle}>Marketplace Coming Soon</h2>
+        <h2 style={styles.comingSoonTitle}>市场即将上线</h2>
         <p style={styles.comingSoonText}>
-          Browse and install plugins to extend Moodify's capabilities.
+          浏览和安装插件以扩展沐脉的功能。
         </p>
       </div>
     </div>

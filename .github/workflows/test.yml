@@ -1,0 +1,39 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python 3.11 quality and tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: moodify-core-package
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: moodify-core-package/requirements.lock.txt
+
+      - name: Install package and development dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run Ruff
+        run: python -m ruff check src tests ../tests
+
+      - name: Run pytest
+        env:
+          MPLBACKEND: Agg
+        run: python -m pytest -q tests ../tests

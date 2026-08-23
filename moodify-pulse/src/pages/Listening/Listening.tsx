@@ -9,16 +9,16 @@ export function Listening() {
     <div style={styles.container}>
       {/* Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>AI Listening</h1>
-        <p style={styles.subtitle}>Upload audio for intelligent analysis</p>
+        <h1 style={styles.title}>AI 聆听</h1>
+        <p style={styles.subtitle}>上传音频进行智能分析</p>
       </header>
 
       {/* Upload Area */}
       <div style={styles.uploadArea}>
         <div style={styles.uploadIcon}>▶</div>
-        <div style={styles.uploadText}>Drop audio files here</div>
-        <div style={styles.uploadHint}>or click to browse</div>
-        <div style={styles.uploadFormats}>Supports: WAV, MP3, FLAC</div>
+        <div style={styles.uploadText}>拖拽音频文件到此处</div>
+        <div style={styles.uploadHint}>或点击浏览</div>
+        <div style={styles.uploadFormats}>支持格式: WAV, MP3, FLAC</div>
       </div>
 
       {/* Analysis Result */}
@@ -31,39 +31,39 @@ export function Listening() {
             </div>
             <div style={styles.mrsScore}>
               <div style={styles.mrsValue}>{selectedAsset.mrs.overall}</div>
-              <div style={styles.mrsLabel}>MRS Score</div>
+              <div style={styles.mrsLabel}>MRS 评分</div>
             </div>
           </div>
 
           {/* Metrics Grid */}
           <div style={styles.metricsGrid}>
             <MetricCard
-              label="Tempo"
+              label="速度"
               value={`${selectedAsset.analysis.tempo} BPM`}
               icon="◈"
             />
             <MetricCard
-              label="Energy"
+              label="能量"
               value={selectedAsset.analysis.energy}
               icon="◆"
             />
             <MetricCard
-              label="Emotion"
+              label="情绪"
               value={selectedAsset.analysis.emotion}
               icon="◎"
             />
             <MetricCard
-              label="Frequency"
+              label="频率平衡"
               value={selectedAsset.analysis.frequencyBalance}
               icon="▣"
             />
             <MetricCard
-              label="Stereo Width"
+              label="立体声宽度"
               value={selectedAsset.analysis.stereoWidth.toFixed(2)}
               icon="◇"
             />
             <MetricCard
-              label="Duration"
+              label="时长"
               value={`${Math.floor(selectedAsset.duration / 60)}:${(selectedAsset.duration % 60).toString().padStart(2, '0')}`}
               icon="▶"
             />
@@ -71,40 +71,40 @@ export function Listening() {
 
           {/* MRS Breakdown */}
           <div style={styles.mrsBreakdown}>
-            <h3 style={styles.breakdownTitle}>MRS Breakdown</h3>
+            <h3 style={styles.breakdownTitle}>MRS 细分</h3>
             <div style={styles.breakdownGrid}>
-              <MRSBar label="Fidelity" value={selectedAsset.mrs.fidelity} />
-              <MRSBar label="Balance" value={selectedAsset.mrs.balance} />
-              <MRSBar label="Clarity" value={selectedAsset.mrs.clarity} />
+              <MRSBar label="保真度" value={selectedAsset.mrs.fidelity} />
+              <MRSBar label="平衡" value={selectedAsset.mrs.balance} />
+              <MRSBar label="清晰度" value={selectedAsset.mrs.clarity} />
             </div>
           </div>
 
           {/* Recommendations */}
           <div style={styles.recommendations}>
-            <h3 style={styles.recommendationsTitle}>AI Recommendations</h3>
+            <h3 style={styles.recommendationsTitle}>AI 建议</h3>
             <ul style={styles.recommendationList}>
               {selectedAsset.mrs.fidelity < 85 && (
                 <li style={styles.recommendationItem}>
                   <span style={styles.recommendationIcon}>▸</span>
-                  Consider enhancing high-frequency clarity
+                  建议增强高频清晰度
                 </li>
               )}
               {selectedAsset.mrs.balance < 85 && (
                 <li style={styles.recommendationItem}>
                   <span style={styles.recommendationIcon}>▸</span>
-                  Stereo field could benefit from widening
+                  立体声场可以进一步加宽
                 </li>
               )}
               {selectedAsset.mrs.clarity < 85 && (
                 <li style={styles.recommendationItem}>
                   <span style={styles.recommendationIcon}>▸</span>
-                  Vocals could be more prominent in the mix
+                  人声在混音中可以更突出
                 </li>
               )}
               {selectedAsset.mrs.overall >= 85 && (
                 <li style={styles.recommendationItem}>
                   <span style={styles.recommendationIcon}>✓</span>
-                  Audio quality is excellent - no changes needed
+                  音频质量优秀 - 无需修改
                 </li>
               )}
             </ul>
@@ -114,7 +114,7 @@ export function Listening() {
 
       {/* Asset List */}
       <div style={styles.assetList}>
-        <h3 style={styles.listTitle}>Recent Analyses</h3>
+        <h3 style={styles.listTitle}>近期分析</h3>
         {mockAssets.slice(0, 5).map(asset => (
           <button
             key={asset.id}

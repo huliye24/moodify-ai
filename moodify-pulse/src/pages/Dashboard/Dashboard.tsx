@@ -8,8 +8,8 @@ export function Dashboard() {
     <div style={styles.container}>
       {/* Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>Good Evening</h1>
-        <p style={styles.subtitle}>Your Audio Intelligence</p>
+        <h1 style={styles.title}>晚上好</h1>
+        <p style={styles.subtitle}>您的音频智能中心</p>
       </header>
 
       {/* Stats Grid */}
@@ -17,31 +17,31 @@ export function Dashboard() {
         <div style={styles.statCard}>
           <div style={styles.statIcon}>▤</div>
           <div style={styles.statValue}>{dashboardStats.totalTracks}</div>
-          <div style={styles.statLabel}>Total Tracks</div>
+          <div style={styles.statLabel}>总曲目</div>
         </div>
 
         <div style={styles.statCard}>
           <div style={styles.statIcon}>◎</div>
           <div style={styles.statValue}>{dashboardStats.analyzedTracks}</div>
-          <div style={styles.statLabel}>Analyzed</div>
+          <div style={styles.statLabel}>已分析</div>
         </div>
 
         <div style={styles.statCard}>
           <div style={styles.statIcon}>◈</div>
           <div style={styles.statValue}>{dashboardStats.averageMRS}</div>
-          <div style={styles.statLabel}>Average MRS</div>
+          <div style={styles.statLabel}>平均 MRS</div>
         </div>
 
         <div style={styles.statCard}>
           <div style={styles.statIcon}>▣</div>
           <div style={styles.statValue}>12</div>
-          <div style={styles.statLabel}>Projects</div>
+          <div style={styles.statLabel}>项目</div>
         </div>
       </div>
 
       {/* Recent Intelligence */}
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Recent Intelligence</h2>
+        <h2 style={styles.sectionTitle}>近期分析</h2>
         <div style={styles.intelligenceList}>
           {recentAnalyses.map(asset => (
             <div key={asset.id} style={styles.intelligenceCard}>
@@ -56,7 +56,7 @@ export function Dashboard() {
               </div>
               <div style={styles.recommendation}>
                 <span style={styles.recommendationIcon}>▸</span>
-                Recommendation: {getRecommendation(asset)}
+                建议: {getRecommendation(asset)}
               </div>
             </div>
           ))}
@@ -67,7 +67,7 @@ export function Dashboard() {
       <section style={styles.quickActions}>
         <button style={styles.primaryButton}>
           <span style={styles.buttonIcon}>+</span>
-          Analyze New Track
+          分析新曲目
         </button>
       </section>
     </div>
@@ -75,10 +75,10 @@ export function Dashboard() {
 }
 
 function getRecommendation(asset: typeof mockAssets[0]): string {
-  if (asset.mrs.clarity < 80) return 'Improve vocal presence'
-  if (asset.mrs.balance < 80) return 'Increase spatial depth'
-  if (asset.mrs.fidelity < 80) return 'Enhance frequency clarity'
-  return 'Audio quality is excellent'
+  if (asset.mrs.clarity < 80) return '建议提升人声清晰度'
+  if (asset.mrs.balance < 80) return '建议增加空间深度'
+  if (asset.mrs.fidelity < 80) return '建议增强频率清晰度'
+  return '音频质量优秀'
 }
 
 const styles = {

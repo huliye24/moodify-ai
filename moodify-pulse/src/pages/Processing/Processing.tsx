@@ -18,25 +18,25 @@ export function Processing() {
     <div style={styles.container}>
       {/* Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>Processing Workspace</h1>
-        <p style={styles.subtitle}>AI-powered audio optimization</p>
+        <h1 style={styles.title}>处理工作区</h1>
+        <p style={styles.subtitle}>AI 驱动的音频优化</p>
       </header>
 
       {/* Workflow */}
       <div style={styles.workflow}>
         <div style={styles.workflowStep}>
           <div style={styles.stepIcon}>◈</div>
-          <div style={styles.stepLabel}>Original</div>
+          <div style={styles.stepLabel}>原始音频</div>
         </div>
         <div style={styles.workflowArrow}>→</div>
         <div style={styles.workflowStep}>
           <div style={{ ...styles.stepIcon, background: 'var(--color-brand-gradient)' }}>◆</div>
-          <div style={styles.stepLabel}>Moodify AI</div>
+          <div style={styles.stepLabel}>沐脉 AI</div>
         </div>
         <div style={styles.workflowArrow}>→</div>
         <div style={styles.workflowStep}>
           <div style={styles.stepIcon}>◇</div>
-          <div style={styles.stepLabel}>Optimized</div>
+          <div style={styles.stepLabel}>优化完成</div>
         </div>
       </div>
 
@@ -45,19 +45,19 @@ export function Processing() {
         {/* Before/After */}
         <div style={styles.comparison}>
           <div style={styles.comparisonHeader}>
-            <div style={styles.comparisonTitle}>Before / After</div>
+            <div style={styles.comparisonTitle}>前后对比</div>
             <button
               style={styles.toggleButton}
               onClick={() => setShowComparison(!showComparison)}
             >
-              {showComparison ? 'Hide' : 'Show'} Comparison
+              {showComparison ? '隐藏' : '显示'}对比
             </button>
           </div>
 
           <div style={styles.waveformContainer}>
             {/* Original */}
             <div style={styles.waveformSection}>
-              <div style={styles.waveformLabel}>Original</div>
+              <div style={styles.waveformLabel}>原始</div>
               <div style={styles.waveform}>
                 <WaveformVisualization color="var(--color-text-muted)" />
               </div>
@@ -75,7 +75,7 @@ export function Processing() {
 
             {/* After */}
             <div style={styles.waveformSection}>
-              <div style={styles.waveformLabel}>Optimized</div>
+              <div style={styles.waveformLabel}>优化后</div>
               <div style={styles.waveform}>
                 <WaveformVisualization color="var(--color-brand-primary)" />
               </div>
@@ -95,7 +95,7 @@ export function Processing() {
 
         {/* Parameters Panel */}
         <div style={styles.parametersPanel}>
-          <h3 style={styles.panelTitle}>Processing Parameters</h3>
+          <h3 style={styles.panelTitle}>处理参数</h3>
 
           <div style={styles.parametersList}>
             {parameters.map(param => (
@@ -127,19 +127,19 @@ export function Processing() {
               {isProcessing ? (
                 <>
                   <span style={styles.spinner}>◌</span>
-                  Processing...
+                  处理中...
                 </>
               ) : (
                 <>
                   <span style={styles.buttonIcon}>▶</span>
-                  Apply Processing
+                  应用处理
                 </>
               )}
             </button>
 
             <button style={styles.exportButton}>
               <span style={styles.buttonIcon}>↓</span>
-              Export
+              导出
             </button>
           </div>
         </div>
@@ -147,19 +147,19 @@ export function Processing() {
 
       {/* Processing Log */}
       <div style={styles.processingLog}>
-        <h3 style={styles.logTitle}>Processing Log</h3>
+        <h3 style={styles.logTitle}>处理日志</h3>
         <div style={styles.logContent}>
           <div style={styles.logEntry}>
             <span style={styles.logTime}>14:32:05</span>
-            <span style={styles.logMessage}>Audio loaded: {selectedAsset.title}</span>
+            <span style={styles.logMessage}>音频加载: {selectedAsset.title}</span>
           </div>
           <div style={styles.logEntry}>
             <span style={styles.logTime}>14:32:06</span>
-            <span style={styles.logMessage}>Analysis complete - MRS: {selectedAsset.mrs.overall}</span>
+            <span style={styles.logMessage}>分析完成 - MRS: {selectedAsset.mrs.overall}</span>
           </div>
           <div style={styles.logEntry}>
             <span style={styles.logTime}>14:32:07</span>
-            <span style={styles.logMessage}>Ready for processing</span>
+            <span style={styles.logMessage}>准备处理</span>
           </div>
         </div>
       </div>

@@ -4,6 +4,10 @@ import path from 'path'
 import fs from 'fs'
 import http from 'http'
 import net from 'net'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
 
@@ -113,7 +117,7 @@ function createWindow(): void {
     height: 820,
     minWidth: 900,
     minHeight: 620,
-    title: 'Moodify Pulse',
+    title: '沐脉 Pulse',
     backgroundColor: '#101113',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -131,6 +135,7 @@ function createWindow(): void {
 
   if (isDev) {
     win.loadURL('http://localhost:5173')
+    win.webContents.openDevTools()
   } else {
     win.loadFile(path.join(__dirname, '../dist/index.html'))
   }

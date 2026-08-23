@@ -1,5 +1,5 @@
 import React from 'react'
-import './styles.css'
+import logoWhite from '../../assets/logo-white.png'
 
 interface SidebarItem {
   id: string
@@ -9,15 +9,15 @@ interface SidebarItem {
 }
 
 const sidebarItems: SidebarItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: '◆' },
-  { id: 'listening', label: 'AI Listening', icon: '◎' },
-  { id: 'processing', label: 'Processing', icon: '▶' },
-  { id: 'library', label: 'Audio Library', icon: '▤' },
-  { id: 'projects', label: 'Projects', icon: '▣' },
-  { id: 'reports', label: 'Reports', icon: '◈' },
-  { id: 'plugins', label: 'Plugins', icon: '◊' },
-  { id: 'marketplace', label: 'Marketplace', icon: '◇' },
-  { id: 'settings', label: 'Settings', icon: '◉' },
+  { id: 'dashboard', label: '工作台', icon: '◆' },
+  { id: 'listening', label: 'AI 聆听', icon: '◎' },
+  { id: 'processing', label: '音频处理', icon: '▶' },
+  { id: 'library', label: '音频库', icon: '▤' },
+  { id: 'projects', label: '项目', icon: '▣' },
+  { id: 'reports', label: '报告', icon: '◈' },
+  { id: 'plugins', label: '插件', icon: '◊' },
+  { id: 'marketplace', label: '市场', icon: '◇' },
+  { id: 'settings', label: '设置', icon: '◉' },
 ]
 
 interface SidebarProps {
@@ -30,8 +30,8 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
     <aside style={styles.sidebar}>
       {/* Logo */}
       <div style={styles.logo}>
-        <div style={styles.logoIcon}>◈</div>
-        <div style={styles.logoText}>Moodify</div>
+        <img src={logoWhite} alt="沐脉" style={styles.logoImg} />
+        <div style={styles.logoText}>沐脉</div>
       </div>
 
       {/* Navigation */}
@@ -56,10 +56,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
 
       {/* User */}
       <div style={styles.user}>
-        <div style={styles.userAvatar}>A</div>
+        <div style={styles.userAvatar}>音</div>
         <div style={styles.userInfo}>
-          <div style={styles.userName}>Audio Engineer</div>
-          <div style={styles.userPlan}>Pro Plan</div>
+          <div style={styles.userName}>音频工程师</div>
+          <div style={styles.userPlan}>专业版</div>
         </div>
       </div>
     </aside>
@@ -85,17 +85,12 @@ const styles = {
     marginBottom: 'var(--space-lg)',
   },
 
-  logoIcon: {
+  logoImg: {
     width: '32px',
     height: '32px',
-    background: 'var(--color-brand-gradient)',
     borderRadius: 'var(--radius-md)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'var(--color-text-inverse)',
-    fontSize: '16px',
-    fontWeight: 600,
+    objectFit: 'contain' as const,
+    background: 'var(--color-brand-gradient)',
   },
 
   logoText: {
