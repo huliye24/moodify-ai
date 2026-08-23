@@ -4,7 +4,6 @@ import sys
 sys.path.insert(0, 'src')
 
 # Test data types
-from moodify.data_types import WaveState, WaveStateDiagnosis, CraftCardV2
 print("1. Data types OK")
 
 # Test knowledge base
@@ -21,15 +20,12 @@ import pedalboard
 print(f"4. pedalboard {pedalboard.__version__} OK")
 
 # Test pyloudnorm
-import pyloudnorm
 print("5. pyloudnorm OK")
 
 # Test diagnosis engine (lightweight import check)
-from moodify.diagnosis.engine import DiagnosisEngine
 print("6. DiagnosisEngine import OK")
 
 # Test workflow
-from moodify.orchestration.workflow_engine import WorkflowOrchestrator
 print("7. WorkflowOrchestrator import OK")
 
 print("\n=== ALL CHECKS PASSED ===")

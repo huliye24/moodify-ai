@@ -1,5 +1,8 @@
 """Agent B: Phase 2 system validation — B1, B3, B4, B5. Adapted to actual APIs."""
-import os, sys, json, time, glob, traceback
+import sys
+import json
+import time
+import traceback
 from pathlib import Path
 sys.path.insert(0, 'src')
 import numpy as np
@@ -165,7 +168,7 @@ for emo in ['GA', 'DR', 'WL', 'SE', 'HL']:
         r = search_optimal_strengths(ws, emo, top_k=1, n_samples=1000)
         if not r:
             gate_results.append({'emotion': emo, 'proxy_score': -999, 'gate': 'FAIL', 'reason': 'no search results'})
-            print(f'FAIL: no search results')
+            print('FAIL: no search results')
             continue
 
         vec, params, proxy_score = r[0]
@@ -209,7 +212,7 @@ for emo in ['GA', 'DR', 'WL', 'SE', 'HL']:
 n_pass = sum(1 for g in gate_results if g['gate'] == 'PASS')
 report_lines = [
     '# E2E 管道验证报告', '',
-    f'**测试音频**: {audio}', f'**搜索样本**: 1000', '',
+    f'**测试音频**: {audio}', '**搜索样本**: 1000', '',
     '## 结果汇总', '',
     '| 情绪 | proxy_score | WHS | Defects | 判定 |',
     '|------|------------|-----|---------|------|',
@@ -223,7 +226,7 @@ report_lines += [
     f'**通过率**: {n_pass}/{len(gate_results)}',
     '',
     '## 备注',
-    f'质量门规则: WHS后 >= WHS前 × 0.7 且 缺陷增加 <= 2',
+    '质量门规则: WHS后 >= WHS前 × 0.7 且 缺陷增加 <= 2',
 ]
 
 with open(OUT / 'e2e_quality_gate_report.md', 'w') as f:

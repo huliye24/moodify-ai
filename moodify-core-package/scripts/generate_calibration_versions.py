@@ -14,7 +14,10 @@
     --emotions GA SE CN LW HL
 """
 
-import os, sys, json, time, argparse
+import sys
+import json
+import time
+import argparse
 from pathlib import Path
 import numpy as np
 import soundfile as sf
@@ -23,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from moodify.diagnosis.engine import DiagnosisEngine
 from moodify.knowledge.craft_chains import get_recommended_params
-from moodify.knowledge.emotion_targets import resolve_emotion, KEY_TO_CODE, EMOTION_TARGETS_V2
+from moodify.knowledge.emotion_targets import EMOTION_TARGETS_V2
 from moodify.processing.spectral_chain import SpectralDSPChain
 
 

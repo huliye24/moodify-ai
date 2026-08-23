@@ -7,7 +7,9 @@
     --output calibration/correlation_report.md
 """
 
-import sys, json, argparse
+import sys
+import json
+import argparse
 from pathlib import Path
 from collections import defaultdict
 import numpy as np
@@ -153,13 +155,13 @@ def generate_report(correlation: dict, reliability: dict, failures: list, output
     lines = [
         "# EDSR 校准报告",
         "",
-        f"**日期**: 2026-05-29",
+        "**日期**: 2026-05-29",
         f"**可用版本数**: {correlation.get('n_versions', 0)}",
         "",
         "## 1. 代理指标 vs 人耳偏好",
         "",
-        f"| 指标 | 值 |",
-        f"|------|-----|",
+        "| 指标 | 值 |",
+        "|------|-----|",
         f"| Spearman ρ | {correlation.get('spearman_rho', 'N/A')} |",
         f"| Spearman p | {correlation.get('spearman_p', 'N/A')} |",
         f"| Kendall τ | {correlation.get('kendall_tau', 'N/A')} |",
