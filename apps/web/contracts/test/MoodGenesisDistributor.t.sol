@@ -36,6 +36,17 @@ contract MockMOOD is ERC20 {
 }
 
 contract MoodGenesisDistributorTest is Test {
+    // Import events from target contract
+    event Claimed(
+        uint256 indexed participantNumber,
+        address indexed account,
+        uint256 amount
+    );
+
+    event UnclaimedRecovered(
+        address indexed recipient,
+        uint256 amount
+    );
     MoodGenesisDistributor public distributor;
     MockMOOD public token;
 
@@ -296,7 +307,7 @@ contract MoodGenesisDistributorTest is Test {
         vm.prank(participant1);
 
         vm.expectEmit(true, true, false, true);
-        emit MoodGenesisDistributor.Claimed(
+        emit Claimed(
             PARTICIPANT_1_NUMBER,
             participant1,
             PARTICIPANT_1_AMOUNT

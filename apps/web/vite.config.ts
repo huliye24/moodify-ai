@@ -9,6 +9,9 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
 
 const { d1, r2 } = hostingConfig;
 
+// Detect staging environment
+const isStaging = process.env.CLOUDFLARE_ENV === "staging";
+
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
@@ -67,7 +70,8 @@ export default defineConfig(async () => {
       cloudflare({
         viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
         inspectorPort: false,
-        config: localBindingConfig,
+        // Staging uses wrangler.jsonc, local dev uses localBindingConfig
+        config: isStaging ? undefined : localBindingConfig,
       }),
     ],
   };
