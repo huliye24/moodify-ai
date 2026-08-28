@@ -1,124 +1,43 @@
 /**
- * MOOD-GENESIS-007: Read-Only Chain Service
+ * MOOD-GENESIS-007: Real BSC Mainnet Chain Service
  *
- * Typed reads for on-chain MOOD data.
+ * Typed reads for on-chain MOOD data using viem.
  * No signer required.
  * No write capabilities.
+ *
+ * This implementation replaces the placeholder version with real BSC mainnet RPC.
  */
 
+import { createPublicClient, http, parseAbi } from "viem";
+import { bsc } from "viem/chains";
 import { MOOD_TOKEN } from "./mood-token";
 import { TREASURY_CONFIG, TreasuryAccount } from "./mood-treasury";
 
-/** RPC configuration */
-const RPC_ENDPOINT = TREASURY_CONFIG.rpcEndpoint;
-
 /** BEP-20 token ABI (read-only) */
-const TOKEN_ABI = [
-  // totalSupply
-  {
-    constant: true,
-    inputs: [],
-    name: "totalSupply",
-    outputs: [{ name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  // balanceOf
-  {
-    constant: true,
-    inputs: [{ name: "account", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  // decimals
-  {
-    constant: true,
-    inputs: [],
-    name: "decimals",
-    outputs: [{ name: "", type: "uint8" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-];
+const MOOD_ABI = parseAbi([
+  "function totalSupply() view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function balanceOf(address account) view returns (uint256)",
+]);
 
 /** Distributor ABI (read-only) */
-const DISTRIBUTOR_ABI = [
-  // merkleRoot
-  {
-    inputs: [],
-    name: "merkleRoot",
-    outputs: [{ name: "", type: "bytes32" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  // token
-  {
-    inputs: [],
-    name: "token",
-    outputs: [{ name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  // claimedParticipant
-  {
-    inputs: [{ name: "participantNumber", type: "uint256" }],
-    name: "claimedParticipant",
-    outputs: [{ name: "", type: "bool" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  // totalClaimed
-  {
-    inputs: [],
-    name: "totalClaimed",
-    outputs: [{ name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  // distributorBalance
-  {
-    inputs: [],
-    name: "distributorBalance",
-    outputs: [{ name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-];
+const DISTRIBUTOR_ABI = parseAbi([
+  "function merkleRoot() view returns (bytes32)",
+  "function token() view returns (address)",
+  "function claimedParticipant(uint256 participantNumber) view returns (bool)",
+  "function totalClaimed() view returns (uint256)",
+  "function distributorBalance() view returns (uint256)",
+]);
 
-/** RPC call payload */
-interface RPCCall {
-  jsonrpc: "2.0";
-  method: string;
-  params: unknown[];
-  id: number;
-}
+/** Public RPC endpoint for BSC mainnet */
+const BSC_RPC_URL = process.env.NEXT_PUBLIC_BSC_RPC || "https://bsc-dataseed.binance.org";
 
-/** RPC response */
-interface RPCResponse {
-  jsonrpc: "2.0";
-  id: number;
-  result?: string;
-  error?: {
-    code: number;
-    message: string;
-  };
-}
-
-/** Chain read error */
-export class ChainReadError extends Error {
-  constructor(
-    public code: string,
-    message: string,
-    public details?: Record<string, unknown>
-  ) {
-    super(message);
-    this.name = "ChainReadError";
-  }
+/** Create viem public client for BSC */
+function createBSCClient() {
+  return createPublicClient({
+    chain: bsc,
+    transport: http(BSC_RPC_URL),
+  });
 }
 
 /** Chain data with metadata */
@@ -137,86 +56,39 @@ export interface ChainData<T> {
   error?: string;
 }
 
-/** Make RPC call */
-async function makeRPCCall(call: RPCCall): Promise<RPCResponse> {
-  try {
-    const response = await fetch(RPC_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(call),
-    });
-
-    if (!response.ok) {
-      throw new ChainReadError(
-        "RPC_HTTP_ERROR",
-        `HTTP ${response.status}: ${response.statusText}`
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    throw new ChainReadError(
-      "RPC_NETWORK_ERROR",
-      error instanceof Error ? error.message : "Network error"
-    );
+/** Chain read error */
+export class ChainReadError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public details?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = "ChainReadError";
   }
 }
 
-/** Encode function call */
-function encodeCall(signature: string, params: string[]): string {
-  // Simple encoder for common function signatures
-  // In production, use ethers.js or viem
-  const hash = signature; // Placeholder - would use proper ABI encoding
-  return hash;
-}
-
-/** Decode uint256 result */
-function decodeUint256(hex: string): bigint {
-  return BigInt(hex);
-}
-
-/** Get total supply */
+/** Get total supply from BSC */
 export async function getTotalSupply(): Promise<ChainData<bigint>> {
   try {
-    // Using eth_call for totalSupply
-    const callData = "0x18160ddd"; // totalSupply() selector
-
-    const response = await makeRPCCall({
-      jsonrpc: "2.0",
-      method: "eth_call",
-      params: [
-        {
-          to: MOOD_TOKEN.address,
-          data: callData,
-        },
-        "latest",
-      ],
-      id: 1,
+    const client = createBSCClient();
+    const result = await client.readContract({
+      address: MOOD_TOKEN.address as `0x${string}`,
+      abi: MOOD_ABI,
+      functionName: "totalSupply",
     });
 
-    if (response.error) {
-      throw new ChainReadError(
-        "RPC_CALL_ERROR",
-        response.error.message,
-        { code: response.error.code }
-      );
-    }
-
-    const value = decodeUint256(response.result || "0x0");
-
     return {
-      value,
+      value: result,
       source: "rpc",
       updatedAt: new Date().toISOString(),
       isStale: false,
     };
   } catch (error) {
-    // Fallback to config value
+    console.error("Failed to read totalSupply:", error);
     return {
       value: BigInt(MOOD_TOKEN.totalSupply) * BigInt(10 ** MOOD_TOKEN.decimals),
-      source: "config",
+      source: "unavailable",
       updatedAt: new Date().toISOString(),
       isStale: true,
       error: error instanceof Error ? error.message : "Unknown error",
@@ -224,44 +96,53 @@ export async function getTotalSupply(): Promise<ChainData<bigint>> {
   }
 }
 
-/** Get balance of address */
-export async function getBalance(address: string): Promise<ChainData<bigint>> {
+/** Get decimals from BSC */
+export async function getDecimals(): Promise<ChainData<number>> {
   try {
-    // balanceOf(address) selector + padded address
-    const selector = "0x70a08231";
-    const paddedAddress = address.toLowerCase().replace("0x", "").padStart(64, "0");
-    const callData = selector + paddedAddress;
-
-    const response = await makeRPCCall({
-      jsonrpc: "2.0",
-      method: "eth_call",
-      params: [
-        {
-          to: MOOD_TOKEN.address,
-          data: callData,
-        },
-        "latest",
-      ],
-      id: 2,
+    const client = createBSCClient();
+    const result = await client.readContract({
+      address: MOOD_TOKEN.address as `0x${string}`,
+      abi: MOOD_ABI,
+      functionName: "decimals",
     });
 
-    if (response.error) {
-      throw new ChainReadError(
-        "RPC_CALL_ERROR",
-        response.error.message,
-        { code: response.error.code }
-      );
-    }
-
-    const value = decodeUint256(response.result || "0x0");
-
     return {
-      value,
+      value: result,
       source: "rpc",
       updatedAt: new Date().toISOString(),
       isStale: false,
     };
   } catch (error) {
+    console.error("Failed to read decimals:", error);
+    return {
+      value: MOOD_TOKEN.decimals,
+      source: "unavailable",
+      updatedAt: new Date().toISOString(),
+      isStale: true,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/** Get MOOD balance of address from BSC */
+export async function getBalance(address: string): Promise<ChainData<bigint>> {
+  try {
+    const client = createBSCClient();
+    const result = await client.readContract({
+      address: MOOD_TOKEN.address as `0x${string}`,
+      abi: MOOD_ABI,
+      functionName: "balanceOf",
+      args: [address as `0x${string}`],
+    });
+
+    return {
+      value: result,
+      source: "rpc",
+      updatedAt: new Date().toISOString(),
+      isStale: false,
+    };
+  } catch (error) {
+    console.error("Failed to read balance:", error);
     return {
       value: BigInt(0),
       source: "unavailable",
@@ -282,36 +163,59 @@ export async function getDistributorState(
   balance: ChainData<bigint>;
 }> {
   try {
-    // This would make multiple eth_calls in parallel
-    // For now, return unavailable state
+    const client = createBSCClient();
+
+    const [merkleRoot, token, totalClaimed, balance] = await Promise.all([
+      client.readContract({
+        address: distributorAddress as `0x${string}`,
+        abi: DISTRIBUTOR_ABI,
+        functionName: "merkleRoot",
+      }).catch(() => null),
+      client.readContract({
+        address: distributorAddress as `0x${string}`,
+        abi: DISTRIBUTOR_ABI,
+        functionName: "token",
+      }).catch(() => null),
+      client.readContract({
+        address: distributorAddress as `0x${string}`,
+        abi: DISTRIBUTOR_ABI,
+        functionName: "totalClaimed",
+      }).catch(() => null),
+      client.readContract({
+        address: distributorAddress as `0x${string}`,
+        abi: DISTRIBUTOR_ABI,
+        functionName: "distributorBalance",
+      }).catch(() => null),
+    ]);
+
     return {
       merkleRoot: {
-        value: "0x0",
-        source: "unavailable",
+        value: merkleRoot ? `0x${merkleRoot.toString(16)}` : "0x0",
+        source: merkleRoot ? "rpc" : "unavailable",
         updatedAt: new Date().toISOString(),
-        isStale: true,
-        error: "Distributor reads not implemented",
+        isStale: !merkleRoot,
+        error: merkleRoot ? undefined : "Distributor not deployed",
       },
       token: {
-        value: "0x0",
-        source: "unavailable",
+        value: token || "0x0",
+        source: token ? "rpc" : "unavailable",
         updatedAt: new Date().toISOString(),
-        isStale: true,
-        error: "Distributor reads not implemented",
+        isStale: !token,
+        error: token ? undefined : "Distributor not deployed",
       },
       totalClaimed: {
-        value: BigInt(0),
-        source: "unavailable",
+        value: totalClaimed || BigInt(0),
+        source: totalClaimed ? "rpc" : "unavailable",
         updatedAt: new Date().toISOString(),
-        isStale: true,
-        error: "Distributor reads not implemented",
+        isStale: !totalClaimed,
+        error: totalClaimed ? undefined : "Distributor not deployed",
       },
       balance: {
-        value: BigInt(0),
-        source: "unavailable",
+        value: balance || BigInt(0),
+        source: balance ? "rpc" : "unavailable",
         updatedAt: new Date().toISOString(),
-        isStale: true,
-        error: "Distributor reads not implemented",
+        isStale: !balance,
+        isStaleerror: balance ? undefined : "Distributor not deployed",
       },
     };
   } catch (error) {

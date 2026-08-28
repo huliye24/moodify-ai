@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MOOD_TOKEN } from "../../lib/mood-token";
+import { getTotalSupply, getDecimals, formatMood } from "../../lib/mood-chain";
 import { Button } from "../../components/ui/primitives";
+import WalletConnect from "./WalletConnect";
 
 // Token — MOOD-GENESIS-001: MOOD 协议资产信息页。
 //   本页回答:MOOD 是什么、在哪条链、官方合约是什么、总量多少、
@@ -86,6 +88,39 @@ const OFFICIAL_LINKS: { label: string; hint: string; href: string }[] = [
 ];
 
 export default function TokenPage() {
+  const [liveSupply, setLiveSupply] = useState<string | null>(null);
+  const [liveDecimals, setLiveDecimals] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchChainData() {
+      try {
+        setIsLoading(true);
+        const [supplyData, decimalsData] = await Promise.all([
+          getTotalSupply(),
+          getDecimals(),
+        ]);
+
+        if (supplyData.source === "rpc" && supplyData.value) {
+          setLiveSupply(formatMood(supplyData.value));
+        } else if (supplyData.error) {
+          setError(`RPC unavailable: ${supplyData.error}`);
+        }
+
+        if (decimalsData.source === "rpc") {
+          setLiveDecimals(decimalsData.value);
+        }
+      } catch (err) {
+        setError("Failed to fetch chain data");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchChainData();
+  }, []);
+
   return (
     <main
       style={{
@@ -134,18 +169,62 @@ export default function TokenPage() {
 
       {/* Token facts */}
       <section aria-label="MOOD 代币事实" style={{ display: "grid", gap: "var(--space-8)", maxWidth: 720 }}>
+        {/* Live chain status */}
+        {isLoading && (
+          <div style={{ padding: "var(--space-4)", border: "1px solid var(--line)", borderRadius: "var(--radius-md)", background: "var(--surface-subtle)" }}>
+            <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--text-faint)" }}>正在读取链上数据...</p>
+          </div>
+        )}
+        {error && (
+          <div style={{ padding: "var(--space-4)", border: "1px solid var(--attention)", borderRadius: "var(--radius-md)", background: "var(--attention-soft)" }}>
+            <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--blocking)" }}>
+              <strong>链上数据暂时不可用:</strong> {error}
+            </p>
+            <p style={{ margin: "var(--space-2) 0 0", fontSize: "var(--text-xs)", color: "var(--text-faint)" }}>
+              显示配置值作为参考，请通过 BscScan 验证实时数据。
+            </p>
+          </div>
+        )}
+        {liveSupply && (
+          <div style={{ padding: "var(--space-4)", border: "1px solid var(--evidence)", borderRadius: "var(--radius-md)", background: "var(--evidence-soft)" }}>
+            <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--text)" }}>
+              <strong>实时链上数据已加载</strong> (来源: BSC Mainnet RPC)
+            </p>
+          </div>
+        )}
+
         <dl style={{ margin: 0, display: "grid", gap: "var(--space-3)", border: "1px solid var(--line)", borderRadius: "var(--radius-lg)", background: "var(--surface-subtle)", padding: "var(--space-6)" }}>
           <FactRow term="网络 / Network">BNB Smart Chain</FactRow>
           <FactRow term="Chain ID">{MOOD_TOKEN.chainId}</FactRow>
           <FactRow term="合约地址 / Contract">
             <CopyContract address={MOOD_TOKEN.address} />
           </FactRow>
-          <FactRow term="小数位 / Decimals">{MOOD_TOKEN.decimals}</FactRow>
-          <FactRow term="总量 / Total supply">{MOOD_TOKEN.totalSupplyDisplay}</FactRow>
+          <FactRow term="小数位 / Decimals">
+            {liveDecimals !== null ? (
+              <span>{liveDecimals} <span style={{ color: "var(--evidence)", fontSize: "var(--text-xs)" }}>(实时)</span></span>
+            ) : (
+              MOOD_TOKEN.decimals
+            )}
+          </FactRow>
+          <FactRow term="总量 / Total supply">
+            {liveSupply ? (
+              <span>{liveSupply} MOOD <span style={{ color: "var(--evidence)", fontSize: "var(--text-xs)" }}>(实时)</span></span>
+            ) : (
+              MOOD_TOKEN.totalSupplyDisplay
+            )}
+          </FactRow>
           <FactRow term="主要 DEX">{MOOD_TOKEN.dex.name}</FactRow>
           <FactRow term="交易对 / Pair">{MOOD_TOKEN.dex.pair}</FactRow>
           <FactRow term="费率档 / Fee tier">{MOOD_TOKEN.dex.feeTier}</FactRow>
         </dl>
+
+        {/* Wallet Connection */}
+        <div style={{ display: "grid", gap: "var(--space-3)" }}>
+          <h2 style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", color: "var(--text)" }}>
+            钱包连接
+          </h2>
+          <WalletConnect />
+        </div>
 
         {/* Official links */}
         <div style={{ display: "grid", gap: "var(--space-3)" }}>

@@ -1,0 +1,13 @@
+{
+  "package_id": "MOOD-GENESIS-DISTRIBUTOR-DEPLOYMENT-010",
+  "repo": "huliye24/moodify-ai",
+  "chain": "BNB Smart Chain Mainnet",
+  "chain_id": 56,
+  "mood_contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+  "contract_target": "MoodGenesisDistributor",
+  "staging_domain": "test.crestwavecoin.com",
+  "depends_on": "MOOD-MAINNET-INTEGRATION-009",
+  "human_signature_required": true,
+  "private_key_custody_by_codex": false,
+  "claims_enabled_after_package": false
+}
