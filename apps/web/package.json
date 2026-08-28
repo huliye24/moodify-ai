@@ -21,6 +21,7 @@
     "contributions:rewards-export": "node --experimental-strip-types scripts/contributions-rewards-export.ts"
   },
   "dependencies": {
+    "@openzeppelin/merkle-tree": "^1.0.8",
     "drizzle-orm": "0.45.2",
     "next": "16.2.6",
     "react": "19.2.6",

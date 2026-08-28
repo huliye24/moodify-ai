@@ -7,6 +7,12 @@ pragma solidity ^0.8.20;
  * @dev Immutable root, single claim per participant, SafeERC20 transfers
  *
  * MOOD-GENESIS-005: Merkle Airdrop
+ * MOOD Merkle Standard v1: OpenZeppelin StandardMerkleTree compatible
+ *
+ * Leaf encoding:
+ *   types: ["uint256", "address", "uint256"]
+ *   values: [participantNumber, account, amountAtomic]
+ *   leaf: keccak256(bytes.concat(keccak256(abi.encode(...))))
  *
  * Security invariants:
  * - Only approved Merkle leaves can claim
@@ -20,6 +26,7 @@ pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract MoodGenesisDistributor {
     using SafeERC20 for IERC20;
@@ -73,7 +80,7 @@ contract MoodGenesisDistributor {
 
     /**
      * @param _token MOOD token contract address
-     * @param _merkleRoot Approved Merkle root from Package 004
+     * @param _merkleRoot Approved Merkle root from Package 004 (MOOD Merkle Standard v1)
      * @param _claimDeadline Optional deadline (0 for no deadline)
      * @param _owner Optional owner for recovery (address(0) for no recovery)
      */
@@ -86,7 +93,6 @@ contract MoodGenesisDistributor {
         if (_token == address(0)) revert ZeroAddress();
         if (_merkleRoot == bytes32(0)) revert ZeroRoot();
         if (_claimDeadline > 0 && _claimDeadline <= block.timestamp) {
-            // Deadline must be in the future if set
             revert DeadlinePassed();
         }
 
@@ -129,24 +135,29 @@ contract MoodGenesisDistributor {
         // 3. Validate amount
         if (amount == 0) revert ZeroAmount();
 
-        // 4. Construct and verify leaf
-        // Leaf encoding matches Package 004: [uint256, address, uint256]
+        // 4. Construct and verify leaf (MOOD Merkle Standard v1)
+        // Double-hash leaf to match OpenZeppelin StandardMerkleTree
         bytes32 leaf = keccak256(
-            abi.encode(participantNumber, msg.sender, amount)
+            bytes.concat(
+                keccak256(
+                    abi.encode(participantNumber, msg.sender, amount)
+                )
+            )
         );
 
-        if (!_verifyProof(leaf, proof)) {
+        // 5. Verify Merkle proof using OpenZeppelin library
+        if (!MerkleProof.verifyCalldata(proof, merkleRoot, leaf)) {
             revert InvalidProof();
         }
 
-        // 5. Mark claimed BEFORE transfer (checks-effects-interactions)
+        // 6. Mark claimed BEFORE transfer (checks-effects-interactions)
         claimedParticipant[participantNumber] = true;
         totalClaimed += amount;
 
-        // 6. Transfer MOOD (SafeERC20 handles failures)
+        // 7. Transfer MOOD (SafeERC20 handles failures)
         token.safeTransfer(msg.sender, amount);
 
-        // 7. Emit event
+        // 8. Emit event
         emit Claimed(participantNumber, msg.sender, amount);
     }
 
@@ -196,37 +207,5 @@ contract MoodGenesisDistributor {
      */
     function remainingClaimable() external view returns (uint256) {
         return token.balanceOf(address(this)) - totalClaimed;
-    }
-
-    /* ========== INTERNAL FUNCTIONS ========== */
-
-    /**
-     * @notice Verify a Merkle proof
-     * @param leaf Leaf hash to verify
-     * @param proof Merkle proof
-     * @return True if proof is valid
-     */
-    function _verifyProof(
-        bytes32 leaf,
-        bytes32[] calldata proof
-    ) internal view returns (bool) {
-        bytes32 computedHash = leaf;
-
-        for (uint256 i = 0; i < proof.length; i++) {
-            bytes32 proofElement = proof[i];
-
-            // Sort for deterministic ordering (OpenZeppelin convention)
-            if (computedHash <= proofElement) {
-                computedHash = keccak256(
-                    abi.encodePacked(computedHash, proofElement)
-                );
-            } else {
-                computedHash = keccak256(
-                    abi.encodePacked(proofElement, computedHash)
-                );
-            }
-        }
-
-        return computedHash == merkleRoot;
     }
 }

@@ -32,12 +32,27 @@ const DISTRIBUTOR_ABI = parseAbi([
 /** Public RPC endpoint for BSC mainnet */
 const BSC_RPC_URL = process.env.NEXT_PUBLIC_BSC_RPC || "https://bsc-dataseed.binance.org";
 
-/** Create viem public client for BSC */
+/** Create viem public client for BSC with timeout */
 function createBSCClient() {
   return createPublicClient({
     chain: bsc,
-    transport: http(BSC_RPC_URL),
+    transport: http(BSC_RPC_URL, {
+      timeout: 10000, // 10 second timeout
+    }),
   });
+}
+
+/** Bounded RPC call wrapper with timeout */
+async function callWithTimeout<T>(
+  fn: () => Promise<T>,
+  timeoutMs: number = 10000
+): Promise<T> {
+  return Promise.race([
+    fn(),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("RPC_TIMEOUT")), timeoutMs)
+    ),
+  ]);
 }
 
 /** Chain data with metadata */
@@ -72,11 +87,13 @@ export class ChainReadError extends Error {
 export async function getTotalSupply(): Promise<ChainData<bigint>> {
   try {
     const client = createBSCClient();
-    const result = await client.readContract({
-      address: MOOD_TOKEN.address as `0x${string}`,
-      abi: MOOD_ABI,
-      functionName: "totalSupply",
-    });
+    const result = await callWithTimeout(() =>
+      client.readContract({
+        address: MOOD_TOKEN.address as `0x${string}`,
+        abi: MOOD_ABI,
+        functionName: "totalSupply",
+      })
+    );
 
     return {
       value: result,
@@ -100,11 +117,13 @@ export async function getTotalSupply(): Promise<ChainData<bigint>> {
 export async function getDecimals(): Promise<ChainData<number>> {
   try {
     const client = createBSCClient();
-    const result = await client.readContract({
-      address: MOOD_TOKEN.address as `0x${string}`,
-      abi: MOOD_ABI,
-      functionName: "decimals",
-    });
+    const result = await callWithTimeout(() =>
+      client.readContract({
+        address: MOOD_TOKEN.address as `0x${string}`,
+        abi: MOOD_ABI,
+        functionName: "decimals",
+      })
+    );
 
     return {
       value: result,
@@ -128,12 +147,14 @@ export async function getDecimals(): Promise<ChainData<number>> {
 export async function getBalance(address: string): Promise<ChainData<bigint>> {
   try {
     const client = createBSCClient();
-    const result = await client.readContract({
-      address: MOOD_TOKEN.address as `0x${string}`,
-      abi: MOOD_ABI,
-      functionName: "balanceOf",
-      args: [address as `0x${string}`],
-    });
+    const result = await callWithTimeout(() =>
+      client.readContract({
+        address: MOOD_TOKEN.address as `0x${string}`,
+        abi: MOOD_ABI,
+        functionName: "balanceOf",
+        args: [address as `0x${string}`],
+      })
+    );
 
     return {
       value: result,
