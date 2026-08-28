@@ -1,0 +1,58 @@
+{
+  "package": "Moodify Protocol Genesis 002",
+  "id": "MOOD-GENESIS-002",
+  "depends_on": "MOOD-GENESIS-001",
+  "purpose": "Wallet-signature Genesis participant registration",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "13a66db7261c8d4e8e70d3bd31a9cf4a467f845b983b45c634723efeafac42cd",
+      "bytes": 1196
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "b1724bc57efeb1c23f90dbd36daa63b0e7bb7115e6de8801de8703c412696595",
+      "bytes": 5778
+    },
+    {
+      "name": "02_SECURITY_MODEL.md",
+      "sha256": "63b399154b748323d9a229669d6269eb4f237491801c011b6aad74422109269b",
+      "bytes": 2353
+    },
+    {
+      "name": "03_DATABASE_SCHEMA.md",
+      "sha256": "33d5606e999a02a53bfb8a4a777cadf0dcd28d20b2a0fed08be6a662f4baabd7",
+      "bytes": 2009
+    },
+    {
+      "name": "04_ACCEPTANCE_CRITERIA.md",
+      "sha256": "129650abd6951b38152ea60bf05b82702c38cd7106264f4ed4cbd6bf959a70d0",
+      "bytes": 1903
+    },
+    {
+      "name": "05_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "f1889a2020a48cf0b1fec8b222de82ccb78037dafd60fe5004e76c3fc2260307",
+      "bytes": 3921
+    },
+    {
+      "name": "06_TEST_MATRIX.md",
+      "sha256": "4099b68af2ec3ad24f38061cb66c0bd1bfeb7bf2f01cdd2f89e3a7950839f0df",
+      "bytes": 1967
+    },
+    {
+      "name": "07_ROLLBACK_AND_OPERATIONS.md",
+      "sha256": "3e4e5c0c897ec5d177d66c6ab1fb4514e9f035f69f1ec83581ea6cb55916c71f",
+      "bytes": 1404
+    },
+    {
+      "name": "08_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "eb2e6515b3d05d11109971f7cf501a2d3e3fd54dcd2039e597e4b24cfec88f68",
+      "bytes": 1469
+    },
+    {
+      "name": "09_PACKAGE_CANON.json",
+      "sha256": "7aa53105f9094669b44096ff4814fd66da8530a170c27a73e340e4169271791f",
+      "bytes": 692
+    }
+  ]
+}

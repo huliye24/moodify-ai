@@ -1,0 +1,69 @@
+{
+  "package": "Moodify Protocol Genesis 006",
+  "id": "MOOD-GENESIS-006",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004",
+    "MOOD-GENESIS-005"
+  ],
+  "purpose": "Contribution tasks, review, reputation and pending MOOD reward network",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "c187790c180479c05d7bd6bbdea704d6ca9b0ec3d86c2539d335adc15a5d4f21",
+      "bytes": 1441
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "568702781bdb35a3dd29af924607a9344c7a652986b3a431c83054f5dd3334c4",
+      "bytes": 9109
+    },
+    {
+      "name": "02_DATA_MODEL.md",
+      "sha256": "f98bf84485b7c6a873394bcced8ba223db959de595e06499271475ca295ec47b",
+      "bytes": 2088
+    },
+    {
+      "name": "03_REVIEW_AND_REWARD_POLICY.md",
+      "sha256": "debbed78c8623e006fc2dc897c226aae80da66c76bde62060bfeaa5b7de79414",
+      "bytes": 1644
+    },
+    {
+      "name": "04_ACCEPTANCE_CRITERIA.md",
+      "sha256": "fcd0d7b3738787428602565f9cf956aaf67b25653ea1c7d72aeb01ccb41e8ed8",
+      "bytes": 2600
+    },
+    {
+      "name": "05_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "d4efb949c53ec4c1e2c53d8013cf4f002a5d121931d5b11c8aa3316e273acf40",
+      "bytes": 5299
+    },
+    {
+      "name": "06_TEST_MATRIX.md",
+      "sha256": "a583a5f49f143d420f8d8f617d4ac08fa38504dd44397203f22b65be09132e4e",
+      "bytes": 2636
+    },
+    {
+      "name": "07_REWARD_EXPORT_SPEC.md",
+      "sha256": "2fbda04cfadac48ffb44419628b161cc1ca721123efbfb2ac9a7d7156c60eee6",
+      "bytes": 1404
+    },
+    {
+      "name": "08_HUMAN_POLICY_GATE.md",
+      "sha256": "032ee830cf590b194afa393cd1cae744b332ebcc22cc9eb1a56bad3611faa613",
+      "bytes": 836
+    },
+    {
+      "name": "09_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "3551d9df0b7daad668637ce9e446d57b6699a6d93b61b29fa87abab423b93a70",
+      "bytes": 1614
+    },
+    {
+      "name": "10_PACKAGE_CANON.json",
+      "sha256": "b4a61bb68da05e4b7e537b5e49f33c881ce3b649ba7319cd50722b04730d712b",
+      "bytes": 1389
+    }
+  ]
+}

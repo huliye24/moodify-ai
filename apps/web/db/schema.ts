@@ -134,3 +134,212 @@ export const publicationEvents = sqliteTable("publication_events", {
   reason: text("reason"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }, (table) => [index("publication_events_track_created_idx").on(table.trackId, table.createdAt)]);
+
+/* MOOD-GENESIS-002: Genesis Participant Registry — wallet-signature only.
+   Additive, non-destructive. Race-safe participant numbering via UNIQUE index
+   + INSERT-time allocation (see docs/protocol/GENESIS_REGISTRATION.md).
+
+   MOOD-GENESIS-003: Added `contribution_score` as a simple administrative
+   score kept consistent with `reputation_events` (source of truth).
+
+   MOOD-GENESIS-004: Added allocation fields for distribution engine.
+
+   MOOD-GENESIS-006: Added cached `reputation_score` aggregate (sum of
+   reputation_events.points_delta). Source of truth remains
+   `reputation_events`. Never overwritten by contribution rewards directly —
+   the events table is the only allowed mutation surface. */
+export const genesisParticipants = sqliteTable("genesis_participants", {
+  id: text("id").primaryKey(),
+  participantNumber: integer("participant_number").notNull().unique(),
+  walletAddress: text("wallet_address").notNull(),
+  walletAddressNormalized: text("wallet_address_normalized").notNull().unique(),
+  chainId: integer("chain_id").notNull(),
+  joinedAt: text("joined_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  status: text("status", { enum: ["registered", "reviewed", "eligible", "allocated", "distributed"] }).notNull().default("registered"),
+  /** Allocation amount in MOOD (decimal string). Set by Package 003. */
+  allocationMood: text("allocation_mood"),
+  /** Allocation amount in atomic units (bigint string). Denormalized for efficiency. */
+  allocationAtomic: text("allocation_atomic"),
+  /** Reason for allocation (optional audit trail). */
+  allocationReason: text("allocation_reason"),
+  /** When allocation was set (ISO timestamp). */
+  allocatedAt: text("allocated_at"),
+  /** Cached admin contribution score (Package 003). Mutated only with an
+      accompanying event/reason; default 0 for new participants. */
+  contributionScore: integer("contribution_score").notNull().default(0),
+  /** Cached aggregate Reputation from `reputation_events` (Package 006).
+      Must equal SUM(points_delta) for the participant. */
+  reputationScore: integer("reputation_score").notNull().default(0),
+  signatureVersion: text("signature_version").notNull(),
+  termsVersion: text("terms_version").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("genesis_participants_wallet_idx").on(table.walletAddressNormalized),
+  index("genesis_participants_joined_idx").on(table.joinedAt),
+  index("genesis_participants_status_idx").on(table.status),
+]);
+
+/* MOOD-GENESIS-002: server-issued nonces. The raw nonce is only ever persisted
+   as a SHA-256 hash (`nonce_hash`); the random bytes never leave the server
+   response. Marking `used_at` atomically prevents replay. */
+export const genesisNonces = sqliteTable("genesis_nonces", {
+  id: text("id").primaryKey(),
+  walletAddressNormalized: text("wallet_address_normalized").notNull(),
+  nonceHash: text("nonce_hash").notNull().unique(),
+  issuedAt: text("issued_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  usedAt: text("used_at"),
+  chainId: integer("chain_id").notNull(),
+  termsVersion: text("terms_version").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("genesis_nonces_wallet_idx").on(table.walletAddressNormalized),
+  index("genesis_nonces_expires_idx").on(table.expiresAt),
+]);
+
+/* MOOD-GENESIS-006: Contribution Network.
+
+   This section adds the public/private contribution system on top of the
+   existing Genesis identity and admin authorization. No on-chain transfer,
+   no token approval, no wallet signing. All values are off-chain.
+
+   Tables:
+   - contribution_tasks            — public task catalog
+   - contribution_submissions      — per-participant submissions
+   - contribution_review_events    — append-only review history
+   - reputation_events             — append-only Reputation source of truth
+   - reward_events                 — append-only pending MOOD reward ledger
+
+   Genesis allocation is NEVER overwritten by contribution rewards:
+   `reward_events` is a separate ledger that downstream distribution
+   snapshots can consume (Package 004/005 integration). */
+
+export const contributionTasks = sqliteTable("contribution_tasks", {
+  id: text("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  summary: text("summary").notNull().default(""),
+  description: text("description").notNull().default(""),
+  /** Controlled category; see lib/contribution-config.ts */
+  category: text("category").notNull(),
+  /** draft | active | paused | completed | archived */
+  status: text("status", { enum: ["draft", "active", "paused", "completed", "archived"] }).notNull().default("draft"),
+  /** Free-form requirements text; never executed. */
+  requirements: text("requirements").notNull().default(""),
+  /** Free-form evidence instructions text. */
+  evidenceInstructions: text("evidence_instructions").notNull().default(""),
+  /** Default reward points (admin-set; reviewer may override at approval). */
+  rewardPointsDefault: integer("reward_points_default").notNull().default(0),
+  /** Default pending MOOD reward (decimal string, e.g., "100"). */
+  rewardMoodDefault: text("reward_mood_default"),
+  /** Atomic units (bigint string) — denormalized for fast queries. */
+  rewardMoodAtomicDefault: text("reward_mood_atomic_default"),
+  /** Optional deadline (ISO timestamp). */
+  deadline: text("deadline"),
+  /** Optional cap on number of approvals. */
+  maxApprovals: integer("max_approvals"),
+  /** Whether duplicate submissions per (task, participant) are allowed. */
+  allowDuplicateSubmissions: integer("allow_duplicate_submissions", { mode: "boolean" }).notNull().default(false),
+  /** Terms version acknowledged at submission. */
+  termsVersion: text("terms_version").notNull().default("contribution-v1"),
+  /** Authoring admin display id (subject string, never an email/password). */
+  createdBy: text("created_by").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  /** Set when the task is activated for the first time. */
+  publishedAt: text("published_at"),
+}, (table) => [
+  index("contribution_tasks_status_idx").on(table.status),
+  index("contribution_tasks_category_idx").on(table.category),
+  index("contribution_tasks_published_idx").on(table.publishedAt),
+]);
+
+export const contributionSubmissions = sqliteTable("contribution_submissions", {
+  id: text("id").primaryKey(),
+  taskId: text("task_id").notNull().references(() => contributionTasks.id, { onDelete: "restrict" }),
+  participantId: text("participant_id").notNull().references(() => genesisParticipants.id, { onDelete: "restrict" }),
+  /** submitted | under_review | changes_requested | approved | rejected | withdrawn */
+  status: text("status", { enum: ["submitted", "under_review", "changes_requested", "approved", "rejected", "withdrawn"] }).notNull().default("submitted"),
+  summary: text("summary").notNull().default(""),
+  evidenceText: text("evidence_text").notNull().default(""),
+  /** JSON-encoded array of strings. */
+  evidenceUrlsJson: text("evidence_urls_json").notNull().default("[]"),
+  /** Revision counter; incremented every time a contributor resubmits. */
+  revisionNumber: integer("revision_number").notNull().default(1),
+  submittedAt: text("submitted_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  reviewedAt: text("reviewed_at"),
+  reviewerId: text("reviewer_id"),
+  /** Reviewer's free-form note attached to the latest review action. */
+  reviewNote: text("review_note"),
+}, (table) => [
+  index("contribution_submissions_task_idx").on(table.taskId),
+  index("contribution_submissions_participant_idx").on(table.participantId),
+  index("contribution_submissions_status_idx").on(table.status),
+  index("contribution_submissions_submitted_idx").on(table.submittedAt),
+]);
+
+export const contributionReviewEvents = sqliteTable("contribution_review_events", {
+  id: text("id").primaryKey(),
+  submissionId: text("submission_id").notNull().references(() => contributionSubmissions.id, { onDelete: "restrict" }),
+  /** Reviewer admin display id; recorded for audit. */
+  actorId: text("actor_id").notNull(),
+  /** created | status_change | changes_requested | approved | rejected | withdrawn | reopened */
+  eventType: text("event_type").notNull(),
+  oldStatus: text("old_status"),
+  newStatus: text("new_status"),
+  /** Reputation points delta attached to this event (zero for non-approval). */
+  pointsDelta: integer("points_delta").notNull().default(0),
+  /** Reward (decimal string) attached to this event; zero for non-approval. */
+  rewardMood: text("reward_mood").notNull().default("0"),
+  /** Reward (atomic units, bigint string) attached to this event; zero for non-approval. */
+  rewardAtomic: text("reward_atomic").notNull().default("0"),
+  reason: text("reason").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("contribution_review_events_submission_idx").on(table.submissionId),
+  index("contribution_review_events_actor_idx").on(table.actorId),
+  index("contribution_review_events_created_idx").on(table.createdAt),
+]);
+
+export const reputationEvents = sqliteTable("reputation_events", {
+  id: text("id").primaryKey(),
+  participantId: text("participant_id").notNull().references(() => genesisParticipants.id, { onDelete: "restrict" }),
+  /** Nullable: reviewer may also record reputation adjustments outside a single submission. */
+  submissionId: text("submission_id"),
+  /** approval | rollback | manual_adjust */
+  eventType: text("event_type").notNull(),
+  pointsDelta: integer("points_delta").notNull(),
+  reason: text("reason").notNull().default(""),
+  /** Admin actor id for audit. */
+  actorId: text("actor_id").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("reputation_events_participant_idx").on(table.participantId),
+  index("reputation_events_submission_idx").on(table.submissionId),
+  index("reputation_events_created_idx").on(table.createdAt),
+]);
+
+export const rewardEvents = sqliteTable("reward_events", {
+  id: text("id").primaryKey(),
+  participantId: text("participant_id").notNull().references(() => genesisParticipants.id, { onDelete: "restrict" }),
+  submissionId: text("submission_id").references(() => contributionSubmissions.id, { onDelete: "restrict" }),
+  taskId: text("task_id").references(() => contributionTasks.id, { onDelete: "restrict" }),
+  /** Decimal string (human-readable MOOD). */
+  rewardMood: text("reward_mood").notNull(),
+  /** Atomic units (bigint string). */
+  rewardAtomic: text("reward_atomic").notNull(),
+  /** pending | included_in_snapshot | distributed | cancelled */
+  status: text("status", { enum: ["pending", "included_in_snapshot", "distributed", "cancelled"] }).notNull().default("pending"),
+  reason: text("reason").notNull().default(""),
+  approvedBy: text("approved_by").notNull(),
+  /** Set when a future distribution snapshot consumes this reward. */
+  distributionSnapshotId: text("distribution_snapshot_id"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("reward_events_participant_idx").on(table.participantId),
+  index("reward_events_task_idx").on(table.taskId),
+  index("reward_events_status_idx").on(table.status),
+  index("reward_events_submission_idx").on(table.submissionId),
+]);

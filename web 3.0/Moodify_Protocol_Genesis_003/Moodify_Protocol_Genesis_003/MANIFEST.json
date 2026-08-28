@@ -1,0 +1,66 @@
+{
+  "package": "Moodify Protocol Genesis 003",
+  "id": "MOOD-GENESIS-003",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002"
+  ],
+  "purpose": "Secure Genesis participant review, provisional allocation and audit control plane",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "4e0acf720c034e9dc030d4607a0e42dc35f6e78017a84a47211d57e0af5e5921",
+      "bytes": 1500
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "b1604e50dc967c3f4d259b3bc1c1aafb172b4e1ed1c3b3f04b30fc1ad7434b4a",
+      "bytes": 6363
+    },
+    {
+      "name": "02_AUTH_AND_SECURITY.md",
+      "sha256": "3aced5f08fa6ce84c7af911875551b1d4f792a9584abf18211872437363dedf1",
+      "bytes": 2233
+    },
+    {
+      "name": "03_DATABASE_CHANGES.md",
+      "sha256": "b3d1c213f671af7941271aec67028a7fb396eeb79eee5b58cf44981f674827d2",
+      "bytes": 1544
+    },
+    {
+      "name": "04_ACCEPTANCE_CRITERIA.md",
+      "sha256": "b0922b966ced7dc89a981b8b9429ecef37b1c5a4d3371555df58877965123b26",
+      "bytes": 2164
+    },
+    {
+      "name": "05_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "abe5aaa792c8895fc7d71c6bdda37cd820a6ff50ddcb514c75627c2f338e5a95",
+      "bytes": 4513
+    },
+    {
+      "name": "06_TEST_MATRIX.md",
+      "sha256": "36733b4c5f47561326c72d7cb9bc9b22a7b7379ba811448d9d42a078911ede71",
+      "bytes": 1911
+    },
+    {
+      "name": "07_EXPORT_SPEC.md",
+      "sha256": "41fc4e6b023e2a1adf63e6def0830b93760bd6c37267037f7be22a223224ed8c",
+      "bytes": 1179
+    },
+    {
+      "name": "08_ROLLBACK_AND_OPERATIONS.md",
+      "sha256": "75f730e0b5cd5b793f5b89c6ddd3763d7f7a6bc62925d8539f4b9f41aa246726",
+      "bytes": 1123
+    },
+    {
+      "name": "09_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "a5b2fee8c24a53b813af96d50b99c113971d805933ddc893c0dc6b813f4bb8b9",
+      "bytes": 1487
+    },
+    {
+      "name": "10_PACKAGE_CANON.json",
+      "sha256": "77c825cd76047ff77da6e77dffb32064bdb9f19c8979a8ee9814db69eedd4b81",
+      "bytes": 794
+    }
+  ]
+}

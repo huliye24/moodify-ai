@@ -1,0 +1,53 @@
+{
+  "package_id": "MOOD-GENESIS-004",
+  "name": "Distribution Engine",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003"
+  ],
+  "canon_change": false,
+  "network": {
+    "name": "BNB Smart Chain",
+    "chain_id": 56
+  },
+  "token": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18,
+    "total_supply": "33000000"
+  },
+  "outputs": [
+    "snapshot.json",
+    "distribution.csv",
+    "merkle.json",
+    "distribution-report.md",
+    "manifest.json",
+    "checksums.txt"
+  ],
+  "merkle": {
+    "preferred_leaf_types": [
+      "uint256",
+      "address",
+      "uint256"
+    ],
+    "values": [
+      "participantNumber",
+      "walletAddress",
+      "allocationAtomic"
+    ]
+  },
+  "scope": {
+    "read_allocations": true,
+    "generate_snapshot": true,
+    "generate_merkle_tree": true,
+    "generate_proofs": true,
+    "generate_checksums": true,
+    "token_transfer": false,
+    "wallet_signature": false,
+    "contract_deployment": false,
+    "production_root_publication": false
+  },
+  "next_package": "MOOD-GENESIS-005 Merkle Airdrop"
+}

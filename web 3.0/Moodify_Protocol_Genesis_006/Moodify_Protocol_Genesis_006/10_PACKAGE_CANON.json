@@ -1,0 +1,68 @@
+{
+  "package_id": "MOOD-GENESIS-006",
+  "name": "Contribution Network",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004",
+    "MOOD-GENESIS-005"
+  ],
+  "canon_change": false,
+  "network": {
+    "name": "BNB Smart Chain",
+    "chain_id": 56
+  },
+  "token": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18
+  },
+  "contribution_categories": [
+    "code",
+    "audio-testing",
+    "dataset",
+    "research",
+    "documentation",
+    "translation",
+    "bug-report",
+    "community",
+    "other"
+  ],
+  "task_statuses": [
+    "draft",
+    "active",
+    "paused",
+    "completed",
+    "archived"
+  ],
+  "submission_statuses": [
+    "submitted",
+    "under_review",
+    "changes_requested",
+    "approved",
+    "rejected",
+    "withdrawn"
+  ],
+  "reward_statuses": [
+    "pending",
+    "included_in_snapshot",
+    "distributed",
+    "cancelled"
+  ],
+  "scope": {
+    "task_system": true,
+    "submission_system": true,
+    "review_system": true,
+    "reputation": true,
+    "pending_mood_rewards": true,
+    "reward_export": true,
+    "automatic_token_transfer": false,
+    "trading_rewards": false,
+    "staking": false,
+    "wallet_signing": false,
+    "private_key_handling": false
+  },
+  "next_package": "MOOD-GENESIS-007 Transparency & Treasury"
+}

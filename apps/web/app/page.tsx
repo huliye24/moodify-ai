@@ -155,6 +155,7 @@ export default function Home() {
       <nav>
         <button className="nav-active" aria-current="page">◉　发现音乐</button>
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+        <a href="/listen" className="nav-link" aria-label="Listen — 听一次原声与 Moodify 的对比">◐　Listen</a>
         {me?.capabilities?.account_actions && <a href="/library" className="nav-link">▥　我的音乐</a>}
       </nav>
       {me && <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>聆听者</span></div></div>}
@@ -167,7 +168,13 @@ export default function Home() {
     <nav className={`drawer ${menuOpen ? "is-open" : ""}`} aria-label="菜单">
       <div className="drawer-header"><strong>菜单</strong><button onClick={() => setMenuOpen(false)} aria-label="关闭">✕</button></div>
       {me?.capabilities?.account_actions && (<><a href="/library" className="drawer-item" onClick={() => setMenuOpen(false)}>▥　我的音乐</a><hr className="drawer-divider" /></>)}
+      <span className="drawer-label">聆听</span>
+      <a href="/listen" className="drawer-item" onClick={() => setMenuOpen(false)}>◐　Listen · 原声与 Moodify 对比</a>
+      <a href="/evidence" className="drawer-item" onClick={() => setMenuOpen(false)}>◎　Evidence · 已验证的案例</a>
+      <hr className="drawer-divider" />
       <span className="drawer-label">关于</span>
+      <a href="/token" className="drawer-item" onClick={() => setMenuOpen(false)}>◈　MOOD · 协议资产信息</a>
+      <a href="/genesis" className="drawer-item" onClick={() => setMenuOpen(false)}>◉　Genesis · 钱包签名注册</a>
       <a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏠 Moodify 官网</a>
       <a href="https://rongjingwenchuan.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏢 荣景文川</a>
       <hr className="drawer-divider" />

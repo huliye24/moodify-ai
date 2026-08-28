@@ -1,0 +1,30 @@
+{
+  "package_id": "MOOD-GENESIS-002",
+  "name": "Genesis Registration",
+  "depends_on": [
+    "MOOD-GENESIS-001"
+  ],
+  "canon_change": false,
+  "network": {
+    "name": "BNB Smart Chain",
+    "chain_id": 56
+  },
+  "token_context": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18
+  },
+  "registration": {
+    "requires_token_transfer": false,
+    "requires_token_approval": false,
+    "requires_gas": false,
+    "wallet_action": "message_signature_only",
+    "terms_version": "genesis-v1"
+  },
+  "future_packages": {
+    "003": "Genesis Admin",
+    "004": "Distribution Engine",
+    "005": "Merkle Airdrop"
+  }
+}

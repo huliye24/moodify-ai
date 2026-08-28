@@ -1,0 +1,47 @@
+{
+  "package": "Moodify Protocol Genesis 001",
+  "id": "MOOD-GENESIS-001",
+  "purpose": "Official MOOD token foundation inside the Moodify web project",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "f6f43c2a5051498b959eff2a1003a9f79711c36879ad4cb5892899328fedf331",
+      "bytes": 1363
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "e97b27855234ea3b574e20266b2e46514ff3e84a22128d938a67550114ee76b0",
+      "bytes": 4971
+    },
+    {
+      "name": "02_ACCEPTANCE_CRITERIA.md",
+      "sha256": "28af6a91eb5e892db3e9bd30916a6bedeb1ed1bdf82ce65aa41de58c7debf0c2",
+      "bytes": 1687
+    },
+    {
+      "name": "03_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "0dfb3ca72d573761703ba550862fd1676394e6f7a6e01b0e9e4909d4bbc1c934",
+      "bytes": 2876
+    },
+    {
+      "name": "04_TOKEN_CANON.json",
+      "sha256": "6fb775c3c8fee8f4f727953c4b821efbc23251c3bef3b8d8a8c56cd05ccd9586",
+      "bytes": 774
+    },
+    {
+      "name": "05_EXPECTED_FILES.md",
+      "sha256": "40be17ba42fd19ff6eac663052f3a8d1432e49f69ab829860c20a911248734bc",
+      "bytes": 919
+    },
+    {
+      "name": "06_GUARDRAILS_AND_ROLLBACK.md",
+      "sha256": "e4a013391f860557f156023ec45829cc46be37d7854538fccc11f8513c948c89",
+      "bytes": 952
+    },
+    {
+      "name": "07_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "c31ca7ed7cd42ce3bec665508911414f22e410a52d6fad47574f52f560135714",
+      "bytes": 770
+    }
+  ]
+}

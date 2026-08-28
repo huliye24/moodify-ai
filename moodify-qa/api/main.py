@@ -163,15 +163,15 @@ async def global_exception_handler(request, exc):
 @app.on_event("startup")
 async def startup_event():
     """Application startup."""
-    print(f"🚀 Moodify QA API v{APP_VERSION} starting...")
-    print(f"📚 Documentation: http://localhost:8000/docs")
+    print(f"Moodify QA API v{APP_VERSION} starting...")
+    print(f"Documentation: http://localhost:8000/docs")
 
 
 # Shutdown event
 @app.on_event("shutdown")
 async def shutdown_event():
     """Application shutdown."""
-    print("👋 Moodify QA API shutting down...")
+    print("Moodify QA API shutting down...")
 
 
 if __name__ == "__main__":

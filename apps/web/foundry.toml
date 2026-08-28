@@ -1,0 +1,48 @@
+[profile.default]
+src = "contracts/protocol"
+out = "contracts/out"
+lib = "contracts/lib"
+test = "contracts/test"
+script = "contracts/script"
+cache_path = "contracts/cache"
+
+# Compiler settings
+solc = "0.8.20"
+optimizer = true
+optimizer_runs = 200
+
+# Gas reporting
+gas_reports = ["MoodGenesisDistributor"]
+gas_reports_ignore = []
+
+# Fuzzing
+[fuzz]
+runs = 1000
+max_test_rejects = 65536
+seed = "0x1234"
+
+# Invariant testing
+[invariant]
+runs = 1000
+depth = 15
+fail_on_revert = false
+
+# Remappings
+remappings = [
+    "@openzeppelin/=contracts/lib/openzeppelin-contracts/"
+]
+
+# Etherscan verification (BscScan)
+[etherscan]
+bsc = { key = "${BSCSCAN_API_KEY}" }
+
+# RPC endpoints
+[rpc_endpoints]
+bsc = "https://bsc-dataseed.binance.org"
+bsc_testnet = "https://data-seed-prebsc-1-s1.binance.org:8545"
+local = "http://localhost:8545"
+
+# Private keys (NEVER commit real keys)
+[private_keys]
+# local = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80" # Anvil default
+# production = "${PRIVATE_KEY}" # Set via environment

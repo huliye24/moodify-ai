@@ -16,7 +16,9 @@
     "validate:no-deploy-audio": "bash scripts/prune-deploy-audio.sh",
     "validate:artifact": "bash scripts/validate-artifact.sh",
     "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
+    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate",
+    "genesis:snapshot": "node --experimental-strip-types scripts/genesis-snapshot.ts",
+    "contributions:rewards-export": "node --experimental-strip-types scripts/contributions-rewards-export.ts"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

@@ -8,6 +8,20 @@
       "when": 1786572066632,
       "tag": "0000_closed_demogoblin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1787751387731,
+      "tag": "0001_shallow_major_mapleleaf",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788650000000,
+      "tag": "0002_contribution_network",
+      "breakpoints": true
     }
   ]
 }

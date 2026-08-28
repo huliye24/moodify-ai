@@ -1,0 +1,67 @@
+{
+  "package": "Moodify Protocol Genesis 004",
+  "id": "MOOD-GENESIS-004",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003"
+  ],
+  "purpose": "Deterministic Genesis allocation snapshot, export, Merkle tree and proof generation",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "8ec22121413ba9c1c8818da54aa9bce5f64b092cd73205c630c5e18512fd4eba",
+      "bytes": 1655
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "00567582ff5a2ee89633fee560735c7d9d32894fd3bbfa01ff312b4bff2d2d3f",
+      "bytes": 7383
+    },
+    {
+      "name": "02_MERKLE_SPEC.md",
+      "sha256": "5aa27ddf679192866e2fb9e751d160e0fa131886c4a2e33f3da5b71e798674fc",
+      "bytes": 2078
+    },
+    {
+      "name": "03_ARTIFACT_SCHEMA.md",
+      "sha256": "820267cbc385c271c5a19138491be445e7563478d8b28d8480ca5cbfb56ce278",
+      "bytes": 1241
+    },
+    {
+      "name": "04_ACCEPTANCE_CRITERIA.md",
+      "sha256": "1b2cfc6bdc9bb2650f33f4da3ccaf8e9764c61d7df3a13005c16d454a540ccc5",
+      "bytes": 2194
+    },
+    {
+      "name": "05_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "4153fe1f52e678a2c3b106164f457a5fdc5cd298b73deecde4510c02ddfe4a78",
+      "bytes": 4568
+    },
+    {
+      "name": "06_TEST_MATRIX.md",
+      "sha256": "a08b7c5196eadf8892222df7a85c86457c8fae721547a0597edb8a20ec2e7867",
+      "bytes": 2076
+    },
+    {
+      "name": "07_HUMAN_APPROVAL_GATE.md",
+      "sha256": "931d99289b2745a91ad3de5d7db0f31ff374eede719cf367f7149ab2b6d136dc",
+      "bytes": 945
+    },
+    {
+      "name": "08_ROLLBACK_AND_OPERATIONS.md",
+      "sha256": "f13e31d43e649c313f8ec4fe22eb79b27ca197625d2ddbe1c6af79ee172be94f",
+      "bytes": 1198
+    },
+    {
+      "name": "09_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "b964a178db9fd2a4d3bea5b571b71e45f443fa616de6ccec603d6c5cbcdae038",
+      "bytes": 1440
+    },
+    {
+      "name": "10_PACKAGE_CANON.json",
+      "sha256": "de88387800c3cef1669a3d8291dbc27a878b2207baef553fa19be2de73f13502",
+      "bytes": 1156
+    }
+  ]
+}

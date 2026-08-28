@@ -1,0 +1,64 @@
+{
+  "package_id": "MOOD-GENESIS-008",
+  "name": "Security & Public Launch",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004",
+    "MOOD-GENESIS-005",
+    "MOOD-GENESIS-006",
+    "MOOD-GENESIS-007"
+  ],
+  "canon_change": false,
+  "network": {
+    "name": "BNB Smart Chain",
+    "chain_id": 56
+  },
+  "token": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18,
+    "total_supply": "33000000"
+  },
+  "release_gates": {
+    "critical_findings_allowed": 0,
+    "unaccepted_high_findings_allowed": 0,
+    "production_private_key_in_repo_allowed": false,
+    "automatic_mainnet_deployment_allowed": false,
+    "automatic_treasury_transfer_allowed": false,
+    "automatic_liquidity_mutation_allowed": false
+  },
+  "required_public_routes": [
+    "/token",
+    "/genesis",
+    "/airdrop",
+    "/contribute",
+    "/transparency"
+  ],
+  "required_docs": [
+    "GENESIS_SECURITY_REVIEW.md",
+    "GENESIS_THREAT_MODEL.md",
+    "GENESIS_PRIVACY_REVIEW.md",
+    "GENESIS_INCIDENT_RESPONSE.md",
+    "GENESIS_LAUNCH_RUNBOOK.md",
+    "GENESIS_V1_RC.md"
+  ],
+  "scope": {
+    "security_audit": true,
+    "contract_audit": true,
+    "privacy_review": true,
+    "secret_scan": true,
+    "release_candidate": true,
+    "incident_response": true,
+    "launch_runbook": true,
+    "production_transfer": false,
+    "production_wallet_signature": false,
+    "production_contract_deployment": false,
+    "treasury_transaction": false,
+    "liquidity_mutation": false,
+    "private_key_handling": false
+  },
+  "sequence_status": "FINAL_PACKAGE"
+}
