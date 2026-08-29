@@ -1,0 +1,69 @@
+{
+  "schema_version": "mamse-002-evidence-v1",
+  "source_sha256": "1169ab697fc524a5663f36d82bca9a3b6f0a0911676e380acc9690315685db52",
+  "geometry": {
+    "bins_per_octave": 24,
+    "adjacent_ratio": 1.029302236643492,
+    "semitone_bins": 2.0,
+    "octave_bins": 24,
+    "q_factor": 34.12708770892056,
+    "lowest_frequency_hz": 32.70319566257483,
+    "highest_frequency_hz": 16267.36597196161,
+    "nominal_window_low_ms": 1043.5416666666667,
+    "nominal_window_a4_ms": 77.5625,
+    "nominal_window_high_ms": 2.1041666666666665
+  },
+  "observation": {
+    "status": "OK",
+    "notes": [],
+    "top_mean_peaks": [
+      {
+        "bin": 16,
+        "frequency_hz": 51.913087197493134,
+        "mean_power": 11.485851287841797
+      },
+      {
+        "bin": 10,
+        "frequency_hz": 43.653528929125486,
+        "mean_power": 9.954564094543457
+      },
+      {
+        "bin": 20,
+        "frequency_hz": 58.270470189761234,
+        "mean_power": 7.826822757720947
+      },
+      {
+        "bin": 26,
+        "frequency_hz": 69.29565774421802,
+        "mean_power": 5.5274248123168945
+      },
+      {
+        "bin": 30,
+        "frequency_hz": 77.78174593052022,
+        "mean_power": 4.841609001159668
+      },
+      {
+        "bin": 24,
+        "frequency_hz": 65.40639132514966,
+        "mean_power": 2.9896903038024902
+      },
+      {
+        "bin": 44,
+        "frequency_hz": 116.54094037952247,
+        "mean_power": 2.4849965572357178
+      },
+      {
+        "bin": 6,
+        "frequency_hz": 38.89087296526011,
+        "mean_power": 2.3490641117095947
+      }
+    ]
+  },
+  "sketch_status": "OK",
+  "interpretation_policy": [
+    "dominant_midi 是估计量，不等于感知音高",
+    "chroma 不等于和声理解",
+    "tuning deviation 不等于认证调音器",
+    "log-frequency 特征不直接映射为艺术好坏"
+  ]
+}

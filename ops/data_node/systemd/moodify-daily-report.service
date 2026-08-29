@@ -1,0 +1,15 @@
+[Unit]
+Description=Moodify daily production report
+
+[Service]
+Type=oneshot
+User=moodify
+Group=moodify
+ExecStart=/opt/moodify/.venv/bin/python /opt/moodify/ops/data_node/daily_report.py \
+  --db /var/lib/moodify/node.sqlite3 \
+  --resource-log /var/lib/moodify/ops/resource_snapshots.jsonl \
+  --reports-root /var/lib/moodify/reports
+Nice=15
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/moodify

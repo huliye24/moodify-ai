@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use Moodify in research, please cite it as follows."
+title: "Moodify — The Ear of AI"
+abstract: >-
+  Evidence-first auditory intelligence for AI-generated audio: a frozen
+  data-production framework that converts real songs into reproducible,
+  inspectable, versioned Auditory Production Cases with standards-backed
+  measurement, diagnosis-derived ABC interventions, deterministic algorithmic
+  review, and pairwise training data.
+authors:
+  - family-names: 荣景文川
+    given-names: ""
+    orcid: ""
+date-released: 2026-08-31
+version: 1.0.0-rc.1
+license: GPL-3.0-only
+url: https://github.com/huliye24/moodify-ai
+keywords:
+  - audio
+  - auditory intelligence
+  - loudness
+  - measurement
+  - evidence
+  - data production
+  - BS.1770

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": {
+    "name": "MOOD Protocol",
+    "ticker": "MOOD"
+  },
+  "chain": {
+    "family": "other",
+    "network": "HUMAN_DECISION_REQUIRED",
+    "chainId": null,
+    "cluster": null
+  },
+  "token": {
+    "name": "MOOD",
+    "symbol": "MOOD",
+    "identifier": "HUMAN_DECISION_REQUIRED",
+    "decimals": 0,
+    "totalSupplyAtomic": "0"
+  },
+  "addresses": {
+    "treasury": null,
+    "genesisPool": null
+  },
+  "endpoints": {
+    "rpcUrls": [],
+    "explorerBaseUrl": "https://example.invalid"
+  },
+  "evidence": {
+    "sourceCommit": null,
+    "references": [],
+    "unresolved": [
+      "HUMAN_DECISION_REQUIRED: verify chain identity",
+      "HUMAN_DECISION_REQUIRED: verify official MOOD token identifier",
+      "HUMAN_DECISION_REQUIRED: verify decimals and total supply",
+      "HUMAN_DECISION_REQUIRED: verify public protocol addresses and explorer"
+    ]
+  },
+  "launch": {
+    "status": "draft",
+    "lockedAt": null,
+    "lockedBy": null
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "record_id": "GOLDEN-001-CAD10-05_VIEILLIR",
+  "source_hash": "aa1542c00866efa8e438cfcaf6b40b2325abe2285e5896e8751151459700e9e5",
+  "rights_status": "OWNED",
+  "diagnostic_version": "era-diagnostic-v0.1",
+  "objective_version": "reconstruction-objective-policy-v1",
+  "identity_guard_version": "identity-guard-v0.1",
+  "candidate_id": "TBD",
+  "plan_hash": "TBD",
+  "engine_version": "golden-pipeline-v0.1",
+  "technical_result": {
+    "ranking": [
+      {
+        "candidate_id": "C",
+        "guard_state": "PASS",
+        "position": 1,
+        "auto_approvable": true,
+        "objective_progress": 1.0,
+        "intervention_magnitude": 1.511,
+        "reason": "identity PASS, auto-approvable"
+      },
+      {
+        "candidate_id": "B",
+        "guard_state": "PASS",
+        "position": 2,
+        "auto_approvable": true,
+        "objective_progress": 0.5,
+        "intervention_magnitude": 0.715,
+        "reason": "identity PASS, auto-approvable"
+      },
+      {
+        "candidate_id": "A",
+        "guard_state": "PASS",
+        "position": 3,
+        "auto_approvable": true,
+        "objective_progress": 0.2,
+        "intervention_magnitude": 0.154,
+        "reason": "identity PASS, auto-approvable"
+      },
+      {
+        "candidate_id": "SOURCE",
+        "guard_state": "PASS",
+        "position": 4,
+        "auto_approvable": true,
+        "objective_progress": 0.0,
+        "intervention_magnitude": 0.0,
+        "reason": "SOURCE is always an eligible result (no intervention)"
+      }
+    ],
+    "technical_top": "C"
+  },
+  "human_result": {},
+  "hardware_observations": [],
+  "golden_status": "PENDING_LISTENING",
+  "created_at": "2026-08-17T04:58:44+00:00"
+}

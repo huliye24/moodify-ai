@@ -1,0 +1,92 @@
+flowchart TD
+    %% W01-P00 CURRENT SYSTEM MAP — 2026-08-17（只画观察到的现实）
+    %% 实线 = 有运行/部署证据；虚线 = 存在但状态未验证；点线 = 计划中/未部署
+
+    subgraph GitHub["GitHub canonical（main fa88b0b9, 2026-08-08）"]
+        GH_README["README/AGENTS: The Ear of AI<br/>(产品身份, 与本地宪法冲突)"]
+        GH_CORE["moodify-core-package<br/>(2026-08-08 冻结版)"]
+        GH_CI["CI: ci.yml + deploy.yml<br/>+ temporal-texture.yml"]
+    end
+
+    subgraph LocalBranch["本地分支 codex/moodify-classic-reconstruction-001<br/>(98f7b96e, 领先 main 154 commits, 未合并)"]
+        LB_CONST["Classic Reconstruction Constitution v1.0<br/>(reconstruction-first, Supersedes 旧身份)"]
+        LB_RECON["reconstruction 系模块<br/>objective/guard/diagnostic/factory/era"]
+        LB_MUSIC["music-web / music-android 3.1 /<br/>moodify-music-package (分支内)"]
+        LB_EVIDENCE["artifacts/ 59 证据目录 + golden_run_out<br/>+ 补丁包 01-73 记录"]
+    end
+
+    subgraph CloudLA["LA 103.144.246.242（亿速云, 核心节点, 4C/8G/98G）"]
+        LA_NGINX["nginx :80（三域名）"]
+        LA_TUNNEL["cloudflared 隧道<br/>(rongjingmusic.com 等)"]
+        LA_API["moodify-api :8000<br/>(Ear FastAPI, 127.0.0.1)"]
+        LA_MUSIC["moodify-music :3100<br/>(node vinext 平台)"]
+        LA_BFF["moodify-music-bff :8100"]
+        LA_WORKER["moodify-worker<br/>(SQLite 队列 node.sqlite3 16KB 近空)"]
+        LA_AUDIOLLA["docker moodify-audiolla<br/>:18080→8000 (lalal.ai 代理, healthy)"]
+        LA_MEDIA["music-media 音频 248MB/5 文件"]
+    end
+
+    subgraph CloudHZ["杭州 120.55.191.146（阿里云, 2C/1.6G/40G）"]
+        HZ_API["moodify-api :8000<br/>(公网, service-key 鉴权, mode=v01)"]
+        HZ_WORKER["moodify-data-worker<br/>(moodify-node, 4 timers)"]
+        HZ_DATA["/var/lib/moodify<br/>(node.sqlite3 + inbox + 6.5GB 历史批处理)"]
+    end
+
+    subgraph ManagedDB["PolarDB（凭据核验 BLOCKED, 内容引自同日黑箱调查）"]
+        DB_OLD["MySQL 8.0.13 172.27.118.106<br/>(空壳)"]
+        DB_DEV["MySQL 8.0.18 172.27.118.104<br/>moodify_dev 19 表 ≈0 数据"]
+        DB_PG["PG 16.14 101.133.107.206<br/>(在线未用)"]
+    end
+
+    subgraph LocalAssets["本地资产（E:\\moodify）"]
+        LA_PREMUSIC["pre-music ~7 首真实曲目<br/>+ lalalai 分轨 zip"]
+        LA_OUTPUTS["outputs/ 3.7GB 处理产物<br/>(data_factory 4 case, CAD, calib)"]
+        LA_APKS["deliverables/releases<br/>1.0-rc2 / 2.0 / 2.0.1 / 3.0 / 3.1 APK"]
+    end
+
+    subgraph External["外部能力"]
+        EXT_LALAL["LALAL.AI 云端 API<br/>(经 audiolla 代理)"]
+        EXT_FFMPEG["FFmpeg 8.0.1 (HZ) / 4.4.2 (LA)"]
+        EXT_DEMUCS["Demucs（权重未下载）"]
+        EXT_CF["Cloudflare DNS + 隧道"]
+        EXT_OSS["OSS/S3/R2（NOT_PROVISIONED）"]
+    end
+
+    %% 真实连接（实线）
+    GH_CORE -.->|tar 手工发布, 非 git| LA_API
+    GH_CORE -.->|tar 手工发布| HZ_WORKER
+    GH_CI -.->|CI 未连接部署| LA_API
+    LA_NGINX --> LA_TUNNEL
+    LA_NGINX --> LA_MUSIC
+    LA_NGINX --> LA_BFF
+    LA_BFF --> HZ_API
+    LA_MEDIA --> LA_MUSIC
+    LA_WORKER --> LA_API
+    LA_AUDIOLLA --> EXT_LALAL
+    LA_API --> LA_WORKER
+    HZ_WORKER --> HZ_DATA
+    HZ_API --> HZ_DATA
+    EXT_CF --> LA_TUNNEL
+    HZ_WORKER -.->|历史 pilot| DB_DEV
+
+    %% 存在但未验证（虚线）
+    LB_MUSIC -.->|分支内, 未合并| LA_MUSIC
+    LB_MUSIC -.->|分支内| LA_BFF
+    LB_MUSIC -.->|APK 产物| LA_APKS
+
+    %% 计划中/未部署（点线）
+    GH_README -.-|权威冲突 C1| LB_CONST
+    LB_RECON -.-|154 commits 未合并| GH_CORE
+    LB_EVIDENCE -.-|证据在本地/分支| GH_CORE
+    EXT_OSS -.-|W01-P03| HZ_API
+    EXT_DEMUCS -.-|权重待下载| LA_AUDIOLLA
+    DB_DEV -.-|无业务流量| HZ_API
+    DB_PG -.-|未用| HZ_API
+    DB_OLD -.-|空壳| HZ_API
+
+    classDef running fill:#d4f4d4,stroke:#2a7;
+    classDef branch fill:#fff3c4,stroke:#b90;
+    classDef plan fill:#e8e8ff,stroke:#55a,stroke-dasharray: 4 3;
+    class LA_NGINX,LA_TUNNEL,LA_API,LA_MUSIC,LA_BFF,LA_WORKER,LA_AUDIOLLA,LA_MEDIA,HZ_API,HZ_WORKER,HZ_DATA running;
+    class LB_CONST,LB_RECON,LB_MUSIC,LB_EVIDENCE branch;
+    class EXT_OSS,EXT_DEMUCS,DB_DEV,DB_PG,DB_OLD plan;

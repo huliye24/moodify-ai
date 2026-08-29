@@ -1,0 +1,53 @@
+{
+  "authority": "EXPERIMENTAL_DESCRIPTOR",
+  "config": {
+    "audio_hop": 256,
+    "audio_n_fft": 2048,
+    "bands_per_octave": 12,
+    "fmax_hz": 16000.0,
+    "fmin_hz": 55.0,
+    "log_floor_db": -80.0,
+    "low_energy_rms_dbfs": -70.0,
+    "min_audio_seconds": 1.5,
+    "modulation_hop_seconds": 2.0,
+    "modulation_window_seconds": 4.0,
+    "sample_rate": 48000,
+    "spectral_max_cpo": 4.0,
+    "temporal_max_hz": 40.0,
+    "temporal_min_hz": 0.25
+  },
+  "config_version": "mamse006-modulation-v0.1",
+  "diagonal_orientation_index": -0.002484360152678121,
+  "fast_energy_ratio": 0.05874657921868382,
+  "frame_rate_hz": 187.5,
+  "judgment_eligible": false,
+  "limitations": [
+    "Temporal modulation bands are engineering descriptors, not universal perceptual categories.",
+    "Ridge velocity is a spectrogram-texture velocity candidate, not physical source motion.",
+    "Orientation must not be mapped to upward/downward semantics without calibrated convention.",
+    "No AI-vs-human or artistic-quality judgment is authorized by this operator."
+  ],
+  "log_frequency_bins": 99,
+  "mid_energy_ratio": 0.16404688618991398,
+  "modulation_segments": 98,
+  "operator_id": "MAMSE-006",
+  "operator_version": "0.1.0",
+  "profile_hash": "60b3a6501db27ec7b0c6815f3039e5c99d99d10b1d8442ec768a8f901342de36",
+  "ridge": {
+    "ridge_concentration": 0.1063897379724191,
+    "spectral_rate_cpo": 0.12121212121212122,
+    "status": "CANDIDATE",
+    "temporal_rate_hz": 0.25,
+    "velocity_oct_per_s": 2.0625
+  },
+  "rms_dbfs": -17.495198146644263,
+  "runtime_seconds": 5.0767113999991125,
+  "schema_version": "mamse-006-manifest-v1",
+  "slow_energy_ratio": 0.7772065345914024,
+  "source_sha256": "1b346d06a7592a0c8c315cd0930b10f2dd7c7fce2de85c91ead6499b4f770fd9",
+  "spectral_peak_cpo": 0.12121212121212122,
+  "status": "OK",
+  "temporal_centroid_hz": 3.3071168952470664,
+  "temporal_modulation_entropy": 0.5456844870088146,
+  "temporal_peak_hz": 0.25
+}

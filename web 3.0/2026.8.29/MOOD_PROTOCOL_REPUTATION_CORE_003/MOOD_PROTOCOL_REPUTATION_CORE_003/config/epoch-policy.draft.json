@@ -1,0 +1,17 @@
+{
+  "epochPolicyVersion": "003-draft-1",
+  "status": "draft",
+  "timezone": "UTC",
+  "epochs": [
+    {
+      "epochId": "GENESIS_DRAFT",
+      "startsAt": null,
+      "endsAt": null,
+      "locked": false
+    }
+  ],
+  "notes": [
+    "Human/repository authority must approve real GENESIS boundaries.",
+    "Do not invent launch dates."
+  ]
+}

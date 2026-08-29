@@ -1,0 +1,12 @@
+{
+  "fixture": "generated deterministic 48kHz stereo dual-sine WAV",
+  "cold_runs": [
+    {"duration_seconds": 30, "wall_seconds": 6.787, "rtf": 0.22622, "rss_after_bytes": 117121024, "cache_bytes": 295049},
+    {"duration_seconds": 180, "wall_seconds": 20.453, "rtf": 0.11363, "rss_after_bytes": 175800320, "cache_bytes": 1649109},
+    {"duration_seconds": 600, "wall_seconds": 84.426, "rtf": 0.14071, "rss_after_bytes": 319782912, "cache_bytes": 5464789}
+  ],
+  "warm_30_seconds": {"wall_seconds": 0.071, "speedup": 95.34, "decoded_source_count": 0, "cache_hits": 6, "nodes_reused": 6},
+  "logical_output_equal": true,
+  "timing_note": "RSS is process resident size observed after each sequential run, not isolated peak RSS",
+  "verdict": "PASS"
+}

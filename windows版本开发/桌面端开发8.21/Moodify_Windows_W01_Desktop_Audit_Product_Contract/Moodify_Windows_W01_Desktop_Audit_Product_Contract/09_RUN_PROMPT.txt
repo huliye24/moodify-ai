@@ -1,0 +1,59 @@
+You are executing MFY-WIN-W01-DESKTOP-AUDIT-001 for the Moodify repository.
+
+Read this task package in order:
+00_README.md
+01_CODEX_TASK.md
+02_ACCEPTANCE_CRITERIA.md
+03_AUDIT_REPORT_TEMPLATE.md
+04_FUNCTION_MATRIX.csv
+05_PRODUCT_MODEL_CANDIDATE.md
+06_UI_FREEZE_CONTRACT.md
+07_EVIDENCE_MANIFEST_TEMPLATE.json
+08_W02_HANDOFF_GATE.md
+
+Rules:
+- Work ONLY on W01.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not implement W02 features.
+- Read repository authority before subsystem code.
+- Discover the ACTUAL Windows desktop implementation and stack from evidence. Do not assume Electron, Tauri, WebView2, or any other stack.
+- Preserve the current Moodify Windows Alpha visual direction.
+- Do not create a second state store, queue authority, state machine, or persistence authority.
+- Do not mass-delete legacy code.
+- Do not claim unverified cloud functionality as operational.
+- Do not commit private audio, secrets, credentials, or large generated artifacts.
+- If a critical fact cannot be verified, mark it UNKNOWN or BLOCKED. Never invent.
+- The highest-priority investigation is the current incomplete “add track to playlist” flow. Locate the first failing boundary and explain the real root cause.
+
+Required output directory:
+artifacts/windows/w01/
+
+Required outputs:
+W01_AUDIT_REPORT.md
+repository-map.md
+function-matrix.csv
+state-authority-map.md
+playback-flow.md
+persistence-audit.md
+playlist-add-root-cause.md
+product-model-assessment.md
+build-test-reality.md
+evidence-manifest.json
+W02_HANDOFF.md
+
+At the end, report:
+1) files changed,
+2) commands run,
+3) tests run and results,
+4) manual flows tested,
+5) evidence paths,
+6) blockers/unknowns,
+7) W01_STATUS,
+8) W02_GATE.
+
+Finish with exactly:
+W01_STATUS = PASS | BLOCKED
+W02_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

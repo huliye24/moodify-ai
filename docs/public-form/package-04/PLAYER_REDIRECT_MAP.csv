@@ -1,0 +1,20 @@
+﻿source_path,destination_path,status,redirect_type,priority,notes
+/,/,keep,None,P0,Core player surface — no redirect needed
+,/library,keep,None,P1,User library — accessible via drawer or direct URL
+,/playlists,keep,None,P2,Playlists — accessible via direct URL
+,/studio,keep,None,P2,Creator center — moved to drawer, direct URL still works
+,/drafts,keep,None,P2,Drafts — moved to drawer, direct URL still works
+,/console,keep,None,P3,Admin console — gated access preserved
+,/inbox,keep,None,P2,Inbox — moved to drawer, direct URL still works
+,/offline,keep,None,P3,PWA utility — service worker dependent
+,/design,keep,None,P3,Design system showcase — no nav exposure
+,/beta-login,keep,None,P1,Auth flow — required for login
+,/track/[id],/t/[id],preserve,301,P1,Existing alias redirect preserved
+,/t/[id],/t/[id],keep,None,P0,Track deep link — canonical play page
+,/c/[handle],/c/[handle],keep,None,P0,Creator profile deep link
+,/api/v1/tracks,/api/v1/tracks,keep,None,P0,API endpoint — backend only
+,/api/v1/tracks/[id],/api/v1/tracks/[id],keep,None,P0,API endpoint — backend only
+,/api/v1/tracks/[id]/audio,/api/v1/tracks/[id]/audio,keep,None,P0,Critical: audio streaming — must preserve
+,/api/v1/tracks/[id]/publish,/api/v1/tracks/[id]/publish,keep,None,P2,Creator action — backend only
+,/api/v1/creators/[handle],/api/v1/creators/[handle],keep,None,P0,API endpoint — backend only
+,/api/v1/me/creator,/api/v1/me/creator,keep,None,P1,API endpoint — authenticated

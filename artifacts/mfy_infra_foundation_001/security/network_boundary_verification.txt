@@ -1,0 +1,26 @@
+MFY-INFRA-FOUNDATION-001 C2/C7 — Network boundary verification
+===============================================================
+Date: 2026-08-13
+
+C2 SECURITY GROUP (Hangzhou ECS :8000) — BLOCKED_BY_HUMAN_AUTHORITY
+------------------------------------------------------------------
+aliyun CLI has no credentials; security group rules are console-only.
+Current observed: :8000 is reachable from arbitrary public sources
+(verified pre-change). Application layer is NOW authenticated (C1),
+which closes the data-access hole even before SG tightening.
+
+HUMAN INSTRUCTION:
+Aliyun console -> ECS i-bp1dkujhln9jrdhi9iv6 -> 安全组 ->
+inbound rule for TCP 8000: remove 0.0.0.0/0, add 103.144.246.242/32 only.
+Keep port 22 rule. After change, verify from LA (curl 200 with key)
+and from a non-LA source (should time out / be filtered).
+
+C7 NETWORK BOUNDARY (verified)
+------------------------------
+- Hangzhou ECS -> MySQL B: private VPC peer path only (172.21.10.9 -> 172.27.118.104)
+- Hangzhou ECS -> MySQL A: private VPC peer path only (172.21.10.9 -> 172.27.118.106)
+- LA does not connect to PolarDB: no code, no config, no new connection added
+  during this task. LA has no MySQL client and no DSN references (audit).
+- 3 public domains: unchanged Cloudflare proxy -> tunnel -> LA nginx.
+
+RESULT: PASS (LA-must-not-connect-PolarDB invariant maintained)

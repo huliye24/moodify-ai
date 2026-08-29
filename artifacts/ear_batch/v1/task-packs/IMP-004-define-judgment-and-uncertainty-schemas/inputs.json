@@ -1,0 +1,26 @@
+{
+  "work_item": {
+    "id": "WI-004",
+    "epic": "EPIC-01",
+    "title": "Define Judgment and Uncertainty schemas",
+    "deps": [
+      "WI-002",
+      "WI-003"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "schemas/ear_v1",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "schemas/ear_v1/judgment_record.schema.json",
+      "schemas/ear_v1/uncertainty.schema.json",
+      "tests/ear_v1_contracts/test_judgment_schema.py"
+    ],
+    "acceptance": "Judgment references but never overwrites measurements; UNCERTAIN and INSUFFICIENT_EVIDENCE are valid outputs; severity and confidence are separate."
+  },
+  "dependencies": [
+    "IMP-002",
+    "IMP-003"
+  ]
+}

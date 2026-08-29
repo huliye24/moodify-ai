@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-example-code-001",
+  "contributor": {
+    "type": "wallet",
+    "id": "0x0000000000000000000000000000000000000001",
+    "displayName": null
+  },
+  "category": "code",
+  "title": "Example protocol contribution",
+  "description": "Non-production fixture used to test the MPF-002 contribution core.",
+  "submittedAt": "2026-08-29T00:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-example-001",
+      "type": "git_commit",
+      "uri": "https://example.invalid/commit/0000000",
+      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "observedAt": "2026-08-29T00:00:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "unverified",
+        "method": null,
+        "verifiedAt": null,
+        "verifiedBy": null
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

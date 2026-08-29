@@ -1,0 +1,4 @@
+Moodify Music 2.0.0 - Internal Experience Release
+Date: 2026-08-15
+
+This APK is signed with the Android Debug certificate and is intended for internal testing and product experience validation. It is not a production app-store signing artifact.

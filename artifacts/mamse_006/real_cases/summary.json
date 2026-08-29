@@ -1,0 +1,83 @@
+{
+  "schema_version": "mamse-006-real-cases-v1",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "source_sha256": "abde7f2e9e3f774a2fcd9023c0bad7d30b583ea29ed75baef6c253c16abd12f4",
+      "status": "OK",
+      "rms_dbfs": -17.190070177060896,
+      "temporal_peak_hz": 0.25,
+      "temporal_centroid_hz": 3.498470655075172,
+      "slow_energy_ratio": 0.752870551380078,
+      "mid_energy_ratio": 0.19520122432633924,
+      "fast_energy_ratio": 0.051928224293582834,
+      "temporal_modulation_entropy": 0.6449332405443816,
+      "spectral_peak_cpo": 0.12121212121212122,
+      "diagonal_orientation_index": 0.05509476488635979,
+      "ridge": {
+        "temporal_rate_hz": 0.25,
+        "spectral_rate_cpo": 0.12121212121212122,
+        "velocity_oct_per_s": 2.0625,
+        "ridge_concentration": 0.08530358177120895,
+        "status": "CANDIDATE"
+      },
+      "log_frequency_bins": 99,
+      "modulation_segments": 64,
+      "runtime_seconds": 3.2242755999996007
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "source_sha256": "c116dd0b6ae49cf9264c65d1f7981bbf82e829ed70af02290f5e2acf92ee2bcd",
+      "status": "OK",
+      "rms_dbfs": -16.83313439178847,
+      "temporal_peak_hz": 0.25,
+      "temporal_centroid_hz": 3.303553835368364,
+      "slow_energy_ratio": 0.7686257528100919,
+      "mid_energy_ratio": 0.17872997811907426,
+      "fast_energy_ratio": 0.05264426907083368,
+      "temporal_modulation_entropy": 0.5776662761385098,
+      "spectral_peak_cpo": 0.12121212121212122,
+      "diagonal_orientation_index": 0.0022514599228957255,
+      "ridge": {
+        "temporal_rate_hz": 0.25,
+        "spectral_rate_cpo": 0.12121212121212122,
+        "velocity_oct_per_s": 2.0625,
+        "ridge_concentration": 0.11425433192813737,
+        "status": "CANDIDATE"
+      },
+      "log_frequency_bins": 99,
+      "modulation_segments": 92,
+      "runtime_seconds": 6.964945599998828
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "source_sha256": "1b346d06a7592a0c8c315cd0930b10f2dd7c7fce2de85c91ead6499b4f770fd9",
+      "status": "OK",
+      "rms_dbfs": -17.495198146644263,
+      "temporal_peak_hz": 0.25,
+      "temporal_centroid_hz": 3.3071168952470664,
+      "slow_energy_ratio": 0.7772065345914024,
+      "mid_energy_ratio": 0.16404688618991398,
+      "fast_energy_ratio": 0.05874657921868382,
+      "temporal_modulation_entropy": 0.5456844870088146,
+      "spectral_peak_cpo": 0.12121212121212122,
+      "diagonal_orientation_index": -0.002484360152678121,
+      "ridge": {
+        "temporal_rate_hz": 0.25,
+        "spectral_rate_cpo": 0.12121212121212122,
+        "velocity_oct_per_s": 2.0625,
+        "ridge_concentration": 0.1063897379724191,
+        "status": "CANDIDATE"
+      },
+      "log_frequency_bins": 99,
+      "modulation_segments": 98,
+      "runtime_seconds": 5.0767113999991125
+    }
+  ]
+}

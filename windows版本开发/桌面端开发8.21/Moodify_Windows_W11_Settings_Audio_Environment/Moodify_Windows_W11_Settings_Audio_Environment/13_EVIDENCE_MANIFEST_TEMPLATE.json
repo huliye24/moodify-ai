@@ -1,0 +1,29 @@
+{
+  "package_id": "MFY-WIN-W11-SETTINGS-AUDIO-ENV-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w10_status": "",
+  "w11_gate": "",
+  "settings_schema_version": "",
+  "capabilities": {
+    "output_enumeration": "",
+    "output_selection": "",
+    "output_hotplug": "",
+    "tray": "",
+    "startup": "",
+    "cache": "",
+    "storage_relocation": "",
+    "metered_network_detection": ""
+  },
+  "defaults": {},
+  "commands": [],
+  "tests": [],
+  "manual_flows": [],
+  "migration_tests": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w11_status": "BLOCKED",
+  "w12_gate": "BLOCKED"
+}

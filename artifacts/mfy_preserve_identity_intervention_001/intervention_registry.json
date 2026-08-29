@@ -1,0 +1,38 @@
+{
+  "schema": "intervention-registry-v1",
+  "package": "MFY_PRESERVE_IDENTITY_INTERVENTION_001",
+  "pipeline_version": "mfy-intervention-v1",
+  "principle": "pre-registered conservative candidates; processing more is not success; identity gate before selection; HUMAN_REQUIRED on uncertainty",
+  "primitives": [
+    {
+      "primitive_id": "clip_peak_repair",
+      "version": "v1",
+      "scope": "full-mix; short clipped flat segments (<= 16 samples)",
+      "max_strength": "linear transition over repaired segment; never exceeds neighbours",
+      "identity_risk": "LOW",
+      "failure_state": "long/edge segments reported, not repaired; NaN input -> ValueError",
+      "default_enabled": true,
+      "notes": "long clipping is a mastering defect signal, not auto-fixed"
+    },
+    {
+      "primitive_id": "dc_offset_fix",
+      "version": "v1",
+      "scope": "full-mix, any format; removes constant per-channel offset",
+      "max_strength": "full DC removal (|dc| > 1e-4 fires); no gain change",
+      "identity_risk": "NONE",
+      "failure_state": "NaN/Inf input -> ValueError (never silent)",
+      "default_enabled": true,
+      "notes": "DC is not musical content; spectrum impact at 0 Hz only"
+    },
+    {
+      "primitive_id": "tonal_balance_very_conservative",
+      "version": "v1",
+      "scope": "full-mix; low band (20-120 Hz) or high band (10-20 kHz) deficit",
+      "max_strength": "±0.5 dB shelf correction (hard cap)",
+      "identity_risk": "MEDIUM",
+      "failure_state": "FFT failure -> ValueError; imbalance below threshold -> bypassed",
+      "default_enabled": false,
+      "notes": "not a modern-master template; never generic brightness"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "case": "case_9056391_harmonic",
+  "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+  "duration_s": 128.52,
+  "n_rows": 1282,
+  "reference_model_id": "covmodel-f62fc68f320c566a",
+  "complete_rows": 641,
+  "shrinkage_alpha": 0.01108091076350168,
+  "effective_rank": 5.48653732362112,
+  "lag1_by_feature": {
+    "band_air": 0.791,
+    "band_bass": 0.71,
+    "band_brilliance": 0.478,
+    "band_core_mid": 0.663,
+    "band_low_mid": 0.735,
+    "band_mid": 0.711,
+    "band_presence": 0.6,
+    "band_sub": 0.608,
+    "peak_db": 0.914,
+    "rms_db": 0.942,
+    "spectral_centroid_hz": 0.747,
+    "stereo_correlation": 0.852
+  },
+  "neff_ratio_min": 0.03,
+  "mahalanobis_second_half": {
+    "median_d2": 24.479,
+    "frac_above_q95": 0.1934,
+    "frac_above_q99": 0.0484
+  },
+  "relation_break_injection": {
+    "feature": "rms_db",
+    "median_d2": 27.055,
+    "frac_above_q95": 0.2746,
+    "frac_above_q99": 0.1388,
+    "increment": "NO_INCREMENT"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "task": "TP-001",
+  "verified_at": "2026-08-12T00:46:23.626488+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "corpus/inventory.json",
+      "exists": true,
+      "bytes": 30242,
+      "sha256": "bc7061b93394d723e4bca45ab6a98fd1eefeacd65f0a8afd0b44ba63c48e6b59",
+      "passed": true
+    },
+    {
+      "path": "corpus/inventory.md",
+      "exists": true,
+      "bytes": 319,
+      "sha256": "374cf9a7857e68ab885b1c2a350d1a3a2a55e7bb911f4e7a40870e91a43d1825",
+      "passed": true
+    }
+  ]
+}

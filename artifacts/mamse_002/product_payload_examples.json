@@ -1,0 +1,94 @@
+{
+  "schema_version": "mamse-002-payload-v1",
+  "note": "产品层消费语义事件，不暴露 transform 名称；底层 evidence 可展开。不得暗示机器完全理解音高/和声。",
+  "examples": [
+    {
+      "case": "case_9056391_harmonic",
+      "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+      "time_range_ms": [
+        123125.33333333333,
+        124384.0
+      ],
+      "status": "SUPPORTED",
+      "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+      "estimated_centers_hz": [
+        65.4,
+        73.4
+      ],
+      "musical_distance_semitones": 2.0,
+      "linear_path_resolution": "PARTIAL",
+      "log_frequency_increment": "RESOLVED",
+      "evidence_refs": [
+        "log_frequency_evidence.json",
+        "mamse002_logfreq_sketch.npz",
+        "real_cases/case_9056391_harmonic/mamse002_manifest.json"
+      ]
+    },
+    {
+      "case": "case_9961e07_transient",
+      "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+      "time_range_ms": [
+        68522.66666666667,
+        69525.33333333334
+      ],
+      "status": "SUPPORTED",
+      "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+      "estimated_centers_hz": [
+        46.2,
+        51.9
+      ],
+      "musical_distance_semitones": 2.0,
+      "linear_path_resolution": "PARTIAL",
+      "log_frequency_increment": "RESOLVED",
+      "evidence_refs": [
+        "log_frequency_evidence.json",
+        "mamse002_logfreq_sketch.npz",
+        "real_cases/case_9961e07_transient/mamse002_manifest.json"
+      ]
+    },
+    {
+      "case": "case_9961e07_transient",
+      "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+      "time_range_ms": [
+        83765.33333333333,
+        86357.33333333333
+      ],
+      "status": "SUPPORTED",
+      "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+      "estimated_centers_hz": [
+        46.2,
+        51.9
+      ],
+      "musical_distance_semitones": 2.0,
+      "linear_path_resolution": "PARTIAL",
+      "log_frequency_increment": "RESOLVED",
+      "evidence_refs": [
+        "log_frequency_evidence.json",
+        "mamse002_logfreq_sketch.npz",
+        "real_cases/case_9961e07_transient/mamse002_manifest.json"
+      ]
+    },
+    {
+      "case": "case_9961e07_transient",
+      "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+      "time_range_ms": [
+        114304.0,
+        117130.66666666667
+      ],
+      "status": "SUPPORTED",
+      "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+      "estimated_centers_hz": [
+        46.2,
+        51.9
+      ],
+      "musical_distance_semitones": 2.0,
+      "linear_path_resolution": "PARTIAL",
+      "log_frequency_increment": "RESOLVED",
+      "evidence_refs": [
+        "log_frequency_evidence.json",
+        "mamse002_logfreq_sketch.npz",
+        "real_cases/case_9961e07_transient/mamse002_manifest.json"
+      ]
+    }
+  ]
+}

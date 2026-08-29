@@ -1,0 +1,91 @@
+# Moodify Phase I Scope — MFY-PHASE1-FREEZE-001
+# 产品身份：AI 听觉智能系统（AI 生成音乐的听音/分析/判断/证据/学习）
+# 规范循环：LISTEN -> REPRESENT -> JUDGE -> EVIDENCE -> LEARN
+
+task_id: MFY-PHASE1-FREEZE-001
+phase: 1
+product_identity: "AI auditory intelligence system"
+organizing_question: "Can machines learn to hear?"
+target_domain: "AI-generated music"
+freeze_date: "2026-08-08"
+
+canonical_loop:
+  - listen
+  - represent
+  - judge
+  - intervene
+  - verify
+  - learn
+
+primary_surfaces:
+  - home
+  - analyze
+  - auditory_report
+  - library
+  - profile
+
+phase1_core:
+  - audio_intake
+  - source_identity
+  - wse_measurement
+  - mse_structure
+  - auditory_representation
+  - judgment_layer
+  - evidence_artifacts
+  - auditory_report
+  - production_case
+  - human_review
+  - learning_record
+  - reproducibility
+  - validation
+
+phase1_secondary:
+  - controlled_intervention
+  - before_after_comparison
+  - internal_research_tools
+  - batch_analysis
+
+phase2_frozen:
+  - cwc_token
+  - marketplace
+  - transaction_center
+  - nft_or_collectible_trading
+  - physical_art_commerce
+  - copyright_exchange
+  - social_graph
+  - feed
+  - invitation_growth
+  - complex_creator_center
+  - publishing_distribution_network
+  - recommendation_network
+  - ai_comic
+  - ai_3d
+  - ecosystem_expansion
+  - enterprise_admin_suite
+
+freeze_behavior:
+  default: "feature_flag_off"
+  preserve_data_models: true
+  preserve_historical_assets: true
+  hide_from_primary_navigation: true
+  block_new_phase2_development: true
+  destructive_delete_requires_proof: true
+
+# 仓库实际落地机制（2026-08-08 审计确认）
+enforcement:
+  runtime_gate: "MOODIFY_ENABLE_PHASE2_EXPERIMENTS must be explicitly enabled to expose preserved Phase II labs"
+  android_navigation: "4-tab 底部导航（首页/听觉检测/案例/我的）；Phase II 入口已从主导航移除"
+  android_dead_screens: "CreatorCenter/CopyrightCenter/CollaborationHub/PublishWork/NotificationCenter 保留代码但 @Deprecated 标注、不可达"
+  core_package: "src/moodify 无 Phase II 模块（grep 确认 0 命中）"
+  cli_v2: "case 全链路是规范路径；run.execute/run.verify 需 --allow-uncontrolled 显式非默认"
+  learning_safety: "单案例反馈不自动改全局阈值；提交前需 review（RightsMetadata 权利审查）"
+
+phase1_exit_conditions:
+  - reproducible_analysis_pipeline
+  - unified_auditory_representation
+  - working_judgment_layer
+  - resolvable_evidence_chain
+  - production_case_persistence
+  - human_review_capture
+  - learning_feedback_record
+  - representative_sample_validation

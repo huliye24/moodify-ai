@@ -1,0 +1,11 @@
+{
+  "healthPolicyVersion": "004-draft-1",
+  "status": "draft",
+  "healthyFreshnessSeconds": 300,
+  "degradedAfterSeconds": 900,
+  "inactiveAfterSeconds": 3600,
+  "notes": [
+    "Example bootstrap thresholds only.",
+    "Do not claim production truth until approved by repository/human authority."
+  ]
+}

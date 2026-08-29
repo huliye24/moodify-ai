@@ -1,0 +1,46 @@
+{
+  "task_id": "MFY-24X7-DATA-PIPELINE-001",
+  "pilot_started_at": "2026-08-10T06:56:49Z",
+  "pilot_finished_at": "2026-08-10T07:13:20Z",
+  "pilot_duration_minutes": 16.5,
+  "sources": "10 owned full-length tracks (128-198 s) from operator library, sequential submission via staging -> inbox -> SHA256 source store",
+  "manifest_validation": {
+    "validated_by": "ops/data_node/validate_pilot_manifest.py",
+    "errors": [],
+    "full_length_signal": "10/10"
+  },
+  "cases": [
+    {"label": "pilot-01", "source": "01_des_portes_et_des_lampes.wav", "source_duration_s": 179.8, "runtime_s": 87.8, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": null, "min_available_mib": null},
+    {"label": "pilot-02", "source": "02_j_apprends_la_tendresse.wav", "source_duration_s": 131.3, "runtime_s": 62.9, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": 165.8, "min_available_mib": 833.7},
+    {"label": "pilot-03", "source": "03_je_deposerai_mon_inquietude.wav", "source_duration_s": 184.3, "runtime_s": 85.7, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": null, "min_available_mib": null},
+    {"label": "pilot-04", "source": "04_je_ne_prendrai_pas_tes_limites.wav", "source_duration_s": 198.0, "runtime_s": 86.3, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": null, "min_available_mib": null},
+    {"label": "pilot-05", "source": "05_je_ne_veux_pas_faire_de_toi.wav", "source_duration_s": 179.8, "runtime_s": 89.6, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": 663.4, "min_available_mib": 781.0},
+    {"label": "pilot-06", "source": "06_je_te_garde_un_morceau.wav", "source_duration_s": 128.5, "runtime_s": 64.5, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": null, "min_available_mib": null},
+    {"label": "pilot-07", "source": "07_nous_pouvons_etre_calmes.wav", "source_duration_s": 184.4, "runtime_s": 95.0, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": null, "min_available_mib": null},
+    {"label": "pilot-08", "source": "08_t_aimer_lentement.wav", "source_duration_s": 193.5, "runtime_s": 98.9, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": 1024.7, "min_available_mib": 570.6},
+    {"label": "pilot-09", "source": "09_tu_n_as_pas_besoin.wav", "source_duration_s": 159.9, "runtime_s": 89.6, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": 1024.0, "min_available_mib": 511.7},
+    {"label": "pilot-10", "source": "10_viens_chez_moi.wav", "source_duration_s": 188.5, "runtime_s": 89.9, "result": "SUCCEEDED", "attempts": 1, "peak_swap_mib": 1024.0, "min_available_mib": 518.2}
+  ],
+  "summary": {
+    "completed": "10/10",
+    "failed": "0/10",
+    "oom_kills": 0,
+    "resource_deferrals": 0,
+    "worker_restarts_during_pilot": 0,
+    "median_runtime_s": 87.7,
+    "p95_runtime_s": 96.5,
+    "peak_swap_mib_observed": 1024.7,
+    "min_available_memory_mib_observed": 511.7,
+    "min_free_disk_gib": 27.3,
+    "swap_post_pilot_mib": 1019.7,
+    "memory_available_post_pilot_mib": 770.2,
+    "queue_backlog": 0,
+    "duration_stats_report": {"median_job_seconds": 64.54, "p95_job_seconds": 95.75}
+  },
+  "hardware_verdict": {
+    "verdict": "KEEP_2C2G",
+    "watch_flag": "REVIEW_MEMORY",
+    "rationale": "All functional KEEP_2C2G criteria met: 10/10 cases succeeded, 0 OOM, 0 resource defer, 0 worker restart, queue fully drained, disk healthy (28 GiB free), memory available never below 511 MiB. Watch: swap parks at ~1.0 of 2.0 GiB during/after full-length processing (vs 76 MiB on 45 s clips) - the automated daily report flags REVIEW_MEMORY (peak 1024.7 MiB > 1024 MiB threshold). Upgrade to 2C4G (memory first) only if sustained swap > 1.2 GiB, repeated failures, or resource defers appear on future batches.",
+    "evidence_files": ["resource_snapshots_pilot.jsonl", "daily_report_sample.md", "server_final_state.txt"]
+  }
+}

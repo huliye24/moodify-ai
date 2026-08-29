@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/node/1.0.0",
+  "title": "MOOD Protocol Node",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "nodeId",
+    "operatorProtocolId",
+    "nodeType",
+    "displayName",
+    "region",
+    "endpoint",
+    "capabilityManifestId",
+    "verification",
+    "health",
+    "lifecycleStatus",
+    "registeredAt",
+    "updatedAt",
+    "recordFingerprint"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "nodeId": {
+      "type": "string",
+      "pattern": "^mood:node:[0-9a-f]{64}$"
+    },
+    "operatorProtocolId": {
+      "type": "string",
+      "pattern": "^mood:contributor:[0-9a-f]{64}$"
+    },
+    "nodeType": {
+      "type": "string",
+      "enum": [
+        "developer",
+        "compute",
+        "data",
+        "storage",
+        "validation",
+        "gateway"
+      ]
+    },
+    "displayName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 120
+    },
+    "region": {
+      "type": "object",
+      "required": [
+        "countryCode",
+        "regionCode",
+        "city",
+        "precision"
+      ],
+      "properties": {
+        "countryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{2}$"
+        },
+        "regionCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100
+        },
+        "precision": {
+          "type": "string",
+          "enum": [
+            "country",
+            "region",
+            "city",
+            "exact",
+            "hidden"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "endpoint": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "uri"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "https",
+                "http",
+                "repository",
+                "none"
+              ]
+            },
+            "uri": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capabilityManifestId": {
+      "type": "string",
+      "pattern": "^mood:capability:[0-9a-f]{64}$"
+    },
+    "verification": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "verified",
+            "partially_verified",
+            "rejected",
+            "expired"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "verifiedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "health": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "healthy",
+            "degraded",
+            "unreachable",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "lifecycleStatus": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "registered",
+        "pending_verification",
+        "verified",
+        "active",
+        "degraded",
+        "inactive",
+        "suspended",
+        "rejected",
+        "retired"
+      ]
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "recordFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "not": {
+        "required": [
+          "privateKey"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "seedPhrase"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "sshKey"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "tokenReward"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "stakingAmount"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

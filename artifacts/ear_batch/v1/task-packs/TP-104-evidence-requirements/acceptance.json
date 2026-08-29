@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "knowledge/evidence_requirements.json",
+    "knowledge/evidence_requirements.md"
+  ],
+  "non_empty": true
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/api/envelope/v1",
+  "title": "MOOD Protocol API Success Envelope",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "data",
+    "meta"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "v1"
+    },
+    "data": {},
+    "meta": {
+      "type": "object",
+      "required": [
+        "requestId",
+        "generatedAt"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "pagination": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,21 @@
+{
+  "task": "TP-101",
+  "verified_at": "2026-08-12T00:52:02.164785+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "knowledge/claims.jsonl",
+      "exists": true,
+      "bytes": 2102482,
+      "sha256": "dc1ce4376ec6d3b537bdf7ef8571f9b72c8c378cfa47c7cbbe74d240ae8c1f04",
+      "passed": true
+    },
+    {
+      "path": "knowledge/claims_summary.md",
+      "exists": true,
+      "bytes": 778,
+      "sha256": "46a4b4433d162acd4bdae845b0e583fc619792bd857aa3457140bbd96398f63f",
+      "passed": true
+    }
+  ]
+}

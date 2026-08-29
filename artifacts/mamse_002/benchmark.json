@@ -1,0 +1,61 @@
+{
+  "schema_version": "mamse-002-benchmark-v1",
+  "source": "/var/lib/moodify/sources/sha256/c3/c3886611711d6e657e2180eec16ca6b54e0c3e9afcf908c3dff0d83010c16c63/10_viens_chez_moi.wav",
+  "sample_rate": 48000,
+  "measurements": [
+    {
+      "label": "slice_10s",
+      "duration_s": 10.0,
+      "wall_time_s": 21.891,
+      "cpu_time_s": 21.28,
+      "peak_rss_kb": 458168,
+      "rss_delta_kb": 206096,
+      "swap_before_kb": 144200,
+      "swap_after_kb": 144456,
+      "swap_delta_kb": 256,
+      "status": "OK",
+      "bins": 216,
+      "frames": 938,
+      "dense_intermediate_bytes": 1620864,
+      "persisted_sketch_bytes": 112560,
+      "config_sha256": "b847bfb1695399fa",
+      "geometry_id": "log2-equal-temperament-24bpo-v0.1"
+    },
+    {
+      "label": "slice_45s",
+      "duration_s": 45.0,
+      "wall_time_s": 4.358,
+      "cpu_time_s": 4.357,
+      "peak_rss_kb": 483824,
+      "rss_delta_kb": 25656,
+      "swap_before_kb": 144456,
+      "swap_after_kb": 144456,
+      "swap_delta_kb": 0,
+      "status": "OK",
+      "bins": 216,
+      "frames": 4219,
+      "dense_intermediate_bytes": 7290432,
+      "persisted_sketch_bytes": 506280,
+      "config_sha256": "b847bfb1695399fa",
+      "geometry_id": "log2-equal-temperament-24bpo-v0.1"
+    },
+    {
+      "label": "full",
+      "duration_s": 188.52,
+      "wall_time_s": 18.358,
+      "cpu_time_s": 18.354,
+      "peak_rss_kb": 588596,
+      "rss_delta_kb": 104772,
+      "swap_before_kb": 144456,
+      "swap_after_kb": 144456,
+      "swap_delta_kb": 0,
+      "status": "OK",
+      "bins": 216,
+      "frames": 17674,
+      "dense_intermediate_bytes": 30540672,
+      "persisted_sketch_bytes": 2120880,
+      "config_sha256": "b847bfb1695399fa",
+      "geometry_id": "log2-equal-temperament-24bpo-v0.1"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "schema_version": "mamse-007-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "input_features": 14,
+  "semantic_retained": [
+    "rms_db",
+    "peak_db",
+    "stereo_correlation",
+    "spectral_centroid_hz",
+    "band_sub",
+    "band_bass",
+    "band_low_mid",
+    "band_mid",
+    "band_core_mid",
+    "band_presence",
+    "band_brilliance",
+    "band_air"
+  ],
+  "measurements": [
+    {
+      "label": "full",
+      "n_windows": 1282,
+      "d_input_features": 12,
+      "d_retained": 12,
+      "k_components": 3,
+      "wall_time_s": 0.0042,
+      "cpu_time_s": 0.0,
+      "explained_variance_ratio": [
+        0.9338493532522395,
+        0.037606050943993226,
+        0.014017504277830094
+      ],
+      "npz_bytes": 382004,
+      "json_bytes": 4604
+    },
+    {
+      "label": "half",
+      "n_windows": 641,
+      "d_input_features": 12,
+      "d_retained": 12,
+      "k_components": 3,
+      "wall_time_s": 0.0025,
+      "cpu_time_s": 0.0,
+      "explained_variance_ratio": [
+        0.9478946051463149,
+        0.03030946183071175,
+        0.010615939309910076
+      ],
+      "npz_bytes": 193380,
+      "json_bytes": 4606
+    },
+    {
+      "label": "quarter",
+      "n_windows": 321,
+      "d_input_features": 12,
+      "d_retained": 12,
+      "k_components": 3,
+      "wall_time_s": 0.0034,
+      "cpu_time_s": 0.0,
+      "explained_variance_ratio": [
+        0.9374363250801839,
+        0.039676531667734556,
+        0.01248969503239608
+      ],
+      "npz_bytes": 98655,
+      "json_bytes": 4610
+    }
+  ],
+  "semantic_dropped": [
+    {
+      "feature": "rms_db",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "peak_db",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "stereo_correlation",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "mid_energy",
+      "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+      "status": "SEMANTIC_CONFLICT"
+    },
+    {
+      "feature": "side_energy",
+      "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+      "status": "SEMANTIC_CONFLICT"
+    },
+    {
+      "feature": "spectral_centroid_hz",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_sub",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_bass",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_low_mid",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_mid",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_core_mid",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_presence",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_brilliance",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    },
+    {
+      "feature": "band_air",
+      "reason": "UNIT_UNRESOLVED_ALLOWED_EXPLORATORY"
+    }
+  ]
+}

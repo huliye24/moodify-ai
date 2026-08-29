@@ -1,0 +1,15 @@
+{
+  "product": "Moodify Music Android",
+  "version_name": "2.0.0",
+  "version_code": 20,
+  "release_date": "2026-08-15",
+  "package_name": "com.moodify.app",
+  "release_kind": "internal-experience-fixed",
+  "git_baseline": "09bac4c6d72cb979ee2491e064b0a84f247ab661",
+  "built_from_worktree_changes": true,
+  "signing": "Android Debug",
+  "min_sdk": 26,
+  "target_sdk": 36,
+  "device_validation": "Xiaomi M2102J2SC (thyme)",
+  "archive_policy": "independent; does not replace 1.0"
+}

@@ -1,0 +1,23 @@
+# W02-P01 Acceptance Checklist
+
+- [ ] W02-P00 actual results loaded
+- [ ] human-selected one candidate
+- [ ] Problem Contract frozen
+- [ ] current evidence cited
+- [ ] baseline measurable
+- [ ] Scope Lock
+- [ ] Change Budget
+- [ ] reuse-first analysis
+- [ ] minimum intervention
+- [ ] every change linked to evidence
+- [ ] rollback defined
+- [ ] tests complete
+- [ ] Wave 01 regressions protected
+- [ ] Golden Case regression where applicable
+- [ ] 3-case subset regression where applicable
+- [ ] After measurement uses same metric definition
+- [ ] metric gaming avoided
+- [ ] new debt/trade-offs recorded
+- [ ] evidence-based completion verdict
+- [ ] Next Decision Gate generated
+- [ ] no automatic W02-P02

@@ -1,0 +1,15 @@
+{
+  "package_id": "MFY-WIN-W04-PLAYBACK-CORE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "implementation_root": "E:\\moodify-desktop",
+  "desktop_git_metadata": false,
+  "authority": {"business": "PlaybackService", "execution": "ChromiumPlaybackEngine", "audio_instances": 1, "formal_queue": false, "source_resolver": "LibraryService + moodify-local protocol"},
+  "verification": {"command": "npm run verify", "typecheck": "PASS", "lint": "PASS", "test_files": 9, "tests_passed": 102, "tests_failed": 0},
+  "changed_code": ["src/domain/playback/service.ts", "src/domain/playback/engine.ts", "src/renderer/components/player/MinimalPlayer.tsx", "tests/unit/playback-core.test.ts"],
+  "race_controls": ["playback generation", "engine load generation", "track-scoped event filter", "serialized toggle/next/previous"],
+  "known_limits": ["Formal Queue deferred to W05", "Error auto-skip deferred to Queue-aware policy", "Full restart restoration deferred to W08", "Final package directory remains locked by running Moodify processes"],
+  "w04_status": "PASS",
+  "w05_gate": "PASS"
+}

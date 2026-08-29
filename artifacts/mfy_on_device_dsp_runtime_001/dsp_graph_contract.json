@@ -1,0 +1,61 @@
+{
+  "package_id": "MFY_ON_DEVICE_DSP_RUNTIME_001",
+  "sequence": 69,
+  "schema": "dsp-graph-v1",
+  "graph_id": "mfy-dsp-graph-v1",
+  "source": "apps/android/app/src/main/java/com/moodify/app/audio/{DspGraph,IdentityAudioProcessor,DspGraphRuntime}.kt",
+  "principle": "one authoritative DSP graph attached to the single Media3 playback path; no second player state machine; observation never modifies playback",
+  "nodes": [
+    {
+      "id": "identity",
+      "class": "com.moodify.app.audio.IdentityAudioProcessor",
+      "mode": "byte-identity copy + sample-peak observation",
+      "latency_ms": 0,
+      "parameter_count": 0,
+      "note": "no EQ/compression/spatialization/split-band or aesthetic parameters exist in 69"
+    }
+  ],
+  "headroom_db": -1.0,
+  "headroom_linear": 0.8912509381337456,
+  "headroom_semantics": "sample-peak threshold; identity graph never exceeds input, hot fixture (> -1 dBFS) deterministically trips protection; documented as sample-peak approximation, NOT oversampled true-peak",
+  "offload_policy": "HARDWARE_OFFLOAD_DISABLED_WHEN_PROCESSOR_ACTIVE",
+  "offload_evidence": "processor installed via DefaultAudioSink.Builder.setAudioProcessors; offload callback observed as UNKNOWN on this device (no offload signal with processor active); mutual-exclusion relationship recorded, never claimed both active",
+  "bypass_semantics": {
+    "explicit": "DspGraphRuntime.requestBypass(reason) -> processor reports inactive at next reconfigure; Media3 skips it (clean path)",
+    "automatic": "headroom limit trip OR unsupported format -> requestBypass with recorded reason",
+    "playback_continuity": "queueInput always passes data through even after bypass request; bypass takes effect only at reconfigure, never mid-stream (fix: input.position must advance, Media3 re-sends otherwise)"
+  },
+  "supported_encodings": ["PCM_8BIT", "PCM_16BIT", "PCM_24BIT", "PCM_32BIT", "PCM_FLOAT"],
+  "unsupported_handling": "UnhandledAudioFormatException -> Media3 drops processor from chain; playback continues on direct path",
+  "latency_reporting": "identity latency = 0ms (constant, no buffering); pipeline measures actual processing cost separately in runtime_benchmarks.json",
+  "monitoring": {
+    "underrun": "AnalyticsListener.onAudioUnderrun",
+    "thermal": "PowerManager.OnThermalStatusChangedListener (API 29+)",
+    "memory": "Runtime freeMemory snapshot",
+    "route_change": "AudioDeviceCallback DEVICE_ADDED/REMOVED count",
+    "offload": "ExoPlayer.AudioOffloadListener"
+  },
+  "honesty_rules": [
+    "null = not observed; no inference presented as measured fact",
+    "UNKNOWN = no signal received during observation window",
+    "truePeakDb is sample-peak approximation (not oversampled); stated in every artifact",
+    "no claim of post-mixer bit-perfection (boundary from MFY_ANDROID_AUDIO_PATH_OBSERVABILITY_001)"
+  ],
+  "fields": [
+    {"name": "graphId", "type": "string"},
+    {"name": "processorActive", "type": "bool"},
+    {"name": "bypassActive", "type": "bool"},
+    {"name": "bypassReason", "type": "string|null"},
+    {"name": "headroomDb", "type": "double"},
+    {"name": "latencyMs", "type": "long"},
+    {"name": "peakDb", "type": "double|null"},
+    {"name": "truePeakDb", "type": "double|null"},
+    {"name": "underruns", "type": "int"},
+    {"name": "thermalState", "type": "string|null"},
+    {"name": "memoryFreeBytes", "type": "long|null"},
+    {"name": "offloadStatus", "type": "string"},
+    {"name": "routeChangeCount", "type": "int"},
+    {"name": "autoBypassEvents", "type": "array"},
+    {"name": "graphCreatedAtMs", "type": "long"}
+  ]
+}

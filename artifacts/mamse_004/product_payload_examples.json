@@ -1,0 +1,44 @@
+{
+  "schema_version": "mamse-004-product-payload-examples-v1",
+  "note": "MAMSE-004 adds no app entry point and no UI switch. These payloads are the consumable evidence shape for a future Case Detail 'advanced auditory evidence' entry, translated to natural language only at the product layer.",
+  "examples": [
+    {
+      "event": "PHASE_GEOMETRY_SUMMARY",
+      "mono": {
+        "status": "AVAILABLE",
+        "valid_bin_ratio": 0.24,
+        "group_delay_median_ms": -1.09,
+        "group_delay_mad_ms": 2.7,
+        "group_delay_p95_abs_ms": 8.1,
+        "phase_curvature_median_s2": 0.0
+      },
+      "stereo": {
+        "ipd_available": true,
+        "interchannel_delay_median_ms": -0.02,
+        "gcc_phat_delay_ms": 0.06,
+        "cross_method_disagreement_ms": 0.08
+      },
+      "interpretation_hint": "Descriptive only. Negative or nonzero group delay is NOT a defect; it reflects the mix's filter/delay chain. No artistic judgment.",
+      "authority_class": "EXPERIMENTAL_DESCRIPTOR_ESTIMATOR",
+      "judgment_eligible": false
+    },
+    {
+      "event": "INTERCHANNEL_DELAY_CONSISTENT",
+      "status": "SUPPORTED",
+      "interchannel_delay_median_ms": 0.31,
+      "gcc_phat_delay_ms": 0.29,
+      "cross_method_disagreement_ms": 0.02,
+      "evidence_refs": [
+        "phase_geometry_evidence.json",
+        "mamse004_phase_geometry.npz"
+      ],
+      "language_rule": "Never claim 'phase problem' or 'out of phase' from these values alone."
+    },
+    {
+      "event": "PHASE_UNAVAILABLE",
+      "status": "UNAVAILABLE",
+      "reason": "signal shorter than n_fft (960 < 4096)",
+      "language_rule": "Render as 'insufficient data for phase analysis', never as 0 ms or 'no delay'."
+    }
+  ]
+}

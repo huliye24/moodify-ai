@@ -1,0 +1,32 @@
+{
+  "schema_version": "mamse-009-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "input": "S1 band-energy ratios",
+  "measurements": [
+    {
+      "label": "full",
+      "features": 8,
+      "frames": 1282,
+      "iterations": 33,
+      "converged": true,
+      "rank_L": 5,
+      "sparsity_S": 0.8188377535101404,
+      "lambda_used": 0.027929038673897278,
+      "wall_time_s": 0.0628,
+      "cpu_time_s": 0.0625,
+      "npz_bytes": 247979,
+      "json_bytes": 959
+    },
+    {
+      "label": "long_2x_frames",
+      "features": 8,
+      "frames": 2564,
+      "iterations": 33,
+      "converged": true,
+      "rank_L": 5,
+      "wall_time_s": 0.1186,
+      "resource_note": "SVD cost scales with min(rows, cols); rows fixed at 8 -> near-linear in frames"
+    }
+  ]
+}

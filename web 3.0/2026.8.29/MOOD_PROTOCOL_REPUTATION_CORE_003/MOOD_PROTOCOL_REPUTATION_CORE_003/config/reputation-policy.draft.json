@@ -1,0 +1,29 @@
+{
+  "policyVersion": "003-draft-1",
+  "status": "draft",
+  "inputEligibility": {
+    "allowedContributionStatuses": [
+      "scored",
+      "finalized"
+    ],
+    "rejectDuplicateContributionIds": true,
+    "rejectDuplicateFingerprints": true
+  },
+  "dimensions": [
+    "contribution",
+    "impact",
+    "quality",
+    "persistence",
+    "early"
+  ],
+  "weights": null,
+  "aggregateEnabled": false,
+  "decayEnabled": false,
+  "identityAutoMerge": false,
+  "notes": [
+    "Bootstrap draft only.",
+    "Reuse authoritative existing policy if one exists.",
+    "Do not invent weights.",
+    "Do not assign protocol rights or MOOD."
+  ]
+}

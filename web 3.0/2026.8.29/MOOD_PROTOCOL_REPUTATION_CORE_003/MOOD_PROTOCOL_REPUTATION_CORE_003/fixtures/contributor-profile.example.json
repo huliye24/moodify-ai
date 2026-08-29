@@ -1,0 +1,16 @@
+{
+  "profileVersion": "1.0.0",
+  "protocolId": "mood:contributor:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "primaryIdentity": {
+    "type": "wallet",
+    "namespace": "eip155:1",
+    "id": "0x0000000000000000000000000000000000000001"
+  },
+  "linkedPublicIdentities": [],
+  "createdAt": "2026-08-29T00:00:00Z",
+  "status": "active",
+  "firstVerifiedContributionAt": "2026-08-29T00:00:00Z",
+  "lastVerifiedContributionAt": "2026-08-29T00:00:00Z",
+  "verifiedContributionCount": 1,
+  "currentSnapshotId": null
+}

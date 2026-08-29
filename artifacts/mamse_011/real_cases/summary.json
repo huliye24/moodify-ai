@@ -1,0 +1,155 @@
+{
+  "schema_version": "mamse-011-real-cases-v1",
+  "input": "S1 clean subset",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "n_rows": 1282,
+      "reference_model_id": "covmodel-f62fc68f320c566a",
+      "complete_rows": 641,
+      "shrinkage_alpha": 0.01108091076350168,
+      "effective_rank": 5.48653732362112,
+      "lag1_by_feature": {
+        "band_air": 0.791,
+        "band_bass": 0.71,
+        "band_brilliance": 0.478,
+        "band_core_mid": 0.663,
+        "band_low_mid": 0.735,
+        "band_mid": 0.711,
+        "band_presence": 0.6,
+        "band_sub": 0.608,
+        "peak_db": 0.914,
+        "rms_db": 0.942,
+        "spectral_centroid_hz": 0.747,
+        "stereo_correlation": 0.852
+      },
+      "neff_ratio_min": 0.03,
+      "mahalanobis_second_half": {
+        "median_d2": 24.479,
+        "frac_above_q95": 0.1934,
+        "frac_above_q99": 0.0484
+      },
+      "relation_break_injection": {
+        "feature": "rms_db",
+        "median_d2": 27.055,
+        "frac_above_q95": 0.2746,
+        "frac_above_q99": 0.1388,
+        "increment": "NO_INCREMENT"
+      }
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "n_rows": 1840,
+      "reference_model_id": "covmodel-2112890b9e3887fc",
+      "complete_rows": 920,
+      "shrinkage_alpha": 0.007922783793048019,
+      "effective_rank": 5.554501499247509,
+      "lag1_by_feature": {
+        "band_air": 0.592,
+        "band_bass": 0.842,
+        "band_brilliance": 0.576,
+        "band_core_mid": 0.826,
+        "band_low_mid": 0.847,
+        "band_mid": 0.868,
+        "band_presence": 0.729,
+        "band_sub": 0.796,
+        "peak_db": 0.935,
+        "rms_db": 0.962,
+        "spectral_centroid_hz": 0.68,
+        "stereo_correlation": 0.905
+      },
+      "neff_ratio_min": 0.019,
+      "mahalanobis_second_half": {
+        "median_d2": 20.23,
+        "frac_above_q95": 0.0576,
+        "frac_above_q99": 0.0163
+      },
+      "relation_break_injection": {
+        "feature": "rms_db",
+        "median_d2": 22.692,
+        "frac_above_q95": 0.1989,
+        "frac_above_q99": 0.1337,
+        "increment": "RELATION_BREAK_CANDIDATE"
+      }
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "n_rows": 1976,
+      "reference_model_id": "covmodel-c9329eefc6fe6951",
+      "complete_rows": 988,
+      "shrinkage_alpha": 0.008198425309981165,
+      "effective_rank": 5.653509804327067,
+      "lag1_by_feature": {
+        "band_air": 0.661,
+        "band_bass": 0.864,
+        "band_brilliance": 0.687,
+        "band_core_mid": 0.892,
+        "band_low_mid": 0.827,
+        "band_mid": 0.867,
+        "band_presence": 0.76,
+        "band_sub": 0.833,
+        "peak_db": 0.942,
+        "rms_db": 0.963,
+        "spectral_centroid_hz": 0.718,
+        "stereo_correlation": 0.941
+      },
+      "neff_ratio_min": 0.019,
+      "mahalanobis_second_half": {
+        "median_d2": 30.997,
+        "frac_above_q95": 0.0435,
+        "frac_above_q99": 0.0081
+      },
+      "relation_break_injection": {
+        "feature": "rms_db",
+        "median_d2": 34.372,
+        "frac_above_q95": 0.1326,
+        "frac_above_q99": 0.0567,
+        "increment": "NO_INCREMENT"
+      }
+    }
+  ],
+  "cross_case_drift": [
+    {
+      "a": "case_9056391_harmonic",
+      "b": "case_9961e07_transient",
+      "covariance_relative_frobenius": 0.3673,
+      "correlation_relative_frobenius": 0.4301,
+      "principal_angles_deg": [
+        4.61,
+        10.56,
+        26.97
+      ],
+      "projector_distance": 0.701
+    },
+    {
+      "a": "case_9056391_harmonic",
+      "b": "case_7b3f021_ai",
+      "covariance_relative_frobenius": 0.6135,
+      "correlation_relative_frobenius": 0.5003,
+      "principal_angles_deg": [
+        15.26,
+        28.21,
+        30.92
+      ],
+      "projector_distance": 1.0553
+    },
+    {
+      "a": "case_9961e07_transient",
+      "b": "case_7b3f021_ai",
+      "covariance_relative_frobenius": 0.6177,
+      "correlation_relative_frobenius": 0.3942,
+      "principal_angles_deg": [
+        16.81,
+        20.12,
+        34.03
+      ],
+      "projector_distance": 1.0151
+    }
+  ]
+}

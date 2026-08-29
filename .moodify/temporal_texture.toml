@@ -1,0 +1,52 @@
+[scan]
+extensions = [".py", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".rs", ".go"]
+exclude_dirs = [
+  ".git", ".idea", ".vscode", ".venv", ".venv-basic-pitch", "venv", "node_modules",
+  "dist", "build", "coverage", ".next", ".turbo", "vendor",
+  "artifacts", "generated", "fixtures", "snapshots",
+  # Workspace scratch / working copies / third-party packs: not Moodify
+  # production code (scope correction, not threshold weakening).
+  "tmp", "scratch", ".codex-work", "night", "project_analytics", "third_party",
+  "pre-music", "video", "output", "local_audio_assets", "models",
+  "deliverables", "science", "moodify-pulse", "moodify-app",
+  "Moodify_Deep_Ear_Diagnostic_Pack_v0.1.1", "RJWC_VideoPack_System",
+  "补丁包", "研究论文", "投资ppt", "实验图库",
+  # ---- Moodify 1.0 收敛 (MFY-1.0-RC-001): 非 1.0 表面/历史目录 ----
+  # 1.0 authoritative surface = moodify-core-package/src+moodify-core-package/tests
+  #                            + apps/android + scripts + asset-registry + .github
+  "_github_moodify_ai", "moodify-bridge", "moodify_runtime", "experiments",
+  "phys-lab", "docs", "data", "outputs", "tools/studio_session_prep"
+]
+exclude_globs = [
+  "**/*.min.js",
+  "**/*.bundle.js",
+  "**/package-lock.json",
+  "**/pnpm-lock.yaml",
+  "**/yarn.lock",
+  "tools/temporal_texture/**",
+  "tests/temporal_texture/**"
+]
+
+[thresholds]
+max_line_length = 120
+function_warning_lines = 60
+function_error_lines = 120
+complexity_warning = 12
+complexity_error = 20
+nesting_warning = 4
+nesting_error = 6
+parameter_warning = 6
+parameter_error = 9
+
+[policy]
+forbid_empty_exception_handlers = true
+review_broad_exception_handlers = true
+track_debt_markers = true
+debt_markers = ["TODO", "FIXME", "HACK", "TEMP", "WORKAROUND"]
+fail_on_new_errors = true
+fail_on_new_warnings = false
+
+[weights]
+error = 5
+warning = 2
+info = 1

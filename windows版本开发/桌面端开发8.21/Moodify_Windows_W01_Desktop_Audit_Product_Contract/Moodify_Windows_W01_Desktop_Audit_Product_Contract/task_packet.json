@@ -1,0 +1,38 @@
+{
+  "package_id": "MFY-WIN-W01-DESKTOP-AUDIT-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 1,
+  "total_packages": 12,
+  "title": "Windows Desktop 现状审计、产品模型与开发冻结",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "implementation_mode": "audit-first",
+  "starts_next_package": false,
+  "highest_priority_investigation": "Root-cause the incomplete add-track-to-playlist flow",
+  "required_authority_reads": [
+    "AGENTS.md",
+    "docs/canon/CURRENT_CANON.md",
+    "docs/canon/PRODUCT_BOUNDARY.md",
+    "docs/canon/AUTHORITY_ORDER.md",
+    "docs/canon/CURRENT_ARCHITECTURE.md",
+    "docs/REPOSITORY_STATUS.md",
+    "docs/brand/public/README.md"
+  ],
+  "expected_outputs": [
+    "W01_AUDIT_REPORT.md",
+    "repository-map.md",
+    "function-matrix.csv",
+    "state-authority-map.md",
+    "playback-flow.md",
+    "persistence-audit.md",
+    "playlist-add-root-cause.md",
+    "product-model-assessment.md",
+    "build-test-reality.md",
+    "evidence-manifest.json",
+    "W02_HANDOFF.md"
+  ],
+  "next_package": "W02 Music Library 本地音乐库"
+}

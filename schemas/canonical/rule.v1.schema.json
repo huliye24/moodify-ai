@@ -1,0 +1,101 @@
+{
+  "$defs": {
+    "RuleStatus": {
+      "enum": [
+        "DRAFT",
+        "EXPERIMENTAL",
+        "ACTIVE",
+        "DEPRECATED",
+        "RETIRED"
+      ],
+      "title": "RuleStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "additionalProperties": true,
+      "title": "Action",
+      "type": "object"
+    },
+    "conditions": {
+      "additionalProperties": true,
+      "title": "Conditions",
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "limitations": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "provenance_evidence_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Provenance Evidence Ids",
+      "type": "array"
+    },
+    "rule_id": {
+      "title": "Rule Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "title": "Scope",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/RuleStatus"
+    },
+    "supersedes_rule_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes Rule Id"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "rule_id",
+    "name",
+    "version",
+    "status",
+    "scope",
+    "description"
+  ],
+  "title": "Rule",
+  "type": "object"
+}

@@ -1,0 +1,12 @@
+{
+  "negative_controls": 5,
+  "all_bypassed": [
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "bypass_rate": 1.0,
+  "metric": "processing more is not success; negative control must bypass at high proportion"
+}

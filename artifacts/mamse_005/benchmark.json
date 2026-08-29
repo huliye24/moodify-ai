@@ -1,0 +1,50 @@
+{
+  "schema_version": "mamse-005-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "config_hash": "24c749524d4e1803bb299d17ea625deec4f95536796bc31381e726eb3f496ed7",
+  "measurements": [
+    {
+      "label": "10s",
+      "duration_s": 10.0,
+      "wall_time_s": 0.651,
+      "cpu_time_s": 0.656,
+      "config_hash": "24c749524d4e1803",
+      "frame_count": 465,
+      "median_f0_candidate_hz": 393.44262295081967,
+      "periodicity_available_ratio": 0.010752688172043012,
+      "envelope_roughness": 0.004529489422421925,
+      "fine_to_envelope_energy_ratio": 0.019969404998124336,
+      "npz_bytes": 10494061,
+      "manifest_bytes": 1503
+    },
+    {
+      "label": "30s",
+      "duration_s": 30.0,
+      "wall_time_s": 2.699,
+      "cpu_time_s": 2.609,
+      "config_hash": "24c749524d4e1803",
+      "frame_count": 1403,
+      "median_f0_candidate_hz": 333.3333333333333,
+      "periodicity_available_ratio": 0.022808267997148968,
+      "envelope_roughness": 0.004421936284483034,
+      "fine_to_envelope_energy_ratio": 0.023470851631638506,
+      "npz_bytes": 10598064,
+      "manifest_bytes": 1503
+    },
+    {
+      "label": "45s",
+      "duration_s": 45.0,
+      "wall_time_s": 5.667,
+      "cpu_time_s": 5.234,
+      "config_hash": "24c749524d4e1803",
+      "frame_count": 2106,
+      "median_f0_candidate_hz": 333.3333333333333,
+      "periodicity_available_ratio": 0.016144349477682812,
+      "envelope_roughness": 0.004284142328893251,
+      "fine_to_envelope_energy_ratio": 0.02578173380691265,
+      "npz_bytes": 9583019,
+      "manifest_bytes": 1502
+    }
+  ]
+}

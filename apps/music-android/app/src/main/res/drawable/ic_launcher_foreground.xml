@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="center" android:width="72dp" android:height="72dp">
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/moodify_wave_mark" />
+    </item>
+</layer-list>

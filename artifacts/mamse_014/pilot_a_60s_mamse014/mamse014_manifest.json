@@ -1,0 +1,53 @@
+{
+  "schema_version": "mamse-014-manifest-v1",
+  "operator_id": "MAMSE-014",
+  "operator_version": "mamse-014-v0.1",
+  "geometry_id": "erb-spread-masking-v0.1",
+  "config": {
+    "operator_id": "MAMSE-014",
+    "operator_version": "mamse-014-v0.1",
+    "geometry_id": "erb-spread-masking-v0.1",
+    "fmin_hz": 20.0,
+    "fmax_hz": 20000.0,
+    "n_channels": 41,
+    "hop_length": 512,
+    "window_samples": 2048,
+    "slope_db_per_erb": 15.0,
+    "offset_db": 6.0,
+    "soft_range_db": 6.0,
+    "content_floor_db": 60.0,
+    "event_ratio_threshold": 0.1,
+    "event_min_frames": 5
+  },
+  "config_sha256": "9be5171d35a5681de2fa295bec6fe89085cf41e0265745975c44599899d47fe8",
+  "source_sha256": "09704c8741b3be2fc5bd9161c18cff9dd295dbd79cd776c5624604419e2973a7",
+  "sample_rate": 48000,
+  "duration_s": 60.0,
+  "hop_length": 512,
+  "n_channels": 41,
+  "feature_schema_version": "mamse-014-masking-features-v1",
+  "evidence_schema_version": "mamse-014-evidence-v1",
+  "feature_authority": {
+    "masking_depth_mean": "ESTIMATOR — spectral-competition inference, not a hearing test",
+    "masking_depth_p95": "ESTIMATOR — spectral-competition inference, not a hearing test",
+    "masked_channel_ratio_mean": "ESTIMATOR — masked does not mean absent",
+    "audible_channel_ratio_mean": "ESTIMATOR — audible does not mean present",
+    "strongest_masker_frequency_hz": "DESCRIPTOR",
+    "n_strong_masking_events": "DESCRIPTOR",
+    "frame_masked_channel_ratio": "ESTIMATOR",
+    "frame_audible_centroid_erb": "DESCRIPTOR"
+  },
+  "frame_count": 5622,
+  "git_commit": "128bcc3ce42f7b07742157fabb8bb801c23a53d8",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "implementation": {
+    "backend": "stft-erb-channel-masking",
+    "model": "spreading-masking-v0.1",
+    "model_status": "probabilistic_estimator"
+  },
+  "generated_at_utc": "2026-08-11T17:53:59+00:00"
+}

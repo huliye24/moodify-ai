@@ -1,0 +1,8 @@
+{
+  "output_root": "workspace",
+  "required_outputs": [
+    "schemas/ear_v1/source_identity.schema.json",
+    "tests/ear_v1_contracts/test_source_identity_schema.py"
+  ],
+  "non_empty": true
+}

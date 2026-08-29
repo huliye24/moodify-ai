@@ -1,0 +1,1832 @@
+{
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "sample_rate": 48000,
+      "source_sha256": null,
+      "cqt_status": "OK",
+      "frames": 12049,
+      "median_dominant_hz": 164.67,
+      "median_dominant_midi": 51.98,
+      "median_tuning_deviation_cents": 0.0,
+      "mean_tonal_peakiness": 0.2578,
+      "mean_log_spectral_entropy": 0.5079,
+      "events": [
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            123125.33333333333,
+            124384.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            73.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "sample_rate": 48000,
+      "source_sha256": null,
+      "cqt_status": "OK",
+      "frames": 17281,
+      "median_dominant_hz": 130.63,
+      "median_dominant_midi": 47.98,
+      "median_tuning_deviation_cents": -0.95,
+      "mean_tonal_peakiness": 0.28,
+      "mean_log_spectral_entropy": 0.4832,
+      "events": [
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            68522.66666666667,
+            69525.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            46.2,
+            51.9
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            83765.33333333333,
+            86357.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            46.2,
+            51.9
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            114304.0,
+            117130.66666666667
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            46.2,
+            51.9
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            132042.66666666666,
+            133045.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            46.2,
+            51.9
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            150325.33333333334,
+            151402.6666666667
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            46.2,
+            51.9
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            163829.3333333333,
+            167477.3333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            46.2,
+            51.9
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            68522.66666666667,
+            69525.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            84288.0,
+            86357.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            114304.0,
+            116501.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            132042.66666666666,
+            133568.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            147285.33333333334,
+            148789.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            164256.0,
+            165866.6666666667
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            166538.66666666666,
+            167861.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            137152.0,
+            138261.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            139701.33333333334,
+            141162.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            154986.6666666667,
+            156138.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            168064.0,
+            169589.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            171850.66666666666,
+            173322.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            139701.33333333334,
+            140949.3333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            154986.6666666667,
+            156320.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            171850.66666666666,
+            173322.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            57109.33333333333,
+            58133.333333333336
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            106474.66666666666,
+            107882.66666666667
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            168064.0,
+            169589.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "sample_rate": 48000,
+      "source_sha256": null,
+      "cqt_status": "OK",
+      "frames": 18559,
+      "median_dominant_hz": 72.56,
+      "median_dominant_midi": 37.8,
+      "median_tuning_deviation_cents": -0.05,
+      "mean_tonal_peakiness": 0.2971,
+      "mean_log_spectral_entropy": 0.4835,
+      "events": [
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            79509.33333333333,
+            82069.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            87178.66666666667,
+            88576.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            88778.66666666667,
+            90336.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            94805.33333333334,
+            97152.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            99477.33333333333,
+            100597.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            107093.33333333333,
+            108480.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            114282.66666666667,
+            115840.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            141717.33333333334,
+            142997.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            143253.33333333334,
+            144586.6666666667
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            149034.6666666667,
+            150805.3333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            150954.66666666666,
+            152992.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            156426.6666666667,
+            158720.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            160117.33333333334,
+            162560.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            167456.0,
+            169365.3333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            169408.0,
+            170869.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            180128.0,
+            183104.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            187413.3333333333,
+            189888.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            190037.3333333333,
+            191285.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            51.9,
+            58.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            92352.0,
+            93482.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            38.9,
+            43.7
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            123488.0,
+            127029.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            38.9,
+            43.7
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            131765.33333333334,
+            132778.6666666667
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            38.9,
+            43.7
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            145493.33333333334,
+            146997.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            38.9,
+            43.7
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            172928.0,
+            176874.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            38.9,
+            43.7
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            54272.0,
+            55680.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            79509.33333333333,
+            82069.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            94805.33333333334,
+            97152.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            99477.33333333333,
+            100597.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            119786.66666666666,
+            121504.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            121760.0,
+            122805.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            141930.66666666666,
+            142997.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            143253.33333333334,
+            144586.6666666667
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            156426.6666666667,
+            158720.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            160117.33333333334,
+            162432.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            180416.0,
+            183104.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            58.3,
+            65.4
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            21056.0,
+            22069.333333333332
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            64864.00000000001,
+            67125.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            72202.66666666667,
+            73632.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            83264.0,
+            86869.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            90485.33333333333,
+            92341.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            109792.0,
+            114176.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            116181.33333333333,
+            118048.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            153002.66666666666,
+            154261.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            163989.3333333333,
+            165578.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            166304.0,
+            167445.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            184160.0,
+            185728.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            191434.66666666666,
+            193056.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            69.3,
+            77.8
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            54272.0,
+            55680.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            72202.66666666667,
+            73632.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            90485.33333333333,
+            92341.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            109792.0,
+            112565.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            116181.33333333333,
+            118048.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            119786.66666666666,
+            121504.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            121760.0,
+            122805.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            153002.66666666666,
+            154261.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            191434.66666666666,
+            193056.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            65.4,
+            69.3
+          ],
+          "musical_distance_semitones": 1.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            21056.0,
+            22069.333333333332
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            77.8,
+            87.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            64864.00000000001,
+            67125.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            77.8,
+            87.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            83264.0,
+            86869.33333333333
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            77.8,
+            87.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            112576.0,
+            114176.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            77.8,
+            87.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            163989.3333333333,
+            165578.66666666666
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            77.8,
+            87.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            166304.0,
+            167445.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            77.8,
+            87.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            184160.0,
+            185728.0
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            77.8,
+            87.3
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            33301.33333333333,
+            34442.666666666664
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            103.8,
+            116.5
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        },
+        {
+          "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+          "time_range_ms": [
+            76501.33333333333,
+            77525.33333333334
+          ],
+          "status": "SUPPORTED",
+          "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+          "estimated_centers_hz": [
+            103.8,
+            116.5
+          ],
+          "musical_distance_semitones": 2.0,
+          "linear_path_resolution": "PARTIAL",
+          "log_frequency_increment": "RESOLVED",
+          "evidence_refs": [
+            "log_frequency_evidence.json",
+            "mamse002_logfreq_sketch.npz"
+          ]
+        }
+      ]
+    }
+  ]
+}

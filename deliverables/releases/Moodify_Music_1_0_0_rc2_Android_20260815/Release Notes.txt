@@ -1,0 +1,8 @@
+Moodify Music 1.0.0-rc.2
+Release date: 2026-08-15
+versionCode: 2
+
+Frozen Android listening release.
+Includes minimal player, vertical swipe track switching, cloud catalogue, playlists, favourites and profile drawer surfaces.
+
+This directory is immutable. Create a new versioned directory for every future release.

@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-05-30 10:12:01",
+  "results": {
+    "B1_pipeline": {
+      "n_pass": 5,
+      "n_total": 5,
+      "details": [
+        {
+          "emotion": "GA",
+          "proxy_score": 25.4,
+          "WHS_before": 74.1,
+          "WHS_after": 76.2,
+          "defects_before": 5,
+          "defects_after": 6,
+          "gate": "PASS",
+          "elapsed_s": 6.3
+        },
+        {
+          "emotion": "DR",
+          "proxy_score": -13.4,
+          "WHS_before": 74.1,
+          "WHS_after": 78.2,
+          "defects_before": 5,
+          "defects_after": 5,
+          "gate": "PASS",
+          "elapsed_s": 5.6
+        },
+        {
+          "emotion": "WL",
+          "proxy_score": -100.0,
+          "WHS_before": 74.1,
+          "WHS_after": 76.6,
+          "defects_before": 5,
+          "defects_after": 5,
+          "gate": "PASS",
+          "elapsed_s": 5.6
+        },
+        {
+          "emotion": "SE",
+          "proxy_score": 44.8,
+          "WHS_before": 74.1,
+          "WHS_after": 78.2,
+          "defects_before": 5,
+          "defects_after": 5,
+          "gate": "PASS",
+          "elapsed_s": 5.6
+        },
+        {
+          "emotion": "HL",
+          "proxy_score": 23.6,
+          "WHS_before": 74.1,
+          "WHS_after": 76.2,
+          "defects_before": 5,
+          "defects_after": 6,
+          "gate": "PASS",
+          "elapsed_s": 5.6
+        }
+      ]
+    }
+  }
+}

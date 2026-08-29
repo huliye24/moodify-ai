@@ -1,0 +1,638 @@
+"""LA Public BFF — /api/v1/music.
+
+Public boundary for Music Web. Forwards to Hangzhou /internal/v1/music
+over authenticated server-to-server HTTP. Never connects to PolarDB.
+
+Env:
+  MOODIFY_HANGZHOU_BASE   http://120.55.191.146:8000 (default)
+  MOODIFY_HANGZHOU_KEY    service key (required in production)
+  MOODIFY_BFF_TIMEOUT     5.0
+"""
+
+from __future__ import annotations
+
+import functools
+import time
+import uuid
+import os
+from urllib.parse import urlencode
+
+import httpx
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from moodify_music.bff.auth import (
+    COOKIE_NAME,
+    CSRF_COOKIE_NAME,
+    SESSION_TTL_SECONDS,
+    authenticate_invite,
+    csrf_token,
+    csrf_valid,
+    issue_session,
+)
+from moodify_music.bff.media import ALLOWED_MIME, MAX_AUDIO_BYTES, allocate_upload, looks_like_audio, promote_upload, sha256_file
+from starlette.concurrency import run_in_threadpool
+
+UPSTREAM = os.environ.get("MOODIFY_HANGZHOU_BASE", "http://120.55.191.146:8000").rstrip("/")
+SERVICE_KEY = os.environ.get("MOODIFY_HANGZHOU_KEY", "")
+TIMEOUT = float(os.environ.get("MOODIFY_BFF_TIMEOUT", "5.0"))
+DEMO_USER_ID = os.environ.get("MOODIFY_BFF_DEMO_USER_ID", "")
+# Production public path must never carry demo identity; "demo_read_only" is
+# an explicit development-only opt-in (MFY_PLATFORM_IDENTITY_ACCESS_PRIVACY_001).
+AUTH_MODE = os.environ.get("MOODIFY_BFF_AUTH_MODE", "anonymous")
+CORS_ORIGINS = [o.strip() for o in os.environ.get("MOODIFY_BFF_CORS_ORIGINS", "").split(",") if o.strip()]
+_SESSION_CACHE_TTL = 30.0
+
+app = FastAPI(title="Moodify Music Public BFF", version="0.1.0")
+
+_cache: dict[str, tuple[float, dict]] = {}
+_session_cache: dict[str, tuple[float, dict | None]] = {}
+_login_attempts: dict[str, tuple[float, int]] = {}
+_PRIVATE_PREFIXES = ("/api/v1/music/auth", "/api/v1/music/drafts", "/api/v1/music/inbox", "/api/v1/music/library", "/api/v1/music/playlists", "/api/v1/music/media", "/api/v1/music/session")
+_TTL: dict[str, float] = {
+    "creator_page": 60.0, "track": 60.0, "album": 300.0, "catalogue": 30.0,
+    "bootstrap": 60.0, "inbox": 30.0,
+}
+
+
+def _cached(key: str, ttl_key: str):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            now = time.monotonic()
+            request = kwargs.get("request") or next(
+                (value for value in args if isinstance(value, Request)), None
+            )
+            cache_key = f"{key}?{request.url.query}" if request and request.url.query else key
+            hit = _cache.get(cache_key)
+            if hit and now - hit[0] < _TTL[ttl_key]:
+                return JSONResponse(content=hit[1])
+            result = func(*args, **kwargs)
+            if isinstance(result, JSONResponse):
+                import json as _json
+
+                body = _json.loads(result.body)
+                _cache[cache_key] = (now, body)
+            return result
+        return wrapper
+    return decorator
+
+
+def _validate_session(token: str | None) -> dict | None:
+    """Server-authoritative session validation against the data API."""
+    if not token:
+        return None
+    now = time.monotonic()
+    cached = _session_cache.get(token)
+    if cached and now - cached[0] < _SESSION_CACHE_TTL:
+        return cached[1]
+    try:
+        r = httpx.request(
+            "POST", f"{UPSTREAM}/internal/v1/music/auth/validate",
+            headers={"X-Moodify-Service-Key": SERVICE_KEY, "Content-Type": "application/json"},
+            json={"token": token}, timeout=TIMEOUT,
+        )
+    except httpx.RequestError:
+        return None
+    if r.status_code != 200:
+        _session_cache[token] = (now, None)
+        return None
+    try:
+        user = r.json().get("user")
+    except ValueError:
+        return None
+    _session_cache[token] = (now, user)
+    return user
+
+
+def _actor_user_id(request: Request) -> str | None:
+    # Never accept the internal actor header from a public request; the actor
+    # is resolved exclusively from the server-side session store.
+    if AUTH_MODE == "invite_beta":
+        user = _validate_session(request.cookies.get(COOKIE_NAME))
+        return user["id"] if user else None
+    if AUTH_MODE == "demo_read_only":
+        return DEMO_USER_ID or None
+    return None
+
+
+def _account_actions_enabled(request: Request) -> bool:
+    return AUTH_MODE == "invite_beta" and bool(_actor_user_id(request))
+
+
+def _upstream_headers(request: Request, body: dict | None = None) -> dict:
+    headers = {"X-Moodify-Service-Key": SERVICE_KEY, "Content-Type": "application/json"}
+    rid = request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16]
+    headers["X-Request-Id"] = rid
+    idem = request.headers.get("Idempotency-Key")
+    if idem:
+        headers["Idempotency-Key"] = idem
+    actor = _actor_user_id(request)
+    if actor:
+        headers["X-Moodify-Actor-User-Id"] = actor
+    return headers
+
+
+def _forward(method: str, path: str, request: Request, body: dict | None = None, *, retries: int = 0):
+    url = f"{UPSTREAM}/internal/v1/music{path}"
+    headers = _upstream_headers(request, body)
+    last_exc: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            r = httpx.request(method, url, headers=headers, json=body, timeout=TIMEOUT)
+            if not r.content:
+                return JSONResponse(status_code=r.status_code, content={})
+            try:
+                content = r.json()
+            except ValueError:
+                return JSONResponse(
+                    status_code=502,
+                    content={"error": {
+                        "code": "UPSTREAM_INVALID_RESPONSE",
+                        "message": "Hangzhou data API returned a non-JSON response",
+                        "request_id": headers["X-Request-Id"],
+                        "upstream_status": r.status_code,
+                    }},
+                )
+            return JSONResponse(status_code=r.status_code, content=content)
+        except httpx.TimeoutException as exc:
+            last_exc = exc
+        except httpx.RequestError:
+            return JSONResponse(status_code=502, content={"error": {
+                "code": "UPSTREAM_UNAVAILABLE",
+                "message": "Hangzhou data API is unavailable",
+                "request_id": headers["X-Request-Id"],
+            }})
+    return JSONResponse(status_code=504, content={"error": {"code": "UPSTREAM_TIMEOUT", "message": "Hangzhou data API timed out", "request_id": request.headers.get("X-Request-Id", "")}})
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    # CORS: exact-origin allowlist only; never '*' (production or not).
+    origin = request.headers.get("origin")
+    if origin and origin in CORS_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Vary"] = "Origin"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    # Private responses and anything that sets a cookie must not be cached.
+    if request.url.path.startswith(_PRIVATE_PREFIXES) or response.headers.get("set-cookie"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@app.middleware("http")
+async def csrf_guard(request: Request, call_next):
+    path = request.url.path
+    state_changing = request.method in ("POST", "PUT", "PATCH", "DELETE")
+    login_only = request.method == "POST" and path.endswith("/session")
+    if state_changing and path.startswith("/api/v1/music") and not login_only:
+        if not csrf_valid(request.cookies.get(CSRF_COOKIE_NAME), request.headers.get("x-csrf-token")):
+            return JSONResponse(status_code=403, content={"error": {
+                "code": "CSRF_INVALID",
+                "message": "valid CSRF token required",
+                "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+            }})
+    return await call_next(request)
+
+
+_LOGIN_RATE_LIMIT = (5, 600)  # 5 attempts per 10 minutes per client IP
+
+
+def _login_allowed(client_ip: str) -> bool:
+    now = time.monotonic()
+    record = _login_attempts.get(client_ip)
+    if not record or now - record[0] > _LOGIN_RATE_LIMIT[1]:
+        _login_attempts[client_ip] = (now, 1)
+        return True
+    if record[1] >= _LOGIN_RATE_LIMIT[0]:
+        return False
+    _login_attempts[client_ip] = (now, record[1] + 1)
+    return True
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "moodify-music-bff", "direct_db": False}
+
+
+@app.get("/ready")
+def ready(request: Request):
+    """BFF readiness follows the authoritative Hangzhou/PolarDB data path."""
+    try:
+        response = httpx.get(
+            f"{UPSTREAM}/ready",
+            headers=_upstream_headers(request),
+            timeout=TIMEOUT,
+        )
+    except httpx.RequestError:
+        return JSONResponse(status_code=503, content={
+            "status": "not_ready",
+            "service": "moodify-music-bff",
+            "upstream": "unreachable",
+        })
+    if response.status_code != 200:
+        return JSONResponse(status_code=503, content={
+            "status": "not_ready",
+            "service": "moodify-music-bff",
+            "upstream": "not_ready",
+        })
+    return {
+        "status": "ready",
+        "service": "moodify-music-bff",
+        "upstream": "ready",
+        "database_authority": "polardb",
+        "direct_db": False,
+    }
+
+
+def _session_service(method: str, path: str, body: dict) -> dict | None:
+    """Call the internal auth service; returns parsed JSON or None on failure."""
+    try:
+        r = httpx.request(
+            method, f"{UPSTREAM}/internal/v1/music/auth{path}",
+            headers={"X-Moodify-Service-Key": SERVICE_KEY, "Content-Type": "application/json"},
+            json=body, timeout=TIMEOUT,
+        )
+    except httpx.RequestError:
+        return None
+    if r.status_code not in (200, 201):
+        return None
+    try:
+        return r.json()
+    except ValueError:
+        return None
+
+
+@app.post("/api/v1/music/session")
+async def create_session(request: Request):
+    if AUTH_MODE != "invite_beta":
+        return _beta_locked(request)
+    client_ip = request.client.host if request.client else ""
+    if not _login_allowed(client_ip):
+        return JSONResponse(status_code=429, content={"error": {
+            "code": "LOGIN_RATE_LIMITED",
+            "message": "too many login attempts, retry later",
+            "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+        }})
+    body = await request.json()
+    code = body.get("invite_code") if isinstance(body, dict) else None
+    user_id = authenticate_invite(code.strip() if isinstance(code, str) else "")
+    if not user_id:
+        return JSONResponse(status_code=401, content={"error": {
+            "code": "INVITE_INVALID",
+            "message": "invite code is invalid",
+            "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+        }})
+    token = issue_session(user_id)
+    issued = _session_service("POST", "/sessions", {"user_id": user_id, "ttl_seconds": SESSION_TTL_SECONDS})
+    if not issued:
+        return JSONResponse(status_code=503, content={"error": {
+            "code": "SESSION_SERVICE_UNAVAILABLE",
+            "message": "session service is unavailable",
+            "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+        }})
+    response = JSONResponse(content={"authenticated": True, "user": issued.get("user")})
+    response.set_cookie(
+        COOKIE_NAME, token, max_age=SESSION_TTL_SECONDS,
+        httponly=True, secure=True, samesite="lax", path="/",
+    )
+    response.set_cookie(
+        CSRF_COOKIE_NAME, csrf_token(), max_age=SESSION_TTL_SECONDS,
+        httponly=False, secure=True, samesite="lax", path="/",
+    )
+    return response
+
+
+@app.delete("/api/v1/music/session")
+def delete_session(request: Request):
+    token = request.cookies.get(COOKIE_NAME)
+    if token and AUTH_MODE == "invite_beta":
+        _session_service("DELETE", "/sessions", {"token": token})
+        _session_cache.pop(token, None)
+    response = JSONResponse(content={"authenticated": False})
+    response.delete_cookie(COOKIE_NAME, path="/")
+    response.delete_cookie(CSRF_COOKIE_NAME, path="/")
+    return response
+
+
+@app.get("/api/v1/music/auth/me")
+def auth_me(request: Request):
+    user = _validate_session(request.cookies.get(COOKIE_NAME))
+    if user is None:
+        return JSONResponse(status_code=200, content={"user": None, "authenticated": False})
+    return JSONResponse(content={"user": user, "authenticated": True})
+
+
+@app.get("/api/v1/music/bootstrap")
+def bootstrap(request: Request):
+    user = _validate_session(request.cookies.get(COOKIE_NAME))
+    if user:
+        enabled = _account_actions_enabled(request)
+        return JSONResponse(content={
+            **user,
+            "auth_state": "SESSION_AUTHENTICATED",
+            "capabilities": {"account_actions": enabled, "creator_writes": enabled},
+        })
+    return JSONResponse(status_code=200, content={
+        "id": None, "display_name": None, "status": "anonymous",
+        "auth_state": "PUBLIC_ANONYMOUS_READ",
+        "capabilities": {"account_actions": False, "creator_writes": False},
+    })
+
+
+@app.get("/api/v1/music/catalogue")
+@_cached("catalogue", "catalogue")
+def catalogue(request: Request, limit: int = 50, cursor: str | None = None):
+    query = {"limit": min(max(limit, 1), 100)}
+    if cursor:
+        query["cursor"] = cursor
+    return _forward("GET", f"/catalogue?{urlencode(query)}", request, retries=1)
+
+
+@app.put("/api/v1/music/media")
+async def upload_media(request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    actor = _actor_user_id(request)
+    mime = (request.headers.get("content-type") or "").split(";", 1)[0].lower()
+    filename = request.headers.get("x-filename") or ""
+    try:
+        expected_bytes = int(request.headers.get("content-length") or "0")
+    except ValueError:
+        expected_bytes = 0
+    if mime not in ALLOWED_MIME:
+        return _media_error(request, 415, "AUDIO_TYPE_UNSUPPORTED", "unsupported audio format")
+    if expected_bytes <= 0 or expected_bytes > MAX_AUDIO_BYTES:
+        return _media_error(request, 413, "AUDIO_SIZE_INVALID", "audio must be between 1 byte and 100 MiB")
+    if not filename or len(filename) > 255:
+        return _media_error(request, 400, "FILENAME_INVALID", "valid X-Filename header required")
+    try:
+        temporary = allocate_upload(actor)
+    except ValueError:
+        return _media_error(request, 403, "MEDIA_IDENTITY_INVALID", "authenticated media identity is invalid")
+    written = 0
+    head = bytearray()
+    try:
+        with temporary.open("wb") as target:
+            async for chunk in request.stream():
+                written += len(chunk)
+                if written > MAX_AUDIO_BYTES:
+                    return _media_error(request, 413, "AUDIO_SIZE_INVALID", "audio exceeds 100 MiB")
+                if len(head) < 16:
+                    head.extend(chunk[: 16 - len(head)])
+                await run_in_threadpool(target.write, chunk)
+        if written != expected_bytes:
+            return _media_error(request, 400, "AUDIO_SIZE_MISMATCH", "received size differs from Content-Length")
+        if not looks_like_audio(bytes(head), mime):
+            return _media_error(request, 415, "AUDIO_SIGNATURE_INVALID", "file signature does not match audio type")
+        digest = await run_in_threadpool(sha256_file, temporary)
+        asset_key, deduplicated = await run_in_threadpool(promote_upload, actor, temporary, digest, mime)
+        return JSONResponse(status_code=200 if deduplicated else 201, content={
+            "asset_key": asset_key, "bytes": written, "sha256": digest, "mime_type": mime,
+            "deduplicated": deduplicated,
+        })
+    finally:
+        if temporary.exists():
+            temporary.unlink(missing_ok=True)
+
+
+@app.post("/api/v1/music/creators")
+async def create_creator(request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    actor = _actor_user_id(request)
+    if not actor:
+        return _auth_required(request)
+    body = await request.json()
+    body["user_id"] = actor
+    return _forward("POST", "/creators", request, body)
+
+
+@app.get("/api/v1/music/creators/by-handle/{handle}")
+def creator_by_handle(handle: str, request: Request):
+    return _forward("GET", f"/creators/by-handle/{handle}", request, retries=1)
+
+
+@app.get("/api/v1/music/creators/{creator_id}/page")
+def creator_page(creator_id: str, request: Request):
+    return _forward("GET", f"/creators/{creator_id}/page", request, retries=1)
+
+
+@app.get("/api/v1/music/tracks/{track_id}")
+def track_detail(track_id: str, request: Request):
+    return _forward("GET", f"/tracks/{track_id}", request, retries=1)
+
+
+@app.get("/api/v1/music/tracks/{track_id}/passport")
+def track_passport(track_id: str, request: Request):
+    return _forward("GET", f"/tracks/{track_id}/passport", request, retries=1)
+
+
+@app.post("/api/v1/music/tracks")
+async def create_track(request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    return _forward("POST", "/tracks", request, await request.json())
+
+
+@app.post("/api/v1/music/tracks/{track_id}/versions")
+async def create_version(track_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    return _forward("POST", f"/tracks/{track_id}/versions", request, await request.json())
+
+
+@app.post("/api/v1/music/tracks/{track_id}/publish")
+async def publish(track_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    return _forward("POST", f"/tracks/{track_id}/publish", request, await request.json())
+
+
+@app.put("/api/v1/music/tracks/{track_id}/passport")
+async def upsert_passport(track_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    return _forward("PUT", f"/tracks/{track_id}/passport", request, await request.json())
+
+
+@app.put("/api/v1/music/users/{user_id}/follows/{creator_id}")
+async def follow(user_id: str, creator_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    if user_id != _actor_user_id(request):
+        return _ownership_denied(request)
+    return _forward("PUT", f"/users/{user_id}/follows/{creator_id}", request, await request.json())
+
+
+@app.delete("/api/v1/music/users/{user_id}/follows/{creator_id}")
+def unfollow(user_id: str, creator_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    if user_id != _actor_user_id(request):
+        return _ownership_denied(request)
+    return _forward("DELETE", f"/users/{user_id}/follows/{creator_id}", request)
+
+
+@app.put("/api/v1/music/users/{user_id}/favorites/{track_id}")
+async def favorite(user_id: str, track_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    if user_id != _actor_user_id(request):
+        return _ownership_denied(request)
+    return _forward("PUT", f"/users/{user_id}/favorites/{track_id}", request, await request.json())
+
+
+@app.delete("/api/v1/music/users/{user_id}/favorites/{track_id}")
+def unfavorite(user_id: str, track_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    if user_id != _actor_user_id(request):
+        return _ownership_denied(request)
+    return _forward("DELETE", f"/users/{user_id}/favorites/{track_id}", request)
+
+
+@app.post("/api/v1/music/play-events")
+async def play_event(request: Request):
+    body = await request.json()
+    body["user_id"] = _actor_user_id(request)
+    return _forward("POST", "/play-events", request, body)
+
+
+@app.post("/api/v1/music/license-intents")
+async def license_intent(request: Request):
+    return _forward("POST", "/license-intents", request, await request.json())
+
+
+@app.get("/api/v1/music/creators/{creator_id}/license-intents")
+def creator_inbox(creator_id: str, request: Request):
+    if not _account_actions_enabled(request):
+        return _beta_locked(request)
+    return _forward("GET", f"/creators/{creator_id}/license-intents", request)
+
+
+@app.post("/api/v1/music/support-intents")
+async def support_intent(request: Request):
+    return _forward("POST", "/support-intents", request, await request.json())
+
+
+def _ownership_denied(request: Request) -> JSONResponse:
+    return JSONResponse(status_code=403, content={"error": {
+        "code": "OWNERSHIP_DENIED",
+        "message": "the authenticated user does not match the requested user",
+        "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+    }})
+
+
+def _auth_required(request: Request) -> JSONResponse:
+    return JSONResponse(status_code=401, content={"error": {
+        "code": "AUTH_REQUIRED",
+        "message": "authenticated Music identity required",
+        "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+    }})
+
+
+def _beta_locked(request: Request) -> JSONResponse:
+    return JSONResponse(status_code=503, content={"error": {
+        "code": "BETA_AUTH_REQUIRED",
+        "message": "creator and account actions are locked until production authentication is enabled",
+        "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+    }})
+
+
+def _media_error(request: Request, status: int, code: str, message: str) -> JSONResponse:
+    return JSONResponse(status_code=status, content={"error": {
+        "code": code, "message": message,
+        "request_id": request.headers.get("X-Request-Id") or uuid.uuid4().hex[:16],
+    }})
+
+
+# MFY_MUSIC_CREATOR_LIFECYCLE_001 — recovery endpoints
+@app.get("/api/v1/music/creators/{creator_id}/drafts")
+def creator_drafts(creator_id: str, request: Request):
+    return _forward("GET", f"/creators/{creator_id}/drafts", request)
+
+
+@app.get("/api/v1/music/drafts/{track_id}/resume")
+def resume_draft(track_id: str, request: Request):
+    return _forward("GET", f"/drafts/{track_id}/resume", request)
+
+
+@app.post("/api/v1/music/drafts/{track_id}/abandon")
+async def abandon_draft(track_id: str, request: Request):
+    return _forward("POST", f"/drafts/{track_id}/abandon", request, await request.json())
+
+
+@app.get("/api/v1/music/media/references")
+def media_references(request: Request):
+    return _forward("GET", "/media/references", request)
+
+
+@app.post("/api/v1/music/audit-events")
+async def audit_event(request: Request):
+    return _forward("POST", "/audit-events", request, await request.json())
+
+
+@app.get("/api/v1/music/users/{user_id}/favorites")
+def my_favorites(user_id: str, request: Request, cursor: str | None = None):
+    path = f"/users/{user_id}/favorites" + (f"?cursor={cursor}" if cursor else "")
+    return _forward("GET", path, request)
+
+
+@app.get("/api/v1/music/users/{user_id}/recent-plays")
+def my_recent_plays(user_id: str, request: Request, limit: int = 20):
+    return _forward("GET", f"/users/{user_id}/recent-plays?limit={limit}", request)
+
+
+@app.get("/api/v1/music/search")
+def search(request: Request, q: str = "", type: str = "track", limit: int = 10):
+    return _forward("GET", f"/search?q={q}&type={type}&limit={limit}", request)
+
+
+@app.get("/api/v1/music/creators/{creator_id}/tracks")
+def creator_tracks(creator_id: str, request: Request, status: str | None = None):
+    path = f"/creators/{creator_id}/tracks" + (f"?status={status}" if status else "")
+    return _forward("GET", path, request)
+
+
+@app.post("/api/v1/music/tracks/{track_id}/unpublish")
+async def unpublish(track_id: str, request: Request):
+    return _forward("POST", f"/tracks/{track_id}/unpublish", request, await request.json())
+
+
+@app.post("/api/v1/music/playlists")
+async def create_playlist(request: Request):
+    return _forward("POST", "/playlists", request, await request.json())
+
+
+@app.get("/api/v1/music/playlists/{playlist_id}")
+def get_playlist(playlist_id: str, request: Request):
+    return _forward("GET", f"/playlists/{playlist_id}", request)
+
+
+@app.patch("/api/v1/music/playlists/{playlist_id}")
+async def update_playlist(playlist_id: str, request: Request):
+    return _forward("PATCH", f"/playlists/{playlist_id}", request, await request.json())
+
+
+@app.delete("/api/v1/music/playlists/{playlist_id}")
+def delete_playlist(playlist_id: str, request: Request):
+    return _forward("DELETE", f"/playlists/{playlist_id}", request)
+
+
+@app.post("/api/v1/music/playlists/{playlist_id}/items")
+async def add_item(playlist_id: str, request: Request):
+    return _forward("POST", f"/playlists/{playlist_id}/items", request, await request.json())
+
+
+@app.delete("/api/v1/music/playlists/{playlist_id}/items/{track_id}")
+def remove_item(playlist_id: str, track_id: str, request: Request):
+    return _forward("DELETE", f"/playlists/{playlist_id}/items/{track_id}", request)
+
+
+@app.get("/api/v1/music/users/{user_id}/playlists")
+def my_playlists(user_id: str, request: Request):
+    return _forward("GET", f"/users/{user_id}/playlists", request)

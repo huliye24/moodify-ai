@@ -1,0 +1,44 @@
+Execute MFY-WIN-W12-RELEASE-HARDENING-001 in the Moodify repository.
+
+This is W12, the final package of the Windows Desktop Completion sequence.
+
+Critical rules:
+- First read W11 artifacts and W12 handoff. Also read W08 recovery, W09 native integration and W10 cloud report.
+- If W12_GATE is not PASS, stop and report BLOCKED.
+- Freeze scope. W12 is not a feature-development package.
+- Only fix release blockers, data-safety issues, security issues, crashes, migrations, packaging, performance regressions and diagnostics.
+- Do not add major features.
+- Do not redesign UI.
+- Do not create new business authorities.
+- Establish one consistent version/build identity.
+- Production build must not depend on repo, dev server, localhost, developer machine paths, debug bridges or private credentials.
+- Build a real installer/uninstaller using the actual desktop toolchain.
+- Define uninstall data-retention policy. Never delete users' original music files.
+- Test upgrade from a previous real build with Library/Playlist/Favorite/History/Settings/Recovery populated.
+- Migrations must be idempotent and must never silently wipe data.
+- Implement installer-level file associations only for formats genuinely supported, and never force the user's default player choice.
+- Startup registration only follows the user's W11 setting.
+- Audit all production data/cache/log/crash paths.
+- Add privacy-safe production logs and crash diagnostics.
+- Prevent crash loops caused by restoring a bad transient session.
+- Run performance regression and a meaningful playback soak test.
+- Re-run security review: secrets, native IPC, argv/path handling, installer permissions, cloud auth, logs, update seam.
+- Prove local playback still works fully offline.
+- Audit W10 cloud claims; partial capability must not be described as full.
+- Perform clean install, upgrade, uninstall and reinstall tests.
+- Generate installer SHA256 and release artifact manifest.
+- If signing is unavailable, state SIGNING=NOT_CONFIGURED truthfully; never pretend signed.
+- Do not build an unsafe ad-hoc updater. Update downloads must eventually be integrity-verified.
+- P0 and P1 known issues must both be zero before WINDOWS_BETA_CANDIDATE=PASS.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not commit secrets, private audio or unsafe diagnostics.
+
+Write artifacts under:
+artifacts/windows/w12/
+
+Finish with:
+W12_STATUS = PASS | BLOCKED
+WINDOWS_BETA_CANDIDATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

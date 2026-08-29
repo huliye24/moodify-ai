@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "corpus/source_authority.json",
+    "corpus/duplicate_analysis.md"
+  ],
+  "non_empty": true
+}

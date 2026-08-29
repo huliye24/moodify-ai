@@ -1,0 +1,3 @@
+TEST RELEASE
+
+This APK is an owned-device test build. Audio is streamed from the Moodify cloud catalogue. Do not redistribute private audio, database credentials, or modified APK files. Verify SHA256SUMS.txt before installation.

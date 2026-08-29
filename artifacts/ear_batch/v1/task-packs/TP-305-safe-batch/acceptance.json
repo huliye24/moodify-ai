@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "planning/unattended_batch.json",
+    "planning/unattended_batch.md"
+  ],
+  "non_empty": true
+}

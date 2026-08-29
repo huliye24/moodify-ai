@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moodify.ai/schemas/intelligence-report.v1.json",
+  "title": "Moodify Intelligence Report",
+  "description": "Unified analysis report contract shared by Moodify QA / Master / Rating / Supply and the demo pipeline.",
+  "type": "object",
+  "required": [
+    "schema_id",
+    "meta",
+    "track_info",
+    "audio_features",
+    "quality_score",
+    "issues",
+    "recommendations",
+    "commercial_insight"
+  ],
+  "properties": {
+    "schema_id": { "const": "moodify.intelligence-report.v1" },
+    "meta": {
+      "type": "object",
+      "required": ["schema_id", "engine_version", "generated_at"],
+      "properties": {
+        "schema_id": { "type": "string" },
+        "engine_version": { "type": "string" },
+        "generated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "track_info": {
+      "type": "object",
+      "required": ["file_name", "file_path", "format", "duration_s", "sample_rate", "channels"],
+      "properties": {
+        "file_name": { "type": "string" },
+        "file_path": { "type": "string" },
+        "format": { "type": "string" },
+        "duration_s": { "type": "number", "minimum": 0 },
+        "sample_rate": { "type": "integer", "minimum": 8000 },
+        "channels": { "type": "integer", "minimum": 1, "maximum": 2 }
+      }
+    },
+    "audio_features": {
+      "type": "object",
+      "required": ["loudness", "spectrum", "dynamics", "stereo"],
+      "properties": {
+        "loudness": {
+          "type": "object",
+          "properties": {
+            "integrated_lufs": { "type": ["number", "null"] },
+            "loudness_range_lu": { "type": ["number", "null"] },
+            "peak_db": { "type": "number" },
+            "crest_factor": { "type": "number" }
+          }
+        },
+        "spectrum": {
+          "type": "object",
+          "description": "Band energies in dB relative to total RMS (negative values).",
+          "properties": {
+            "sub": { "type": "number" },
+            "bass": { "type": "number" },
+            "low_mid": { "type": "number" },
+            "mid": { "type": "number" },
+            "presence": { "type": "number" },
+            "air": { "type": "number" }
+          }
+        },
+        "dynamics": {
+          "type": "object",
+          "properties": {
+            "dynamic_range_db": { "type": "number" },
+            "crest_factor": { "type": "number" }
+          }
+        },
+        "stereo": {
+          "type": "object",
+          "properties": {
+            "correlation_lr": { "type": "number", "minimum": -1, "maximum": 1 },
+            "width_rating": { "type": "string", "enum": ["narrow", "balanced", "wide"] }
+          }
+        }
+      }
+    },
+    "quality_score": {
+      "type": "object",
+      "required": ["overall", "audio_quality", "dynamic_range", "mrs"],
+      "properties": {
+        "overall": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "audio_quality": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "dynamic_range": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "mrs": {
+          "type": "object",
+          "properties": {
+            "quality_score": { "type": "number" },
+            "technical_score": { "type": "number" },
+            "listening_score": { "type": ["number", "null"] },
+            "method": { "type": "string" },
+            "feature_contributions": { "type": "object" }
+          }
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "title", "detail", "evidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "severity": { "enum": ["high", "medium", "low"] },
+          "title": { "type": "string" },
+          "detail": { "type": "string" },
+          "evidence": { "type": "object" }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "target", "rationale", "priority"],
+        "properties": {
+          "action": { "type": "string" },
+          "target": { "type": "string" },
+          "rationale": { "type": "string" },
+          "priority": { "enum": ["high", "medium", "low"] }
+        }
+      }
+    },
+    "commercial_insight": {
+      "type": "object",
+      "required": ["summary", "release_readiness", "strengths", "risks"],
+      "properties": {
+        "summary": { "type": "string" },
+        "release_readiness": { "enum": ["ready", "needs_mastering", "not_ready"] },
+        "strengths": { "type": "array", "items": { "type": "string" } },
+        "risks": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

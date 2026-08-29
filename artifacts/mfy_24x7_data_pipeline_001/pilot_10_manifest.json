@@ -1,0 +1,16 @@
+{
+  "protocol": "MFY-24X7-DATA-PIPELINE-001",
+  "notes": "10 owned full-length tracks from the operator's local music library; submitted sequentially via staging -> inbox -> source store.",
+  "songs": [
+    {"path": "/var/lib/moodify/pilot_sources/01_des_portes_et_des_lampes.wav", "rights_ok": true, "label": "pilot-01"},
+    {"path": "/var/lib/moodify/pilot_sources/02_j_apprends_la_tendresse.wav", "rights_ok": true, "label": "pilot-02"},
+    {"path": "/var/lib/moodify/pilot_sources/03_je_deposerai_mon_inquietude.wav", "rights_ok": true, "label": "pilot-03"},
+    {"path": "/var/lib/moodify/pilot_sources/04_je_ne_prendrai_pas_tes_limites.wav", "rights_ok": true, "label": "pilot-04"},
+    {"path": "/var/lib/moodify/pilot_sources/05_je_ne_veux_pas_faire_de_toi.wav", "rights_ok": true, "label": "pilot-05"},
+    {"path": "/var/lib/moodify/pilot_sources/06_je_te_garde_un_morceau.wav", "rights_ok": true, "label": "pilot-06"},
+    {"path": "/var/lib/moodify/pilot_sources/07_nous_pouvons_etre_calmes.wav", "rights_ok": true, "label": "pilot-07"},
+    {"path": "/var/lib/moodify/pilot_sources/08_t_aimer_lentement.wav", "rights_ok": true, "label": "pilot-08"},
+    {"path": "/var/lib/moodify/pilot_sources/09_tu_n_as_pas_besoin.wav", "rights_ok": true, "label": "pilot-09"},
+    {"path": "/var/lib/moodify/pilot_sources/10_viens_chez_moi.wav", "rights_ok": true, "label": "pilot-10"}
+  ]
+}

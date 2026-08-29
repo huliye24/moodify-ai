@@ -1,0 +1,8 @@
+{
+  "output_root": "workspace",
+  "required_outputs": [
+    "schemas/ear_v1/measurement_record.schema.json",
+    "tests/ear_v1_contracts/test_measurement_record_schema.py"
+  ],
+  "non_empty": true
+}

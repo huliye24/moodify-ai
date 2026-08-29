@@ -1,0 +1,14 @@
+[Unit]
+Description=Moodify lightweight resource probe
+
+[Service]
+Type=oneshot
+User=moodify
+Group=moodify
+ExecStart=/opt/moodify/.venv/bin/python /opt/moodify/ops/data_node/resource_probe.py \
+  --data-path /var/lib/moodify \
+  --output /var/lib/moodify/ops/resource_snapshots.jsonl
+Nice=15
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/moodify

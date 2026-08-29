@@ -1,0 +1,18 @@
+{
+  "name": "Moodify Music",
+  "short_name": "Moodify",
+  "description": "听见此刻与你更接近的音乐。先听，再发现，然后创作。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#05081e",
+  "theme_color": "#05081e",
+  "icons": [
+    {
+      "src": "/moodify-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

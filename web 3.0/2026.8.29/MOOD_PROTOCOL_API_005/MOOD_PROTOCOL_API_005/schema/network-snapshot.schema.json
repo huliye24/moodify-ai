@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/api/network-snapshot/v1",
+  "title": "MOOD Protocol API Network Snapshot",
+  "type": "object",
+  "required": [
+    "snapshotVersion",
+    "snapshotId",
+    "sourceFingerprints",
+    "generatedAt",
+    "snapshotFingerprint"
+  ],
+  "properties": {
+    "snapshotVersion": {
+      "const": "1.0.0"
+    },
+    "snapshotId": {
+      "type": "string",
+      "minLength": 8
+    },
+    "sourceFingerprints": {
+      "type": "object",
+      "required": [
+        "mainnet",
+        "contributions",
+        "reputation",
+        "nodes"
+      ],
+      "properties": {
+        "mainnet": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contributions": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reputation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nodes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "snapshotFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,65 @@
+# Evidence Index — Phase I Launch
+
+**Document ID:** MFY-PHASE1-EVIDENCE-INDEX-001
+**Version:** 0.1
+**Date:** 2026-08-14
+**Package:** MFY_PHASE1_PRODUCT_LAUNCH_MASTERPLAN_001 (43)
+**Status:** LIVE LEDGER — 每包完成时登记证据路径 + commit hash
+
+## 1. Ear 科学/研究证据（artifacts/）
+
+| 证据包 | 内容 | 关键 commit | 状态 |
+|---|---|---|---|
+| artifacts/mamse_001..016 | R 轴多分辨率、CQT 几何、小波散射、相位几何、倒谱、调制频谱、PCA/SVD、NMF、RobustPCA、张量、协方差/本征空间、图信号 12 篇 + 阶段 0/1 吸收 | bfbfa6a, 2eb01b0, 5e6de72, 8e291b2, 4c92b0f, 89633c4, 6ce2635, 2bbc98a, 540b454, 6416cc5, 7369316, a0014b4 | 全 EXPERIMENTAL_ACCEPTED；595 绿 |
+| artifacts/mfy_1_0_rc_001 | 1.0.0-rc.1 打包 + 10/12 门 | fdac22d..e81108d | 完成 |
+| artifacts/g4_04_cross_machine_001 | 跨机器 52/52 零差异 | 6b5592e（包30） | 完成 |
+| artifacts/g6_03_clean_install_001 | 干净安装验证 | 9918281 | 完成 |
+| artifacts/mfy_failure_injection_001 | 失败注入 10 项 8 PASS+2 FINDING | 3783086（本地未推送） | 完成 |
+| artifacts/mfy_data_factory_001_rev2 → artifacts/mfy_data_foundation_001_rev2 | 16 表落 PolarDB + 杭州 Data API + LA BFF + Web 12 步全通 | PR #2（分支 codex/mfy-data-foundation-001-rev2） | 完成；XEngine 无 FK |
+| artifacts/aliyun_node_001 | node 队列/资源守卫/worker 3 case SUCCEEDED | 4a18b32（包27） | 完成 |
+| artifacts/mfy_24x7_data_pipeline_001 | 10-song pilot 10/10 SUCCEEDED | c18a4f5（包28） | 完成 |
+| artifacts/ear_pilot_001 | 50-case pilot（包42） | 52ae335 + 453ca14 | pilot 50/50 GO |
+| artifacts/ear_batch | 批处理运行器证据 | ops/ear_batch/ | 运行中 |
+| artifacts/web_origin | 官网入口部署证据 | ops/web_origin/ | 部署中 |
+
+## 2. Music 产品证据
+
+| 证据 | 内容 | 关键 commit | 状态 |
+|---|---|---|---|
+| artifacts/mfy_music_creator_lifecycle_001 | 创作者生命周期（版本/护照/发布） | 062c760 等（包30） | 完成 |
+| artifacts/mfy_music_listening_first_web_001 | 聆听优先 Web 收敛 | a9e752e4（包31） | 完成 |
+| apps/music-web（库/控制台/搜索） | 包32 四个 checkpoint | a072e3a, 9939ae7, f3612fd, a9ab4e7 | 完成 |
+| apps/music-web PWA 地基 | 包33 | 7334da9 | 完成 |
+| docs/contracts/music/（6 份契约） | 身份/所有权/发布/API/生命周期/共享客户端 | ec5aac1（包35） | FROZEN |
+
+## 3. 治理与边界证据
+
+| 证据 | 内容 | 状态 |
+|---|---|---|
+| docs/product-framework/（4 份） | 宪法/官网蓝图/Ear 框架/Music 框架 | APPROVED v1.0（包44，2026-08-14 人类批准） |
+| docs/product-framework/PRODUCT_AUTHORITY_INDEX.md | 文档权威索引 | 包44 |
+| docs/product-framework/TERMINOLOGY_AND_CLAIMS.md | 术语表 + claim 成熟度 | 包44 |
+| docs/PHASE1_CONSTITUTION.md | 仓库宪法 v1.1（判断权威修正） | 包44 修订 |
+| AGENTS.md、README.md | 判断权威与公开声明修正 | 包44 修订 |
+| docs/contracts/product-boundary.md | 产品边界与共享契约 | FROZEN（ec5aac1） |
+
+## 4. 45–54 包登记
+
+| 包 | 证据 | commit | P0 结果 |
+|---|---|---|---|
+| 45 设计系统 | docs/design/design_tokens_v1.md（token 单一来源）+ design_system_migration.md（KEEP/ADAPT/COMPLETE/ISOLATE）+ apps/music-web/components/ui/（6 组组件）+ app/design/ 陈列页 + tests/design-system.test.mjs（7/7）+ Android Color.kt/Theme.kt 归并 + artifacts/phase1_launch/design_system_001/ 截图（1440/390 双宽度，深色石墨 + evidence 绿 + amber 已验像素） | 06b2e6b | 7/7 测试绿；tsc 我的文件零错误 |
+| 51 身份隐私 | docs/contracts/music/identity_access_privacy.md（决策/威胁模型/授权矩阵/迁移）+ models AuthSession/UserRole + api/identity.py + routes_auth.py + BFF 服务端 actor/CSRF/CORS/no-store + tests/test_identity.py + test_bff.py 更新 | a7378ae | 90 全绿（music 包）；demo 身份退出公开路径；actor 服务端解析 |
+| 46 官网 | ops/web_origin/site/rongjingmusic/ 七页面（/、/ear、/music、/evidence、/about、/contact、/privacy）+ site.css（design tokens v1）+ robots/sitemap/favicon + check_site.mjs（6/6）+ artifacts/phase1_launch/official_site_001/ 截图（3 路由 × 1440/390） | 90f9aa4 | 6/6 检查绿；无伪入口/无自动播放/无禁语声称；CTA 全部可解析 |
+| 47 Ear 表面 | apps/ear-workbench/ 七页面 + workbench.css/js（tokens）+ dev_proxy.py（同源代理）+ check_workbench.mjs（7/7）+ artifacts/phase1_launch/ear_workbench_001/（真实案例截图 + EVIDENCE.md：job_4b85…→case_df1c…→SUCCEEDED 40s，manifest sha256 328c3a98） | a4927a8 | 7/7 检查绿；真实全链路 ✓；四一级状态；无伪入口；私密不缓存 |
+| 49 Music 聆听 | 播放器错误恢复（onError → .player-error）+ tests/listening-product.test.mjs（7/7：单播放器/无自动播放/幂等/无 Ear 评分/媒体不改造）+ 五曲 Range 矩阵 5/5 206（线上 LA）+ 截图 home-1440/390 + AUDIT.md | 9b5e7eb | 7/7 检查绿；Range 矩阵 5/5；favorite/follow 双层幂等 |
+| 48 Ear 升级 | moodify/authority/（scope_contract + escalation + review_store + pipeline）+ api/routes/reviews.py 四端点 + 工作台 reviews.html（amber 审核队列）+ tests/authority/ 15 测试 | 7eec681 | 639 全绿（core）；八类越界均升级；审核不可静默改写；超时无自动通过 |
+| 50 Creator 发布 | tests/test_creator_publishing.py（4 项：Passport IDOR/发布恢复/媒体保留/幂等重放）+ tests/creator-studio.test.mjs（6 项客户端检查）+ AUDIT.md | 45e7f91 | 94 全绿（music）；Passport 越权 403；发布丢失读权威状态；无媒体静默删除 |
+| 52 证据桥 | models EvidenceBridge 表 + api/routes_bridge.py（requests/update/attach/detach/cancel，单调状态机）+ track 序列化补 approved_evidence_ref + tests/test_evidence_bridge.py（10 项九场景） | 68811f5 | 104 全绿（music）；幂等重放/哈希校验/越权/终态/取消保留审计/内部字段不泄漏 |
+| 53 生产运维 | ops/web_origin/PRODUCTION_TOPOLOGY.md（组件清单/关键路径/缓存策略/缺口）+ ALERTS_AND_RUNBOOK.md（A1–A10 + R1–R3）+ scan_secrets.sh（clean）+ backup_snapshot.sh + 本地备份/恢复演练（ID/hash 零漂移，backup.sha256 3/3 OK）+ DRILLS.md | 8031c0f | secrets clean；隔离恢复演练通过；告警表齐备；真机演练归 54 |
+| 54 上线验收 | LAUNCH_ACCEPTANCE_001.md（候选冻结/场景映射/P0 门/P1/上线步骤/回滚条件）+ GO_NO_GO_RECORD.md 更新（Wave 6：NOT SIGNED，待真机 + 人类签署） | 9d12858 | 候选冻结完成；本地门 PASS；⚠ 真机项清单明确；GO 未签署 |
+| 55 发布真相 | RELEASE_TRUTH_RECONCILIATION_001.md（候选标识 MFY-PHASE1-RC-20260814-1/13 commits/统一测试口径/Gate 标记/风险更新）+ 账本修正（EVIDENCE/CAPABILITY/RISK/GO-NOGO/LAUNCH-ACCEPTANCE） | 待提交 | 只读审计完成；PASS_LOCAL 不冒充 PASS_LIVE；GO 未签署 |
+
+## 5. 登记规则
+
+- 包 45–54 每包完成：追加一行（证据路径 + commit hash + P0 结果）。
+- Gate D/E 审查时以本索引为检查清单；找不到证据的声称视为不存在。

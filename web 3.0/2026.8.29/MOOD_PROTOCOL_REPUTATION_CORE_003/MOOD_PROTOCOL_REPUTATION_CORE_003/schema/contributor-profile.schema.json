@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/reputation/contributor-profile/1.0.0",
+  "title": "MOOD Contributor Profile",
+  "type": "object",
+  "required": [
+    "profileVersion",
+    "protocolId",
+    "primaryIdentity",
+    "linkedPublicIdentities",
+    "createdAt",
+    "status",
+    "verifiedContributionCount",
+    "currentSnapshotId"
+  ],
+  "properties": {
+    "profileVersion": {
+      "const": "1.0.0"
+    },
+    "protocolId": {
+      "type": "string",
+      "pattern": "^mood:contributor:[0-9a-f]{64}$"
+    },
+    "primaryIdentity": {
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "wallet",
+            "github",
+            "protocol_id",
+            "node_id"
+          ]
+        },
+        "namespace": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "linkedPublicIdentities": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "disputed",
+        "superseded"
+      ]
+    },
+    "firstVerifiedContributionAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "lastVerifiedContributionAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "verifiedContributionCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "currentSnapshotId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,74 @@
+{
+  "package_id": "MFD-009",
+  "title": "Alpha Field Validation & Evidence",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Alpha Validation",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-008 must be GO or approved CONDITIONAL GO",
+  "scope": [
+    "controlled alpha cohort",
+    "device matrix",
+    "reliability evidence",
+    "playback evidence",
+    "minimal telemetry/support bundle",
+    "listening comparison evidence",
+    "second-session signal",
+    "UX confusion capture",
+    "bug/feature-request separation",
+    "privacy boundary",
+    "alpha batch report",
+    "final alpha validation report"
+  ],
+  "forbidden": [
+    "uncontrolled feature expansion",
+    "EQ/lyrics/recommendation/community/skin expansion",
+    "WASAPI/native audio expansion",
+    "filtering negative listening results",
+    "unnecessary personal-data collection",
+    "secret/signed-URL telemetry"
+  ],
+  "next_package": "MFD-010 — Alpha Entropy Reduction & Fix Prioritization",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "19b1c578e36f6fd4b17acc955459a57fad0f97958c5c36ce9e00fe50ae0502f0"
+    },
+    {
+      "name": "01_MFD-009_TASK.md",
+      "sha256": "7dc0b85afe7f95075e44f1b7759166248c126fd938b40aa577bf2414127f43b4"
+    },
+    {
+      "name": "02_ALPHA_COHORT_TEMPLATE.md",
+      "sha256": "f90a92abdeeec1fe5538211c65a8cf1c91fd9d7f2bf3c498b4568e41e41b6094"
+    },
+    {
+      "name": "03_LISTENING_EVIDENCE_PROTOCOL.md",
+      "sha256": "af33ca38d9a0d862dccea22e47d22145d349db0ff20fe3fbe68a6563e19b54e5"
+    },
+    {
+      "name": "04_TELEMETRY_MINIMUM_SCHEMA.md",
+      "sha256": "8d001ed8508cb79253def6ad91ffd56ee862faa491f7e730258d28697ba7f0ff"
+    },
+    {
+      "name": "05_FEEDBACK_AND_DEFECT_TEMPLATE.md",
+      "sha256": "e249a3c3e1f405928450a8a7f4dd5480e6227fc093fca16cfe4f7931caabce3c"
+    },
+    {
+      "name": "06_ALPHA_BATCH_REPORT_TEMPLATE.md",
+      "sha256": "91f36caafd3365604b02aeaf21296d44de5162877cb2879eee1c9c1d1305caf0"
+    },
+    {
+      "name": "07_ACCEPTANCE_GATE.md",
+      "sha256": "b95180450cc49d8192fad0d21db31ed212ed5a58693d19bc311f162d87096fa6"
+    },
+    {
+      "name": "08_MFD-010_INPUT_CONTRACT.md",
+      "sha256": "1e266b73718d0003fefcbcc63bdbb1819a3c1c1646f858e8d7bb383f3788505d"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "b0d8045ab305984a96b872802bfc2fe7cd94346d1601966f1571c0f5119b022e"
+    }
+  ]
+}

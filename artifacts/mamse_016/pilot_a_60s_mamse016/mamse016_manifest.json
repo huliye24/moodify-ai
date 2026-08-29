@@ -1,0 +1,51 @@
+{
+  "schema_version": "mamse-016-manifest-v1",
+  "operator_id": "MAMSE-016",
+  "operator_version": "mamse-016-v0.1",
+  "geometry_id": "yin-lite-multicandidate-v0.1",
+  "config": {
+    "operator_id": "MAMSE-016",
+    "operator_version": "mamse-016-v0.1",
+    "geometry_id": "yin-lite-multicandidate-v0.1",
+    "hop_length": 512,
+    "frame_samples": 2048,
+    "fmin_hz": 60.0,
+    "fmax_hz": 1600.0,
+    "cmndf_threshold": 0.2,
+    "max_candidates": 3,
+    "event_min_frames": 8,
+    "event_stability_cents": 100.0
+  },
+  "config_sha256": "9b2a7612a8513ff1a36dd38680f33edaa2bd2e6f5c1402a52edf727f508d1113",
+  "source_sha256": "09704c8741b3be2fc5bd9161c18cff9dd295dbd79cd776c5624604419e2973a7",
+  "sample_rate": 48000,
+  "duration_s": 60.0,
+  "hop_length": 512,
+  "frame_samples": 2048,
+  "feature_schema_version": "mamse-016-pitch-features-v1",
+  "evidence_schema_version": "mamse-016-evidence-v1",
+  "feature_authority": {
+    "voicing_fraction": "ESTIMATOR — voicing evidence, not a binary pitch claim",
+    "harmonic_consistency_mean": "ESTIMATOR — harmonic support, not harmony",
+    "dominant_frequency_hz": "ESTIMATOR — not perceived pitch",
+    "mean_confidence_voiced": "ESTIMATOR",
+    "n_stable_pitch_runs": "DESCRIPTOR",
+    "ambiguity_index": "ESTIMATOR — polyphonic ambiguity, not uncertainty of the track",
+    "frame_voiced": "ESTIMATOR",
+    "frame_dominant_f0": "ESTIMATOR — not perceived pitch",
+    "frame_confidence": "ESTIMATOR"
+  },
+  "frame_count": 5622,
+  "git_commit": "128bcc3ce42f7b07742157fabb8bb801c23a53d8",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "implementation": {
+    "backend": "yin-lite-acf",
+    "model": "multi-candidate-f0-v0.1",
+    "model_status": "probabilistic_estimator"
+  },
+  "generated_at_utc": "2026-08-11T17:54:40+00:00"
+}

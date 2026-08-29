@@ -1,0 +1,13 @@
+﻿work_item,automated_gate,evidence,failure_action,human_gate
+WI-001,"Valid and invalid fixtures prove immutable identity, path-independent digest, media metadata, and schema version fields.",task evidence JSON plus test output,retry twice then isolate,none
+WI-002,"Schema separates measured value, unit, time support, parameters, implementation version, source identity, and tolerance policy.",task evidence JSON plus test output,retry twice then isolate,none
+WI-003,"Evidence links immutable inputs and measurement records, carries provenance, and cannot masquerade as a judgment.",task evidence JSON plus test output,retry twice then isolate,none
+WI-004,Judgment references but never overwrites measurements; UNCERTAIN and INSUFFICIENT_EVIDENCE are valid outputs; severity and confidence are separate.,task evidence JSON plus test output,retry twice then isolate,none
+WI-005,"CLI validates one artifact or a directory, returns nonzero on invalid input, and emits deterministic JSON evidence.",task evidence JSON plus test output,retry twice then isolate,none
+WI-006,"Utility hashes immutable inputs, records versions and parameters, writes atomically, and detects later source drift.",task evidence JSON plus test output,retry twice then isolate,none
+WI-007,"Manifest distinguishes transform, expected sensitivity/invariance, tolerances, negative controls, and evidence outputs.",task evidence JSON plus test output,retry twice then isolate,none
+WI-008,"Definitions are parameter-only, reproducible, contain no private audio, and cover silence, tone, impulse, clipping, phase inversion, and lossless rewrap controls.",task evidence JSON plus test output,retry twice then isolate,none
+WI-009,"Contract is explicitly EXPERIMENTAL and records pairing, alignment, changed parameters, metrics, tolerance, and verification outcome.",task evidence JSON plus test output,retry twice then isolate,none
+WI-010,"Case preserves attempts, failures, evidence, rule/model versions, and human decision without claiming autonomous learning.",task evidence JSON plus test output,retry twice then isolate,none
+WI-011,"Human approves vocabulary, override semantics, and validation population before implementation.",task evidence JSON plus test output,retry twice then isolate,required
+WI-012,"Checker rejects missing source, measurement, evidence, schema-version, or verification links and produces a reusable evidence report.",task evidence JSON plus test output,retry twice then isolate,none

@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moodify"
+version = "0.1.0"
+description = "Moodify — The Ear of AI: an auditory intelligence system for analyzing, judging, intervening on, verifying, and learning from audio"
+authors = [{name = "文川院 / Moodify 声音实验室"}]
+license = {text = "GPL-3.0-only"}
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Intended Audience :: Developers",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "numpy==2.2.6; python_version < '3.11'",
+    "numpy==2.4.4; python_version >= '3.11'",
+    "scipy==1.15.3; python_version < '3.11'",
+    "scipy==1.17.1; python_version >= '3.11'",
+    "librosa==0.11.0",
+    "soundfile==0.13.1",
+    "pyloudnorm==0.2.0",
+    "pydantic==2.13.2",
+    "pedalboard==0.9.23",
+    "fastapi==0.136.0",
+    "uvicorn==0.44.0",
+    "python-multipart==0.0.28",
+    "PyYAML==6.0.3",
+    "matplotlib==3.10.8",
+    "httpx>=0.24.0,<1.0.0",
+]
+
+[project.optional-dependencies]
+dsp = ["pedalboard>=0.9.0"]
+separation = ["demucs", "torch>=2.0"]
+api = ["fastapi>=0.100.0", "uvicorn", "python-multipart", "httpx>=0.24.0,<1.0.0"]
+dev = ["pytest>=7.0", "httpx>=0.24.0", "matplotlib>=3.5", "ruff>=0.6.0"]
+node = ["matplotlib>=3.5"]
+full = ["moodify[dsp,separation,api,dev]"]
+
+[project.scripts]
+moodify = "moodify.release_cli:main"
+moodify-node = "moodify.node.cli:main"
+moodify-reconstruction = "moodify.reconstruction_job.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"run_agent_b.py" = ["E402"]
+"smoke_test.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "v01: v0.1.0 mainline tests",
+    "legacy: old system tests kept for compatibility",
+    "experimental: future or research modules not required by v0.1.0",
+]

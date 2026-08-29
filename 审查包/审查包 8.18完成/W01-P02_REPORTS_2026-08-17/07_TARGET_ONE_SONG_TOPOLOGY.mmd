@@ -1,0 +1,71 @@
+flowchart TD
+    %% W01-P02 TARGET ONE SONG TOPOLOGY
+    %% 实线 = P02 目标主链（基于真实节点）
+    %% 虚线 = 现状存在但未接入目标链 / 未验证
+    %% 点线 = PLANNED 组件（未开通）
+    %% 节点标注真实 alias；数据流与控制流分开
+
+    subgraph Client["客户端"]
+        AND["Android Moodify Music 3.1<br/>(PLAY)"]
+        WEB["浏览器 (官网/平台)"]
+    end
+
+    subgraph CF["公网边界"]
+        CFX["Cloudflare DNS+隧道<br/>(rongjingmusic.com)"]
+    end
+
+    subgraph LA["NODE-001 LA 103.144.246.242<br/>CONTROL_API + PLAYBACK_DELIVERY (共置)"]
+        NG["nginx :80"]
+        MUS["moodify-music :3100 (vinext)"]
+        BFF["moodify-music-bff :8100"]
+        EAPI["moodify-api :8000 (Ear, loopback)"]
+        LW["moodify-worker (SQLite queue)"]
+        AUD["moodify-audiolla 容器 :18080<br/>(EXTERNAL_AUDIO_SERVICE)"]
+        MEDIA["music-media 音频"]
+    end
+
+    subgraph HZ["NODE-002 杭州 120.55.191.146<br/>CPU_WORKER + CONTROL_API (共置)"]
+        HAPI["moodify-api :8000<br/>(service-key)"]
+        HW["moodify-data-worker<br/>(4 timers + SQLite)"]
+        SCRATCH["/var/lib/moodify<br/>(scratch + 队列)"]
+    end
+
+    subgraph DataPlane["数据平面"]
+        DB["PolarDB MySQL moodify_dev<br/>172.27.118.104 (METADATA_DB)"]
+        OSS["OSS<br/>(OBJECT_STORAGE) - PLANNED"]
+    end
+
+    subgraph Ext["外部"]
+        LALAL["LALAL.AI 云端 API"]
+    end
+
+    %% 目标主链（实线）
+    AND -->|HTTPS 隧道| CFX
+    WEB -->|HTTPS 隧道| CFX
+    CFX --> NG
+    NG --> BFF
+    NG --> MUS
+    MUS --> MEDIA
+    BFF --> HAPI
+    BFF --> EAPI
+    EAPI --> LW
+    LW --> AUD
+    AUD -->|官方 HTTPS| LALAL
+    HAPI --> HW
+    HW --> SCRATCH
+    HW -.->|"元数据/状态 (目标, 私网 VPC 对等)"| DB
+    HW -.->|"source/render/evidence 对象 (目标)"| OSS
+    MUS -.->|"READY 曲目读取 (目标)"| OSS
+
+    %% 现状存在但未接入目标链（虚线）
+    LW -.->|"现状 queue"| SCRATCH
+    AND -.->|"现状: 直接静态 URL"| MEDIA
+
+    %% PLANNED（点线）
+    OSS -.-|PLANNED (P03)| HW
+    DB -.-|schema-only| HAPI
+
+    classDef running fill:#d4f4d4,stroke:#2a7;
+    classDef planned fill:#e8e8ff,stroke:#55a,stroke-dasharray: 4 3;
+    class NG,MUS,BFF,EAPI,LW,AUD,MEDIA,HAPI,HW,SCRATCH,CFX running;
+    class OSS planned;

@@ -1,0 +1,22 @@
+{
+  "object_id": "obj_01EXAMPLE000000000000000000",
+  "track_id": "trk_01EXAMPLE000000000000000000",
+  "job_id": "job_01EXAMPLE000000000000000000",
+  "artifact_type": "render",
+  "artifact_role": "final_stereo",
+  "bucket": "moodify-example",
+  "object_key": "moodify/tracks/trk_01EXAMPLE/jobs/job_01EXAMPLE/renders/obj_01EXAMPLE.wav",
+  "content_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash_algorithm": "sha256",
+  "byte_size": 123456,
+  "mime_type": "audio/wav",
+  "created_at": "2026-08-17T08:00:00Z",
+  "producer": "moodify-pipeline",
+  "producer_version": "example",
+  "pipeline_version": "example",
+  "source_object_id": "obj_source_example",
+  "parent_object_id": null,
+  "immutable": true,
+  "retention_class": "render_versioned",
+  "evidence_class": null
+}

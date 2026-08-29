@@ -1,0 +1,53 @@
+{
+  "schema_version": "mamse-015-manifest-v1",
+  "operator_id": "MAMSE-015",
+  "operator_version": "mamse-015-v0.1",
+  "geometry_id": "soft-role-cues-v0.1",
+  "config": {
+    "operator_id": "MAMSE-015",
+    "operator_version": "mamse-015-v0.1",
+    "geometry_id": "soft-role-cues-v0.1",
+    "hop_length": 512,
+    "n_fft": 2048,
+    "cue_sharpness": 8.0,
+    "tonal_midpoint": 0.35,
+    "texture_midpoint": 0.35,
+    "percussive_sharpness": 10.0,
+    "percussive_midpoint": 0.5,
+    "label_confidence_gate": 0.55,
+    "min_region_frames": 2,
+    "max_objects": 32
+  },
+  "config_sha256": "1bb33fa4cca086b90d30f856e4e2b71c7aed63f2d9d410839bda8c2198bf0c44",
+  "source_sha256": "09704c8741b3be2fc5bd9161c18cff9dd295dbd79cd776c5624604419e2973a7",
+  "sample_rate": 48000,
+  "duration_s": 60.0,
+  "hop_length": 512,
+  "feature_schema_version": "mamse-015-soft-object-features-v1",
+  "evidence_schema_version": "mamse-015-evidence-v1",
+  "feature_authority": {
+    "n_objects": "DESCRIPTOR",
+    "mean_confidence": "ESTIMATOR — acoustic-role cue, not classifier posterior",
+    "unresolved_fraction": "ESTIMATOR — weak-evidence honesty",
+    "tonal_fraction": "ESTIMATOR — acoustic-role cue",
+    "texture_fraction": "ESTIMATOR — acoustic-role cue",
+    "percussive_fraction": "ESTIMATOR — acoustic-role cue",
+    "unresolved_object_fraction": "ESTIMATOR",
+    "frame_dominant_label": "DESCRIPTOR",
+    "frame_confidence": "ESTIMATOR",
+    "frame_unresolved": "ESTIMATOR"
+  },
+  "frame_count": 5626,
+  "git_commit": "128bcc3ce42f7b07742157fabb8bb801c23a53d8",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "librosa": "0.11.0"
+  },
+  "implementation": {
+    "backend": "librosa-cues",
+    "model": "soft-role-cues-v0.1",
+    "model_status": "probabilistic_estimator"
+  },
+  "generated_at_utc": "2026-08-11T17:54:09+00:00"
+}

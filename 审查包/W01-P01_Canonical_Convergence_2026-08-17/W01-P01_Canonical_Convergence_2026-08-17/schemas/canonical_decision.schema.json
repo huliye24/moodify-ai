@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify P01 Canonical Decision",
+  "type": "object",
+  "required": [
+    "id",
+    "object",
+    "decision",
+    "classification",
+    "human_review_required"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "object": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_claim": {
+      "type": "string"
+    },
+    "p00_observed_reality": {
+      "type": "string"
+    },
+    "human_direction": {
+      "type": "string"
+    },
+    "decision": {
+      "type": "string"
+    },
+    "classification": {
+      "enum": [
+        "CANONICAL",
+        "INTERNAL",
+        "EXPERIMENTAL",
+        "LEGACY",
+        "MIGRATION_PENDING",
+        "HUMAN_DECISION_REQUIRED",
+        "REMOVE_LATER"
+      ]
+    },
+    "affected_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "human_review_required": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

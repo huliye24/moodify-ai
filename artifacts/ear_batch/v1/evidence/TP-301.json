@@ -1,0 +1,21 @@
+{
+  "task": "TP-301",
+  "verified_at": "2026-08-12T01:14:50.170970+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "planning/epics.json",
+      "exists": true,
+      "bytes": 1386,
+      "sha256": "197ed03f95845994444e45ac3c65ba28570676bc78bab75cc9c2b23befd1eb1a",
+      "passed": true
+    },
+    {
+      "path": "planning/epics.md",
+      "exists": true,
+      "bytes": 847,
+      "sha256": "f96a16af27f556b1cbd8f59c076fd82662385cf2a90580b48ec199982b46ca0c",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "work_item": {
+    "id": "WI-002",
+    "epic": "EPIC-01",
+    "title": "Define MeasurementRecord JSON Schema",
+    "deps": [
+      "WI-001"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "schemas/ear_v1",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "schemas/ear_v1/measurement_record.schema.json",
+      "tests/ear_v1_contracts/test_measurement_record_schema.py"
+    ],
+    "acceptance": "Schema separates measured value, unit, time support, parameters, implementation version, source identity, and tolerance policy."
+  },
+  "dependencies": [
+    "IMP-001"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "snapshotVersion": "1.0.0",
+  "snapshotId": "mood-reputation-example-001",
+  "protocolId": "mood:contributor:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "epochId": "GENESIS_DRAFT",
+  "policyVersion": "003-draft-1",
+  "epochPolicyVersion": "003-draft-1",
+  "inputContributionIds": [
+    "mood-contrib-example-code-001"
+  ],
+  "inputFingerprints": [
+    "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+  ],
+  "dimensions": {
+    "contribution": 50,
+    "impact": null,
+    "quality": null,
+    "persistence": null,
+    "early": null
+  },
+  "aggregate": null,
+  "verifiedContributionCount": 1,
+  "categoryDiversity": [
+    "code"
+  ],
+  "confidence": "insufficient",
+  "generatedAt": "2026-08-29T00:00:00Z",
+  "snapshotFingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "supersedes": null
+}

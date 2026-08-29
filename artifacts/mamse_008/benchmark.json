@@ -1,0 +1,32 @@
+{
+  "schema_version": "mamse-008-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "input": "S1 band-energy ratios (nonnegative simplex)",
+  "measurements": [
+    {
+      "rank": 2,
+      "features": 8,
+      "frames": 1282,
+      "iterations": 225,
+      "relative_error": 0.4497387868545913,
+      "wall_time_s": 0.0578,
+      "cpu_time_s": 0.0625,
+      "basis_id": "nmfbasis-ce94188b7f7b6bb1",
+      "npz_bytes": 19965,
+      "json_bytes": 2578
+    },
+    {
+      "rank": 3,
+      "features": 8,
+      "frames": 1282,
+      "iterations": 300,
+      "relative_error": 0.2998077812063941,
+      "wall_time_s": 0.0653,
+      "cpu_time_s": 0.0625,
+      "basis_id": "nmfbasis-6f88d4cc2555b1ca",
+      "npz_bytes": 28106,
+      "json_bytes": 3357
+    }
+  ]
+}

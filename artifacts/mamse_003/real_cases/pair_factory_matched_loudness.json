@@ -1,0 +1,21 @@
+{
+  "label": "factory_matched_loudness",
+  "a": {
+    "path": "..\\outputs\\data_factory\\cases\\case_45e96f4c663b4fbead98592511fae126\\00_source\\source.wav",
+    "sha256": "f5f3e7c542b02b184fae080c095b71e0e84b0d960c9e41fdf7773f50d34c1c34",
+    "high_modulation_ratio": 0.17019398247888556,
+    "texture_entropy": 0.8540113158257752,
+    "stationarity_index": 0.40922712038884984,
+    "texture_sparsity": 0.347534414697689
+  },
+  "b": {
+    "path": "..\\outputs\\data_factory\\cases\\case_bf117642623d43e9a16fd034b394164f\\00_source\\source.wav",
+    "sha256": "049576ace457279b7be7399e74fd5d15a98f559af29c3a776348e8a438650bc9",
+    "high_modulation_ratio": 0.15913767373437535,
+    "texture_entropy": 0.880304693859901,
+    "stationarity_index": 0.42063463277686197,
+    "texture_sparsity": 0.31580270331241556
+  },
+  "first_order_cosine": 0.9884235268436593,
+  "modulation_cosine": 0.9976425478443426
+}

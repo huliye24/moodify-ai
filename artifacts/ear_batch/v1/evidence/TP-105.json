@@ -1,0 +1,21 @@
+{
+  "task": "TP-105",
+  "verified_at": "2026-08-12T00:56:51.383010+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "knowledge/truth_labels.jsonl",
+      "exists": true,
+      "bytes": 1743823,
+      "sha256": "55d8253cfd27372688ccdf12837cd53588eec19851b3bc4b49686becbf69d16e",
+      "passed": true
+    },
+    {
+      "path": "knowledge/truth_label_review.md",
+      "exists": true,
+      "bytes": 628,
+      "sha256": "e6663f047956059a3babead90e8ae75ba33c9605db9d255d869fafedf4660aac",
+      "passed": true
+    }
+  ]
+}

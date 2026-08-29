@@ -1,0 +1,43 @@
+{
+  "schema_version": "mamse-006-manifest-v1",
+  "operator_id": "MAMSE-006",
+  "operator_version": "0.1.0",
+  "config_version": "mamse006-modulation-v0.1",
+  "profile_hash": "60b3a6501db27ec7b0c6815f3039e5c99d99d10b1d8442ec768a8f901342de36",
+  "config": {
+    "sample_rate": 48000,
+    "audio_n_fft": 2048,
+    "audio_hop": 256,
+    "fmin_hz": 55.0,
+    "fmax_hz": 16000.0,
+    "bands_per_octave": 12,
+    "modulation_window_seconds": 4.0,
+    "modulation_hop_seconds": 2.0,
+    "log_floor_db": -80.0,
+    "temporal_min_hz": 0.25,
+    "temporal_max_hz": 40.0,
+    "spectral_max_cpo": 4.0,
+    "min_audio_seconds": 1.5,
+    "low_energy_rms_dbfs": -70.0
+  },
+  "source_sha256": "abde7f2e9e3f774a2fcd9023c0bad7d30b583ea29ed75baef6c253c16abd12f4",
+  "status": "OK",
+  "git_commit": "4c92b0f30c1d00591c22233ff9aa164f7bbf9bf6",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "resource": {
+    "runtime_seconds": 3.2242755999996007
+  },
+  "authority": "EXPERIMENTAL_DESCRIPTOR",
+  "judgment_eligible": false,
+  "limitations": [
+    "Temporal modulation bands are engineering descriptors, not universal perceptual categories.",
+    "Ridge velocity is a spectrogram-texture velocity candidate, not physical source motion.",
+    "Orientation must not be mapped to upward/downward semantics without calibrated convention.",
+    "No AI-vs-human or artistic-quality judgment is authorized by this operator."
+  ],
+  "generated_at_utc": "2026-08-11T11:34:17+00:00"
+}

@@ -1,0 +1,23 @@
+{
+  "version": "reconstruction-batch-v1",
+  "tracks_total": 3,
+  "golden_count": 0,
+  "improved_count": 1,
+  "subtle_count": 1,
+  "source_wins": 1,
+  "human_required": 0,
+  "stem_recommended": 0,
+  "unsupported": 0,
+  "failed": 0,
+  "agreement": {
+    "n": 3,
+    "technical_top_matches_human_top": 3,
+    "technical_top_matches_identity_top": 3,
+    "source_technical_rank": null,
+    "source_human_rank": null,
+    "patterns": [
+      "SOURCE_WINS"
+    ]
+  },
+  "failures": 0
+}

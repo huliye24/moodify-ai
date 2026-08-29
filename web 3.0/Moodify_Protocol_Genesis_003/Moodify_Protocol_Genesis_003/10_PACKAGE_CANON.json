@@ -1,0 +1,35 @@
+{
+  "package_id": "MOOD-GENESIS-003",
+  "name": "Genesis Admin",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002"
+  ],
+  "canon_change": false,
+  "token_context": {
+    "network": "BNB Smart Chain",
+    "chain_id": 56,
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E"
+  },
+  "scope": {
+    "admin_review": true,
+    "contribution_score": true,
+    "provisional_allocation": true,
+    "audit_log": true,
+    "csv_export": true,
+    "json_export": true,
+    "token_transfer": false,
+    "wallet_signature": false,
+    "smart_contract_deployment": false
+  },
+  "status_model": [
+    "registered",
+    "reviewed",
+    "eligible",
+    "allocated",
+    "rejected"
+  ],
+  "next_package": "MOOD-GENESIS-004 Distribution Engine"
+}

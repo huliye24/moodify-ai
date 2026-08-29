@@ -1,0 +1,35 @@
+{
+  "emotion": "HL",
+  "n_valid": 200,
+  "n_failed": 0,
+  "effective_rank": 3,
+  "r2_per_dimension": {
+    "E": 0.935,
+    "D": -214.477,
+    "S": -28.511,
+    "T": -388948086.739,
+    "H": -1.101
+  },
+  "elapsed_s": 1116.8,
+  "B_shape": [
+    5,
+    15
+  ],
+  "param_keys": [
+    "P01_vocal_presence_freq",
+    "P02_vocal_presence_gain",
+    "P03_vocal_presence_q",
+    "P04_proximity_low_freq",
+    "P05_proximity_low_gain",
+    "P06_compression_ratio",
+    "P07_compression_attack",
+    "P08_compression_release",
+    "P09_compression_threshold",
+    "P10_reverb_t60",
+    "P11_reverb_dry_wet",
+    "P12_reverb_width",
+    "P13_harmonic_drive",
+    "P14_high_shelf_freq",
+    "P15_high_shelf_gain"
+  ]
+}

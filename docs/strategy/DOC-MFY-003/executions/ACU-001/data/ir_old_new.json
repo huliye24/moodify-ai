@@ -1,0 +1,21 @@
+{
+  "description": "Schroeder混响脉冲响应对比 (RT60=1.5s)",
+  "old": {
+    "label": "Schroeder旧实现 (交叉耦合反馈, 无全通)",
+    "peak_db": -1.19,
+    "rt60_estimated_s": 0.019,
+    "echo_peak_count_50_200ms": 107,
+    "rms": 0.014003,
+    "t_max_sample": 1309,
+    "t_max_ms": 29.68
+  },
+  "new": {
+    "label": "Schroeder新实现 (标准反馈梳状 + 全通)",
+    "peak_db": 5.849999904632568,
+    "rt60_estimated_s": null,
+    "echo_peak_count_50_200ms": 560,
+    "rms": 0.032763,
+    "t_max_sample": 0,
+    "t_max_ms": 0.0
+  }
+}

@@ -1,0 +1,2 @@
+﻿blocker_id,severity,layer,symptom,evidence,blocks_golden_song,root_cause,minimum_fix,files_changed,regression_test,rerun_point,resolution,deferred_to
+EXAMPLE-001,B0,,,,false,,,,,,,Delete example row

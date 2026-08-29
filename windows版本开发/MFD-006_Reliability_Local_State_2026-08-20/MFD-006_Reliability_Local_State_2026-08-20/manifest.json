@@ -1,0 +1,73 @@
+{
+  "package_id": "MFD-006",
+  "title": "Reliability & Local State",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-005 must be GO",
+  "scope": [
+    "single local state authority",
+    "schema versioning and migration",
+    "track/position/volume/window restore",
+    "secure session persistence",
+    "session refresh",
+    "playback manifest refresh",
+    "bounded retry",
+    "race cancellation and stale-response rejection",
+    "abnormal-exit recovery",
+    "corrupted-state recovery",
+    "stress smoke"
+  ],
+  "forbidden": [
+    "full offline library",
+    "background audio download manager",
+    "new product pages",
+    "tray",
+    "media keys",
+    "auto update",
+    "installer productization",
+    "DSP",
+    "WASAPI",
+    "native audio"
+  ],
+  "next_package": "MFD-007 — Windows Productization",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "dc1f049412a6283b8b848506eecc076b31305dcc61bb469eb3fb31d87bdf6e60"
+    },
+    {
+      "name": "01_MFD-006_TASK.md",
+      "sha256": "d218e95d2a519943dd37f4a795e6246a845591506e7308b821b1a847dcda9ede"
+    },
+    {
+      "name": "02_LOCAL_STATE_CONTRACT.md",
+      "sha256": "e63e72b5fe8c350c6617d881a3c92e71ab7c24df7c720d0d4adc29ba8b493c56"
+    },
+    {
+      "name": "03_RECOVERY_STATE_MACHINE.md",
+      "sha256": "7e8b921c25e248bab3bdabfda409e4448f1652f72e344006302af72ca411cfe8"
+    },
+    {
+      "name": "04_RELIABILITY_TEST_MATRIX.md",
+      "sha256": "5be37e8ce19b4e638608d5c6374fdff41970269b2c0cf599ce8e215fc9e22ecb"
+    },
+    {
+      "name": "05_IMPLEMENTATION_SEQUENCE.md",
+      "sha256": "0ea855ffc475fe3c1c0ac3e7e4a8b71a189718ae010143c807028362f90edd2b"
+    },
+    {
+      "name": "06_ACCEPTANCE_GATE.md",
+      "sha256": "188e22b426bf870239772cbd3217cf33e5752a0b2fdcbf76fb8f6efb1dcd77d3"
+    },
+    {
+      "name": "07_EVIDENCE_TEMPLATE.md",
+      "sha256": "39bbf6badeb8c7c073a6495d45547a755832362a481cfbf39bb1987cc9a33a2e"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "a1a73fe5589a0fb9a5397ef5a50edb692c365f0b17ac1866f604bd710053fe1d"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "work_item": {
+    "id": "WI-012",
+    "epic": "EPIC-06",
+    "title": "Create traceability integrity checker",
+    "deps": [
+      "WI-005"
+    ],
+    "risk": "safe",
+    "allowed_paths": [
+      "tools/ear_v1_contracts",
+      "tests/ear_v1_contracts"
+    ],
+    "outputs": [
+      "tools/ear_v1_contracts/check_traceability.py",
+      "tests/ear_v1_contracts/test_traceability_checker.py"
+    ],
+    "acceptance": "Checker rejects missing source, measurement, evidence, schema-version, or verification links and produces a reusable evidence report."
+  },
+  "dependencies": [
+    "IMP-005"
+  ]
+}

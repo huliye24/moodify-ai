@@ -1,0 +1,40 @@
+{
+  "schema": "moodify-genesis-airdrop-deployment-v1",
+  "status": "UNDEPLOYED",
+  "network": {
+    "name": "BNB Smart Chain",
+    "chainId": 56
+  },
+  "token": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "address": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18
+  },
+  "snapshot": {
+    "snapshotId": null,
+    "snapshotSha256": null,
+    "merkleRoot": null,
+    "participantCount": null,
+    "totalMood": null,
+    "humanApproved": false
+  },
+  "distributor": {
+    "address": null,
+    "deploymentTx": null,
+    "deploymentBlock": null,
+    "verifiedBscScanUrl": null,
+    "owner": null,
+    "claimDeadline": null
+  },
+  "funding": {
+    "requiredMood": null,
+    "fundingTx": null,
+    "confirmedBalance": null
+  },
+  "release": {
+    "gitCommit": null,
+    "frontendPublished": false,
+    "publishedAt": null
+  }
+}

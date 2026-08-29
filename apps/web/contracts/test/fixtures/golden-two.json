@@ -1,0 +1,27 @@
+{
+  "schema": "mood-merkle-standard-v1",
+  "version": "1.0.0",
+  "description": "Golden fixture for two-participants",
+  "participantCount": 2,
+  "root": "0xd91944360cb50e1bf60dc31be1017cf4afa1a9879e3ed6eef848771d1879438d",
+  "participants": [
+    {
+      "participantNumber": 1,
+      "account": "0x1111111111111111111111111111111111111111",
+      "amountAtomic": "1000000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": [
+        "0x51bc608fd66b5edd9ee7ad2983d734b29a086a58a0e729933e212b539a30332c"
+      ]
+    },
+    {
+      "participantNumber": 2,
+      "account": "0x2222222222222222222222222222222222222222",
+      "amountAtomic": "2000000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": [
+        "0xc9ea0e6c193c42dd87916abb17e07271b26d5741cf8209cd5250ccf73eddb766"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+stateDiagram-v2
+    [*] --> CREATED
+    CREATED --> QUEUED: enqueue
+    CREATED --> CANCELED: cancel
+    QUEUED --> RUNNING: claim
+    QUEUED --> CANCELED: cancel
+    RUNNING --> VERIFYING: processing complete
+    RUNNING --> RETRY_WAIT: retryable failure
+    RUNNING --> FAILED: terminal failure
+    VERIFYING --> READY: verification passes
+    VERIFYING --> RETRY_WAIT: retryable verification failure
+    VERIFYING --> FAILED: terminal verification failure
+    RETRY_WAIT --> QUEUED: retry due
+    RETRY_WAIT --> CANCELED: cancel
+    READY --> [*]
+    FAILED --> [*]
+    CANCELED --> [*]

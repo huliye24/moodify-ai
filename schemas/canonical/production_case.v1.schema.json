@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "AuthorityState": {
+      "enum": [
+        "SYSTEM",
+        "ALGORITHM",
+        "HUMAN_REQUIRED",
+        "HUMAN_APPROVED",
+        "HUMAN_REJECTED"
+      ],
+      "title": "AuthorityState",
+      "type": "string"
+    },
+    "LifecycleState": {
+      "enum": [
+        "CREATED",
+        "ACTIVE",
+        "AWAITING_HUMAN",
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "title": "LifecycleState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "authority_state": {
+      "$ref": "#/$defs/AuthorityState"
+    },
+    "case_id": {
+      "title": "Case Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "evidence_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "lifecycle_state": {
+      "$ref": "#/$defs/LifecycleState"
+    },
+    "measurement_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Measurement Ids",
+      "type": "array"
+    },
+    "objective": {
+      "title": "Objective",
+      "type": "string"
+    },
+    "parent_case_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Case Id"
+    },
+    "rule_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Rule Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "created_at",
+    "case_id",
+    "source_id",
+    "objective",
+    "lifecycle_state",
+    "authority_state"
+  ],
+  "title": "ProductionCase",
+  "type": "object"
+}

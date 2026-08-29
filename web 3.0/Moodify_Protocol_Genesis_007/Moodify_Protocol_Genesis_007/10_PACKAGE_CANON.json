@@ -1,0 +1,50 @@
+{
+  "package_id": "MOOD-GENESIS-007",
+  "name": "Transparency & Treasury",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004",
+    "MOOD-GENESIS-005",
+    "MOOD-GENESIS-006"
+  ],
+  "canon_change": false,
+  "network": {
+    "name": "BNB Smart Chain",
+    "chain_id": 56
+  },
+  "token": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18,
+    "total_supply": "33000000"
+  },
+  "public_route": "/transparency",
+  "account_categories": [
+    "ecosystem",
+    "treasury",
+    "liquidity",
+    "contributors",
+    "team",
+    "strategic",
+    "genesis-distributor",
+    "other"
+  ],
+  "scope": {
+    "public_transparency": true,
+    "treasury_read_model": true,
+    "onchain_balance_reads": true,
+    "genesis_aggregates": true,
+    "contribution_aggregates": true,
+    "liquidity_reads": true,
+    "circulating_supply_numeric_without_approved_methodology": false,
+    "token_transfer": false,
+    "treasury_write": false,
+    "liquidity_mutation": false,
+    "wallet_signing": false,
+    "private_key_handling": false
+  },
+  "next_package": "MOOD-GENESIS-008 Security & Public Launch"
+}

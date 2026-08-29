@@ -1,0 +1,336 @@
+[
+  {
+    "name": "site-home",
+    "url": "http://localhost:8080/",
+    "viewport": "1440x900",
+    "identity": "anonymous",
+    "file": "site-home-1440x900.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "Home",
+          "href": "/",
+          "visible": true
+        },
+        {
+          "text": "Moodify Music",
+          "href": "/music.html",
+          "visible": true
+        },
+        {
+          "text": "Evidence",
+          "href": "/evidence.html",
+          "visible": true
+        },
+        {
+          "text": "About",
+          "href": "/about.html",
+          "visible": true
+        },
+        {
+          "text": "Contact",
+          "href": "/contact.html",
+          "visible": true
+        },
+        {
+          "text": "Privacy",
+          "href": "/privacy.html",
+          "visible": true
+        }
+      ],
+      "libraryLink": null,
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "LISTEN. THEN PLAY.",
+      "eyebrow": "MOODIFY",
+      "url": "http://localhost:8080/"
+    },
+    "errors": []
+  },
+  {
+    "name": "site-home-mobile",
+    "url": "http://localhost:8080/",
+    "viewport": "390x844",
+    "identity": "anonymous",
+    "file": "site-home-mobile-390x844.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "Home",
+          "href": "/",
+          "visible": true
+        },
+        {
+          "text": "Moodify Music",
+          "href": "/music.html",
+          "visible": true
+        },
+        {
+          "text": "Evidence",
+          "href": "/evidence.html",
+          "visible": true
+        },
+        {
+          "text": "About",
+          "href": "/about.html",
+          "visible": true
+        },
+        {
+          "text": "Contact",
+          "href": "/contact.html",
+          "visible": true
+        },
+        {
+          "text": "Privacy",
+          "href": "/privacy.html",
+          "visible": true
+        }
+      ],
+      "libraryLink": null,
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "LISTEN. THEN PLAY.",
+      "eyebrow": "MOODIFY",
+      "url": "http://localhost:8080/"
+    },
+    "errors": []
+  },
+  {
+    "name": "site-music",
+    "url": "http://localhost:8080/music.html",
+    "viewport": "1440x900",
+    "identity": "anonymous",
+    "file": "site-music-1440x900.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "Home",
+          "href": "/",
+          "visible": true
+        },
+        {
+          "text": "Moodify Music",
+          "href": "/music.html",
+          "visible": true
+        },
+        {
+          "text": "Evidence",
+          "href": "/evidence.html",
+          "visible": true
+        },
+        {
+          "text": "About",
+          "href": "/about.html",
+          "visible": true
+        },
+        {
+          "text": "Contact",
+          "href": "/contact.html",
+          "visible": true
+        },
+        {
+          "text": "Privacy",
+          "href": "/privacy.html",
+          "visible": true
+        }
+      ],
+      "libraryLink": null,
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "Moodify listens before you do.",
+      "eyebrow": "MOODIFY MUSIC",
+      "url": "http://localhost:8080/music.html"
+    },
+    "errors": []
+  },
+  {
+    "name": "ear-index-operator",
+    "url": "http://localhost:8081/",
+    "viewport": "1440x900",
+    "identity": "anonymous",
+    "file": "ear-index-operator-1440x900.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "Home",
+          "href": "/",
+          "visible": true
+        },
+        {
+          "text": "New Listening Case",
+          "href": "/new-case.html",
+          "visible": true
+        },
+        {
+          "text": "Evidence Library",
+          "href": "/evidence.html",
+          "visible": true
+        },
+        {
+          "text": "System Status",
+          "href": "/status.html",
+          "visible": true
+        }
+      ],
+      "libraryLink": null,
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "Listening, as an instrument",
+      "eyebrow": "INTERNAL OPERATOR SYSTEM / THE EAR OF AI",
+      "url": "http://localhost:8081/"
+    },
+    "errors": []
+  },
+  {
+    "name": "music-home-anonymous",
+    "url": "http://localhost:5173/",
+    "viewport": "1440x900",
+    "identity": "anonymous",
+    "file": "music-home-anonymous-1440x900.png",
+    "visible": {
+      "nav": [],
+      "libraryLink": null,
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "Je ne veux pas enfermer ton aujourd'hui",
+      "eyebrow": "CADEAU10 · 专辑 1",
+      "url": "http://localhost:5173/"
+    },
+    "errors": []
+  },
+  {
+    "name": "music-home-anonymous-mobile",
+    "url": "http://localhost:5173/",
+    "viewport": "390x844",
+    "identity": "anonymous",
+    "file": "music-home-anonymous-mobile-390x844.png",
+    "visible": {
+      "nav": [],
+      "libraryLink": null,
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "Je ne veux pas enfermer ton aujourd'hui",
+      "eyebrow": "CADEAU10 · 专辑 1",
+      "url": "http://localhost:5173/"
+    },
+    "errors": []
+  },
+  {
+    "name": "music-home-listener",
+    "url": "http://localhost:5173/",
+    "viewport": "1440x900",
+    "identity": "listener",
+    "file": "music-home-listener-1440x900.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "▥　我的音乐",
+          "href": "/library",
+          "visible": true
+        }
+      ],
+      "libraryLink": {
+        "visible": true
+      },
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "Je ne veux pas enfermer ton aujourd'hui",
+      "eyebrow": "CADEAU10 · 专辑 1",
+      "url": "http://localhost:5173/"
+    },
+    "errors": []
+  },
+  {
+    "name": "music-home-listener-mobile",
+    "url": "http://localhost:5173/",
+    "viewport": "390x844",
+    "identity": "listener",
+    "file": "music-home-listener-mobile-390x844.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "▥　我的音乐",
+          "href": "/library",
+          "visible": false
+        }
+      ],
+      "libraryLink": {
+        "visible": false
+      },
+      "studioLink": null,
+      "uploadLink": null,
+      "inboxLink": null,
+      "h1": "Je ne veux pas enfermer ton aujourd'hui",
+      "eyebrow": "CADEAU10 · 专辑 1",
+      "url": "http://localhost:5173/"
+    },
+    "errors": []
+  },
+  {
+    "name": "music-home-creator",
+    "url": "http://localhost:5173/",
+    "viewport": "1440x900",
+    "identity": "creator",
+    "file": "music-home-creator-1440x900.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "▥　我的音乐",
+          "href": "/library",
+          "visible": true
+        }
+      ],
+      "libraryLink": {
+        "visible": true
+      },
+      "studioLink": {
+        "visible": true
+      },
+      "uploadLink": {
+        "visible": true
+      },
+      "inboxLink": null,
+      "h1": "Je ne veux pas enfermer ton aujourd'hui",
+      "eyebrow": "CADEAU10 · 专辑 1",
+      "url": "http://localhost:5173/"
+    },
+    "errors": []
+  },
+  {
+    "name": "music-home-creator-mobile",
+    "url": "http://localhost:5173/",
+    "viewport": "390x844",
+    "identity": "creator",
+    "file": "music-home-creator-mobile-390x844.png",
+    "visible": {
+      "nav": [
+        {
+          "text": "▥　我的音乐",
+          "href": "/library",
+          "visible": false
+        }
+      ],
+      "libraryLink": {
+        "visible": false
+      },
+      "studioLink": {
+        "visible": false
+      },
+      "uploadLink": {
+        "visible": false
+      },
+      "inboxLink": null,
+      "h1": "Je ne veux pas enfermer ton aujourd'hui",
+      "eyebrow": "CADEAU10 · 专辑 1",
+      "url": "http://localhost:5173/"
+    },
+    "errors": []
+  }
+]

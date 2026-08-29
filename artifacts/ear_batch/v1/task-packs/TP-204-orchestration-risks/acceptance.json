@@ -1,0 +1,6 @@
+{
+  "required_outputs": [
+    "alignment/orchestration_risks.md"
+  ],
+  "non_empty": true
+}

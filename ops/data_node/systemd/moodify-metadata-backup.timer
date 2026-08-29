@@ -1,0 +1,10 @@
+[Unit]
+Description=Back up Moodify metadata daily
+
+[Timer]
+OnCalendar=*-*-* 00:20:00
+Persistent=true
+AccuracySec=2min
+
+[Install]
+WantedBy=timers.target

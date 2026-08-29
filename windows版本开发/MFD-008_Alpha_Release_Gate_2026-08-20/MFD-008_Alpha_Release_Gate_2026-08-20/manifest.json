@@ -1,0 +1,98 @@
+{
+  "package_id": "MFD-008",
+  "title": "Alpha Release Gate",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-007 must be GO",
+  "mode": "Release Gatekeeper / no feature expansion",
+  "scope": [
+    "release candidate freeze",
+    "clean build verification",
+    "fresh install and first launch",
+    "authentication and authorization verification",
+    "real Cloud playback and human audible verification",
+    "manifest expiry and network recovery",
+    "restart and forced-kill recovery",
+    "local-state corruption tests",
+    "rapid interaction and duplicate playback checks",
+    "single-instance/tray/background/media-control checks",
+    "upgrade and uninstall",
+    "Electron/security/secret audit",
+    "update/signing status",
+    "Windows compatibility truthfulness",
+    "resource sanity",
+    "defect classification",
+    "release artifact assembly",
+    "rollback plan",
+    "final GO/CONDITIONAL GO/NO-GO"
+  ],
+  "release_decisions": [
+    "ALPHA_GO",
+    "CONDITIONAL_ALPHA_GO",
+    "ALPHA_NO_GO"
+  ],
+  "forbidden": [
+    "new product features",
+    "UI redesign",
+    "new APIs",
+    "WASAPI",
+    "native audio",
+    "DSP",
+    "Cloud/Ear rearchitecture",
+    "public publishing without authorization",
+    "changing acceptance criteria to hide failure"
+  ],
+  "phase_closure": "If GO, Moodify Desktop Phase 1 closes as Moodify Desktop 0.1 Alpha",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "49f41adf441fc065b60afd886306c3ad50d8c1640818d7eeb55bf5ad88d6e8a0"
+    },
+    {
+      "name": "01_MFD-008_TASK.md",
+      "sha256": "14f307c3e4ef91fb57f29c1738ab929524e8401aeee5f4e119d8f90d3e1ee711"
+    },
+    {
+      "name": "02_RELEASE_GATE_MATRIX.md",
+      "sha256": "cb0c2c34ae1fbe5a35956e04d4b1d2acb7cbbb91e94566d23972f221b53c7f07"
+    },
+    {
+      "name": "03_DEFECT_POLICY.md",
+      "sha256": "f7d04fcdd6d7b3eb5d0c6ba42ab876600709254100108b69cace0820ac560d2c"
+    },
+    {
+      "name": "04_REAL_WORLD_SCENARIOS.md",
+      "sha256": "7e002c46fb36d255ccfee230495701aa331cfe11a8933715445253f7eec85d35"
+    },
+    {
+      "name": "05_SECURITY_RELEASE_CHECKLIST.md",
+      "sha256": "5b0911e30a3b400b2afd0acba10cb6720674c71260df099d745ab417cf86b767"
+    },
+    {
+      "name": "06_RELEASE_ARTIFACT_TEMPLATE.md",
+      "sha256": "ae02cee975b7a8808b943e8144157defefd895eee44b208e8592ed1907c4b5e3"
+    },
+    {
+      "name": "07_ROLLBACK_TEMPLATE.md",
+      "sha256": "52f4bdc6f61303743aab7718c457e4005680d3f4c1092a5f8e8cb17bff5e2082"
+    },
+    {
+      "name": "08_IMPLEMENTATION_SEQUENCE.md",
+      "sha256": "2d9710eb5908df054bf1fac255f3e4c564a7b37356f87c0e8e33ac1e44bb6ea2"
+    },
+    {
+      "name": "09_FINAL_DECISION_TEMPLATE.md",
+      "sha256": "62f3ed0930d021c560bfef29abee0726e3e136adaacb3212c94d6966c8493ec1"
+    },
+    {
+      "name": "10_PHASE_1_CLOSURE.md",
+      "sha256": "5d9ae5fb1f590bf932566fab5bd7f98280fdac733aca12af34f908edd9751d7d"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "f94cf32bd94b6a8c1d5da144b69fba8c090b3eff5105ca56c3a6f5c4c60676ff"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "task": "TP-203",
+  "verified_at": "2026-08-12T00:56:49.822949+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "alignment/authority_map.json",
+      "exists": true,
+      "bytes": 3103,
+      "sha256": "8779a6c10b8f9cc618080d7704b825848f51c619a7723413b2766648f8183489",
+      "passed": true
+    },
+    {
+      "path": "alignment/authority_review.md",
+      "exists": true,
+      "bytes": 245,
+      "sha256": "38e62f47428f40e27c1f86272e94266c2bc662ddf745b17ebe2e51779a273494",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Playback Event",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "playback_session_id",
+    "track_id",
+    "occurred_at"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_type": {
+      "enum": [
+        "PLAY_REQUESTED",
+        "PLAY_STARTED",
+        "PLAY_PAUSED",
+        "PLAY_RESUMED",
+        "PLAY_ENDED",
+        "PLAY_FAILED"
+      ]
+    },
+    "playback_session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "track_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "render_object_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "position_ms": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "duration_ms": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "app_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "failure_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "correlation_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

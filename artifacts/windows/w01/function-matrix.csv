@@ -1,0 +1,39 @@
+capability,subflow,ui_entry,ui_path,runtime_path,data_source,state_owner,persistence,ipc_or_api,test_coverage,status,severity,notes,evidence
+launch,cold start,app launch,main window,src/main/index.ts,defaults,Electron main,partial JSON,IPC app info,unit only,WORKING,P0,single instance and crash guards,verify plus packaged EXE
+empty_state,no songs,automatic,MinimalPlayer,MinimalPlayer.tsx,BFF/none,React,no,no,none,WORKING,P1,explicit empty state,source inspection
+import_song,single local file,+ 添加歌曲,file input,handleAddSongs,File object,React and PlaybackService,no,no,none,PARTIAL,P0,playable only for current process,MinimalPlayer.tsx:187
+import_folder,folder/batch import,file input,multiple files,handleAddSongs,FileList,React,no,no,none,PARTIAL,P1,no folder picker; multi-file selection only,MinimalPlayer.tsx:341
+duplicate_import,same file twice,+ 添加歌曲,file input,generated time/index ID,File,React,no,no,none,BROKEN,P1,new identity and queue replacement,MinimalPlayer.tsx:191
+metadata,title/artist/duration,+ 添加歌曲,player,handleAddSongs,filename,React,no,no,none,PARTIAL,P1,title from filename only,MinimalPlayer.tsx:193
+format_validation,unsupported/invalid file,file picker,player,audio element,MIME/extension,engine,no,no,engine unit,BROKEN,P2,accept hint is not validation,MinimalPlayer.tsx:344
+missing_source,moved/renamed/deleted,none,none,blob URL,File/blob,engine,no,no,none,MISSING,P1,no durable source or unavailable/relink state,persistence audit
+playlist,create,+ beside 我的歌单,sidebar,createPlaylist,local object,React/localStorage,localStorage,no,none,WORKING,P0,name persists,MinimalPlayer.tsx:231
+playlist,rename,none,none,none,none,none,no,no,none,MISSING,P1,,, 
+playlist,delete,none,none,none,none,none,no,no,none,MISSING,P1,,, 
+playlist,add one track,none,playlist button,none,none,none,no,no,none,MISSING,P0,no PlaylistItem model,playlist-add-root-cause.md
+playlist,add multiple tracks,none,none,none,none,none,no,no,none,MISSING,P1,,, 
+playlist,remove track,none,none,none,none,none,no,no,none,MISSING,P1,,, 
+playlist,reorder tracks,none,none,none,none,none,no,no,none,MISSING,P2,,, 
+playback,play,center control,player,PlaybackService/engine,queue,engine,no,BFF media,unit,WORKING,P0,,, 
+playback,pause,center control,player,PlaybackService/engine,audio,engine,no,media-key IPC,unit,WORKING,P0,,, 
+playback,seek,progress bar,player,engine,audio,engine,no,no,unit,WORKING,P1,,, 
+playback,previous,control,player,PlaybackService,queue,PlaybackService,no,media-key IPC,unit,WORKING,P1,,, 
+playback,next,control,player,PlaybackService,queue,PlaybackService,no,media-key IPC,unit,WORKING,P1,,, 
+playback,end of track,automatic,player,engine/service,queue,PlaybackService,no,no,unit,WORKING,P1,,, 
+playback,volume,slider,player,engine,audio,engine,no,no,unit,WORKING,P2,not restored,source inspection
+queue,current queue,implicit,player,PlaybackQueue,tracks,PlaybackService,no,no,unit,WORKING,P1,in-memory only,playback.test.ts
+queue,play next,next control,player,PlaybackQueue,queue,PlaybackService,no,IPC media key,unit,WORKING,P1,,, 
+queue,reorder,none,none,none,none,none,no,no,none,MISSING,P2,,, 
+persistence,library restart,none,none,none,none,none,no,no,none,MISSING,P0,,, 
+persistence,playlist restart,sidebar,MinimalPlayer,loadPlaylists,localStorage,renderer,yes,no,none,PARTIAL,P0,names only,MinimalPlayer.tsx:20
+persistence,playback session restart,none,none,LocalStateStore fields,JSON,main,declared but unwired,no,state validation,PLACEHOLDER,P2,,, 
+library,all songs,+ 添加歌曲,player,React array,File/BFF,renderer,no,BFF,none,MISSING,P1,no durable library,persistence audit
+library,favorites,none,none,BffClient,BFF,server,server,HTTP,API unit,PLACEHOLDER,P2,,, 
+library,history,none,none,BffClient/play events,BFF,server,server,HTTP,API unit,PLACEHOLDER,P2,,, 
+library,search,none,none,BffClient,BFF,server,server,HTTP,API unit,PLACEHOLDER,P2,,, 
+windows_native,media keys,hardware key,main,globalShortcut,engine,main,no,IPC,none,WORKING,P2,registration may fail safely,main/index.ts
+windows_native,system media session,none,none,none,none,none,no,no,none,MISSING,P2,,, 
+windows_native,single instance,second launch,main,requestSingleInstanceLock,Electron,main,no,no,none,WORKING,P2,,, 
+release,build,npm script,CLI,Forge/Vite,source,build,no,no,verify/make,WORKING,P0,production bundles built,build-test-reality.md
+release,installer,npm run make,CLI,Squirrel,package,Forge,out artifacts,no,make,PARTIAL,P1,fresh artifacts but process did not exit,build-test-reality.md
+release,update strategy,automatic,main,UpdateService,feed,main,no,no,unit,PLACEHOLDER,P2,unsigned/unverified feed,build-test-reality.md

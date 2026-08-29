@@ -1,0 +1,21 @@
+{
+  "task_id": "MFY-FAILURE-INJECTION-001",
+  "node": "120.55.191.146",
+  "date": "2026-08-11",
+  "queue_before": {"QUEUED": 0, "RUNNING": 0, "SUCCEEDED": 17, "FAILED": 2},
+  "queue_after": {"QUEUED": 0, "RUNNING": 0, "SUCCEEDED": 21, "FAILED": 3},
+  "fi_01_worker_killed": {"result": "PASS", "evidence": "job_0487e073 SUCCEEDED attempts=2; journal recovered_interrupted_jobs=1; systemd restart counter=1"},
+  "fi_02_server_reboot": {"result": "PASS (prior evidence)", "evidence": "acceptance.md Gate C: live reboot ~30s recovery, recorded 2026-08-10; not re-run"},
+  "fi_03_corrupted_audio": {"result": "PASS with finding", "evidence": "fi_01_non_audio FAILED SpectrogramGenerationFailed; fi_02_truncated (128B) ACCEPTED as SUCCEEDED - finding: truncated wav not rejected"},
+  "fi_04_deleted_artifact": {"result": "PASS", "evidence": "case_MANIFEST_MISSING -> rejected_cases.jsonl FileNotFoundError"},
+  "fi_05_modified_hash": {"result": "FINDING", "evidence": "case_HASH_TAMPERED (source_sha256 zeroed) ACCEPTED into cases.jsonl - aggregate does not verify hash consistency"},
+  "fi_06_duplicate_submit": {"result": "PASS", "evidence": "ingest returned duplicate + original job_id job_f94cfa8d; no new ledger row"},
+  "fi_07_repeated_retry": {"result": "PASS", "evidence": "retry x2 -> REQUEUED both times, attempts 1->3, no duplicate artifacts"},
+  "fi_08_disk_exhaustion": {"result": "PASS", "evidence": "fallocate 26G -> free 1.50 GiB; resource_defer 'free disk 1.50 GiB < 3.00 GiB'; released -> job SUCCEEDED in 31s"},
+  "fi_09_low_memory": {"result": "PASS", "evidence": "memhog 1088 MiB -> MemAvailable 241 MiB; resource_defer 'available memory 270 MiB < 300 MiB'; released -> job SUCCEEDED in 36s"},
+  "fi_10_partial_output": {"result": "PASS", "evidence": "case_PARTIAL_OUTPUT (missing 04_after_scan/B/metrics.json) -> rejected_cases.jsonl FileNotFoundError"},
+  "findings": [
+    {"id": "MFY-FI-FINDING-001", "severity": "MEDIUM", "title": "aggregate_dataset does not verify artifact hash consistency", "detail": "Tampering with case_manifest.json source_sha256 was silently accepted into cases.jsonl. Manifest records hashes but no verifier checks them against actual artifacts."},
+    {"id": "MFY-FI-FINDING-002", "severity": "LOW", "title": "truncated wav accepted as successful scan", "detail": "128-byte wav (header only) scanned SUCCEEDED via ffmpeg showspectrumpic tolerance. Invalid audio may produce empty/degenerate cases without explicit rejection."}
+  ]
+}

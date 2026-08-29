@@ -1,0 +1,119 @@
+{
+  "schema_version": "mamse-010-real-cases-v1",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "tensor_id": "tensor-50bd63449cfad7d7",
+      "scale_feature_shape": [
+        1286,
+        3,
+        12
+      ],
+      "scale_feature_valid_fraction": 0.3886,
+      "channel_spectral_shape": [
+        1506,
+        99,
+        2
+      ],
+      "hosvd_ranks": [
+        8,
+        8,
+        2
+      ],
+      "hosvd_model_id": "tucker-c13f9ed1e78c7065",
+      "hosvd_relative_error": 0.20968576389566193,
+      "localization_candidates": [
+        {
+          "time_s": 42.00533333333333,
+          "relative_residual": 0.9999971884918624
+        },
+        {
+          "time_s": 94.31466666666667,
+          "relative_residual": 0.9999903412790649
+        },
+        {
+          "time_s": 116.33066666666667,
+          "relative_residual": 0.999954171590479
+        }
+      ]
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "tensor_id": "tensor-185caf95dcfe6224",
+      "scale_feature_shape": [
+        1844,
+        3,
+        12
+      ],
+      "scale_feature_valid_fraction": 0.3886,
+      "channel_spectral_shape": [
+        2160,
+        99,
+        2
+      ],
+      "hosvd_ranks": [
+        8,
+        8,
+        2
+      ],
+      "hosvd_model_id": "tucker-3fcc62c80c8751ac",
+      "hosvd_relative_error": 0.1800545559185011,
+      "localization_candidates": [
+        {
+          "time_s": 58.730666666666664,
+          "relative_residual": 0.9999252750440158
+        },
+        {
+          "time_s": 161.984,
+          "relative_residual": 0.9999268803241133
+        },
+        {
+          "time_s": 162.66666666666666,
+          "relative_residual": 0.9999425083183061
+        }
+      ]
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "tensor_id": "tensor-c6ba9f9fac75510e",
+      "scale_feature_shape": [
+        1980,
+        3,
+        12
+      ],
+      "scale_feature_valid_fraction": 0.3887,
+      "channel_spectral_shape": [
+        2320,
+        99,
+        2
+      ],
+      "hosvd_ranks": [
+        8,
+        8,
+        2
+      ],
+      "hosvd_model_id": "tucker-ec185bd0516fff7e",
+      "hosvd_relative_error": 0.27257707615893406,
+      "localization_candidates": [
+        {
+          "time_s": 8.981333333333334,
+          "relative_residual": 0.9981140222353654
+        },
+        {
+          "time_s": 10.858666666666666,
+          "relative_residual": 0.9991576669688517
+        },
+        {
+          "time_s": 46.35733333333334,
+          "relative_residual": 0.9994059063670154
+        }
+      ]
+    }
+  ]
+}

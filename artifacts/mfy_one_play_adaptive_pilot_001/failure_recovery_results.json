@@ -1,0 +1,28 @@
+{
+  "package_id": "MFY_ONE_PLAY_ADAPTIVE_PILOT_001",
+  "sequence": 73,
+  "gate": "failure_recovery",
+  "status": "IMPLEMENTED + JVM_VERIFIED; device stress tests SKIPPED per user",
+  "failure_never_blocks_playback": {
+    "design": "recordPilotDecision is called after playback starts and inside the existing observer callbacks; any exception in the recorder path is swallowed locally (measurement/evidence guarded with try/catch) and never touches the player",
+    "error_decision": "PilotEvaluator returns ERROR with reason on any playback exception; recording proceeds",
+    "jvm_evidence": "PilotScopeTest.playback error never blocks and records ERROR (RuntimeException -> ERROR, recorder path survives)"
+  },
+  "original_always_available": {
+    "design": "3.1 controls unchanged: toggle/stop/next/previous/seek all untouched; user can switch back to original at any time",
+    "evidence": "PlaybackManager playback methods unchanged in 73 (diff = +decision recording only)"
+  },
+  "stable_bypass_out_of_scope": {
+    "design": "STREAMING_HTTP / QQ_SHARE always BYPASSED_OUT_OF_SCOPE; playback continues on the unmodified path",
+    "jvm_evidence": "PilotScopeTest.cloud and QQ always bypass out of scope"
+  },
+  "policy_safety_bypass": {
+    "design": "BYPASSED_SAFETY when the 70 policy forbids DSP (spatializer/offload/thermal/underrun/unknown route)",
+    "jvm_evidence": "PilotScopeTest.policy safety bypass applies even in scope"
+  },
+  "recovery_continuity": {
+    "69 evidence": "pause/resume/seek cycles 0 underruns with identity graph (device run 2026-08-17)",
+    "73 note": "no new audio-path code; recovery semantics inherited from 68/69 verified device runs"
+  },
+  "device_stress_pending": ["long-duration playback", "background switch", "route hot-switch", "phone/notification interruption", "low battery", "thermal stress"]
+}

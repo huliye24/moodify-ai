@@ -1,0 +1,24 @@
+{
+  "events": [
+    {
+      "event": "LOW_REGISTER_ADJACENT_TONAL_STRUCTURE",
+      "time_range_ms": [
+        123125.33333333333,
+        124384.0
+      ],
+      "status": "SUPPORTED",
+      "frequency_geometry": "log2-equal-temperament-24bpo-v0.1",
+      "estimated_centers_hz": [
+        65.4,
+        73.4
+      ],
+      "musical_distance_semitones": 2.0,
+      "linear_path_resolution": "PARTIAL",
+      "log_frequency_increment": "RESOLVED",
+      "evidence_refs": [
+        "log_frequency_evidence.json",
+        "mamse002_logfreq_sketch.npz"
+      ]
+    }
+  ]
+}

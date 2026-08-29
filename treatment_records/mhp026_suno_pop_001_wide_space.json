@@ -1,0 +1,112 @@
+{
+  "schema_version": "0.1.0",
+  "record_type": "moodify_treatment_record",
+  "song_id": "mhp026_suno_pop_001",
+  "preset": "wide_space",
+  "created_at": "2026-06-01T08:35:31Z",
+  "paths": {
+    "before_audio": "E:\\moodify\\local_audio_assets\\mhp026\\source\\02_suno_pop\\mhp026_02_suno_pop__beijixing_yu_heiye_02.flac",
+    "after_audio": "E:\\moodify\\outputs\\mhp026_02_suno_pop__beijixing_yu_heiye_02_wide_space.wav",
+    "inspector_metrics": "E:\\moodify\\inspector_reports\\mhp026_mhp026_suno_pop_001_wide_space\\metrics_comparison.json",
+    "matched_after_audio": "E:\\moodify\\inspector_reports\\mhp026_mhp026_suno_pop_001_wide_space\\after_matched.wav",
+    "inspector_report_md": "E:\\moodify\\inspector_reports\\mhp026_mhp026_suno_pop_001_wide_space\\report.md",
+    "inspector_report_html": "E:\\moodify\\inspector_reports\\mhp026_mhp026_suno_pop_001_wide_space\\report.html"
+  },
+  "before_features": {
+    "peak_db": -1.76,
+    "rms_db": -14.89,
+    "crest_factor": 4.54,
+    "dynamic_range_db": 12.02,
+    "correlation_lr": 0.702,
+    "mid_side_ratio_db": -7.55,
+    "bands": {
+      "sub": -4.5,
+      "bass": -3.2,
+      "low_mid": -12.6,
+      "mid": -11.7,
+      "presence": -16.9,
+      "air": -19.4
+    },
+    "spectral_centroid": 4934.7,
+    "spectral_rolloff_95": 15625.4,
+    "spectral_flatness": 0.3303
+  },
+  "after_features": {
+    "peak_db": -0.01,
+    "rms_db": -9.85,
+    "crest_factor": 3.11,
+    "dynamic_range_db": 5.93,
+    "correlation_lr": 0.654,
+    "mid_side_ratio_db": -6.79,
+    "bands": {
+      "sub": -4.8,
+      "bass": -3.2,
+      "low_mid": -12.3,
+      "mid": -11.3,
+      "presence": -16.1,
+      "air": -18.7
+    },
+    "spectral_centroid": 5135.8,
+    "spectral_rolloff_95": 16000.0,
+    "spectral_flatness": 0.3799
+  },
+  "delta_features": {
+    "peak_delta_db": 1.75,
+    "rms_delta_db": 5.04,
+    "crest_delta": -1.43,
+    "dynamic_range_delta_db": -6.09,
+    "correlation_lr_delta": -0.05,
+    "mid_side_ratio_delta_db": 0.76,
+    "spectral_centroid_delta": 201.1,
+    "spectral_rolloff_95_delta": 374.6,
+    "spectral_flatness_delta": 0.05,
+    "sub_delta_db": -0.3,
+    "bass_delta_db": 0.0,
+    "low_mid_delta_db": 0.3,
+    "mid_delta_db": 0.4,
+    "presence_delta_db": 0.8,
+    "air_delta_db": 0.7
+  },
+  "preset_params": {
+    "P01_vocal_presence_freq": 3000.0,
+    "P02_vocal_presence_gain": 1.0,
+    "P03_vocal_presence_q": 0.5,
+    "P04_proximity_low_freq": 150.0,
+    "P05_proximity_low_gain": 0.0,
+    "P06_compression_ratio": 1.25,
+    "P07_compression_attack": 35.0,
+    "P08_compression_release": 320.0,
+    "P09_compression_threshold": -14.0,
+    "P10_reverb_t60": 2.5,
+    "P11_reverb_dry_wet": 0.28,
+    "P12_reverb_width": 1.0,
+    "P13_harmonic_drive": 0.05,
+    "P14_high_shelf_freq": 12000.0,
+    "P15_high_shelf_gain": 1.5
+  },
+  "loudness_match": {
+    "rms_delta_db": 5.04,
+    "after_gain_match_db": -5.04,
+    "warning_level": "strong",
+    "matched_after_path": "after_matched.wav"
+  },
+  "human_feedback": {
+    "status": "pending",
+    "volume_matched": null,
+    "clarity": null,
+    "warmth": null,
+    "space": null,
+    "harshness_control": null,
+    "plastic_feel_control": null,
+    "artifact_control": null,
+    "target_fit": null,
+    "better_than_before": null,
+    "notes": "matched_after=E:\\moodify\\inspector_reports\\mhp026_mhp026_suno_pop_001_wide_space\\after_matched.wav"
+  },
+  "algorithm_learning": {
+    "usable_for_future_adaptive_preset": true,
+    "issue_tags": [],
+    "positive_tags": [],
+    "parameter_adjustment_suggestion": null
+  }
+}

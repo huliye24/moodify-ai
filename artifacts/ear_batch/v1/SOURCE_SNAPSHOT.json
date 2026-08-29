@@ -1,0 +1,793 @@
+{
+  "source": "E:\\Moodify ear",
+  "created_at": "2026-08-12T00:45:17.474469+00:00",
+  "v2_excluded": true,
+  "files": [
+    {
+      "path": "Moodify_Ear_v1_August_2026.pdf",
+      "bytes": 50618,
+      "sha256": "13196e4ee264459ec906eef1dfea9dc8c27ab7439def4ddbc5cbda4c63dea986",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_01.pdf",
+      "bytes": 87220,
+      "sha256": "876d6bb196c60cf48a6fae548c9821a73512b7fbcb637bc9e4923c11978009b8",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02/manifest.json",
+      "bytes": 382,
+      "sha256": "0fcfa4a07d4c8e265b311756c37bf659ed5fdefc56ff637ddc493bfc5697a3db",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+      "bytes": 35154,
+      "sha256": "84d30e52e88bcf1af948a59dc51c1e8397d038073dca74802d5585b54dd61168",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.pdf",
+      "bytes": 110820,
+      "sha256": "928ccde4951add4077e6df740b0399d53f55e844c4f25434c8bdfda3e2fdabae",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02/README.md",
+      "bytes": 394,
+      "sha256": "a80e13a1daabd840a5aee5f268c25b2fad66a68e2a237484cc3bd5e20fa35fc6",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02/references.md",
+      "bytes": 3379,
+      "sha256": "39582cec358dbcd5f983d25e8c4a3ff08efc2eec371f4e40e0637eeea205ddee",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02_Package.zip",
+      "bytes": 115335,
+      "sha256": "8b6b7fbb5600e9283670ef9371891e1d0634a50ca98c57694fbdb3b48359dc5c",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/manifest.json",
+      "bytes": 382,
+      "sha256": "0fcfa4a07d4c8e265b311756c37bf659ed5fdefc56ff637ddc493bfc5697a3db",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+      "bytes": 35154,
+      "sha256": "84d30e52e88bcf1af948a59dc51c1e8397d038073dca74802d5585b54dd61168",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.pdf",
+      "bytes": 110820,
+      "sha256": "928ccde4951add4077e6df740b0399d53f55e844c4f25434c8bdfda3e2fdabae",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/README.md",
+      "bytes": 394,
+      "sha256": "a80e13a1daabd840a5aee5f268c25b2fad66a68e2a237484cc3bd5e20fa35fc6",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/references.md",
+      "bytes": 3379,
+      "sha256": "39582cec358dbcd5f983d25e8c4a3ff08efc2eec371f4e40e0637eeea205ddee",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03/manifest.json",
+      "bytes": 387,
+      "sha256": "0a642ba2784b875894cc428fafd76b101f7785f1591987bc0e07c15a760c02b7",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+      "bytes": 33226,
+      "sha256": "f34ac84e669c9d51a1405688ffcac87aad8e78eaed98a021d4dc1d326101b8d9",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.pdf",
+      "bytes": 110314,
+      "sha256": "8ef36b161f4e4222dadbd1d53ba63a13bbc661ff07d765b93782288bf2d7710e",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03/README.md",
+      "bytes": 475,
+      "sha256": "e7ba8b346b4d45ad503309046b3f22edbf0d89e23abe9075c16a7e6aaeacb47a",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03/references.md",
+      "bytes": 4241,
+      "sha256": "78fd6aa3cba5970e9ea72972ad7bde879ab963c8cc260eeb4dc7b24b5ab8ca23",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03_Package.zip",
+      "bytes": 114437,
+      "sha256": "190c6b30a23dd5fa873ab8dc97b97e0a424e2d09b285525e5383de33b9032f23",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/manifest.json",
+      "bytes": 387,
+      "sha256": "0a642ba2784b875894cc428fafd76b101f7785f1591987bc0e07c15a760c02b7",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+      "bytes": 33226,
+      "sha256": "f34ac84e669c9d51a1405688ffcac87aad8e78eaed98a021d4dc1d326101b8d9",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.pdf",
+      "bytes": 110314,
+      "sha256": "8ef36b161f4e4222dadbd1d53ba63a13bbc661ff07d765b93782288bf2d7710e",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/README.md",
+      "bytes": 475,
+      "sha256": "e7ba8b346b4d45ad503309046b3f22edbf0d89e23abe9075c16a7e6aaeacb47a",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/references.md",
+      "bytes": 4241,
+      "sha256": "78fd6aa3cba5970e9ea72972ad7bde879ab963c8cc260eeb4dc7b24b5ab8ca23",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04/manifest.json",
+      "bytes": 378,
+      "sha256": "4dcc58d403f51c5d426ade6e41084ed355faddcb4946f47608177ca82e4b1b52",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.md",
+      "bytes": 34694,
+      "sha256": "2586e2c326046da9e48e3c71a6b659c60534bd7502c54f76b6d94278268b807e",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.pdf",
+      "bytes": 112190,
+      "sha256": "ab8ee3c0662dd0c87deda78f869d047cd88825743a944de8bc4499415a24852b",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04/README.md",
+      "bytes": 595,
+      "sha256": "82af9e1f5dfd9603621ec7507ec0cafd02faa32211c1854e8ed5c34500d1f8d3",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04/references.md",
+      "bytes": 4201,
+      "sha256": "2ddc701b215295e0c1cb1968575a8d713d9b697fd6c9153b4e2ceab5260abc39",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04_Package.zip",
+      "bytes": 116044,
+      "sha256": "ba2cf92d11ec0eac88c555fd5e772e1818039fe1408f3ca3796ad6bf985cdf9f",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/manifest.json",
+      "bytes": 378,
+      "sha256": "4dcc58d403f51c5d426ade6e41084ed355faddcb4946f47608177ca82e4b1b52",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.md",
+      "bytes": 34694,
+      "sha256": "2586e2c326046da9e48e3c71a6b659c60534bd7502c54f76b6d94278268b807e",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.pdf",
+      "bytes": 112190,
+      "sha256": "ab8ee3c0662dd0c87deda78f869d047cd88825743a944de8bc4499415a24852b",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/README.md",
+      "bytes": 595,
+      "sha256": "82af9e1f5dfd9603621ec7507ec0cafd02faa32211c1854e8ed5c34500d1f8d3",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/references.md",
+      "bytes": 4201,
+      "sha256": "2ddc701b215295e0c1cb1968575a8d713d9b697fd6c9153b4e2ceab5260abc39",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_05_Package.zip",
+      "bytes": 114756,
+      "sha256": "036505cb0d502c650b7f12e172e489d09733860c3688658358e9596b458a51fb",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/manifest.json",
+      "bytes": 382,
+      "sha256": "7fb8d1a50020d0d4e6c3d8ebffc59799de9bce4ba677d2fbb5793c602983213b",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+      "bytes": 32896,
+      "sha256": "1b0ea0f8eac7426fa7b4522a57b7eac5d314c25b92c286d8454bee73059e02ad",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.pdf",
+      "bytes": 111559,
+      "sha256": "13d5de42ca3a730eefbf93dd1c6bdcfabd4741112bb5cd20354663595e45ba4e",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/README.md",
+      "bytes": 630,
+      "sha256": "dd1f25650572517da67f268cd3e4940b66b8c43bb6ce37af7567889d16f39f35",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/references.md",
+      "bytes": 2892,
+      "sha256": "0b6703865190a686e6b44e18e32a71cf92f5c62480f73664bacba10e95901e03",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_06_Package.zip",
+      "bytes": 115002,
+      "sha256": "49fd520b21b3560cdf2e53d95c591a6049af22850fd02735270eb7da9da51d5c",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/manifest.json",
+      "bytes": 381,
+      "sha256": "9980ba752cb2131fdfd53d61045bdf957545206c2d8de9f21ddec0c96c316233",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+      "bytes": 33016,
+      "sha256": "b700df3450ebe0f1642e725f8c793948da02570c7bf8a2a59e065b739fcff79c",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.pdf",
+      "bytes": 111747,
+      "sha256": "4345e1bb89547847a5530d52ab0b078f29f196f3fe1e96a80d3ffc3c0bde2a91",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/README.md",
+      "bytes": 634,
+      "sha256": "dd99eab7c3765f851155f381844163765fafbb9fdc5faef6a9ac2064853ba451",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/references.md",
+      "bytes": 4093,
+      "sha256": "49b3d3931e27b754697980473b1e89c2be83175be938184b83b0460c00465279",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_07_Package.zip",
+      "bytes": 121288,
+      "sha256": "4c23f2d61405d67a9549acad536682062a264e18991c94e06eace445679edb6c",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/manifest.json",
+      "bytes": 382,
+      "sha256": "7aaf2dce0a3f57e31dfeab316fc41a5bffd4f07bc1e9c079e11db9536ed441bb",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+      "bytes": 37426,
+      "sha256": "427d057640e395a3b7b038c99275131df174120776e84ff1162d7acd1874cf79",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.pdf",
+      "bytes": 117679,
+      "sha256": "4210204549b79bd936634387e62bf6fb4fdf1f3d798d6927cd256f58fa239806",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/README.md",
+      "bytes": 613,
+      "sha256": "66d2976a42319d120748b6aa3845e017920f0ee5026e8f67653a5171e4384ab7",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/references.md",
+      "bytes": 4390,
+      "sha256": "c3d7e19e3afc183851b7152616ad5c16a97b71dc02d86cebfcadbe5f6ed541b0",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_08_Package.zip",
+      "bytes": 117056,
+      "sha256": "66fd707ca0bc1a1e924ca6ce50ecc771dfbb65ae6dc6467ff064bc7c9ffc3e52",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/manifest.json",
+      "bytes": 376,
+      "sha256": "cdc20c0916c33f1f73deaa598420bf457a243226e7d08a50576c0589ab88b752",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+      "bytes": 34405,
+      "sha256": "a664f1148348037502c8974be6517f588ff16ed1cda187c6fb12bf764cfc49df",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.pdf",
+      "bytes": 114249,
+      "sha256": "9632a22785adecd4087c46cd2b7e8a3a4cf221f0fd909e7a87b491547e73f09a",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/README.md",
+      "bytes": 592,
+      "sha256": "7a31d7efd974f2462a9b309b6e5f3eafc167e3cf4c1e4e44c7ef307c040806ca",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/references.md",
+      "bytes": 3939,
+      "sha256": "1cd3ec8ff525d6941ec67de0bae646a1e938a1bf9b76aab41624695ad9e2fd5f",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_09_Package.zip",
+      "bytes": 117018,
+      "sha256": "6465f7ed06ad1008bb6c844bb58a633edb460d37b90f6e3a84b5a901a7167143",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/manifest.json",
+      "bytes": 378,
+      "sha256": "d4dc8330cd0fd36a9726ad99dcc08cf4fa966c6d55b8b67fe712cc0cd6e50a59",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+      "bytes": 34243,
+      "sha256": "c02bfc37322301e492f2eeb2d322eccb28cd2c89b9ef1ac32a7f6e31a64a83e4",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.pdf",
+      "bytes": 114076,
+      "sha256": "044b1d0776116d5dbc0b77a8c02642669065ed19a16ca78a126bb4a3d88bcd00",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/README.md",
+      "bytes": 578,
+      "sha256": "4b5e34a95bc0b9c1d08c0185ada744616658204195d7a4f7c0e103990d6c6766",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/references.md",
+      "bytes": 3328,
+      "sha256": "7716e5331a7cf976b4b99bf3253f282791221ebe820fba54f12b034dee9bf5bb",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_10_Package.zip",
+      "bytes": 115645,
+      "sha256": "6414210d4247c8501fbd30533515f902a375a03019ea3e4e57dc16d747cf435d",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/manifest.json",
+      "bytes": 378,
+      "sha256": "f90c6dbdc6d872064370fcbc575a2e503e1508d4b8c7b1e9cc4ee1fb87d8c521",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/Moodify_Ear_v1_Chapter_10.md",
+      "bytes": 33007,
+      "sha256": "f300b6fefcf6da56482cef335a2532ae3e0a8fd4848029271d06e4cf58c4010a",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/Moodify_Ear_v1_Chapter_10.pdf",
+      "bytes": 113231,
+      "sha256": "0cd16eb4a2459425a39df2344454f279360cdd6c060c4e4267bd452f05ee6f32",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/README.md",
+      "bytes": 593,
+      "sha256": "513f57660e3df6e7a7c1d8d6606dd06b7d6d0bf6688ba9f60acc24bfc4efdabc",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/references.md",
+      "bytes": 3893,
+      "sha256": "be76154155f3e7ecdffa77e7906855c1c9005e8c67f175e7aebcc8cf91121e19",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_11_Package.zip",
+      "bytes": 118497,
+      "sha256": "f8280bc0b56bd42a5cfc031607b86a198206b7d0d28e98c62cc6e8ba82eb69d1",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/manifest.json",
+      "bytes": 383,
+      "sha256": "3c36cba7ec679cd8eafe27cde73897f92b777c469f33cfe046c621db86e75481",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+      "bytes": 36149,
+      "sha256": "e4ff70b97dcb1fc0822fe3f88c01e39ca9a3077b6d31343a564ead34614cd6df",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.pdf",
+      "bytes": 115881,
+      "sha256": "89caa4ecfb6eb5bdb79dfe31f73e906578a8a0f339583d1a54591edc37083669",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/README.md",
+      "bytes": 558,
+      "sha256": "fbfbf3d7375389dab94238902461ef54775172ba52aa1773f2a3fc40986713ee",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/references.md",
+      "bytes": 3984,
+      "sha256": "c2a470296cccc9629a88acae2e27e7928bfb353fe1fa1d1dfa63dfd2dc4a5e47",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_12_Package.zip",
+      "bytes": 119430,
+      "sha256": "d79517c66953a024499b89443fb70a4fdfaf261b7226e7affd2b7b2a8a72bf7b",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/manifest.json",
+      "bytes": 370,
+      "sha256": "925b11619ba3c88c2f779848df8eadf1a638ff69a8be2022b9d328138b73c06c",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+      "bytes": 35793,
+      "sha256": "94f7e6cfd3696f1628577b263cfb590ab80f94f8596e64a0cfbdd08d597b2341",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.pdf",
+      "bytes": 116429,
+      "sha256": "a2c65e1ddcb5c709727fe78f806317fac6b1705fd96d197f6e012937e74c18c8",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/README.md",
+      "bytes": 559,
+      "sha256": "8308f8249c13350fff6880139080ffd2d9d9345935048bbbb7b1218a1386edcf",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/references.md",
+      "bytes": 4887,
+      "sha256": "5565eb76e44f010e361e4ec3d5f659c03f23155ab4a2cd3b86c0d7e7cd41e32e",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_13_Package.zip",
+      "bytes": 119473,
+      "sha256": "91abecb8efdb8d3358cfd26f9b970dbcfa92b21b5d319880564879ac69363604",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/manifest.json",
+      "bytes": 370,
+      "sha256": "b41ea7ef9630dab5acbde3b347540f0b3e3bd4f35aa40514eef14e12042c44c5",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.md",
+      "bytes": 35124,
+      "sha256": "4948d908bcc2a154c8eebd115210d1f62189a945c22ae82f05f840e1349a98ec",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.pdf",
+      "bytes": 117282,
+      "sha256": "f047617459c898e1072fff61c6d03523c8129842063db0773312c3eb40a26f3e",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/README.md",
+      "bytes": 633,
+      "sha256": "b6e509aa9313719ae2a0c10d96f11e419371abfcfd756e3826f8e9ea23983da8",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/references.md",
+      "bytes": 4391,
+      "sha256": "563fc9c9134e5ecdb304d9d57f7e431ee15e97f47dce8e515ed834e490b7b536",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_14_Package.zip",
+      "bytes": 124279,
+      "sha256": "e141fe22fa30b4034c4709081f32d69da18ec6d59d1ab0cf6763b5ed61304355",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/manifest.json",
+      "bytes": 368,
+      "sha256": "4964346d07385daeb69d1c8dd1a97a15477be4fdb3a74dd9d49ea30e7214baba",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/Moodify_Ear_v1_Chapter_14.md",
+      "bytes": 39720,
+      "sha256": "b844dfcef6b686b2d59c064699ab458cc521f1e1d1fd9c4b36212a8bae9125ca",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/Moodify_Ear_v1_Chapter_14.pdf",
+      "bytes": 121311,
+      "sha256": "0ecefd374911149a059265918838acc3d55e5da9fea0dc218c86b17e7ea511b3",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/README.md",
+      "bytes": 591,
+      "sha256": "3650a6524927e333363cd75d44617ea5a72dc8069f568f2d0500642a3ea281e8",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/references.md",
+      "bytes": 4429,
+      "sha256": "6ba1540f1d781cf6bfe19498aa1facefe42c533f4f5094e96bd631dcde014c75",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_15_Package.zip",
+      "bytes": 118594,
+      "sha256": "5094b6a40c9f3d5c6cdab46b3a0101663732e4bfb2a521236de15a1d8a2a6da7",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/manifest.json",
+      "bytes": 371,
+      "sha256": "75cd58239bd73a4a461b4d8b6824195402519d0bb47d0ae24e10976d80da8716",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+      "bytes": 35890,
+      "sha256": "36b0250ec154a3a756b19e298f7279e2c42bac88ff23fc3615f3fa5caacea692",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.pdf",
+      "bytes": 116097,
+      "sha256": "201c010134a9c365483e0905cda9cbf65d9e9f357c6148094ccc2ff771655460",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/README.md",
+      "bytes": 624,
+      "sha256": "53e5519963a52653e9ad702365e6142814e2f0aa1d8e85d276684c4f32212cba",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/references.md",
+      "bytes": 3626,
+      "sha256": "5b07f8e0eee8e81fa04717c4c1b83f4a737a406089c9182d571dc2eca5f8c626",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_16_Package.zip",
+      "bytes": 123546,
+      "sha256": "ccca5ad76b0d0031913107158a4021a7398c2fb4d324d2a53c3170cf134fa933",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/manifest.json",
+      "bytes": 385,
+      "sha256": "2d544af5e0b6a385e28213f7453e6136c88d3d5c7c5385326458cbecf81c70e8",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+      "bytes": 38208,
+      "sha256": "417c642144765f872ccec3e8b377b1df2c95792142d0611eccb8abd055b1959d",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.pdf",
+      "bytes": 121596,
+      "sha256": "21926c6955a228b2137315d7b6a36e3c621d436b4072a1b0bc21b876cdefaf43",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/README.md",
+      "bytes": 905,
+      "sha256": "c0f6066ff6abfab1bc408ce18c98b9ab0975f165edfb40534ea9ea9afb8c1574",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/references.md",
+      "bytes": 3877,
+      "sha256": "c0fdbf959ca80055621b28c89a93a336f51f5689cf3d26b03fd41c8d46a676b1",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_17_Package.zip",
+      "bytes": 120422,
+      "sha256": "d3b2d97b55be98c12eff36bcbc3d32ee2a856acda653f6c89345d09001e44325",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_17_Package/Moodify_Ear_v1_Chapter_17/manifest.json",
+      "bytes": 371,
+      "sha256": "54febea4a1a3312369d92e6b3a0949c0f68601f827e2b74055348d0b8412c6e2",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_17_Package/Moodify_Ear_v1_Chapter_17/Moodify_Ear_v1_Chapter_17.md",
+      "bytes": 36623,
+      "sha256": "00c53db90f4f7408f2fe76bfaf73f5d1320d1f7a07515ba618df7b41681d49e3",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_17_Package/Moodify_Ear_v1_Chapter_17/Moodify_Ear_v1_Chapter_17.pdf",
+      "bytes": 117778,
+      "sha256": "a6b00aa902f461556a79de3778c49007549c9e1bb7b257d75740f5c2940d33ec",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_17_Package/Moodify_Ear_v1_Chapter_17/README.md",
+      "bytes": 635,
+      "sha256": "a1e7a8fa5027c9fbc4967ea7f6dab6a00c86f5681a694d365ea66f81bb443104",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_17_Package/Moodify_Ear_v1_Chapter_17/references.md",
+      "bytes": 4395,
+      "sha256": "e02f02c73d24c35b724be99a5a0c5a6ab0e0d8ec32ec81680eba32c3d8bd5f21",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_18_Package.zip",
+      "bytes": 127212,
+      "sha256": "1795289188fdf909d8c415a4b46cbf20672964f491d6d5c673a9e6c2e07d7610",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/manifest.json",
+      "bytes": 375,
+      "sha256": "16099244ff2dd7e57283e9fcf7bbe9c7615a5f33fd611316dfc97bcbab725569",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+      "bytes": 42267,
+      "sha256": "1d8325936cd395a69d59e8745c970aa74a1c2f4e3ef74ca25e3c197df6b90456",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.pdf",
+      "bytes": 124879,
+      "sha256": "6e3dd1c4139609f5520de22a86467ebaf1610d04987bab6025bad7185e7f86b9",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/README.md",
+      "bytes": 797,
+      "sha256": "13da8d935b65c8621b5fe80da0dfdf85771ee4e184778890ab695500b9112c0f",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/references.md",
+      "bytes": 4280,
+      "sha256": "962c7aff2ee71de2d8556f2a9956a61682e8f186f338ee01bf73deedb4902288",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_19_Package.zip",
+      "bytes": 126356,
+      "sha256": "ad4895c4c6b9c8448dec06279736bf5666e0e5280ecaf4fa55728546f68c4370",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_19_Package/Moodify_Ear_v1_Chapter_19/manifest.json",
+      "bytes": 381,
+      "sha256": "610fefa12c67298cd2270317191e884aedfca6bf2c460eda61524ada6343a99d",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_19_Package/Moodify_Ear_v1_Chapter_19/Moodify_Ear_v1_Chapter_19.md",
+      "bytes": 41611,
+      "sha256": "2d3af7be8c170d12bd862bce8a432ec03a6c8b09572041a81115bc6f57259722",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_19_Package/Moodify_Ear_v1_Chapter_19/Moodify_Ear_v1_Chapter_19.pdf",
+      "bytes": 124148,
+      "sha256": "3f2038939664581e6bca83e72826ca35f023c8b398ca24470c75bbf1aba4c97d",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_19_Package/Moodify_Ear_v1_Chapter_19/README.md",
+      "bytes": 649,
+      "sha256": "6c2f98937af5d8f6c95adb2503d6fbe5f1a0e7e8ad30c8e203ef929014070afd",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_19_Package/Moodify_Ear_v1_Chapter_19/references.md",
+      "bytes": 3844,
+      "sha256": "443b1de607e07d43b4a225fe1165a0e659da0f95488cf3df876509c55531b613",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_20_Package.zip",
+      "bytes": 130693,
+      "sha256": "19a8d61ba14ed653f52be3a7778d2b46cd9685b1eaa0f750a1c493cf4c30c2f4",
+      "extension": ".zip"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/manifest.json",
+      "bytes": 479,
+      "sha256": "1bfe04e0ddd189e313ba9a49f45bbd7aa4949abe0952a8c3a177fecd4185b78f",
+      "extension": ".json"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/Moodify_Ear_v1_Chapter_20.md",
+      "bytes": 45445,
+      "sha256": "62620160a1d820884acc3692e7ed6d8fb37aef5dd5096fd2c3d1d1e26d232323",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/Moodify_Ear_v1_Chapter_20.pdf",
+      "bytes": 128574,
+      "sha256": "31e235ca805f5c5ec7a6e36688132dfdb9a75156b635b9db04c8a3414e3a07e3",
+      "extension": ".pdf"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/README.md",
+      "bytes": 757,
+      "sha256": "2377e72cbe414f2f349f85da44567197f68702a991fb854a393c29093213b61b",
+      "extension": ".md"
+    },
+    {
+      "path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/references.md",
+      "bytes": 3951,
+      "sha256": "8fc8737fe92e41196e17cc6fce867da6e96c0fd03603910d3604bd90a550bf64",
+      "extension": ".md"
+    }
+  ]
+}

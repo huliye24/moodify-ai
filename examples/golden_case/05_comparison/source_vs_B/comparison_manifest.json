@@ -1,0 +1,43 @@
+{
+  "case_id": "case_00000000000000000000000000000001",
+  "candidate_id": "case_00000000000000000000000000000001__CAND_B",
+  "artifacts": {
+    "metrics_delta": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_B\\metrics_delta.json",
+      "sha256": "65be924f574a2461b8b43f552f3bf3301e1caab7c27dee3339edb645492129b5",
+      "size_bytes": 13444
+    },
+    "delta_spectrum_linear": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_B\\delta_spectrum_linear.png",
+      "sha256": "addc9723ace1ef492c63873941aea787d5cd874070a463a3e69ee4149974ac52",
+      "size_bytes": 84166
+    },
+    "delta_spectrum_log": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_B\\delta_spectrum_log.png",
+      "sha256": "10df83e311b5848a15fcb88010f49eba58951687b8c5d054cf1b5e8195e05fed",
+      "size_bytes": 135557
+    },
+    "comparison_contact_sheet": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_B\\comparison_contact_sheet.png",
+      "sha256": "7e014fbc6fbd9fd8cd6a36ede5f1eaf910422965a412233414ef19fa08cdf1bd",
+      "size_bytes": 315920
+    },
+    "comparison_report": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_B\\comparison_report.json",
+      "sha256": "a011b67935c674d9ca02deafe46a18152d705e81d4336994183317d7bba76bc2",
+      "size_bytes": 16430
+    },
+    "auditory_report": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_B\\auditory_report.json",
+      "sha256": "931c3c10684abbbf8c1ddb9a541c21edf545579088e52f07c7e19244d31e9d81",
+      "size_bytes": 2102
+    },
+    "judgment_rules": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\05_comparison\\source_vs_B\\judgment_rules.json",
+      "sha256": "9f60bc60f5e821eaed03134846c364cfdb3a152881289dfb6b00487fa3d97a3e",
+      "size_bytes": 1816
+    }
+  },
+  "judgment_decision": "PASS_TO_LISTENING",
+  "generated_at": "2026-08-10T23:42:20.013482+00:00"
+}

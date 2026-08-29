@@ -1,0 +1,30 @@
+{
+  "package_id": "MFY-WIN-W07-DESKTOP-INTERACTION-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w06_status": "",
+  "w07_gate": "",
+  "desktop_runtime": "",
+  "native_bridge": "",
+  "interaction_surfaces": {
+    "context_menu": "",
+    "double_click": "",
+    "file_drop": "",
+    "track_to_playlist_drag": "",
+    "multi_select": "",
+    "batch_actions": "",
+    "keyboard": "",
+    "explorer_reveal": ""
+  },
+  "commands": [],
+  "tests": [],
+  "manual_flows": [],
+  "screenshots": [],
+  "logs": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w07_status": "BLOCKED",
+  "w08_gate": "BLOCKED"
+}

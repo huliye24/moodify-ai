@@ -1,0 +1,69 @@
+{
+  "package_id": "MFD-004",
+  "title": "Playback Vertical Slice",
+  "date": "2026-08-20",
+  "phase": "Moodify Desktop Phase 1 — Windows Alpha",
+  "executor": "Codex",
+  "priority": "P0",
+  "prerequisite": "MFD-003 must be GO",
+  "scope": [
+    "real Player API session",
+    "real PlaybackManifest",
+    "real authorized media asset",
+    "PlaybackEngine abstraction",
+    "ChromiumPlaybackEngine",
+    "play/pause/seek/ended/volume",
+    "minimal next/previous",
+    "manifest expiry recovery",
+    "network interruption smoke",
+    "human audible verification"
+  ],
+  "forbidden": [
+    "final product UI",
+    "skins",
+    "system tray",
+    "media keys",
+    "offline library",
+    "DSP",
+    "WASAPI",
+    "ASIO",
+    "native audio addon",
+    "bit-perfect claims",
+    "installer productization"
+  ],
+  "next_package": "MFD-005 — Moodify Minimal Player",
+  "files": [
+    {
+      "name": "00_README.md",
+      "sha256": "a4374c0608e7fcf3767355b73b84a9a3364157ab1e2c03472b9d1ec66fd3d6bc"
+    },
+    {
+      "name": "01_MFD-004_TASK.md",
+      "sha256": "b74315c144056586bf54b37fb33979823e7a14276517b2214754c06d6d2faf72"
+    },
+    {
+      "name": "02_PLAYBACK_ENGINE_CONTRACT.md",
+      "sha256": "ee365af0971a568c09c81546733ffe9971b7296a0d7ee07b401846289b8e671f"
+    },
+    {
+      "name": "03_REAL_PLAYBACK_TEST_MATRIX.md",
+      "sha256": "9f25121c3dbb04d036e329f2f01d761d0a1a33b3f484598e54b0c9f4ab2ddefb"
+    },
+    {
+      "name": "04_PLAYBACK_EVIDENCE_TEMPLATE.md",
+      "sha256": "fd22fd9feaab39f0a3b380d8c101422a6fe35950db39d55595fc303701af34d0"
+    },
+    {
+      "name": "05_IMPLEMENTATION_SEQUENCE.md",
+      "sha256": "fd07cfa65526905f5b822ed57ddf879afad3d02b2ab09b484eb5a5286d2bd9d1"
+    },
+    {
+      "name": "06_ACCEPTANCE_GATE.md",
+      "sha256": "143919619e07414d98f57a50290432e91552958bbc2377f90638b90f3de9b5dd"
+    },
+    {
+      "name": "CODEX_START_PROMPT.md",
+      "sha256": "23ff5ff48f9b7a8691cb70827afb2a39a8e91a7eba503fb5f4232ad50e3a3d89"
+    }
+  ]
+}

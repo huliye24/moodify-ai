@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Wave 02 Candidate",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "problem",
+    "evidence",
+    "user_impact",
+    "main_river_impact",
+    "stop_condition"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "problem": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "user_impact": {
+      "type": "string",
+      "minLength": 1
+    },
+    "main_river_impact": {
+      "type": "string",
+      "minLength": 1
+    },
+    "why_now": {
+      "type": "string"
+    },
+    "why_not_later": {
+      "type": "string"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expected_cognitive_cost": {
+      "type": "string"
+    },
+    "expected_product_value": {
+      "type": "string"
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stop_condition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "non_goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

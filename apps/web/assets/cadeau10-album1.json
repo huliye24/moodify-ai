@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "album": "Cadeau10 / 专辑 1",
+  "productionSource": "E:/Cadeau 曲库/Cadeau10/专辑1/作品/新建文件夹",
+  "publicBaseUrl": "https://play.rongjingmusic.com/audio/cadeau10-album1/",
+  "storagePolicy": "Audio binaries are deployment assets and are not committed to Git.",
+  "tracks": [
+    { "title": "Je ne veux pas enfermer ton aujourd'hui", "file": "je-ne-veux-pas-enfermer-ton-aujourdhui.wav", "duration": "2:44", "bytes": 47451230, "sha256": "cb79417242cf8ef8f1749bfacc9325362819ce225d9f493135d0ae58398f3c0e" },
+    { "title": "Ne vivons pas seulement de souvenirs", "file": "ne-vivons-pas-seulement-de-souvenirs.wav", "duration": "3:39", "bytes": 63290982, "sha256": "d5dbd411b904b7150c0cbf96d178a2c5ce70a6cc26a0d4be599109ace225b434" },
+    { "title": "Nous pouvons nous reconnaître encore", "file": "nous-pouvons-nous-reconnaitre-encore.wav", "duration": "2:59", "bytes": 51794070, "sha256": "d88e6f7b63c471f690abc013d5925651203841ea5eb64738e75997e8dc045a6d" },
+    { "title": "Où es-tu maintenant", "file": "ou-es-tu-maintenant.wav", "duration": "3:04", "bytes": 48887540, "sha256": "4578b9423f288cba2ffb5255145614d077821e69409de9885b958b32c1d62d00" },
+    { "title": "Vieillir et devenir nouveau avec toi", "file": "vieillir-et-devenir-nouveau-avec-toi.wav", "duration": "3:02", "bytes": 48199580, "sha256": "f77f96492cfc12aac71007e4b9339b2872d428e7961da4c988f700cfed9fb4df" }
+  ]
+}

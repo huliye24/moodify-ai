@@ -1,0 +1,47 @@
+{
+  "schema_version": "mamse-011-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "input": "S1 clean subset (12 features)",
+  "measurements": [
+    {
+      "label": "oas",
+      "estimator": "oas",
+      "n_rows": 1282,
+      "n_complete": 1282,
+      "p_features": 12,
+      "shrinkage_alpha": 0.006138512423279078,
+      "effective_rank": 5.808637185963584,
+      "wall_time_s": 0.0088,
+      "cpu_time_s": 0.0,
+      "npz_bytes": 6735,
+      "json_bytes": 5444
+    },
+    {
+      "label": "empirical",
+      "estimator": "empirical",
+      "n_rows": 1282,
+      "n_complete": 1282,
+      "p_features": 12,
+      "shrinkage_alpha": 0.0,
+      "effective_rank": 5.74661791338599,
+      "wall_time_s": 0.0111,
+      "cpu_time_s": 0.0156,
+      "npz_bytes": 6732,
+      "json_bytes": 5426
+    },
+    {
+      "label": "fixed",
+      "estimator": "fixed_shrinkage",
+      "n_rows": 1282,
+      "n_complete": 1282,
+      "p_features": 12,
+      "shrinkage_alpha": 0.1,
+      "effective_rank": 6.683908794874178,
+      "wall_time_s": 0.0134,
+      "cpu_time_s": 0.0156,
+      "npz_bytes": 6732,
+      "json_bytes": 5445
+    }
+  ]
+}

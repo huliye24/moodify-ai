@@ -1,0 +1,56 @@
+{
+  "case_id": "legit_dc_clip_01",
+  "decisions": [
+    "SELECTED",
+    "SELECTED"
+  ],
+  "proposals": [
+    {
+      "primitive": "clip_peak_repair",
+      "strength": {
+        "repair_segments": 1.0,
+        "max_segment": 16.0
+      },
+      "rationale": "1 short clipped segment(s) detected; linear transition repair within max strength",
+      "identity_risk": "LOW"
+    },
+    {
+      "primitive": "dc_offset_fix",
+      "strength": {
+        "remove_dc": 1.0
+      },
+      "rationale": "DC offset detected; removing constant offset (no gain change)",
+      "identity_risk": "NONE"
+    }
+  ],
+  "outcomes": [
+    {
+      "decision": "SELECTED",
+      "reason": "",
+      "identity": "PASS",
+      "verify": {
+        "shape_match": 1.0,
+        "duration_match_ms": 0,
+        "loudness_diff_db": -0.0082,
+        "peak_abs": 0.823951,
+        "clipped": 0.0,
+        "has_nan": 0.0,
+        "safe": 1.0
+      }
+    },
+    {
+      "decision": "SELECTED",
+      "reason": "",
+      "identity": "PASS",
+      "verify": {
+        "shape_match": 1.0,
+        "duration_match_ms": 0,
+        "loudness_diff_db": -0.1189,
+        "peak_abs": 0.773985,
+        "clipped": 0.0,
+        "has_nan": 0.0,
+        "safe": 1.0
+      }
+    }
+  ]
+}

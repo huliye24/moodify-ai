@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify W02 Selected Problem Contract",
+  "type": "object",
+  "required": [
+    "problem_id",
+    "problem_statement",
+    "evidence",
+    "baseline_metric",
+    "success_criteria",
+    "stop_conditions",
+    "non_goals"
+  ],
+  "properties": {
+    "problem_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "problem_statement": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "baseline_metric": {
+      "type": "string",
+      "minLength": 1
+    },
+    "success_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requires_canon_change": {
+      "type": "boolean"
+    },
+    "requires_authority_change": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

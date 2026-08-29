@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-08-12T01:18:00Z",
+  "mode": "read-only BatchMode SSH probe",
+  "candidates": [
+    {"alias":"aliyun-moodify","result":"authentication_failed","detail":"Permission denied (publickey,password)"},
+    {"alias":"nemt-cloud","result":"unreachable","detail":"connection refused"}
+  ],
+  "remote_mutations": false,
+  "next_requirement": "One reachable Linux SSH alias with key-based authentication and permission to install/authenticate Codex CLI."
+}

@@ -1,0 +1,21 @@
+{
+  "events": [
+    {
+      "event": "NARROWBAND_PERSISTENT_STRUCTURE",
+      "time_range_ms": [
+        512.0,
+        184234.66666666666
+      ],
+      "confidence": "PARTIAL",
+      "median_dominant_frequency_hz": 257.8125,
+      "supporting_resolutions": [
+        "R2",
+        "R3"
+      ],
+      "conflicting_resolutions": [],
+      "evidence_refs": [
+        "cross_resolution_evidence.json"
+      ]
+    }
+  ]
+}

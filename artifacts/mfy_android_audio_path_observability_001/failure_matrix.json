@@ -1,0 +1,85 @@
+{
+  "package_id": "MFY_ANDROID_AUDIO_PATH_OBSERVABILITY_001",
+  "sequence": 68,
+  "gate": "failure_recovery",
+  "rule": "every defined condition produces a defined state; nothing silently succeeds or crashes",
+  "conditions": [
+    {
+      "id": "ROUTE_DEVICE_ADDED",
+      "condition": "output device added (e.g. BT A2DP connected)",
+      "defined_state": "RouteChangeEvent{type: DEVICE_ADDED, deviceType} appended to record.routeChanges",
+      "observed_source": "PlaybackPathObserver.onAudioDevicesAdded (AudioDeviceCallback)",
+      "verified": "IMPLEMENTED, not yet exercised on device (no BT pairing during run)"
+    },
+    {
+      "id": "ROUTE_DEVICE_REMOVED",
+      "condition": "output device removed (e.g. wired unplug)",
+      "defined_state": "RouteChangeEvent{type: DEVICE_REMOVED, deviceType}",
+      "observed_source": "PlaybackPathObserver.onAudioDevicesRemoved",
+      "verified": "IMPLEMENTED, not yet exercised on device"
+    },
+    {
+      "id": "AUDIO_FOCUS",
+      "condition": "audio focus change",
+      "defined_state": "audioFocusState = \"NOT_OBSERVABLE\" (constant; no passive API, observing would change behavior)",
+      "observed_source": "documented design decision in PlaybackPathObserver.kt",
+      "verified": "VERIFIED_IN_SCHEMA (asserted in unit + device tests)"
+    },
+    {
+      "id": "UNDERRUN",
+      "condition": "audio underrun / starvation",
+      "defined_state": "record.underruns incremented via AnalyticsListener.onAudioUnderrun",
+      "observed_source": "PlaybackPathObserver.onAudioUnderrun",
+      "verified": "IMPLEMENTED; 0 underruns observed on short WAV (not triggered)"
+    },
+    {
+      "id": "BLUETOOTH_SWITCH",
+      "condition": "BT route change",
+      "defined_state": "routeChanges entries with deviceType BLUETOOTH_A2DP / BLUETOOTH_SCO",
+      "observed_source": "AudioDeviceCallback",
+      "verified": "IMPLEMENTED, not yet exercised on device"
+    },
+    {
+      "id": "PERMISSION_LOST",
+      "condition": "persistable URI permission revoked / source unavailable",
+      "defined_state": "PlaybackException → errorCode recorded (e.g. ERROR_CODE_IO_UNSPECIFIED); playback error surfaced in PlaybackManager state.error; record.errorCode non-null",
+      "observed_source": "PlaybackPathObserver.onPlayerError",
+      "verified": "IMPLEMENTED; exercised via unit-level error propagation design (no live revocation test)"
+    },
+    {
+      "id": "DECODE_ERROR",
+      "condition": "codec/decoder failure",
+      "defined_state": "errorCode from PlaybackException; record snapshot captures it",
+      "observed_source": "PlaybackPathObserver.onPlayerError",
+      "verified": "IMPLEMENTED; not triggered (all fixtures decode cleanly)"
+    },
+    {
+      "id": "OFFLOAD_STATE",
+      "condition": "audio offload active or fallback",
+      "defined_state": "offloadStatus = OFFLOAD_ACTIVE / FALLBACK_TO_AUDIOTRACK; UNKNOWN if no callback",
+      "observed_source": "ExoPlayer.AudioOffloadListener",
+      "verified": "OBSERVED_AS_UNKNOWN on this device (no offload callback for WAV)"
+    },
+    {
+      "id": "OBSERVATION_INCOMPLETE",
+      "condition": "output format回读/route 观察失败",
+      "defined_state": "null fields in record (never fabricated); record still emitted",
+      "observed_source": "record assembly: absent values stay null",
+      "verified": "VERIFIED_IN_SCHEMA (honesty rule: null = not observed)"
+    }
+  ],
+  "device_runs": [
+    {
+      "run": "BypassEquivalenceTest",
+      "result": "5/5 PASS",
+      "no_crashes": true,
+      "note": "initial run crashed on releaseOutputBuffer(TRY_AGAIN_LATER) — fixed decode loop, rerun clean; reconfirmed 2026-08-17"
+    },
+    {
+      "run": "PlaybackPathRecordDeviceTest",
+      "result": "2/2 PASS",
+      "no_crashes": true,
+      "note": "real WAV playback on device; path record exported via logcat; reconfirmed 2026-08-17 (record identical except audioSessionId/createdAtMs)"
+    }
+  ]
+}

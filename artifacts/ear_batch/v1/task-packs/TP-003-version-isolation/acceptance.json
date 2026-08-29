@@ -1,0 +1,6 @@
+{
+  "required_outputs": [
+    "corpus/version_boundaries.md"
+  ],
+  "non_empty": true
+}

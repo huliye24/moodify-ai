@@ -1,0 +1,22 @@
+{
+  "base": "8bc30a7",
+  "source": "origin/codex/mainline-cloud-dev-20260603",
+  "changed_paths": 2809,
+  "domain_counts": {
+    "UNKNOWN": 515,
+    "APPLICATION_ANDROID": 82,
+    "GENERATED_ARTIFACT": 344,
+    "CLOUD": 51,
+    "DOCUMENTATION_HISTORY": 1347,
+    "RESEARCH_EXPERIMENTAL": 29,
+    "EVIDENCE_ASSET": 32,
+    "APPLICATION_API": 5,
+    "PPE_RUNTIME": 172,
+    "AUDITORY_CORE": 17,
+    "WSE": 6,
+    "LEARNING": 11,
+    "MSE": 30,
+    "TESTS": 88,
+    "TOOLING": 80
+  }
+}

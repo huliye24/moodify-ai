@@ -1,0 +1,52 @@
+{
+  "case_id": "ref_suite",
+  "stage": "ref",
+  "input_path": "benchmarks\\reference_audio\\fixtures\\dual_tone.wav",
+  "input_sha256": "4cbb01e3484e99d936b5c03aebb5162213647ab52918911a4864f08b68645f7d",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "benchmarks\\reference_audio\\expected\\dual_tone\\spectrum_linear.png",
+      "sha256": "c627dd3db71989e58aecc8aa58215da32ae9a98f1089a4244fb9b9a4fe4f0fb3",
+      "size_bytes": 40182
+    },
+    "spectrum_log": {
+      "path": "benchmarks\\reference_audio\\expected\\dual_tone\\spectrum_log.png",
+      "sha256": "fd3685b3f1f1530d10961a232a64993ad42c3cbbfa39fd15f1aff92029782f97",
+      "size_bytes": 53817
+    },
+    "metrics": {
+      "path": "benchmarks\\reference_audio\\expected\\dual_tone\\metrics.json",
+      "sha256": "639a47f4daed793c9d3b308314d579017affed01df989d814f4efad86f8d1e35",
+      "size_bytes": 8135
+    },
+    "timeline": {
+      "path": "benchmarks\\reference_audio\\expected\\dual_tone\\timeline_metrics.jsonl",
+      "sha256": "13531a90c382244f3f9e37ea99147f7d2d7482c692758ac9e66caa432900803f",
+      "size_bytes": 1172
+    },
+    "analysis_data": {
+      "path": "benchmarks\\reference_audio\\expected\\dual_tone\\analysis_data.npz",
+      "sha256": "b69f5065e0d005d5faa8b107e4920575eb0d3988ac1ebf9d4b82759cadf7c2f2",
+      "size_bytes": 68478
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\dual_tone.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\dual_tone\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\dual_tone.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\dual_tone\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:09:58.461462+00:00"
+}

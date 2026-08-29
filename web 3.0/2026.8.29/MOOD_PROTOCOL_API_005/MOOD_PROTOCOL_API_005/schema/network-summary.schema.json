@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/api/network-summary/v1",
+  "title": "MOOD Network Summary",
+  "type": "object",
+  "required": [
+    "protocol",
+    "contributors",
+    "contributions",
+    "nodes",
+    "reputation",
+    "sources",
+    "generatedAt"
+  ],
+  "properties": {
+    "protocol": {
+      "type": "object"
+    },
+    "contributors": {
+      "type": "object",
+      "required": [
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "contributions": {
+      "type": "object",
+      "required": [
+        "total",
+        "verified"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "verified": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "nodes": {
+      "type": "object",
+      "required": [
+        "total",
+        "active",
+        "byType",
+        "byRegion"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "active": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "byType": {
+          "type": "object"
+        },
+        "byRegion": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "reputation": {
+      "type": "object",
+      "required": [
+        "profiles",
+        "snapshots"
+      ],
+      "properties": {
+        "profiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "snapshots": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "sources": {
+      "type": "object"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "allOf": [
+    {
+      "not": {
+        "required": [
+          "tokenPrice"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "marketCap"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "volume24h"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

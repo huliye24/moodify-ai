@@ -1,0 +1,21 @@
+{
+  "task": "TP-102",
+  "verified_at": "2026-08-12T00:52:11.856025+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "knowledge/disciplines.json",
+      "exists": true,
+      "bytes": 103368,
+      "sha256": "e189906ce5dc50ff468509fe75f565e11583d92eb2cfd18c845198f2c3578cdf",
+      "passed": true
+    },
+    {
+      "path": "knowledge/disciplines.md",
+      "exists": true,
+      "bytes": 4011,
+      "sha256": "0f4724b09faeeb17bd17b12f01244f7455e568f7dd16ec8610b757a0a2c6d4a8",
+      "passed": true
+    }
+  ]
+}

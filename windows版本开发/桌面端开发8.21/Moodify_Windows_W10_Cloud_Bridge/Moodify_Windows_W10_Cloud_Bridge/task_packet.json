@@ -1,0 +1,43 @@
+{
+  "package_id": "MFY-WIN-W10-CLOUD-BRIDGE-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 10,
+  "total_packages": 12,
+  "title": "Moodify Cloud Bridge 云端入口",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w09/W10_HANDOFF.md => W10_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "starts_next_package": false,
+  "focus": [
+    "current cloud capability audit",
+    "cloud client boundary",
+    "CloudPreparation model",
+    "Track-cloud mapping",
+    "request/upload seam",
+    "auth boundary",
+    "idempotency",
+    "status refresh",
+    "retry/backoff",
+    "offline behavior",
+    "prepared source",
+    "local fallback",
+    "restart recovery",
+    "minimal cloud UI",
+    "claims audit"
+  ],
+  "out_of_scope": [
+    "new AI model implementation",
+    "Ear public UI",
+    "stem UI",
+    "internal production controls",
+    "creator backend",
+    "community",
+    "recommendation",
+    "payments",
+    "visual redesign"
+  ],
+  "next_package": "W11 Settings & Audio Environment"
+}

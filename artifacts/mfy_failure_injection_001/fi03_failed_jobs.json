@@ -1,0 +1,44 @@
+[
+  {
+    "job_id": "job_f94cfa8d283b43938ad2ff7f580e84a2",
+    "source_path": "/var/lib/moodify/sources/sha256/73/7320024ffb3b407cd6fdf2debd85fec9b89903b334f550254579242ffac41ba9/fi_01_non_audio.wav",
+    "output_root": "/var/lib/moodify/data_factory",
+    "status": "FAILED",
+    "attempts": 1,
+    "created_at": "2026-08-10T20:56:48.447634+00:00",
+    "updated_at": "2026-08-10T20:56:52.505258+00:00",
+    "started_at": "2026-08-10T20:56:52.178167+00:00",
+    "finished_at": "2026-08-10T20:56:52.505258+00:00",
+    "lease_until": null,
+    "case_dir": null,
+    "last_error": "SpectrogramGenerationFailed: showspectrumpic failed (linear): [in#0 @ 0x5a842e91cbc0] Error opening input: Invalid data found when processing input\nError opening input file /var/lib/moodify/data_factory/cases/case_3f8453bed4b640a595c333f14e49d28d/00_source/source.wav.\nError opening input files: Invalid data found when processing input\n"
+  },
+  {
+    "job_id": "job_dd5a30ce0e5447388cf53b9d179c9dd2",
+    "source_path": "/var/lib/moodify/sources/sha256/9d/9d4d351dbc7a969bd4a9a4f6976d055be6a060c86d63fa91b430bf5e59dd138e/young_test.wav",
+    "output_root": "/var/lib/moodify/data_factory",
+    "status": "FAILED",
+    "attempts": 1,
+    "created_at": "2026-08-10T05:44:37.579184+00:00",
+    "updated_at": "2026-08-10T05:44:41.719489+00:00",
+    "started_at": "2026-08-10T05:44:41.596743+00:00",
+    "finished_at": "2026-08-10T05:44:41.719489+00:00",
+    "lease_until": null,
+    "case_dir": null,
+    "last_error": "SpectrogramGenerationFailed: showspectrumpic failed (linear): [in#0 @ 0x5bb2560fcbc0] Error opening input: Invalid data found when processing input\nError opening input file /var/lib/moodify/data_factory/cases/case_5872e17fa67142a0bc8e905599da71b0/00_source/source.wav.\nError opening input files: Invalid data found when processing input\n"
+  },
+  {
+    "job_id": "job_2a9157e9a3b141acbcf3258dea2a7ff5",
+    "source_path": "/var/lib/moodify/sources/sha256/c7/c787c9c3b4d9bbea199db2107aa0d71f1e153b2698ed8de4d8c500e7e5ac2e72/dup_test.wav",
+    "output_root": "/var/lib/moodify/data_factory",
+    "status": "FAILED",
+    "attempts": 1,
+    "created_at": "2026-08-10T05:42:37.494777+00:00",
+    "updated_at": "2026-08-10T05:42:41.583649+00:00",
+    "started_at": "2026-08-10T05:42:41.446355+00:00",
+    "finished_at": "2026-08-10T05:42:41.583649+00:00",
+    "lease_until": null,
+    "case_dir": null,
+    "last_error": "SpectrogramGenerationFailed: showspectrumpic failed (linear): [in#0 @ 0x580155344bc0] Error opening input: Invalid data found when processing input\nError opening input file /var/lib/moodify/data_factory/cases/case_22e015a8e58d4d308ce7439d110a19db/00_source/source.wav.\nError opening input files: Invalid data found when processing input\n"
+  }
+]

@@ -1,0 +1,87 @@
+{
+  "package_id": "MFY_MOBILE_AUDIO_CAPABILITY_BASELINE_001",
+  "sequence": 67,
+  "kind": "read_only_mobile_audio_baseline",
+  "execution_date": "2026-08-16",
+  "executor": "DeepSeek (Claude Code)",
+  "status": "READY_FOR_CODEX_REVIEW",
+  "repository": {
+    "path": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
+    "branch": "codex/moodify-3.0-external-audio",
+    "head_commit": "f6316612",
+    "head_commit_message": "feat(android): complete QQ local playback in 3.1",
+    "worktree_clean": false,
+    "verified_minimum_commit": "f6316612 (matches manifest minimum_baseline_commit)",
+    "note": "未清理任何他人改动;未修改任何源码。产物生成(2026-08-16 19:58-19:59)时工作树干净;20:12-20:16 起工作树出现他人未提交的 68 先行实现(见 dirty_worktree_observations)"
+  },
+  "dirty_worktree_observations": {
+    "observed_at": "2026-08-16 20:16+ (续作会话复核时)",
+    "head_unchanged": true,
+    "modified_files": [
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt (已修改, +29/-2: 接入 PlaybackPathObserver)"
+    ],
+    "untracked_files": [
+      "apps/android/app/src/main/java/com/moodify/app/data/InputMetadataExtractor.kt (staging-side 元数据读取)",
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackPath.kt (PlaybackPathRecord schema mfy-playback-path-v1)",
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackPathObserver.kt (观测: offload/underrun/route/spatializer)",
+      "apps/android/app/src/test/java/com/moodify/app/data/PlaybackPathRecordTest.kt",
+      "apps/android/app/src/androidTest/java/com/moodify/app/audio/BypassEquivalenceTest.kt (wav/flac 字节精确 + mp3/aac 有效 PCM)",
+      "apps/android/app/src/androidTest/assets/audio/{tone.wav,tone.flac,tone.mp3,tone.aac}"
+    ],
+    "assessment": "这些文件正是 68 包(MFY_ANDROID_AUDIO_PATH_OBSERVABILITY_001)的先行实现,尚未提交。67 按只读边界不评估、不修改、不清理,仅在此记录事实边界。Codex 复核 67 时应注意:工作树已含 68 代码草案,68 契约的 PlaybackProbe/AudioPathRecord 命名与先行实现 PlaybackPathRecord 不一致,68 包应以先行实现为输入重新对齐命名与验收门。"
+  },
+  "read_items": [
+    "根 AGENTS.md(100 行,权威顺序/三学科/机器权限边界)",
+    "产品重定义包 Moodify_Product_Redefinition_2026-08-16(01 产品定义/02 技术连续性/03 发展路线/04 Codex 边界/05 决策日志)",
+    "补丁包 67 全部文件(00_READ_ME_FIRST/01_MASTER_TASK/02_ACCEPTANCE/07_START_PROMPT/ROADMAP/manifest)",
+    "补丁包 66 真实状态(只读记录,见 reuse_gap_classification.md §66)"
+  ],
+  "audited_android": {
+    "src_files": 35,
+    "key_files": [
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt",
+      "apps/android/app/src/main/java/com/moodify/app/PlaybackService.kt",
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackAudioCache.kt",
+      "apps/android/app/src/main/java/com/moodify/app/MainActivity.kt",
+      "apps/android/app/src/main/java/com/moodify/app/ui/MoodifyApp.kt",
+      "apps/android/app/src/main/java/com/moodify/app/ui/screens/HomeScreen.kt",
+      "apps/android/app/src/main/java/com/moodify/app/data/PersonalLibraryStore.kt",
+      "apps/android/app/src/main/java/com/moodify/app/data/TokenStore.kt"
+    ],
+    "audio_path_findings": "Media3 1.10.1 默认栈;无 AudioTrack/offload/AudioSink 定制;无转码/采样率协商;缓存 512MB LRU;后台/锁屏 READY;A/B 机制存在但 NowPlayingScreen 未接线;音频路径零测试覆盖",
+    "no_audio_customization": "未发现任何 EQ/响度/空间化/AI 效果代码(符合 67 禁止项)"
+  },
+  "audited_core": {
+    "path": "moodify-core-package/src/moodify",
+    "findings": "WSE/MSE/PPE 三层 + 12 项 judgment_eligible 白名单 + 8 类事件 + 15 阈值 judgment + fail-closed authority + A/B/C plan + intervention + algorithmic_review + before/after delta 全部生产级已接线;fingerprint/reality_metrics/HPSS 为 EXPERIMENTAL/UNWIRED;分轨能力空白(3.0 分支无 stems)"
+  },
+  "package_66_status": {
+    "audiolla_deployed": true,
+    "verdict": "PASS_WITH_LIMITATIONS",
+    "detail": "LA 103.144.246.242 Docker 29.1.3 + audiolla 0.3.0(sha256:1b76f692...),容器 healthy,5 引擎,Bearer token,127.0.0.1:18080;smoke/async/matchering 通过;SSH 间歇性重置(网络波动,服务器健康);最终报告待补交",
+    "lalal_stems": "已部署 LA /api/v1/stems/*(E:\\moodify 分支,不在 3.0 分支)"
+  },
+  "prohibitions_respected": [
+    "未增加任何 EQ/响度/空间化/AI 效果",
+    "未把手机型号映射为参数",
+    "未修改 UI/图标/APK/线上/秘密",
+    "未声称更好听",
+    "未实现 68-73 任何代码",
+    "未修改任何源码(只读)"
+  ],
+  "artifacts": [
+    "capability_inventory.json",
+    "android_audio_path_map.md",
+    "device_test_matrix.json",
+    "reuse_gap_classification.md",
+    "package_68_73_contracts.md",
+    "execution_record.json"
+  ],
+  "machine_gates": ["source_inventory", "audio_path_map", "device_matrix", "next_contracts"],
+  "gate_results": {
+    "source_inventory": "PASS(所有路径来自真实源码,带文件位置与成熟度)",
+    "audio_path_map": "PASS(播放源码/格式转换点/mixer/offload/AudioTrack/MediaSession/缓存边界全部定位,无转化点如实标注 NONE)",
+    "device_matrix": "PASS(observed/api_reported/inferred/unknown 分级,禁止推断当实测)",
+    "next_contracts": "PASS(68-73 接口/失败状态/证据/回滚已设计,未实现)"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "captured_at": "2026-08-10T13:21:32+08:00",
+  "source": "free -m / swapon --show / df -h on 120.55.191.146",
+  "memory_total_mib": 1607,
+  "memory_available_mib": 594,
+  "swap_total_mib": 2047,
+  "swap_used_mib": 77,
+  "disk_free_gib": 31,
+  "disk_used_gib": 6.9,
+  "load_1m": 0.42,
+  "load_5m": 0.19,
+  "load_15m": 0.12,
+  "worker_service_state": "active (running)",
+  "api_service_state": "active (running)",
+  "queue_queued": 0,
+  "queue_running": 0,
+  "queue_succeeded": 3,
+  "queue_failed": 0
+}

@@ -1,0 +1,214 @@
+{
+  "algorithm_version": "mamse011-covariance-v0.1",
+  "complete_rows": 641,
+  "condition_number": 250.4144248491897,
+  "config": {
+    "center_method": "median",
+    "eigen_floor": 1e-08,
+    "eigengap_relative_tol": 0.001,
+    "estimator": "oas",
+    "max_missing_fraction": 0.35,
+    "min_complete_rows": 4,
+    "scale_method": "mad",
+    "shrinkage_alpha": 0.1,
+    "winsor_z": 8.0
+  },
+  "config_hash": "385c2d88015e94a9c64f72f3cb31871fdc45c2c3ae8be571148605af2f491b92",
+  "effective_rank": 5.48653732362112,
+  "effective_sample_size_by_feature": {
+    "band_air": 74.79635562043114,
+    "band_bass": 108.64385382421862,
+    "band_brilliance": 226.41499239064208,
+    "band_core_mid": 130.02736965236517,
+    "band_low_mid": 97.77474782013257,
+    "band_mid": 108.08500877586728,
+    "band_presence": 160.22750435277922,
+    "band_sub": 156.22016374412385,
+    "peak_db": 28.948775526954076,
+    "rms_db": 19.067103806538206,
+    "spectral_centroid_hz": 92.83213748490667,
+    "stereo_correlation": 51.28878268373184
+  },
+  "eigengap_stability": [
+    {
+      "between": [
+        0,
+        1
+      ],
+      "gap": 10.175858943752363,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.34701902580289506
+    },
+    {
+      "between": [
+        1,
+        2
+      ],
+      "gap": 11.738623709283958,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.6130541853562215
+    },
+    {
+      "between": [
+        2,
+        3
+      ],
+      "gap": 2.4266200423300868,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.32751659277480494
+    },
+    {
+      "between": [
+        3,
+        4
+      ],
+      "gap": 1.950139182567228,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.39139526038855876
+    },
+    {
+      "between": [
+        4,
+        5
+      ],
+      "gap": 0.25867548118378014,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.0853040968715802
+    },
+    {
+      "between": [
+        5,
+        6
+      ],
+      "gap": 0.8594054855308815,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.30983894933083245
+    },
+    {
+      "between": [
+        6,
+        7
+      ],
+      "gap": 0.45239675032179383,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.2363235055951145
+    },
+    {
+      "between": [
+        7,
+        8
+      ],
+      "gap": 0.6178612229505447,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.422638406202798
+    },
+    {
+      "between": [
+        8,
+        9
+      ],
+      "gap": 0.31593895777737935,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.37431162071535506
+    },
+    {
+      "between": [
+        9,
+        10
+      ],
+      "gap": 0.06740657495282354,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.12763632773426006
+    },
+    {
+      "between": [
+        10,
+        11
+      ],
+      "gap": 0.3436073456555856,
+      "individual_vectors_stable_candidate": true,
+      "relative_gap": 0.7458249499818981
+    }
+  ],
+  "eigenvalues": [
+    29.323634115474107,
+    19.147775171721744,
+    7.409151462437785,
+    4.982531420107699,
+    3.0323922375404706,
+    2.7737167563566905,
+    1.914311270825809,
+    1.4619145205040152,
+    0.8440532975534705,
+    0.5281143397760911,
+    0.4607077648232676,
+    0.11710041916768196
+  ],
+  "explained_variance_ratio": [
+    0.4072987022045139,
+    0.26595830335472004,
+    0.1029114523528693,
+    0.06920624412075085,
+    0.042119248182595416,
+    0.038526303755469164,
+    0.026589354278274097,
+    0.020305664863721908,
+    0.011723711028830323,
+    0.007335389752830363,
+    0.006399127542279574,
+    0.001626498563131124
+  ],
+  "feature_names": [
+    "rms_db",
+    "peak_db",
+    "stereo_correlation",
+    "spectral_centroid_hz",
+    "band_sub",
+    "band_bass",
+    "band_low_mid",
+    "band_mid",
+    "band_core_mid",
+    "band_presence",
+    "band_brilliance",
+    "band_air"
+  ],
+  "feature_units": [
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown",
+    "unknown"
+  ],
+  "lag1_autocorrelation_by_feature": {
+    "band_air": 0.7910121921322165,
+    "band_bass": 0.7101454156664262,
+    "band_brilliance": 0.4779546252327728,
+    "band_core_mid": 0.6627165914719969,
+    "band_low_mid": 0.7353056581627029,
+    "band_mid": 0.7114212472293455,
+    "band_presence": 0.6000449223664411,
+    "band_sub": 0.6080877758775195,
+    "peak_db": 0.9135791374372342,
+    "rms_db": 0.942226771500715,
+    "spectral_centroid_hz": 0.7469935350526509,
+    "stereo_correlation": 0.8518283584347406
+  },
+  "model_id": "covmodel-f62fc68f320c566a",
+  "reference_distance_quantiles": {
+    "q50": 18.366964480325766,
+    "q90": 34.69943858037471,
+    "q95": 40.839055076102255,
+    "q99": 54.46685143238007
+  },
+  "schema_version": "mamse011-eigenspace-v0.1",
+  "semantic_boundary": "Mahalanobis / covariance distance measures departure from a reference relationship model; it is not automatic artistic or quality authority.",
+  "shrinkage_alpha": 0.01108091076350168,
+  "total_rows": 641
+}

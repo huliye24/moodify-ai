@@ -1,0 +1,4 @@
+﻿candidate_id,problem,evidence_strength,user_impact,main_river_impact,urgency,reversibility,dependency_readiness,cognitive_leverage,cost,total_score,human_selected
+CANDIDATE-1,,,,,,,,,,,false
+CANDIDATE-2,,,,,,,,,,,false
+CANDIDATE-3,,,,,,,,,,,false

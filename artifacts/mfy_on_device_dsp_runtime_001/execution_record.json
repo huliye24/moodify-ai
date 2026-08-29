@@ -1,0 +1,62 @@
+{
+  "package_id": "MFY_ON_DEVICE_DSP_RUNTIME_001",
+  "sequence": 69,
+  "executor": "DeepSeek (Claude Code)",
+  "status": "READY_FOR_CODEX_REVIEW",
+  "execution_date": "2026-08-17",
+  "repository": {
+    "path": "E:\\moodify-worktrees\\moodify-3.0-external-audio",
+    "branch": "codex/moodify-3.0-external-audio",
+    "head_commit": "db92b65b (+05ba0d32 gitignore fixtures exception)",
+    "note": "UI/图标/包名未动(3.1 冻结遵守);无新增用户 DSP 控件;只建可旁路 runtime + identity processor"
+  },
+  "changed_files": {
+    "added_main": [
+      "apps/android/app/src/main/java/com/moodify/app/audio/DspGraph.kt (契约 dsp-graph-v1 + DspGraphState)",
+      "apps/android/app/src/main/java/com/moodify/app/audio/IdentityAudioProcessor.kt (byte-identity + 峰值观测 + headroom 自动旁路)",
+      "apps/android/app/src/main/java/com/moodify/app/audio/DspGraphRuntime.kt (sink 注入 DefaultAudioSink.setAudioProcessors, underrun/thermal/memory/route/offload 观测, 旁路管理)"
+    ],
+    "modified": [
+      "apps/android/app/src/main/java/com/moodify/app/data/PlaybackManager.kt (+3 行: setRenderersFactory + attach + release)"
+    ],
+    "added_tests": [
+      "apps/android/app/src/test/java/com/moodify/app/audio/PlaybackGraphContractTest.kt (6 JVM tests)",
+      "apps/android/app/src/androidTest/java/com/moodify/app/audio/DspGraphDeviceTest.kt (4 device tests: noop equivalence / auto-bypass / transition cycle / throughput benchmark)",
+      "apps/android/app/src/androidTest/assets/audio/tone_hot.wav (0 dBFS fixture)"
+    ]
+  },
+  "gates": {
+    "noop_equivalence": {"result": "PASS", "evidence": "WAV 播放 READY->ENDED, path 与 68 一致 (44.1k/44.1k, error null, underruns 0), processor active, latency 0"},
+    "glitch_free_transition": {"result": "PASS", "evidence": "pause/resume/seek 5 轮无错误无 underrun 无状态异常; click/pop 真听感需外部录音(边界如实记录)"},
+    "resource_budget": {"result": "PASS", "evidence": "identity 54ns/帧 (819200 帧 44ms), 44100Hz 下 CPU ~0.24% 单核; memory 无状态; thermal NONE; 单档设备(中端)记录, 低/高档矩阵待扩展"},
+    "automatic_bypass": {"result": "PASS", "evidence": "tone_hot.wav (0dBFS) 确定性触发 HEADROOM_LIMIT_EXCEEDED, 播放不中断到 ENDED, 原因记录"}
+  },
+  "unit_tests": {
+    "jvm": "52/52 PASS (新增 PlaybackGraphContractTest 6: schema/byte-exact/float peak/headroom/unsupported/roundtrip + 输入消费断言)",
+    "device": "10/10 PASS (DspGraphDeviceTest 4 + 68 回归 BypassEquivalenceTest 5 + PlaybackPathRecordDeviceTest 2)"
+  },
+  "fixed_issues": [
+    "Android DirectByteBuffer.put(Buffer) 平台边界异常 -> byte[] 拷贝",
+    "queueInput 未推进 input.position -> Media3 无限重发同一 buffer (播放卡死, position 按 wall clock 前进) -> 显式消费 + JVM 断言",
+    "JVM duplicate() 不继承字节序 (该环境返回 BIG_ENDIAN) -> 显式 order(input.order())",
+    "单例 runtime 跨测试状态污染 -> 每个测试开头 requestRestore()",
+    "bypass 后 queueInput 丢数据会饿死 sink -> 始终透传, 旁路在下次 reconfigure 生效"
+  ],
+  "boundary_facts": {
+    "click_pop_audition": "未做外部录音听感验证;代理证据 = 无错误/无 underrun/状态连续;需要外部采集设备",
+    "device_tiers": "只有中档 M2102J2SC;低/高档矩阵待扩展",
+    "bt_route_change": "观测代码已实现,本轮无 BT/有线设备未触发;routeChangeCount 观测就绪",
+    "offload": "processor 安装后 offload 回调未触发(UNKNOWN);互斥策略记录, 不声称双生效",
+    "true_peak": "truePeakDb = 样本峰值近似, 非 oversampled true-peak (契约中声明)",
+    "dsp_parameters": "零听感参数;无用户 DSP 控件;UI/图标/包名冻结",
+    "playback_paths_preserved": "本地播放/云端播放/失败回退保留(PlaybackManager 播放逻辑零改动,仅 +3 行注入)"
+  },
+  "artifacts": [
+    "dsp_graph_contract.json",
+    "runtime_benchmarks.json",
+    "bypass_and_glitch_results.json",
+    "degradation_policy.json",
+    "execution_record.json"
+  ],
+  "machine_gate_summary": "4/4 PASS (noop_equivalence / glitch_free_transition / resource_budget / automatic_bypass); 输出 READY_FOR_CODEX_REVIEW"
+}

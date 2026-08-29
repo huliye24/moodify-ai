@@ -1,0 +1,169 @@
+{
+  "basis": {
+    "basis_id": "basis-b7d0b97255c1e2bf",
+    "basis_version": "mamse007-pca-v0.1",
+    "mode": "CASE_LOCAL",
+    "input_feature_names": [
+      "rms_db",
+      "peak_db",
+      "stereo_correlation",
+      "spectral_centroid_hz",
+      "band_sub",
+      "band_bass",
+      "band_low_mid",
+      "band_mid",
+      "band_core_mid",
+      "band_presence",
+      "band_brilliance",
+      "band_air"
+    ],
+    "retained_feature_names": [
+      "rms_db",
+      "peak_db",
+      "stereo_correlation",
+      "spectral_centroid_hz",
+      "band_sub",
+      "band_bass",
+      "band_low_mid",
+      "band_mid",
+      "band_core_mid",
+      "band_presence",
+      "band_brilliance",
+      "band_air"
+    ],
+    "dropped_features": [],
+    "center": [
+      -17.18178939819336,
+      -5.42964506149292,
+      0.7237685966420231,
+      433.5242418420753,
+      0.0008319738728810262,
+      0.04444083936271655,
+      0.15901813881488122,
+      0.28532817535483745,
+      0.060050137943348375,
+      0.0068542299966497374,
+      0.004209977055398047,
+      0.0026816469603329054
+    ],
+    "scale": [
+      2.544748996353149,
+      0.9215433803558349,
+      0.22893860714825875,
+      276.35649726843565,
+      0.0012293080040707747,
+      0.06584374894988657,
+      0.20244468338673774,
+      0.3278082883338354,
+      0.07051060717026347,
+      0.008499969831309084,
+      0.00598495235592774,
+      0.0036698958322074903
+    ],
+    "components": [
+      [
+        0.001204849142529687,
+        -0.001782376953932352,
+        -0.0011425058229610303,
+        -0.0009023140056117415,
+        0.9994255704935384,
+        0.031317551481193195,
+        0.00035732594663773665,
+        -0.00225394134646426,
+        0.0008009206938852905,
+        -0.0002936254308344155,
+        0.01192608292755605,
+        0.0035811892484421473
+      ],
+      [
+        -0.15747485610534373,
+        -0.3434538576144336,
+        -0.013464872395132891,
+        0.27857197290158164,
+        -0.010176741798662403,
+        -0.006945082178229303,
+        0.0021552768083538485,
+        -0.0014062079753768665,
+        0.0184483440630747,
+        0.22469916043622862,
+        0.7233656584001371,
+        0.4530023374976116
+      ],
+      [
+        0.2924937642027752,
+        0.7163654973618936,
+        0.032979834098649324,
+        -0.06360745498263086,
+        -0.005993803328551803,
+        0.013425016797209362,
+        -0.0037535430356674497,
+        -0.00010912921118721476,
+        -0.03631145008592212,
+        -0.2597034111215694,
+        0.565255502260231,
+        -0.0873262306844636
+      ]
+    ],
+    "singular_values": [
+      2607.193052189162,
+      523.1950711270636,
+      319.42590035954726
+    ],
+    "explained_variance": [
+      5306.366597489022,
+      213.6870276749829,
+      79.65098034387776
+    ],
+    "explained_variance_ratio": [
+      0.9338493532522395,
+      0.037606050943993226,
+      0.014017504277830094
+    ],
+    "feature_schema_hash": "705c58aeb86ce5651a51658bd17f98b15d81d3cd517a08c8149402c3427b379e",
+    "preprocessing": {
+      "scaling": "robust",
+      "max_missing_fraction": 0.2,
+      "imputation": "median",
+      "sign_rule": "largest_abs_loading_positive",
+      "whitening": false
+    }
+  },
+  "evidence": {
+    "operator": "MAMSE-007",
+    "operator_version": "0.1.0",
+    "config_hash": "7da662067a9d69ccf55941ec6d1a9c95a6399d73660a8390ab70f217185c33c6",
+    "basis_id": "basis-b7d0b97255c1e2bf",
+    "basis_version": "mamse007-pca-v0.1",
+    "mode": "CASE_LOCAL",
+    "observations": 1282,
+    "input_features": 12,
+    "retained_features": 12,
+    "dropped_features": [],
+    "imputed_cells": 0,
+    "explained_variance_ratio": [
+      0.9338493532522395,
+      0.037606050943993226,
+      0.014017504277830094
+    ],
+    "cumulative_explained_variance": [
+      0.9338493532522395,
+      0.9714554041962328,
+      0.9854729084740629
+    ],
+    "mean_reconstruction_residual_standardized": 5.761889469220233,
+    "max_reconstruction_residual_standardized": 100.64617973729182,
+    "runtime_seconds": 0.007229700000607409,
+    "interpretation_limits": [
+      "principal components are coordinate axes, not physical causes",
+      "explained variance is not perceptual importance",
+      "low-variance safety metrics must remain outside PCA gating",
+      "CASE_LOCAL bases are not cross-case comparable"
+    ],
+    "source_meta": {
+      "source_sha256": "real:case_9056391_harmonic",
+      "case": "case_9056391_harmonic",
+      "plane": "S1",
+      "window_ms": 400
+    }
+  }
+}

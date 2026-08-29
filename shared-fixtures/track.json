@@ -1,0 +1,13 @@
+{
+  "id": "2741771e03774e36ac606f5d8fa30328",
+  "creator_id": "a2f923605bd3436f89cd758ec9d52e14",
+  "creator_handle": "cadeau10",
+  "title": "Je ne veux pas enfermer ton aujourd'hui",
+  "status": "published",
+  "visibility": "public",
+  "primary_language": "fr",
+  "duration_ms": 164000,
+  "published_at": "2026-08-12T22:34:10",
+  "updated_at": "2026-08-12T22:34:10",
+  "version": { "id": "cac0a172110e414faeb5b7f38e3d2d02", "version_no": 1, "audio_asset_key": "cadeau10-album1/je-ne-veux-pas-enfermer-ton-aujourdhui.wav" }
+}

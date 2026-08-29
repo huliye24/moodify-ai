@@ -1,0 +1,17 @@
+case_id: null
+source_sha256: null
+original_asset: null
+moodify_asset: null
+sample_rate: null
+bit_depth_or_codec: null
+duration: null
+loudness_original: null
+loudness_moodify: null
+normalization: null
+processing_version: null
+publish_rights: "NOT_GRANTED"
+publish_status: "BLOCKED"
+evidence_link: "docs/public-form/package-02/BLOCKERS.md"
+notes: >-
+  No asset is wired to the Product Home. A public demo requires an explicitly
+  authorized same-source pair plus documented loudness fairness and lineage.

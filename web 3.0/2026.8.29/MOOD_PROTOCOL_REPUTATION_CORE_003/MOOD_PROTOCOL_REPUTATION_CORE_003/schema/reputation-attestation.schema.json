@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/reputation/attestation/1.0.0",
+  "title": "MOOD Reputation Attestation",
+  "type": "object",
+  "required": [
+    "attestationVersion",
+    "snapshotId",
+    "snapshotFingerprint",
+    "attestor",
+    "method",
+    "createdAt",
+    "evidence"
+  ],
+  "properties": {
+    "attestationVersion": {
+      "const": "1.0.0"
+    },
+    "snapshotId": {
+      "type": "string"
+    },
+    "snapshotFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "attestor": {
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "method": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "moodify-treasury-config-v1",
+  "network": {
+    "name": "BNB Smart Chain",
+    "chainId": 56
+  },
+  "token": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "address": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18
+  },
+  "circulatingSupplyMethodology": {
+    "status": "draft",
+    "version": "unpublished",
+    "description": "Do not publish a numeric circulating supply until methodology is human-approved."
+  },
+  "accounts": [],
+  "notes": [
+    "Do not populate wallet labels without explicit human approval.",
+    "Wallet balance alone does not prove treasury ownership/control.",
+    "Package 007 is read-only."
+  ]
+}

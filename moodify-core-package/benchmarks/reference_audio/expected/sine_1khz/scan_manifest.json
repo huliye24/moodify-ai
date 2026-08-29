@@ -1,0 +1,52 @@
+{
+  "case_id": "ref_suite",
+  "stage": "ref",
+  "input_path": "benchmarks\\reference_audio\\fixtures\\sine_1khz.wav",
+  "input_sha256": "8446efde7f30862189f1541477c4037d97df60d986a93c4eb99a3b0f09bdb7a2",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "benchmarks\\reference_audio\\expected\\sine_1khz\\spectrum_linear.png",
+      "sha256": "aa7c83cad40b0cd1c292ba71baf44147ba820899d0fedbe971b0877350cfe617",
+      "size_bytes": 31418
+    },
+    "spectrum_log": {
+      "path": "benchmarks\\reference_audio\\expected\\sine_1khz\\spectrum_log.png",
+      "sha256": "808d56d0ffeb23b349f49de24a800974720143fd4cd585105bd38a4c40a7aee9",
+      "size_bytes": 37059
+    },
+    "metrics": {
+      "path": "benchmarks\\reference_audio\\expected\\sine_1khz\\metrics.json",
+      "sha256": "24721c80c7d2c904ef594899868457e054e0ffd04b7444d718c144cdeab9f494",
+      "size_bytes": 8099
+    },
+    "timeline": {
+      "path": "benchmarks\\reference_audio\\expected\\sine_1khz\\timeline_metrics.jsonl",
+      "sha256": "77988c73bc11dbc36cffa5be1603609f6d40f9f2ec70b1a2fa4ecf62aa34fd94",
+      "size_bytes": 1132
+    },
+    "analysis_data": {
+      "path": "benchmarks\\reference_audio\\expected\\sine_1khz\\analysis_data.npz",
+      "sha256": "17bf85a913b77e78a3cc7d6d2ca8f4d891c2bb3d4421941c35a533ab1013099e",
+      "size_bytes": 8977
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\sine_1khz.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\sine_1khz\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\sine_1khz.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\sine_1khz\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:10:29.207977+00:00"
+}

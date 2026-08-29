@@ -1,0 +1,11 @@
+{
+  "package_id": "MFY-WIN-W12-RELEASE-HARDENING-001",
+  "generated_at": "2026-08-21T06:21:05Z",
+  "verification": { "typecheck": "PASS", "lint": "PASS", "test_files": 15, "tests_passed": 144, "tests_failed": 0, "make": "PASS", "production_dependency_vulnerabilities": 0, "development_toolchain_vulnerabilities": 31 },
+  "artifact_sha256": "A571D54CD3666675DF7DA903E436A565B25DF74698AF034CB9F40ECC9EA58702",
+  "authenticode": "NotSigned",
+  "w10_status": "BLOCKED",
+  "limitations": ["clean install not run", "upgrade not run", "uninstall/reinstall not run", "performance/soak not run"],
+  "w12_status": "BLOCKED",
+  "windows_beta_candidate": "BLOCKED"
+}

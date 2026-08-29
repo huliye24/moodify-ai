@@ -1,0 +1,29 @@
+{
+  "apiVersion": "v1",
+  "policyVersion": "005-draft-1",
+  "status": "draft",
+  "mode": "read_only",
+  "pagination": {
+    "defaultLimit": 50,
+    "maxLimit": 200
+  },
+  "publicRead": {
+    "health": true,
+    "protocol": true,
+    "mainnet": true,
+    "contributions": true,
+    "contributors": true,
+    "reputation": true,
+    "nodes": true,
+    "networkSummary": true,
+    "networkSnapshot": true
+  },
+  "writes": {
+    "enabled": false
+  },
+  "notes": [
+    "Read-only is the preferred MPF-005 baseline.",
+    "Enable controlled writes only if canonical domain commands already exist.",
+    "No chain writes, token transfers or remote execution."
+  ]
+}

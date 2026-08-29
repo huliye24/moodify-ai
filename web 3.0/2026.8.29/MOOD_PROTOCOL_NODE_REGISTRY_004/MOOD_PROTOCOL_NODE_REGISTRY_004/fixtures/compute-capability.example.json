@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "manifestId": "mood:capability:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "nodeId": "mood:node:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "nodeType": "compute",
+  "protocolVersions": [
+    "0.1"
+  ],
+  "capabilities": [
+    {
+      "key": "compute.cpu.arch",
+      "value": "x86_64",
+      "visibility": "public",
+      "verificationStatus": "declared",
+      "evidenceIds": []
+    },
+    {
+      "key": "compute.memory.capacity_class",
+      "value": "8-16GB",
+      "visibility": "public",
+      "verificationStatus": "declared",
+      "evidenceIds": []
+    }
+  ],
+  "createdAt": "2026-08-29T00:00:00Z",
+  "fingerprint": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+}

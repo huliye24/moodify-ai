@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "languageName": "English",
+    "locale": "en-US"
+  },
+  "common": {
+    "appName": "Moodify",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "done": "Done",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "retry": "Retry",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading…",
+    "unknownError": "Something went wrong.",
+    "networkError": "Network connection unavailable.",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "nav": {
+    "home": "Home",
+    "process": "Analyze",
+    "works": "Works",
+    "profile": "Profile",
+    "discover": "Discover Music",
+    "tasks": "Processing Tasks",
+    "cloud": "Cloud Space",
+    "creatorCenter": "Creator Center",
+    "dataCenter": "Data Center",
+    "copyright": "Copyright & Publishing",
+    "partnership": "Partnerships",
+    "settings": "Settings",
+    "help": "Help & Feedback",
+    "cases": "Library"
+  },
+  "home": {
+    "title": "Hear what others miss.",
+    "subtitle": "Auditory intelligence for music analysis, judgment, intervention, and verification.",
+    "startAnalysis": "Start Auditory Analysis",
+    "importAudio": "Import Audio",
+    "recentWorks": "Recent Works",
+    "noRecentWorks": "No works yet"
+  },
+  "analysis": {
+    "title": "Audio Analysis",
+    "upload": "Upload Audio",
+    "analyzing": "Listening and analyzing…",
+    "completed": "Analysis complete",
+    "failed": "Analysis failed",
+    "source": "Source",
+    "waveform": "Waveform",
+    "loudness": "Loudness",
+    "stereo": "Stereo",
+    "phase": "Phase",
+    "spectrum": "Spectrum",
+    "transients": "Transients",
+    "residual": "Residual",
+    "highFrequencyCutoff": "High-frequency cutoff",
+    "report": "Analysis Report",
+    "exportReport": "Export Report",
+    "processingTitle": "Auditory Intervention"
+  },
+  "works": {
+    "all": "All",
+    "drafts": "Drafts",
+    "processed": "Processed",
+    "published": "Published",
+    "empty": "Your works will appear here.",
+    "version": "Version {{version}}",
+    "updatedAt": "Updated {{date}}"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageDescription": "Choose the display language for Moodify.",
+    "followSystem": "Follow system language",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "about": "About Moodify",
+    "languageChanged": "Language changed to {{language}}."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Create Account",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "forgotPassword": "Forgot password?"
+  },
+  "accessibility": {
+    "openLanguageMenu": "Open language menu",
+    "selectedLanguage": "{{language}} selected"
+  }
+}

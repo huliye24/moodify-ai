@@ -1,0 +1,30 @@
+{
+  "package_id": "MFY-WIN-W09-WINDOWS-NATIVE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w08_status": "",
+  "w09_gate": "",
+  "desktop_runtime": "",
+  "native_bridge": "",
+  "capabilities": {
+    "media_keys": "",
+    "system_media_controls": "",
+    "metadata": "",
+    "timeline_seek": "",
+    "tray": "",
+    "taskbar": "",
+    "single_instance": "",
+    "open_file": "",
+    "file_association": ""
+  },
+  "commands": [],
+  "tests": [],
+  "security_tests": [],
+  "manual_flows": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w09_status": "BLOCKED",
+  "w10_gate": "BLOCKED"
+}

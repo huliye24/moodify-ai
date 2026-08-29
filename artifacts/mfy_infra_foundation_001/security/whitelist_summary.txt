@@ -1,0 +1,22 @@
+MFY-INFRA-FOUNDATION-001 C6 — PolarDB whitelist status
+======================================================
+Status: PARTIALLY_BLOCKED_BY_HUMAN_AUTHORITY
+
+Whitelist configuration is a console-only control-plane operation.
+The aliyun CLI on Hangzhou ECS (v3.4.11) has NO credentials
+(no ~/.aliyun/config.json, no AK env vars) -> cannot read or change
+whitelist from code.  Database-side SHOW GRANTS does not expose whitelists.
+
+Observed facts:
+- Hangzhou ECS (172.21.10.9) reaches both MySQL instances over VPC peer
+  (DNS + TCP 3306 + auth OK) -> at least 172.21.10.9 is permitted.
+- No evidence of 0.0.0.0/0 exposure (MySQL A/B have no public endpoints
+  per audit; connectivity is private-path only).
+
+HUMAN INSTRUCTION (Aliyun console, ~10 min):
+1. RDS/PolarDB console -> pc-bp19502y46246gv6n (MySQL B) -> 白名单/安全管控
+   -> confirm whitelist contains ONLY 172.21.10.9; remove anything else.
+2. Repeat for pc-bp1112f8t24wdta5t (MySQL A) -> only 172.21.10.9.
+3. Shanghai PG pc-uf65m4xqwst72vq5a -> confirm whitelist = 120.55.191.146 only
+   (audit-recorded; console confirm).
+Do NOT add 103.144.246.242 (LA) — LA must never connect to PolarDB directly.

@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "corpus/normalized_manifest.json",
+    "corpus/README.md"
+  ],
+  "non_empty": true
+}

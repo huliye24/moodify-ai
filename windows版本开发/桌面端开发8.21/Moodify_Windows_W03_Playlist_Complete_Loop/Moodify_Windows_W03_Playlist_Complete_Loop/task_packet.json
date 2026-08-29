@@ -1,0 +1,40 @@
+{
+  "package_id": "MFY-WIN-W03-PLAYLIST-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 3,
+  "total_packages": 12,
+  "title": "Playlist 歌单完整闭环",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w02/W03_HANDOFF.md => W03_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "starts_next_package": false,
+  "highest_priority": "Complete and persist Add Track to Playlist end-to-end",
+  "focus": [
+    "single Playlist authority",
+    "PlaylistItem relation",
+    "create playlist",
+    "rename playlist",
+    "delete playlist",
+    "add track",
+    "batch add",
+    "remove track",
+    "reorder",
+    "restart persistence",
+    "referential safety",
+    "minimal player integration"
+  ],
+  "out_of_scope": [
+    "formal queue authority",
+    "shuffle/repeat",
+    "favorites",
+    "history",
+    "cloud playlist sync",
+    "social playlist",
+    "skin community",
+    "visual redesign"
+  ],
+  "next_package": "W04 Playback Core 播放核心"
+}

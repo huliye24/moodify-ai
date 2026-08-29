@@ -1,0 +1,37 @@
+flowchart TD
+    %% W01-P01 TARGET CANON MAP（权威图，非云拓扑；拓扑 P02）
+
+    PRODUCT["External Product<br/>Moodify Music / Player"]
+    PLAY["Primary User Action<br/>PLAY"]
+    USER["User<br/>只做选择与播放"]
+
+    CLOUD["Cloud Production System<br/>Intake→Identify→Analyze→Stem→Judge<br/>→Intervene→Preset→Render→Verify<br/>→Evidence→Delivery（角色级, 拓扑 P02）"]
+    INTERNAL["Internal Auditory Systems"]
+    EAR["Ear / Auditory Intelligence<br/>INTERNAL"]
+    PROC["Analysis / Stem / Judgment /<br/>Intervention / Preset / Verify / Evidence / Learn"]
+    RECON["Classic Reconstruction<br/>内部生产哲学（宪法 v1.0）"]
+    CI["Cognitive Infrastructure<br/>Canon / Evidence / Cases / Rules / Failures"]
+
+    CANON["docs/canon/*<br/>CURRENT_CANON / PRODUCT_BOUNDARY<br/>INTERNAL_SYSTEMS / AUTHORITY_ORDER<br/>CURRENT_ARCHITECTURE"]
+    GUARD["Canon drift guard<br/>scripts/canon_guard.py + pytest"]
+
+    USER --> PRODUCT
+    PRODUCT --> PLAY
+    PRODUCT -.->|CLOUD 为内部承载| CLOUD
+    CLOUD --> INTERNAL
+    EAR --> INTERNAL
+    PROC --> INTERNAL
+    RECON --> CLOUD
+    CI --> INTERNAL
+    CI --> CLOUD
+
+    CANON --> PRODUCT
+    CANON --> INTERNAL
+    GUARD --> CANON
+
+    classDef product fill:#d4f4d4,stroke:#2a7;
+    classDef internal fill:#fff3c4,stroke:#b90;
+    classDef canon fill:#e8e8ff,stroke:#55a,stroke-dasharray: 4 3;
+    class PRODUCT,PLAY,USER product;
+    class EAR,PROC,RECON,INTERNAL,CLOUD internal;
+    class CANON,GUARD,CI canon;

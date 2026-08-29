@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/node-registry-snapshot/1.0.0",
+  "title": "MOOD Node Registry Snapshot",
+  "type": "object",
+  "required": [
+    "snapshotVersion",
+    "snapshotId",
+    "registryPolicyVersion",
+    "nodeIds",
+    "nodeRecordFingerprints",
+    "generatedAt",
+    "snapshotFingerprint"
+  ],
+  "properties": {
+    "snapshotVersion": {
+      "const": "1.0.0"
+    },
+    "snapshotId": {
+      "type": "string",
+      "minLength": 8
+    },
+    "registryPolicyVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nodeIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^mood:node:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "nodeRecordFingerprints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "snapshotFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

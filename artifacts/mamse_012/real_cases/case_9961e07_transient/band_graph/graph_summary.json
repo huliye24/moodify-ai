@@ -1,0 +1,62 @@
+{
+  "algebraic_connectivity": 0.15224093497742658,
+  "algorithm_version": "mamse012-gsp-v0.1",
+  "component_labels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "connected_components": 1,
+  "degree_max": 2.0,
+  "degree_mean": 1.75,
+  "degree_min": 1.0,
+  "edge_authority": "DETERMINISTIC_TOPOLOGY",
+  "edge_count": 7,
+  "edge_semantic": "ordered acoustic-band adjacency",
+  "graph_family": "canonical_band_path",
+  "graph_id": "agraph-6878bd9cfa0d4ad6",
+  "laplacian_eigenvalues": [
+    4.567077919915834e-17,
+    0.15224093497742658,
+    0.5857864376269053,
+    1.2346331352698205,
+    1.9999999999999998,
+    2.7653668647301797,
+    3.414213562373095,
+    3.847759065022573
+  ],
+  "node_count": 8,
+  "provenance": {
+    "weight_semantics": "unit adjacency; not calibrated psychoacoustic similarity"
+  },
+  "schema_version": "mamse012-graph-v0.1",
+  "semantic_boundaries": [
+    "graph frequency is topology frequency, not acoustic Hz",
+    "edges express selected relation, not causality",
+    "high graph-frequency energy is structural variation candidate, not bad audio"
+  ],
+  "signal": {
+    "dc_energy_ratio": 0.4705992767073622,
+    "dirichlet_energy": 1.0265658302241363,
+    "high_graph_frequency_ratio": 0.10054484294617982,
+    "high_start_eigenvalue": 2.7653668647301797,
+    "local_variation": [
+      0.0285259557946911,
+      0.03227097605820923,
+      0.04019749708121054,
+      0.11829916731212692,
+      0.4400583281979885,
+      0.36242178126255753,
+      0.0045011340381780444,
+      0.00029099047917455597
+    ],
+    "low_graph_frequency_ratio": 0.8994551570531735,
+    "total_energy": 1.546280098000339
+  },
+  "zero_eigenvalue_count": 1
+}

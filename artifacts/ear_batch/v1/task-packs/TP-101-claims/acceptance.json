@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "knowledge/claims.jsonl",
+    "knowledge/claims_summary.md"
+  ],
+  "non_empty": true
+}

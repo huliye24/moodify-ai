@@ -1,0 +1,125 @@
+You are working on the Moodify Core Engine project at /home/moodify/moodify-lab.
+
+You are an autonomous AI engineer. Your ONLY job is to complete ALL tasks below.
+Work continuously. Make tool calls to read files, write code, install packages,
+run tests, and verify everything works. DO NOT STOP until all tasks are done.
+
+If you hit an error, fix it. If a package is missing, install it.
+If an approach doesn't work, try another. Be persistent and thorough.
+
+=== PROJECT OVERVIEW ===
+
+Moodify is an AI music post-processing engine. It takes AI-generated music
+(from Suno/Udio) as a "raw wave field", diagnoses its 5-dimensional wave state
+(18 audio parameters), matches to emotion-targeted DSP chains (8 emotions x 15 params),
+applies processing via pedalboard, and outputs emotionally enhanced music.
+
+Metaphor: AI music = film negative, Moodify = darkroom developing the photograph.
+
+=== PROJECT STRUCTURE ===
+
+/home/moodify/moodify-lab/
+  MOODIFY_INTENT.md          Full product intent - READ THIS FIRST
+  src/moodify/
+    diagnosis/               [COMPLETE] 18-param engine - READ ONLY
+    processing/              [TO COMPLETE] DSP operators - MAIN WORK
+    knowledge/               [COMPLETE] 8 emotion craft chains - READ ONLY
+    orchestration/           [TO COMPLETE] 6-phase workflow
+    api/                     [TO COMPLETE] FastAPI REST service
+    data_types.py            [COMPLETE] Data structures - READ ONLY
+    cli.py                   [TO COMPLETE] Command-line interface
+  tests/
+  requirements.txt
+  pyproject.toml
+  outputs/                   Save processed audio here
+
+=== CRITICAL RULES ===
+
+1. DO NOT modify: data_types.py, diagnosis/, knowledge/
+2. These passed acceptance testing - they are correct, use them as-is
+3. All new code goes in: processing/, orchestration/, api/, cli.py
+
+=== VERIFIED ENVIRONMENT ===
+- Python 3.10.12, pip3
+- pedalboard 0.9.23, pyloudnorm 0.2.0
+- numpy, scipy, librosa, soundfile, fastapi, uvicorn, pydantic
+- 4GB RAM, 50GB disk, no GPU (CPU mode only)
+
+=== TASK 1: READ MOODIFY_INTENT.md ===
+Use Read tool on /home/moodify/moodify-lab/MOODIFY_INTENT.md
+This has the complete vision, 8 emotions specs, 6-phase workflow, success criteria.
+
+=== TASK 2: DSP Processing Engine ===
+FILE TO CREATE: src/moodify/processing/pedalboard_chain.py
+
+FIRST read src/moodify/processing/operators.py to see existing interface.
+FIRST read src/moodify/knowledge/craft_chains.py to see the 15-param format.
+
+Create MoodifyDSPChain class with method:
+  process(audio: np.ndarray, sr: int, params: dict) -> np.ndarray
+
+Map the 15 craft params to pedalboard effects:
+- P01-P03 (vocal presence): pedalboard.PeakFilter(frequency_hz=P01, gain_db=P02, q=P03)
+- P04-P05 (low warmth): pedalboard.LowShelfFilter(cutoff_frequency_hz=P04, gain_db=P05)
+- P06-P09 (dynamics): pedalboard.Compressor(threshold_db=P09, ratio=P06, attack_ms=P07, release_ms=P08)
+- P10-P12 (space): pedalboard.Reverb(room_size=P11, damping=0.5, wet_level=P11, dry_level=1-P11, width=P12)
+- P13 (harmonic): pedalboard.Distortion(drive_db=P13*20) -- convert 0-1 to drive
+- P14-P15 (air): pedalboard.HighShelfFilter(cutoff_frequency_hz=P14, gain_db=P15)
+- Add pedalboard.Gain for output level
+- Add pedalboard.Limiter as safety
+
+Output must be same shape and sample rate as input.
+Handle mono and stereo audio.
+Test by constructing a chain and processing a numpy zeros array.
+
+=== TASK 3: Complete Workflow Engine ===
+FILE TO EDIT: src/moodify/orchestration/workflow_engine.py
+
+Read file first. Phase 1 works. Fix Phase 2-6 stubs:
+
+Phase 2: Try import demucs. If fails, use full_mix mode -- this is OK.
+Phase 3: Import and use MoodifyDSPChain from Task 2. Apply processing with craft card params.
+Phase 4: M/S stereo width via pedalboard.Mix (mid_side format) or manual numpy.
+Phase 5: If stems: mix with gain balancing. If full_mix: passthrough.
+Phase 6:
+  - Loudness normalize to -14 LUFS using pyloudnorm
+  - Brick-wall limiter via pedalboard.Limiter
+  - Export WAV via soundfile.write()
+
+=== TASK 4: CLI Interface ===
+FILE TO EDIT: src/moodify/cli.py
+
+Read existing file. Implement:
+  moodify analyze <file> -- outputs 18-param JSON diagnosis
+  moodify process <file> <emotion> -- full pipeline, saves to outputs/
+  moodify emotions -- list 8 emotions with names
+  moodify serve -- start uvicorn on port 8000
+
+=== TASK 5: API Service ===
+FILE TO EDIT: src/moodify/api/main.py
+
+Read existing file. Add:
+  POST /api/v1/analyze -- upload audio, return diagnosis JSON
+  POST /api/v1/process -- upload audio + emotion, return report
+  GET /api/v1/emotions -- list emotions
+  GET /health -- health check
+  CORS middleware
+  File size limit 50MB
+
+=== TASK 6: Update Dependencies ===
+Update requirements.txt with ALL actual deps and versions.
+Update pyproject.toml with correct entry points.
+Create install.sh script.
+
+=== TASK 7: End-to-End Test ===
+1. Generate test tone with scipy
+2. Analyze it
+3. Process it with at least 3 emotions
+4. Verify output exists and is valid
+5. Print summary
+
+=== SUCCESS CRITERIA ===
+"pip install -e . && moodify process test.wav GA" produces enhanced audio.
+
+START NOW. Read MOODIFY_INTENT.md first, then begin Task 2.
+

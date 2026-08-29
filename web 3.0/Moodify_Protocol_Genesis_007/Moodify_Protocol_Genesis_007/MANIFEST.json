@@ -1,0 +1,70 @@
+{
+  "package": "Moodify Protocol Genesis 007",
+  "id": "MOOD-GENESIS-007",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004",
+    "MOOD-GENESIS-005",
+    "MOOD-GENESIS-006"
+  ],
+  "purpose": "Public protocol transparency, treasury classification, read-only on-chain reconciliation and accounting",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "1c78b3977ff3d271771e0130a383a724355b14549ad3bca430ed341505294dc3",
+      "bytes": 1692
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "f551aa430e7f6370cadd58409ee6d9c91ed4a324b3cf3ceffed452d9befab19a",
+      "bytes": 7497
+    },
+    {
+      "name": "02_ACCOUNTING_MODEL.md",
+      "sha256": "3581fb069d0a26dd63e3745e2ea107e2bba7445e159c6d8ec3c573582a65d753",
+      "bytes": 2071
+    },
+    {
+      "name": "03_DATA_SOURCE_AND_CACHE_SPEC.md",
+      "sha256": "19dcb54673b38cf77fc0e06b71f276ae3b52cb30172485ad593b6e212563662a",
+      "bytes": 1381
+    },
+    {
+      "name": "04_ACCEPTANCE_CRITERIA.md",
+      "sha256": "c62a7677a8921f706111a580059b291b22b42122a16ac53c500f3591f366cabe",
+      "bytes": 2519
+    },
+    {
+      "name": "05_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "3053805586d8091c5f80d2836b9d3223c1dabf777f596d32bc9ef16479c5c926",
+      "bytes": 4642
+    },
+    {
+      "name": "06_TEST_MATRIX.md",
+      "sha256": "223255cfbe6f6d5ae5f42ab9c48168fe3fea0d5238c5ac3031d3ea88761d917a",
+      "bytes": 2416
+    },
+    {
+      "name": "07_TREASURY_CONFIG_TEMPLATE.json",
+      "sha256": "1e5f6bde07ad5750a373c110630c91fbac24f4945e8821571f7a71ff8b4839fb",
+      "bytes": 661
+    },
+    {
+      "name": "08_HUMAN_CLASSIFICATION_GATE.md",
+      "sha256": "d746c09519e8aa7659cfd2447d6ee8a46daef420405aed034525e68db53cc221",
+      "bytes": 1156
+    },
+    {
+      "name": "09_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "806d2cc156f2004905de85db78efa864ddb98f43687bf2d4f1753c99310975a7",
+      "bytes": 1711
+    },
+    {
+      "name": "10_PACKAGE_CANON.json",
+      "sha256": "1cac2d50e0d0c9412f660de2b00312bd2b819de1f660a2c030b13603d951a4fa",
+      "bytes": 1220
+    }
+  ]
+}

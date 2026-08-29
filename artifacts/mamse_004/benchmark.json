@@ -1,0 +1,50 @@
+{
+  "schema_version": "mamse-004-benchmark-v1",
+  "source": "../outputs/mamse001_sources/case_9056391_harmonic.wav",
+  "sample_rate": 48000,
+  "config_hash": "c7730ef9483a61dace751f153e035b3d22022b5b0fe6fcbbbdf0ddf4d2f54d63",
+  "measurements": [
+    {
+      "label": "10s",
+      "duration_s": 10.0,
+      "wall_time_s": 0.522,
+      "cpu_time_s": 0.516,
+      "config_hash": "c7730ef9483a61da",
+      "mono_valid_bin_ratio": 0.3023,
+      "group_delay_median_ms": -2.9409926468582093,
+      "stereo_ipd_available": true,
+      "interchannel_delay_median_ms": -0.04824483109377997,
+      "gcc_phat_delay_ms": 0.0,
+      "npz_bytes": 21414921,
+      "manifest_bytes": 1284
+    },
+    {
+      "label": "30s",
+      "duration_s": 30.0,
+      "wall_time_s": 2.019,
+      "cpu_time_s": 2.031,
+      "config_hash": "c7730ef9483a61da",
+      "mono_valid_bin_ratio": 0.2242,
+      "group_delay_median_ms": -1.4105416401690718,
+      "stereo_ipd_available": true,
+      "interchannel_delay_median_ms": -0.08922710437819781,
+      "gcc_phat_delay_ms": 0.0,
+      "npz_bytes": 64777720,
+      "manifest_bytes": 1282
+    },
+    {
+      "label": "45s",
+      "duration_s": 45.0,
+      "wall_time_s": 2.976,
+      "cpu_time_s": 2.969,
+      "config_hash": "c7730ef9483a61da",
+      "mono_valid_bin_ratio": 0.2405,
+      "group_delay_median_ms": -1.0893380932229801,
+      "stereo_ipd_available": true,
+      "interchannel_delay_median_ms": -0.06025665573372585,
+      "gcc_phat_delay_ms": 0.0,
+      "npz_bytes": 97307445,
+      "manifest_bytes": 1282
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+[Unit]
+Description=Generate Moodify daily report
+
+[Timer]
+OnCalendar=*-*-* 00:05:00
+Persistent=true
+AccuracySec=2min
+
+[Install]
+WantedBy=timers.target

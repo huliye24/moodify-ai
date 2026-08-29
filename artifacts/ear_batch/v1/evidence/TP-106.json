@@ -1,0 +1,21 @@
+{
+  "task": "TP-106",
+  "verified_at": "2026-08-12T00:56:53.817659+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "knowledge/traceability.csv",
+      "exists": true,
+      "bytes": 320714,
+      "sha256": "e0d45a9f5c3f46d8c408db58d63f86c50501e002e4d2318f1a1f52e5dfdc355c",
+      "passed": true
+    },
+    {
+      "path": "knowledge/traceability.md",
+      "exists": true,
+      "bytes": 289,
+      "sha256": "6c428f4dd32ad8ea7f0c2fef3d36d478ea8e8a4a915b7499a1066ab0aae8028b",
+      "passed": true
+    }
+  ]
+}

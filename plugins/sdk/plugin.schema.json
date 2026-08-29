@@ -1,0 +1,104 @@
+{
+  "$schema": "https://moodify.ai/schemas/plugin.json",
+  "name": "moodify-plugin-template",
+  "version": "1.0.0",
+  "description": "Official Moodify plugin template for audio processing",
+  "author": {
+    "name": "Your Name",
+    "email": "your@email.com",
+    "url": "https://your-website.com"
+  },
+  "license": "GPL-3.0-only",
+  "type": "audio-processing",
+  "category": "ai-analysis",
+  "engine": {
+    "name": "moodify-core",
+    "version": ">=1.0.0",
+    "api_version": "v1"
+  },
+  "permissions": [
+    "audio:read",
+    "audio:write",
+    "mrs:evaluate",
+    "analysis:run",
+    "preset:load"
+  ],
+  "entry_points": {
+    "vst3": "MoodifyPlugin.vst3",
+    "au": "MoodifyPlugin.component",
+    "standalone": "MoodifyPlugin.exe"
+  },
+  "parameters": [
+    {
+      "id": "mrs_threshold",
+      "name": "MRS Threshold",
+      "type": "float",
+      "default": 70.0,
+      "min": 0.0,
+      "max": 100.0,
+      "step": 1.0,
+      "unit": "score"
+    },
+    {
+      "id": "analysis_mode",
+      "name": "Analysis Mode",
+      "type": "choice",
+      "default": "standard",
+      "choices": [
+        "quick",
+        "standard",
+        "detailed"
+      ]
+    },
+    {
+      "id": "auto_process",
+      "name": "Auto Process",
+      "type": "bool",
+      "default": false
+    }
+  ],
+  "presets": {
+    "default": "presets/default.json",
+    "user": "~/.moodify/presets/"
+  },
+  "ui": {
+    "width": 800,
+    "height": 600,
+    "resizable": true,
+    "theme": "dark"
+  },
+  "resources": {
+    "icon": "resources/icon.png",
+    "screenshot": "resources/screenshot.png",
+    "documentation": "docs/README.md"
+  },
+  "dependencies": {
+    "moodify_sdk": ">=1.0.0",
+    "juce": ">=7.0.0"
+  },
+  "pricing": {
+    "type": "free",
+    "tiers": [
+      {
+        "name": "free",
+        "price": 0,
+        "features": ["basic_analysis"]
+      },
+      {
+        "name": "pro",
+        "price": 29.99,
+        "currency": "USD",
+        "features": ["advanced_analysis", "batch_processing", "custom_presets"]
+      }
+    ]
+  },
+  "marketplace": {
+    "listing_url": "https://marketplace.moodify.ai/plugins/moodify-plugin-template",
+    "support_url": "https://github.com/yourusername/moodify-plugin-template/issues",
+    "rating": 0,
+    "downloads": 0,
+    "verified": false
+  },
+  "created_at": "2026-08-23T00:00:00Z",
+  "updated_at": "2026-08-23T00:00:00Z"
+}

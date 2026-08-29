@@ -1,0 +1,1409 @@
+{
+  "schema_version": 1,
+  "disciplines": {
+    "WSE": {
+      "name": "Wave-Spectral Evolution",
+      "question": "What happened in the sound?",
+      "evidence": [
+        {
+          "chapter": 1,
+          "section": "The three systems converge at the Auditory Representation and Judgment layers. WSE",
+          "source_path": "Moodify_Ear_v1_Chapter_01.pdf",
+          "excerpt": "MSE without WSE can describe structure while missing the physical behavior of the sound."
+        },
+        {
+          "chapter": 2,
+          "section": "10A. Pitch, Harmonicity and Tonal Organization",
+          "source_path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+          "excerpt": "Tonal estimates can also help align WSE evidence with MSE structure."
+        },
+        {
+          "chapter": 2,
+          "section": "14. Musical Structure Changes the Meaning of Sound",
+          "source_path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+          "excerpt": "Tempo, beat grid, section boundaries, phrase structure, lyrics timing, note or MIDI evidence, repetition and role estimates supply context for WSE measurements."
+        },
+        {
+          "chapter": 2,
+          "section": "14. Musical Structure Changes the Meaning of Sound",
+          "source_path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+          "excerpt": "The integration of WSE and MSE is one of Moodify’s distinctive opportunities."
+        },
+        {
+          "chapter": 3,
+          "section": "7. Context Changes the Meaning of the Same Signal",
+          "source_path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+          "excerpt": "This is one of the reasons MSE matters to an Ear whose sensory measurements are largely WSE."
+        },
+        {
+          "chapter": 3,
+          "section": "17. Human Review Is an Epistemic Interface",
+          "source_path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+          "excerpt": "A LearningRecord can distinguish false positive, false negative, context error, reference error, severity error, confidence error and unknown phenomenon. | Review outcome | Likely implication | | --- | --- | | Measurement wrong | Sensor / WSE correction | | Context wrong | MSE or contextual representation correction | | Judgment wrong | Rule/model update candidate | | Severity wrong | Calibration or policy change | | Confidence wrong | Calibration / uncertainty change | | Evidence incomplete | PPE / evidence pipeline correction | | Unknown phenomenon | New research class / case cluster | This decomposition matters because different errors require different fixes."
+        },
+        {
+          "chapter": 4,
+          "section": "19. Resource-Aware Architecture for Ear v1",
+          "source_path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.md",
+          "excerpt": "A resource-constrained architecture should separate mandatory sensors from optional expensive models and should cache reusable representations. | Tier | Purpose | Compute policy | | --- | --- | --- | | Tier 0 | Source identity, decode validation, cheap integrity checks | Always run; CPU | | Tier 1 | Core WSE/PPE deterministic measurements | Always run; CPU-first | | Tier 2 | Selected learned representations / heavier structure models | Run only when judgment value justifies cost | | Tier 3 | Research training, large comparison experiments | Offline; not required for product completion | Tier 0/1 analysis can run on CPU and produce deterministic engineering evidence."
+        },
+        {
+          "chapter": 5,
+          "section": "Can Machines Learn to Hear?",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "**Technical Monographs - Volume I** **Chapter V - WSE - Hearing the Physical Sound** **August 2026** > Before a machine can understand sound, it must be able to remember what the sound actually did."
+        },
+        {
+          "chapter": 5,
+          "section": "1. The Physical Layer of Hearing",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "Wave-Spectral Evolution, or WSE, is the framework for that account."
+        },
+        {
+          "chapter": 5,
+          "section": "1. The Physical Layer of Hearing",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE treats an audio file as a time-varying physical record whose amplitude, spectrum, dynamics, spatial relationships and transient behavior evolve continuously."
+        },
+        {
+          "chapter": 5,
+          "section": "2. From Continuous Pressure to Discrete Signal",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE must therefore bind every physical measurement to source identity and sampling context."
+        },
+        {
+          "chapter": 5,
+          "section": "3. Amplitude Is Not Loudness",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should therefore preserve several amplitude views rather than forcing one scalar to represent all intensity behavior: sample peak, true peak, RMS-like energy, integrated loudness, short-term loudness, momentary loudness and local crest behavior."
+        },
+        {
+          "chapter": 5,
+          "section": "4. Time Is a First-Class Dimension",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE instead treats time as a first-class coordinate."
+        },
+        {
+          "chapter": 5,
+          "section": "4. Time Is a First-Class Dimension",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should preserve local trajectories and then derive global summaries from them."
+        },
+        {
+          "chapter": 5,
+          "section": "6. The Short-Time Fourier Transform",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The choice is not neutral: different WSE questions require different resolutions."
+        },
+        {
+          "chapter": 5,
+          "section": "7. Window Functions and Spectral Leakage",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "But WSE should store the window type, size, hop and FFT length with the resulting artifact."
+        },
+        {
+          "chapter": 5,
+          "section": "8. Multi-Resolution Hearing",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should therefore be multi-resolution by design."
+        },
+        {
+          "chapter": 5,
+          "section": "9. Spectral Energy as an Evolving Field",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "For WSE it is an evolving field whose shape can be summarized at several levels."
+        },
+        {
+          "chapter": 5,
+          "section": "10. Spectral Tilt and Balance",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE can estimate local or global tilt by fitting a line to log-frequency / log-magnitude summaries over a defined range."
+        },
+        {
+          "chapter": 5,
+          "section": "11. High-Frequency Cutoff and Bandwidth Evidence",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should approach this as a bandwidth-estimation problem rather than a binary label."
+        },
+        {
+          "chapter": 5,
+          "section": "11. High-Frequency Cutoff and Bandwidth Evidence",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The WSE output should therefore be *bandwidth evidence* plus confidence, not “AI artifact detected.” The later interpretation layer may connect a recurring cutoff pattern to known generation or transcoding families after validation."
+        },
+        {
+          "chapter": 5,
+          "section": "11. High-Frequency Cutoff and Bandwidth Evidence",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "This is a useful example of the entire Ear philosophy: WSE observes; Interpretation proposes; Judgment decides; Evidence preserves the chain."
+        },
+        {
+          "chapter": 5,
+          "section": "12. Low-Frequency Structure",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should represent low-frequency energy in physically meaningful bands and over multiple time scales."
+        },
+        {
+          "chapter": 5,
+          "section": "13. Dynamics as Evolution, Not One Number",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should distinguish microdynamics, mesodynamics and macrodynamics. | Scale | Approximate object | Examples | | --- | --- | --- | | Micro | milliseconds to tens of ms | attack shape, clipping, peak/RMS relation | | Meso | hundreds of ms to seconds | short-term loudness, local compression, phrase envelope | | Macro | sections to whole track | verse/chorus contrast, loudness arc, dynamic range | Crest factor, loudness range, local RMS variation, peak-to-loudness relations and envelope statistics can expose different aspects of compression and limiting."
+        },
+        {
+          "chapter": 5,
+          "section": "13. Dynamics as Evolution, Not One Number",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE's responsibility is to measure how the ratio evolves and how it differs across sections, not to impose an aesthetic conclusion."
+        },
+        {
+          "chapter": 5,
+          "section": "14. True Peak and Inter-Sample Risk",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should record both sample peak and true peak where delivery risk matters."
+        },
+        {
+          "chapter": 5,
+          "section": "15. Transients: Fast Events That Define Texture",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should use transient evidence to describe attack density, attack sharpness, temporal regularity and local degradation."
+        },
+        {
+          "chapter": 5,
+          "section": "16. Phase Is Part of the Signal",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE should not reduce phase to one global correlation number."
+        },
+        {
+          "chapter": 5,
+          "section": "16. Phase Is Part of the Signal",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE's role is to reveal the physical relation before a later layer assigns risk."
+        },
+        {
+          "chapter": 5,
+          "section": "18. Mono Fold-Down as a Physical Test",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "A simple stereo-to-mono fold is: WSE can compare band energy, transient behavior and local loudness before and after fold-down."
+        },
+        {
+          "chapter": 5,
+          "section": "20. Waveform Morphology",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE can examine clipping plateaus, asymmetry, DC offset, impulsive spikes, envelope discontinuities, repeated micro-patterns and local amplitude distributions."
+        },
+        {
+          "chapter": 5,
+          "section": "21. Artifact Evidence as a Vector, Not a Label",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "Instead, WSE can produce an artifact-evidence vector: Each component represents a physical observation with its own confidence and time support."
+        },
+        {
+          "chapter": 5,
+          "section": "21. Artifact Evidence as a Vector, Not a Label",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "If several unresolved cases share a recurring WSE signature, the case library can cluster them before the system knows the cause."
+        },
+        {
+          "chapter": 5,
+          "section": "22. WSE as a Time-Indexed State",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The deepest form of WSE is not a report full of plots but a time-indexed physical state."
+        },
+        {
+          "chapter": 5,
+          "section": "22. WSE as a Time-Indexed State",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "This state becomes the WSE contribution to the broader Auditory Representation."
+        },
+        {
+          "chapter": 5,
+          "section": "23. Determinism and Numerical Reproducibility",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The same source, decoder, parameters and software version should produce the same deterministic WSE outputs within defined numerical tolerance."
+        },
+        {
+          "chapter": 5,
+          "section": "23. Determinism and Numerical Reproducibility",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The WSE artifact manifest should therefore record implementation version, numerical precision, analysis parameters and, where appropriate, tolerance policy."
+        },
+        {
+          "chapter": 5,
+          "section": "24. Evidence Figures",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE figures should be treated as evidence artifacts rather than decoration."
+        },
+        {
+          "chapter": 5,
+          "section": "26. WSE Validation Experiments",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The WSE layer should be tested against controlled physical changes."
+        },
+        {
+          "chapter": 5,
+          "section": "26. WSE Validation Experiments",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE accuracy is therefore not measured only by matching human labels."
+        },
+        {
+          "chapter": 5,
+          "section": "28. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE can be summarized by ten principles. **1."
+        },
+        {
+          "chapter": 5,
+          "section": "28. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "WSE does not judge alone.** It contributes the physical state from which the Ear can later understand."
+        },
+        {
+          "chapter": 5,
+          "section": "28. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "With these rules, WSE becomes the sensory substrate of Moodify Ear v1: narrow enough to be testable, rich enough to support future intelligence."
+        },
+        {
+          "chapter": 5,
+          "section": "29. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The importance of WSE is therefore foundational: before a machine can understand sound, it must be able to remember what the sound actually did."
+        },
+        {
+          "chapter": 6,
+          "section": "Can Machines Learn to Hear?",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "**Technical Monographs - Volume I** **Chapter VI - MSE - Hearing Musical Structure** **August 2026** > WSE asks what happened in the sound."
+        },
+        {
+          "chapter": 6,
+          "section": "1. From Physical Sound to Musical Organization",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE asks a different question from WSE: *What is the musical structure?* Its purpose is not to replace the physical signal with notation."
+        },
+        {
+          "chapter": 6,
+          "section": "2. MSE Is Context, Not a Second Analyzer",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "Its architectural purpose is to annotate the same timeline used by WSE with musical hypotheses and confidence."
+        },
+        {
+          "chapter": 6,
+          "section": "2. MSE Is Context, Not a Second Analyzer",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE therefore changes the meaning of WSE without rewriting WSE."
+        },
+        {
+          "chapter": 6,
+          "section": "7. Tempo Is a Trajectory, Not Only a BPM Label",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "The Ear should distinguish a deliberate ritardando from irregular timing only when sufficient musical context exists; WSE/MSE can first expose the trajectory."
+        },
+        {
+          "chapter": 6,
+          "section": "12. Repetition Can Be More Reliable Than Names",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "If section A occurs three times, WSE can compare its spectral and dynamic state across repetitions."
+        },
+        {
+          "chapter": 6,
+          "section": "12. Repetition Can Be More Reliable Than Names",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE supplies the correspondence; WSE supplies the physical difference; Interpretation decides what it may mean."
+        },
+        {
+          "chapter": 6,
+          "section": "13. Chroma and Pitch-Class Structure",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "Moodify should preserve this distinction just as WSE separates spectra from judgments."
+        },
+        {
+          "chapter": 6,
+          "section": "18. Alignment: Connecting Symbolic and Acoustic Time",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "For Moodify, alignment allows WSE findings to be expressed musically: “the anomaly occurs during the second half of bar 17” or “during the second syllable of the chorus line,” rather than only at 01:23.4."
+        },
+        {
+          "chapter": 6,
+          "section": "20. Vocal Activity and Source Roles",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "Any WSE measurement performed on an estimated stem should carry the separator version and confidence."
+        },
+        {
+          "chapter": 6,
+          "section": "22. Structure as a Graph",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "A WSE finding can attach to a time range; the graph can identify which section, lyric line and source-role hypotheses overlap that range."
+        },
+        {
+          "chapter": 6,
+          "section": "23. MSE and WSE Must Share Time",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "The simplest integration failure would be to let WSE and MSE use incompatible timelines."
+        },
+        {
+          "chapter": 6,
+          "section": "30. From MSE to Auditory Representation",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE contributes a structured subspace to the Auditory Representation: This subspace is aligned to the same source and run identity as WSE."
+        },
+        {
+          "chapter": 6,
+          "section": "31. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "WSE and MSE share one timeline.** Physical findings and musical entities must be cross-queryable. **9."
+        },
+        {
+          "chapter": 6,
+          "section": "32. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "WSE gives Moodify a physical memory of sound."
+        },
+        {
+          "chapter": 7,
+          "section": "35. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "WSE and MSE make it possible for Moodify to observe and contextualize sound."
+        },
+        {
+          "chapter": 8,
+          "section": "1. The Ear Needs an Internal Language",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "It connects the physical sensor layer of WSE, the musical-structural context of MSE, the Judgment Engine, the Evidence Graph and the learning loop."
+        },
+        {
+          "chapter": 8,
+          "section": "6. WSE Subspace: The Physical State",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "The WSE subspace provides the physical state described in Chapter V."
+        },
+        {
+          "chapter": 8,
+          "section": "6. WSE Subspace: The Physical State",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "The WSE subspace is therefore not just a dictionary of numbers."
+        },
+        {
+          "chapter": 8,
+          "section": "17. Representation as a Graph of Relations",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "Auditory Representation v1 therefore includes a graph-like relation layer: A section contains bars; bars contain beats; a lyric line aligns with a phrase; a WSE finding overlaps a section; a learned embedding is derived from a time interval; two sections repeat; an evidence artifact supports a judgment."
+        },
+        {
+          "chapter": 8,
+          "section": "21. Representation and Learning",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "These are different interventions. | Observed review problem | Likely technical target | | --- | --- | | measurement incorrect | WSE sensor / decode / parameter | | structure incorrect | MSE model / alignment | | needed pattern absent | representation schema / new feature | | representation sufficient, judgment wrong | rule/model/policy | | confidence poor | calibration / uncertainty propagation | | similar cases not found | retrieval view / embedding / index | | evidence incomplete | projection/provenance/PPE | The LearningRecord should therefore identify which layer is believed to need change."
+        },
+        {
+          "chapter": 9,
+          "section": "17. Evidence Agreement and Conflict",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "Conflict between WSE and MSE can be particularly informative: an acoustic discontinuity aligned exactly with a section boundary may reduce anomaly confidence."
+        },
+        {
+          "chapter": 9,
+          "section": "18. Context Can Reverse a Judgment",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "MSE therefore acts as a conditional prior over WSE evidence."
+        },
+        {
+          "chapter": 9,
+          "section": "26. Human Review Must Decompose the Error",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "A reviewer should not be limited to “correct/incorrect.” Richer outcomes make learning targeted. | Review outcome | Likely change target | | --- | --- | | measurement incorrect | WSE sensor / decode / parameters | | context incorrect | MSE / structural alignment | | reference inappropriate | reference selection / corpus | | classification wrong | rule/model / family definition | | severity wrong | severity policy | | confidence wrong | calibration / uncertainty | | evidence incomplete | evidence projection / PPE | | new phenomenon | research candidate / new family | If the measurement is right but context is wrong, MSE should improve."
+        },
+        {
+          "chapter": 9,
+          "section": "35. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "Context can reverse meaning.** MSE changes how WSE is interpreted. **9."
+        },
+        {
+          "chapter": 10,
+          "section": "14. Disagreement Is Information",
+          "source_path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/Moodify_Ear_v1_Chapter_10.md",
+          "excerpt": "WSE may indicate a discontinuity while MSE shows a repeated section boundary."
+        },
+        {
+          "chapter": 11,
+          "section": "6. Evidence Has Resolution",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "This principle mirrors the multi-resolution architecture of WSE and MSE."
+        },
+        {
+          "chapter": 11,
+          "section": "19. Contrastive Explanation",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "The system can show exactly which WSE dimensions differ between structurally equivalent regions."
+        },
+        {
+          "chapter": 11,
+          "section": "37. Evidence as a Long-Term Asset",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "If the original WSE/MSE evidence and provenance were preserved, the new model can reinterpret history without inventing it."
+        },
+        {
+          "chapter": 12,
+          "section": "14. Structural Context Belongs Next to Physical Evidence",
+          "source_path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+          "excerpt": "Section bands, beat/bar coordinates, repetition groups or lyric lines can be aligned with WSE evidence where useful."
+        },
+        {
+          "chapter": 12,
+          "section": "18. The Analysis Status Block",
+          "source_path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+          "excerpt": "The report should include a compact analysis-status block. | Field | Example | | --- | --- | | case status | COMPLETED / DEGRADED / FAILED / etc. | | source integrity | verified / warning | | WSE coverage | complete / partial | | MSE coverage | complete / low-confidence / not-run | | learned models | executed / optional unavailable | | evidence completeness | all mandatory artifacts resolved? | | report version | schema + renderer | This block can be small in the creator-facing view and expanded in the audit view."
+        },
+        {
+          "chapter": 13,
+          "section": "9. The Artifact Index",
+          "source_path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.md",
+          "excerpt": "They should be indexed by role rather than scattered across directories. | Artifact class | Examples | | --- | --- | | identity/spec | source record, case spec, config/version manifest | | measurement | WSE/MSE sensor outputs | | representation | Auditory Representation v1 arrays/records | | judgment | JudgmentRecords and uncertainty state | | evidence | Evidence Bundles, plots, excerpts, comparisons | | report | machine JSON, PDF/app render | | review | HumanReview records | | learning | LearningRecords/candidate links | | operations | logs, validation, packaging manifest | Every artifact should identify its producer, content hash, semantic role, source/run relationship and version."
+        },
+        {
+          "chapter": 13,
+          "section": "28. LearningRecord: What the Case Teaches",
+          "source_path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.md",
+          "excerpt": "Possible targets include WSE sensor, MSE structure, Auditory Representation, judgment rule/model, calibration, evidence contract, report presentation or benchmark coverage."
+        },
+        {
+          "chapter": 14,
+          "section": "36. Self-Supervised Learning and the Case Corpus",
+          "source_path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/Moodify_Ear_v1_Chapter_14.md",
+          "excerpt": "Moodify's Production Case corpus can eventually support domain-specific self-supervised or weakly supervised learning, especially because each source is accompanied by rich WSE/MSE structure and provenance."
+        },
+        {
+          "chapter": 15,
+          "section": "3. Intervention as a Causal Variable",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "Moodify can test whether the corresponding WSE field moves in the expected direction and whether the Judgment Engine responds at appropriate strengths."
+        },
+        {
+          "chapter": 15,
+          "section": "10. High-Frequency Attenuation",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "A controlled low-pass or high-shelf attenuation is one of the cleanest WSE experiments."
+        },
+        {
+          "chapter": 15,
+          "section": "11. Low-Frequency Accumulation",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "Expected WSE responses include increased low-band energy, altered low/mid ratio, changed crest behavior and possibly stereo/phase effects if the intervention is channel-specific."
+        },
+        {
+          "chapter": 15,
+          "section": "20. Spectral Tilt and Equalization",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "This makes equalization experiments useful for testing that WSE remains descriptive while the Judgment Engine remains conditional."
+        },
+        {
+          "chapter": 15,
+          "section": "24. Structure-Targeted Interventions",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "This validates the integration of WSE, MSE, Judgment and Evidence rather than only one sensor."
+        },
+        {
+          "chapter": 15,
+          "section": "30. Expected Effect vs Expected Judgment",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "Every experiment should distinguish the expected physical effect from the expected semantic judgment. | Level | Example | | --- | --- | | known transformation | low-pass at 14 kHz | | expected physical effect | upper-band energy falls above cutoff | | expected WSE response | bandwidth estimate and high-band trajectory change | | possible interpretation | bandwidth limitation | | semantic judgment | depends on reference/context | | causal claim | known only inside intervention case; not necessarily inferable in wild case | A low-pass transformation guarantees spectral attenuation according to its filter response."
+        },
+        {
+          "chapter": 15,
+          "section": "38. From Experiment to LearningRecord",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "If the Ear misses a known low-pass transformation, the target may be the WSE sensor."
+        },
+        {
+          "chapter": 16,
+          "section": "10. Minimum MSE for Ear v1",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "MSE is intentionally smaller than WSE in the first release."
+        },
+        {
+          "chapter": 16,
+          "section": "11. Auditory Representation v1 Minimum",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "WSE and MSE fields resolve to one physical timeline."
+        },
+        {
+          "chapter": 16,
+          "section": "25. CPU-First Resource Strategy",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "Ear v1 should be capable of completing the core path on commodity CPU infrastructure. | Tier | Workload | Policy | | --- | --- | --- | | 0 | hash/decode/integrity | always CPU | | 1 | core WSE + representation + rules | always CPU-first | | 2 | selected learned models/MSE | CPU possible; GPU optional if justified | | 3 | research/training/heavy experiments | offline; not required for case completion | GPU acceleration may improve selected learned models, but the first scientific claim should not depend on high-end hardware."
+        },
+        {
+          "chapter": 16,
+          "section": "27. Determinism Classes",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "Different outputs require different reproducibility contracts. | Class | Ear v1 use | | --- | --- | | bitwise | hashes, canonical serialization, selected deterministic records | | tolerance | FFT/resampling/numeric measurements | | semantic | judgment/evidence relation remains unchanged | | statistical | only for explicitly stochastic research/learned components | Canonical WSE measurements should aim for bitwise or tolerance determinism."
+        },
+        {
+          "chapter": 16,
+          "section": "44. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "WSE is the primary sensory substrate; MSE supplies minimal context.** **5."
+        },
+        {
+          "chapter": 18,
+          "section": "16. Learned Artifact Spaces",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "WSE evidence and contextual structure remain necessary for explanation and false-positive control."
+        },
+        {
+          "chapter": 18,
+          "section": "31. Representation Evolution",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "Auditory Representation must evolve without breaking historical knowledge. | Generation | Representation emphasis | | --- | --- | | v1 | physical WSE + minimal MSE + provenance | | v2 | richer context graph and internal references | | v3 | artifact latent spaces + retrieval indices | | v4 | hierarchical structural/source-role relations | | v5 | transferable plural auditory state across domains | Each generation should preserve the ability to read historical cases under their original representation contract."
+        },
+        {
+          "chapter": 18,
+          "section": "43. Organizational Evolution Around the Ear",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "As the Ear deepens, research roles can become more specialized without fragmenting the technical theory. | Research lens | Persistent question | | --- | --- | | WSE | what physically happened in the sound? | | MSE | what is the musical/structural organization? | | PPE | can the hearing event be trusted/reproduced? | | representation/model research | what internal state best supports hearing? | | benchmark/review | where is the capability boundary? | WSE, MSE and PPE remain useful as research disciplines even when more model specialists join."
+        },
+        {
+          "chapter": 18,
+          "section": "43. Organizational Evolution Around the Ear",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "The case-learning interface connects the disciplines: a production failure can become a WSE question, MSE question, PPE question or representation/model question."
+        },
+        {
+          "chapter": 20,
+          "section": "5. Physical Hearing Comes First",
+          "source_path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/Moodify_Ear_v1_Chapter_20.md",
+          "excerpt": "WSE established the first discipline: before the machine interprets, it must observe the physical sound well. | Physical domain | Ear v1 role | | --- | --- | | amplitude / peaks | sample and true-peak events, clipping evidence | | loudness / dynamics | level and compression trajectories | | spectrum / bandwidth | balance, cutoff and band-energy evidence | | transients | attack and onset irregularity | | stereo / M-S | width, imbalance and channel relation | | phase / mono | cancellation and compatibility evidence | These measurements provide the Ear with contact with the signal."
+        }
+      ]
+    },
+    "MSE": {
+      "name": "Musical-Structural Engineering",
+      "question": "What is the musical structure?",
+      "evidence": [
+        {
+          "chapter": 1,
+          "section": "The three systems converge at the Auditory Representation and Judgment layers. WSE",
+          "source_path": "Moodify_Ear_v1_Chapter_01.pdf",
+          "excerpt": "without MSE can confuse a deliberate musical event with a defect."
+        },
+        {
+          "chapter": 1,
+          "section": "The three systems converge at the Auditory Representation and Judgment layers. WSE",
+          "source_path": "Moodify_Ear_v1_Chapter_01.pdf",
+          "excerpt": "MSE without WSE can describe structure while missing the physical behavior of the sound."
+        },
+        {
+          "chapter": 2,
+          "section": "10A. Pitch, Harmonicity and Tonal Organization",
+          "source_path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+          "excerpt": "Tonal estimates can also help align WSE evidence with MSE structure."
+        },
+        {
+          "chapter": 2,
+          "section": "12. Handcrafted Features and Learned Representations",
+          "source_path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+          "excerpt": "The Judgment Engine consumes all three, but provenance records which pathway supported each claim. | Representation family | Advantages | Risks | Moodify role | | --- | --- | --- | --- | | Deterministic engineering metrics | Auditable, reproducible | Limited expressiveness | Evidence backbone | | Psychoacoustic transforms | Perceptually organized | Model assumptions | Perceptual context | | Learned embeddings | Pattern discovery, transfer | Opacity, dataset bias | Artifact/context discovery | | Musical structure | Context and form | Depends on structural accuracy | MSE conditioning | | Provenance/quality state | Trust and traceability | No direct semantic content | PPE control |"
+        },
+        {
+          "chapter": 2,
+          "section": "14. Musical Structure Changes the Meaning of Sound",
+          "source_path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+          "excerpt": "The integration of WSE and MSE is one of Moodify’s distinctive opportunities."
+        },
+        {
+          "chapter": 3,
+          "section": "7. Context Changes the Meaning of the Same Signal",
+          "source_path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+          "excerpt": "This is one of the reasons MSE matters to an Ear whose sensory measurements are largely WSE."
+        },
+        {
+          "chapter": 3,
+          "section": "17. Human Review Is an Epistemic Interface",
+          "source_path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+          "excerpt": "A LearningRecord can distinguish false positive, false negative, context error, reference error, severity error, confidence error and unknown phenomenon. | Review outcome | Likely implication | | --- | --- | | Measurement wrong | Sensor / WSE correction | | Context wrong | MSE or contextual representation correction | | Judgment wrong | Rule/model update candidate | | Severity wrong | Calibration or policy change | | Confidence wrong | Calibration / uncertainty change | | Evidence incomplete | PPE / evidence pipeline correction | | Unknown phenomenon | New research class / case cluster | This decomposition matters because different errors require different fixes."
+        },
+        {
+          "chapter": 5,
+          "section": "22. WSE as a Time-Indexed State",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "The benefit is architectural: MSE can align musical sections to the same timeline, the Judgment Engine can query the state at a finding's time range, and the evidence layer can reproduce the physical basis of a claim."
+        },
+        {
+          "chapter": 6,
+          "section": "Can Machines Learn to Hear?",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "**Technical Monographs - Volume I** **Chapter VI - MSE - Hearing Musical Structure** **August 2026** > WSE asks what happened in the sound."
+        },
+        {
+          "chapter": 6,
+          "section": "Can Machines Learn to Hear?",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE asks where that event belongs in the music."
+        },
+        {
+          "chapter": 6,
+          "section": "1. From Physical Sound to Musical Organization",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "This gap is the domain of Musical-Structural Engineering, or MSE."
+        },
+        {
+          "chapter": 6,
+          "section": "1. From Physical Sound to Musical Organization",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE asks a different question from WSE: *What is the musical structure?* Its purpose is not to replace the physical signal with notation."
+        },
+        {
+          "chapter": 6,
+          "section": "2. MSE Is Context, Not a Second Analyzer",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE should not become a separate dashboard of tempo, chords and MIDI notes."
+        },
+        {
+          "chapter": 6,
+          "section": "2. MSE Is Context, Not a Second Analyzer",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "At time t, the MSE state may contain beat phase, bar position, section identity, harmonic state, pitch activity, vocal/lyric alignment, source-role estimates and uncertainty."
+        },
+        {
+          "chapter": 6,
+          "section": "2. MSE Is Context, Not a Second Analyzer",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE therefore changes the meaning of WSE without rewriting WSE."
+        },
+        {
+          "chapter": 6,
+          "section": "3. Musical Time Is Hierarchical",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE should therefore maintain conversion functions between physical time and musical time wherever confidence is sufficient."
+        },
+        {
+          "chapter": 6,
+          "section": "4. Onsets: Candidate Events, Not Yet Beats",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE should therefore preserve onset evidence separately from beat decisions."
+        },
+        {
+          "chapter": 6,
+          "section": "5. Beat Tracking as Temporal Inference",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "Conceptually, MSE observes acoustic evidence A and infers a latent beat-state sequence B: The latent state can encode tempo, phase and position within a bar."
+        },
+        {
+          "chapter": 6,
+          "section": "6. Downbeats, Bars and Meter",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "If meter changes or the model is uncertain, MSE should preserve local hypotheses rather than impose one bar grid over the whole track."
+        },
+        {
+          "chapter": 6,
+          "section": "7. Tempo Is a Trajectory, Not Only a BPM Label",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "The Ear should distinguish a deliberate ritardando from irregular timing only when sufficient musical context exists; WSE/MSE can first expose the trajectory."
+        },
+        {
+          "chapter": 6,
+          "section": "10. Novelty and Boundary Detection",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE should store boundary confidence and scale."
+        },
+        {
+          "chapter": 6,
+          "section": "12. Repetition Can Be More Reliable Than Names",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE supplies the correspondence; WSE supplies the physical difference; Interpretation decides what it may mean."
+        },
+        {
+          "chapter": 6,
+          "section": "12. Repetition Can Be More Reliable Than Names",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "This is one of the strongest reasons to build MSE early: repetition creates natural internal references even when no clean external reference exists."
+        },
+        {
+          "chapter": 6,
+          "section": "16. Automatic Music Transcription",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "A MIDI-like event layer can enrich MSE when confidence is sufficient, but the entire Ear must not depend on perfect transcription."
+        },
+        {
+          "chapter": 6,
+          "section": "17. MIDI and Score Are Structural Views, Not Ground Truth",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "If reliable, this is extremely useful for MSE."
+        },
+        {
+          "chapter": 6,
+          "section": "19. Lyrics as a Structural Timeline",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "Lyrics add a linguistic layer to music, but MSE first treats them as a timed structural sequence: lines, words, syllables and vocal activity."
+        },
+        {
+          "chapter": 6,
+          "section": "20. Vocal Activity and Source Roles",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE does not need perfect source separation to infer that a vocal, drums or bass-like role is active, but source-aware context can greatly improve interpretation."
+        },
+        {
+          "chapter": 6,
+          "section": "21. Fine-Grained Source Taxonomy",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "A future MSE can represent roles hierarchically: vocals -> lead/backing; drums -> kick/snare/cymbals; harmonic -> guitar/keys; low-frequency -> bass/sub; effects and ambience."
+        },
+        {
+          "chapter": 6,
+          "section": "23. MSE and WSE Must Share Time",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "The simplest integration failure would be to let WSE and MSE use incompatible timelines."
+        },
+        {
+          "chapter": 6,
+          "section": "24. Structure-Conditioned Judgment",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "Without MSE, the Ear sees a change in short-term loudness."
+        },
+        {
+          "chapter": 6,
+          "section": "24. Structure-Conditioned Judgment",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "With MSE, it can know that the jump coincides with a chorus downbeat, recurs at the next chorus and is accompanied by increased instrumentation."
+        },
+        {
+          "chapter": 6,
+          "section": "24. Structure-Conditioned Judgment",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE therefore reduces false positives by providing expected musical variation."
+        },
+        {
+          "chapter": 6,
+          "section": "30. From MSE to Auditory Representation",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE contributes a structured subspace to the Auditory Representation: This subspace is aligned to the same source and run identity as WSE."
+        },
+        {
+          "chapter": 6,
+          "section": "31. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE can be summarized by ten principles. **1."
+        },
+        {
+          "chapter": 6,
+          "section": "31. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "WSE and MSE share one timeline.** Physical findings and musical entities must be cross-queryable. **9."
+        },
+        {
+          "chapter": 6,
+          "section": "31. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "MSE exists to improve hearing.** A structural feature is valuable when it changes interpretation, evidence or learning."
+        },
+        {
+          "chapter": 6,
+          "section": "32. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_06_Package/Moodify_Ear_v1_Chapter_06/Moodify_Ear_v1_Chapter_06.md",
+          "excerpt": "The question of MSE is therefore not whether a machine can produce a perfect score."
+        },
+        {
+          "chapter": 7,
+          "section": "35. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "WSE and MSE make it possible for Moodify to observe and contextualize sound."
+        },
+        {
+          "chapter": 8,
+          "section": "1. The Ear Needs an Internal Language",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "It connects the physical sensor layer of WSE, the musical-structural context of MSE, the Judgment Engine, the Evidence Graph and the learning loop."
+        },
+        {
+          "chapter": 8,
+          "section": "5. Physical Time and Musical Time Must Coexist",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "MSE adds beats, bars, phrases, sections and lyric positions."
+        },
+        {
+          "chapter": 8,
+          "section": "7. MSE Subspace: The Structural State",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "The MSE subspace adds the musical organization developed in Chapter VI."
+        },
+        {
+          "chapter": 8,
+          "section": "9. Hybrid Representation Is a Deliberate Choice",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "Moodify Ear v1 adopts a hybrid representation because no single representation family satisfies all requirements. | Component | Strength | Weakness | | --- | --- | --- | | engineering descriptors | interpretable, reproducible | limited semantic capacity | | MSE structure | musically meaningful context | estimation errors / ambiguity | | learned embeddings | rich pattern sensitivity | opaque / task-dependent | | retrieval links | case-based evidence | depends on corpus quality | | relation graph | explicit compositional context | schema complexity | Handcrafted physical descriptors offer direct interpretability and deterministic behavior."
+        },
+        {
+          "chapter": 8,
+          "section": "21. Representation and Learning",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "These are different interventions. | Observed review problem | Likely technical target | | --- | --- | | measurement incorrect | WSE sensor / decode / parameter | | structure incorrect | MSE model / alignment | | needed pattern absent | representation schema / new feature | | representation sufficient, judgment wrong | rule/model/policy | | confidence poor | calibration / uncertainty propagation | | similar cases not found | retrieval view / embedding / index | | evidence incomplete | projection/provenance/PPE | The LearningRecord should therefore identify which layer is believed to need change."
+        },
+        {
+          "chapter": 9,
+          "section": "17. Evidence Agreement and Conflict",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "Conflict between WSE and MSE can be particularly informative: an acoustic discontinuity aligned exactly with a section boundary may reduce anomaly confidence."
+        },
+        {
+          "chapter": 9,
+          "section": "18. Context Can Reverse a Judgment",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "MSE therefore acts as a conditional prior over WSE evidence."
+        },
+        {
+          "chapter": 9,
+          "section": "26. Human Review Must Decompose the Error",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "A reviewer should not be limited to “correct/incorrect.” Richer outcomes make learning targeted. | Review outcome | Likely change target | | --- | --- | | measurement incorrect | WSE sensor / decode / parameters | | context incorrect | MSE / structural alignment | | reference inappropriate | reference selection / corpus | | classification wrong | rule/model / family definition | | severity wrong | severity policy | | confidence wrong | calibration / uncertainty | | evidence incomplete | evidence projection / PPE | | new phenomenon | research candidate / new family | If the measurement is right but context is wrong, MSE should improve."
+        },
+        {
+          "chapter": 9,
+          "section": "35. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "Context can reverse meaning.** MSE changes how WSE is interpreted. **9."
+        },
+        {
+          "chapter": 10,
+          "section": "12. Structural Uncertainty Must Propagate",
+          "source_path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/Moodify_Ear_v1_Chapter_10.md",
+          "excerpt": "MSE context often changes judgment meaning, but MSE itself is estimated."
+        },
+        {
+          "chapter": 10,
+          "section": "14. Disagreement Is Information",
+          "source_path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/Moodify_Ear_v1_Chapter_10.md",
+          "excerpt": "WSE may indicate a discontinuity while MSE shows a repeated section boundary."
+        },
+        {
+          "chapter": 11,
+          "section": "5. Evidence Must Be Localizable",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "Every time-localized finding should include a support interval: The interval can be expressed in seconds and, where MSE is available, in musical coordinates such as bar, phrase, section or lyric line."
+        },
+        {
+          "chapter": 11,
+          "section": "6. Evidence Has Resolution",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "This principle mirrors the multi-resolution architecture of WSE and MSE."
+        },
+        {
+          "chapter": 11,
+          "section": "19. Contrastive Explanation",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "Moodify can answer using paired representation differences: Contrastive explanations are particularly powerful when MSE provides repeated sections."
+        },
+        {
+          "chapter": 11,
+          "section": "37. Evidence as a Long-Term Asset",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "If the original WSE/MSE evidence and provenance were preserved, the new model can reinterpret history without inventing it."
+        },
+        {
+          "chapter": 12,
+          "section": "8. Location Must Be Visible",
+          "source_path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+          "excerpt": "Where MSE confidence is sufficient, the report should show both absolute time and musical coordinates."
+        },
+        {
+          "chapter": 12,
+          "section": "14. Structural Context Belongs Next to Physical Evidence",
+          "source_path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+          "excerpt": "When MSE contributes to a judgment, structural context should be visible in the report rather than hidden in model logic."
+        },
+        {
+          "chapter": 12,
+          "section": "18. The Analysis Status Block",
+          "source_path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+          "excerpt": "The report should include a compact analysis-status block. | Field | Example | | --- | --- | | case status | COMPLETED / DEGRADED / FAILED / etc. | | source integrity | verified / warning | | WSE coverage | complete / partial | | MSE coverage | complete / low-confidence / not-run | | learned models | executed / optional unavailable | | evidence completeness | all mandatory artifacts resolved? | | report version | schema + renderer | This block can be small in the creator-facing view and expanded in the audit view."
+        },
+        {
+          "chapter": 12,
+          "section": "21. Repetition Can Create a Narrative of Change",
+          "source_path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+          "excerpt": "MSE repetition groups allow the report to describe how a phenomenon evolves across structurally equivalent sections."
+        },
+        {
+          "chapter": 13,
+          "section": "9. The Artifact Index",
+          "source_path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.md",
+          "excerpt": "They should be indexed by role rather than scattered across directories. | Artifact class | Examples | | --- | --- | | identity/spec | source record, case spec, config/version manifest | | measurement | WSE/MSE sensor outputs | | representation | Auditory Representation v1 arrays/records | | judgment | JudgmentRecords and uncertainty state | | evidence | Evidence Bundles, plots, excerpts, comparisons | | report | machine JSON, PDF/app render | | review | HumanReview records | | learning | LearningRecords/candidate links | | operations | logs, validation, packaging manifest | Every artifact should identify its producer, content hash, semantic role, source/run relationship and version."
+        },
+        {
+          "chapter": 13,
+          "section": "17. Review Can Target Different Layers",
+          "source_path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.md",
+          "excerpt": "A reviewer may disagree with different parts of the case. | Target layer | Example disagreement | | --- | --- | | measurement | sensor value is wrong | | MSE context | section/beat/lyric alignment is wrong | | representation | required feature missing/poor | | judgment | classification is wrong | | severity/confidence | meaning right, calibration/policy wrong | | evidence | claim unsupported/incomplete | | report | presentation misleading while judgment is correct | | ontology | new phenomenon does not fit existing class | This decomposition helps the LearningRecord identify the correct engineering response."
+        },
+        {
+          "chapter": 13,
+          "section": "28. LearningRecord: What the Case Teaches",
+          "source_path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.md",
+          "excerpt": "Possible targets include WSE sensor, MSE structure, Auditory Representation, judgment rule/model, calibration, evidence contract, report presentation or benchmark coverage."
+        },
+        {
+          "chapter": 14,
+          "section": "36. Self-Supervised Learning and the Case Corpus",
+          "source_path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/Moodify_Ear_v1_Chapter_14.md",
+          "excerpt": "Moodify's Production Case corpus can eventually support domain-specific self-supervised or weakly supervised learning, especially because each source is accompanied by rich WSE/MSE structure and provenance."
+        },
+        {
+          "chapter": 15,
+          "section": "11. Low-Frequency Accumulation",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "MSE can be used to test context sensitivity: the same low-frequency change applied only to one chorus should be compared with matched chorus repetitions."
+        },
+        {
+          "chapter": 15,
+          "section": "24. Structure-Targeted Interventions",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "MSE enables interventions applied to musically meaningful regions: one chorus, one phrase, one bar or one lyric line."
+        },
+        {
+          "chapter": 15,
+          "section": "24. Structure-Targeted Interventions",
+          "source_path": "Moodify_Ear_v1_Chapter_15_Package/Moodify_Ear_v1_Chapter_15/Moodify_Ear_v1_Chapter_15.md",
+          "excerpt": "This validates the integration of WSE, MSE, Judgment and Evidence rather than only one sensor."
+        },
+        {
+          "chapter": 16,
+          "section": "10. Minimum MSE for Ear v1",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "MSE is intentionally smaller than WSE in the first release."
+        },
+        {
+          "chapter": 16,
+          "section": "11. Auditory Representation v1 Minimum",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "WSE and MSE fields resolve to one physical timeline."
+        },
+        {
+          "chapter": 16,
+          "section": "20. Human Review Minimum",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "Ear v1 needs a compact review interface because learning depends on error decomposition. | Review outcome | Required use | | --- | --- | | accepted | confirm supported judgment | | rejected | semantic error | | false positive / false negative | benchmark/learning signal | | severity adjusted | policy learning | | confidence adjusted | calibration learning | | context/evidence corrected | MSE/evidence learning | | new phenomenon | research/ontology candidate | | insufficient evidence confirmed | coverage/sensor learning | Review should target the exact JudgmentID and evidence."
+        },
+        {
+          "chapter": 16,
+          "section": "25. CPU-First Resource Strategy",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "Ear v1 should be capable of completing the core path on commodity CPU infrastructure. | Tier | Workload | Policy | | --- | --- | --- | | 0 | hash/decode/integrity | always CPU | | 1 | core WSE + representation + rules | always CPU-first | | 2 | selected learned models/MSE | CPU possible; GPU optional if justified | | 3 | research/training/heavy experiments | offline; not required for case completion | GPU acceleration may improve selected learned models, but the first scientific claim should not depend on high-end hardware."
+        },
+        {
+          "chapter": 16,
+          "section": "34. Negative Acceptance Cases",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "A reliable system must also prove that it refuses invalid completion. | Negative case | Expected behavior | | --- | --- | | corrupt input | reject before semantic analysis | | required sensor failure | block affected authoritative judgment | | missing evidence artifact | case cannot close as fully evidenced | | low-confidence MSE | disable/soften dependent contextual judgment | | OOD high | reduce authority; do not invent defect | | invalid state transition | reject transition | | attempt to mutate closed case | append new record/fork; no silent rewrite | | post-processing unavailable | canonical Ear still completes | The system passes these tests when it blocks semantic overreach."
+        },
+        {
+          "chapter": 16,
+          "section": "44. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "WSE is the primary sensory substrate; MSE supplies minimal context.** **5."
+        },
+        {
+          "chapter": 17,
+          "section": "11. Generator and Domain Slices",
+          "source_path": "Moodify_Ear_v1_Chapter_17_Package/Moodify_Ear_v1_Chapter_17/Moodify_Ear_v1_Chapter_17.md",
+          "excerpt": "The benchmark should preserve slices for known source domains. | Slice | Why preserve it | | --- | --- | | generator family | model-specific artifacts/drift | | unknown generator | open-world behavior | | time cohort | ecosystem evolution | | genre/texture | different acoustic baselines | | vocal vs instrumental | different structural/evidence regimes | | sample rate / codec | format-dependent measurement conditions | | short vs long track | different temporal coverage | | simple vs complex arrangement | sensor/MSE difficulty | Generator identity may be unavailable for some cases; those should remain in an UNKNOWN domain rather than being guessed."
+        },
+        {
+          "chapter": 18,
+          "section": "7. Graduation from v1 to v2",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "Moodify should not call a release Ear v2 simply because it adds MSE models."
+        },
+        {
+          "chapter": 18,
+          "section": "8. Ear v2 - Contextual Hearing",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "This generation begins to transform MSE from auxiliary context into a major component of the auditory state."
+        },
+        {
+          "chapter": 18,
+          "section": "11. v2 Benchmark Expansion",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "The benchmark must evolve with the new capability. | Benchmark | v2 question | | --- | --- | | context reversal | does correct structure change the judgment? | | repetition hard negatives | are repeated intentional changes protected? | | boundary uncertainty | does uncertain MSE reduce downstream confidence? | | section transfer | does context generalize across forms/genres? | | v1 regression | are physical capabilities preserved? | Ear v2 should be rewarded when structural context prevents a false positive, not merely when a section label is correct."
+        },
+        {
+          "chapter": 18,
+          "section": "11. v2 Benchmark Expansion",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "This keeps MSE aligned with the product definition: structure matters only when it improves hearing."
+        },
+        {
+          "chapter": 18,
+          "section": "31. Representation Evolution",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "Auditory Representation must evolve without breaking historical knowledge. | Generation | Representation emphasis | | --- | --- | | v1 | physical WSE + minimal MSE + provenance | | v2 | richer context graph and internal references | | v3 | artifact latent spaces + retrieval indices | | v4 | hierarchical structural/source-role relations | | v5 | transferable plural auditory state across domains | Each generation should preserve the ability to read historical cases under their original representation contract."
+        },
+        {
+          "chapter": 18,
+          "section": "42. Deployment Evolution",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "The deployment architecture can scale without changing the semantic architecture. | Generation | Likely deployment change | | --- | --- | | v1 | single/few workers, CPU-first, optional learned models | | v2 | more MSE caching and structural artifacts | | v3 | vector retrieval + selected GPU inference | | v4 | larger relational/case graph services | | v5 | multi-domain model routing / scalable inference | The Production Case remains the unit of truth whether the runtime is a local CLI, one cloud worker or a distributed inference fleet."
+        },
+        {
+          "chapter": 18,
+          "section": "43. Organizational Evolution Around the Ear",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "As the Ear deepens, research roles can become more specialized without fragmenting the technical theory. | Research lens | Persistent question | | --- | --- | | WSE | what physically happened in the sound? | | MSE | what is the musical/structural organization? | | PPE | can the hearing event be trusted/reproduced? | | representation/model research | what internal state best supports hearing? | | benchmark/review | where is the capability boundary? | WSE, MSE and PPE remain useful as research disciplines even when more model specialists join."
+        },
+        {
+          "chapter": 18,
+          "section": "43. Organizational Evolution Around the Ear",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "The case-learning interface connects the disciplines: a production failure can become a WSE question, MSE question, PPE question or representation/model question."
+        },
+        {
+          "chapter": 19,
+          "section": "22. Moodify Does Not Assume Western Music Theory Is Universal",
+          "source_path": "Moodify_Ear_v1_Chapter_19_Package/Moodify_Ear_v1_Chapter_19/Moodify_Ear_v1_Chapter_19.md",
+          "excerpt": "MSE should therefore treat structure as a flexible relational system rather than enforce one universal symbolic grammar."
+        },
+        {
+          "chapter": 19,
+          "section": "56. The Boundary Is a Research Map",
+          "source_path": "Moodify_Ear_v1_Chapter_19_Package/Moodify_Ear_v1_Chapter_19/Moodify_Ear_v1_Chapter_19.md",
+          "excerpt": "Persistent structural ambiguity suggests MSE research."
+        },
+        {
+          "chapter": 20,
+          "section": "6. Structure Changes Meaning",
+          "source_path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/Moodify_Ear_v1_Chapter_20.md",
+          "excerpt": "MSE introduced the second discipline: sound unfolds in musical relations."
+        },
+        {
+          "chapter": 20,
+          "section": "46. What Would Count as Failure?",
+          "source_path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/Moodify_Ear_v1_Chapter_20.md",
+          "excerpt": "For example, if contextual models add complexity without reducing errors, MSE may need a different representation."
+        }
+      ]
+    },
+    "PPE": {
+      "name": "Production Process Engineering",
+      "question": "How is the result produced, verified and recovered reliably?",
+      "evidence": [
+        {
+          "chapter": 1,
+          "section": "The three systems converge at the Auditory Representation and Judgment layers. WSE",
+          "source_path": "Moodify_Ear_v1_Chapter_01.pdf",
+          "excerpt": "Both without PPE can produce interesting results that cannot be trusted, compared or learned from."
+        },
+        {
+          "chapter": 2,
+          "section": "12. Handcrafted Features and Learned Representations",
+          "source_path": "Moodify_Ear_v1_Chapter_02_Package/Moodify_Ear_v1_Chapter_02/Moodify_Ear_v1_Chapter_02.md",
+          "excerpt": "The Judgment Engine consumes all three, but provenance records which pathway supported each claim. | Representation family | Advantages | Risks | Moodify role | | --- | --- | --- | --- | | Deterministic engineering metrics | Auditable, reproducible | Limited expressiveness | Evidence backbone | | Psychoacoustic transforms | Perceptually organized | Model assumptions | Perceptual context | | Learned embeddings | Pattern discovery, transfer | Opacity, dataset bias | Artifact/context discovery | | Musical structure | Context and form | Depends on structural accuracy | MSE conditioning | | Provenance/quality state | Trust and traceability | No direct semantic content | PPE control |"
+        },
+        {
+          "chapter": 3,
+          "section": "16. Evidence Is What Turns a Score into a Technical Claim",
+          "source_path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+          "excerpt": "This is the bridge between auditory intelligence and PPE."
+        },
+        {
+          "chapter": 3,
+          "section": "17. Human Review Is an Epistemic Interface",
+          "source_path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+          "excerpt": "A LearningRecord can distinguish false positive, false negative, context error, reference error, severity error, confidence error and unknown phenomenon. | Review outcome | Likely implication | | --- | --- | | Measurement wrong | Sensor / WSE correction | | Context wrong | MSE or contextual representation correction | | Judgment wrong | Rule/model update candidate | | Severity wrong | Calibration or policy change | | Confidence wrong | Calibration / uncertainty change | | Evidence incomplete | PPE / evidence pipeline correction | | Unknown phenomenon | New research class / case cluster | This decomposition matters because different errors require different fixes."
+        },
+        {
+          "chapter": 3,
+          "section": "17. Human Review Is an Epistemic Interface",
+          "source_path": "Moodify_Ear_v1_Chapter_03_Package/Moodify_Ear_v1_Chapter_03/Moodify_Ear_v1_Chapter_03.md",
+          "excerpt": "A reproducibility or provenance failure belongs to PPE."
+        },
+        {
+          "chapter": 4,
+          "section": "3. Layer 0 - Source Identity",
+          "source_path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.md",
+          "excerpt": "A useful principle is: Source identity belongs to PPE as much as to signal processing."
+        },
+        {
+          "chapter": 4,
+          "section": "13. The PPE Trust Plane",
+          "source_path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.md",
+          "excerpt": "PPE is best understood as a trust plane running through every Ear layer rather than as a separate application module."
+        },
+        {
+          "chapter": 4,
+          "section": "19. Resource-Aware Architecture for Ear v1",
+          "source_path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.md",
+          "excerpt": "A resource-constrained architecture should separate mandatory sensors from optional expensive models and should cache reusable representations. | Tier | Purpose | Compute policy | | --- | --- | --- | | Tier 0 | Source identity, decode validation, cheap integrity checks | Always run; CPU | | Tier 1 | Core WSE/PPE deterministic measurements | Always run; CPU-first | | Tier 2 | Selected learned representations / heavier structure models | Run only when judgment value justifies cost | | Tier 3 | Research training, large comparison experiments | Offline; not required for product completion | Tier 0/1 analysis can run on CPU and produce deterministic engineering evidence."
+        },
+        {
+          "chapter": 4,
+          "section": "23. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_04_Package/Moodify_Ear_v1_Chapter_04/Moodify_Ear_v1_Chapter_04.md",
+          "excerpt": "PPE runs through the entire system as a trust plane."
+        },
+        {
+          "chapter": 5,
+          "section": "23. Determinism and Numerical Reproducibility",
+          "source_path": "Moodify_Ear_v1_Chapter_05_Package/Moodify_Ear_v1_Chapter_05/Moodify_Ear_v1_Chapter_05.md",
+          "excerpt": "This is PPE operating inside the physical layer."
+        },
+        {
+          "chapter": 7,
+          "section": "Can Machines Learn to Hear?",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "**Technical Monographs - Volume I** **Chapter VII - PPE - Making Hearing Trustworthy** **August 2026** > A hearing result becomes knowledge only when identity, evidence, state and lineage survive the run that produced it."
+        },
+        {
+          "chapter": 7,
+          "section": "1. Hearing Is Not Trust",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "Production Process Engineering, or PPE, exists to solve this second-order problem."
+        },
+        {
+          "chapter": 7,
+          "section": "1. Hearing Is Not Trust",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE asks: *How was this hearing produced reliably?* PPE does not make the Ear more sensitive in the immediate perceptual sense."
+        },
+        {
+          "chapter": 7,
+          "section": "2. PPE as a Trust Plane",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE should not be implemented as one administrative module placed beside the auditory pipeline."
+        },
+        {
+          "chapter": 7,
+          "section": "2. PPE as a Trust Plane",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE makes those dependencies visible at the unit of the Production Case. | Without PPE | Failure of trust | | --- | --- | | No source hash | Cannot prove which audio was analyzed | | No run identity | Cannot reconstruct which execution produced the result | | Mutable defaults | Same command may mean different things over time | | No evidence index | Judgment cannot be audited | | One success flag | Partial/failed/blocked cases look complete | | Silent feedback mutation | Historical behavior cannot be reproduced | | No migration contract | Old cases silently change meaning |"
+        },
+        {
+          "chapter": 7,
+          "section": "4. Source Identity Must Precede Analysis",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE should therefore refuse to use a mutable path or display name as the sole case identity."
+        },
+        {
+          "chapter": 7,
+          "section": "5. Run Identity: Which Execution Produced the Result?",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE applies the same principle to every production hearing."
+        },
+        {
+          "chapter": 7,
+          "section": "7. Version Identity Is Multi-Dimensional",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE generalizes this documentation approach to the entire hearing stack."
+        },
+        {
+          "chapter": 7,
+          "section": "11. Determinism Is a Contract, Not an Absolute",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE should therefore distinguish bitwise determinism, tolerance determinism and statistical reproducibility. | Class | Contract | | --- | --- | | bitwise | Identical bytes or serialized values on supported environment | | tolerance | Numeric outputs agree within declared absolute/relative tolerance | | semantic | Judgment class/evidence relation is stable though low-level numerics vary | | statistical | Distributional behavior is reproducible across repeated stochastic runs | A run should declare the reproducibility class of important outputs."
+        },
+        {
+          "chapter": 7,
+          "section": "13. Evidence Graph and Judgment Provenance",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "If one sensor is later found defective, PPE can identify which historical judgments depended on it instead of invalidating every case."
+        },
+        {
+          "chapter": 7,
+          "section": "15. Human Authority Is a Technical Boundary",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE therefore represents human authority as part of the system architecture."
+        },
+        {
+          "chapter": 7,
+          "section": "19. Golden Cases and Regression Memory",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "When a deliberate change alters a Golden Case, PPE should require an explicit re-baseline decision rather than silently accepting the new output."
+        },
+        {
+          "chapter": 7,
+          "section": "20. Benchmarks Must Be Frozen Enough to Measure Progress",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE should version benchmark suites and preserve historical subsets."
+        },
+        {
+          "chapter": 7,
+          "section": "22. No Silent Learning",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "The distinction between feedback and promotion is one of PPE's most important contributions to a learning Ear."
+        },
+        {
+          "chapter": 7,
+          "section": "23. Change Control and Semantic Versioning",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE can classify changes as: | Change class | Example | Expected policy | | --- | --- | --- | | non-semantic | refactor/logging/UI layout | no case-meaning change expected | | compatible feature | new optional evidence artifact | old cases remain valid | | semantic minor | threshold/calibration update | new internal version + regression | | schema/model major | representation meaning changes | migration/compatibility review | | breaking | old contract cannot be supported | explicit deprecation + archive reader | The exact numbering scheme can remain project-specific."
+        },
+        {
+          "chapter": 7,
+          "section": "27. Auditability Without Bureaucracy",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE should therefore automate provenance collection wherever possible."
+        },
+        {
+          "chapter": 7,
+          "section": "28. Risk-Based Trust",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE can define assurance as a function of consequence: Risk management frameworks such as NIST AI RMF and ISO/IEC 23894 emphasize that governance should be proportional to context, impact and uncertainty [8,9]."
+        },
+        {
+          "chapter": 7,
+          "section": "29. Security, Secrets and Environment Boundaries",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE should distinguish reproducibility metadata from sensitive runtime secrets."
+        },
+        {
+          "chapter": 7,
+          "section": "32. PPE Validation Experiments",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE succeeds when such violations become visible and classifiable rather than silently accepted."
+        },
+        {
+          "chapter": 7,
+          "section": "33. The Institutional Knowledge Loop",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE creates the interface between production and research: The loop is deliberately closed."
+        },
+        {
+          "chapter": 7,
+          "section": "34. Chapter Principles",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE can be summarized by twelve principles. **1."
+        },
+        {
+          "chapter": 7,
+          "section": "35. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "PPE makes those observations durable enough to become knowledge."
+        },
+        {
+          "chapter": 7,
+          "section": "35. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "Without PPE, each successful analysis is a demonstration."
+        },
+        {
+          "chapter": 7,
+          "section": "35. Chapter Conclusion",
+          "source_path": "Moodify_Ear_v1_Chapter_07_Package/Moodify_Ear_v1_Chapter_07/Moodify_Ear_v1_Chapter_07.md",
+          "excerpt": "With PPE, each validated case becomes part of a reproducible lineage from Ear v1 to every later version."
+        },
+        {
+          "chapter": 8,
+          "section": "10. The Representation Should Preserve Missingness",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "PPE uses the same status to decide whether a finding is allowed to become authoritative."
+        },
+        {
+          "chapter": 8,
+          "section": "21. Representation and Learning",
+          "source_path": "Moodify_Ear_v1_Chapter_08_Package/Moodify_Ear_v1_Chapter_08/Moodify_Ear_v1_Chapter_08.md",
+          "excerpt": "These are different interventions. | Observed review problem | Likely technical target | | --- | --- | | measurement incorrect | WSE sensor / decode / parameter | | structure incorrect | MSE model / alignment | | needed pattern absent | representation schema / new feature | | representation sufficient, judgment wrong | rule/model/policy | | confidence poor | calibration / uncertainty propagation | | similar cases not found | retrieval view / embedding / index | | evidence incomplete | projection/provenance/PPE | The LearningRecord should therefore identify which layer is believed to need change."
+        },
+        {
+          "chapter": 9,
+          "section": "25. Evidence Completeness Is a Gate",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "This is where PPE constrains intelligence: semantic authority is limited by evidential completeness."
+        },
+        {
+          "chapter": 9,
+          "section": "26. Human Review Must Decompose the Error",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "A reviewer should not be limited to “correct/incorrect.” Richer outcomes make learning targeted. | Review outcome | Likely change target | | --- | --- | | measurement incorrect | WSE sensor / decode / parameters | | context incorrect | MSE / structural alignment | | reference inappropriate | reference selection / corpus | | classification wrong | rule/model / family definition | | severity wrong | severity policy | | confidence wrong | calibration / uncertainty | | evidence incomplete | evidence projection / PPE | | new phenomenon | research candidate / new family | If the measurement is right but context is wrong, MSE should improve."
+        },
+        {
+          "chapter": 9,
+          "section": "27. Learning from Judgment Errors",
+          "source_path": "Moodify_Ear_v1_Chapter_09_Package/Moodify_Ear_v1_Chapter_09/Moodify_Ear_v1_Chapter_09.md",
+          "excerpt": "PPE requires regression and benchmark validation before the new judgment family/version becomes production authority."
+        },
+        {
+          "chapter": 10,
+          "section": "13. Evidence Completeness Is Different from Model Confidence",
+          "source_path": "Moodify_Ear_v1_Chapter_10_Package/Moodify_Ear_v1_Chapter_10/Moodify_Ear_v1_Chapter_10.md",
+          "excerpt": "This is one of the strongest ways PPE constrains overconfident machine learning."
+        },
+        {
+          "chapter": 11,
+          "section": "32. Explanation Review Taxonomy",
+          "source_path": "Moodify_Ear_v1_Chapter_11_Package/Moodify_Ear_v1_Chapter_11/Moodify_Ear_v1_Chapter_11.md",
+          "excerpt": "Explanation errors should be classified separately from judgment errors. | Explanation review outcome | Likely change target | | --- | --- | | evidence incorrect | sensor/evidence extraction | | evidence incomplete | judgment-family evidence contract | | explanation unfaithful | XAI method / model interface | | language overstates certainty | rendering policy | | causal overreach | epistemic-level policy | | too technical / not meaningful | audience projection | | unstable under irrelevant change | explanation method / model robustness | | artifact/provenance missing | PPE packaging | A correct judgment with an unfaithful explanation is still a defect."
+        },
+        {
+          "chapter": 12,
+          "section": "26. Report Regeneration",
+          "source_path": "Moodify_Ear_v1_Chapter_12_Package/Moodify_Ear_v1_Chapter_12/Moodify_Ear_v1_Chapter_12.md",
+          "excerpt": "A core PPE test is whether a report can be regenerated from the closed Production Case without re-running the auditory pipeline."
+        },
+        {
+          "chapter": 13,
+          "section": "26. Failure Cases Are Assets",
+          "source_path": "Moodify_Ear_v1_Chapter_13_Package/Moodify_Ear_v1_Chapter_13/Moodify_Ear_v1_Chapter_13.md",
+          "excerpt": "PPE should preserve the failure class, stack/log evidence, partial artifacts, last valid state and recovery decision."
+        },
+        {
+          "chapter": 14,
+          "section": "17. Data Drift vs Concept Drift",
+          "source_path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/Moodify_Ear_v1_Chapter_14.md",
+          "excerpt": "The system should distinguish a change in input distribution from a change in the meaning of labels. | Drift type | Meaning | Likely response | | --- | --- | --- | | data/covariate drift | P(x) changes | new reference/calibration/evaluation | | prior drift | P(y) changes | revisit prevalence/thresholds | | concept drift | P(y|x) changes | new model/representation/ontology | | operational drift | formats/workflows change | runtime/PPE adaptation | A new genre may shift spectral distributions while existing clipping rules remain valid."
+        },
+        {
+          "chapter": 14,
+          "section": "39. Institutional Learning vs Model Learning",
+          "source_path": "Moodify_Ear_v1_Chapter_14_Package/Moodify_Ear_v1_Chapter_14/Moodify_Ear_v1_Chapter_14.md",
+          "excerpt": "PPE is what allows these forms of learning to coexist and remain versioned."
+        },
+        {
+          "chapter": 16,
+          "section": "29. Ear v1 Benchmark Suite",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "A first benchmark should contain several complementary case families. | Case family | Purpose | | --- | --- | | clean/reference tracks | baseline false-positive behavior | | controlled Intervention Cases | known physical effects | | hard negatives | intentional production choices resembling anomalies | | AI-generated production cases | target domain | | unknown/new generator cases | OOD/novelty behavior | | failure/input-integrity cases | PPE and refusal semantics | | Golden Cases | detailed regression | | human-reviewed ambiguous cases | abstention/calibration boundary | The benchmark must contain both positive and negative examples."
+        },
+        {
+          "chapter": 16,
+          "section": "30. Benchmark Metrics",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "PPE requires reproducibility and report regeneration."
+        },
+        {
+          "chapter": 16,
+          "section": "37. Observability Minimum",
+          "source_path": "Moodify_Ear_v1_Chapter_16_Package/Moodify_Ear_v1_Chapter_16/Moodify_Ear_v1_Chapter_16.md",
+          "excerpt": "Production operation needs a narrow observability layer. | Operational signal | Use | | --- | --- | | case state counts | throughput / stuck cases | | failure class counts | runtime reliability | | latency/memory | resource budget | | optional model availability | degraded-capability monitoring | | evidence-packaging failures | PPE integrity | | report regeneration failures | case durability | | benchmark drift alerts | release/recalibration research trigger | Metrics should describe case throughput and failures without replacing case-level evidence."
+        },
+        {
+          "chapter": 17,
+          "section": "5. Benchmark Corpus Architecture",
+          "source_path": "Moodify_Ear_v1_Chapter_17_Package/Moodify_Ear_v1_Chapter_17/Moodify_Ear_v1_Chapter_17.md",
+          "excerpt": "Ear v1 should use a layered corpus rather than one undifferentiated test set. | Layer | Purpose | | --- | --- | | Controlled Intervention | known physical cause and strength | | Natural Reviewed | real production complexity | | Hard Negative | semantic restraint / artistic extremes | | Golden Cases | fine-grained regression memory | | OOD / Unknown | novelty and uncertainty behavior | | Failure / Integrity | input/PPE refusal behavior | | Calibration | threshold and confidence fitting | | Protected Release Test | final unbiased release estimate | The layers serve different purposes."
+        },
+        {
+          "chapter": 18,
+          "section": "43. Organizational Evolution Around the Ear",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "As the Ear deepens, research roles can become more specialized without fragmenting the technical theory. | Research lens | Persistent question | | --- | --- | | WSE | what physically happened in the sound? | | MSE | what is the musical/structural organization? | | PPE | can the hearing event be trusted/reproduced? | | representation/model research | what internal state best supports hearing? | | benchmark/review | where is the capability boundary? | WSE, MSE and PPE remain useful as research disciplines even when more model specialists join."
+        },
+        {
+          "chapter": 18,
+          "section": "43. Organizational Evolution Around the Ear",
+          "source_path": "Moodify_Ear_v1_Chapter_18_Package/Moodify_Ear_v1_Chapter_18/Moodify_Ear_v1_Chapter_18.md",
+          "excerpt": "The case-learning interface connects the disciplines: a production failure can become a WSE question, MSE question, PPE question or representation/model question."
+        },
+        {
+          "chapter": 20,
+          "section": "7. Trust Is an Architecture, Not a Disclaimer",
+          "source_path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/Moodify_Ear_v1_Chapter_20.md",
+          "excerpt": "PPE established that reproducibility, lineage and authority cannot be added after the fact."
+        },
+        {
+          "chapter": 20,
+          "section": "7. Trust Is an Architecture, Not a Disclaimer",
+          "source_path": "Moodify_Ear_v1_Chapter_20_Package/Moodify_Ear_v1_Chapter_20/Moodify_Ear_v1_Chapter_20.md",
+          "excerpt": "PPE turns trust into mechanics: identities, states, manifests, hashes, evidence bundles, closure rules and append-only review."
+        }
+      ]
+    }
+  }
+}

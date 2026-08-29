@@ -1,0 +1,21 @@
+{
+  "task": "TP-104",
+  "verified_at": "2026-08-12T00:56:48.646810+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "knowledge/evidence_requirements.json",
+      "exists": true,
+      "bytes": 1141826,
+      "sha256": "e5034f10ad9bcda7c9d688cf46029e1f5fb9ab60e41827bd1342ca441f9eab1b",
+      "passed": true
+    },
+    {
+      "path": "knowledge/evidence_requirements.md",
+      "exists": true,
+      "bytes": 316,
+      "sha256": "82301de6b90eb15c2ee254a0e1127c185d8179f9dfda77c507e1b66c7ebfca8f",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "package": "Moodify Protocol Genesis 008",
+  "id": "MOOD-GENESIS-008",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004",
+    "MOOD-GENESIS-005",
+    "MOOD-GENESIS-006",
+    "MOOD-GENESIS-007"
+  ],
+  "purpose": "End-to-end security hardening, privacy review, incident response, release candidate and controlled public launch preparation",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "cd613bd6c0d140a83d97b4a21d4313a6d5fa9f2a01f62c7ff54dd8ce89f43b9b",
+      "bytes": 1860
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "dd6aed1bbe056eb5ec895040bbc92bc136624e56a6345c43a612a5148e23bb73",
+      "bytes": 9730
+    },
+    {
+      "name": "02_SECURITY_CHECKLIST.md",
+      "sha256": "f46bf99a2986f7b280364b0c7966242d8a07ba40e113b961533862742bbacb75",
+      "bytes": 3100
+    },
+    {
+      "name": "03_RELEASE_GATE.md",
+      "sha256": "224a8dee42a1bd98d6b6887c4edef8ec48f7b2712fb53eb90098011dfa94d744",
+      "bytes": 1485
+    },
+    {
+      "name": "04_INCIDENT_RESPONSE_TEMPLATE.md",
+      "sha256": "4c2299223b58f2fcd9c2962cdcf09f88292675bd1aa9b3f09ff8895160eedee8",
+      "bytes": 861
+    },
+    {
+      "name": "05_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "f59c7059f3fa0f88717d6f892fc18830f1164fe1f907c895701058d0df816662",
+      "bytes": 5625
+    },
+    {
+      "name": "06_TEST_MATRIX.md",
+      "sha256": "6d06b7301be8869ada7659251b54b23f88104fc3bf8257ad89fae6a9af73b2d5",
+      "bytes": 3465
+    },
+    {
+      "name": "07_LAUNCH_CHECKLIST.md",
+      "sha256": "8613f49210351b6cb6d705349c7b28e33f006b0a17c60bd6b06970985255aeb8",
+      "bytes": 1970
+    },
+    {
+      "name": "08_RELEASE_REPORT_TEMPLATE.md",
+      "sha256": "1b261272860fb45740de1e0ec49061adbd572c4e76580a11c0d270495ca8c896",
+      "bytes": 1371
+    },
+    {
+      "name": "09_PACKAGE_CANON.json",
+      "sha256": "53522657aa8d7cd8e0e2e72a7ce06c567cf4751840302c5746ee0c93193f136d",
+      "bytes": 1660
+    },
+    {
+      "name": "10_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "840a5c8342458ac92ed5fc7235c748d8851aa278d342cb2620673ce1425d20e0",
+      "bytes": 2230
+    }
+  ]
+}

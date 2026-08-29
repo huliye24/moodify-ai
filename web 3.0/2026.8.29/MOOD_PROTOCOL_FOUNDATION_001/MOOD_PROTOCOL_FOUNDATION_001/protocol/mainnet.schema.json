@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moodify.invalid/schemas/mood-mainnet.schema.json",
+  "title": "MOOD Protocol Mainnet Facts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "protocol",
+    "chain",
+    "token",
+    "addresses",
+    "endpoints",
+    "evidence",
+    "launch"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "ticker"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "ticker": {"const": "MOOD"}
+      }
+    },
+    "chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "network", "chainId", "cluster"],
+      "properties": {
+        "family": {"enum": ["evm", "solana", "other"]},
+        "network": {"type": "string", "minLength": 1},
+        "chainId": {"type": ["integer", "null"], "minimum": 1},
+        "cluster": {"type": ["string", "null"]}
+      }
+    },
+    "token": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "symbol", "identifier", "decimals", "totalSupplyAtomic"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "symbol": {"const": "MOOD"},
+        "identifier": {"type": "string", "minLength": 1},
+        "decimals": {"type": "integer", "minimum": 0, "maximum": 36},
+        "totalSupplyAtomic": {"type": "string", "pattern": "^[0-9]+$"}
+      }
+    },
+    "addresses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["treasury", "genesisPool"],
+      "properties": {
+        "treasury": {"type": ["string", "null"]},
+        "genesisPool": {"type": ["string", "null"]}
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rpcUrls", "explorerBaseUrl"],
+      "properties": {
+        "rpcUrls": {
+          "type": "array",
+          "items": {"type": "string", "format": "uri"},
+          "uniqueItems": true
+        },
+        "explorerBaseUrl": {"type": "string", "format": "uri"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceCommit", "references", "unresolved"],
+      "properties": {
+        "sourceCommit": {"type": ["string", "null"]},
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["fact", "source", "status"],
+            "properties": {
+              "fact": {"type": "string", "minLength": 1},
+              "source": {"type": "string", "minLength": 1},
+              "status": {
+                "enum": [
+                  "VERIFIED",
+                  "REPOSITORY_ONLY",
+                  "PUBLIC_CHAIN_ONLY",
+                  "CONFLICT",
+                  "HUMAN_DECISION_REQUIRED",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            }
+          }
+        },
+        "unresolved": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        }
+      }
+    },
+    "launch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "lockedAt", "lockedBy"],
+      "properties": {
+        "status": {"enum": ["draft", "locked"]},
+        "lockedAt": {"type": ["string", "null"], "format": "date-time"},
+        "lockedBy": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "case_id": "case_00000000000000000000000000000001",
+  "stage": "after",
+  "input_path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\03_candidates\\candidate_C.wav",
+  "input_sha256": "fc1a553d1c649f3b45a9efe04c061a4dea7592fccf8ed7029df5fe90e3e379ed",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\C\\spectrum_linear.png",
+      "sha256": "19999be15b67aef53b24410f6f7319a0f5994a3a960ad49c268e6fe4934d966e",
+      "size_bytes": 114998
+    },
+    "spectrum_log": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\C\\spectrum_log.png",
+      "sha256": "e525e09d2787a0091bb4051ce26fb6a04337bd96f84f064becfb94aeb642b21b",
+      "size_bytes": 403918
+    },
+    "metrics": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\C\\metrics.json",
+      "sha256": "015519b2886cef73858b9a8ae3e84ed76799704535bd37561bb6155a205a0743",
+      "size_bytes": 8084
+    },
+    "timeline": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\C\\timeline_metrics.jsonl",
+      "sha256": "56249aecb4f7cf878c70d0bfc99d4a3c4c204505f03af932335da8e2be90047a",
+      "size_bytes": 2325
+    },
+    "analysis_data": {
+      "path": "E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\C\\analysis_data.npz",
+      "sha256": "f1a4fb551b33d752b64c9aef9318a759c46657c41d2ef29300bf5fd0cbe60ab8",
+      "size_bytes": 154729
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\03_candidates\\candidate_C.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\C\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\03_candidates\\candidate_C.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 E:\\moodify\\examples\\golden_case\\cases\\case_00000000000000000000000000000001\\04_after_scan\\C\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:42:23.877173+00:00"
+}

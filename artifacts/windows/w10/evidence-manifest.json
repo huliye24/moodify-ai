@@ -1,0 +1,32 @@
+{
+  "package_id": "MFY-WIN-W10-CLOUD-BRIDGE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w09_status": "PASS",
+  "w10_gate": "PASS",
+  "cloud_chain": "BLOCKED",
+  "capabilities": {
+    "public_catalogue_playback": "VERIFIED_LIVE",
+    "media_upload_route": "VERIFIED_PARTIAL",
+    "desktop_upload_auth": "BLOCKED",
+    "preparation_request": "BLOCKED",
+    "preparation_status": "BLOCKED",
+    "prepared_source": "BLOCKED"
+  },
+  "authorities": { "track": "LibraryTrack/LibraryService", "playback": "PlaybackService", "recovery": "LocalStateStore/RecoveryService", "cloud_client": "BffClient (no preparation methods)" },
+  "auth_model": "CLIENT_AUTH_BLOCKED; live writes disabled; upload expects invite-beta session cookie/CSRF",
+  "idempotency": "not available without request contract; future server key required",
+  "trigger_policy": "DISABLED_BLOCKED; future MANUAL",
+  "source_policy": "unchanged local/published-source policy; no prepared source",
+  "commands": ["read-only live endpoint probes", "npm run verify"],
+  "tests": ["live bootstrap 200", "preparations 404", "jobs 404", "14/14 files", "137/137 tests"],
+  "manual_flows": [],
+  "network_failure_tests": ["local playback regression remains PASS; preparation network tests blocked"],
+  "security_tests": ["desktop secret scan", "no private upload", "read-only probes", "claims audit"],
+  "changed_files": [],
+  "blockers": ["no public preparation request", "no status endpoint", "no desktop-compatible scoped auth", "no prepared source contract", "no preparation idempotency contract"],
+  "unknowns": ["backend delivery schedule", "prepared asset/source form", "expiry/resign model"],
+  "w10_status": "BLOCKED",
+  "w11_gate": "BLOCKED"
+}

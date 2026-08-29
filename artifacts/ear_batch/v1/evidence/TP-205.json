@@ -1,0 +1,14 @@
+{
+  "task": "TP-205",
+  "verified_at": "2026-08-12T00:58:24.662010+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "planning/ear_v1_engineering_scope.md",
+      "exists": true,
+      "bytes": 1862,
+      "sha256": "af4334d540d080b7615787da21f01da128e2fe6953e1237aad4be3954c31d758",
+      "passed": true
+    }
+  ]
+}

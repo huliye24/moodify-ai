@@ -1,0 +1,10 @@
+conflict_id,object,current_claim,p00_observed_reality,human_direction,decision,classification,human_review_required,evidence_refs,affected_paths,notes
+C1,Product identity,README/AGENTS local=reconstruction-first; GitHub main=Ear of AI,Two identities in parallel across branches,Music/Player only; PLAY first,CD-001/CANONICAL,true,E03-E06 E18,README.md AGENTS.md docs/canon/,主要冲突已裁决; 宪法文本更新待人类
+C2,Repository authority,Local branch 154 commits ahead of main,main frozen 2026-08-08,Merge decision later,CD-001 附注,LEGACY/UNCLEAR,true,E01 E02 E10,git branches,合并与版本权威归 W01-P01 后人类裁决
+C3,PR 21 positioning,KEEP per freeze protocol,OPEN DRAFT not merged,Do not auto-merge,CD-013,INTERNAL(能力)/LEGACY(表述),false,E08 E12,06_PR21_CANONICAL_COMPATIBILITY.md,能力与哲学分离评估
+C4,Repository status doc,REPOSITORY_STATUS=0b355e7/Ear of AI,Stale vs HEAD 98f7b96e,Redirect to canon,CD-009,MIGRATION_PENDING(本包完成),false,E11,docs/REPOSITORY_STATUS.md,
+C5,State machine authority,orchestration/node/data_factory/reconstruction_factory coexist,node+data_factory 实跑; orchestration LEGACY,Unify later,CD-015,混合,true,E13 E14,src/moodify/*,统一方案 HUMAN_DECISION_REQUIRED
+C6,Cloud vs claim,"Moodify Cloud" name vs reality,2 VPS + static site + API shells + batch,Canon must not fabricate,CD-012,INTERNAL,false,E18,docs/canon/CURRENT_ARCHITECTURE.md,拓扑 P02
+D1,Data authority,PolarDB moodify_dev vs SQLite queue,SQLite 实跑; PolarDB ≈0 数据,Keep both roles explicit,CD-012 附注,INTERNAL,true,E17 E18,03 报告,数据权威统一归 P03/P04
+D2,Track identity,No unified hash registry,Golden case only has manifest,Not in P01 scope,维持现状,UNKNOWN,true,E20 E22,,W01-P07 Golden Song 范围
+D3,Stem versions,Repeated lalalai zips no version authority,Duplicated assets exist,Not in P01 scope,维持现状,UNKNOWN,true,E20,,W01-P07/P08 范围

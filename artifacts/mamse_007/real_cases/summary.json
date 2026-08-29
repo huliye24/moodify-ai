@@ -1,0 +1,155 @@
+{
+  "schema_version": "mamse-007-real-cases-v1",
+  "cases": [
+    {
+      "case": "case_9056391_harmonic",
+      "source": "..\\outputs\\mamse001_sources\\case_9056391_harmonic.wav",
+      "duration_s": 128.52,
+      "plane": "S1",
+      "n_windows": 1282,
+      "input_features": 14,
+      "semantic_conflict_dropped": [
+        {
+          "feature": "mid_energy",
+          "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+          "status": "SEMANTIC_CONFLICT"
+        },
+        {
+          "feature": "side_energy",
+          "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+          "status": "SEMANTIC_CONFLICT"
+        }
+      ],
+      "retained_features": [
+        "rms_db",
+        "peak_db",
+        "stereo_correlation",
+        "spectral_centroid_hz",
+        "band_sub",
+        "band_bass",
+        "band_low_mid",
+        "band_mid",
+        "band_core_mid",
+        "band_presence",
+        "band_brilliance",
+        "band_air"
+      ],
+      "basis_id": "basis-b7d0b97255c1e2bf",
+      "mode": "CASE_LOCAL",
+      "explained_variance_ratio": [
+        0.9338493532522395,
+        0.037606050943993226,
+        0.014017504277830094
+      ],
+      "cumulative_explained": [
+        0.9338493532522395,
+        0.9714554041962328,
+        0.9854729084740629
+      ],
+      "mean_residual_standardized": 5.761889469220233,
+      "max_residual_standardized": 100.64617973729182,
+      "imputed_cells": 0,
+      "runtime_seconds": 0.007229700000607409
+    },
+    {
+      "case": "case_9961e07_transient",
+      "source": "..\\outputs\\mamse001_sources\\case_9961e07_transient.wav",
+      "duration_s": 184.32,
+      "plane": "S1",
+      "n_windows": 1840,
+      "input_features": 14,
+      "semantic_conflict_dropped": [
+        {
+          "feature": "mid_energy",
+          "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+          "status": "SEMANTIC_CONFLICT"
+        },
+        {
+          "feature": "side_energy",
+          "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+          "status": "SEMANTIC_CONFLICT"
+        }
+      ],
+      "retained_features": [
+        "rms_db",
+        "peak_db",
+        "stereo_correlation",
+        "spectral_centroid_hz",
+        "band_sub",
+        "band_bass",
+        "band_low_mid",
+        "band_mid",
+        "band_core_mid",
+        "band_presence",
+        "band_brilliance",
+        "band_air"
+      ],
+      "basis_id": "basis-0faecbd6ef4ec52c",
+      "mode": "CASE_LOCAL",
+      "explained_variance_ratio": [
+        0.9993758078656829,
+        0.00024582536857607556,
+        0.00016690079816347525
+      ],
+      "cumulative_explained": [
+        0.9993758078656829,
+        0.999621633234259,
+        0.9997885340324225
+      ],
+      "mean_residual_standardized": 4.847197914774357,
+      "max_residual_standardized": 28.644609531373717,
+      "imputed_cells": 0,
+      "runtime_seconds": 0.008712900000318768
+    },
+    {
+      "case": "case_7b3f021_ai",
+      "source": "..\\outputs\\mamse001_sources\\case_7b3f021_ai.wav",
+      "duration_s": 197.96,
+      "plane": "S1",
+      "n_windows": 1976,
+      "input_features": 14,
+      "semantic_conflict_dropped": [
+        {
+          "feature": "mid_energy",
+          "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+          "status": "SEMANTIC_CONFLICT"
+        },
+        {
+          "feature": "side_energy",
+          "reason": "IMPL_IS_LINEAR_ENERGY_NOT_RATIO",
+          "status": "SEMANTIC_CONFLICT"
+        }
+      ],
+      "retained_features": [
+        "rms_db",
+        "peak_db",
+        "stereo_correlation",
+        "spectral_centroid_hz",
+        "band_sub",
+        "band_bass",
+        "band_low_mid",
+        "band_mid",
+        "band_core_mid",
+        "band_presence",
+        "band_brilliance",
+        "band_air"
+      ],
+      "basis_id": "basis-dca738a14f872057",
+      "mode": "CASE_LOCAL",
+      "explained_variance_ratio": [
+        0.3570225986356021,
+        0.27786410599722156,
+        0.15774543815118902
+      ],
+      "cumulative_explained": [
+        0.3570225986356021,
+        0.6348867046328237,
+        0.7926321427840127
+      ],
+      "mean_residual_standardized": 3.7265706800169633,
+      "max_residual_standardized": 30.368561388290644,
+      "imputed_cells": 0,
+      "runtime_seconds": 0.008224200000768178
+    }
+  ]
+}

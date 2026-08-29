@@ -1,0 +1,52 @@
+{
+  "case_id": "ref_suite",
+  "stage": "ref",
+  "input_path": "benchmarks\\reference_audio\\fixtures\\clipped.wav",
+  "input_sha256": "ef2bf88b2c2a15ed3d7a7fa4b9f217f2c82ec8c10d84f0884e588f890cd37f45",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "benchmarks\\reference_audio\\expected\\clipped\\spectrum_linear.png",
+      "sha256": "dfad80aab3335dbeaf3077079f8934fe49eb8332ec70475b260edc159cd7988d",
+      "size_bytes": 53378
+    },
+    "spectrum_log": {
+      "path": "benchmarks\\reference_audio\\expected\\clipped\\spectrum_log.png",
+      "sha256": "0d8eef37ddd3ce51e80f0d0ac75ef6c0e472afbf2e52d4bdd7fd0ab0ad04ed7f",
+      "size_bytes": 48546
+    },
+    "metrics": {
+      "path": "benchmarks\\reference_audio\\expected\\clipped\\metrics.json",
+      "sha256": "34a4ffef37a9112fc1ac6d6d6c58e419426f98250513da52caed3d61105ef3aa",
+      "size_bytes": 8170
+    },
+    "timeline": {
+      "path": "benchmarks\\reference_audio\\expected\\clipped\\timeline_metrics.jsonl",
+      "sha256": "52864ef534462501282b50294629ba1107d60e6eb8df1851f79ae675e1488031",
+      "size_bytes": 1160
+    },
+    "analysis_data": {
+      "path": "benchmarks\\reference_audio\\expected\\clipped\\analysis_data.npz",
+      "sha256": "68e9fa48265648b343e66bd3de455c66804c2a16aad83f8f704e7a945f97e003",
+      "size_bytes": 9335
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.4",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\clipped.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\clipped\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i benchmarks\\reference_audio\\fixtures\\clipped.wav -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 benchmarks\\reference_audio\\expected\\clipped\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-08-10T23:09:56.454030+00:00"
+}

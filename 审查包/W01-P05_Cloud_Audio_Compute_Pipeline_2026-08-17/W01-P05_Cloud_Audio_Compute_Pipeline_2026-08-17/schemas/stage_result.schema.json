@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Pipeline Stage Result",
+  "type": "object",
+  "required": [
+    "stage",
+    "status",
+    "job_id",
+    "attempt_id",
+    "input_objects",
+    "output_objects",
+    "evidence_refs",
+    "producer",
+    "producer_version",
+    "started_at",
+    "finished_at"
+  ],
+  "properties": {
+    "stage": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "SUCCEEDED",
+        "BYPASSED",
+        "FAILED"
+      ]
+    },
+    "job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_objects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "output_objects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metrics": {
+      "type": "object"
+    },
+    "decision": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "failure": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producer_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

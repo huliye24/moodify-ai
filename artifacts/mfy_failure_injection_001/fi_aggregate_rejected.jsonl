@@ -1,0 +1,2 @@
+{"case_id": "case_MANIFEST_MISSING", "error_type": "FileNotFoundError", "message": "[Errno 2] No such file or directory: '/var/lib/moodify/fi_exp/cases2/case_MANIFEST_MISSING/case_manifest.json'"}
+{"case_id": "case_PARTIAL_OUTPUT", "error_type": "FileNotFoundError", "message": "[Errno 2] No such file or directory: '/var/lib/moodify/fi_exp/cases2/case_PARTIAL_OUTPUT/04_after_scan/B/metrics.json'"}

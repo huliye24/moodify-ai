@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/api/error/v1",
+  "title": "MOOD Protocol API Error Envelope",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "error",
+    "meta"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "v1"
+    },
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message",
+        "details"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "NOT_FOUND",
+            "CONFLICT",
+            "UNAUTHORIZED",
+            "FORBIDDEN",
+            "RATE_LIMITED",
+            "DEPENDENCY_UNAVAILABLE",
+            "POLICY_BLOCKED",
+            "HUMAN_DECISION_REQUIRED",
+            "INTERNAL_ERROR"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {}
+      },
+      "additionalProperties": false
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "requestId"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

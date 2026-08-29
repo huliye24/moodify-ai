@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/node-capability/1.0.0",
+  "title": "MOOD Node Capability Manifest",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "manifestId",
+    "nodeId",
+    "nodeType",
+    "protocolVersions",
+    "capabilities",
+    "createdAt",
+    "fingerprint"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "manifestId": {
+      "type": "string",
+      "pattern": "^mood:capability:[0-9a-f]{64}$"
+    },
+    "nodeId": {
+      "type": "string",
+      "pattern": "^mood:node:[0-9a-f]{64}$"
+    },
+    "nodeType": {
+      "type": "string",
+      "enum": [
+        "developer",
+        "compute",
+        "data",
+        "storage",
+        "validation",
+        "gateway"
+      ]
+    },
+    "protocolVersions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "value",
+          "visibility",
+          "verificationStatus",
+          "evidenceIds"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$"
+          },
+          "value": {},
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "public",
+              "restricted"
+            ]
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "declared",
+              "verified",
+              "partially_verified",
+              "unverified",
+              "rejected"
+            ]
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

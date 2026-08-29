@@ -1,0 +1,14 @@
+{
+  "task": "TP-003",
+  "verified_at": "2026-08-12T00:46:23.765581+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "corpus/version_boundaries.md",
+      "exists": true,
+      "bytes": 502,
+      "sha256": "d95307aae8d044f651d8ca0e327d2c4a51d47457752d1f23f37c49ecd53f4578",
+      "passed": true
+    }
+  ]
+}

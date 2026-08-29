@@ -1,0 +1,21 @@
+{
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows",
+  "channel": "BETA_CANDIDATE",
+  "version": "",
+  "build_number": "",
+  "git_commit": "",
+  "build_time": "",
+  "installer": {
+    "filename": "",
+    "size_bytes": 0,
+    "sha256": "",
+    "signed": false,
+    "signature_status": ""
+  },
+  "minimum_windows_version": "",
+  "architecture": [],
+  "upgrade_from": [],
+  "known_issues_file": "KNOWN_ISSUES.md",
+  "release_checklist": "RELEASE_CHECKLIST.md"
+}

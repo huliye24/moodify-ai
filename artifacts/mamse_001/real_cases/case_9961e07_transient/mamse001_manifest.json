@@ -1,0 +1,62 @@
+{
+  "schema_version": "mamse-001-manifest-v1",
+  "operator_id": "MAMSE-001",
+  "operator_version": "0.1.0",
+  "source_sha256": "ea2736b413cdbca56e317b02a4a087453a30863481162e0dcaf8824b0589a562",
+  "sample_rate": 48000,
+  "duration_s": 184.32,
+  "resolution_registry": {
+    "version": "mamse-001-resolutions-v1",
+    "hash": "94709cd96a0fb8988f3c99afce4b36a51ebd38486075e63b37ae47ff0fb4ad74",
+    "resolutions": [
+      {
+        "resolution_id": "R0",
+        "name": "TRANSIENT",
+        "n_fft": 512,
+        "hop_length": 128,
+        "window": "hann",
+        "purpose": "transient/click/clipping-edge observation at high time resolution"
+      },
+      {
+        "resolution_id": "R1",
+        "name": "LOCAL",
+        "n_fft": 2048,
+        "hop_length": 512,
+        "window": "hann",
+        "purpose": "local spectral state; adjacent to the current scan baseline"
+      },
+      {
+        "resolution_id": "R2",
+        "name": "HARMONIC",
+        "n_fft": 8192,
+        "hop_length": 2048,
+        "window": "hann",
+        "purpose": "harmonic structure, narrowband peaks, pitch neighborhoods"
+      },
+      {
+        "resolution_id": "R3",
+        "name": "MACRO",
+        "n_fft": 32768,
+        "hop_length": 8192,
+        "window": "hann",
+        "purpose": "low-frequency detail, close-frequency resolution, sustained resonance"
+      }
+    ]
+  },
+  "window": "hann",
+  "feature_schema_version": "mamse-001-sketch-features-v1",
+  "evidence_schema_version": "mamse-001-evidence-v1",
+  "git_commit": "9759b84035c78c419eafd946675aa4593e87e050",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1",
+    "ffmpeg": "unavailable"
+  },
+  "fft_backend": {
+    "backend": "numpy.fft.rfft",
+    "numpy_version": "2.4.4"
+  },
+  "band_source": "moodify.auditory.representation.feature_registry.BANDS (canonical)",
+  "generated_at_utc": "2026-08-11T03:22:54+00:00"
+}

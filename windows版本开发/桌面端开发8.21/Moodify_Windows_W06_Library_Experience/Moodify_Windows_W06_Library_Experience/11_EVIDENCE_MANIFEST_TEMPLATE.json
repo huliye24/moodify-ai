@@ -1,0 +1,35 @@
+{
+  "package_id": "MFY-WIN-W06-LIBRARY-EXPERIENCE-001",
+  "date": "2026-08-21",
+  "canon_change": false,
+  "visual_redesign": false,
+  "w05_status": "",
+  "w06_gate": "",
+  "authorities": {
+    "track": "",
+    "library": "",
+    "favorite": "",
+    "history": "",
+    "playlist": "",
+    "playback": "",
+    "queue": ""
+  },
+  "history_policy": "",
+  "search_fields": [],
+  "sort_keys": [],
+  "performance": {
+    "100": "",
+    "1000": "",
+    "5000": ""
+  },
+  "commands": [],
+  "tests": [],
+  "manual_flows": [],
+  "screenshots": [],
+  "logs": [],
+  "changed_files": [],
+  "blockers": [],
+  "unknowns": [],
+  "w06_status": "BLOCKED",
+  "w07_gate": "BLOCKED"
+}

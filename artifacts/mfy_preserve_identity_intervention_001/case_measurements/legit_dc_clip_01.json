@@ -1,0 +1,22 @@
+{
+  "case_id": "legit_dc_clip_01",
+  "measurements": [
+    {
+      "primitive": "dc_offset_fix",
+      "values": {
+        "dc": 0.050119,
+        "dc_db": -25.999889,
+        "active": 1.0
+      }
+    },
+    {
+      "primitive": "clip_peak_repair",
+      "values": {
+        "clip_segments": 1.0,
+        "clip_repairable": 1.0,
+        "clip_longest_segment": 8.0,
+        "active": 1.0
+      }
+    }
+  ]
+}

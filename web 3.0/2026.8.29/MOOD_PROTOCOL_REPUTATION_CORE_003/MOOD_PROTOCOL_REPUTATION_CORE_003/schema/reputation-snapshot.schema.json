@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mood://protocol/reputation/snapshot/1.0.0",
+  "title": "MOOD Reputation Snapshot",
+  "type": "object",
+  "required": [
+    "snapshotVersion",
+    "snapshotId",
+    "protocolId",
+    "epochId",
+    "policyVersion",
+    "epochPolicyVersion",
+    "inputContributionIds",
+    "inputFingerprints",
+    "dimensions",
+    "aggregate",
+    "verifiedContributionCount",
+    "categoryDiversity",
+    "confidence",
+    "generatedAt",
+    "snapshotFingerprint",
+    "supersedes"
+  ],
+  "properties": {
+    "snapshotVersion": {
+      "const": "1.0.0"
+    },
+    "snapshotId": {
+      "type": "string",
+      "minLength": 8
+    },
+    "protocolId": {
+      "type": "string",
+      "pattern": "^mood:contributor:[0-9a-f]{64}$"
+    },
+    "epochId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policyVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "epochPolicyVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputContributionIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "inputFingerprints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "dimensions": {
+      "type": "object",
+      "required": [
+        "contribution",
+        "impact",
+        "quality",
+        "persistence",
+        "early"
+      ],
+      "properties": {
+        "contribution": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "impact": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "quality": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "persistence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "early": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "aggregate": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "verifiedContributionCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "categoryDiversity": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "insufficient"
+      ]
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "snapshotFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "supersedes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "not": {
+        "required": [
+          "tokenAmount"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "claimAmount"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "votingPower"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "stakingWeight"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "payout"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

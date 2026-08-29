@@ -1,0 +1,2 @@
+﻿transition_id,from_state,command,to_state,actor,preconditions,transactional_writes,event_type,idempotency,retry_semantics,terminal_protection,notes
+EXAMPLE-CLAIM,QUEUED,claim,RUNNING,worker,valid queued job; no live lease,state+attempt+lease+event,JOB_CLAIMED,claim CAS,n/a,n/a,Replace with final design

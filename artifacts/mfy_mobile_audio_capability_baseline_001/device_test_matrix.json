@@ -1,0 +1,55 @@
+{
+  "package_id": "MFY_MOBILE_AUDIO_CAPABILITY_BASELINE_001",
+  "sequence": 67,
+  "evidence_rule": "设备能力分级: observed=本机/已实测, api_reported=系统 API 可查询但未实测, inferred=从规格推断, unknown=不可知。禁止把 inferred 写成 observed。",
+  "matrix": [
+    {
+      "device_class": "deepseek_dev_host",
+      "note": "当前审计机: Windows 10 x86_64, 8GB RAM, i7-7500U(低配置约束 parallel=1)。非 Android 设备,仅用于 core 侧验证。",
+      "observed": ["core 测量链 WSE FAST/STANDARD/DEEP 在本机可跑", "pytest 全量回归", "audiolla smoke/async 通过(40s WAV)"],
+      "audio_outputs": {"speaker": "api_reported", "wired": "unknown", "usb_dac": "unknown", "bluetooth": "unknown", "codec_observability": "unknown"}
+    },
+    {
+      "device_class": "target_android_class_a",
+      "note": "第一优先真机类: 中高端 Android (Snapdragon 8xx / Dimensity 9xxx), Android 13+, 支持 USB DAC",
+      "capability_source": "api_reported_to_be_verified",
+      "observable": ["AudioManager.getProperty(PROPERTY_OUTPUT_SAMPLE_RATE/FRAMES_PER_BUFFER)", "AudioManager.getDevices(GET_DEVICES_OUTPUTS)", "AudioTrack 属性查询", "BluetoothProfile A2DP codec (HFP/A2DP SBC/AAC/aptX/LDAC)", "MediaCodec 能力枚举", "ExoPlayer 输出格式回调"],
+      "test_items": ["扬声器播放", "有线 3.5mm", "USB DAC (44.1/96k)", "蓝牙 SBC", "蓝牙 AAC", "蓝牙 LDAC(如支持)", "后台播放 + 锁屏", "通知媒体按钮", "缓存命中/失效", "本地 FLAC/WAV/MP3/AAC 播放"],
+      "outputs": {"speaker": "api_reported", "wired": "api_reported", "usb_dac": "api_reported", "bluetooth": "api_reported", "codec_observability": "api_reported"}
+    },
+    {
+      "device_class": "target_android_class_b",
+      "note": "第二优先: 中低端 Android (Snapdragon 6xx/7xx / Dimensity 7xxx), Android 11-13, 无 USB DAC",
+      "capability_source": "api_reported_to_be_verified",
+      "observable": ["同上 API", "无 USB 音频路径(仅 speaker/wired/BT)"],
+      "test_items": ["扬声器", "有线", "蓝牙 SBC/AAC", "后台/锁屏", "缓存", "本地格式"],
+      "outputs": {"speaker": "api_reported", "wired": "api_reported", "usb_dac": "unknown", "bluetooth": "api_reported", "codec_observability": "api_reported"}
+    },
+    {
+      "device_class": "target_android_class_c",
+      "note": "第三优先: 低端/旧 Android (Android 8-10), 2-4GB RAM —— 验证 69 实时 DSP 的降级路径",
+      "capability_source": "inferred_from_spec",
+      "observable": ["AudioTrack 基本属性", "无 MediaCodec 高级 codec 保证"],
+      "test_items": ["扬声器", "蓝牙 SBC", "DSP Runtime 旁路路径(性能不足时必须旁路)"],
+      "outputs": {"speaker": "api_reported", "wired": "api_reported", "usb_dac": "unknown", "bluetooth": "api_reported", "codec_observability": "inferred"}
+    },
+    {
+      "device_class": "output_chain_observability",
+      "note": "输出链可观测范围(所有设备通用): 系统 API 能观测什么 vs 观测不到什么",
+      "api_observable": [
+        "输出设备类型与路由(AudioManager.getDevices)",
+        "系统输出采样率/帧缓冲(PROPERTY_OUTPUT_SAMPLE_RATE / FRAMES_PER_BUFFER)",
+        "播放中实际格式(ExoPlayer AudioSink 回调,需 68 加观测点)",
+        "蓝牙连接 codec(部分 OEM 隐藏)",
+        "underrun/overrun(ExoPlayer 统计或 AudioTrack 回调)"
+      ],
+      "not_observable": [
+        "DAC 内部滤波/过采样行为",
+        "耳机频响曲线(禁止猜测)",
+        "蓝牙端到端数字路径(厂商黑盒)",
+        "mixer 内的其他 App 音效处理"
+      ],
+      "rules": ["手机型号/耳机名称 → 参数映射: 禁止(未测量)", "任何能力以 observed 为准, api_reported 须在 68/70 用探针实测", "能力不足 → 旁路或 HUMAN_REQUIRED, 不得降级硬跑"]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": "mamse-003-manifest-v1",
+  "operator_id": "mamse003-texture",
+  "operator_version": "0.1",
+  "config_version": "mamse003-texture-v0.1",
+  "config_hash": "d3a327b559dd67a9084769349ce0931d43682341f92f255fa296137550ee75f7",
+  "config": {
+    "operator_id": "mamse003-texture",
+    "operator_version": "0.1",
+    "analysis_sample_rate": 24000,
+    "carrier_f_min": 80.0,
+    "carrier_f_max": 8000.0,
+    "carrier_bands_per_octave": 4,
+    "carrier_q": 6.0,
+    "envelope_sample_rate": 200,
+    "modulation_rates_hz": [
+      1.0,
+      2.0,
+      4.0,
+      8.0,
+      16.0
+    ],
+    "modulation_q": 2.0,
+    "frame_ms": 500,
+    "hop_ms": 250,
+    "eps": 1e-12,
+    "carrier_centers_hz": [
+      80.0,
+      95.13656920021768,
+      113.13708498984761,
+      134.54342644059432,
+      160.0,
+      190.27313840043536,
+      226.27416997969522,
+      269.08685288118863,
+      320.0,
+      380.5462768008707,
+      452.54833995939043,
+      538.1737057623773,
+      640.0,
+      761.0925536017414,
+      905.0966799187809,
+      1076.3474115247545,
+      1280.0,
+      1522.1851072034829,
+      1810.1933598375617,
+      2152.694823049509,
+      2560.0,
+      3044.3702144069657,
+      3620.3867196751235,
+      4305.389646099018,
+      5120.0,
+      6088.740428813931,
+      7240.773439350247
+    ]
+  },
+  "source_sha256": "9671437aa1238c1d157bbc698416d6a073cbe073a9a6bca8289aa52c00f6626a",
+  "analysis_sample_rate": 24000,
+  "git_commit": "2eb01b0a7ad8110c2c31507f9f8b87d6d10099f5",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "resource": {
+    "runtime_seconds": 23.65100940000002,
+    "peak_memory_mb": 2565.1831674575806
+  },
+  "limitations": [
+    "scattering-inspired prototype; not numerically equivalent to Kymatio/Mallat scattering",
+    "analysis is downsampled to 24 kHz and carrier texture is limited to <=8 kHz",
+    "texture descriptors are experimental and not artistic quality scores"
+  ],
+  "generated_at_utc": "2026-08-11T09:27:01+00:00"
+}

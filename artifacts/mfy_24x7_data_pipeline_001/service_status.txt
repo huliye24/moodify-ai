@@ -1,0 +1,49 @@
+Captured 2026-08-10T13:21:32+08:00 via SSH (paramiko) on 120.55.191.146
+
+=== services (systemctl list-units | grep moodify) ===
+  moodify-api.service           loaded  active  running  Moodify API demo server
+  moodify-data-worker.service   loaded  active  running  Moodify Phase-I Data Factory Worker
+
+=== moodify-data-worker.service (/etc/systemd/system/moodify-data-worker.service) ===
+[Unit]
+Description=Moodify Phase-I Data Factory Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=moodify
+Group=moodify
+WorkingDirectory=/opt/moodify/moodify-core-package
+Environment=PYTHONUNBUFFERED=1
+Environment=MOODIFY_NODE_STATE_DIR=/var/lib/moodify
+Environment=MOODIFY_NODE_OUTPUT_ROOT=/var/lib/moodify/data_factory
+Environment=MOODIFY_NODE_POLL_SECONDS=10
+Environment=MOODIFY_NODE_MIN_AVAILABLE_MB=300
+Environment=MOODIFY_NODE_MIN_FREE_DISK_GB=3
+ExecStart=/opt/moodify/.venv/bin/moodify-node worker
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=120
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=6
+MemoryHigh=1500M
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/moodify
+
+[Install]
+WantedBy=multi-user.target
+
+=== worker drop-ins ===
+NONE
+
+=== /etc/moodify ===
+NONE (nothing to back up; rollback plan item N/A)
+
+=== moodify-api.service ===
+Active: active (running) since Sat 2026-08-08 20:01:08 CST; 1 day 17h ago
+Main PID: 11298 (uvicorn), /root/venv/bin/uvicorn moodify.api.main:app --host 0.0.0.0 --port 8000
+Memory: 22.9M (peak: 143.2M, swap: 72M, swap peak: 72M)

@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "scope": "authoritative v1 package trees, chapters 02-20",
+  "chapter_01_note": "Only standalone PDF material was supplied; no Chapter 01 package exists.",
+  "chapters_checked": 19,
+  "issue_count": 0,
+  "results": [
+    {
+      "chapter": 2,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_02_Package\\Moodify_Ear_v1_Chapter_02\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_02.md",
+        "Moodify_Ear_v1_Chapter_02.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_02.md",
+        "Moodify_Ear_v1_Chapter_02.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 3,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_03_Package\\Moodify_Ear_v1_Chapter_03\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_03.md",
+        "Moodify_Ear_v1_Chapter_03.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_03.md",
+        "Moodify_Ear_v1_Chapter_03.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 4,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_04_Package\\Moodify_Ear_v1_Chapter_04\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_04.md",
+        "Moodify_Ear_v1_Chapter_04.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_04.md",
+        "Moodify_Ear_v1_Chapter_04.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 5,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_05_Package\\Moodify_Ear_v1_Chapter_05\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_05.md",
+        "Moodify_Ear_v1_Chapter_05.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_05.md",
+        "Moodify_Ear_v1_Chapter_05.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 6,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_06_Package\\Moodify_Ear_v1_Chapter_06\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_06.md",
+        "Moodify_Ear_v1_Chapter_06.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_06.md",
+        "Moodify_Ear_v1_Chapter_06.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 7,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_07_Package\\Moodify_Ear_v1_Chapter_07\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_07.md",
+        "Moodify_Ear_v1_Chapter_07.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_07.md",
+        "Moodify_Ear_v1_Chapter_07.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 8,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_08_Package\\Moodify_Ear_v1_Chapter_08\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_08.md",
+        "Moodify_Ear_v1_Chapter_08.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_08.md",
+        "Moodify_Ear_v1_Chapter_08.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 9,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_09_Package\\Moodify_Ear_v1_Chapter_09\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_09.md",
+        "Moodify_Ear_v1_Chapter_09.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_09.md",
+        "Moodify_Ear_v1_Chapter_09.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 10,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_10_Package\\Moodify_Ear_v1_Chapter_10\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_10.md",
+        "Moodify_Ear_v1_Chapter_10.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_10.md",
+        "Moodify_Ear_v1_Chapter_10.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 11,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_11_Package\\Moodify_Ear_v1_Chapter_11\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_11.md",
+        "Moodify_Ear_v1_Chapter_11.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_11.md",
+        "Moodify_Ear_v1_Chapter_11.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 12,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_12_Package\\Moodify_Ear_v1_Chapter_12\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_12.md",
+        "Moodify_Ear_v1_Chapter_12.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_12.md",
+        "Moodify_Ear_v1_Chapter_12.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 13,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_13_Package\\Moodify_Ear_v1_Chapter_13\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_13.md",
+        "Moodify_Ear_v1_Chapter_13.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_13.md",
+        "Moodify_Ear_v1_Chapter_13.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 14,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_14_Package\\Moodify_Ear_v1_Chapter_14\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_14.md",
+        "Moodify_Ear_v1_Chapter_14.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_14.md",
+        "Moodify_Ear_v1_Chapter_14.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 15,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_15_Package\\Moodify_Ear_v1_Chapter_15\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_15.md",
+        "Moodify_Ear_v1_Chapter_15.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_15.md",
+        "Moodify_Ear_v1_Chapter_15.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 16,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_16_Package\\Moodify_Ear_v1_Chapter_16\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_16.md",
+        "Moodify_Ear_v1_Chapter_16.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_16.md",
+        "Moodify_Ear_v1_Chapter_16.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 17,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_17_Package\\Moodify_Ear_v1_Chapter_17\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_17.md",
+        "Moodify_Ear_v1_Chapter_17.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_17.md",
+        "Moodify_Ear_v1_Chapter_17.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 18,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_18_Package\\Moodify_Ear_v1_Chapter_18\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_18.md",
+        "Moodify_Ear_v1_Chapter_18.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_18.md",
+        "Moodify_Ear_v1_Chapter_18.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 19,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_19_Package\\Moodify_Ear_v1_Chapter_19\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_19.md",
+        "Moodify_Ear_v1_Chapter_19.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_19.md",
+        "Moodify_Ear_v1_Chapter_19.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    },
+    {
+      "chapter": 20,
+      "manifest": "E:\\Moodify ear\\Moodify_Ear_v1_Chapter_20_Package\\Moodify_Ear_v1_Chapter_20\\manifest.json",
+      "expected_files": [
+        "Moodify_Ear_v1_Chapter_20.md",
+        "Moodify_Ear_v1_Chapter_20.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "actual_files": [
+        "Moodify_Ear_v1_Chapter_20.md",
+        "Moodify_Ear_v1_Chapter_20.pdf",
+        "README.md",
+        "manifest.json",
+        "references.md"
+      ],
+      "zip_file_count": 5,
+      "issues": [],
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "package_id": "MFY-WIN-W07-DESKTOP-INTERACTION-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 7,
+  "total_packages": 12,
+  "title": "Desktop Interaction 桌面交互层",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w06/W07_HANDOFF.md => W07_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "starts_next_package": false,
+  "focus": [
+    "unified context menus",
+    "double-click playback",
+    "file drag-and-drop import",
+    "Track to Playlist drag",
+    "multi-select",
+    "batch actions",
+    "keyboard interaction",
+    "Explorer reveal",
+    "destructive action safety",
+    "interaction regression tests"
+  ],
+  "out_of_scope": [
+    "new business authorities",
+    "global hotkeys",
+    "system media keys",
+    "tray",
+    "file associations",
+    "cloud upload",
+    "skin community",
+    "visual redesign"
+  ],
+  "next_package": "W08 Recovery & Resilience 状态恢复与韧性"
+}

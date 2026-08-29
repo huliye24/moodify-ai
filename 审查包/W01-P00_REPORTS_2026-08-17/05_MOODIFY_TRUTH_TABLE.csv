@@ -1,0 +1,52 @@
+id,domain,capability,claimed_state,observed_state,main_status,canonical_relevance,code_ref,runtime_ref,evidence_ref,authority_conflict,confidence,notes
+TT-001,repo,GitHub main 分支,"main=fa88b0b9, Ear of AI identity","fa88b0b9 (2026-08-08), identity=Ear of AI",VERIFIED,CURRENT,origin/main,origin/main,git rev-parse origin/main,true,HIGH,锚点一致
+TT-002,repo,本地重建分支,"reconstruction-first 已完成","98f7b96e, 领先 154 commits",IMPLEMENTED_NOT_MERGED,CURRENT,codex/moodify-classic-reconstruction-001,本地工作树,git rev-list origin/main..HEAD,true,HIGH,全部重建工作未进 main
+TT-003,repo,Classic Reconstruction Constitution v1.0,"LIVE 权威","docs 权威, Supersedes Ear-of-AI",IMPLEMENTED_NOT_MERGED,CURRENT,docs/CLASSIC_RECONSTRUCTION_CONSTITUTION.md,,99c9efa2,true,HIGH,与 main README 冲突
+TT-004,repo,moodify-core-package 引擎,"692+ 测试绿","src 70+ 模块; 81 test 文件",VERIFIED,CURRENT,moodify-core-package/,,各包 TEST_RESULTS,false,HIGH,未在本扫描重跑
+TT-005,repo,REPOSITORY_STATUS.md,"当前状态文档","baseline 0b355e7 / Ear of AI",OBSOLETE,LEGACY,docs/REPOSITORY_STATUS.md,,,true,HIGH,落后于代码
+TT-006,repo,v01_pipeline 主链,"canonical mainline","杭州 API health mode=v01",DEPLOYED_NOT_VERIFIED,CURRENT,src/moodify/v01_pipeline.py,杭州:8000,curl /health,false,MEDIUM,无生产流量证据
+TT-007,repo,orchestration/workflow_engine,"LEGACY","LEGACY 声明",OBSOLETE,LEGACY,src/moodify/orchestration/,,REPOSITORY_STATUS.md,false,HIGH,
+TT-008,repo,data_factory,"10 曲 pilot 全成功","Data Protocol v1 冻结",VERIFIED,CURRENT,src/moodify/data_factory/,杭州 worker,artifacts/mfy_24x7_data_pipeline_001,false,HIGH,
+TT-009,repo,node 队列 worker,"双节点部署","SQLite 队列 LA+HZ",DEPLOYED_NOT_VERIFIED,CURRENT,src/moodify/node/,LA/杭州,raw_scan LA/HZ,false,HIGH,队列近空
+TT-010,repo,reconstruction_objective v0.1,"P04 完成","evidence-gated 规划",IMPLEMENTED_NOT_MERGED,CURRENT,src/moodify/reconstruction_objective/,,12aaabae,false,HIGH,
+TT-011,repo,era_diagnostic v0.1,"P03 完成","年代诊断",IMPLEMENTED_NOT_MERGED,EXPERIMENTAL,src/moodify/era_diagnostic/,,b7e44d0b,false,HIGH,
+TT-012,repo,identity_guard v0.1,"P05 完成","六维 veto",IMPLEMENTED_NOT_MERGED,CURRENT,src/moodify/identity_guard/,,36f2a721,false,HIGH,
+TT-013,repo,reconstruction_factory v0.1,"P07 完成","rights-gated 学习工厂",IMPLEMENTED_NOT_MERGED,EXPERIMENTAL,src/moodify/reconstruction_factory/,,787d51af,false,HIGH,
+TT-014,repo,MAMSE-001..016,"001-012 ACCEPTED","013-016 仅结构",VERIFIED,EXPERIMENTAL,src/moodify/auditory,local,artifacts/mamse_001..016,false,HIGH,
+TT-015,repo,stems lalal 集成,"audiolla 部署","代理健康无自动调用",DEPLOYED_NOT_VERIFIED,UNCLEAR,src/moodify/stems,LA 容器,72c47c4d,false,MEDIUM,
+TT-016,repo,intervention 原语,"71 包完成","3 原语负对照 5/5 旁路",IMPLEMENTED_NOT_MERGED,EXPERIMENTAL,src/moodify/intervention/,,55bd01d0,false,HIGH,未编译进播放链
+TT-017,repo,算法评审器,"10/10 pilot","确定性技术排名",VERIFIED,CURRENT,src/moodify/data_factory/algorithmic_review,,6b5592e,false,HIGH,
+TT-018,repo,moodify.contracts,"四契约","已吸收进分支",IMPLEMENTED_NOT_MERGED,CURRENT,src/moodify/contracts/,,af0e1d41,false,HIGH,
+TT-019,repo,盲听验证,"71 candidates 冻结","人类会话 SKIPPED",IMPLEMENTED_NOT_MERGED,EXPERIMENTAL,src/moodify/listening/,,7bf0f594,false,HIGH,
+TT-020,repo,CI ci.yml,"core 测试+ruff","PR #21 CI success",VERIFIED,CURRENT,.github/workflows/ci.yml,github-actions,gh run list,false,HIGH,
+TT-021,repo,Temporal Texture Guard,"持续 failure","workflow failure",DEPLOYED_NOT_VERIFIED,UNCLEAR,.github/workflows/moodify-temporal-texture.yml,github-actions,gh run list,false,HIGH,
+TT-022,repo,Deploy workflow,"tag deploy failure","v1.0.0-data-foundation failure",UNKNOWN,UNCLEAR,.github/workflows/deploy.yml,github-actions,gh run list,false,MEDIUM,
+TT-023,repo,PR #21,"协议 KEEP","OPEN DRAFT 未 merge",IMPLEMENTED_NOT_MERGED,UNCLEAR,codex/mfy-data-factory-001,,docs/PR_DISPOSITION.md,true,HIGH,与重建方向关系未裁决
+TT-024,repo,补丁包 01-73,"多数已交付","部分计划壳",VERIFIED,UNCLEAR,补丁包/,本地,artifacts/,false,MEDIUM,逐包见 02 报告
+TT-025,repo,apps/android Ear 工作台,"JVM 46/46 设备 7/7","设备测试通过",VERIFIED,CURRENT,apps/android,,23b13d35,false,HIGH,
+TT-026,repo,Moodify Music Android 3.1,"APK 发布","播放器验证",VERIFIED,CURRENT,apps/music-android,,deliverables/releases,false,HIGH,
+TT-027,repo,apps/music-web PWA,"Cloudflare 站点","wrangler 痕迹",IMPLEMENTED_NOT_MERGED,UNCLEAR,apps/music-web,,,false,MEDIUM,
+TT-028,repo,云端部署产物,"tar 发布","无 git 身份",DEPLOYED_NOT_VERIFIED,UNCLEAR,/opt/moodify/releases (LA),LA,raw_scan LA,false,MEDIUM,
+TT-030,cloud,LA 节点,"核心节点运行","6 服务+audiolla 容器",VERIFIED,CURRENT,,103.144.246.242,raw_scan/LA,false,HIGH,
+TT-031,cloud,杭州节点,"worker+API 运行","2C/1.6G 4 timers",VERIFIED,CURRENT,,120.55.191.146,raw_scan/HZ,false,HIGH,
+TT-032,cloud,腾讯云三台,"已删除","2026-08-12 删除",OBSOLETE,LEGACY,,不存在,用户确认 2026-08-12,false,HIGH,
+TT-033,database,PolarDB MySQL 172.27.118.106,"空壳","空壳(黑箱调查)",BLOCKED,LEGACY,,pc-bp1112f8t24wdta5t,MOODIFY_CLOUD_CURRENT_STATE,false,MEDIUM,直接核验凭据不符
+TT-034,database,PolarDB MySQL 172.27.118.104,"moodify_dev 19 表","≈0 数据(黑箱调查)",BLOCKED,CURRENT,,pc-bp19502y46246gv6n,MOODIFY_CLOUD_CURRENT_STATE,false,MEDIUM,
+TT-035,database,PolarDB PG 101.133.107.206,"在线未用","未确认内容",BLOCKED,LEGACY,,pc-uf65m4xqwst72vq5a,MOODIFY_CLOUD_CURRENT_STATE,false,LOW,
+TT-036,storage,OSS,"计划中","NOT_PROVISIONED",PLANNED_ONLY,UNCLEAR,,,黑箱调查 §11,false,HIGH,
+TT-037,storage,SQLite 队列,"LA 16KB 近空","历史 pilot 数据",DEPLOYED_NOT_VERIFIED,CURRENT,,LA/杭州 /var/lib/moodify,raw_scan LA/HZ,false,HIGH,
+TT-038,external,audiolla 容器,"已部署健康","无自动 pipeline",DEPLOYED_NOT_VERIFIED,EXPERIMENTAL,,LA docker,raw_scan LA,false,HIGH,
+TT-039,external,Cloudflare 隧道,"运行","LA cloudflared",VERIFIED,CURRENT,,LA,raw_scan LA,false,HIGH,
+TT-040,cloud,云端 AI 推理,"无","无模型无 GPU",PLANNED_ONLY,UNCLEAR,,,黑箱调查 §6,false,HIGH,
+TT-050,data,真实歌曲 pre-music,"~7 首 owned","法语曲目库",VERIFIED,CURRENT,,,pre-music/,false,HIGH,无统一 hash 注册表
+TT-051,data,lalalai 分轨,"多次尝试","split zip 产物",VERIFIED,EXPERIMENTAL,,,pre-music/*/split zip,false,HIGH,同曲多版本
+TT-052,data,data_factory cases,"4 case","cases.jsonl+pairwise",VERIFIED,CURRENT,,,outputs/data_factory/,false,HIGH,
+TT-053,data,golden_run_out,"PROMISING_NOT_GOLDEN","golden_record 存在",VERIFIED,CURRENT,,,moodify-core-package/golden_run_out/,false,HIGH,人类聆听未做
+TT-054,data,artifacts 证据库,"59 子目录","多数 FINAL_RESPONSE",VERIFIED,CURRENT,,,artifacts/,false,HIGH,
+TT-055,data,listening_test,"34 文件","结果 DATA_PENDING",UNKNOWN,EXPERIMENTAL,,,listening_test/,false,MEDIUM,
+TT-056,external,LALAL.AI,"audiolla 代理","已部署未接 pipeline",DEPLOYED_NOT_VERIFIED,EXPERIMENTAL,,LA,raw_scan LA,false,HIGH,外部状态=CONNECTED_UNTESTED
+TT-057,external,FFmpeg,"双节点部署","8.0.1 / 4.4.2",DEPLOYED_NOT_VERIFIED,CURRENT,,杭州/LA,raw_scan,false,HIGH,外部状态=PRODUCTION_USED(工具存在)
+TT-058,external,Demucs,"权重未下载","无运行",PLANNED_ONLY,UNCLEAR,,,,false,HIGH,外部状态=UNAVAILABLE
+TT-059,external,Basic Pitch,"工具代码","无运行进程",IMPLEMENTED_NOT_MERGED,UNCLEAR,,LA capabilities,raw_scan LA,false,MEDIUM,外部状态=EXPERIMENTAL
+TT-060,data,反馈学习闭环,"不存在","无反馈采集",PLANNED_ONLY,UNCLEAR,,,黑箱调查 §28,false,HIGH,
+TT-061,data,云端完整 Ear 链路,"仅代码","无生产流量",PLANNED_ONLY,UNCLEAR,,,黑箱调查 §5,false,HIGH,

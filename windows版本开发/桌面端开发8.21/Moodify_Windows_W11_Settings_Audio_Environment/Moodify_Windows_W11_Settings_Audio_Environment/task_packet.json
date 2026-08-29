@@ -1,0 +1,41 @@
+{
+  "package_id": "MFY-WIN-W11-SETTINGS-AUDIO-ENV-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 11,
+  "total_packages": 12,
+  "title": "Settings & Audio Environment",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w10/W11_HANDOFF.md => W11_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "starts_next_package": false,
+  "focus": [
+    "single Settings authority",
+    "settings schema/defaults/migration",
+    "audio output capability audit",
+    "output device preference",
+    "hotplug safety",
+    "volume policy",
+    "autoplay policy",
+    "close/tray behavior",
+    "startup seam",
+    "cache taxonomy and clear",
+    "storage location safety",
+    "cloud preference",
+    "network preference",
+    "reset settings"
+  ],
+  "out_of_scope": [
+    "EQ",
+    "DSP",
+    "Ear settings",
+    "advanced engineering audio controls",
+    "developer settings",
+    "API endpoint editor",
+    "service key input",
+    "major UI redesign"
+  ],
+  "next_package": "W12 Release Hardening 发布工程"
+}

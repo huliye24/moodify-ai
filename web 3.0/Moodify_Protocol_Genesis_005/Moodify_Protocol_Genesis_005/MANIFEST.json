@@ -1,0 +1,73 @@
+{
+  "package": "Moodify Protocol Genesis 005",
+  "id": "MOOD-GENESIS-005",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004"
+  ],
+  "purpose": "Production-capable Merkle airdrop contract, claim UI, security tests and human-signed deployment preparation",
+  "files": [
+    {
+      "name": "00_README_FIRST.md",
+      "sha256": "2cf149ce7abfff724ecaec7c7f04653796582ea6526500249f44e856478465f0",
+      "bytes": 1431
+    },
+    {
+      "name": "01_TASK_SPEC.md",
+      "sha256": "6e1e9f21db545d2b725e3751aaf2facaaf7b0b249e4138b2c7e398ee3347d1db",
+      "bytes": 8162
+    },
+    {
+      "name": "02_CONTRACT_SECURITY_SPEC.md",
+      "sha256": "d02c6a69720d1c0d1b4ad7da801d7448a27e2742d4d70b9e06a9eb1ef230b978",
+      "bytes": 2886
+    },
+    {
+      "name": "03_FRONTEND_SPEC.md",
+      "sha256": "7f35ed5ff4bf82c0625b5fa45c6b33d6bb3c3295d3dc256057330aaca0e5f03f",
+      "bytes": 2263
+    },
+    {
+      "name": "04_DEPLOYMENT_AND_FUNDING_RUNBOOK.md",
+      "sha256": "8180cfba968520848727658e23c2a0609dfd0af931ff3f03e880ee92060a286f",
+      "bytes": 2582
+    },
+    {
+      "name": "05_ACCEPTANCE_CRITERIA.md",
+      "sha256": "abd4c6a50b0e1ff7bf1bf5d7c4bfd7e384e383cf17c3f88948d330dba01dd670",
+      "bytes": 2458
+    },
+    {
+      "name": "06_CODEX_EXECUTION_PROMPT.md",
+      "sha256": "045d7f93f323d7f70e897ac19f787fe4a92c972e999b15e66938519d1b3cd818",
+      "bytes": 4373
+    },
+    {
+      "name": "07_TEST_MATRIX.md",
+      "sha256": "227ca8f0c87ca01802ebfac94f57e97e95eaff50ec7c5d1451b6eb3ed5f02ce4",
+      "bytes": 2013
+    },
+    {
+      "name": "08_DEPLOYMENT_RECORD_TEMPLATE.json",
+      "sha256": "a7e6f2918c2b8d446f25cf7d06859dcf75ab3480ff405cf1231069da3606c0e2",
+      "bytes": 844
+    },
+    {
+      "name": "09_HUMAN_APPROVAL_GATE.md",
+      "sha256": "83d892c493abea395f9965afdac97cc9b8d35b1908dfb295f21423d9bd0ffec3",
+      "bytes": 1264
+    },
+    {
+      "name": "10_FINAL_REPORT_TEMPLATE.md",
+      "sha256": "3f09b162ccc005e644cc43e49edde1ee62f9efaf16bd7e8da3ec473d999a4056",
+      "bytes": 1564
+    },
+    {
+      "name": "11_PACKAGE_CANON.json",
+      "sha256": "c9f3d7c7fa81a94416c14ed847c6ec5e8f5cc3dfe56158b4bf88773e1af3c4ad",
+      "bytes": 1237
+    }
+  ]
+}

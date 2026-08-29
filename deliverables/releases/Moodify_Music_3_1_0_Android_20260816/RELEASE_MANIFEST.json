@@ -1,0 +1,13 @@
+{
+  "product": "Moodify Music",
+  "versionName": "3.1.0",
+  "versionCode": 31,
+  "packageName": "com.moodify.app",
+  "releaseDate": "2026-08-16",
+  "baselineVersion": "3.0.0",
+  "feature": "qq_local_audio_handoff",
+  "uiChanged": false,
+  "launcherIconChanged": false,
+  "apk": "Moodify_Music_3.1.0_Android_20260816.apk",
+  "sha256": "60acfcfac9a73c3ef74932dd4d1855d1246f8b169b0e4d66c1e2daf323874337"
+}

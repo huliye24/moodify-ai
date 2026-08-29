@@ -1,0 +1,7 @@
+{
+  "required_outputs": [
+    "quality/text_integrity.json",
+    "quality/text_integrity.md"
+  ],
+  "non_empty": true
+}

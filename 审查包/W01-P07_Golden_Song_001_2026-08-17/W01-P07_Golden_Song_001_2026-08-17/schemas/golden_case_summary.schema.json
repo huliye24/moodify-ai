@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify Golden Case Summary",
+  "type": "object",
+  "required": [
+    "golden_case_id",
+    "track_id",
+    "source_object_id",
+    "source_sha256",
+    "engineering_verdict",
+    "listening_verdict",
+    "p08_gate"
+  ],
+  "properties": {
+    "golden_case_id": {
+      "const": "GOLDEN-001"
+    },
+    "track_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "successful_run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "job_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pipeline_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "production_fingerprint": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "final_render_object_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "engineering_verdict": {
+      "enum": [
+        "PASS",
+        "PASS_WITH_BLOCKER_FIXES",
+        "FAIL"
+      ]
+    },
+    "listening_verdict": {
+      "enum": [
+        "RENDER_PREFERRED",
+        "SOURCE_PREFERRED",
+        "NO_MEANINGFUL_DIFFERENCE",
+        "MIXED_TRADEOFF",
+        "INVALID_REVIEW"
+      ]
+    },
+    "p08_gate": {
+      "enum": [
+        "P08_GATE_OPEN",
+        "P08_GATE_CLOSED"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

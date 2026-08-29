@@ -1,0 +1,68 @@
+{
+  "record_id": "GOLDEN-002-CAD10-01_NE_VIVONS",
+  "case_id": "p06_run2_cad10-01",
+  "source": {
+    "sha256": "ecef89a227fea4c44abac4fe07d5139cee5965359a295e5d764c557a108d745a",
+    "duration_s": 219.4,
+    "sample_rate": 48000,
+    "channels": 2,
+    "bit_depth": 24,
+    "codec": "wav(pcm24)",
+    "origin": "Moodify-owned cadeau10-album1 (LA media)",
+    "rights_status": "OWNED",
+    "alias": "ne-vivons-pas-seulement-de-souvenirs"
+  },
+  "deviation_note": "modern self-produced demo track, NOT 1980s/1990s old recording",
+  "p03": [
+    {
+      "id": "ED-01-1",
+      "category": "ED-01",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "p04": [
+    {
+      "id": "obj_326577a7791f9211",
+      "kind": "RO-01",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate": "A",
+      "plan_id": "obj_326577a7791f9211__A",
+      "intensity": 0.1,
+      "params": {
+        "eq_gain_db": 0.25,
+        "loudness_delta_db": 0.0,
+        "stereo_width_delta": 0.0,
+        "noise_gate_db": 0.0
+      },
+      "hard_gates": true,
+      "identity": "PASS",
+      "objective": "RO-01",
+      "confidence": "MEDIUM"
+    },
+    {
+      "candidate": "B",
+      "plan_id": "obj_326577a7791f9211__B",
+      "intensity": 0.2,
+      "params": {
+        "eq_gain_db": 0.5,
+        "loudness_delta_db": 0.0,
+        "stereo_width_delta": 0.0,
+        "noise_gate_db": 0.0
+      },
+      "hard_gates": true,
+      "identity": "PASS",
+      "objective": "RO-01",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "technical_ranking": [
+    "A",
+    "B"
+  ],
+  "human_listening": "SKIPPED per user",
+  "golden_status": "PROMISING_NOT_GOLDEN"
+}

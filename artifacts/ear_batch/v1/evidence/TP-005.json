@@ -1,0 +1,21 @@
+{
+  "task": "TP-005",
+  "verified_at": "2026-08-12T00:49:16.396208+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "path": "quality/text_integrity.json",
+      "exists": true,
+      "bytes": 16710,
+      "sha256": "d1eb9a149c9636d41ff6534d5573fd81da8bb4035e33fc585aa271ae7577244d",
+      "passed": true
+    },
+    {
+      "path": "quality/text_integrity.md",
+      "exists": true,
+      "bytes": 206,
+      "sha256": "15da6609f942871cb74bb21df6e37411da3b413aee57c62115bc7c77b0c25271",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "package_id": "MOOD-GENESIS-005",
+  "name": "Merkle Airdrop",
+  "depends_on": [
+    "MOOD-GENESIS-001",
+    "MOOD-GENESIS-002",
+    "MOOD-GENESIS-003",
+    "MOOD-GENESIS-004"
+  ],
+  "canon_change": false,
+  "network": {
+    "name": "BNB Smart Chain",
+    "chain_id": 56
+  },
+  "token": {
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18,
+    "total_supply": "33000000"
+  },
+  "contract": {
+    "preferred_name": "MoodGenesisDistributor",
+    "merkle_root": "immutable_preferred",
+    "upgradeable": false,
+    "claimant_token_approval_required": false,
+    "mint_capability": false
+  },
+  "merkle": {
+    "preferred_leaf_types": [
+      "uint256",
+      "address",
+      "uint256"
+    ],
+    "preferred_values": [
+      "participantNumber",
+      "account",
+      "amountAtomic"
+    ]
+  },
+  "scope": {
+    "write_contract": true,
+    "test_contract": true,
+    "build_claim_frontend": true,
+    "prepare_deployment": true,
+    "prepare_funding": true,
+    "production_transfer": false,
+    "production_deployment": false,
+    "production_signature": false,
+    "private_key_handling": false
+  },
+  "next_package": "MOOD-GENESIS-006 Contribution Network"
+}

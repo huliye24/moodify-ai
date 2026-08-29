@@ -1,0 +1,27 @@
+{
+  "package_id": "MOOD-GENESIS-001",
+  "canon_change": false,
+  "token": {
+    "network": "BNB Smart Chain",
+    "chain_id": 56,
+    "name": "Moodify",
+    "symbol": "Mood",
+    "contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "decimals": 18,
+    "total_supply": "33000000",
+    "total_supply_display": "33,000,000 MOOD"
+  },
+  "dex": {
+    "name": "PancakeSwap V3",
+    "pair": "MOOD / WBNB",
+    "fee_tier": "1%",
+    "pool_address": null,
+    "note": "Do not fabricate or hard-code a pool address unless verified from chain/explorer."
+  },
+  "authority": {
+    "application_config": "Single source of truth required",
+    "contract_changes": "Human confirmation required",
+    "wallet_signatures": "Human only",
+    "liquidity_changes": "Out of scope"
+  }
+}

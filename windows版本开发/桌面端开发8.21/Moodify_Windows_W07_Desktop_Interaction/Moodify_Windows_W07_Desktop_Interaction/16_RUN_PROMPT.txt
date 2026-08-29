@@ -1,0 +1,60 @@
+Execute MFY-WIN-W07-DESKTOP-INTERACTION-001 in the Moodify repository.
+
+This is W07 of the Windows Desktop Completion sequence.
+
+Read all files in this package.
+
+Critical rules:
+- First read W06 artifacts under artifacts/windows/w06/.
+- If W07_GATE is not PASS, stop and report BLOCKED.
+- W07 is an interaction layer only.
+- Reuse existing Track, Library, Playlist, Playback, Queue, Favorite and History use-cases.
+- Do not create new business authorities.
+- File drag-and-drop must reuse the W02 import pipeline.
+- Track-to-playlist drag must reuse W03 playlist operations.
+- Play Next/Add to Queue must reuse W05.
+- Double-click play must reuse W04/W05 playback+queue semantics.
+- Multi-select is ephemeral UI state keyed by stable IDs.
+- All destructive actions must have exact scope.
+- W07 must never delete original user audio files.
+- Use safe native reveal APIs only; do not shell out with unsafe command strings.
+- Keyboard shortcuts must not fire while typing in inputs/editable fields.
+- Preserve the current Windows Alpha visual direction.
+- Add interaction feedback only; no visual redesign.
+- No global hotkeys/media keys yet; those belong to W09.
+- No Ear, DSP, cloud internals, social or recommendation UI.
+- CANON_CHANGE = NO.
+- VISUAL_REDESIGN = FORBIDDEN.
+- Do not start W08.
+- Do not commit secrets, credentials, private audio, or large fixtures.
+
+Write artifacts under:
+artifacts/windows/w07/
+
+At the end report:
+1. W06 preflight,
+2. current interaction reality,
+3. action routing,
+4. double-click semantics,
+5. file drop import,
+6. Track→Playlist drag,
+7. multi-select,
+8. batch actions,
+9. context menus,
+10. keyboard interactions,
+11. Explorer reveal,
+12. destructive wording,
+13. files changed,
+14. commands,
+15. tests,
+16. manual flows,
+17. evidence,
+18. blockers/unknowns,
+19. W07_STATUS,
+20. W08_GATE.
+
+Finish with:
+W07_STATUS = PASS | BLOCKED
+W08_GATE = PASS | BLOCKED
+CANON_CHANGE = NO
+VISUAL_REDESIGN = NO

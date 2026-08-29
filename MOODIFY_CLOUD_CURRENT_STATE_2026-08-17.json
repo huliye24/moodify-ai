@@ -1,0 +1,152 @@
+{
+  "report": "MOODIFY_CLOUD_CURRENT_STATE_2026-08-17",
+  "date": "2026-08-17",
+  "nature": "read-only survey; scanned LA server, Hangzhou ECS, PolarDB",
+  "infrastructure": {
+    "servers": [
+      {
+        "host": "yisu-6a7bcb73aac20",
+        "public_ip": "103.144.246.242",
+        "provider": "Yisu (LA)",
+        "role": "core node: web/music/api/bff/worker/audiolla",
+        "os": "Ubuntu 22.04 LTS",
+        "cpu": "4 vCPU AMD EPYC 7H12",
+        "ram_gb": 7.9,
+        "ram_used_gb": 1.4,
+        "disk_gb": 98,
+        "disk_used_gb": 19,
+        "load": 0.08
+      },
+      {
+        "host": "iZln9jrdhi9iv6Z",
+        "public_ip": "120.55.191.146",
+        "provider": "Aliyun (cn-hangzhou)",
+        "role": "data factory worker + internal API",
+        "os": "Ubuntu 26.04 (kernel 7.0)",
+        "cpu": "2 vCPU Intel Xeon",
+        "ram_gb": 1.6,
+        "ram_used_gb": 0.45,
+        "disk_gb": 40,
+        "disk_used_gb": 15,
+        "load": 0.17,
+        "private_vpc": "172.21.10.9/20"
+      }
+    ],
+    "networking": {
+      "cloudflare_tunnel": "rongjingmusic.com + rongjingwenchuan.com via cloudflared (LA, port 20241)",
+      "https_termination": "Cloudflare edge; origin HTTP only",
+      "open_ports_la": [22, 80],
+      "open_ports_hz": [22, 8000]
+    }
+  },
+  "services": {
+    "la": [
+      {"name": "nginx", "port": 80, "purpose": "reverse proxy 3 domains", "status": "running"},
+      {"name": "cloudflared-moodify", "port": 20241, "purpose": "CF tunnel", "status": "running"},
+      {"name": "moodify-api", "port": 8000, "purpose": "Ear FastAPI (127.0.0.1)", "status": "running"},
+      {"name": "moodify-music", "port": 3100, "purpose": "Music Platform (node vinext)", "status": "running"},
+      {"name": "moodify-music-bff", "port": 8100, "purpose": "Music Public BFF", "status": "running"},
+      {"name": "moodify-worker", "port": null, "purpose": "Ear worker (SQLite queue)", "status": "running, queue near-empty (16KB)"},
+      {"name": "moodify-audiolla", "port": 18080, "purpose": "lalal.ai separation proxy (docker)", "status": "running healthy, Up 15h, RSS 770MB"}
+    ],
+    "hangzhou": [
+      {"name": "moodify-api", "port": 8000, "purpose": "internal API, service-key auth", "status": "running, public"},
+      {"name": "moodify-data-worker", "port": null, "purpose": "data factory worker", "status": "running"},
+      {"name": "timers", "port": null, "purpose": "inbox 1min / resource 5min / daily 00:05 / backup 00:20", "status": "enabled"}
+    ]
+  },
+  "databases": [
+    {"name": "pc-bp1112f8t24wdta5t", "engine": "MySQL 8.0.13", "ip": "172.27.118.106", "databases": [], "tables": 0, "status": "empty shell, historical"},
+    {"name": "pc-bp19502y46246gv6n", "engine": "MySQL 8.0.18", "ip": "172.27.118.104", "databases": ["moodify_dev"], "tables": 19, "engine_type": "XENGINE", "rows": {"tracks": 32, "track_versions": 6, "audit_events": 10, "idempotency_keys": 18, "creation_passports": 6, "users": 0, "albums": 0, "playlists": 0}, "status": "schema present, near-zero data"},
+    {"name": "pc-uf65m4xqwst72vq5a", "engine": "PostgreSQL 16.14", "ip": "101.133.107.206:5432", "databases": null, "tables": null, "status": "online, content unverified"}
+  ],
+  "storage": {
+    "object_storage": null,
+    "la_music_media_gb": 0.25,
+    "la_music_releases_gb": 3.6,
+    "la_ear_remote_mb": 11,
+    "hangzhou_var_lib_gb": 6.5,
+    "audio_files": 5
+  },
+  "audio_pipeline": {
+    "production_chain": "static website playback only (music-media 248MB/5 files)",
+    "upload": "no production upload endpoint evidence",
+    "queue": "SQLite (LA node.sqlite3 16KB near-empty; Hangzhou data_node historical)",
+    "separation": "audiolla container healthy; no automatic pipeline calls",
+    "full_ear_loop": "NOT RUNNING in production",
+    "real_case": null
+  },
+  "models": {"running_inference": "NONE", "files_on_servers": "NONE", "audiolla": "lalal.ai API proxy (model remote)"},
+  "ai_capabilities": {
+    "signal_analysis": "code exists (repo), not deployed to cloud production",
+    "structure_analysis": "code exists, not deployed",
+    "source_separation": "audiolla container deployed; no auto pipeline",
+    "perception_defects": "code exists, not deployed",
+    "decision_preset": "code exists, cloud has no production preset",
+    "verification": "code exists, not deployed",
+    "learning_loop": "DOES NOT EXIST"
+  },
+  "apis": [
+    {"method": "GET", "path": "/healthz", "host": "LA:8000, HZ:8000", "auth": "HZ requires service-key", "status": "ok"},
+    {"method": "GET", "path": "/api/v1/music/*", "host": "LA BFF:8100 via rongjinwenchuan.xyz", "auth": "none", "status": "ok"},
+    {"method": "GET", "path": "/", "host": "LA nginx:80 rongjingmusic.com", "auth": "none", "status": "ok"}
+  ],
+  "clients": {
+    "android": "plays local files + cloud URLs; no account/upload/process loop",
+    "web": "2 static sites + Music platform (LA, same host)",
+    "closed_loop": "NOT FORMED"
+  },
+  "resource_usage": {
+    "la": {"load": 0.08, "ram_gb": 1.4, "top_mem": "audiolla 770MB"},
+    "hangzhou": {"load": 0.17, "ram_gb": 0.45, "note": "historical 10-song pilot 0 OOM, swap ~1GiB"}
+  },
+  "data_assets": {
+    "real_songs": 5,
+    "test_pairs": 0,
+    "stems": 0,
+    "presets": 0,
+    "human_reviews": 0,
+    "user_feedback": 0,
+    "experiment_batches": "Hangzhou fi_* + data_factory* (6.5GB historical)"
+  },
+  "security": {
+    "ssh": "LA key (root); HZ password",
+    "secrets": "LA /etc/moodify/node.env 0644; HZ systemd inline env; PolarDB creds local 0600",
+    "db_exposure": "PolarDB private via VPC peering; Shanghai PG public whitelist 120.55.191.146",
+    "api_auth": "HZ service-key; LA:8000 localhost only",
+    "https": "Cloudflare tunnel termination",
+    "fail2ban": "not enabled (LA)",
+    "rate_limit": "no evidence"
+  },
+  "backup": {
+    "code": "GitHub recoverable",
+    "media": "NOT recoverable (server-only)",
+    "experiments": "Hangzhou 6.5GB server-only, partial permanent loss on disk failure",
+    "database": "near-empty, low loss",
+    "recreate_server": "no reproducible flow (tar manual deploys)"
+  },
+  "technical_debt": {
+    "p0": ["no object storage", "database near-empty"],
+    "p1": ["no model serving", "Ear chain not connected", "deployment not reproducible"],
+    "p2": ["empty old PolarDB", "unused Shanghai PG", "no monitoring", "envs in systemd inline"],
+    "p3": ["no backup drills", "journald only"]
+  },
+  "cloud_repo_drift": {
+    "repo_has_cloud_missing": ["GPU node", "model weights", "Ear analysis runtime", "preset/intervention production"],
+    "cloud_has_repo_missing": ["audiolla container", "music-platform/bff production", "HZ systemd env", "6.5GB experiment data", "PolarDB actual schema state"],
+    "version_mismatch": "music releases 20260813 timestamps vs repo unverified"
+  },
+  "bottlenecks": [
+    "P0 no object storage",
+    "P0 database idle",
+    "P1 no AI inference in cloud",
+    "P1 Ear worker queue near-empty",
+    "P1 no learning loop",
+    "P2 Hangzhou 1.6GB RAM hard limit",
+    "P2 tar-based unreproducible deploys",
+    "P2 empty old PolarDB + unused Shanghai PG",
+    "P3 no monitoring dashboard",
+    "P3 no backup drills"
+  ],
+  "current_cloud_truth": "Two VPS hosting a static music site + API shells + data-factory batch processing + a healthy lalal separation proxy container + a 19-table near-empty PolarDB + a deployed but idle Ear worker. It is NOT a hearing system: Listen/Judge/Intervene/Verify exist only as repo code; no real audio has passed the Listen→Judge chain in the cloud."
+}

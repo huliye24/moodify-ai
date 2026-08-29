@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "nodes": [
+    {
+      "id": "WI-001",
+      "deps": [],
+      "priority": 1
+    },
+    {
+      "id": "WI-002",
+      "deps": [
+        "WI-001"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "WI-003",
+      "deps": [
+        "WI-001",
+        "WI-002"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "WI-004",
+      "deps": [
+        "WI-002",
+        "WI-003"
+      ],
+      "priority": 4
+    },
+    {
+      "id": "WI-005",
+      "deps": [
+        "WI-001",
+        "WI-002",
+        "WI-003",
+        "WI-004"
+      ],
+      "priority": 5
+    },
+    {
+      "id": "WI-006",
+      "deps": [
+        "WI-001"
+      ],
+      "priority": 6
+    },
+    {
+      "id": "WI-007",
+      "deps": [
+        "WI-002",
+        "WI-003"
+      ],
+      "priority": 7
+    },
+    {
+      "id": "WI-008",
+      "deps": [
+        "WI-007"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "WI-009",
+      "deps": [
+        "WI-002",
+        "WI-003",
+        "WI-007"
+      ],
+      "priority": 9
+    },
+    {
+      "id": "WI-010",
+      "deps": [
+        "WI-003",
+        "WI-004"
+      ],
+      "priority": 10
+    },
+    {
+      "id": "WI-011",
+      "deps": [
+        "WI-004",
+        "WI-010"
+      ],
+      "priority": 11
+    },
+    {
+      "id": "WI-012",
+      "deps": [
+        "WI-005"
+      ],
+      "priority": 12
+    }
+  ]
+}

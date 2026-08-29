@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "nodeId": "mood:node:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "operatorProtocolId": "mood:contributor:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "nodeType": "compute",
+  "displayName": "Singapore Compute Node Example",
+  "region": {
+    "countryCode": "SG",
+    "regionCode": null,
+    "city": null,
+    "precision": "country"
+  },
+  "endpoint": {
+    "type": "https",
+    "uri": "https://node.example.invalid"
+  },
+  "capabilityManifestId": "mood:capability:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "verification": {
+    "status": "pending",
+    "method": null,
+    "verifiedAt": null,
+    "evidenceIds": []
+  },
+  "health": {
+    "status": "unknown",
+    "observedAt": null
+  },
+  "lifecycleStatus": "registered",
+  "registeredAt": "2026-08-29T00:00:00Z",
+  "updatedAt": "2026-08-29T00:00:00Z",
+  "recordFingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+}

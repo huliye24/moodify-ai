@@ -1,0 +1,418 @@
+
+
+===== TIMESTAMP =====
+
+$ date -Is
+2026-08-17T19:52:35+08:00
+
+
+===== HOST =====
+
+$ hostname
+yisu-6a7bcb73aac20
+
+$ uname -a
+Linux yisu-6a7bcb73aac20 5.15.0-69-generic #76-Ubuntu SMP Fri Mar 17 17:19:29 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+
+$ hostnamectl
+ Static hostname: yisu-6a7bcb73aac20
+       Icon name: computer-vm
+         Chassis: vm
+      Machine ID: 0f2eeed39668412c9bb012684ed3a27d
+         Boot ID: 0c949718dcd841fd954e01a71ff6a233
+  Virtualization: kvm
+Operating System: Ubuntu 22.04.2 LTS
+          Kernel: Linux 5.15.0-69-generic
+    Architecture: x86-64
+ Hardware Vendor: QEMU
+  Hardware Model: Standard PC _i440FX + PIIX, 1996_
+PRETTY_NAME="Ubuntu 22.04.2 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04.2 LTS (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+
+
+===== UPTIME =====
+
+$ uptime
+ 19:52:35 up 5 days, 10:19,  0 users,  load average: 0.14, 0.09, 0.02
+
+
+===== CPU =====
+
+$ lscpu
+Architecture:                    x86_64
+CPU op-mode(s):                  32-bit, 64-bit
+Address sizes:                   40 bits physical, 48 bits virtual
+Byte Order:                      Little Endian
+CPU(s):                          4
+On-line CPU(s) list:             0-3
+Vendor ID:                       AuthenticAMD
+Model name:                      AMD EPYC 7H12 64-Core Processor
+CPU family:                      23
+Model:                           49
+Thread(s) per core:              1
+Core(s) per socket:              4
+Socket(s):                       1
+Stepping:                        0
+BogoMIPS:                        5190.24
+Flags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm rep_good nopl cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ssbd ibpb vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 arat umip
+Hypervisor vendor:               KVM
+Virtualization type:             full
+L1d cache:                       256 KiB (4 instances)
+L1i cache:                       256 KiB (4 instances)
+L2 cache:                        2 MiB (4 instances)
+L3 cache:                        64 MiB (4 instances)
+NUMA node(s):                    1
+NUMA node0 CPU(s):               0-3
+Vulnerability Itlb multihit:     Not affected
+Vulnerability L1tf:              Not affected
+Vulnerability Mds:               Not affected
+Vulnerability Meltdown:          Not affected
+Vulnerability Mmio stale data:   Not affected
+Vulnerability Retbleed:          Mitigation; untrained return thunk; SMT disabled
+Vulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl and seccomp
+Vulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:        Mitigation; Retpolines, IBPB conditional, STIBP disabled, RSB filling, PBRSB-eIBRS Not affected
+Vulnerability Srbds:             Not affected
+Vulnerability Tsx async abort:   Not affected
+
+$ getconf _NPROCESSORS_ONLN
+4
+
+
+===== MEMORY =====
+
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           7.7Gi       1.3Gi       521Mi       1.0Mi       5.9Gi       6.1Gi
+Swap:             0B          0B          0B
+MemTotal:        8090436 kB
+MemAvailable:    6346976 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+
+
+===== FILESYSTEM =====
+
+$ df -hT
+Filesystem     Type     Size  Used Avail Use% Mounted on
+tmpfs          tmpfs    791M  1.3M  789M   1% /run
+/dev/sda3      ext4      98G   19G   76G  20% /
+tmpfs          tmpfs    3.9G     0  3.9G   0% /dev/shm
+tmpfs          tmpfs    5.0M     0  5.0M   0% /run/lock
+/dev/sda2      ext4     452M  260M  158M  63% /boot
+overlay        overlay   98G   19G   76G  20% /var/lib/docker/rootfs/overlayfs/9505b3aa9ad4a7c1ccb8c6385926f98c056c8b69b9a68d221859627cb4f68bc8
+tmpfs          tmpfs    791M     0  791M   0% /run/user/0
+
+$ df -ih
+Filesystem     Inodes IUsed IFree IUse% Mounted on
+tmpfs            988K   760  987K    1% /run
+/dev/sda3        6.3M  428K  5.8M    7% /
+tmpfs            988K     1  988K    1% /dev/shm
+tmpfs            988K     3  988K    1% /run/lock
+/dev/sda2        125K   320  125K    1% /boot
+overlay          6.3M  428K  5.8M    7% /var/lib/docker/rootfs/overlayfs/9505b3aa9ad4a7c1ccb8c6385926f98c056c8b69b9a68d221859627cb4f68bc8
+tmpfs            198K    21  198K    1% /run/user/0
+
+
+===== NETWORK LISTENERS =====
+
+$ ss -lntup
+Netid State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                                                                                                       
+udp   UNCONN 0      0      127.0.0.53%lo:53         0.0.0.0:*    users:(("systemd-resolve",pid=102660,fd=13))                                                                                                 
+udp   UNCONN 0      0          127.0.0.1:323        0.0.0.0:*    users:(("chronyd",pid=769,fd=5))                                                                                                             
+udp   UNCONN 0      0                  *:59019            *:*    users:(("cloudflared",pid=35894,fd=4))                                                                                                       
+udp   UNCONN 0      0                  *:39966            *:*    users:(("cloudflared",pid=35894,fd=8))                                                                                                       
+udp   UNCONN 0      0              [::1]:323           [::]:*    users:(("chronyd",pid=769,fd=6))                                                                                                             
+udp   UNCONN 0      0                  *:50034            *:*    users:(("cloudflared",pid=35894,fd=10))                                                                                                      
+udp   UNCONN 0      0                  *:46300            *:*    users:(("cloudflared",pid=35894,fd=9))                                                                                                       
+tcp   LISTEN 0      128          0.0.0.0:22         0.0.0.0:*    users:(("sshd",pid=49014,fd=3))                                                                                                              
+tcp   LISTEN 0      511        127.0.0.1:3100       0.0.0.0:*    users:(("node",pid=196388,fd=21))                                                                                                            
+tcp   LISTEN 0      4096       127.0.0.1:18080      0.0.0.0:*    users:(("docker-proxy",pid=267050,fd=7))                                                                                                     
+tcp   LISTEN 0      2048       127.0.0.1:8000       0.0.0.0:*    users:(("uvicorn",pid=235704,fd=6))                                                                                                          
+tcp   LISTEN 0      2048       127.0.0.1:8100       0.0.0.0:*    users:(("uvicorn",pid=193823,fd=6))                                                                                                          
+tcp   LISTEN 0      511          0.0.0.0:80         0.0.0.0:*    users:(("nginx",pid=235630,fd=10),("nginx",pid=235629,fd=10),("nginx",pid=235628,fd=10),("nginx",pid=235627,fd=10),("nginx",pid=18708,fd=10))
+tcp   LISTEN 0      4096       127.0.0.1:20241      0.0.0.0:*    users:(("cloudflared",pid=35894,fd=7))                                                                                                       
+tcp   LISTEN 0      4096       127.0.0.1:34611      0.0.0.0:*    users:(("containerd",pid=236905,fd=15))                                                                                                      
+tcp   LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*    users:(("systemd-resolve",pid=102660,fd=14))                                                                                                 
+tcp   LISTEN 0      128             [::]:22            [::]:*    users:(("sshd",pid=49014,fd=4))                                                                                                              
+tcp   LISTEN 0      511             [::]:80            [::]:*    users:(("nginx",pid=235630,fd=11),("nginx",pid=235629,fd=11),("nginx",pid=235628,fd=11),("nginx",pid=235627,fd=11),("nginx",pid=18708,fd=11))
+
+
+===== PROCESSES =====
+
+$ ps -eo pid,ppid,user,lstart,etime,comm,args --sort=comm
+    PID    PPID USER                      STARTED     ELAPSED COMMAND         COMMAND
+ 338587  338586 root     Mon Aug 17 19:52:34 2026       00:01 (sd-pam)        (sd-pam)
+  47767       1 root     Thu Aug 13 06:40:34 2026  4-13:12:01 ModemManager    /usr/sbin/ModemManager
+    112       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 acpi_thermal_pm [acpi_thermal_pm]
+    756       1 root     Wed Aug 12 09:33:35 2026  5-10:19:00 agetty          /sbin/agetty -o -p -- \u --noclear tty1 linux
+    100       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 ata_sff         [ata_sff]
+ 338657  338583 root     Mon Aug 17 19:52:35 2026       00:00 bash            bash -s
+     98       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 blkcg_punt_bio  [blkcg_punt_bio]
+    141       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 charger_manager [charger_manager]
+    769       1 _chrony  Wed Aug 12 09:33:35 2026  5-10:19:00 chronyd         /usr/sbin/chronyd -F 1
+    775     769 _chrony  Wed Aug 12 09:33:36 2026  5-10:18:59 chronyd         /usr/sbin/chronyd -F 1
+  35894       1 root     Wed Aug 12 21:58:11 2026  4-21:54:24 cloudflared     /usr/bin/cloudflared --no-autoupdate --config /root/.cloudflared/config.yml tunnel run
+ 236905       1 root     Sun Aug 16 16:13:41 2026  1-03:38:54 containerd      /usr/bin/containerd
+ 266958       1 root     Sun Aug 16 20:01:39 2026    23:50:56 containerd-shim /usr/bin/containerd-shim-runc-v2 -namespace moby -id 9505b3aa9ad4a7c1ccb8c6385926f98c056c8b69b9a68d221859627cb4f68bc8 -address /run/containerd/containerd.sock
+     18       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 cpuhp/0         [cpuhp/0]
+     19       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 cpuhp/1         [cpuhp/1]
+     25       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 cpuhp/2         [cpuhp/2]
+     31       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 cpuhp/3         [cpuhp/3]
+    720       1 root     Wed Aug 12 09:33:35 2026  5-10:19:00 cron            /usr/sbin/cron -f -P
+    200       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 cryptd          [cryptd]
+    711       1 message+ Wed Aug 12 09:33:35 2026  5-10:19:00 dbus-daemon     @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+    103       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 devfreq_wq      [devfreq_wq]
+ 267050  237098 root     Sun Aug 16 20:01:39 2026    23:50:56 docker-proxy    /usr/bin/docker-proxy -proto tcp -host-ip 127.0.0.1 -host-port 18080 -container-ip 172.18.0.2 -container-port 8000 -use-listen-fd
+ 237098       1 root     Sun Aug 16 16:13:44 2026  1-03:38:51 dockerd         /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+    109       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 ecryptfs-kthrea [ecryptfs-kthrea]
+    102       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 edac-poller     [edac-poller]
+    311       2 root     Wed Aug 12 09:33:29 2026  5-10:19:06 ext4-rsv-conver [ext4-rsv-conver]
+    544       2 root     Wed Aug 12 09:33:31 2026  5-10:19:04 ext4-rsv-conver [ext4-rsv-conver]
+     16       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 idle_inject/0   [idle_inject/0]
+     20       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 idle_inject/1   [idle_inject/1]
+     26       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 idle_inject/2   [idle_inject/2]
+     32       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 idle_inject/3   [idle_inject/3]
+     38       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 inet_frag_wq    [inet_frag_wq]
+    121       2 root     Wed Aug 12 09:33:26 2026  5-10:19:09 ipv6_addrconf   [ipv6_addrconf]
+    715       1 root     Wed Aug 12 09:33:35 2026  5-10:19:00 irqbalance      /usr/sbin/irqbalance --foreground
+    543       2 root     Wed Aug 12 09:33:31 2026  5-10:19:04 jbd2/sda2-8     [jbd2/sda2-8]
+    310       2 root     Wed Aug 12 09:33:29 2026  5-10:19:06 jbd2/sda3-8     [jbd2/sda3-8]
+    410       2 root     Wed Aug 12 09:33:30 2026  5-10:19:05 kaluad          [kaluad]
+     39       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kauditd         [kauditd]
+     97       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kblockd         [kblockd]
+     46       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kcompactd0      [kcompactd0]
+     37       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kdevtmpfs       [kdevtmpfs]
+     48       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 khugepaged      [khugepaged]
+     43       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 khungtaskd      [khungtaskd]
+     96       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kintegrityd     [kintegrityd]
+    415       2 root     Wed Aug 12 09:33:30 2026  5-10:19:05 kmpath_handlerd [kmpath_handlerd]
+    413       2 root     Wed Aug 12 09:33:30 2026  5-10:19:05 kmpath_rdacd    [kmpath_rdacd]
+    414       2 root     Wed Aug 12 09:33:30 2026  5-10:19:05 kmpathd         [kmpathd]
+     47       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 ksmd            [ksmd]
+     13       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 ksoftirqd/0     [ksoftirqd/0]
+     22       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 ksoftirqd/1     [ksoftirqd/1]
+     28       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 ksoftirqd/2     [ksoftirqd/2]
+     34       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 ksoftirqd/3     [ksoftirqd/3]
+    131       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 kstrp           [kstrp]
+    108       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kswapd0         [kswapd0]
+      2       0 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kthreadd        [kthreadd]
+    111       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kthrotld        [kthrotld]
+ 338115       2 root     Mon Aug 17 19:49:25 2026       03:10 kworker/0:0-rcu [kworker/0:0-rcu_par_gp]
+      8       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kworker/0:0H-ev [kworker/0:0H-events_highpri]
+ 336843       2 root     Mon Aug 17 19:24:30 2026       28:05 kworker/0:1-eve [kworker/0:1-events]
+    106       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kworker/0:1H-kb [kworker/0:1H-kblockd]
+ 337730       2 root     Mon Aug 17 19:43:49 2026       08:46 kworker/0:2-rcu [kworker/0:2-rcu_par_gp]
+ 337426       2 root     Mon Aug 17 19:37:12 2026       15:23 kworker/1:0-rcu [kworker/1:0-rcu_par_gp]
+     24       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kworker/1:0H-ev [kworker/1:0H-events_highpri]
+ 337683       2 root     Mon Aug 17 19:42:48 2026       09:47 kworker/1:1-rcu [kworker/1:1-rcu_par_gp]
+    189       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 kworker/1:1H-kb [kworker/1:1H-kblockd]
+ 338008       2 root     Mon Aug 17 19:47:53 2026       04:42 kworker/1:2-eve [kworker/1:2-events]
+ 337661       2 root     Mon Aug 17 19:42:17 2026       10:18 kworker/2:0-cgr [kworker/2:0-cgroup_destroy]
+     30       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kworker/2:0H-ev [kworker/2:0H-events_highpri]
+ 337995       2 root     Mon Aug 17 19:47:53 2026       04:42 kworker/2:1-eve [kworker/2:1-events]
+    203       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 kworker/2:1H-kb [kworker/2:1H-kblockd]
+ 336885       2 root     Mon Aug 17 19:25:31 2026       27:04 kworker/2:2-rcu [kworker/2:2-rcu_par_gp]
+ 337835       2 root     Mon Aug 17 19:46:21 2026       06:14 kworker/3:0-rcu [kworker/3:0-rcu_par_gp]
+     36       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 kworker/3:0H-ev [kworker/3:0H-events_highpri]
+ 337324       2 root     Mon Aug 17 19:35:10 2026       17:25 kworker/3:1-rcu [kworker/3:1-rcu_par_gp]
+    201       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 kworker/3:1H-kb [kworker/3:1H-kblockd]
+ 338297       2 root     Mon Aug 17 19:51:27 2026       01:08 kworker/3:2-eve [kworker/3:2-events]
+ 337855       2 root     Mon Aug 17 19:46:41 2026       05:54 kworker/u384:0- [kworker/u384:0-flush-8:0]
+ 337029       2 root     Mon Aug 17 19:29:00 2026       23:35 kworker/u384:2- [kworker/u384:2-events_unbound]
+ 337451       2 root     Mon Aug 17 19:37:43 2026       14:52 kworker/u384:3- [kworker/u384:3-events_power_efficient]
+ 337163       2 root     Mon Aug 17 19:31:37 2026       20:58 kworker/u384:4- [kworker/u384:4-events_unbound]
+    136       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 kworker/u385:0  [kworker/u385:0]
+    101       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 md              [md]
+     15       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 migration/0     [migration/0]
+     21       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 migration/1     [migration/1]
+     27       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 migration/2     [migration/2]
+     33       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 migration/3     [migration/3]
+    120       2 root     Wed Aug 12 09:33:26 2026  5-10:19:09 mld             [mld]
+     10       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 mm_percpu_wq    [mm_percpu_wq]
+ 235623       1 moodify  Sun Aug 16 16:07:31 2026  1-03:45:04 moodify-node    /opt/moodify/venv/bin/python3 /opt/moodify/venv/bin/moodify-node worker
+    416       1 root     Wed Aug 12 09:33:30 2026  5-10:19:05 multipathd      /sbin/multipathd -d -s
+      6       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 netns           [netns]
+    717       1 root     Wed Aug 12 09:33:35 2026  5-10:19:00 networkd-dispat /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+  18708       1 root     Wed Aug 12 10:13:52 2026  5-09:38:43 nginx           nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+ 235627   18708 www-data Sun Aug 16 16:07:31 2026  1-03:45:04 nginx           nginx: worker process
+ 235628   18708 www-data Sun Aug 16 16:07:31 2026  1-03:45:04 nginx           nginx: worker process
+ 235629   18708 www-data Sun Aug 16 16:07:31 2026  1-03:45:04 nginx           nginx: worker process
+ 235630   18708 www-data Sun Aug 16 16:07:31 2026  1-03:45:04 nginx           nginx: worker process
+ 196388       1 root     Thu Aug 13 11:45:53 2026  4-08:06:42 node            /opt/node22/bin/node node_modules/vinext/dist/cli.js start --hostname 127.0.0.1 --port 3100
+     44       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 oom_reaper      [oom_reaper]
+ 106506       1 root     Thu Aug 13 06:53:59 2026  4-12:58:36 packagekitd     /usr/libexec/packagekitd
+  47763       1 root     Thu Aug 13 06:40:34 2026  4-13:12:01 polkitd         /usr/libexec/polkitd --no-debug
+ 338672  338657 root     Mon Aug 17 19:52:35 2026       00:00 ps              ps -eo pid,ppid,user,lstart,etime,comm,args --sort=comm
+ 266982  266958 1000     Sun Aug 16 20:01:39 2026    23:50:56 python3         python3 -m audiolla
+    263       2 root     Wed Aug 12 09:33:28 2026  5-10:19:07 raid5wq         [raid5wq]
+      3       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 rcu_gp          [rcu_gp]
+      4       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 rcu_par_gp      [rcu_par_gp]
+     14       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 rcu_sched       [rcu_sched]
+     11       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 rcu_tasks_rude_ [rcu_tasks_rude_]
+     12       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 rcu_tasks_trace [rcu_tasks_trace]
+ 109103       1 syslog   Thu Aug 13 06:55:27 2026  4-12:57:08 rsyslogd        /usr/sbin/rsyslogd -n -iNONE
+    114       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 scsi_eh_0       [scsi_eh_0]
+    116       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 scsi_eh_1       [scsi_eh_1]
+    190       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 scsi_eh_2       [scsi_eh_2]
+    115       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 scsi_tmf_0      [scsi_tmf_0]
+    117       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 scsi_tmf_1      [scsi_tmf_1]
+    191       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 scsi_tmf_2      [scsi_tmf_2]
+      5       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 slub_flushwq    [slub_flushwq]
+  49014       1 root     Thu Aug 13 06:41:25 2026  4-13:11:10 sshd            sshd: /usr/sbin/sshd -D [listener] 2 of 10-100 startups
+ 338247   49014 root     Mon Aug 17 19:51:10 2026       01:25 sshd            sshd: root [priv]
+ 338248  338247 sshd     Mon Aug 17 19:51:10 2026       01:25 sshd            sshd: root [net]
+ 338583   49014 root     Mon Aug 17 19:52:32 2026       00:03 sshd            sshd: root@notty
+ 338592   49014 root     Mon Aug 17 19:52:34 2026       00:01 sshd            sshd: [accepted]
+      1       0 root     Wed Aug 12 09:33:25 2026  5-10:19:10 systemd         /lib/systemd/systemd --system --deserialize 22
+ 338586       1 root     Mon Aug 17 19:52:34 2026       00:01 systemd         /lib/systemd/systemd --user
+ 338662       1 root     Mon Aug 17 19:52:35 2026       00:00 systemd-hostnam /lib/systemd/systemd-hostnamed
+ 102662       1 root     Thu Aug 13 06:51:39 2026  4-13:00:56 systemd-journal /lib/systemd/systemd-journald
+    729       1 root     Wed Aug 12 09:33:35 2026  5-10:19:00 systemd-logind  /lib/systemd/systemd-logind
+ 102655       1 systemd+ Thu Aug 13 06:51:39 2026  4-13:00:56 systemd-network /lib/systemd/systemd-networkd
+ 102660       1 systemd+ Thu Aug 13 06:51:39 2026  4-13:00:56 systemd-resolve /lib/systemd/systemd-resolved
+ 136350       1 root     Thu Aug 13 07:00:12 2026  4-12:52:23 systemd-udevd   /lib/systemd/systemd-udevd
+     99       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 tpm_dev_wq      [tpm_dev_wq]
+  85308       1 root     Thu Aug 13 06:46:18 2026  4-13:06:17 udisksd         /usr/libexec/udisks2/udisksd
+    771       1 root     Wed Aug 12 09:33:35 2026  5-10:19:00 unattended-upgr /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+  18717       1 root     Wed Aug 12 10:13:53 2026  5-09:38:42 upowerd         /usr/libexec/upowerd
+ 193823       1 root     Thu Aug 13 10:35:03 2026  4-09:17:32 uvicorn         /opt/moodify/music-bff/.venv/bin/python3 /opt/moodify/music-bff/.venv/bin/uvicorn moodify_music.bff.main:app --host 127.0.0.1 --port 8100 --workers 1
+ 235704       1 moodify  Sun Aug 16 16:07:42 2026  1-03:44:53 uvicorn         /opt/moodify/venv/bin/python3 /opt/moodify/venv/bin/uvicorn moodify.api.main:app --host 127.0.0.1 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips=127.0.0.1
+    119       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 vfio-irqfd-clea [vfio-irqfd-clea]
+    104       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 watchdogd       [watchdogd]
+     45       2 root     Wed Aug 12 09:33:25 2026  5-10:19:10 writeback       [writeback]
+    134       2 root     Wed Aug 12 09:33:27 2026  5-10:19:08 zswap-shrink    [zswap-shrink]
+
+
+===== SYSTEMD RUNNING SERVICES =====
+
+$ systemctl list-units --type=service --state=running --no-pager
+  UNIT                        LOAD   ACTIVE SUB     DESCRIPTION
+  chrony.service              loaded active running chrony, an NTP client/server
+  cloudflared-moodify.service loaded active running Cloudflare Tunnel for Moodify web origins
+  containerd.service          loaded active running containerd container runtime
+  cron.service                loaded active running Regular background program processing daemon
+  dbus.service                loaded active running D-Bus System Message Bus
+  docker.service              loaded active running Docker Application Container Engine
+  getty@tty1.service          loaded active running Getty on tty1
+  irqbalance.service          loaded active running irqbalance daemon
+  ModemManager.service        loaded active running Modem Manager
+  moodify-api.service         loaded active running Moodify Ear FastAPI service
+  moodify-music-bff.service   loaded active running Moodify Music Public BFF (LA)
+  moodify-music.service       loaded active running Moodify Music Platform
+  moodify-worker.service      loaded active running Moodify Ear unattended auditory worker
+  multipathd.service          loaded active running Device-Mapper Multipath Device Controller
+  networkd-dispatcher.service loaded active running Dispatcher daemon for systemd-networkd
+  nginx.service               loaded active running A high performance web server and a reverse proxy server
+  packagekit.service          loaded active running PackageKit Daemon
+  polkit.service              loaded active running Authorization Manager
+  rsyslog.service             loaded active running System Logging Service
+  ssh.service                 loaded active running OpenBSD Secure Shell server
+  systemd-hostnamed.service   loaded active running Hostname Service
+  systemd-journald.service    loaded active running Journal Service
+  systemd-logind.service      loaded active running User Login Management
+  systemd-networkd.service    loaded active running Network Configuration
+  systemd-resolved.service    loaded active running Network Name Resolution
+  systemd-udevd.service       loaded active running Rule-based Manager for Device Events and Files
+  udisks2.service             loaded active running Disk Manager
+  unattended-upgrades.service loaded active running Unattended Upgrades Shutdown
+  upower.service              loaded active running Daemon for power management
+  user@0.service              loaded active running User Manager for UID 0
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+30 loaded units listed.
+
+$ systemctl list-timers --all --no-pager
+NEXT                        LEFT               LAST                        PASSED        UNIT                           ACTIVATES
+Mon 2026-08-17 19:52:49 CST 14s left           Mon 2026-08-17 13:09:47 CST 6h ago        ua-timer.timer                 ua-timer.service
+Mon 2026-08-17 21:50:28 CST 1h 57min left      Mon 2026-08-17 08:51:57 CST 11h ago       fwupd-refresh.timer            fwupd-refresh.service
+Tue 2026-08-18 00:00:00 CST 4h 7min left       Mon 2026-08-17 00:00:14 CST 19h ago       dpkg-db-backup.timer           dpkg-db-backup.service
+Tue 2026-08-18 00:00:00 CST 4h 7min left       Mon 2026-08-17 00:00:14 CST 19h ago       logrotate.timer                logrotate.service
+Tue 2026-08-18 03:02:03 CST 7h left            Mon 2026-08-17 16:32:04 CST 3h 20min ago  motd-news.timer                motd-news.service
+Tue 2026-08-18 03:07:44 CST 7h left            Mon 2026-08-17 01:06:05 CST 18h ago       man-db.timer                   man-db.service
+Tue 2026-08-18 06:13:09 CST 10h left           Mon 2026-08-17 06:55:58 CST 12h ago       apt-daily-upgrade.timer        apt-daily-upgrade.service
+Tue 2026-08-18 09:38:53 CST 13h left           Mon 2026-08-17 09:38:53 CST 10h ago       update-notifier-download.timer update-notifier-download.service
+Tue 2026-08-18 09:49:39 CST 13h left           Mon 2026-08-17 09:49:39 CST 10h ago       systemd-tmpfiles-clean.timer   systemd-tmpfiles-clean.service
+Tue 2026-08-18 11:00:30 CST 15h left           Mon 2026-08-17 19:06:39 CST 45min ago     apt-daily.timer                apt-daily.service
+Sun 2026-08-23 03:10:07 CST 5 days left        Sun 2026-08-16 03:10:27 CST 1 day 16h ago e2scrub_all.timer              e2scrub_all.service
+Mon 2026-08-24 00:28:27 CST 6 days left        Mon 2026-08-17 00:09:39 CST 19h ago       fstrim.timer                   fstrim.service
+Sat 2026-08-29 09:58:54 CST 1 week 4 days left Sun 2026-08-16 16:03:17 CST 1 day 3h ago  update-notifier-motd.timer     update-notifier-motd.service
+n/a                         n/a                n/a                         n/a           apport-autoreport.timer        apport-autoreport.service
+n/a                         n/a                n/a                         n/a           snapd.snap-repair.timer        
+
+15 timers listed.
+
+
+===== CRON LOCATIONS =====
+-rw-r--r-- 1 root root 1142 Aug 12 09:25 /etc/crontab
+total 16
+drwxr-xr-x   2 root root 4096 Feb 18  2023 .
+drwxr-xr-x 119 root root 4096 Aug 16 16:13 ..
+-rw-r--r--   1 root root  201 Jan  9  2022 e2scrub_all
+-rw-r--r--   1 root root  102 Mar 23  2022 .placeholder
+
+$ crontab -l
+no crontab for root
+
+
+===== RUNTIMES =====
+Python 3.10.12
+ffmpeg version 4.4.2-0ubuntu0.22.04.1 Copyright (c) 2000-2021 the FFmpeg developers
+built with gcc 11 (Ubuntu 11.2.0-19ubuntu1)
+configuration: --prefix=/usr --extra-version=0ubuntu0.22.04.1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --enable-gnutls --enable-ladspa --enable-libaom --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libcodec2 --enable-libdav1d --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libjack --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librabbitmq --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libsrt --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg --enable-libzmq --enable-libzvbi --enable-lv2 --enable-omx --enable-openal --enable-opencl --enable-opengl --enable-sdl2 --enable-pocketsphinx --enable-librsvg --enable-libmfx --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-libx264 --enable-shared
+ffprobe version 4.4.2-0ubuntu0.22.04.1 Copyright (c) 2007-2021 the FFmpeg developers
+built with gcc 11 (Ubuntu 11.2.0-19ubuntu1)
+configuration: --prefix=/usr --extra-version=0ubuntu0.22.04.1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --enable-gnutls --enable-ladspa --enable-libaom --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libcodec2 --enable-libdav1d --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libjack --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librabbitmq --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libsrt --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg --enable-libzmq --enable-libzvbi --enable-lv2 --enable-omx --enable-openal --enable-opencl --enable-opengl --enable-sdl2 --enable-pocketsphinx --enable-librsvg --enable-libmfx --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-libx264 --enable-shared
+git version 2.34.1
+Docker version 29.1.3, build 29.1.3-0ubuntu3~22.04.2
+CONTAINER ID                                                       IMAGE                                                                                     COMMAND                                CREATED        STATUS                  PORTS                       NAMES
+9505b3aa9ad4a7c1ccb8c6385926f98c056c8b69b9a68d221859627cb4f68bc8   psyb0t/audiolla@sha256:1b76f692326e9311be2d92c3d9b8050b593bba5b93395067bfd1b2610a8af03a   "/usr/local/bin/audiolla-entrypoint"   24 hours ago   Up 24 hours (healthy)   127.0.0.1:18080->8000/tcp   moodify-audiolla
+WARNING: This output is designed for human readability. For machine-readable output, please use --format.
+IMAGE                    ID             DISK USAGE   CONTENT SIZE   EXTRA
+psyb0t/audiolla:latest   1b76f692326e       4.12GB         1.02GB   U    
+v20.19.4
+10.8.2
+
+
+===== LIKELY MOODIFY PATHS =====
+/opt/moodify
+/opt/moodify/releases/20260812T033521Z/moodify-core-package
+/opt/moodify/releases/20260816T080310Z/moodify-core-package
+/opt/moodify/releases/20260812T034741Z/moodify-core-package
+/opt/moodify/releases/20260812T033921Z/moodify-core-package
+/opt/moodify/releases/20260812T033024Z/moodify-core-package
+/opt/moodify/releases/20260812T032946Z/moodify-core-package
+/opt/moodify/releases/20260812T033122Z/moodify-core-package
+/opt/moodify/releases/20260816T080724Z/moodify-core-package
+/opt/moodify/releases/20260812T033339Z/moodify-core-package
+/opt/moodify/music-bff/src/moodify_music
+/opt/moodify/moodify-core-package
+/opt/moodify/moodify-core-package/src/moodify
+/opt/moodify/moodify-core-package/src/moodify_experimental
+/opt/moodify/moodify-core-package/src/moodify.egg-info
+/srv/moodify
+/root/moodify-ear-remote
+/root/moodify-baseline-recovery
+/root/moodify-ops
+
+
+===== GIT IDENTITIES IN LIKELY MOODIFY REPOS =====
+
+
+===== ENVIRONMENT VARIABLE NAMES ONLY =====
+
+
+===== END =====
+W01-P00 read-only node scan finished.

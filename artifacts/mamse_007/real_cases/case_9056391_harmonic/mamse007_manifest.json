@@ -1,0 +1,21 @@
+{
+  "schema_version": "mamse-007-manifest-v1",
+  "operator_id": "MAMSE-007",
+  "operator_version": "0.1.0",
+  "basis_id": "basis-b7d0b97255c1e2bf",
+  "basis_version": "mamse007-pca-v0.1",
+  "mode": "CASE_LOCAL",
+  "config_hash": "7da662067a9d69ccf55941ec6d1a9c95a6399d73660a8390ab70f217185c33c6",
+  "feature_schema_hash": "705c58aeb86ce5651a51658bd17f98b15d81d3cd517a08c8149402c3427b379e",
+  "source_sha256": "real:case_9056391_harmonic",
+  "git_commit": "89633c4ddcf04d0058bf429ea06dbe02d51230cd",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "resource": {
+    "runtime_seconds": 0.007229700000607409
+  },
+  "generated_at_utc": "2026-08-11T11:45:17+00:00"
+}

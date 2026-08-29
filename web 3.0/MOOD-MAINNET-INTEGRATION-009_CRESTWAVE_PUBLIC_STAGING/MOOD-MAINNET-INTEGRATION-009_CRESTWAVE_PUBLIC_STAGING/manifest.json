@@ -1,0 +1,25 @@
+{
+  "package_id": "MOOD-MAINNET-INTEGRATION-009",
+  "name": "Crestwave Public Staging",
+  "repo": "huliye24/moodify-ai",
+  "staging_domain": "test.crestwavecoin.com",
+  "chain": "BNB Smart Chain Mainnet",
+  "chain_id": 56,
+  "mood_contract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+  "mode": "public-staging-read-only-mainnet",
+  "distributor_deployment": false,
+  "asset_movement": false,
+  "files": [
+    "00_README.md",
+    "01_TASK_SPEC.md",
+    "02_EXECUTION_PLAN.md",
+    "03_CODEX_EXECUTION_PROMPT.md",
+    "04_SECURITY_GATES.md",
+    "05_ACCEPTANCE_CHECKLIST.md",
+    "06_ENVIRONMENT_TEMPLATE.md",
+    "07_CLOUDFLARE_STAGING.md",
+    "08_FINAL_REPORT_TEMPLATE.md",
+    "09_CONTEXT_SNAPSHOT.md",
+    "10_HUMAN_GATES.md"
+  ]
+}

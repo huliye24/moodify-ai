@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify P02 Node Role",
+  "type": "object",
+  "required": [
+    "node_id",
+    "observed_identity",
+    "primary_role",
+    "forbidden_roles",
+    "failure_domain",
+    "evidence_ref"
+  ],
+  "properties": {
+    "node_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provider": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "primary_role": {
+      "enum": [
+        "CONTROL_API",
+        "JOB_ORCHESTRATION",
+        "CPU_WORKER",
+        "GPU_WORKER",
+        "EXTERNAL_AUDIO_SERVICE",
+        "METADATA_DB",
+        "OBJECT_STORAGE",
+        "PLAYBACK_DELIVERY",
+        "OBSERVABILITY",
+        "DEV_TEST_ONLY",
+        "RESERVE_UNUSED"
+      ]
+    },
+    "secondary_roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "capacity_limit": {
+      "type": "string"
+    },
+    "concurrency_limit": {
+      "type": [
+        "integer",
+        "string"
+      ]
+    },
+    "data_locality": {
+      "type": "string"
+    },
+    "failure_domain": {
+      "type": "string"
+    },
+    "recovery_owner": {
+      "type": "string"
+    },
+    "evidence_ref": {
+      "type": "string"
+    },
+    "decision_reason": {
+      "type": "string"
+    },
+    "revisit_trigger": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

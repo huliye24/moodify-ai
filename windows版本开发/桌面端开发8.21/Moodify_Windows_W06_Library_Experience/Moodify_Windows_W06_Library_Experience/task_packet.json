@@ -1,0 +1,42 @@
+{
+  "package_id": "MFY-WIN-W06-LIBRARY-EXPERIENCE-001",
+  "product": "Moodify Music / Moodify Player",
+  "platform": "Windows Desktop",
+  "phase": "DESKTOP_COMPLETION",
+  "sequence": 6,
+  "total_packages": 12,
+  "title": "Library Experience 音乐管理体验",
+  "date": "2026-08-21",
+  "precondition": "artifacts/windows/w05/W06_HANDOFF.md => W06_GATE = PASS",
+  "canon_change": false,
+  "visual_redesign": false,
+  "starts_next_package": false,
+  "focus": [
+    "All Songs",
+    "Recently Added",
+    "History authority",
+    "Recently Played",
+    "Favorites",
+    "Search",
+    "Sort",
+    "Metadata fallback",
+    "Track action reuse",
+    "Persistence",
+    "Performance baseline"
+  ],
+  "out_of_scope": [
+    "album/artist complex pages",
+    "recommendation",
+    "AI search",
+    "lyrics",
+    "social",
+    "ratings/comments",
+    "smart playlists",
+    "complex filters",
+    "skin community",
+    "DSP",
+    "Windows native integration",
+    "visual redesign"
+  ],
+  "next_package": "W07 Desktop Interaction 桌面交互层"
+}

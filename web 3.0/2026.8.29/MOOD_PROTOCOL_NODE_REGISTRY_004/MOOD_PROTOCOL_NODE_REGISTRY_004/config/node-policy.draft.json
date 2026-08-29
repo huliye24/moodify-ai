@@ -1,0 +1,27 @@
+{
+  "nodePolicyVersion": "004-draft-1",
+  "status": "draft",
+  "nodeTypes": [
+    "developer",
+    "compute",
+    "data",
+    "storage",
+    "validation",
+    "gateway"
+  ],
+  "publicLocationDefaultPrecision": "country",
+  "endpointRequiredByType": {
+    "developer": false,
+    "compute": true,
+    "data": false,
+    "storage": true,
+    "validation": true,
+    "gateway": true
+  },
+  "capabilityVerificationRequiredForActive": false,
+  "notes": [
+    "Bootstrap draft. Reuse existing authoritative policy if present.",
+    "Node verification and capability verification are separate.",
+    "No node economics in MPF-004."
+  ]
+}

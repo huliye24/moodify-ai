@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "decision": "package_extracted_tree",
+  "scope": "Moodify Ear v1 chapters 02-04",
+  "authoritative_pattern": "Moodify_Ear_v1_Chapter_NN_Package/Moodify_Ear_v1_Chapter_NN/",
+  "duplicate_pattern": "Moodify_Ear_v1_Chapter_NN/",
+  "comparison": {
+    "algorithm": "SHA-256",
+    "chapters": [
+      {"chapter": 2, "files_compared": 5, "byte_identical": 5, "different": 0},
+      {"chapter": 3, "files_compared": 5, "byte_identical": 5, "different": 0},
+      {"chapter": 4, "files_compared": 5, "byte_identical": 5, "different": 0}
+    ]
+  },
+  "rationale": "The package-extracted tree follows the same layout as chapters 05-20 and all compared files are byte-identical to the extra top-level copies.",
+  "destructive_action": "none",
+  "human_review_required": false
+}

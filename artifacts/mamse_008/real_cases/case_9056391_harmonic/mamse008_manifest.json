@@ -1,0 +1,30 @@
+{
+  "schema_version": "mamse-008-manifest-v1",
+  "operator_id": "MAMSE-008",
+  "algorithm_version": "mamse008-nmf-v0.1",
+  "basis_id": "nmfbasis-6f88d4cc2555b1ca",
+  "config_hash": "c0fd830887d2bc05ff136432b03e62578c71e9de958532b5943a14a3ea45f48a",
+  "config": {
+    "rank": 3,
+    "beta": 2.0,
+    "max_iter": 300,
+    "tol": 1e-06,
+    "l1_h": 0.0,
+    "l1_w": 0.0,
+    "seed": 0,
+    "init": "nndsvd",
+    "normalize_w": true
+  },
+  "status": "OK",
+  "git_commit": "6ce2635f5009b7e79f837ce1d2919151a4623db3",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "resource": {
+    "runtime_seconds": 0.0748890000013489,
+    "iterations": 300
+  },
+  "generated_at_utc": "2026-08-11T11:54:31+00:00"
+}

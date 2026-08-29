@@ -1,0 +1,8 @@
+{
+  "output_root": "workspace",
+  "required_outputs": [
+    "schemas/ear_v1/before_after_comparison.schema.json",
+    "tests/ear_v1_contracts/test_before_after_schema.py"
+  ],
+  "non_empty": true
+}

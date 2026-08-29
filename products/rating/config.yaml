@@ -1,0 +1,29 @@
+# Moodify Rating — AI Music Asset Rating configuration
+product:
+  name: "Moodify Rating"
+  full_name: "AI Music Asset Rating"
+  version: "0.1.0"
+  api_namespace: "/api/v1/rating"
+
+grading:
+  tiers: [S, A, B, C, D]
+  dimensions:
+    - commercial_potential
+    - artistic_quality
+    - technical_quality
+    - originality
+
+tagging:
+  emotion:
+    model: "knowledge/emotion_targets"
+  scene:
+    categories: [game, film, advertising, streaming, live]
+
+analysis:
+  risk_assessment: enabled
+  identity_ranking: enabled
+  market_fit: enabled
+
+migration:
+  status: "PHASE_A_STRUCTURE_CREATED"
+  source: "moodify-core-package/src/moodify/"
