@@ -1,0 +1,29 @@
+{
+  "schema_version": "mood.genesis-integration-baseline.v1",
+  "captured_at": "2026-08-30T00:00:00+08:00",
+  "integration_branch": "codex/mood-genesis-integration-026",
+  "origin_main": "e24b29f57276999b378f46a478c1914f6198e685",
+  "whitepaper": {
+    "name": "MOOD_中文白皮书_v0.1.pdf",
+    "sha256": "176E0CF2ACF9EE40546D39F370A1C02FEB34A1277CC9CE99FEBD0E5227FF1EB5",
+    "pages": 16
+  },
+  "package_tips": {
+    "011": "429fbbb34abcbaf11be0cce16987bc3d0102296f",
+    "012": "3fbd2cd678c8e1475759e7bb6c4417db47831097",
+    "013": "660d613d92ff9708d4524cd9ee5a294e3b290c07",
+    "014": "72e582eb02730f50599164e2a2a73a29a0ef066f",
+    "015": "cf9df8a81bec4c8c252c63af194291b1d3aeb71c",
+    "016": "5e8a44a2a2b0ab499baa44bacf16f3853f05d341",
+    "017": "0a7a669f2cd40cdf01ff55be5c713a03f8da625e",
+    "018": "1a3b79331a23421f6a8e9e83e095061a0c0e2449",
+    "019": "70727ec8b4c6d9db5f90b5b743299c4ff8094a5a",
+    "020": "3dde397ced8d2f04d9423528445519b6436e410b"
+  },
+  "claims": {
+    "public_genesis_deployed": "UNVERIFIED",
+    "real_participants_loaded": "UNVERIFIED",
+    "end_to_end_proof_chain": "UNVERIFIED",
+    "token_launch_authorized": false
+  }
+}
