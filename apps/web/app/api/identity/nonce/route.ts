@@ -16,9 +16,9 @@
  *   }
  */
 
-import { Passport } from "../../../lib/mood/passport/index.ts";
-import { normalizeEvmAddress } from "../../../lib/mood/passport/evm-address.ts";
-import { jsonError } from "./_helpers.ts";
+import { Passport } from "@/lib/mood/passport/index.ts";
+import { normalizeEvmAddress } from "@/lib/mood/passport/evm-address.ts";
+import { jsonError } from "@/app/api/identity/_helpers.ts";
 
 export const dynamic = "force-dynamic";
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { networkObservatory } from "../../../../lib/mood/network/observatory.ts";
+import { networkObservatory } from "@/lib/mood/network/observatory.ts";
 
 export const dynamic = "force-dynamic";
 

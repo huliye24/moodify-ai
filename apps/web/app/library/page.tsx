@@ -8,8 +8,8 @@ import {
   listArchived,
   STATUS_LABEL,
   formatSha256,
-} from "../../../lib/mood/library";
-import type { LibraryDocument } from "../../../lib/mood/library";
+} from "@/lib/mood/library";
+import type { LibraryDocument } from "@/lib/mood/library";
 import LibraryFilters from "./LibraryFilters";
 
 export const metadata: Metadata = {

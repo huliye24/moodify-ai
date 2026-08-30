@@ -144,7 +144,6 @@ export class NodeRegistry {
     const n = this.requireNode(nodeId);
     if (n.status === "retired" || n.status === "draft") return n.status;
     if (n.status === "maintenance") return "maintenance";
-    if (n.status === "paused") return "paused";
     // active/degraded/offline derived from heartbeat
     if (!n.lastSeenAt) return "offline";
     const age = Date.now() - new Date(n.lastSeenAt).getTime();

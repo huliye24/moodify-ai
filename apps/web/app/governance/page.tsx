@@ -57,7 +57,7 @@ export default function GovernancePage() {
   useEffect(() => {
     fetch("/api/governance/mips")
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) setError(j.error.message);
         else {
           setMips(j.mips ?? []);

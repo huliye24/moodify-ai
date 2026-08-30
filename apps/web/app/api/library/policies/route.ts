@@ -11,14 +11,14 @@
 
 import {
   classifyPolicy,
-} from "../../../lib/mood/passport/index.ts";
-import { libraryRegistry } from "../../../lib/mood/library/index.ts";
+} from "@/lib/mood/passport/index.ts";
+import { listDocuments } from "@/lib/mood/library/index.ts";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<Response> {
   try {
-    const docs = libraryRegistry.listDocuments();
+    const docs = listDocuments();
     const policies = docs
       .map((d) => classifyPolicy(d))
       .filter((p) => p.status === "active" || p.status === "draft")

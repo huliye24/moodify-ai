@@ -27,7 +27,7 @@ export default function BuildPage() {
   useEffect(() => {
     fetch("/api/contribution/tasks")
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) {
           setError(j.error.message);
         } else {

@@ -13,7 +13,7 @@ export default function PortalPage() {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    void import("../lib/music-client").then(({ api }) => {
+    void import("@/lib/music-client").then(({ api }) => {
       void api.bootstrap().then((u) => {
         setMe(u);
         setConnected(Boolean(u.id));

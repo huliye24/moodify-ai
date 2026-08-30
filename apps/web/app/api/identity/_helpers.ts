@@ -4,8 +4,8 @@
  * Helpers for /api/identity/* routes: same auth pattern everywhere.
  */
 
-import type { Resident } from "../lib/mood/passport/types.ts";
-import { defaultResidentRegistry } from "../lib/mood/passport/index.ts";
+import type { Resident } from "@/lib/mood/passport/types.ts";
+import { defaultResidentRegistry } from "@/lib/mood/passport/index.ts";
 
 export const SESSION_COOKIE_NAME = "mood_session";
 

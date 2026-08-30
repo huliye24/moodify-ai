@@ -32,7 +32,7 @@ export default function NodesPage() {
   useEffect(() => {
     fetch("/api/nodes")
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) setError(j.error.message);
         else {
           setNodes(j.nodes ?? []);

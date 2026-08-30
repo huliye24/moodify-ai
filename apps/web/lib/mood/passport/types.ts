@@ -14,6 +14,8 @@
 
 // ─── Core Entities ────────────────────────────────────────────────────────────
 
+export type ResidentId = string;
+
 export type ResidentStatus = "active" | "suspended" | "deleted";
 
 export interface Resident {

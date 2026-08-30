@@ -38,7 +38,7 @@ export default function BuildTaskPage() {
     if (!slug) return;
     fetch(`/api/contribution/tasks/${slug}`)
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) setError(j.error.message);
         else setTask(j.task);
       })
@@ -48,7 +48,7 @@ export default function BuildTaskPage() {
         if (r.status === 401) return null;
         return r.json();
       })
-      .then((j) => {
+      .then((j: any) => {
         if (j) setMe(j);
       })
       .catch(() => {/* not signed in */});
@@ -81,7 +81,7 @@ export default function BuildTaskPage() {
           body: JSON.stringify({ summary, evidenceItems }),
         },
       );
-      const j = await res.json();
+      const j: any = await res.json();
       if (j.error) {
         setError(j.error.message);
       } else {

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { api } from "../../../lib/music-client";
-import type { BootstrapUser, CreatorPage as CreatorPageDto } from "../../../lib/music-client";
+import { api } from "@/lib/music-client";
+import type { BootstrapUser, CreatorPage as CreatorPageDto } from "@/lib/music-client";
 
 export default function CreatorPage({ params }: { params: Promise<{ handle: string }> }) {
   const [page, setPage] = useState<CreatorPageDto | null>(null);

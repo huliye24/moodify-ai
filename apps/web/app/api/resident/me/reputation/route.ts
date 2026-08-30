@@ -11,8 +11,8 @@
  * This endpoint shape is the contract for 016's push path.
  */
 
-import { defaultResidentRegistry } from "../../../../lib/mood/passport/index.ts";
-import { jsonError, requireResident } from "../../identity/_helpers.ts";
+import { defaultResidentRegistry } from "@/lib/mood/passport/index.ts";
+import { jsonError, requireResident } from "@/app/api/identity/_helpers.ts";
 
 export const dynamic = "force-dynamic";
 

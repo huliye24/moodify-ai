@@ -77,7 +77,7 @@ export default function MipDetailPage() {
     if (!params?.id) return;
     fetch(`/api/governance/mips/${encodeURIComponent(params.id)}`)
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) setError(j.error.message);
         else setMip(j.mip ?? null);
       })

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { api, lifecycle, DraftStage } from "../../lib/music-client";
+import { api, lifecycle, DraftStage } from "@/lib/music-client";
 
 export default function DraftsPage() {
   const [drafts, setDrafts] = useState<DraftStage[] | null>(null);

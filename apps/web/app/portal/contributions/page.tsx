@@ -30,7 +30,7 @@ export default function MyContributionsPage() {
         if (r.status === 401) return null;
         return r.json();
       })
-      .then((j) => {
+      .then((j: any) => {
         if (j) setMe(j);
       })
       .catch(() => {/* not signed in */});
@@ -42,7 +42,7 @@ export default function MyContributionsPage() {
       const res = await fetch("/api/resident/me/contributions", {
         credentials: "same-origin",
       });
-      const j = await res.json();
+      const j: any = await res.json();
       if (j.error) setError(j.error.message);
       else setSubs(j.submissions ?? []);
     } catch (e) {

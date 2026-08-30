@@ -2,8 +2,8 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { api, consoleApi, ConsoleTrack } from "../../lib/music-client";
-import type { BootstrapUser } from "../../lib/music-client";
+import { api, consoleApi, ConsoleTrack } from "@/lib/music-client";
+import type { BootstrapUser } from "@/lib/music-client";
 
 export default function ConsolePage() {
   const [me, setMe] = useState<BootstrapUser | null>(null);

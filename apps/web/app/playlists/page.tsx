@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { api, playlists, type BootstrapUser, type PlaylistDto } from "../../lib/music-client";
+import { api, playlists, type BootstrapUser, type PlaylistDto } from "@/lib/music-client";
 
 export default function PlaylistsPage() {
   const [me, setMe] = useState<BootstrapUser | null>(null);

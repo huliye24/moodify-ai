@@ -10,8 +10,8 @@ import {
   isRequestOnHttpsOrigin,
   jsonError,
   readSessionCookie,
-} from "./_helpers.ts";
-import { defaultResidentRegistry } from "../../../lib/mood/passport/index.ts";
+} from "@/app/api/identity/_helpers.ts";
+import { defaultResidentRegistry } from "@/lib/mood/passport/index.ts";
 
 export const dynamic = "force-dynamic";
 

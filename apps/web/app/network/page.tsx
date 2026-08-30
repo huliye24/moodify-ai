@@ -57,11 +57,11 @@ export default function NetworkPage() {
   useEffect(() => {
     fetch("/api/network/overview")
       .then((r) => r.json())
-      .then((j) => setOverview(j))
+      .then((j: any) => setOverview(j))
       .catch((e) => setError((e as Error).message));
     fetch("/api/network/activity?limit=20")
       .then((r) => r.json())
-      .then((j) => setActivity(j.events ?? []))
+      .then((j: any) => setActivity(j.events ?? []))
       .catch((e) => setError((e as Error).message));
   }, []);
 

@@ -18,17 +18,17 @@
  *   signature   : 0x-prefixed hex signature
  */
 
-import { Passport } from "../../../lib/mood/passport/index.ts";
+import { Passport } from "@/lib/mood/passport/index.ts";
 import {
   FAIL_CLOSED_RECOVER,
   type RecoverAddressFn,
-} from "../../../lib/mood/passport/signature.ts";
-import { FAKE_RECOVER_FOR_TEST } from "../../../lib/mood/passport/test-recover.ts";
+} from "@/lib/mood/passport/signature.ts";
+import { FAKE_RECOVER_FOR_TEST } from "@/lib/mood/passport/test-recover.ts";
 import {
   buildSessionCookie,
   isRequestOnHttpsOrigin,
   jsonError,
-} from "./_helpers.ts";
+} from "@/app/api/identity/_helpers.ts";
 
 export const dynamic = "force-dynamic";
 

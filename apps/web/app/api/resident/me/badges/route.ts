@@ -4,8 +4,8 @@
  * Owner-only. Returns the badges awarded to the current Resident.
  */
 
-import { defaultResidentRegistry } from "../../../../lib/mood/passport/index.ts";
-import { jsonError, requireResident } from "../../identity/_helpers.ts";
+import { defaultResidentRegistry } from "@/lib/mood/passport/index.ts";
+import { jsonError, requireResident } from "@/app/api/identity/_helpers.ts";
 
 export const dynamic = "force-dynamic";
 

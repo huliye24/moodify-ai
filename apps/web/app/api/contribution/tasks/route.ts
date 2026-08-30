@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import {
   contributionRegistry,
-  type ContributionCategory,
-} from "../../../../lib/mood/contribution/registry.ts";
+} from "@/lib/mood/contribution/registry.ts";
+import type { ContributionCategory } from "@/lib/mood/contribution/types.ts";
 
 export const dynamic = "force-dynamic";
 

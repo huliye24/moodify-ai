@@ -30,7 +30,7 @@ export default function AgentsPage() {
   useEffect(() => {
     fetch("/api/agents")
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) setError(j.error.message);
         else {
           setAgents(j.agents ?? []);

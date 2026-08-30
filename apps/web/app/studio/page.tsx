@@ -2,8 +2,8 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { api, lifecycle } from "../../lib/music-client";
-import type { BootstrapUser, MediaUpload } from "../../lib/music-client";
+import { api, lifecycle } from "@/lib/music-client";
+import type { BootstrapUser, MediaUpload } from "@/lib/music-client";
 
 type Attempt = {
   fingerprint: string;

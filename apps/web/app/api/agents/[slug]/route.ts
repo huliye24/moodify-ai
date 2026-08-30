@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { agentRegistry } from "../../../../../lib/mood/agents/registry.ts";
+import { agentRegistry } from "@/lib/mood/agents/registry.ts";
 
 export const dynamic = "force-dynamic";
 

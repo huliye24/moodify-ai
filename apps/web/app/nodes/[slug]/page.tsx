@@ -32,7 +32,7 @@ export default function NodeDetailPage() {
     if (!slug) return;
     fetch(`/api/nodes/${slug}`)
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) setError(j.error.message);
         else setNode(j.node);
       })

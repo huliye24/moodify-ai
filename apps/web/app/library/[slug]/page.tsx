@@ -10,8 +10,8 @@ import {
   formatSha256,
   economicsDraftDisclaimer,
   historicalSecurityDisclaimer,
-} from "../../../../lib/mood/library";
-import type { LibraryDocument } from "../../../../lib/mood/library";
+} from "@/lib/mood/library";
+import type { LibraryDocument } from "@/lib/mood/library";
 
 export function generateStaticParams() {
   return LIBRARY_DOCUMENTS.map((doc) => ({ slug: doc.slug }));

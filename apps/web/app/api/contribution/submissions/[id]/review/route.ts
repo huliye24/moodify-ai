@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { contributionRegistry } from "../../../../../lib/mood/contribution/registry.ts";
+import { contributionRegistry } from "@/lib/mood/contribution/registry.ts";
 
 export const dynamic = "force-dynamic";
 

@@ -34,7 +34,7 @@ export default function AgentDetailPage() {
     if (!slug) return;
     fetch(`/api/agents/${slug}`)
       .then((r) => r.json())
-      .then((j) => {
+      .then((j: any) => {
         if (j.error) setError(j.error.message);
         else setAgent(j.agent);
       })

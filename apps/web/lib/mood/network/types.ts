@@ -60,6 +60,7 @@ export type ActivityKind =
   | "ReputationGranted"
   | "ApplicationRegistered"
   | "AgentRegistered"
+  | "AgentTaskCompleted"
   | "NodeRegistered"
   | "MIPPublished"
   | "MIPReviewStarted"

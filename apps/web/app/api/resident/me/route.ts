@@ -8,8 +8,8 @@
 import {
   defaultResidentRegistry,
   derivePublicProfile,
-} from "../../../lib/mood/passport/index.ts";
-import { jsonError, requireResident } from "../identity/_helpers.ts";
+} from "@/lib/mood/passport/index.ts";
+import { jsonError, requireResident } from "@/app/api/identity/_helpers.ts";
 
 export const dynamic = "force-dynamic";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api, BootstrapUser, LicenseIntentDto } from "../../lib/music-client";
+import { api, BootstrapUser, LicenseIntentDto } from "@/lib/music-client";
 
 export default function InboxPage() {
   const [me, setMe] = useState<BootstrapUser | null>(null);

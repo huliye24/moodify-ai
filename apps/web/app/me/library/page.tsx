@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { api, library, type BootstrapUser, type TrackDto } from "../../lib/music-client";
+import { api, library, type BootstrapUser, type TrackDto } from "@/lib/music-client";
 
 export default function LibraryPage() {
   const [me, setMe] = useState<BootstrapUser | null>(null);

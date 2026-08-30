@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { BootstrapUser } from "../lib/music-client";
+import type { BootstrapUser } from "@/lib/music-client";
 
 type Track = {
   id?: string;
@@ -64,14 +64,14 @@ export default function Home() {
   useEffect(() => {
     if (!query.trim()) return;
     const timer = setTimeout(() => {
-      void import("../lib/music-client").then(({ search }) =>
+      void import("@/lib/music-client").then(({ search }) =>
         search.tracks(query.trim()).then(setSearchResults).catch(() => setSearchResults({ tracks: [] }))
       );
     }, 300);
     return () => clearTimeout(timer);
   }, [query]);
   useEffect(() => {
-    void import("../lib/music-client").then(({ api }) => {
+    void import("@/lib/music-client").then(({ api }) => {
       void api.bootstrap().then((user) => setMe(user)).catch(() => null);
       void api.catalogue().then((c) => setLiveTracks(c.tracks.map((t) => ({
         id: t.id,
@@ -128,7 +128,7 @@ export default function Home() {
     setLiked((items) => items.includes(index) ? items.filter((item) => item !== index) : [...items, index]);
     if (track?.id && me?.id && me.capabilities?.account_actions) {
       const userId = me.id;
-      void import("../lib/music-client").then(({ api }) => {
+      void import("@/lib/music-client").then(({ api }) => {
         if (liked.includes(index)) void api.unfavorite(userId, track.id as string).catch(() => {});
         else void api.favorite(userId, track.id as string).catch(() => {});
       });
@@ -137,7 +137,7 @@ export default function Home() {
   const onPlay = () => {
     const track = all[active];
     if (track?.id) {
-      void import("../lib/music-client").then(({ api }) =>
+      void import("@/lib/music-client").then(({ api }) =>
         api.playEvent({ track_id: track.id as string, user_id: me?.id ?? null, session_id: sessionId, played_ms: 0, source: "discover" }).catch(() => {}),
       );
     }
@@ -155,7 +155,7 @@ export default function Home() {
       <nav>
         <button className="nav-active" aria-current="page">◉　发现音乐</button>
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-        {me?.capabilities?.account_actions && <a href="/me/library" className="nav-link">▥　我的音乐</a>}
+        {me?.capabilities?.account_actions && <a href="/library" className="nav-link">▥　MOOD Library</a>}
       </nav>
       {me && <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>聆听者</span></div></div>}
     </aside>
@@ -166,7 +166,7 @@ export default function Home() {
     )}
     <nav className={`drawer ${menuOpen ? "is-open" : ""}`} aria-label="菜单">
       <div className="drawer-header"><strong>菜单</strong><button onClick={() => setMenuOpen(false)} aria-label="关闭">✕</button></div>
-      {me?.capabilities?.account_actions && (<><a href="/me/library" className="drawer-item" onClick={() => setMenuOpen(false)}>▥　我的音乐</a><hr className="drawer-divider" /></>)}
+      {me?.capabilities?.account_actions && (<><a href="/library" className="drawer-item" onClick={() => setMenuOpen(false)}>▥　MOOD Library</a><hr className="drawer-divider" /></>)}
       <span className="drawer-label">关于</span>
       <a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏠 Moodify 官网</a>
       <a href="https://rongjingwenchuan.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏢 荣景文川</a>

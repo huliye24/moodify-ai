@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { api } from "../../lib/music-client";
+import { api } from "@/lib/music-client";
 
 export default function BetaLoginPage() {
   const [message, setMessage] = useState("受邀创作者可使用邀请码进入 Beta。邀请码不会保存在浏览器中。");
