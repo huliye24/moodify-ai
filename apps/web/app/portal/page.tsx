@@ -37,12 +37,18 @@ export default function PortalPage() {
           <li><Link href="/world">/world</Link></li>
           <li><Link href="/protocol">/protocol</Link></li>
           <li><Link href="/library">/library</Link> — Protocol documents (014)</li>
+          <li><Link href="/portal/passport">/portal/passport</Link> — Resident identity (015)</li>
+        </ul>
+        <h2>Passport</h2>
+        <ul>
+          <li><Link href="/portal/passport">Passport</Link></li>
+          <li>Contributions <span style={{ opacity: 0.55 }}>(016)</span></li>
+          <li>Reputation <span style={{ opacity: 0.55 }}>(016 / 020)</span></li>
+          <li><Link href="/portal/passport/settings">Settings</Link></li>
         </ul>
         <h2>Coming Next</h2>
         <ul>
-          <li>Passport (015)</li>
           <li>Contributions (016)</li>
-          <li>Reputation (016 / 020)</li>
           <li>Agents (018)</li>
           <li>Nodes (019)</li>
           <li>Governance (020)</li>
