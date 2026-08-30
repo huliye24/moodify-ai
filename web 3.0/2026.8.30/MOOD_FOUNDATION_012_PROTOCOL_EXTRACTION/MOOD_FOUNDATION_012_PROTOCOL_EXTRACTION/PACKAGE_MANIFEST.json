@@ -1,0 +1,22 @@
+{
+  "package_id": "MOOD-FOUNDATION-012",
+  "title": "Protocol Foundation Extraction",
+  "target_repo": "huliye24/moodify-ai",
+  "depends_on": "MOOD-FOUNDATION-011",
+  "created_at": "2026-08-30",
+  "token_launch": "OUT_OF_SCOPE",
+  "source_branch_of_interest": "codex/mood-mainnet-integration-009",
+  "files": [
+    "ACCEPTANCE.md",
+    "ARCHITECTURE_TARGET.md",
+    "CODEX_COMMAND.txt",
+    "EXTRACTION_MATRIX.md",
+    "GIT_SAFETY.md",
+    "HANDOFF_013.md",
+    "OUTPUT_TEMPLATE.md",
+    "PACKAGE_MANIFEST.json",
+    "README.md",
+    "TASK.md",
+    "TEST_PLAN.md"
+  ]
+}
