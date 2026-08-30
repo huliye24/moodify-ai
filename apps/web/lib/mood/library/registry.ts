@@ -160,7 +160,7 @@ const MOOD_DECISION_LOG: LibraryDocument = {
   githubUrl:
     "https://github.com/huliye24/moodify-ai/blob/main/docs/mood/DECISION_LOG.md",
   onlineUrl: "/library/mood-decision-log",
-  sha256: "0632b913dd151db43e6b18a28471391500b4166fb8224636b7dd635c1e4eff3d",
+  sha256: "aeb7f30d1623aa02d449154889a564950158716212175de2a6fa141d5b4acaa2",
   publishedAt: "2026-08-30",
   updatedAt: "2026-08-30",
 };
