@@ -140,6 +140,49 @@
 | 2026-08-30 | 最小更新 AGENTS.md / README.md 指向 MOOD Canon | MOOD FOUNDATION 011 |
 | 2026-08-30 | 标记 `codex/mood-mainnet-integration-009` DO NOT MERGE WHOLE | MOOD FOUNDATION 011 |
 | 2026-08-30 | 标记 `codex/moodify-classic-reconstruction-001` Genesis v1.0 进入 FREEZE | MOOD FOUNDATION 011 |
+| 2026-08-30 | 新增 `apps/web/lib/mood-launch-state.ts` 单点 runtime launch gate；默认 `foundation` | MOOD FOUNDATION 012 |
+| 2026-08-30 | 新增 `docs/mood/extraction/{012_SOURCE_AUDIT, 012_EXTRACTION_MANIFEST, 012_DEPENDENCY_MAP, 012_LEGACY_TOKEN_SEAMS, 012_FINAL_REPORT}.md` | MOOD FOUNDATION 012 |
+
+### MD-012-001 — 012 不修改 Canon
+
+- **Date：** 2026-08-30
+- **Topic：** 012 是否修改 Canon
+- **Decision：** 012 **不修改** Canon。012 引入 runtime launch gate（`apps/web/lib/mood-launch-state.ts`）作为 Canon 的执行工具，不改变对外身份、内部/外部边界、state machine authority、evidence authority、cloud control authority、data authority。
+- **Reviewer：** 012 implementation + 人类权威（待 012 接受后签发）
+- **Evidence：** `docs/mood/extraction/012_FINAL_REPORT.md` §8 invariants; `docs/canon/CANON_CHANGELOG.md` 未追加 CANON_CHANGE = YES 条目。
+- **Status：** `PENDING`（012 未签发前）
+
+### MD-012-002 — 012 默认 launch state = `foundation`
+
+- **Date：** 2026-08-30
+- **Topic：** Launch gate 默认值
+- **Decision：** `MOOD_LAUNCH_STATE = "foundation"`。foundation 状态下：no Token CA exposure, no Buy/Trade/Claim/Airdrop CTA, no live wallet token balance, no live treasury token balance, no pending reward settlement to token。
+- **Reviewer：** 012 implementation + 人类权威
+- **Evidence：** `apps/web/lib/mood-launch-state.ts`、`apps/web/tests/mood-launch-state.test.mjs`（INV-012-01 / INV-012-06 PASS）。
+- **Status：** `PENDING`
+
+### MD-012-003 — `codex/mood-mainnet-integration-009` 整条不 merge
+
+- **Date：** 2026-08-30
+- **Topic：** 009 处理策略
+- **Decision：** 012 不 merge `codex/mood-mainnet-integration-009` 整条；不做整条 cherry-pick。009 的 token-coupled 资产（`mood-token.ts` / `mood-chain.ts` / `mood-treasury.ts` / `/token` / `/genesis` / `/airdrop` / `MoodGenesisDistributor.sol`）保持 FREEZE。Foundation-grade 资产（`evm-address.ts`、`contribution-*`、`reputation_events`、admin auth、transparency read API）由 015 / 016 / 021 在各自迁移包中处理。
+- **Reviewer：** 012 implementation + 人类权威
+- **Evidence：** `docs/mood/extraction/012_EXTRACTION_MANIFEST.md`、`012_LEGACY_TOKEN_SEAMS.md`。
+- **Status：** `PENDING`
+
+### MD-012-HDR-001 — `pending_mood` 字段是否重命名
+
+- **Topic：** Drizzle `reward_events.amountMood` / `amountAtomic` 字段是否在 016 阶段重命名为 `pending_reward_units`
+- **Why：** 012 当前不动 schema。语义已在 012 文档中明确为「accounting only, no settlement」；schema 名称仍误导。
+- **Inputs：** `docs/mood/extraction/012_EXTRACTION_MANIFEST.md` §4.1。
+- **Decision required by：** 016 启动前（不阻塞 012 接受）。
+
+### MD-012-HDR-002 — `genesis_participants` 身份 / 空投字段拆分
+
+- **Topic：** `genesis_participants` 表是否在 015 阶段拆为身份表 + 空投表（或视图）
+- **Why：** 同一表同时承载 foundation-grade 字段（`walletAddressNormalized`、`signatureVersion`）与空投字段（`allocationMood`、`contributionScore`）。012 不动 schema。
+- **Inputs：** `docs/mood/extraction/012_EXTRACTION_MANIFEST.md` §4.2。
+- **Decision required by：** 015 启动前（不阻塞 012 接受）。
 
 ## 6. 011 期间冲突 / 越权记录
 
