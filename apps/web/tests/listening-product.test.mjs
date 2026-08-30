@@ -43,7 +43,7 @@ test("favorites and follows are idempotent on both client and server contract", 
 });
 
 test("discovery never uses Ear experiment scores or copyright claims", async () => {
-  const pages = ["app/page.tsx", "app/library/page.tsx", "app/playlists/page.tsx", "app/studio/page.tsx", "app/console/page.tsx"];
+  const pages = ["app/page.tsx", "app/me/library/page.tsx", "app/playlists/page.tsx", "app/studio/page.tsx", "app/console/page.tsx"];
   for (const rel of pages) {
     const content = await read(rel);
     assert.doesNotMatch(content, /Ear[^"]{0,40}评分|实验指标.*排序|auditory.*rank|版权认证(?!，|。|；|\.)/i, `${rel} must not rank by Ear experiments`);
