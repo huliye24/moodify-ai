@@ -134,3 +134,101 @@ export const publicationEvents = sqliteTable("publication_events", {
   reason: text("reason"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }, (table) => [index("publication_events_track_created_idx").on(table.trackId, table.createdAt)]);
+
+// Contribution Network tables
+export const contributionTasks = sqliteTable("contribution_tasks", {
+  id: text("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  summary: text("summary").notNull(),
+  description: text("description").notNull(),
+  category: text("category", {
+    enum: ["code", "audio-testing", "dataset", "research", "documentation", "translation", "bug-report", "community", "other"]
+  }).notNull(),
+  status: text("status", { enum: ["draft", "active", "paused", "completed", "archived"] }).notNull().default("draft"),
+  evidenceRequirements: text("evidence_requirements", { mode: "json" }).notNull().default(sql`'[]'`),
+  defaultReputationPoints: integer("default_reputation_points").notNull().default(100),
+  defaultRewardUnits: text("default_reward_units"),
+  deadline: text("deadline"),
+  maxApprovals: integer("max_approvals"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [index("contribution_tasks_category_status_idx").on(table.category, table.status)]);
+
+export const contributionSubmissions = sqliteTable("contribution_submissions", {
+  id: text("id").primaryKey(),
+  taskId: text("task_id").notNull().references(() => contributionTasks.id, { onDelete: "cascade" }),
+  residentId: text("resident_id").notNull(),
+  summary: text("summary").notNull(),
+  evidenceText: text("evidence_text"),
+  status: text("status", {
+    enum: ["submitted", "under_review", "changes_requested", "approved", "rejected", "withdrawn"]
+  }).notNull().default("submitted"),
+  revision: integer("revision").notNull().default(1),
+  evidenceUrls: text("evidence_urls", { mode: "json" }).default(sql`'[]'`),
+  githubPrUrl: text("github_pr_url"),
+  githubCommitHash: text("github_commit_hash"),
+  demoUrl: text("demo_url"),
+  documentUrl: text("document_url"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("contribution_submissions_task_status_idx").on(table.taskId, table.status),
+  index("contribution_submissions_resident_idx").on(table.residentId)
+]);
+
+export const contributionReviewEvents = sqliteTable("contribution_review_events", {
+  id: text("id").primaryKey(),
+  submissionId: text("submission_id").notNull().references(() => contributionSubmissions.id, { onDelete: "cascade" }),
+  reviewerId: text("reviewer_id").notNull(),
+  fromStatus: text("from_status").notNull(),
+  toStatus: text("to_status").notNull(),
+  comment: text("comment"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("contribution_review_events_submission_created_idx").on(table.submissionId, table.createdAt),
+  index("contribution_review_events_reviewer_idx").on(table.reviewerId)
+]);
+
+export const reputationEvents = sqliteTable("reputation_events", {
+  id: text("id").primaryKey(),
+  submissionId: text("submission_id").notNull().references(() => contributionSubmissions.id, { onDelete: "cascade" }),
+  residentId: text("resident_id").notNull(),
+  points: integer("points").notNull(),
+  evidenceType: text("evidence_type").notNull(),
+  notes: text("notes"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("reputation_events_resident_created_idx").on(table.residentId, table.createdAt),
+  index("reputation_events_submission_idx").on(table.submissionId)
+]);
+
+export const rewardEvents = sqliteTable("reward_events", {
+  id: text("id").primaryKey(),
+  submissionId: text("submission_id").notNull().references(() => contributionSubmissions.id, { onDelete: "cascade" }),
+  residentId: text("resident_id").notNull(),
+  amountMinor: integer("amount_minor").notNull(),
+  currency: text("currency").notNull().default("MOOD"),
+  status: text("status", { enum: ["pending", "processing", "completed", "failed"] }).notNull().default("pending"),
+  txHash: text("tx_hash"),
+  processedAt: text("processed_at"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("reward_events_resident_status_idx").on(table.residentId, table.status),
+  index("reward_events_submission_idx").on(table.submissionId)
+]);
+
+export const genesisParticipants = sqliteTable("genesis_participants", {
+  id: text("id").primaryKey(),
+  residentId: text("resident_id").notNull().unique(),
+  walletAddress: text("wallet_address").notNull(),
+  reputationScore: integer("reputation_score").notNull().default(0),
+  isGenesis: integer("is_genesis", { mode: "boolean" }).notNull().default(true),
+  joinedAt: text("joined_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  lastActivityAt: text("last_activity_at"),
+  metadata: text("metadata", { mode: "json" }).default(sql`'{}'`),
+}, (table) => [
+  index("genesis_participants_reputation_idx").on(table.reputationScore),
+  index("genesis_participants_joined_idx").on(table.joinedAt)
+]);
