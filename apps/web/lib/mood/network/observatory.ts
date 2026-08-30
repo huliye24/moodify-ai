@@ -1,15 +1,17 @@
 /**
- * MOOD NETWORK 017 + MOOD AGENTS 018 — Observatory
+ * MOOD NETWORK 017 + MOOD AGENTS 018 + MOOD NODES 019 — Observatory
  *
- * 018 extends 017's NetworkObservatory with agent metrics + activity.
+ * 019 extends 018's NetworkObservatory with node metrics + activity.
  *
- * Authority: MOOD-NETWORK-017 TASK.md + MOOD-AGENTS-018 TASK.md Phase N.
+ * Authority: MOOD-NETWORK-017 TASK.md + MOOD-AGENTS-018 TASK.md Phase N
+ *            + MOOD-NODES-019 TASK.md Phase O.
  */
 
 import { agentRegistry } from "../agents/registry.ts";
 import {
   contributionRegistry,
 } from "../contribution/registry.ts";
+import { nodeRegistry } from "../nodes/registry.ts";
 import type {
   ActivityKind,
   MetricValue,
@@ -22,6 +24,7 @@ const SOURCE_CONTRIBUTION = "contribution-registry:016";
 const SOURCE_REPUTATION = "reputation-registry:016";
 const SOURCE_PENDING = "pending-reward-registry:016";
 const SOURCE_AGENT = "agent-registry:018";
+const SOURCE_NODE = "node-registry:019";
 
 const SUPPRESSION_THRESHOLD = 3;
 
@@ -131,15 +134,11 @@ export class NetworkObservatory {
     );
   }
 
-  // ─── Agent metrics (018) ───────────────────────────────────────────────────
+  // ─── Agents (018) ──────────────────────────────────────────────────────────
 
   agents(): MetricValue {
     const c = agentRegistry.counts();
-    return makeMetric(
-      c.total,
-      SOURCE_AGENT,
-      "Registered AI Agents.",
-    );
+    return makeMetric(c.total, SOURCE_AGENT, "Registered AI Agents.");
   }
 
   agentsActive(): MetricValue {
@@ -152,13 +151,30 @@ export class NetworkObservatory {
     return makeMetric(c.degraded, SOURCE_AGENT, "Agents with degraded status.");
   }
 
+  // ─── Nodes (019) ───────────────────────────────────────────────────────────
+
   nodes(): MetricValue {
+    const c = nodeRegistry.counts();
+    return makeMetric(c.total, SOURCE_NODE, "Registered Nodes.");
+  }
+
+  nodesActive(): MetricValue {
+    const c = nodeRegistry.counts();
+    return makeMetric(c.active, SOURCE_NODE, "Nodes with active status.");
+  }
+
+  nodesDegraded(): MetricValue {
+    const c = nodeRegistry.counts();
+    return makeMetric(c.degraded, SOURCE_NODE, "Nodes with degraded status.");
+  }
+
+  nodesByRole(): Record<string, MetricValue> {
+    const c = nodeRegistry.counts();
     return {
-      value: null,
-      state: "coming-soon",
-      source: "package-019:pending",
-      definition: "Node registry (Package 019).",
-      updatedAt: nowIso(),
+      compute: makeMetric(c.byRole.compute, SOURCE_NODE, "Compute Nodes."),
+      ai: makeMetric(c.byRole.ai, SOURCE_NODE, "AI inference Nodes."),
+      storage: makeMetric(c.byRole.storage, SOURCE_NODE, "Storage Nodes."),
+      verification: makeMetric(c.byRole.verification, SOURCE_NODE, "Verification Nodes."),
     };
   }
 
@@ -198,7 +214,6 @@ export class NetworkObservatory {
     };
   }
 
-  /** Privacy-safe activity feed (extends 017 with agent events). */
   activity(limit = 25): PublicActivityEvent[] {
     const events: PublicActivityEvent[] = [];
     // Contribution events
@@ -245,16 +260,14 @@ export class NetworkObservatory {
     }
     // Agent events (018)
     for (const a of agentRegistry.list()) {
-      events.push({
-        type: "AgentRegistered",
-        timestamp: a.createdAt,
-      });
+      events.push({ type: "AgentRegistered", timestamp: a.createdAt });
       if (a.lastTaskAt) {
-        events.push({
-          type: "AgentTaskCompleted",
-          timestamp: a.lastTaskAt,
-        });
+        events.push({ type: "AgentTaskCompleted", timestamp: a.lastTaskAt });
       }
+    }
+    // Node events (019)
+    for (const n of nodeRegistry.list()) {
+      events.push({ type: "NodeRegistered", timestamp: n.createdAt });
     }
     events.sort((x, y) => (x.timestamp < y.timestamp ? 1 : -1));
     return events.slice(0, limit);
