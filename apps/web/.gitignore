@@ -40,3 +40,13 @@ next-env.d.ts
 /.sites-runtime/
 /outputs/
 /work/
+
+# Foundry build artifacts
+/contracts/out/
+/contracts/cache/
+/broadcast/
+/contracts/**/broadcast/
+
+# Vendored dependencies (track via git submodule if needed)
+/lib/forge-std/
+/lib/openzeppelin-contracts/
