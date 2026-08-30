@@ -24,6 +24,12 @@
     "public_genesis_deployed": "UNVERIFIED",
     "real_participants_loaded": "UNVERIFIED",
     "end_to_end_proof_chain": "UNVERIFIED",
+    "packages_011_020_integrated": true,
+    "typescript": "PASS",
+    "production_build": "PASS",
+    "web_tests": "48/48 PASS",
+    "root_invariants": "91/91 PASS",
+    "persistent_network": "NOT_IMPLEMENTED",
     "token_launch_authorized": false
   }
 }
