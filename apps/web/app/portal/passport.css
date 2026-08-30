@@ -1,0 +1,279 @@
+/**
+ * MOOD PASSPORT 015 — Shared CSS for Passport surfaces
+ *
+ * Continues MOOD white / purple-blue / generous whitespace.
+ * Passport surfaces: /portal/passport, /portal/passport/settings.
+ * NOT shared with Moodify Music (which has its own .public-track styling).
+ */
+
+.passport-surface {
+  background: #ffffff;
+  color: #1a1b22;
+  min-height: 100vh;
+  padding: 64px 24px 96px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+.passport-surface .passport-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.passport-surface .passport-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(26, 27, 34, 0.55);
+  margin: 0 0 8px;
+}
+
+.passport-surface .passport-title {
+  font-size: 48px;
+  line-height: 1.05;
+  margin: 0 0 8px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.passport-surface .passport-subtitle {
+  color: rgba(26, 27, 34, 0.6);
+  font-size: 16px;
+  margin: 0 0 48px;
+}
+
+.passport-surface .passport-card {
+  background: #ffffff;
+  border: 1px solid rgba(26, 27, 34, 0.08);
+  border-radius: 24px;
+  padding: 32px 32px 28px;
+  box-shadow: 0 6px 28px rgba(108, 84, 199, 0.06);
+  margin-bottom: 24px;
+}
+
+.passport-surface .passport-card--accent {
+  background: linear-gradient(135deg, #6c54c7 0%, #4e8cd1 100%);
+  color: #ffffff;
+  border: none;
+}
+
+.passport-surface .passport-card--accent .passport-eyebrow,
+.passport-surface .passport-card--accent .passport-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.passport-surface .passport-card--accent .passport-stat-label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.passport-surface .passport-stat-label {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(26, 27, 34, 0.55);
+}
+
+.passport-surface .passport-stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 4px 0 0;
+}
+
+.passport-surface .passport-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+}
+
+.passport-surface .passport-row {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.passport-surface .passport-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: rgba(108, 84, 199, 0.1);
+  color: #4a3a8c;
+  border: 1px solid rgba(108, 84, 199, 0.25);
+}
+
+.passport-surface .passport-pill--verified {
+  background: rgba(46, 125, 50, 0.1);
+  border-color: rgba(46, 125, 50, 0.3);
+  color: #1b5e20;
+}
+
+.passport-surface .passport-pill--draft {
+  background: rgba(255, 152, 0, 0.1);
+  border-color: rgba(255, 152, 0, 0.3);
+  color: #b86c00;
+}
+
+.passport-surface .passport-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6c54c7 0%, #4e8cd1 100%);
+  color: #ffffff;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.passport-surface .passport-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(108, 84, 199, 0.3);
+}
+
+.passport-surface .passport-cta--ghost {
+  background: transparent;
+  color: #1a1b22;
+  border: 1px solid rgba(26, 27, 34, 0.18);
+}
+
+.passport-surface .passport-cta--ghost:hover {
+  box-shadow: none;
+  background: rgba(26, 27, 34, 0.04);
+}
+
+.passport-surface .passport-divider {
+  height: 1px;
+  background: rgba(26, 27, 34, 0.08);
+  margin: 24px 0;
+}
+
+.passport-surface .passport-link {
+  color: #4a3a8c;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(108, 84, 199, 0.4);
+}
+
+.passport-surface .passport-link:hover {
+  border-bottom-color: #4a3a8c;
+}
+
+.passport-surface .passport-section-title {
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(26, 27, 34, 0.55);
+  margin: 32px 0 16px;
+}
+
+.passport-surface .passport-input,
+.passport-surface .passport-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  border: 1px solid rgba(26, 27, 34, 0.18);
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1a1b22;
+  box-sizing: border-box;
+}
+
+.passport-surface .passport-input:focus,
+.passport-surface .passport-textarea:focus {
+  outline: none;
+  border-color: #6c54c7;
+  box-shadow: 0 0 0 3px rgba(108, 84, 199, 0.18);
+}
+
+.passport-surface .passport-textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.passport-surface .passport-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.passport-surface .passport-radio-group label {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.passport-surface .passport-radio-group label span {
+  display: block;
+  font-size: 14px;
+  color: rgba(26, 27, 34, 0.7);
+}
+
+.passport-surface .passport-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.passport-surface .passport-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.passport-surface .passport-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.passport-surface .passport-table th,
+.passport-surface .passport-table td {
+  text-align: left;
+  padding: 12px 8px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(26, 27, 34, 0.08);
+}
+
+.passport-surface .passport-table th {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(26, 27, 34, 0.55);
+}
+
+.passport-surface .passport-disclaimer {
+  font-size: 13px;
+  color: rgba(26, 27, 34, 0.55);
+  margin: 12px 0 0;
+}
+
+.passport-surface .passport-banner-warn {
+  background: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  color: #b86c00;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.passport-surface .passport-status-empty {
+  color: rgba(26, 27, 34, 0.55);
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .passport-surface .passport-title {
+    font-size: 36px;
+  }
+  .passport-surface .passport-card {
+    padding: 24px 20px;
+  }
+}
