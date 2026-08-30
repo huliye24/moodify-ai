@@ -1,19 +1,12 @@
 /**
- * MOOD NETWORK 017 — Observatory Aggregator
+ * MOOD NETWORK 017 + MOOD AGENTS 018 — Observatory
  *
- * Reads from canonical registries (Contribution, Reputation, PendingReward)
- * and produces privacy-safe aggregates.
+ * 018 extends 017's NetworkObservatory with agent metrics + activity.
  *
- * Authority: MOOD-NETWORK-017 TASK.md Phases C/J.
- *
- * Privacy rules:
- * - Small-sample suppression: count < 3 -> hidden.
- * - Wallet addresses NEVER appear in public feed.
- * - Reviewer notes NEVER appear.
- * - Internal audit details NEVER appear.
- * - Reputation only as totals + positive points.
+ * Authority: MOOD-NETWORK-017 TASK.md + MOOD-AGENTS-018 TASK.md Phase N.
  */
 
+import { agentRegistry } from "../agents/registry.ts";
 import {
   contributionRegistry,
 } from "../contribution/registry.ts";
@@ -28,7 +21,7 @@ import type {
 const SOURCE_CONTRIBUTION = "contribution-registry:016";
 const SOURCE_REPUTATION = "reputation-registry:016";
 const SOURCE_PENDING = "pending-reward-registry:016";
-const SOURCE_AUDIT = "audit-log:016";
+const SOURCE_AGENT = "agent-registry:018";
 
 const SUPPRESSION_THRESHOLD = 3;
 
@@ -62,19 +55,15 @@ function suppressed(value: number): MetricValue {
 }
 
 export class NetworkObservatory {
-  /**
-   * INV-017-12: Moodify is registered as Genesis Application with real source.
-   */
   applications(): MetricValue {
     return makeMetric(
       1,
       "constant:moodify-genesis-application",
-      "Moodify — registered as Genesis Application (017)",
+      "Moodify — registered as Genesis Application.",
     );
   }
 
   residents(): MetricValue {
-    // Source from contribution submissions (distinct residentId).
     const ids = new Set<string>();
     for (const s of contributionRegistry.submissions.values()) {
       ids.add(s.residentId);
@@ -90,7 +79,6 @@ export class NetworkObservatory {
   }
 
   contributors(): MetricValue {
-    // Distinct residents with at least one approved contribution.
     const ids = new Set<string>();
     for (const s of contributionRegistry.submissions.values()) {
       if (s.status === "approved") ids.add(s.residentId);
@@ -106,14 +94,8 @@ export class NetworkObservatory {
   }
 
   openTasks(): MetricValue {
-    const count = contributionRegistry
-      .listTasks({ status: "active" })
-      .filter((t) => t.status === "active").length;
-    return makeMetric(
-      count,
-      SOURCE_CONTRIBUTION,
-      "Active ContributionTasks.",
-    );
+    const count = contributionRegistry.listTasks({ status: "active" }).length;
+    return makeMetric(count, SOURCE_CONTRIBUTION, "Active ContributionTasks.");
   }
 
   submissions(): MetricValue {
@@ -149,15 +131,25 @@ export class NetworkObservatory {
     );
   }
 
+  // ─── Agent metrics (018) ───────────────────────────────────────────────────
+
   agents(): MetricValue {
-    // 018 not implemented yet.
-    return {
-      value: null,
-      state: "coming-soon",
-      source: "package-018:pending",
-      definition: "AI Agent registry (Package 018).",
-      updatedAt: nowIso(),
-    };
+    const c = agentRegistry.counts();
+    return makeMetric(
+      c.total,
+      SOURCE_AGENT,
+      "Registered AI Agents.",
+    );
+  }
+
+  agentsActive(): MetricValue {
+    const c = agentRegistry.counts();
+    return makeMetric(c.active, SOURCE_AGENT, "Agents with active status.");
+  }
+
+  agentsDegraded(): MetricValue {
+    const c = agentRegistry.counts();
+    return makeMetric(c.degraded, SOURCE_AGENT, "Agents with degraded status.");
   }
 
   nodes(): MetricValue {
@@ -180,17 +172,7 @@ export class NetworkObservatory {
     };
   }
 
-  /**
-   * Compute network status from available subsystem signals.
-   * INV-017-12: not dependent on Token RPC.
-   */
   status(): NetworkStatus {
-    const subs = Array.from(contributionRegistry.submissions.values());
-    if (subs.length === 0 && contributionRegistry.tasks.size === 0) {
-      // empty registries -> not broken, just empty
-      return "operational";
-    }
-    // v1: if any registry is reachable and contains data, we treat as operational.
     return "operational";
   }
 
@@ -216,17 +198,11 @@ export class NetworkObservatory {
     };
   }
 
-  /**
-   * Privacy-safe activity feed (INV-017-05/06):
-   * - no full wallet
-   * - no private reviewer notes
-   * - no admin metadata
-   * - small-sample suppression
-   */
+  /** Privacy-safe activity feed (extends 017 with agent events). */
   activity(limit = 25): PublicActivityEvent[] {
     const events: PublicActivityEvent[] = [];
+    // Contribution events
     for (const audit of contributionRegistry.audit.all()) {
-      // Map audit -> activity type.
       let type: ActivityKind | null = null;
       let delta: number | undefined;
       switch (audit.type) {
@@ -245,7 +221,6 @@ export class NetworkObservatory {
           break;
         case "ReputationGranted":
           type = "ReputationGranted";
-          // Look up delta from reputation event id.
           if (audit.reputationEventId) {
             const rep = contributionRegistry.reputation
               .allEvents()
@@ -254,28 +229,34 @@ export class NetworkObservatory {
           }
           break;
         default:
-          // SubmissionWithdrawn, ReviewStarted, ChangesRequested, etc. are
-          // intentionally NOT surfaced in the public feed.
           type = null;
       }
       if (!type) continue;
-      const submission = audit.submissionId
-        ? contributionRegistry.submissions.get(audit.submissionId)
-        : undefined;
       const task = audit.taskId
         ? contributionRegistry.tasks.get(audit.taskId)
         : undefined;
-      // Privacy: short resident ID only, never wallet.
       events.push({
         type,
         timestamp: audit.createdAt,
-        // The audit log does not carry residentId publicly — skip.
         taskSlug: task?.slug,
         submissionId: audit.submissionId,
         reputationDelta: delta,
       });
     }
-    events.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1));
+    // Agent events (018)
+    for (const a of agentRegistry.list()) {
+      events.push({
+        type: "AgentRegistered",
+        timestamp: a.createdAt,
+      });
+      if (a.lastTaskAt) {
+        events.push({
+          type: "AgentTaskCompleted",
+          timestamp: a.lastTaskAt,
+        });
+      }
+    }
+    events.sort((x, y) => (x.timestamp < y.timestamp ? 1 : -1));
     return events.slice(0, limit);
   }
 }
