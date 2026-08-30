@@ -232,3 +232,19 @@ export const genesisParticipants = sqliteTable("genesis_participants", {
   index("genesis_participants_reputation_idx").on(table.reputationScore),
   index("genesis_participants_joined_idx").on(table.joinedAt)
 ]);
+
+export const genesisNonces = sqliteTable("genesis_nonces", {
+  id: text("id").primaryKey(),
+  nonce: text("nonce").notNull().unique(),
+  walletAddress: text("wallet_address").notNull(),
+  issuedAt: text("issued_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  expiresAt: text("expires_at").notNull(),
+  usedAt: text("used_at"),
+  termsVersion: text("terms_version").notNull(),
+  signatureVersion: text("signature_version").notNull(),
+  chainId: integer("chain_id").notNull(),
+  domain: text("domain").notNull(),
+}, (table) => [
+  index("genesis_nonces_address_expires_idx").on(table.walletAddress, table.expiresAt),
+  index("genesis_nonces_used_idx").on(table.usedAt)
+]);
