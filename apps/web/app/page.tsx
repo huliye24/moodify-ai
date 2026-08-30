@@ -155,7 +155,7 @@ export default function Home() {
       <nav>
         <button className="nav-active" aria-current="page">◉　发现音乐</button>
         <label className="nav-search">⌕　<input aria-label="搜索音乐" placeholder="搜索" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-        {me?.capabilities?.account_actions && <a href="/library" className="nav-link">▥　我的音乐</a>}
+        {me?.capabilities?.account_actions && <a href="/me/library" className="nav-link">▥　我的音乐</a>}
       </nav>
       {me && <div className="profile"><div className="avatar">M</div><div><strong>Moodify</strong><span>聆听者</span></div></div>}
     </aside>
@@ -166,7 +166,7 @@ export default function Home() {
     )}
     <nav className={`drawer ${menuOpen ? "is-open" : ""}`} aria-label="菜单">
       <div className="drawer-header"><strong>菜单</strong><button onClick={() => setMenuOpen(false)} aria-label="关闭">✕</button></div>
-      {me?.capabilities?.account_actions && (<><a href="/library" className="drawer-item" onClick={() => setMenuOpen(false)}>▥　我的音乐</a><hr className="drawer-divider" /></>)}
+      {me?.capabilities?.account_actions && (<><a href="/me/library" className="drawer-item" onClick={() => setMenuOpen(false)}>▥　我的音乐</a><hr className="drawer-divider" /></>)}
       <span className="drawer-label">关于</span>
       <a href="https://rongjingmusic.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏠 Moodify 官网</a>
       <a href="https://rongjingwenchuan.com/" target="_blank" rel="noopener noreferrer" className="drawer-item" onClick={() => setMenuOpen(false)}>🏢 荣景文川</a>
