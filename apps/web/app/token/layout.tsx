@@ -1,10 +1,10 @@
 export const metadata = {
   title: "MOOD Token Preparation — Hong Kong · BNB Smart Chain",
-  description: "MOOD 的香港发行准备状态：目标链、待决参数、验证门槛与防诈骗信息。当前尚未发行，亦无官方合约地址。",
+  description: "认识 MOOD World 与它所相信的自由、连接和生活之美。MOOD Token 正在香港为 BNB Smart Chain 发行做准备。",
   alternates: { canonical: "https://crestwavecoin.com/token" },
   openGraph: {
     title: "MOOD Token — Issuance Preparation",
-    description: "Hong Kong preparation · BNB Smart Chain target · Not yet issued.",
+    description: "Discover MOOD World. MOOD Token is coming to BNB Smart Chain.",
     url: "https://crestwavecoin.com/token",
     siteName: "MOOD",
     type: "website",

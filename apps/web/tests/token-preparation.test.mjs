@@ -6,11 +6,10 @@ const page = readFileSync(new URL("../app/token/page.tsx", import.meta.url), "ut
 const layout = readFileSync(new URL("../app/token/layout.tsx", import.meta.url), "utf8");
 const source = `${page}\n${layout}`;
 
-test("token surface truthfully declares preparation state", () => {
-  assert.match(source, /HONG KONG ISSUANCE PREPARATION/);
+test("token surface truthfully declares preparation state in public language", () => {
+  assert.match(source, /香港/);
   assert.match(source, /BNB Smart Chain/);
-  assert.match(source, /Chain ID 56/);
-  assert.match(source, /尚未发行/);
+  assert.match(source, /尚未开放购买/);
   assert.match(source, /没有官方合约地址/);
 });
 
@@ -22,8 +21,8 @@ test("token surface contains no obsolete trade claims", () => {
   assert.doesNotMatch(source, /连接钱包/);
 });
 
-test("token surface defines public genesis gates", () => {
-  for (const gate of ["香港法律与发行主体", "代币参数冻结", "合约与权限安全", "Genesis 真实网络", "公开 Genesis 决议"]) {
-    assert.match(source, new RegExp(gate));
+test("token surface keeps internal readiness notes off the public site", () => {
+  for (const internalNote of ["CURRENT VERIFIED STATE", "PUBLIC GENESIS GATES", "AML/KYC", "多签", "密钥保管", "税率", "审查中", "待决定", "未满足", "未签署"]) {
+    assert.doesNotMatch(source, new RegExp(internalNote));
   }
 });
