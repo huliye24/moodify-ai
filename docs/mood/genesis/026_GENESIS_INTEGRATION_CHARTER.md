@@ -1,4 +1,4 @@
-# MOODIFY GENESIS INTEGRATION 026
+# MOOD Scope Freeze & Entropy Reduction 026
 
 **Status:** ACTIVE INTEGRATION
 **Branch:** `codex/mood-genesis-integration-026`
@@ -7,7 +7,9 @@
 
 ## Objective
 
-Combine the verified work from packages 011-020 into the first publicly testable MOOD network without extending the horizontal package sequence.
+Reduce the repository to the smallest whitepaper-required MOOD v0.1 mainline. Integration of packages 011-020 is evidence input to the scope audit, not permission to retain every integrated surface.
+
+The controlling boundary is root [`MOOD_SCOPE_FREEZE.md`](../../../MOOD_SCOPE_FREEZE.md).
 
 The completion test is not the amount of merged code. A real participant must be able to enter the network, create a contribution, produce traceable evidence, and observe the resulting network state.
 
@@ -57,4 +59,3 @@ Every transition must preserve actor, time, scope, state, evidence reference, fa
 ## Release boundary
 
 026 may prepare Genesis staging and freeze artifacts. Formal token launch remains outside the completion boundary until the running network, security, legal, treasury, and human-signature gates are separately satisfied.
-

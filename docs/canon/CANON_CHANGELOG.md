@@ -2,6 +2,16 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-08-30 — MOOD Scope Freeze & Entropy Reduction 026
+
+- **CANON_CHANGE = YES。** 人类明确将 026 从功能集成包改为范围冻结与熵减审计。
+- **边界：** 026 完成前禁止新增产品、协议、Agent 类型、公开页面、经济机制或横向编号包。
+- **主线：** 仅保留白皮书最小闭环 `WORLD + PROTOCOL + PORTAL -> NETWORK -> Moodify Genesis Application`。
+- **分类：** 所有重要资产必须进入 `KEEP / FREEZE / ARCHIVE / DELETE`；`DELETE` 先分类，实际删除仍需精确目标、证据、迁移、回滚和审查。
+- **Token：** 2026-09-01 是 Go/No-Go 审查点，不是自动发行授权；法律、合约、权限、Treasury、测试网、Genesis 和签名门禁任一缺失即 `NO-GO`。
+- **Authority：** 新增根 `MOOD_SCOPE_FREEZE.md`，在 Genesis 026 范围问题上位于 `docs/mood/*` 之前。
+- **Rollback：** 回退本条、`AGENTS.md` 索引、026 Charter 与 `MOOD_SCOPE_FREEZE.md`；本变更未部署合约、未移动资金、未创建 Token。
+
 ## 2026-08-30 — MOOD FOUNDATION 011: Canonical Freeze & Branch Convergence
 
 - **CANON_CHANGE = YES。** 人类通过 Package 011 冻结 MOOD WORLD 总体身份：`MOOD = WORLD + PROTOCOL + PORTAL`。

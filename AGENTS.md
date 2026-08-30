@@ -25,11 +25,12 @@ Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress t
 进入本仓库先读：
 
 1. `AGENTS.md`（本文件）
-2. `docs/canon/CURRENT_CANON.md`（Moodify Music / Player 对外产品面）
-3. `docs/mood/CURRENT_CANON.md`（MOOD WORLD + PROTOCOL + PORTAL）
-4. `docs/canon/PRODUCT_BOUNDARY.md`
-5. `docs/canon/AUTHORITY_ORDER.md`
-6. `docs/REPOSITORY_STATUS.md`
+2. `MOOD_SCOPE_FREEZE.md`（Genesis 026 范围冻结；禁止横向扩张）
+3. `docs/canon/CURRENT_CANON.md`（Moodify Music / Player 对外产品面）
+4. `docs/mood/CURRENT_CANON.md`（MOOD WORLD + PROTOCOL + PORTAL）
+5. `docs/canon/PRODUCT_BOUNDARY.md`
+6. `docs/canon/AUTHORITY_ORDER.md`
+7. `docs/REPOSITORY_STATUS.md`
 
 Public brand language and public-site roles then resolve through `docs/brand/public/README.md` and its authority set. The highest topic-specific Public Brand authority is `docs/brand/public/PUBLIC_BRAND_CONSTITUTION.md`.
 
