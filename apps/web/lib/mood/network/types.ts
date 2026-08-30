@@ -61,7 +61,10 @@ export type ActivityKind =
   | "ApplicationRegistered"
   | "AgentRegistered"
   | "NodeRegistered"
-  | "MIPPublished";
+  | "MIPPublished"
+  | "MIPReviewStarted"
+  | "MIPAccepted"
+  | "MIPImplemented";
 
 export interface PublicActivityEvent {
   type: ActivityKind;

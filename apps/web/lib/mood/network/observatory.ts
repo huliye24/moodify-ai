@@ -1,10 +1,11 @@
 /**
- * MOOD NETWORK 017 + MOOD AGENTS 018 + MOOD NODES 019 — Observatory
+ * MOOD NETWORK 017 + MOOD AGENTS 018 + MOOD NODES 019 + MOOD GOVERNANCE 020 — Observatory
  *
- * 019 extends 018's NetworkObservatory with node metrics + activity.
+ * 020 extends 019's NetworkObservatory with MIP metrics + activity.
  *
  * Authority: MOOD-NETWORK-017 TASK.md + MOOD-AGENTS-018 TASK.md Phase N
- *            + MOOD-NODES-019 TASK.md Phase O.
+ *            + MOOD-NODES-019 TASK.md Phase O
+ *            + MOOD-GOVERNANCE-020 TASK.md Phase S.
  */
 
 import { agentRegistry } from "../agents/registry.ts";
@@ -12,6 +13,7 @@ import {
   contributionRegistry,
 } from "../contribution/registry.ts";
 import { nodeRegistry } from "../nodes/registry.ts";
+import { mipRegistry } from "../governance/registry.ts";
 import type {
   ActivityKind,
   MetricValue,
@@ -25,6 +27,7 @@ const SOURCE_REPUTATION = "reputation-registry:016";
 const SOURCE_PENDING = "pending-reward-registry:016";
 const SOURCE_AGENT = "agent-registry:018";
 const SOURCE_NODE = "node-registry:019";
+const SOURCE_MIP = "mip-registry:020";
 
 const SUPPRESSION_THRESHOLD = 3;
 
@@ -179,13 +182,28 @@ export class NetworkObservatory {
   }
 
   mips(): MetricValue {
-    return {
-      value: null,
-      state: "coming-soon",
-      source: "package-020:pending",
-      definition: "MIP governance (Package 020).",
-      updatedAt: nowIso(),
-    };
+    const c = mipRegistry.counts();
+    return makeMetric(c.total, SOURCE_MIP, "Total MIPs (any status, including MIP-000).");
+  }
+
+  mipsInDiscussion(): MetricValue {
+    const c = mipRegistry.counts();
+    return makeMetric(c.byStatus.discussion, SOURCE_MIP, "MIPs currently in Discussion.");
+  }
+
+  mipsInReview(): MetricValue {
+    const c = mipRegistry.counts();
+    return makeMetric(c.byStatus.review, SOURCE_MIP, "MIPs currently in Review.");
+  }
+
+  mipsAccepted(): MetricValue {
+    const c = mipRegistry.counts();
+    return makeMetric(c.byStatus.accepted, SOURCE_MIP, "MIPs accepted but not yet Implemented.");
+  }
+
+  mipsImplemented(): MetricValue {
+    const c = mipRegistry.counts();
+    return makeMetric(c.byStatus.implemented, SOURCE_MIP, "MIPs Implemented.");
   }
 
   status(): NetworkStatus {
@@ -268,6 +286,30 @@ export class NetworkObservatory {
     // Node events (019)
     for (const n of nodeRegistry.list()) {
       events.push({ type: "NodeRegistered", timestamp: n.createdAt });
+    }
+    // MIP events (020)
+    for (const m of mipRegistry.list()) {
+      events.push({
+        type: "MIPPublished",
+        timestamp: m.createdAt,
+        taskSlug: m.id.toLowerCase(),
+      });
+      for (const d of mipRegistry.decisionsFor(m.id)) {
+        if (d.decision === "accepted") {
+          events.push({
+            type: "MIPAccepted",
+            timestamp: d.decidedAt,
+            taskSlug: m.id.toLowerCase(),
+          });
+        }
+      }
+      for (const i of mipRegistry.implementationsFor(m.id)) {
+        events.push({
+          type: "MIPImplemented",
+          timestamp: i.recordedAt,
+          taskSlug: m.id.toLowerCase(),
+        });
+      }
     }
     events.sort((x, y) => (x.timestamp < y.timestamp ? 1 : -1));
     return events.slice(0, limit);
