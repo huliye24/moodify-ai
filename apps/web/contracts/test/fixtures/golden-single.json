@@ -1,0 +1,16 @@
+{
+  "schema": "mood-merkle-standard-v1",
+  "version": "1.0.0",
+  "description": "Golden fixture for single-participant",
+  "participantCount": 1,
+  "root": "0xc9ea0e6c193c42dd87916abb17e07271b26d5741cf8209cd5250ccf73eddb766",
+  "participants": [
+    {
+      "participantNumber": 1,
+      "account": "0x1111111111111111111111111111111111111111",
+      "amountAtomic": "1000000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": []
+    }
+  ]
+}

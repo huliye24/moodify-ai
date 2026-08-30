@@ -1,0 +1,61 @@
+{
+  "schema": "mood-merkle-standard-v1",
+  "version": "1.0.0",
+  "description": "Golden fixture for five-participants",
+  "participantCount": 5,
+  "root": "0x86760f9dc6eae2abfc1f5171ed4a4c421c3ffc0c45a897f1aed2d02a5f8a1abc",
+  "participants": [
+    {
+      "participantNumber": 1,
+      "account": "0x1111111111111111111111111111111111111111",
+      "amountAtomic": "1000000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": [
+        "0x63c54ae24ddc611b6b350f5ced4d128273283017b1c4e25510139777ab2bceea",
+        "0xf553904290bb6b648ce50d95e282b797812c03148ad503ab314afaca0a482bde"
+      ]
+    },
+    {
+      "participantNumber": 2,
+      "account": "0x2222222222222222222222222222222222222222",
+      "amountAtomic": "2000000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": [
+        "0x876952b3fc8ed2fab97a7cb7e807ad3dae7cd6021466d4bea7a65966548e6195",
+        "0xc9ea0e6c193c42dd87916abb17e07271b26d5741cf8209cd5250ccf73eddb766",
+        "0xf553904290bb6b648ce50d95e282b797812c03148ad503ab314afaca0a482bde"
+      ]
+    },
+    {
+      "participantNumber": 3,
+      "account": "0x3333333333333333333333333333333333333333",
+      "amountAtomic": "1500000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": [
+        "0xa07df473b4dc52147bc887e7173347f7be480750c5b1837fe4f79d9adeb2f301",
+        "0x14c3fb5c9e942ccc998ad554fd4555640f516391decd6c6d9585c6f0b1d8d356"
+      ]
+    },
+    {
+      "participantNumber": 4,
+      "account": "0x4444444444444444444444444444444444444444",
+      "amountAtomic": "500000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": [
+        "0x8b5a653817ee80d06188248e5de0fe5af7a86407aa10a5aec7556dd286863cc4",
+        "0x14c3fb5c9e942ccc998ad554fd4555640f516391decd6c6d9585c6f0b1d8d356"
+      ]
+    },
+    {
+      "participantNumber": 5,
+      "account": "0x5555555555555555555555555555555555555555",
+      "amountAtomic": "3000000000000000000000",
+      "leaf": "computed-in-solidity",
+      "proof": [
+        "0x51bc608fd66b5edd9ee7ad2983d734b29a086a58a0e729933e212b539a30332c",
+        "0xc9ea0e6c193c42dd87916abb17e07271b26d5741cf8209cd5250ccf73eddb766",
+        "0xf553904290bb6b648ce50d95e282b797812c03148ad503ab314afaca0a482bde"
+      ]
+    }
+  ]
+}
