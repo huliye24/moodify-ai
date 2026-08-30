@@ -540,8 +540,8 @@ describe('T18 - No Chain Writes', () => {
     }
   });
 
-  it('should not sign transactions', () => {
-    const handlerModule = require('../routes/handlers.js');
+  it('should not sign transactions', async () => {
+    const handlerModule = await import('../routes/handlers.js');
     assert.strictEqual(handlerModule.signTransaction, undefined);
   });
 });

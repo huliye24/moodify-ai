@@ -478,6 +478,12 @@ export function createServer(options) {
   };
 }
 
+export {
+  DEFAULT_LIMIT,
+  MAX_LIMIT,
+  ALLOWED_SORT_KEYS
+};
+
 export default {
   ApiContext,
   createServer,
