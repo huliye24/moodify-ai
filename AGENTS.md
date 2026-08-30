@@ -55,12 +55,19 @@ MOOD Token = future economic layer (NOT ACTIVATED).
 
 Token 激活条件：G0–G11 全部 PASS（见 `docs/mood/TOKEN_LAUNCH_GATE.md`）。
 
+MOOD Network Interface 的当前公共主句：
+
+- **MOOD is the world. Moodify is only the beginning.**
+- **在这里，成为你自己。**
+
+`Every voice deserves to be heard.` 属于早期 Moodify Public Form 历史表达，不再用于 MOOD World / `crestwavecoin.com` 公共表面。
+
 ## Important Distinction
 
 - 对外：Moodify Music / Player，用户只做 PLAY。
 - 内部：Ear / analysis / stem / judgment / intervention / preset decision / verification / evidence / learning / cloud production。复杂度由 Moodify 承担。
 - 内部处理复杂度不是对外卖点。
-- Public Form 品牌信念：**每一种声音，都值得被世界听见。 / Every voice deserves to be heard.**
+- 历史 Moodify Public Form 品牌信念：**每一种声音，都值得被世界听见。 / Every voice deserves to be heard.**（不得用于 MOOD World 公共表面）
 - 产品原则：**Listen. Then Play.**；用户动作：**Play.**
 
 ## Three Disciplines

@@ -1,13 +1,26 @@
 import Link from "next/link";
 import "./token.css";
+import "./architecture.css";
 
 export default function TokenPage() {
   return <main className="token-site">
-    <nav className="token-nav" aria-label="MOOD 主导航"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><div className="token-nav-links"><a href="#world">我们的世界</a><a href="#belief">我们的信念</a><Link href="/library">图书馆</Link><a href="#arrival">MOOD Token</a><Link href="/">Moodify Music</Link></div><span className="token-nav-state">COMING SOON</span></nav>
+    <nav className="token-nav" aria-label="MOOD 主导航"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><div className="token-nav-links"><a href="#world">World</a><Link href="/protocol">Protocol</Link><Link href="/portal">Portal</Link><Link href="/network">Network</Link><Link href="/library">Library</Link></div><a className="token-nav-state" href="#entrances">ENTER MOOD</a></nav>
 
     <header className="token-hero"><div className="token-hero-copy"><p className="token-kicker">A DIGITAL HOME FOR FREE SPIRITS</p><h1>在这里，<br /><em>成为你自己。</em></h1><p className="token-lead">MOOD 是一个属于自由意志、独立选择与美的数字家园。没有被规定的人生，只有你愿意生活的方式。</p><div className="token-actions"><a className="token-primary" href="#world">进入这个世界</a><a className="token-secondary" href="#belief">阅读我们的信念</a></div></div><div className="token-hero-mark" aria-hidden="true"><img src="/moodify-brand-logo.png" alt="" /></div></header>
 
     <figure id="world" className="token-world-image"><img src="/mood-world-hero.png" alt="人们在开放的未来音乐空间相遇、聆听与创作" /></figure>
+
+    <section id="entrances" className="token-architecture">
+      <header><p className="token-kicker">ONE WORLD · MANY ENTRANCES</p><h2>同一个世界，<br />从不同的地方进入。</h2><p>你可以先感受这个世界，也可以直接阅读规则、建立身份、查看网络，或进入第一个真实应用。所有入口最终指向同一个 MOOD Network。</p></header>
+      <div className="token-primary-gates">
+        <Link href="/world"><span>01</span><small>EXPERIENCE</small><h3>WORLD</h3><p>感受 MOOD 的信念、文化、空间与共同生活的想象。</p><b>进入世界 →</b></Link>
+        <Link href="/protocol"><span>02</span><small>RULES</small><h3>PROTOCOL</h3><p>阅读贡献、Proof、Agents、Nodes 与治理如何共同运行。</p><b>阅读协议 →</b></Link>
+        <Link href="/portal"><span>03</span><small>PARTICIPATION</small><h3>PORTAL</h3><p>从 Visitor 成为 Resident，建立 Passport 并开始参与。</p><b>进入门户 →</b></Link>
+      </div>
+      <div className="token-places">
+        <Link href="/library"><strong>Library</strong><span>白皮书、文化与公共知识</span></Link><Link href="/build"><strong>Builder Workshop</strong><span>建设者与开放工具</span></Link><Link href="/agents"><strong>Agent Lab</strong><span>真实工作的 AI Agents</span></Link><Link href="/nodes"><strong>Node Station</strong><span>真实网络资源与服务</span></Link><Link href="/governance"><strong>Governance</strong><span>MIP 与共同决策</span></Link><Link href="/"><strong>Moodify Gate</strong><span>第一个 Genesis Application</span></Link>
+      </div>
+    </section>
 
     <section id="belief" className="token-statement"><div><p className="token-kicker">THE MOOD MANIFESTO</p><h2>世界不只需要<br />宏大的使命。</h2></div><div><p>我们相信，人不是为了成为工具而活。闲暇不是浪费，远行不必抵达，艺术也不需要证明价值。你可以思考，可以创造，可以相爱，也可以只是坐在阳光下。</p><p>选择自己的节奏，建立真实的关系，保留感受美的能力——这本身就是一种完整的人生。</p></div></section>
 
@@ -19,8 +32,6 @@ export default function TokenPage() {
 
     <section className="token-principles" aria-label="MOOD 的信念"><article><span>01</span><h3>独立意志</h3><p>没有人替你定义完整的人生。选择权始终属于你。</p></article><article><span>02</span><h3>自由连接</h3><p>关系源于自愿，而不是许可。世界因真实的连接而存在。</p></article><article><span>03</span><h3>生活之美</h3><p>美不是附加项。它是我们愿意生活、创造和留下的理由。</p></article></section>
 
-    <section id="arrival" className="token-arrival"><p className="token-kicker">MOOD TOKEN · COMING SOON</p><h2>先让世界发生。</h2><p>MOOD Token 将成为这个世界里的经济媒介。目前正在香港为 BNB Smart Chain 发行做准备，尚未开放购买，也没有官方合约地址。</p><small>正式发布时，唯一可信的合约地址与验证入口会首先出现在本页。</small></section>
-
-    <footer className="token-footer"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><p>Every voice deserves to be heard.</p><div><Link href="/library">Library</Link><Link href="/">Moodify Music</Link><a href="#belief">Manifesto</a></div></footer>
+    <footer className="token-footer"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><p>MOOD is the world. Moodify is only the beginning.</p><div><Link href="/library">Library</Link><Link href="/network">Network</Link><Link href="/">Moodify Gate</Link></div></footer>
   </main>;
 }

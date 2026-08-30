@@ -1,10 +1,10 @@
 export const metadata = {
-  title: "MOOD Token Preparation — Hong Kong · BNB Smart Chain",
-  description: "认识 MOOD World 与它所相信的自由、连接和生活之美。MOOD Token 正在香港为 BNB Smart Chain 发行做准备。",
+  title: "MOOD — World · Protocol · Portal",
+  description: "进入 MOOD：一个由 WORLD、PROTOCOL 与 PORTAL 共同构成的开放数字世界。Moodify 只是开始。",
   alternates: { canonical: "https://crestwavecoin.com/token" },
   openGraph: {
-    title: "MOOD Token — Issuance Preparation",
-    description: "Discover MOOD World. MOOD Token is coming to BNB Smart Chain.",
+    title: "MOOD — The World Is Open",
+    description: "MOOD is the world. Moodify is only the beginning.",
     url: "https://crestwavecoin.com/token",
     siteName: "MOOD",
     type: "website",

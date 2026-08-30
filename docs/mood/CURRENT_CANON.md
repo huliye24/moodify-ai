@@ -42,6 +42,23 @@ MOOD 是 WORLD + PROTOCOL + PORTAL 三者的总和。Token 只是其中一个未
 5. **历史 / archive 文档允许保留，但必须明确历史属性。** 历史文档不能反向覆盖当前 Canon。
 6. **Canon 变更必须可见。** 进入 [DECISION_LOG.md](DECISION_LOG.md) 与根 `docs/canon/CANON_CHANGELOG.md`。
 
+## 3.1 MOOD Network Interface 公共语言与入口
+
+`crestwavecoin.com` 必须呈现为一个统一结构、多个入口的 MOOD Network Interface：
+
+```text
+MOOD = WORLD + PROTOCOL + PORTAL
+        + NETWORK / LIBRARY / MOODIFY GATE
+```
+
+当前公共主句：
+
+> **MOOD is the world. Moodify is only the beginning.**
+
+> **在这里，成为你自己。**
+
+`Every voice deserves to be heard.` 不再用于 MOOD World 公共表面。Token 准备、发行状态与合约信息不得成为世界入口的主叙事；Token 继续作为未来经济层受 Launch Gate 约束。
+
 ## 4. 011 不做的事
 
 011 是 **Canon Freeze & Branch Convergence**，不是产品扩张：

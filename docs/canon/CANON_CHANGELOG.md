@@ -2,6 +2,16 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-08-30 — MOOD Network Interface & Public Language
+
+- **CANON_CHANGE = YES。** 人类明确要求官网服从白皮书的单一结构、多入口架构，并撤下 Token 准备模块与旧 Moodify 口号。
+- **Why / Evidence：** 《MOOD 中文白皮书 v0.1》第 3–6、11、13–14 节定义 `crestwavecoin.com = WORLD + PROTOCOL + PORTAL`，以及 Library、Protocol Hall、Builder Workshop、Agent Lab、Node Station、Moodify Gate 等入口。
+- **公共主句：** `MOOD is the world. Moodify is only the beginning.` / `在这里，成为你自己。`
+- **边界：** `Every voice deserves to be heard.` 保留为历史 Moodify Public Form 表达，但不再用于 MOOD World / `crestwavecoin.com` 公共表面。
+- **迁移：** `/token` 当前承载的公开首页改为统一 Network Interface；发行准备区退出公众首页，Token 仍受 G0–G11 Gate 约束。
+- **受影响 authority 文件：** `AGENTS.md`、`docs/mood/CURRENT_CANON.md`、本 changelog、`apps/web/app/token/*`。
+- **Rollback：** 回退本条与同一提交中的上述文件；不涉及合约、资金、Token 参数或链上状态。
+
 ## 2026-08-30 — MOOD Scope Freeze & Entropy Reduction 026
 
 - **CANON_CHANGE = YES。** 人类明确将 026 从功能集成包改为范围冻结与熵减审计。
