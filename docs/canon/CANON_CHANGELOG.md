@@ -2,6 +2,26 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-08-30 — MOOD FOUNDATION 011: Canonical Freeze & Branch Convergence
+
+- **CANON_CHANGE = YES。** 人类通过 Package 011 冻结 MOOD WORLD 总体身份：`MOOD = WORLD + PROTOCOL + PORTAL`。
+- **Token Gate：** 引入 G0–G11 Token Launch Gate；Token 激活（025）必须等全部 Gate PASS 才可执行。
+- **身份冻结：**
+  - `Token is not the product.`（Token 不是产品）
+  - `Token is not the protocol.`（Token 不是协议）
+  - `Token is not the world.`（Token 不是世界）
+  - `MOOD Token = future economic layer`（NOT ACTIVATED）
+  - Moodify Music / Player = Genesis Application（MOOD 上第一个用户应用）
+  - `crestwavecoin.com` = MOOD WORLD Home（PLANNED，未上线）
+- **资产分类：** 新增 `docs/mood/ASSET_CLASSIFICATION.md`，完成 KEEP / KEEP BUT DARK / FREEZE / SEPARATE 四类处置。
+- **并行分支：** 标记 `codex/mood-mainnet-integration-009` 为 DO NOT MERGE WHOLE；标记历史 Genesis v1.0 实现（`codex/moodify-classic-reconstruction-001`）进入 FREEZE。
+- **新增文档：** `docs/mood/CURRENT_CANON.md`、`docs/mood/SYSTEM_ARCHITECTURE.md`、`docs/mood/PRODUCT_RELATIONSHIP.md`、`docs/mood/ASSET_CLASSIFICATION.md`、`docs/mood/IN_FLIGHT_CHANGE_REGISTER.md`、`docs/mood/TOKEN_LAUNCH_GATE.md`、`docs/mood/SEPTEMBER_BUILD_ROADMAP.md`、`docs/mood/DECISION_LOG.md`、`docs/mood/START_HERE_FOR_011.md`。
+- **Canon Guard：** 扩展 `scripts/canon_guard.py` 检测 MOOD ≠ Token 反模式与 Buy/Trade MOOD CTA。
+- **AGENTS / README：** 最小更新 AGENTS.md（增加 MOOD Protocol 章节 + Agent Rules 更新）+ README.md（增加 MOOD Protocol 段落）。
+- **受影响 authority 文件：** `AGENTS.md`、`README.md`、`scripts/canon_guard.py`、`docs/canon/CANON_CHANGELOG.md`。
+- **明确未改：** Moodify Music / Player 对外产品身份（v1.1 Public Form 继续有效）；`docs/brand/public/PUBLIC_BRAND_CONSTITUTION.md`（不覆盖）。
+- **Rollback：** 将本 changelog 条目 + `docs/mood/` 目录 + AGENTS.md/README.md/canon_guard.py 变更作为整体单元回退；011 未改运行时，无生产回滚。
+
 ## 2026-08-19 — Public Form Brand Authority Freeze（v1.1）
 
 - **CANON_CHANGE = YES。** 人类通过 Package 01 明确冻结 Public Brand：创始价值原点「弱者的声音也值得被世界听见」；公共表达「每一种声音，都值得被世界听见。 / Every voice deserves to be heard.」；产品原则 `Listen. Then Play.`；动作 `Play.`。

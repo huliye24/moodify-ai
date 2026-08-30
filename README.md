@@ -12,6 +12,16 @@
 
 ---
 
+## MOOD Protocol
+
+MOOD is an open Web3 digital world: `MOOD = WORLD + PROTOCOL + PORTAL`.
+
+Moodify Music / Player is the **Genesis Application** — the first concrete user-facing app running on MOOD.
+
+See [`docs/mood/CURRENT_CANON.md`](docs/mood/CURRENT_CANON.md) for MOOD identity, boundary, and Token Launch Gate (G0–G11).
+
+---
+
 ## What Moodify Is
 
 AI can now generate music at scale. The music industry still lacks reliable infrastructure to **listen to, evaluate, and process** that music. Moodify is building the auditory intelligence layer that fills this gap — the "ears" of the AI music economy.

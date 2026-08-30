@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Moodify Canon drift guard — W01-P01.
+"""Moodify Canon drift guard — W01-P01 + MOOD FOUNDATION 011.
 
-低成本权威守卫：防止高权威文件再次把 Ear 定义为对外一级产品，
-或出现相互冲突的对外产品身份。只读检查，不修改任何文件。
+低成本权威守卫：
+1. W01-P01：防止高权威文件再次把 Ear 定义为对外一级产品，
+   或出现相互冲突的对外产品身份。
+2. MOOD FOUNDATION 011：防止 MOOD 总体身份被错误描述为「单一 Token」，
+   或在公共文件中出现未经批准的 Buy / Trade MOOD CTA。
+
+只读检查，不修改任何文件。
 
 用法:
     python scripts/canon_guard.py            # 检查仓库根（自动定位）
@@ -12,6 +17,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -23,7 +29,17 @@ AUTHORITY_FILES = [
     "docs/canon/INTERNAL_SYSTEMS.md",
     "docs/canon/AUTHORITY_ORDER.md",
     "docs/canon/CURRENT_ARCHITECTURE.md",
+    "docs/canon/CANON_CHANGELOG.md",
     "docs/REPOSITORY_STATUS.md",
+    # MOOD FOUNDATION 011 — MOOD 总体身份文档
+    "docs/mood/CURRENT_CANON.md",
+    "docs/mood/SYSTEM_ARCHITECTURE.md",
+    "docs/mood/PRODUCT_RELATIONSHIP.md",
+    "docs/mood/ASSET_CLASSIFICATION.md",
+    "docs/mood/IN_FLIGHT_CHANGE_REGISTER.md",
+    "docs/mood/TOKEN_LAUNCH_GATE.md",
+    "docs/mood/SEPTEMBER_BUILD_ROADMAP.md",
+    "docs/mood/DECISION_LOG.md",
 ]
 
 REQUIRED_CANON_FILES = [
@@ -33,6 +49,17 @@ REQUIRED_CANON_FILES = [
     "docs/canon/AUTHORITY_ORDER.md",
     "docs/canon/CURRENT_ARCHITECTURE.md",
     "docs/canon/CANON_CHANGELOG.md",
+]
+
+REQUIRED_MOOD_FILES = [
+    "docs/mood/CURRENT_CANON.md",
+    "docs/mood/SYSTEM_ARCHITECTURE.md",
+    "docs/mood/PRODUCT_RELATIONSHIP.md",
+    "docs/mood/ASSET_CLASSIFICATION.md",
+    "docs/mood/IN_FLIGHT_CHANGE_REGISTER.md",
+    "docs/mood/TOKEN_LAUNCH_GATE.md",
+    "docs/mood/SEPTEMBER_BUILD_ROADMAP.md",
+    "docs/mood/DECISION_LOG.md",
 ]
 
 # 对外一级产品身份允许的表述（首身份位置附近可接受的产品行）
@@ -52,10 +79,101 @@ FORBIDDEN_EAR_PRODUCT_PATTERNS = [
     "Moodify is The Ear of AI — an Auditory Intelligence System",
 ]
 
+# MOOD FOUNDATION 011 — MOOD 反 Token 反模式
+# 高权威文件不应把 MOOD 描述为「单一 Token / 已发币产品」
+# （MOOD = WORLD + PROTOCOL + PORTAL；Token 是 future economic layer）
+FORBIDDEN_MOOD_AS_TOKEN_PATTERNS = [
+    "MOOD is a token",
+    "MOOD is the token",
+    "MOOD is a single token",
+    "MOOD Token is the product",
+    "MOOD Token is Moodify",
+    "Moodify is MOOD Token",
+    "the MOOD product is the token",
+]
 
-def load(root: Path) -> dict[str, str]:
+# 公共文件位置（UI / marketing / public docs）出现未经批准的 Buy / Trade CTA
+# 仅检测 README/AGENTS / 公共 brand / mood docs；具体 UI 检测留待后续 canon-guard-ui。
+FORBIDDEN_BUY_TRADE_CTA_PATTERNS = [
+    "Buy MOOD",
+    "Trade MOOD",
+    "Buy MOOD Token",
+    "Trade MOOD Token",
+    "Purchase MOOD",
+]
+
+# 公共文件路径前缀：默认仅在 README/AGENTS/canon/brand/mood 中检查
+PUBLIC_PATH_PREFIXES = (
+    "README.md",
+    "AGENTS.md",
+    "docs/canon/",
+    "docs/brand/",
+    "docs/mood/",
+    "docs/REPOSITORY_STATUS.md",
+)
+
+# Buy/Trade MOOD CTA 检测：允许在描述禁止上下文中出现（如「禁止 Buy MOOD」）
+# 只在非 docs/mood/ 路径中严格检查（mood 文档本身会描述禁令）
+# 在 docs/mood/ 中，仅检测未加禁令标记的裸 CTA
+
+
+def is_forbidden_cta(line: str) -> bool:
+    """判断一行是否包含禁止的 Buy/Trade MOOD CTA（非描述）。"""
+    line_lower = line.lower()
+    cta_markers = ["buy mood", "trade mood", "purchase mood"]
+    for marker in cta_markers:
+        if marker in line_lower:
+            # 如果行中包含禁令关键词（中文或英文），认为是描述不是 CTA
+            forbid_markers = [
+                "禁止", "禁", "❌", "✗", "freez", "gate", "pending",
+                "not ", "do not", "don't", "must not", "never",
+                "should not", "not_activated", "not activated",
+                "不允许", "不展示", "不出现", "不暴露",
+                "无", "none", "no ", "without",
+                "blocked",
+                "检测",  # 描述检测功能，不是真实 CTA
+                "human_decision", "h.d.",
+                "humen", "cta 的", "cta的",
+                "cta 应", "cta should", "cta must",
+                "是否存在", "should detect",
+                # bullet 下的禁止列表项（如 "- 任何...Buy MOOD CTA 的提交"）
+                "任何引入", "任何把", "任何将",
+                "禁止 cherry-pick",
+                "提交的", "声明的",
+            ]
+            # 检查行中是否存在任何禁令标记
+            if any(fm in line_lower for fm in forbid_markers):
+                return False
+            # 检查行中是否存在中文禁令标记（不转小写）
+            forbid_cn = [
+                "禁止", "禁", "❌", "✗", "不允许", "不展示", "不出现", "不暴露",
+                "待", "待定", "CTA 的", "是否存在",
+                "任何引入", "任何把", "任何将",
+                "的提交", "提交的", "的处置",
+            ]
+            if any(fm in line for fm in forbid_cn):
+                return False
+            # 描述 Token Launch Gate 的语境（G0-G11）是允许的
+            if "gate" in line_lower or any(f"g{i}" in line_lower for i in range(12)):
+                return False
+            return True
+    return False
+
+
+def check_buy_trade_cta(rel: str, content: str) -> list[str]:
+    """检查公共路径前缀文件中的 Buy/Trade MOOD CTA。"""
+    errors = []
+    if not any(rel.startswith(prefix) or rel == prefix for prefix in PUBLIC_PATH_PREFIXES):
+        return errors
+    for i, line in enumerate(content.splitlines(), 1):
+        if is_forbidden_cta(line):
+            errors.append(f"{rel}:{i}: forbidden Buy/Trade MOOD CTA in public file: {line.strip()!r}")
+    return errors
+
+
+def load(root: Path, files_to_load: list[str]) -> dict[str, str]:
     files: dict[str, str] = {}
-    for rel in AUTHORITY_FILES:
+    for rel in files_to_load:
         p = root / rel
         files[rel] = p.read_text(encoding="utf-8", errors="replace") if p.exists() else ""
     return files
@@ -93,17 +211,53 @@ def check_files(files: dict[str, str]) -> list[str]:
     if "docs/canon" not in ao:
         errors.append("docs/canon/AUTHORITY_ORDER.md: missing docs/canon authority level")
 
+    # ---- MOOD FOUNDATION 011 ----
+
+    # 6. MOOD CURRENT_CANON 必须声明 WORLD + PROTOCOL + PORTAL
+    mood_cc = files.get("docs/mood/CURRENT_CANON.md", "")
+    if mood_cc:
+        if "WORLD" not in mood_cc or "PROTOCOL" not in mood_cc or "PORTAL" not in mood_cc:
+            errors.append("docs/mood/CURRENT_CANON.md: missing WORLD + PROTOCOL + PORTAL declaration")
+        if "Token is not the product" not in mood_cc:
+            errors.append("docs/mood/CURRENT_CANON.md: missing 'Token is not the product' invariant")
+        if "011" not in mood_cc or "G11" not in mood_cc:
+            errors.append("docs/mood/CURRENT_CANON.md: missing 011 / G11 references")
+
+    # 7. TOKEN_LAUNCH_GATE 必须存在并定义 G0–G11
+    tlg = files.get("docs/mood/TOKEN_LAUNCH_GATE.md", "")
+    if tlg:
+        for gate in (f"G{i}" for i in range(12)):
+            if gate not in tlg:
+                errors.append(f"docs/mood/TOKEN_LAUNCH_GATE.md: missing gate {gate}")
+
+    # 8. MOOD 反 Token 反模式检测（高权威文件）
+    for rel, content in files.items():
+        if rel not in AUTHORITY_FILES:
+            continue
+        for pat in FORBIDDEN_MOOD_AS_TOKEN_PATTERNS:
+            if pat in content:
+                errors.append(f"{rel}: forbidden MOOD-as-token pattern: {pat!r}")
+
+    # 9. 公共文件不应出现 Buy / Trade MOOD CTA（描述禁令的除外）
+    for rel, content in files.items():
+        errors.extend(check_buy_trade_cta(rel, content))
+
     return errors
 
 
 def check(root: Path) -> list[str]:
     errors: list[str] = []
-    files = load(root)
+    files = load(root, AUTHORITY_FILES)
 
     # 1. 必需的 canon 文件存在
     for rel in REQUIRED_CANON_FILES:
         if not (root / rel).exists():
             errors.append(f"missing canon file: {rel}")
+
+    # 1b. 必需的 MOOD 文件存在
+    for rel in REQUIRED_MOOD_FILES:
+        if not (root / rel).exists():
+            errors.append(f"missing mood file: {rel}")
 
     errors.extend(check_files(files))
     return errors
