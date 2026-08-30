@@ -1,0 +1,405 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MOOD Protocol Reputation Snapshot",
+  "description": "Immutable snapshot of reputation state at a specific point in time",
+  "type": "object",
+  "required": [
+    "snapshotVersion",
+    "snapshotId",
+    "protocolId",
+    "epochId",
+    "policyVersion",
+    "epochPolicyVersion",
+    "dimensions",
+    "verifiedContributionCount",
+    "categoryDiversity",
+    "confidence",
+    "generatedAt",
+    "snapshotFingerprint",
+    "supersedes"
+  ],
+  "properties": {
+    "snapshotVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Snapshot schema version"
+    },
+    "snapshotId": {
+      "type": "string",
+      "pattern": "^mood-reputation-[0-9]{3}$",
+      "description": "Unique snapshot identifier"
+    },
+    "protocolId": {
+      "type": "string",
+      "pattern": "^mood:contributor:[a-f0-9]{64}$",
+      "description": "Canonical participant identity"
+    },
+    "epochId": {
+      "type": "string",
+      "pattern": "^EPOCH-[0-9]{4}$|^GENESIS_DRAFT$",
+      "description": "Epoch identifier"
+    },
+    "policyVersion": {
+      "type": "string",
+      "pattern": "^003-v\\d+\\.\\d+$",
+      "description": "Reputation policy version"
+    },
+    "epochPolicyVersion": {
+      "type": "string",
+      "pattern": "^003-v\\d+\\.\\d+$",
+      "description": "Epoch-specific policy version"
+    },
+    "inputContributionIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^mood-contrib-[a-z0-9-]+$"
+      },
+      "description": "IDs of contributions used in this snapshot"
+    },
+    "inputFingerprints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      },
+      "description": "SHA-256 fingerprints of input contributions"
+    },
+    "dimensions": {
+      "$ref": "#/definitions/DimensionScores",
+      "description": "Calculated dimension scores"
+    },
+    "aggregate": {
+      "$ref": "#/definitions/AggregateScore",
+      "description": "Aggregate reputation score (optional)"
+    },
+    "verifiedContributionCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of verified contributions"
+    },
+    "categoryDiversity": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["code", "documentation", "governance", "community", "research", "testing"]
+      },
+      "description": "Categories of contributions made"
+    },
+    "confidence": {
+      "$ref": "#/definitions/ConfidenceLevel",
+      "description": "Confidence level in the snapshot"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When snapshot was generated"
+    },
+    "snapshotFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 fingerprint of the entire snapshot"
+    },
+    "supersedes": {
+      "type": "string",
+      "pattern": "^mood-reputation-[0-9]{3}$",
+      "description": "Previous snapshot this one supersedes (if any)"
+    },
+    "evidence": {
+      "$ref": "#/definitions/SnapshotEvidence",
+      "description": "Evidence supporting the snapshot"
+    },
+    "metadata": {
+      "$ref": "#/definitions/SnapshotMetadata",
+      "description": "Additional snapshot metadata"
+    }
+  },
+  "definitions": {
+    "DimensionScores": {
+      "type": "object",
+      "required": [
+        "contribution",
+        "impact",
+        "quality",
+        "persistence",
+        "early"
+      ],
+      "properties": {
+        "contribution": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Contribution dimension score (null if insufficient data)"
+        },
+        "impact": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Impact dimension score (null if insufficient data)"
+        },
+        "quality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Quality dimension score (null if insufficient data)"
+        },
+        "persistence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Persistence dimension score (null if insufficient data)"
+        },
+        "early": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Early participation dimension score (null if insufficient data)"
+        }
+      }
+    },
+    "AggregateScore": {
+      "type": "object",
+      "required": [
+        "score",
+        "method",
+        "timestamp"
+      ],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Aggregate reputation score"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["weighted-average", "median", "maximum", "custom"],
+          "description": "Aggregation method used"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When aggregation was performed"
+        },
+        "weights": {
+          "type": "object",
+          "description": "Weights used for aggregation",
+          "properties": {
+            "contribution": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "impact": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "quality": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "persistence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "early": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      }
+    },
+    "ConfidenceLevel": {
+      "type": "string",
+      "enum": ["insufficient", "low", "medium", "high", "certainty"],
+      "description": "Confidence level in the data"
+    },
+    "SnapshotEvidence": {
+      "type": "object",
+      "required": [
+        "inputHashes",
+        "calculationLog",
+        "verificationResults"
+      ],
+      "properties": {
+        "inputHashes": {
+          "type": "object",
+          "description": "Hashes of input data",
+          "properties": {
+            "profile": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            "contributions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              }
+            },
+            "policy": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            }
+          }
+        },
+        "calculationLog": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CalculationStep"
+          },
+          "description": "Step-by-step calculation log"
+        },
+        "verificationResults": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VerificationResult"
+          },
+          "description": "Verification results for each component"
+        },
+        "externalAttestations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExternalAttestation"
+          },
+          "description": "Third-party attestations"
+        }
+      }
+    },
+    "CalculationStep": {
+      "type": "object",
+      "required": [
+        "step",
+        "operation",
+        "input",
+        "output",
+        "timestamp"
+      ],
+      "properties": {
+        "step": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Step number in calculation sequence"
+        },
+        "operation": {
+          "type": "string",
+          "description": "Operation performed"
+        },
+        "input": {
+          "type": "object",
+          "description": "Input parameters"
+        },
+        "output": {
+          "type": "object",
+          "description": "Output result"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When step was executed"
+        },
+        "checksum": {
+          "type": "string",
+          "pattern":^[a-f0-9]{64}$",
+          "description": "Checksum of output"
+        }
+      }
+    },
+    "VerificationResult": {
+      "type": "object",
+      "required": [
+        "component",
+        "status",
+        "details"
+      ],
+      "properties": {
+        "component": {
+          "type": "string",
+          "enum": ["identity", "contributions", "aggregation", "integrity"],
+          "description": "Component verified"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "WARNING"],
+          "description": "Verification status"
+        },
+        "details": {
+          "type": "string",
+          "description": "Verification details"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Evidence of verification"
+        }
+      }
+    },
+    "ExternalAttestation": {
+      "type": "object",
+      "required": [
+        "attesterId",
+        "attestedAt",
+        "statement",
+        "signature"
+      ],
+      "properties": {
+        "attesterId": {
+          "type": "string",
+          "pattern": "^mood:attester:[a-f0-9]{64}$",
+          "description": "Attester identity"
+        },
+        "attestedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When attestation was made"
+        },
+        "statement": {
+          "type": "string",
+          "description": "Attestation statement"
+        },
+        "signature": {
+          "type": "string",
+          "description": "Digital signature of attestation"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Scope of attestation"
+        }
+      }
+    },
+    "SnapshotMetadata": {
+      "type": "object",
+      "properties": {
+        "generationContext": {
+          "type": "string",
+          "description": "Context in which snapshot was generated"
+        },
+        "anonymityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Anonymity score (1 = fully anonymous)"
+        },
+        "retentionExpires": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When snapshot can be expired"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional tags"
+        }
+      }
+    }
+  }
+}

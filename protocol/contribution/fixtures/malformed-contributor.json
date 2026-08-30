@@ -1,0 +1,37 @@
+{
+  "description": "This contribution has an invalid contributor wallet address.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-bad-contributor",
+  "contributor": {
+    "type": "wallet",
+    "id": "not-a-valid-wallet-address"
+  },
+  "category": "code",
+  "title": "Contribution with malformed contributor",
+  "submittedAt": "2026-08-29T14:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-bad-001",
+      "type": "git_commit",
+      "uri": null,
+      "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "observedAt": "2026-08-29T13:55:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "unverified",
+        "method": null,
+        "verifiedAt": null,
+        "verifiedBy": null
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:458538c121387901eb0f6a6fae87b82d5cb4cddf13a2eac6bdcf2375f23494c7",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

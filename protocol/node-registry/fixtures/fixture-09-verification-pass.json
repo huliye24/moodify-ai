@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 9: Successfully Verified HTTPS Challenge",
+  "description": "Node that passed HTTP challenge verification",
+  "fixtureId": "f9-verification-pass",
+  "challenge": {
+    "challengeId": "challenge-001",
+    "nonce": "abc123def456",
+    "expectedPath": "/.well-known/mood-node-challenge",
+    "createdAt": "2026-08-20T10:00:00Z"
+  },
+  "nodeResponse": "abc123def456",
+  "verificationResult": {
+    "verified": true,
+    "method": "http_challenge",
+    "timestamp": "2026-08-20T10:05:00Z"
+  },
+  "evidence": {
+    "evidenceId": "evidence-challenge-001",
+    "nodeId": "mood:node:1111111111111111111111111111111111111111111111111111111111111111",
+    "method": "http_challenge",
+    "status": "verified",
+    "createdAt": "2026-08-20T10:05:00Z"
+  },
+  "expectedBehavior": {
+    "verificationPassed": true,
+    "evidenceCreated": true
+  }
+}

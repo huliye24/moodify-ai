@@ -1,0 +1,38 @@
+{
+  "description": "Authored comprehensive documentation for the MPF-002 contribution core.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-docs-001",
+  "contributor": {
+    "type": "github",
+    "id": "alice-moodify"
+  },
+  "category": "documentation",
+  "title": "Write contribution core documentation",
+  "submittedAt": "2026-08-29T11:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-docs-001",
+      "type": "file_hash",
+      "uri": null,
+      "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "observedAt": "2026-08-29T10:50:00Z",
+      "metadata": {
+        "path": "protocol/contribution/README.md",
+        "fixture": true
+      },
+      "verification": {
+        "status": "verified",
+        "method": "hash_match",
+        "verifiedAt": "2026-08-29T11:01:00Z",
+        "verifiedBy": "reviewer-fixture-002"
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:729ffb3be875ec14a16f0352fdcf74bda33deb1319e95f54139ae7cfc72f3bb9",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

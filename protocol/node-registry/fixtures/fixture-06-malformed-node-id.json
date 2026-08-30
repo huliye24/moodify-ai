@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 6: Malformed Node ID",
+  "description": "Node with invalid nodeId format",
+  "fixtureId": "f6-malformed-node-id",
+  "invalidNodeId": "invalid-node-id",
+  "expectedBehavior": {
+    "valid": false,
+    "error": "Invalid nodeId format"
+  }
+}

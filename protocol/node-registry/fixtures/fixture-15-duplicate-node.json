@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 15: Duplicate Node Detection",
+  "description": "Same stable inputs produce duplicate node ID",
+  "fixtureId": "f15-duplicate-node",
+  "nodeOptions": {
+    "operatorProtocolId": "mood:contributor:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "nodeType": "compute",
+    "stableNonce": "unique-stable-nonce-001"
+  },
+  "firstNodeId": "mood:node:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "secondNodeId": "mood:node:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "expectedBehavior": {
+    "idsMatch": true,
+    "duplicateDetected": true
+  }
+}

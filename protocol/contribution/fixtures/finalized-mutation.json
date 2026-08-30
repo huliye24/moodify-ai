@@ -1,0 +1,160 @@
+{
+  "description": "This record is finalized. Attempting to mutate immutable fields must fail.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-finalized",
+  "contributor": {
+    "type": "wallet",
+    "id": "0x8888888888888888888888888888888888888888"
+  },
+  "category": "code",
+  "title": "Finalized contribution — mutation attempt",
+  "submittedAt": "2026-08-29T17:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-fin-001",
+      "type": "git_commit",
+      "uri": null,
+      "digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+      "observedAt": "2026-08-29T16:55:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "verified",
+        "method": "git_verify",
+        "verifiedAt": "2026-08-29T17:01:00Z",
+        "verifiedBy": "reviewer-fixture-fin"
+      }
+    }
+  ],
+  "status": "finalized",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:380fdb41124971744c507d34ee89e3a2a890436562df3597d266b97559ec7682",
+  "review": {
+    "reviewerId": "reviewer-fixture-fin",
+    "reviewedAt": "2026-08-29T17:02:00Z",
+    "notes": "Looks good",
+    "outcome": "approved"
+  },
+  "scores": {
+    "contribution": {
+      "value": 85,
+      "scale": "0-100",
+      "ruleId": "manual.v1",
+      "evidenceIds": [
+        "evidence-fixture-fin-001"
+      ],
+      "source": {
+        "type": "human_review",
+        "id": "reviewer-fixture-fin"
+      }
+    },
+    "impact": {
+      "value": 80,
+      "scale": "0-100",
+      "ruleId": "manual.v1",
+      "evidenceIds": [
+        "evidence-fixture-fin-001"
+      ],
+      "source": {
+        "type": "human_review",
+        "id": "reviewer-fixture-fin"
+      }
+    },
+    "quality": {
+      "value": 90,
+      "scale": "0-100",
+      "ruleId": "manual.v1",
+      "evidenceIds": [
+        "evidence-fixture-fin-001"
+      ],
+      "source": {
+        "type": "human_review",
+        "id": "reviewer-fixture-fin"
+      }
+    },
+    "persistence": {
+      "value": 60,
+      "scale": "0-100",
+      "ruleId": "persistence.v1",
+      "evidenceIds": [],
+      "source": {
+        "type": "deterministic_rule"
+      }
+    },
+    "early": {
+      "value": 75,
+      "scale": "0-100",
+      "ruleId": "early.v1",
+      "evidenceIds": [],
+      "source": {
+        "type": "deterministic_rule"
+      }
+    }
+  },
+  "reputationEvidence": {
+    "contributionId": "mood-contrib-fixture-finalized",
+    "policyVersion": "002-draft-1",
+    "dimensions": {
+      "contribution": {
+        "value": 85,
+        "scale": "0-100",
+        "ruleId": "manual.v1",
+        "evidenceIds": [
+          "evidence-fixture-fin-001"
+        ],
+        "source": {
+          "type": "human_review",
+          "id": "reviewer-fixture-fin"
+        }
+      },
+      "impact": {
+        "value": 80,
+        "scale": "0-100",
+        "ruleId": "manual.v1",
+        "evidenceIds": [
+          "evidence-fixture-fin-001"
+        ],
+        "source": {
+          "type": "human_review",
+          "id": "reviewer-fixture-fin"
+        }
+      },
+      "quality": {
+        "value": 90,
+        "scale": "0-100",
+        "ruleId": "manual.v1",
+        "evidenceIds": [
+          "evidence-fixture-fin-001"
+        ],
+        "source": {
+          "type": "human_review",
+          "id": "reviewer-fixture-fin"
+        }
+      },
+      "persistence": {
+        "value": 60,
+        "scale": "0-100",
+        "ruleId": "persistence.v1",
+        "evidenceIds": [],
+        "source": {
+          "type": "deterministic_rule"
+        }
+      },
+      "early": {
+        "value": 75,
+        "scale": "0-100",
+        "ruleId": "early.v1",
+        "evidenceIds": [],
+        "source": {
+          "type": "deterministic_rule"
+        }
+      }
+    },
+    "aggregate": null,
+    "status": "finalized",
+    "inputFingerprint": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+    "artifactFingerprint": "sha256:deaddeaddeaddeaddeaddeaddeaddeaddeaddeaddeaddeaddeaddeaddeaddead"
+  },
+  "supersedes": null
+}

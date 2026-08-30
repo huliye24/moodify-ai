@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 5: Developer Node Without Endpoint",
+  "description": "Developer node with hidden location, no endpoint",
+  "fixtureId": "f5-developer-node-no-endpoint",
+  "node": {
+    "nodeId": "mood:node:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "operatorProtocolId": "mood:contributor:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "nodeType": "developer",
+    "displayName": "Core Contributor",
+    "region": { "countryCode": null, "regionCode": null, "city": null, "precision": "hidden" },
+    "endpoint": null,
+    "capabilityManifestId": "mood:capability:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "verification": { "status": "pending", "method": null, "verifiedAt": null, "evidenceIds": [] },
+    "health": { "status": "unknown", "observedAt": null },
+    "lifecycleStatus": "registered",
+    "registeredAt": "2026-08-19T10:00:00Z",
+    "updatedAt": "2026-08-19T10:00:00Z",
+    "recordFingerprint": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "lifecycleHistory": []
+  },
+  "expectedBehavior": {
+    "endpointOptional": true,
+    "locationHidden": true
+  }
+}

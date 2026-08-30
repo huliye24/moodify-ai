@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 8: Self-Declared Unverified GPU Capability",
+  "description": "GPU capability declared but not verified",
+  "fixtureId": "f8-unverified-gpu-capability",
+  "capability": {
+    "key": "compute.gpu.model",
+    "value": "NVIDIA A100",
+    "visibility": "public",
+    "verificationStatus": "declared",
+    "evidenceIds": []
+  },
+  "expectedBehavior": {
+    "verified": false,
+    "declared": true,
+    "separateFromNodeVerification": true
+  }
+}

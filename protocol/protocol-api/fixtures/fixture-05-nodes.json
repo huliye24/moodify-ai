@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 5: Node List Response",
+  "description": "Sample node list response",
+  "fixtureId": "f5-nodes",
+  "request": {
+    "method": "GET",
+    "url": "/api/protocol/v1/nodes?limit=10"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "data": [
+      {
+        "nodeId": "mood:node:aaa",
+        "nodeType": "compute",
+        "displayName": "Singapore Compute",
+        "region": { "countryCode": "SG", "precision": "country" },
+        "lifecycleStatus": "active",
+        "health": { "status": "healthy", "observedAt": "2026-08-29T10:00:00Z" },
+        "verification": { "status": "verified" },
+        "registeredAt": "2026-08-15T10:00:00Z"
+      }
+    ],
+    "meta": {
+      "requestId": "req_example_005",
+      "generatedAt": "2026-08-29T10:00:00Z",
+      "pagination": {
+        "limit": 10,
+        "offset": 0,
+        "total": 1,
+        "hasMore": false,
+        "nextCursor": null
+      }
+    }
+  }
+}

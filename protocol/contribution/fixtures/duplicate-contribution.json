@@ -1,0 +1,37 @@
+{
+  "description": "This is an exact duplicate with identical content fingerprint.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-duplicate",
+  "contributor": {
+    "type": "wallet",
+    "id": "0x1234567890123456789012345678901234567890"
+  },
+  "category": "code",
+  "title": "Duplicate of existing contribution",
+  "submittedAt": "2026-08-29T10:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-dup-001",
+      "type": "git_commit",
+      "uri": "https://github.com/moodify/protocol/commit/abc123def456",
+      "digest": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+      "observedAt": "2026-08-29T09:55:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "unverified",
+        "method": null,
+        "verifiedAt": null,
+        "verifiedBy": null
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:faee55f6ad25de203baf15c62135ec06312b374cbba8a5a9490c22ba6ff12a05",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

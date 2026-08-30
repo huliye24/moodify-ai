@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 1: Single Finalized Code Contribution",
+  "description": "Contributor with exactly one finalized code contribution",
+  "fixtureId": "f1-single-finalized-code",
+  "profile": {
+    "profileVersion": "1.0.0",
+    "protocolId": "mood:contributor:1111111111111111111111111111111111111111111111111111111111111111",
+    "primaryIdentity": {
+      "type": "wallet",
+      "namespace": "eip155:1",
+      "id": "0x1111111111111111111111111111111111111111"
+    },
+    "linkedPublicIdentities": [],
+    "createdAt": "2026-08-29T10:00:00Z",
+    "status": "active",
+    "firstVerifiedContributionAt": "2026-08-15T14:30:00Z",
+    "lastVerifiedContributionAt": "2026-08-15T14:30:00Z",
+    "verifiedContributionCount": 1,
+    "currentSnapshotId": "mood-reputation-2026-08-29-001"
+  },
+  "contributions": [
+    {
+      "contributionId": "mood-contrib-single-code-001",
+      "status": "finalized",
+      "category": "code",
+      "title": "Initial commit for protocol/reputation module",
+      "submittedAt": "2026-08-15T14:00:00Z",
+      "finalizedAt": "2026-08-15T14:30:00Z",
+      "scores": {
+        "contribution": 75,
+        "impact": 70,
+        "quality": 80,
+        "persistence": null,
+        "early": 100
+      }
+    }
+  ],
+  "snapshot": {
+    "snapshotVersion": "1.0.0",
+    "snapshotId": "mood-reputation-2026-08-29-001",
+    "protocolId": "mood:contributor:1111111111111111111111111111111111111111111111111111111111111111",
+    "epochId": "GENESIS_2026",
+    "policyVersion": "003-draft-1",
+    "epochPolicyVersion": "003-draft-1",
+    "inputContributionIds": ["mood-contrib-single-code-001"],
+    "inputFingerprints": ["sha256:aaa1111111111111111111111111111111111111111111111111111111111111"],
+    "dimensions": {
+      "contribution": 75,
+      "impact": 70,
+      "quality": 80,
+      "persistence": null,
+      "early": 100
+    },
+    "aggregate": null,
+    "verifiedContributionCount": 1,
+    "categoryDiversity": ["code"],
+    "confidence": "insufficient",
+    "generatedAt": "2026-08-29T10:00:00Z",
+    "snapshotFingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "supersedes": null
+  },
+  "expectedBehavior": {
+    "aggregateCalculated": false,
+    "persistenceScore": null,
+    "confidence": "insufficient",
+    "reason": "Single contribution insufficient for persistence and confidence"
+  }
+}

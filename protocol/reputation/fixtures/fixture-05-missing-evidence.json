@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 5: Missing MPF-002 Evidence",
+  "description": "Profile references contributions that cannot be verified in MPF-002",
+  "fixtureId": "f5-missing-evidence",
+  "profile": {
+    "profileVersion": "1.0.0",
+    "protocolId": "mood:contributor:5555555555555555555555555555555555555555555555555555555555555555",
+    "createdAt": "2026-08-15T10:00:00Z",
+    "status": "active",
+    "verifiedContributionCount": 1,
+    "currentSnapshotId": "mood-reputation-2026-08-29-005"
+  },
+  "contributions": [
+    {
+      "contributionId": "mood-contrib-missing-001",
+      "status": "finalized",
+      "scores": { "contribution": 75 }
+    },
+    {
+      "contributionId": "mood-contrib-missing-002",
+      "status": "MISSING",
+      "mpf002Status": "NOT_FOUND",
+      "error": "Contribution not found in MPF-002 records"
+    },
+    {
+      "contributionId": "mood-contrib-missing-003",
+      "status": "finalized",
+      "scores": { "contribution": 70 }
+    }
+  ],
+  "snapshot": {
+    "snapshotId": "mood-reputation-2026-08-29-005",
+    "verifiedContributionCount": 2,
+    "missingContributionIds": ["mood-contrib-missing-002"],
+    "confidence": "low"
+  },
+  "expectedBehavior": {
+    "missingHandled": true,
+    "confidenceReduced": true,
+    "reason": "Missing MPF-002 evidence should reduce confidence and exclude from calculation"
+  }
+}

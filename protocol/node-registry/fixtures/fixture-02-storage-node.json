@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 2: Valid Storage Node",
+  "description": "Storage node with endpoint and capabilities",
+  "fixtureId": "f2-valid-storage-node",
+  "node": {
+    "schemaVersion": "1.0.0",
+    "nodeId": "mood:node:4444444444444444444444444444444444444444444444444444444444444444",
+    "operatorProtocolId": "mood:contributor:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "nodeType": "storage",
+    "displayName": "US West Storage Node",
+    "region": {
+      "countryCode": "US",
+      "regionCode": "us-west-1",
+      "city": null,
+      "precision": "region"
+    },
+    "endpoint": {
+      "type": "https",
+      "uri": "https://storage-us-west.mood.invalid"
+    },
+    "capabilityManifestId": "mood:capability:4444444444444444444444444444444444444444444444444444444444444444",
+    "verification": { "status": "pending", "method": null, "verifiedAt": null, "evidenceIds": [] },
+    "health": { "status": "unknown", "observedAt": null },
+    "lifecycleStatus": "registered",
+    "registeredAt": "2026-08-16T10:00:00Z",
+    "updatedAt": "2026-08-16T10:00:00Z",
+    "recordFingerprint": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+    "lifecycleHistory": []
+  },
+  "capabilityManifest": {
+    "manifestId": "mood:capability:4444444444444444444444444444444444444444444444444444444444444444",
+    "nodeId": "mood:node:4444444444444444444444444444444444444444444444444444444444444444",
+    "nodeType": "storage",
+    "protocolVersions": ["0.1"],
+    "capabilities": [
+      {
+        "key": "storage.protocol.s3",
+        "value": true,
+        "visibility": "public",
+        "verificationStatus": "declared",
+        "evidenceIds": []
+      },
+      {
+        "key": "storage.capacity_class",
+        "value": "100-500GB",
+        "visibility": "public",
+        "verificationStatus": "declared",
+        "evidenceIds": []
+      }
+    ],
+    "createdAt": "2026-08-16T10:00:00Z",
+    "fingerprint": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+  }
+}

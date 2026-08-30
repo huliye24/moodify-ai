@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 2: Mainnet Facts Response",
+  "description": "Sample mainnet facts endpoint response",
+  "fixtureId": "f2-mainnet",
+  "request": {
+    "method": "GET",
+    "url": "/api/protocol/v1/protocol/mainnet"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "data": {
+      "schemaVersion": "1.0.0",
+      "network": "mainnet",
+      "status": "active",
+      "tokens": [],
+      "contracts": {}
+    },
+    "meta": {
+      "requestId": "req_example_002",
+      "generatedAt": "2026-08-29T10:00:00Z"
+    }
+  }
+}

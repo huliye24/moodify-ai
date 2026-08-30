@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 9: Rate Limited Error",
+  "description": "Sample RATE_LIMITED error response",
+  "fixtureId": "f9-rate-limited",
+  "request": {
+    "method": "GET",
+    "url": "/api/protocol/v1/contributions"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "error": {
+      "code": "RATE_LIMITED",
+      "message": "Too many requests",
+      "details": null
+    },
+    "meta": {
+      "requestId": "req_example_009",
+      "generatedAt": "2026-08-29T10:00:00Z"
+    }
+  },
+  "expectedBehavior": {
+    "httpStatus": 429,
+    "noInternalDetails": true
+  }
+}

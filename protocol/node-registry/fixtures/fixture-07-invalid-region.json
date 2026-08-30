@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 7: Invalid Region Precision",
+  "description": "Node with invalid region precision value",
+  "fixtureId": "f7-invalid-region-precision",
+  "invalidRegion": {
+    "countryCode": "SG",
+    "regionCode": null,
+    "city": null,
+    "precision": "invalid_precision"
+  },
+  "expectedBehavior": {
+    "valid": false,
+    "error": "Invalid precision value"
+  }
+}

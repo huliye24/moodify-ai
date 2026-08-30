@@ -1,0 +1,33 @@
+{
+  "policyVersion": "002-draft-1",
+  "status": "draft",
+  "economicConversionEnabled": false,
+  "categories": {
+    "code": { "eligible": true, "minimumEvidence": 1 },
+    "documentation": { "eligible": true, "minimumEvidence": 1 },
+    "data": { "eligible": true, "minimumEvidence": 1 },
+    "compute": { "eligible": true, "minimumEvidence": 1 },
+    "research": { "eligible": true, "minimumEvidence": 1 },
+    "design": { "eligible": true, "minimumEvidence": 1 },
+    "community": { "eligible": true, "minimumEvidence": 1 },
+    "infrastructure": { "eligible": true, "minimumEvidence": 1 },
+    "security": { "eligible": true, "minimumEvidence": 1 },
+    "other": { "eligible": false, "minimumEvidence": 1 }
+  },
+  "dimensions": [
+    "contribution",
+    "impact",
+    "quality",
+    "persistence",
+    "early"
+  ],
+  "weights": null,
+  "aggregateEnabled": false,
+  "requiresIndependentReview": true,
+  "finalizedImmutable": true,
+  "notes": [
+    "Draft bootstrap only.",
+    "If repository already contains approved authoritative weights/policy, replace this draft by referencing that authority.",
+    "Do not invent economic conversion."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "@moodify/protocol-contribution",
+  "version": "0.0.1",
+  "description": "MPF-002 MOOD Protocol Contribution Core",
+  "type": "module",
+  "main": "src/service.js",
+  "exports": {
+    ".": {
+      "import": "./src/service.js",
+      "types": "./src/service.d.ts"
+    },
+    "./ids": "./src/ids.js",
+    "./normalize": "./src/normalize.js",
+    "./fingerprint": "./src/fingerprint.js",
+    "./validate": "./src/validate.js",
+    "./state-machine": "./src/state-machine.js",
+    "./duplicate-guard": "./src/duplicate-guard.js",
+    "./score": "./src/score.js",
+    "./reputation-evidence": "./src/reputation-evidence.js",
+    "./policy": "./src/policy.js",
+    "./adapters/filesystem": "./adapters/filesystem.js"
+  },
+  "scripts": {
+    "test": "node tests/suite.test.js",
+    "validate": "node cli/index.js validate",
+    "create": "node cli/index.js create"
+  },
+  "keywords": [
+    "mood",
+    "protocol",
+    "contribution",
+    "reputation"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,234 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MOOD Protocol Reputation Attestation",
+  "description": "Third-party attestation of reputation claims",
+  "type": "object",
+  "required": [
+    "attestationVersion",
+    "attestationId",
+    "attesterId",
+    "protocolId",
+    "attestedAt",
+    "statement",
+    "signature",
+    "scope"
+  ],
+  "properties": {
+    "attestationVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Attestation schema version"
+    },
+    "attestationId": {
+      "type": "string",
+      "pattern": "^mood-attest-[0-9]{8}-[0-9]{6}$",
+      "description": "Unique attestation identifier"
+    },
+    "attesterId": {
+      "type": "string",
+      "pattern": "^mood:attester:[a-f0-9]{64}$",
+      "description": "Attester's canonical identity"
+    },
+    "protocolId": {
+      "type": "string",
+      "pattern": "^mood:contributor:[a-f0-9]{64}$",
+      "description": "Subject participant's identity"
+    },
+    "attestedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When attestation was made"
+    },
+    "statement": {
+      "type": "object",
+      "description": "Attestation statement",
+      "properties": {
+        "claim": {
+          "type": "string",
+          "description": "Specific claim being attested"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EvidenceReference"
+          },
+          "description": "Evidence supporting the claim"
+        },
+        "confidence": {
+          "$ref": "#/definitions/ConfidenceLevel",
+          "description": "Confidence in the claim"
+        },
+        "duration": {
+          "type": "object",
+          "description": "Validity period of attestation",
+          "properties": {
+            "validFrom": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "validUntil": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      },
+      "required": ["claim"]
+    },
+    "signature": {
+      "type": "string",
+      "description": "Digital signature of the attestation"
+    },
+    "scope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["identity", "contributions", "dimensions", "aggregate", "snapshot"]
+      },
+      "description": "Scope of the attestation"
+    },
+    "references": {
+      "type": "object",
+      "description": "Related entity references",
+      "properties": {
+        "snapshotId": {
+          "type": "string",
+          "pattern": "^mood-reputation-[0-9]{3}$",
+          "description": "Referenced snapshot ID"
+        },
+        "contributionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^mood-contrib-[a-z0-9-]+$"
+          },
+          "description": "Referenced contribution IDs"
+        },
+        "epochId": {
+          "type": "string",
+          "pattern": "^EPOCH-[0-9]{4}$",
+          "description": "Referenced epoch ID"
+        }
+      }
+    },
+    "metadata": {
+      "$ref": "#/definitions/AttestationMetadata",
+      "description": "Additional attestation metadata"
+    },
+    "revocation": {
+      "$ref": "#/definitions/RevocationInfo",
+      "description": "Revocation information (if revoked)"
+    }
+  },
+  "definitions": {
+    "EvidenceReference": {
+      "type": "object",
+      "required": [
+        "evidenceId",
+        "type",
+        "weight"
+      ],
+      "properties": {
+        "evidenceId": {
+          "type": "string",
+          "pattern": "^EV-[0-9]{6}$",
+          "description": "Evidence identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["documentary", "observational", "computational", "testimonial"],
+          "description": "Type of evidence"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Evidence weight"
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of evidence"
+        }
+      }
+    },
+    "ConfidenceLevel": {
+      "type": "string",
+      "enum": ["insufficient", "low", "medium", "high", "certainty"],
+      "description": "Confidence level"
+    },
+    "AttestationMetadata": {
+      "type": "object",
+      "properties": {
+        "attestationType": {
+          "type": "string",
+          "enum": ["affirmation", "verification", "certification", "endorsement"],
+          "description": "Type of attestation"
+        },
+        "methodology": {
+          "type": "string",
+          "description": "Methodology used for attestation"
+        },
+        "cost": {
+          "type": "object",
+          "description": "Cost of attestation (if any)",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "minimum": 0
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            }
+          }
+        },
+        "appealDeadline": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Deadline for appealing attestation"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional tags"
+        }
+      }
+    },
+    "RevocationInfo": {
+      "type": "object",
+      "required": [
+        "revokedAt",
+        "reason",
+        "revokerId"
+      ],
+      "properties": {
+        "revokedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When attestation was revoked"
+        },
+        "reason": {
+          "type": "string",
+          "enum": ["fraud", "error", "superseded", "request"],
+          "description": "Reason for revocation"
+        },
+        "revokerId": {
+          "type": "string",
+          "pattern": "^mood:attester:[a-f0-9]{64}$",
+          "description": "Identity of revoker"
+        },
+        "replacementId": {
+          "type": "string",
+          "pattern": "^mood-attest-[0-9]{8}-[0-9]{6}$",
+          "description": "Replacement attestation ID"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes"
+        }
+      }
+    }
+  }
+}

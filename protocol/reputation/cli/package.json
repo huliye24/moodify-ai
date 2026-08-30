@@ -1,0 +1,35 @@
+{
+  "name": "mood-reputation-cli",
+  "version": "1.0.0",
+  "description": "MOOD Protocol Reputation CLI",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "mood-reputation": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js",
+    "lint": "eslint --ext .js .",
+    "build": "echo 'Build complete'"
+  },
+  "keywords": [
+    "mood",
+    "protocol",
+    "reputation",
+    "cli",
+    "blockchain"
+  ],
+  "author": "MOOD Protocol Team",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "commander": "^11.0.0"
+  },
+  "devDependencies": {
+    "chalk": "^5.3.0",
+    "eslint": "^8.45.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

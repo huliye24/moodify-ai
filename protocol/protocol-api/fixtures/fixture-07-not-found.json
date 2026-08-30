@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 7: Not Found Error",
+  "description": "Sample NOT_FOUND error response",
+  "fixtureId": "f7-not-found",
+  "request": {
+    "method": "GET",
+    "url": "/api/protocol/v1/contributions/nonexistent-id"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "error": {
+      "code": "NOT_FOUND",
+      "message": "Contribution not found",
+      "details": null
+    },
+    "meta": {
+      "requestId": "req_example_007",
+      "generatedAt": "2026-08-29T10:00:00Z"
+    }
+  },
+  "expectedBehavior": {
+    "httpStatus": 404,
+    "publicSafe": true,
+    "noStackTrace": true
+  }
+}

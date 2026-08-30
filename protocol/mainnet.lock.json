@@ -1,0 +1,115 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-08-29T02:26:59.716Z",
+  "generator": "MOOD Protocol Lock Generator",
+  "integrity": {
+    "configHash": "b01ff6549f49538247127915a770172ff8aab4462cdb775eb562126f219730e8",
+    "configPath": "protocol\\mainnet.json",
+    "configSize": 2502
+  },
+  "facts": {
+    "protocol": {
+      "name": "MOOD Protocol",
+      "ticker": "MOOD"
+    },
+    "chain": {
+      "family": "evm",
+      "network": "BNB Smart Chain",
+      "chainId": 56,
+      "cluster": "bsc-mainnet"
+    },
+    "token": {
+      "name": "Moodify",
+      "symbol": "MOOD",
+      "identifier": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+      "decimals": 18,
+      "totalSupplyAtomic": "33000000000000000000000000"
+    },
+    "addresses": {
+      "treasury": null,
+      "genesisPool": null
+    },
+    "endpoints": {
+      "rpcUrls": [
+        "https://bsc-dataseed.binance.org",
+        "https://bsc-dataseed1.binance.org",
+        "https://bsc-dataseed2.binance.org",
+        "https://bsc-dataseed3.binance.org",
+        "https://bsc-dataseed4.binance.org"
+      ],
+      "explorerBaseUrl": "https://bscscan.com"
+    }
+  },
+  "evidence": {
+    "sourceCommit": "MOOD-PROTOCOL-FOUNDATION-001-INITIAL",
+    "references": [
+      {
+        "fact": "chainId",
+        "source": "apps/web/lib/mood-token.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "token.address",
+        "source": "apps/web/lib/mood-token.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "token.name",
+        "source": "apps/web/lib/mood-token.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "token.symbol",
+        "source": "apps/web/lib/mood-token.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "token.decimals",
+        "source": "apps/web/lib/mood-token.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "token.totalSupplyAtomic",
+        "source": "apps/web/lib/mood-token.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "rpcUrls",
+        "source": "apps/web/lib/mood-chain.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "explorerBaseUrl",
+        "source": "apps/web/lib/mood-token.ts",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "network",
+        "source": "viem/chains",
+        "status": "REPOSITORY_ONLY"
+      },
+      {
+        "fact": "schemaVersion",
+        "source": "protocol/mainnet.schema.json",
+        "status": "REPOSITORY_ONLY"
+      }
+    ],
+    "unresolved": [
+      "treasury",
+      "genesisPool",
+      "contractVerificationStatus",
+      "deploymentCommit",
+      "sourceCommit"
+    ]
+  },
+  "lock": {
+    "status": "locked",
+    "lockedAt": "2026-08-29T00:00:00.000Z",
+    "lockedBy": "MOOD-PROTOCOL-FOUNDATION-001"
+  },
+  "identifiers": {
+    "tokenContract": "0x1BB3115D43E397f7bb586F090831B02cA639e73E",
+    "chainId": 56,
+    "immutableFactsHash": "8482db29d2f97eaafec1ef067437505ddcf1bc7391e60d3caac6f758e8845459"
+  }
+}

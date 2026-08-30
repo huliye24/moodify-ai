@@ -1,0 +1,37 @@
+{
+  "description": "This has the same content fingerprint as valid-docs-contribution but a different contributor.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-cross-dup",
+  "contributor": {
+    "type": "wallet",
+    "id": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "category": "documentation",
+  "title": "Cross-contributor duplicate — same content",
+  "submittedAt": "2026-08-29T18:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-cross-001",
+      "type": "file_hash",
+      "uri": null,
+      "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "observedAt": "2026-08-29T17:55:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "unverified",
+        "method": null,
+        "verifiedAt": null,
+        "verifiedBy": null
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:729ffb3be875ec14a16f0352fdcf74bda33deb1319e95f54139ae7cfc72f3bb9",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

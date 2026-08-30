@@ -1,0 +1,37 @@
+{
+  "description": "This contribution references policy 'unknown-policy-v99' which does not exist.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-policy-mismatch",
+  "contributor": {
+    "type": "github",
+    "id": "charlie-moodify"
+  },
+  "category": "research",
+  "title": "Contribution with mismatched policy version",
+  "submittedAt": "2026-08-29T19:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-policy-001",
+      "type": "document_url",
+      "uri": "https://moodify.internal/research/ear-analysis-001",
+      "digest": null,
+      "observedAt": "2026-08-29T18:55:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "unverified",
+        "method": null,
+        "verifiedAt": null,
+        "verifiedBy": null
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "unknown-policy-v99",
+  "contentFingerprint": "sha256:72333ddd3bf955bb3ec83d2a4acb674657257fc37c17b9fecf22fceb9135df43",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

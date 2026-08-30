@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 6: Duplicate Contribution Input",
+  "description": "Same contribution ID appears multiple times in input",
+  "fixtureId": "f6-duplicate-input",
+  "inputContributions": [
+    "mood-contrib-dup-001",
+    "mood-contrib-dup-001",
+    "mood-contrib-dup-002",
+    "mood-contrib-dup-001"
+  ],
+  "uniqueContributions": ["mood-contrib-dup-001", "mood-contrib-dup-002"],
+  "duplicateCount": 2,
+  "expectedBehavior": {
+    "duplicatesDetected": true,
+    "uniqueCount": 2,
+    "originalCount": 4,
+    "reason": "Duplicate inputs should be detected and deduplicated"
+  },
+  "processing": {
+    "step1": "Detect duplicate IDs",
+    "step2": "Remove duplicate entries",
+    "step3": "Verify unique constraint",
+    "result": "APPROVED"
+  }
+}

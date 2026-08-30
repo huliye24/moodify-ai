@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 4: Valid Validation Node",
+  "description": "Validation node for audio quality verification",
+  "fixtureId": "f4-valid-validation-node",
+  "node": {
+    "nodeId": "mood:node:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "operatorProtocolId": "mood:contributor:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "nodeType": "validation",
+    "displayName": "Audio Quality Validator",
+    "region": { "countryCode": "JP", "regionCode": null, "city": null, "precision": "country" },
+    "endpoint": { "type": "https", "uri": "https://validator-jp.mood.invalid" },
+    "capabilityManifestId": "mood:capability:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "verification": { "status": "verified", "method": "http_challenge", "verifiedAt": "2026-08-18T12:00:00Z", "evidenceIds": ["evidence-001"] },
+    "health": { "status": "healthy", "observedAt": "2026-08-29T10:00:00Z" },
+    "lifecycleStatus": "active",
+    "registeredAt": "2026-08-18T10:00:00Z",
+    "updatedAt": "2026-08-29T10:00:00Z",
+    "recordFingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "lifecycleHistory": []
+  },
+  "capabilityManifest": {
+    "manifestId": "mood:capability:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "nodeId": "mood:node:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "nodeType": "validation",
+    "protocolVersions": ["0.1"],
+    "capabilities": [
+      { "key": "validation.audio_quality", "value": true, "visibility": "public", "verificationStatus": "verified", "evidenceIds": ["evidence-002"] },
+      { "key": "validation.benchmark_suite", "value": "mood-audio-v1", "visibility": "public", "verificationStatus": "declared", "evidenceIds": [] }
+    ],
+    "createdAt": "2026-08-18T10:00:00Z",
+    "fingerprint": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  }
+}

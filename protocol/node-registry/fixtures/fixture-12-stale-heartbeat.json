@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 12: Stale Heartbeat Leading to Inactive",
+  "description": "Stale heartbeat causes node to become inactive",
+  "fixtureId": "f12-stale-heartbeat-inactive",
+  "heartbeat": {
+    "nodeId": "mood:node:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "observedAt": "2026-08-29T02:00:00Z",
+    "source": "registry-probe",
+    "status": "healthy"
+  },
+  "policy": {
+    "healthyFreshnessSeconds": 300,
+    "degradedAfterSeconds": 900,
+    "inactiveAfterSeconds": 3600
+  },
+  "currentTime": "2026-08-29T10:00:00Z",
+  "ageInSeconds": 28800,
+  "evaluation": {
+    "shouldTransition": true,
+    "newHealthStatus": "unreachable",
+    "reason": "STALE_EXPIRED"
+  },
+  "expectedBehavior": {
+    "nodeInactive": true,
+    "lifecycleTransition": "inactive"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "description": "This record shows a draft attempting to skip to verified — illegal transition.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-invalid-transition",
+  "contributor": {
+    "type": "wallet",
+    "id": "0xfedcbafedcbafedcbafedcbafedcbafedcbafedc"
+  },
+  "category": "documentation",
+  "title": "Invalid state transition fixture",
+  "submittedAt": "2026-08-29T15:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-trans-001",
+      "type": "file_hash",
+      "uri": null,
+      "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "observedAt": "2026-08-29T14:55:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "unverified",
+        "method": null,
+        "verifiedAt": null,
+        "verifiedBy": null
+      }
+    }
+  ],
+  "status": "draft",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:44cfbb1021813484f0e9d2a222e4f7bf6edbb71101173c12a59e0871c9bc6fd2",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}
