@@ -1,48 +1,218 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import {
+  LIBRARY_DOCUMENTS,
+  listByCategory,
+  listFeatured,
+  listDraft,
+  listArchived,
+  STATUS_LABEL,
+  formatSha256,
+} from "../../../lib/mood/library";
+import type { LibraryDocument } from "../../../lib/mood/library";
+import LibraryFilters from "./LibraryFilters";
 
-export const metadata = {
-  title: "MOOD Library — Coming in Package 014",
-  description: "Whitepaper, Constitution, Protocol, Governance and Research archive. Package 014 in progress.",
+export const metadata: Metadata = {
+  title: "MOOD Library — Whitepaper · Constitution · Protocol · Governance",
+  description:
+    "MOOD canonical document archive. Foundation, Protocol, Governance, Economics, Security, Research.",
 };
 
-export default function LibraryLandingPage() {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+function readParam(value: string | string[] | undefined): string | undefined {
+  if (Array.isArray(value)) return value[0];
+  return value;
+}
+
+function isEconomicsDraft(doc: LibraryDocument): boolean {
+  return doc.category === "economics" && doc.status === "draft";
+}
+
+export default async function LibraryPage({
+  searchParams,
+}: {
+  searchParams?: Promise<SearchParams>;
+}) {
+  const params = (await searchParams) ?? {};
+  const category = readParam(params.category);
+  const status = readParam(params.status);
+  const language = readParam(params.language);
+  const query = readParam(params.q);
+
+  const allDocs = LIBRARY_DOCUMENTS;
+  const filtered = allDocs.filter((doc) => {
+    if (category && doc.category !== category) return false;
+    if (status && doc.status !== status) return false;
+    if (language && doc.language !== language) return false;
+    if (query) {
+      const q = query.toLowerCase();
+      if (
+        !doc.title.toLowerCase().includes(q) &&
+        !doc.summary.toLowerCase().includes(q) &&
+        !doc.slug.includes(q)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const featured = listFeatured();
+  const draft = listDraft();
+  const archived = listArchived();
+  const grouped = listByCategory();
+
   return (
-    <main className="public-track">
+    <main className="public-track library-root">
       <Link href="/">← Moodify</Link>
-      <article>
+
+      <header className="library-hero">
         <span className="eyebrow">MOOD LIBRARY</span>
         <h1>协议文档图书馆</h1>
-        <p>
-          MOOD Library 是 MOOD WORLD + PROTOCOL + PORTAL 的权威文档馆：
-          Whitepaper / Constitution / Protocol / Governance / Economics / Security / Research。
+        <p className="library-hero-sub">
+          MOOD 总体身份、Moodify Protocol、治理 / 经济 / 安全 / 研究 的权威档案。
         </p>
-        <p>
-          当前路由由 <code>codex/mood-portal-013</code> 建立为占位入口。
-          <strong> 实际文档注册表、阅读器、版本、Hash 由 Package 014 落地。</strong>
+        <p className="library-hero-meta">
+          注册于 <code>97c9106</code>（2026-08-30） · 共 {allDocs.length} 份文档 ·
+          其中 active {allDocs.filter((d) => d.status === "active").length}，
+          draft {draft.length}，archived {archived.length}。
         </p>
-        <p>
-          状态：<code>Coming in Package 014</code> · 详见{" "}
-          <a href="https://github.com/huliye24/moodify-ai/blob/main/docs/mood/portal/013_FINAL_REPORT.md">
-            docs/mood/portal/013_FINAL_REPORT.md
-          </a>
-          。
+      </header>
+
+      <LibraryFilters
+        initialCategory={category}
+        initialStatus={status}
+        initialLanguage={language}
+        initialQuery={query}
+      />
+
+      <section className="library-section" aria-labelledby="library-featured-heading">
+        <h2 id="library-featured-heading">Featured</h2>
+        <p className="library-section-help">
+          活跃的 Foundation 与 Governance 文档。版本、状态、Source Commit 可在每页详情页查看。
         </p>
-        <h2>013 已建立的 IA 入口</h2>
-        <ul>
-          <li><Link href="/world">/world</Link> — MOOD 世界首页（PLANNED）</li>
-          <li><Link href="/protocol">/protocol</Link> — Moodify Protocol 协议层</li>
-          <li><Link href="/portal">/portal</Link> — MOOD Portal（连接后空间）</li>
-          <li><Link href="/library">/library</Link> — 当前页（014 待填充）</li>
+        <ul className="library-grid">
+          {featured.map((doc) => (
+            <li key={doc.slug} className="library-card">
+              <div className="library-card-meta">
+                <span className="library-status-pill" data-status={doc.status}>
+                  {STATUS_LABEL[doc.status]}
+                </span>
+                <span className="library-category-pill">{doc.category}</span>
+                <span className="library-version">v{doc.version}</span>
+              </div>
+              <h3>
+                <Link href={doc.onlineUrl ?? `/library/${doc.slug}`}>{doc.title}</Link>
+              </h3>
+              <p className="library-summary">{doc.summary}</p>
+              <p className="library-hash">
+                SHA-256: <code>{formatSha256(doc.sha256)}</code>
+              </p>
+            </li>
+          ))}
         </ul>
-        <h2>013 不做的事</h2>
-        <ul>
-          <li>不写文档注册表（014）</li>
-          <li>不写 metadata schema（014）</li>
-          <li>不计算 SHA-256（014）</li>
-          <li>不引入 IPFS CID（014）</li>
-          <li>不渲染宪法 / Tokenomics 正文（014）</li>
+      </section>
+
+      {filtered.length > 0 && (
+        <section className="library-section" aria-labelledby="library-results-heading">
+          <h2 id="library-results-heading">Filtered</h2>
+          <p className="library-section-help">
+            按当前过滤器显示 {filtered.length} 份文档。
+          </p>
+          <ul className="library-list">
+            {filtered.map((doc) => (
+              <li key={doc.slug} className="library-list-item">
+                <span className="library-status-pill" data-status={doc.status}>
+                  {STATUS_LABEL[doc.status]}
+                </span>
+                <Link href={doc.onlineUrl ?? `/library/${doc.slug}`} className="library-list-title">
+                  {doc.title}
+                </Link>
+                <span className="library-list-version">v{doc.version}</span>
+                <span className="library-list-category">{doc.category}</span>
+                {isEconomicsDraft(doc) && (
+                  <span className="library-list-warning">
+                    Parameters UNFROZEN
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {grouped.map((group) => (
+        <section key={group.category} className="library-section" aria-labelledby={`library-cat-${group.category}`}>
+          <h2 id={`library-cat-${group.category}`}>{group.label}</h2>
+          <ul className="library-list">
+            {group.documents.map((doc) => (
+              <li key={doc.slug} className="library-list-item">
+                <span className="library-status-pill" data-status={doc.status}>
+                  {STATUS_LABEL[doc.status]}
+                </span>
+                <Link href={doc.onlineUrl ?? `/library/${doc.slug}`} className="library-list-title">
+                  {doc.title}
+                </Link>
+                <span className="library-list-version">v{doc.version}</span>
+                <span className="library-list-language">{doc.language}</span>
+                {isEconomicsDraft(doc) && (
+                  <span className="library-list-warning">
+                    Parameters UNFROZEN
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      <section className="library-section" aria-labelledby="library-draft-heading">
+        <h2 id="library-draft-heading">Draft &amp; Archived</h2>
+        <p className="library-section-help">
+          Draft 文档 <strong>不</strong> 应作为最终承诺解释。Archived / Superseded 文档仅作历史阅读。
+        </p>
+        <ul className="library-list">
+          {draft.map((doc) => (
+            <li key={doc.slug} className="library-list-item">
+              <span className="library-status-pill" data-status={doc.status}>
+                {STATUS_LABEL[doc.status]}
+              </span>
+              <Link href={doc.onlineUrl ?? `/library/${doc.slug}`} className="library-list-title">
+                {doc.title}
+              </Link>
+              <span className="library-list-version">v{doc.version}</span>
+            </li>
+          ))}
+          {archived.map((doc) => (
+            <li key={doc.slug} className="library-list-item">
+              <span className="library-status-pill" data-status={doc.status}>
+                {STATUS_LABEL[doc.status]}
+              </span>
+              <Link href={doc.onlineUrl ?? `/library/${doc.slug}`} className="library-list-title">
+                {doc.title}
+              </Link>
+              <span className="library-list-version">v{doc.version}</span>
+            </li>
+          ))}
         </ul>
-      </article>
+      </section>
+
+      <section className="library-section library-status-honesty">
+        <h2>Status Honesty</h2>
+        <ul>
+          <li>
+            <strong>Draft Tokenomics</strong>：Tokenomics / Treasury / Holder Rewards / Legacy Token /
+            Launch Policy 全部 <code>Draft / Parameters UNFROZEN</code>。
+          </li>
+          <li>
+            <strong>Historical Security</strong>：历史 Genesis v1.0 安全文档必须明确 <code>HISTORICAL / SUPERSEDED / LEGACY SCOPE</code>。
+          </li>
+          <li>
+            <strong>No future official CA</strong>：Library 不显示未激活 Token CA、不显示 Buy / Trade CTA。
+          </li>
+        </ul>
+      </section>
     </main>
   );
 }
