@@ -9,6 +9,7 @@ export type LibraryDocumentStatus =
 
 export type LibraryDocumentCategory =
   | "foundation"
+  | "culture"
   | "protocol"
   | "governance"
   | "economics"

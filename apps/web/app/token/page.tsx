@@ -3,7 +3,7 @@ import "./token.css";
 
 export default function TokenPage() {
   return <main className="token-site">
-    <nav className="token-nav" aria-label="MOOD 主导航"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><div className="token-nav-links"><a href="#world">我们的世界</a><a href="#belief">我们的信念</a><a href="#arrival">MOOD Token</a><Link href="/">Moodify Music</Link></div><span className="token-nav-state">COMING SOON</span></nav>
+    <nav className="token-nav" aria-label="MOOD 主导航"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><div className="token-nav-links"><a href="#world">我们的世界</a><a href="#belief">我们的信念</a><Link href="/library">图书馆</Link><a href="#arrival">MOOD Token</a><Link href="/">Moodify Music</Link></div><span className="token-nav-state">COMING SOON</span></nav>
 
     <header className="token-hero"><div className="token-hero-copy"><p className="token-kicker">A DIGITAL HOME FOR FREE SPIRITS</p><h1>在这里，<br /><em>成为你自己。</em></h1><p className="token-lead">MOOD 是一个属于自由意志、独立选择与美的数字家园。没有被规定的人生，只有你愿意生活的方式。</p><div className="token-actions"><a className="token-primary" href="#world">进入这个世界</a><a className="token-secondary" href="#belief">阅读我们的信念</a></div></div><div className="token-hero-mark" aria-hidden="true"><img src="/moodify-brand-logo.png" alt="" /></div></header>
 
@@ -21,6 +21,6 @@ export default function TokenPage() {
 
     <section id="arrival" className="token-arrival"><p className="token-kicker">MOOD TOKEN · COMING SOON</p><h2>先让世界发生。</h2><p>MOOD Token 将成为这个世界里的经济媒介。目前正在香港为 BNB Smart Chain 发行做准备，尚未开放购买，也没有官方合约地址。</p><small>正式发布时，唯一可信的合约地址与验证入口会首先出现在本页。</small></section>
 
-    <footer className="token-footer"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><p>Every voice deserves to be heard.</p><div><Link href="/">Moodify Music</Link><a href="#belief">Manifesto</a></div></footer>
+    <footer className="token-footer"><Link className="token-brand" href="/token"><img src="/moodify-brand-logo.png" alt="" /><span>MOOD</span></Link><p>Every voice deserves to be heard.</p><div><Link href="/library">Library</Link><Link href="/">Moodify Music</Link><a href="#belief">Manifesto</a></div></footer>
   </main>;
 }

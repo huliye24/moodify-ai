@@ -45,6 +45,38 @@ const MOOD_CANON: LibraryDocument = {
   updatedAt: "2026-08-30",
 };
 
+const MOOD_SCOPE_FREEZE_CN: LibraryDocument = {
+  slug: "mood-scope-freeze-cn",
+  title: "MOOD 范围冻结",
+  category: "culture",
+  version: "1.0",
+  status: "active",
+  language: "zh",
+  summary: "MOOD 是什么、不是什么，以及我们选择建设和拒绝建设什么。它让世界的文化、方向与边界保持清晰。",
+  sourcePath: "docs/mood/culture/MOOD_SCOPE_FREEZE_CN.md",
+  githubUrl: "https://github.com/huliye24/moodify-ai/blob/codex/mood-genesis-integration-026/docs/mood/culture/MOOD_SCOPE_FREEZE_CN.md",
+  onlineUrl: "/library/mood-scope-freeze-cn",
+  sha256: "bc5e748d59367a19b1d5ad2e94621689b27903249570e3c1166d2a5c51e1c0d8",
+  publishedAt: "2026-08-30",
+  updatedAt: "2026-08-30",
+};
+
+const MOOD_SCOPE_FREEZE_EN: LibraryDocument = {
+  slug: "mood-scope-freeze-en",
+  title: "MOOD Scope Freeze",
+  category: "culture",
+  version: "1.0",
+  status: "active",
+  language: "en",
+  summary: "What MOOD is, what it is not, what we build now, and what we refuse to build. A clear cultural and product boundary for the world.",
+  sourcePath: "docs/mood/culture/MOOD_SCOPE_FREEZE.md",
+  githubUrl: "https://github.com/huliye24/moodify-ai/blob/codex/mood-genesis-integration-026/docs/mood/culture/MOOD_SCOPE_FREEZE.md",
+  onlineUrl: "/library/mood-scope-freeze-en",
+  sha256: "673dac64cf23a41a4370432d500bf676e5fb895d302b99a2312937bd5ded7158",
+  publishedAt: "2026-08-30",
+  updatedAt: "2026-08-30",
+};
+
 const MOOD_ARCHITECTURE: LibraryDocument = {
   slug: "mood-architecture",
   title: "MOOD System Architecture",
@@ -745,6 +777,10 @@ export const LIBRARY_DOCUMENTS: LibraryDocument[] = [
   PUBLIC_FORM_CANON,
   CONSTITUTION,
 
+  // Culture — public ideas, values, and boundaries
+  MOOD_SCOPE_FREEZE_CN,
+  MOOD_SCOPE_FREEZE_EN,
+
   // Governance (active 011 docs + draft MIP-000)
   MOOD_LAUNCH_GATE,
   MOOD_ASSET_CLASSIFICATION,
@@ -782,6 +818,7 @@ export const LIBRARY_DOCUMENTS: LibraryDocument[] = [
 
 const CATEGORY_LABEL: Record<LibraryDocument["category"], string> = {
   foundation: "Foundation",
+  culture: "Culture / 文化",
   protocol: "Protocol",
   governance: "Governance",
   economics: "Economics",
@@ -791,6 +828,7 @@ const CATEGORY_LABEL: Record<LibraryDocument["category"], string> = {
 
 export const CATEGORY_ORDER: Array<LibraryDocument["category"]> = [
   "foundation",
+  "culture",
   "protocol",
   "governance",
   "economics",

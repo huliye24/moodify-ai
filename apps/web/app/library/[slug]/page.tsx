@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import {
@@ -69,6 +70,27 @@ function renderSourceMarkdown(md: string): string {
   return escaped;
 }
 
+function renderInline(text: string): ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean).map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("`") && part.endsWith("`")) return <code key={index}>{part.slice(1, -1)}</code>;
+    return part;
+  });
+}
+
+function renderPublicMarkdown(md: string): ReactNode[] {
+  return md.split(/\r?\n\s*\r?\n/).map((block, index) => {
+    const lines = block.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    if (lines.length === 0 || lines.every((line) => line === "---")) return null;
+    const heading = lines[0].match(/^(#{1,3})\s+(.+)$/);
+    if (heading) return heading[1].length === 1 ? <h2 key={index}>{renderInline(heading[2])}</h2> : <h3 key={index}>{renderInline(heading[2])}</h3>;
+    if (lines.every((line) => line.startsWith("- "))) return <ul key={index}>{lines.map((line, item) => <li key={item}>{renderInline(line.slice(2))}</li>)}</ul>;
+    if (lines.every((line) => /^\d+\.\s/.test(line))) return <ol key={index}>{lines.map((line, item) => <li key={item}>{renderInline(line.replace(/^\d+\.\s/, ""))}</li>)}</ol>;
+    if (lines.every((line) => line.startsWith(">"))) return <blockquote key={index}>{lines.map((line) => renderInline(line.replace(/^>\s?/, "")))}</blockquote>;
+    return <p key={index}>{lines.map((line, item) => <span key={item}>{renderInline(line)}{item < lines.length - 1 ? " " : ""}</span>)}</p>;
+  });
+}
+
 export default async function LibraryEntryPage({
   params,
 }: {
@@ -85,6 +107,7 @@ export default async function LibraryEntryPage({
   const isHistoricalSecurity =
     doc.category === "security" &&
     (doc.status === "superseded" || doc.status === "archived");
+  const isCulture = doc.category === "culture";
 
   const toc = hasSource ? buildTableOfContents(sourceBody ?? "") : [];
   const renderedSource = hasSource
@@ -119,7 +142,7 @@ export default async function LibraryEntryPage({
         <p className="library-entry-summary">{doc.summary}</p>
       </header>
 
-      <section className="library-entry-facts">
+      {!isCulture && <section className="library-entry-facts">
         <h2>Document Facts</h2>
         <dl>
           <dt>Status</dt>
@@ -182,7 +205,7 @@ export default async function LibraryEntryPage({
             </a>
           ) : null}
         </div>
-      </section>
+      </section>}
 
       <section className="library-entry-toc">
         <h2>Table of Contents</h2>
@@ -197,12 +220,11 @@ export default async function LibraryEntryPage({
         )}
       </section>
 
-      <section className="library-entry-body">
-        <h2>Content</h2>
+      <section className={`library-entry-body ${isCulture ? "library-entry-culture" : ""}`}>
+        {!isCulture && <h2>Content</h2>}
         {hasSource ? (
-          <pre className="library-source" aria-label="Document source markdown">
-            <code>{renderedSource}</code>
-          </pre>
+          isCulture ? <article className="library-prose">{renderPublicMarkdown(sourceBody ?? "")}</article> :
+          <pre className="library-source" aria-label="Document source markdown"><code>{renderedSource}</code></pre>
         ) : doc.skeleton ? (
           <article className="library-skeleton">
             {doc.skeleton.chapters.map((chapter) => (

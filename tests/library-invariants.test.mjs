@@ -19,6 +19,10 @@ const LIBRARY_DOCUMENTS = [
   ["public-form-canon", "foundation", "1.1", "active", "en", true],
   ["mood-constitution", "foundation", "0.1", "draft", "en", false],
 
+  // Culture (public bilingual reading editions)
+  ["mood-scope-freeze-cn", "culture", "1.0", "active", "zh", true],
+  ["mood-scope-freeze-en", "culture", "1.0", "active", "en", true],
+
   // Governance (active 011 docs + draft MIP-000)
   ["mood-launch-gate", "governance", "1.0", "active", "bilingual", true],
   ["mood-asset-classification", "governance", "1.0", "active", "bilingual", true],
@@ -123,7 +127,7 @@ test("INV-014-10 no Buy/Trade/Claim/Official CA in registry", () => {
 
 test("INV-014-library category coverage", () => {
   const categories = new Set(LIBRARY_DOCUMENTS.map((d) => d[1]));
-  for (const cat of ["foundation", "protocol", "governance", "economics", "security", "research"]) {
+  for (const cat of ["foundation", "culture", "protocol", "governance", "economics", "security", "research"]) {
     assert.ok(categories.has(cat), `missing category ${cat}`);
   }
 });

@@ -13,9 +13,9 @@ import type { LibraryDocument } from "@/lib/mood/library";
 import LibraryFilters from "./LibraryFilters";
 
 export const metadata: Metadata = {
-  title: "MOOD Library — Whitepaper · Constitution · Protocol · Governance",
+  title: "MOOD Library — Culture · Whitepaper · Protocol · Governance",
   description:
-    "MOOD canonical document archive. Foundation, Protocol, Governance, Economics, Security, Research.",
+    "MOOD 的文化、世界观、白皮书与公共协议文献。",
 };
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -69,9 +69,9 @@ export default async function LibraryPage({
 
       <header className="library-hero">
         <span className="eyebrow">MOOD LIBRARY</span>
-        <h1>协议文档图书馆</h1>
+        <h1>MOOD 图书馆</h1>
         <p className="library-hero-sub">
-          MOOD 总体身份、Moodify Protocol、治理 / 经济 / 安全 / 研究 的权威档案。
+          这里收藏 MOOD 的文化、世界观、公共规则与研究。技术告诉我们如何建设，文化告诉我们为什么出发。
         </p>
         <p className="library-hero-meta">
           注册于 <code>97c9106</code>（2026-08-30） · 共 {allDocs.length} 份文档 ·
@@ -79,6 +79,18 @@ export default async function LibraryPage({
           draft {draft.length}，archived {archived.length}。
         </p>
       </header>
+
+      <section className="library-culture-shelf" aria-labelledby="library-culture-heading">
+        <div>
+          <span className="eyebrow">CULTURE / 文化</span>
+          <h2 id="library-culture-heading">一个世界，也需要自己的书。</h2>
+          <p>我们会在这里慢慢放入信念、宣言、边界、故事与思想。它们与协议和代码同样构成 MOOD。</p>
+        </div>
+        <div className="library-culture-links">
+          <Link href="/library/mood-scope-freeze-cn"><small>中文 · 01</small><strong>MOOD 范围冻结</strong><span>阅读中文版本 →</span></Link>
+          <Link href="/library/mood-scope-freeze-en"><small>ENGLISH · 01</small><strong>MOOD Scope Freeze</strong><span>Read in English →</span></Link>
+        </div>
+      </section>
 
       <LibraryFilters
         initialCategory={category}
