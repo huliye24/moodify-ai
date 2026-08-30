@@ -78,8 +78,10 @@ test("INV-017-02: all public numbers have real source", () => {
 
 test("INV-017-03: missing data shows unavailable / coming-soon, not fake numbers", () => {
   const o = freshObservatory().overview();
-  assert.equal(o.metrics.agents?.state, "coming-soon");
-  assert.equal(o.metrics.nodes?.state, "coming-soon");
+  // 018+019 delivered Agents and Nodes as real metrics.
+  // 020 (MIP Governance) is still future.
+  assert.equal(o.metrics.agents?.state, "available");
+  assert.equal(o.metrics.nodes?.state, "available");
   assert.equal(o.metrics.mips?.state, "coming-soon");
 });
 
@@ -151,12 +153,16 @@ test("INV-017-07/08: freshness observable", () => {
 
 // ??? INV-017-09 ???????????????????????????????????????????????????????????????
 
-test("INV-017-09: future Agents/Nodes show coming-soon, no fake count", () => {
+test("INV-017-09: real metrics (Agents/Nodes) have real source; only MIPs still coming-soon", () => {
   const o = freshObservatory().overview();
-  assert.equal(o.metrics.agents?.value, null);
-  assert.equal(o.metrics.nodes?.value, null);
-  assert.equal(o.metrics.agents?.state, "coming-soon");
-  assert.equal(o.metrics.nodes?.state, "coming-soon");
+  // 018+019: Agents and Nodes are real (no longer future).
+  assert.equal(o.metrics.agents?.state, "available");
+  assert.equal(o.metrics.nodes?.state, "available");
+  assert.match(o.metrics.agents?.source ?? "", /agent-registry:018/);
+  assert.match(o.metrics.nodes?.source ?? "", /node-registry:019/);
+  // MIP governance (Package 020) is still future.
+  assert.equal(o.metrics.mips?.value, null);
+  assert.equal(o.metrics.mips?.state, "coming-soon");
 });
 
 // ??? INV-017-10 ???????????????????????????????????????????????????????????????
