@@ -183,14 +183,6 @@ export default function WorldPage() {
                 color: "inherit",
                 transition: "border-color var(--duration-fast), background var(--duration-fast)",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "var(--brand-violet)";
-                e.currentTarget.style.background = "rgba(108, 72, 255, 0.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "var(--line)";
-                e.currentTarget.style.background = "var(--surface-subtle)";
-              }}
             >
               <span
                 aria-hidden
