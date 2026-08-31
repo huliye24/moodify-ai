@@ -11,7 +11,6 @@ export default function TokenPage() {
     <figure id="world" className="token-world-image"><img src="/mood-world-hero.png" alt="人们在开放的未来音乐空间相遇、聆听与创作" /></figure>
 
     <section id="entrances" className="token-architecture">
-      <header><p className="token-kicker">ONE WORLD · MANY ENTRANCES</p><h2>同一个世界，<br />从不同的地方进入。</h2><p>你可以先感受这个世界，也可以直接阅读规则、建立身份、查看网络，或进入第一个真实应用。所有入口最终指向同一个 MOOD Network。</p></header>
       <div className="token-primary-gates">
         <Link href="/world"><span>01</span><small>EXPERIENCE</small><h3>WORLD</h3><p>感受 MOOD 的信念、文化、空间与共同生活的想象。</p><b>进入世界 →</b></Link>
         <Link href="/protocol"><span>02</span><small>RULES</small><h3>PROTOCOL</h3><p>阅读贡献、Proof、Agents、Nodes 与治理如何共同运行。</p><b>阅读协议 →</b></Link>
