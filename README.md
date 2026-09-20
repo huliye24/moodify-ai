@@ -1,10 +1,23 @@
 # Moodify
 
-**AI Audio Intelligence Infrastructure — Moodify Music / Moodify Player**
+**One Core, Two Interfaces — Production CLI + Listening App**
 
-> Moodify builds the intelligence layer for the future of music.
+> Moodify builds the shared audio intelligence that powers both production and playback.
 >
-> Moodify 正在构建 AI 时代音乐产业的听觉智能基础设施。
+> Moodify 正在构建 AI 时代音乐产业的听觉智能基础设施：一个 Core，两个接口。
+
+```text
+             Moodify
+          Shared Core
+        /                \
+Creator Side         Listener Side
+Moodify CLI          Moodify App
+PROCESS              PLAY
+```
+
+- **Moodify CLI** — Production Interface（声音生产端，Creator Side）。核心动作 `PROCESS`。**Makes music sound better.**
+- **Moodify App / Player** — Listening Interface（声音消费端，Listener Side）。核心动作 `PLAY`。**Makes music play better.**
+- **Moodify Core** — 二者共享的声音智能（analysis / dsp / processing / playback / profiles / verification / contracts）。**Powers both.**
 
 [![Test](https://github.com/huliye24/moodify-ai/actions/workflows/test.yml/badge.svg)](https://github.com/huliye24/moodify-ai/actions/workflows/test.yml)
 [![Python](https://img.shields.io/badge/Python-%3E%3D3.10-3776AB?logo=python&logoColor=white)](moodify-core-package/pyproject.toml)
@@ -16,9 +29,11 @@
 
 AI can now generate music at scale. The music industry still lacks reliable infrastructure to **listen to, evaluate, and process** that music. Moodify is building the auditory intelligence layer that fills this gap — the "ears" of the AI music economy.
 
-We are not a music app company. We are an **AI audio intelligence infrastructure company**. Our engine measures, understands, scores, and processes audio; our product modules turn that capability into industry-ready services.
+Moodify is a **one-Core, two-interface platform**: the same Core powers a production interface (CLI) that *changes audio assets* and a listening interface (App) that *changes how music is heard*. We are not a music app company; we are an **AI audio intelligence infrastructure company** whose engine measures, understands, scores, and processes audio, and whose interfaces turn that capability into production and playback.
 
-## Four Product Pillars
+## Core Capabilities
+
+> 以下 QA / Master / Rating / Supply 不再是四个平级「产品身份」，而是共享 Core 的能力簇（capability clusters），分别由生产端 CLI 与消费端 App 复用。详见 [docs/canon/CURRENT_CANON.md](docs/canon/CURRENT_CANON.md)。
 
 ### 1. Moodify QA — AI Music Quality Intelligence
 
@@ -59,32 +74,32 @@ Matching music to where it creates value.
 ## Architecture
 
 ```
-                    Moodify
-                       |
-          Moodify Intelligence Engine
-                       |
-        ┌──────────┬──────────┬──────────┬──────────┐
-        │          │          │          │
-       QA        Master      Rating     Supply
-                       |
-        ┌──────────┬──────────┬──────────┐
-        │          │          │          │
-      Web       Android    Desktop    Partner API
+                    Moodify Core
+                 (shared audio intelligence)
+                 /                    \
+                /                      \
+         Moodify CLI               Moodify App
+         Production                Playback
+             |                         |
+    analyze / process /         dynamic playback /
+    profile / verify            realtime adaptation
+             |                         |
+      changes the audio          changes what's heard
 ```
 
 ### Layered Design
 
 | Layer | Directory | Role |
 |-------|-----------|------|
-| **Engine Layer** | `engine/` | Shared AI auditory capability: acoustic analysis, audio features, music understanding, scoring, recommendation |
-| **Product Layer** | `products/` | Industry modules: `qa/`, `master/`, `rating/`, `supply/` |
-| **Application Layer** | `apps/` | End-user products: `web/` (Next.js player), Android, desktop |
+| **Core** | `engine/`（→ `core/`，渐进迁移） | 共享声音智能：analysis / dsp / processing / playback / profiles / verification / contracts |
+| **Production Interface** | `cli/`（现 `demo/`） | `moodify analyze / process / profile / verify / compare / inspect / render` |
+| **Listening Interface** | `apps/` | 消费端：`web/`（Next.js player）、Android、desktop |
 | **Research Layer** | `research/` | Papers, benchmarks, whitepapers, experimental modules |
 | **Infrastructure** | `shared/` | Contracts, authority, safety, worker nodes, API gateway |
 
-The engine is a pure capability layer — it analyzes, scores, and understands audio. Products package that capability for industry use cases. Applications deliver end-user experiences. **Every judgment produces evidence; every score carries uncertainty; every decision is auditable.**
+The Core is a pure capability layer — it analyzes, scores, processes, and plays audio. **One Core, multiple interfaces**: both CLI and App call the same Core; an interface must never hold its own copy of a sound algorithm. **Every judgment produces evidence; every score carries uncertainty; every decision is auditable.**
 
-Full architecture specification: [docs/MOODIFY_ARCHITECTURE_V1.md](docs/MOODIFY_ARCHITECTURE_V1.md)
+Full architecture specification: [docs/MOODIFY_ARCHITECTURE_V1.md](docs/MOODIFY_ARCHITECTURE_V1.md) · 仓库现实审计：[CURRENT_STATE_AUDIT.md](CURRENT_STATE_AUDIT.md)
 
 ## Quick Demo
 

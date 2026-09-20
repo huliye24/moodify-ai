@@ -40,3 +40,26 @@ def test_guard_catches_ear_as_product_regression():
     }
     errors = canon_guard.check_files(fake)
     assert any("forbidden Ear-as-product" in e for e in errors)
+
+
+def test_guard_accepts_one_core_two_interfaces_identity():
+    """Canon v1.2 身份（One Core / Two Interfaces）必须通过守卫。"""
+    fake = {
+        "README.md": "# Moodify\n\n**One Core, Two Interfaces — Production CLI + Listening App**\n" + "\n" * 50,
+        "AGENTS.md": "**External product:** Moodify — 一个 Core，两个接口（one Core, two interfaces）。\n" + "\n" * 50,
+        "docs/canon/CURRENT_CANON.md": "One Core, Two Interfaces\nCANON_CHANGE = YES\n",
+        "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
+    }
+    assert canon_guard.check_files(fake) == []
+
+
+def test_guard_fails_without_identity_marker():
+    """高权威文件完全不含对外身份标记时必须报错。"""
+    fake = {
+        "README.md": "# Something else entirely\n" + "\n" * 50,
+        "AGENTS.md": "# AGENTS\n" + "\n" * 50,
+        "docs/canon/CURRENT_CANON.md": "CANON_CHANGE = YES\n",
+        "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
+    }
+    errors = canon_guard.check_files(fake)
+    assert any("no external product identity" in e for e in errors)

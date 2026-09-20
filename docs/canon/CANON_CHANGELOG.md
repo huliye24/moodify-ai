@@ -2,6 +2,28 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-09-17 — One Core / Two Interfaces（v1.2）
+
+- **CANON_CHANGE = YES。** 人类已完成产品判断，AI 仅执行落地，不重写产品哲学。
+- **Why：** Moodify 从「以 Player / PLAY 为单一公开中心」扩展为「One Core + Production Interface（CLI）+ Listening Interface（App）」。PLAY 保留为 Listener Side 核心动作，新增 Creator Side（CLI，核心动作 PROCESS）。Moodify Core 成为共享核心资产。
+- **产品定义：** Moodify CLI makes music sound better；Moodify App makes music play better；Moodify Core powers both。
+- **Boundary：** 不推翻 PLAY；不删除任何 legacy；不加第二套 DSP / Core 权威（One Core, Multiple Interfaces 提升为技术宪法级约束）。
+- **Evidence：** 人类 2026-09-17 明确指令 + `CURRENT_STATE_AUDIT.md`（仓库现实：engine=PHASE_B_T0_5 facade、demo CLI 仅 analyze、core/playback 与 profiles 为全新 MISSING、data_plane/delivery 仅为交付层）。
+- **Affected authority files：** `AGENTS.md`、`docs/canon/CURRENT_CANON.md`、`docs/canon/PRODUCT_BOUNDARY.md`、`docs/canon/AUTHORITY_ORDER.md`、`docs/canon/INTERNAL_SYSTEMS.md`、本 changelog、`README.md`。
+- **Migration：** Progressive Migration（Phase 1 core facade/boundary → Phase 2 新代码进 core → Phase 3 engine→core compatibility facade → Phase 4 engine 退役）；products/ 权威降级 + capability mapping，不删除；demo `moodify analyze` 渐进升格为 production CLI 首个正式命令。
+- **Rollback：** 回退本条及上述 authority 文件到 Canon v1.1（PLAY 冻结）即可恢复。
+- **待人类裁决（HUMAN_DECISION_REQUIRED）：** 跨端一致性等级最终取值；products/ 中 Rating/Supply 是否迁入新 Core；engine→core 命名迁移时点。（已裁决 2026-09-20：提交目标分支 = `codex/professional-finishing-layer-20260920`；后续方向演进见 2026-09-20 Professional Finishing 条目。）
+
+## 2026-08-30 — MOOD World Entrance and Public Slogan
+
+- **CANON_CHANGE = YES。** 人类明确要求将 MOOD 网站理解为“先有入口，然后是结构，像是一个世界”，并提出 `To be yourself` 作为口号方向；公开首屏采用更完整、直接的英文命令式 **`BE YOURSELF.`**，中文叙事为“在这里，成为你自己。”
+- **Why：** 现有 `/token` 页面同时承担世界叙事、内容章节、钱包与 Token 信息，但首屏缺少清晰的“进入”体验，MOOD 与 Moodify Music 的层级关系不够明确。
+- **Boundary：** MOOD 被定义为数字世界入口；Moodify Music 是进入该世界的一扇音乐之门。此次不改变 Moodify Music / Player 内部的 `Play` 核心动作，也不把 Ear 或内部生产复杂度公开化。
+- **Evidence：** 人类 2026-08-30 对指定 MOOD 首屏截图的明确反馈；运行表面为 `apps/web/app/token/page.tsx`。
+- **Affected authority/runtime files：** 本 changelog、`apps/web/app/token/page.tsx`、`apps/web/app/token/layout.tsx`、`apps/web/app/globals.css`。
+- **Migration：** 首屏建立 `BE YOURSELF.` → `进入 MOOD` → 世界地图 → 具体世界区域的单向信息结构；Token、钱包和合约信息保留在后段。
+- **Rollback：** 回退本条记录及上述 `/token` 页面、元数据与样式的同批变更，即可恢复 2026-08-30 调整前入口。
+
 ## 2026-08-19 — Public Form Brand Authority Freeze（v1.1）
 
 - **CANON_CHANGE = YES。** 人类通过 Package 01 明确冻结 Public Brand：创始价值原点「弱者的声音也值得被世界听见」；公共表达「每一种声音，都值得被世界听见。 / Every voice deserves to be heard.」；产品原则 `Listen. Then Play.`；动作 `Play.`。

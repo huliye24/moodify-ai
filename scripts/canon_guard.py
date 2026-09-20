@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Moodify Canon drift guard — W01-P01.
+"""Moodify Canon drift guard — W01-P01, updated for Canon v1.2.
 
 低成本权威守卫：防止高权威文件再次把 Ear 定义为对外一级产品，
 或出现相互冲突的对外产品身份。只读检查，不修改任何文件。
+身份标记支持 Canon v1.2（One Core / Two Interfaces）。
 
 用法:
     python scripts/canon_guard.py            # 检查仓库根（自动定位）
@@ -37,10 +38,16 @@ REQUIRED_CANON_FILES = [
 
 # 对外一级产品身份允许的表述（首身份位置附近可接受的产品行）
 ALLOWED_PRODUCT_LINES = [
+    # Canon v1.1（Public Form）
     "Moodify Music",
     "Moodify Player",
     "Moodify Music / Player",
     "Moodify Music / Moodify Player",
+    # Canon v1.2（One Core / Two Interfaces）
+    "One Core, Two Interfaces",
+    "一个 Core，两个接口",
+    "Moodify CLI",
+    "Moodify App",
 ]
 
 # 高权威文件内禁止的"Ear 作为对外一级产品"表述模式
@@ -69,7 +76,7 @@ def check_files(files: dict[str, str]) -> list[str]:
     for rel in ("README.md", "AGENTS.md"):
         head = "\n".join(files.get(rel, "").splitlines()[:60])
         if not any(pat in head for pat in ALLOWED_PRODUCT_LINES):
-            errors.append(f"{rel}: no external product identity (Moodify Music/Player) in first 60 lines")
+            errors.append(f"{rel}: no external product identity marker in first 60 lines")
         for pat in FORBIDDEN_EAR_PRODUCT_PATTERNS:
             if pat in head:
                 errors.append(f"{rel}: forbidden Ear-as-product pattern: {pat!r}")
@@ -83,8 +90,8 @@ def check_files(files: dict[str, str]) -> list[str]:
 
     # 4. CURRENT_CANON 必须声明唯一对外身份与 Canon change rule
     cc = files.get("docs/canon/CURRENT_CANON.md", "")
-    if "Moodify Music" not in cc:
-        errors.append("docs/canon/CURRENT_CANON.md: missing external identity Moodify Music")
+    if not any(pat in cc for pat in ALLOWED_PRODUCT_LINES):
+        errors.append("docs/canon/CURRENT_CANON.md: no external product identity marker")
     if "CANON_CHANGE = YES" not in cc:
         errors.append("docs/canon/CURRENT_CANON.md: missing CANON_CHANGE rule")
 

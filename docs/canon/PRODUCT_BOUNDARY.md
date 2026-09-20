@@ -1,16 +1,18 @@
 # PRODUCT BOUNDARY — Moodify
 
-**Canon v1.1（Public Form Package 01, 2026-08-19）**
+**Canon v1.2（One Core / Two Interfaces, 2026-09-17）**
 
 ## External Product
 
-**Name:** Moodify Music / Moodify Player
+**Name:** Moodify — 一个 Core，两个接口。
 
-**Primary user action:** PLAY
+**Primary user actions:**
+
+- **Listener Side（Moodify App / Player）：`PLAY`** — 消费端，改善音乐被听见的方式。
+- **Creator Side（Moodify CLI）：`PROCESS`** — 生产端，改善音乐本身。
 
 **Public promise（现状声明，非远景承诺）：**
-Moodify 提供以 PLAY 为核心的音乐聆听体验。来源可以是本地文件或云端准备曲目；
-云端准备（识别、分析、重建、渲染）是内部生产环节，不要求用户理解。
+Moodify 提供以 `PLAY` 为核心的消费端聆听体验，同时提供以 `PROCESS` 为核心的生产端接口；两者共享同一个 Moodify Core（声音智能）。云端准备（识别、分析、重建、渲染）是内部生产环节，不要求消费端用户理解。
 
 ## Internal Systems
 
@@ -27,9 +29,11 @@ Moodify 提供以 PLAY 为核心的音乐聆听体验。来源可以是本地文
 - learning
 - cloud production（intake → job → storage → compute → render → delivery）
 
+**Moodify Core** 是跨生产端/消费端的共享资产：analysis / dsp / processing / playback / profiles / verification / contracts 统一来自 Core，interface 不得私藏第二套声音逻辑。
+
 ## User-visible complexity rule
 
-用户不应需要理解内部处理即可获得核心播放体验。
+消费端用户不应需要理解内部处理即可获得核心播放体验。生产端（CLI）面向 Codex / Claude / 工程师 / 制作人 / 云服务器，复杂度由 Moodify 承担，不转嫁给消费端用户。
 
 Public Brand 的品牌信念、语言层级和三站职责以 [`docs/brand/public/`](../brand/public/README.md) 为唯一主题权威：
 
