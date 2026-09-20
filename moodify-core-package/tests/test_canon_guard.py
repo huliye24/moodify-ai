@@ -42,15 +42,38 @@ def test_guard_catches_ear_as_product_regression():
     assert any("forbidden Ear-as-product" in e for e in errors)
 
 
-def test_guard_accepts_one_core_two_interfaces_identity():
-    """Canon v1.2 身份（One Core / Two Interfaces）必须通过守卫。"""
+def test_guard_accepts_professional_finishing_identity():
+    """Canon v2.0 身份（Professional Finishing / Generated is not finished）必须通过守卫。"""
     fake = {
-        "README.md": "# Moodify\n\n**One Core, Two Interfaces — Production CLI + Listening App**\n" + "\n" * 50,
-        "AGENTS.md": "**External product:** Moodify — 一个 Core，两个接口（one Core, two interfaces）。\n" + "\n" * 50,
-        "docs/canon/CURRENT_CANON.md": "One Core, Two Interfaces\nCANON_CHANGE = YES\n",
+        "README.md": (
+            "# Moodify\n\n"
+            "**AI-native Professional Audio Finishing System — One Core, Two Interfaces**\n\n"
+            "> **Generated is not finished.**\n" + "\n" * 50
+        ),
+        "AGENTS.md": (
+            "**External product:** Moodify — AI-native Professional Audio Finishing System。\n\n"
+            "**产品命题：Generated is not finished.**\n" + "\n" * 50
+        ),
+        "docs/canon/CURRENT_CANON.md": (
+            "AI-native Professional Audio Finishing System\nGenerated is not finished\nCANON_CHANGE = YES\n"
+        ),
         "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
     }
     assert canon_guard.check_files(fake) == []
+
+
+def test_guard_catches_player_only_identity_regression():
+    """Canon v2.0：把对外身份回退为 Moodify Music / Player 唯一中心必须报错。"""
+    fake = {
+        "README.md": (
+            "# Moodify\n\n**External product:** Moodify Music / Moodify Player\n\nCore user action: PLAY\n" + "\n" * 50
+        ),
+        "AGENTS.md": "# AGENTS\n\nCore user action: PLAY\n" + "\n" * 50,
+        "docs/canon/CURRENT_CANON.md": "AI-native Professional Audio Finishing System\nGenerated is not finished\nCANON_CHANGE = YES\n",
+        "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
+    }
+    errors = canon_guard.check_files(fake)
+    assert any("forbidden Player-only regression" in e for e in errors)
 
 
 def test_guard_fails_without_identity_marker():

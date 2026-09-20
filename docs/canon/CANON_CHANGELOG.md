@@ -2,6 +2,17 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-09-20 — Professional Finishing（v2.0）
+
+- **CANON_CHANGE = YES。** 人类已明确产品方向（2026-09-20 指令）：Moodify 不再把 Player 当核心产品，转为 AI 音乐与发行之间的专业完成层。AI 仅执行落地，不重写产品哲学。
+- **Why：** 在 v1.2「One Core / Two Interfaces」结构上收敛产品命题：**Generated is not finished.（生成 ≠ 完成。）** 对外身份升级为 **AI-native Professional Audio Finishing System**；生产端 CLI 的 `PROCESS` 落为专业完成流 Import → Analyze → Diagnose → Plan → Process → Verify → Export；Player 重新定位为消费端接口 + 完成会话的 Preview / A-B / Review / Delivery，不再回升为唯一产品中心。
+- **产品定义：** 完成会话的权威表示（目标态）是 **Mix Graph**——可序列化、可重放、可旁路、带证据、可回退；产出不是黑箱 wav。被禁止的是黑箱后处理 / 一键母带，不是有决策、可编辑、带证据的专业完成层。
+- **Boundary：** 不推翻 PLAY；不删除任何 legacy；Ear 仍为内部系统；One Core, Multiple Interfaces 技术宪法不变；Public Form 品牌信念（每一种声音，都值得被世界听见 / Listen. Then Play.）不变。
+- **Evidence：** 人类 2026-09-20 明确指令 + 外部参考研究（[PROFESSIONAL_FINISHING_REFERENCE_MAP_20260920.md](../research/PROFESSIONAL_FINISHING_REFERENCE_MAP_20260920.md)：dasp-pytorch / DeepAFx / pedalboard / matchering / audio-separator 等）+ 仓库现有资产（engine 分析、controlled DSP、evidence 体系、data factory、worker）。
+- **Affected authority files：** `AGENTS.md`、`README.md`、`docs/canon/CURRENT_CANON.md`、`docs/canon/PRODUCT_BOUNDARY.md`、`docs/canon/INTERNAL_SYSTEMS.md`、`docs/canon/AUTHORITY_ORDER.md`、`docs/REPOSITORY_STATUS.md`、`scripts/canon_guard.py`、本 changelog；新增 `docs/MOODIFY_PROFESSIONAL_FINISHING_V1.md`、`docs/research/PROFESSIONAL_FINISHING_REFERENCE_MAP_20260920.md`。
+- **Migration：** 下一工程包 = Mix Graph v0.1 第一条完整 Stereo Finishing Session（Source → Analyze → EQ → Compressor → Stereo → Limiter → Verify → Export，可序列化 / 可重放 / 可旁路 / 可测试）；未实现前所有文档只写 TARGET，不写 runtime truth（R6/R10）。
+- **Rollback：** 回退本条及受影响文件到 Commit A（`c2223dff`，Canon v1.2）即可恢复。
+
 ## 2026-09-17 — One Core / Two Interfaces（v1.2）
 
 - **CANON_CHANGE = YES。** 人类已完成产品判断，AI 仅执行落地，不重写产品哲学。

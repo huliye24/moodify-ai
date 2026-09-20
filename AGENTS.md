@@ -4,7 +4,9 @@ This file defines the canonical context for AI coding agents working in this rep
 
 ## Product Identity
 
-**External product:** Moodify — 一个 Core，两个接口（one Core, two interfaces）。
+**External product:** Moodify — AI-native Professional Audio Finishing System（一个 Core，两个接口）。
+
+**产品命题（Product thesis）：Generated is not finished.（生成 ≠ 完成。）**
 
 ```text
              Moodify
@@ -15,8 +17,8 @@ Moodify CLI          Moodify App
 PROCESS              PLAY
 ```
 
-- **Moodify CLI** — Production Interface（声音生产端，Creator Side）。核心动作 `PROCESS`。
-- **Moodify App / Player** — Listening Interface（声音消费端，Listener Side）。核心动作 `PLAY`。
+- **Moodify CLI** — Production Interface（声音生产端，Creator Side）。核心动作 `PROCESS`。专业完成流：Import → Analyze → Diagnose → Plan → Process → Verify → Export。
+- **Moodify App / Player** — Listening Interface（声音消费端，Listener Side）。核心动作 `PLAY`；同时承担完成会话的 Preview / A-B / Review / Delivery。
 - **Moodify Core** — 二者共享的声音智能（analysis / dsp / processing / playback / profiles / verification / contracts）。
 
 > **Moodify CLI makes music sound better. Moodify App makes music play better. Moodify Core powers both.**
@@ -28,7 +30,7 @@ PROCESS              PLAY
 - Cloud Production System — Intake → Analyze → Stem → Judge → Intervene → Render → Verify → Evidence
 - Classic Reconstruction — 内部生产哲学（宪法 v1.0，决策驱动受控重建）
 
-Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress the repository identity back to "The Ear of AI" as a public product, "AI music post-processing", "automatic mastering", or a preset/DSP product. Do not create a second public product identity alongside Moodify（one Core, two interfaces）.
+Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress the repository identity back to "The Ear of AI" as a public product, or to a **black-box** "AI music post-processing / automatic mastering / preset" product that emits an opaque wav without a Mix Graph, evidence, or human review. Professional Finishing（Canon v2.0）是有决策、可编辑、带证据、可回退的完成层——这与被禁止的黑箱后处理是两个东西。Do not create a second public product identity alongside Moodify（one Core, two interfaces）.
 
 ## Canon Reference
 
@@ -46,11 +48,11 @@ Public brand language and public-site roles then resolve through `docs/brand/pub
 
 ## Important Distinction
 
-- 对外：Moodify 一个 Core、两个接口——CLI（生产端，核心动作 `PROCESS`）/ App（消费端，核心动作 `PLAY`）。
+- 对外：Moodify = AI-native Professional Audio Finishing System，一个 Core、两个接口——CLI（生产端，核心动作 `PROCESS` = 专业完成流）/ App（消费端，核心动作 `PLAY`，兼 Preview / A-B / Review / Delivery）。
 - 内部：Ear / analysis / stem / judgment / intervention / preset decision / verification / evidence / learning / cloud production。复杂度由 Moodify 承担。
 - 内部处理复杂度不是对外卖点。
 - Public Form 品牌信念：**每一种声音，都值得被世界听见。 / Every voice deserves to be heard.**
-- 产品原则：**Listen. Then Play.**；消费端用户动作：**Play.**；生产端用户动作：**Process.**
+- 产品原则：**Listen. Then Play.**（消费端）；生产端命题：**Generated is not finished.**；消费端动作：**Play.**；生产端动作：**Process.**
 
 ## Technical Constitution — One Core, Multiple Interfaces
 
@@ -110,6 +112,8 @@ Historical documents do not override current Canon. A LEGACY / HISTORICAL docume
 - 不创建第二套 authoritative state machine。
 - 不创建第二套 Job authority。
 - 不创建第二套 Core / 第二套 DSP authority（One Core, Multiple Interfaces）。
+- 不把 Player 恢复为唯一产品中心（Player 是 Listener Side 接口 + Preview / A-B / Review / Delivery，不是产品命题本身）。
+- 不把 Professional Finishing 退化为黑箱一键处理：完成会话的产出必须携带 Mix Graph / 参数 / 证据 / 可回退路径（目标态见 `docs/MOODIFY_PROFESSIONAL_FINISHING_V1.md`；该文档为 TARGET，不代表已实现）。
 - 不以"功能很多"作为产品价值。
 - 不把内部处理复杂度暴露给用户作为卖点。
 - 不因文档冲突而自行做产品哲学决策——写 `HUMAN_DECISION_REQUIRED`。

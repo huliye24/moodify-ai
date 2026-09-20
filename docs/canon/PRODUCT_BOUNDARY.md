@@ -1,18 +1,18 @@
 # PRODUCT BOUNDARY — Moodify
 
-**Canon v1.2（One Core / Two Interfaces, 2026-09-17）**
+**Canon v2.0（Professional Finishing, 2026-09-20；v1.2 One Core / Two Interfaces 延续）**
 
 ## External Product
 
-**Name:** Moodify — 一个 Core，两个接口。
+**Name:** Moodify — AI-native Professional Audio Finishing System（一个 Core，两个接口）。产品命题：**Generated is not finished.**
 
 **Primary user actions:**
 
-- **Listener Side（Moodify App / Player）：`PLAY`** — 消费端，改善音乐被听见的方式。
-- **Creator Side（Moodify CLI）：`PROCESS`** — 生产端，改善音乐本身。
+- **Listener Side（Moodify App / Player）：`PLAY`** — 消费端，改善音乐被听见的方式；兼完成会话的 Preview / A-B / Review / Delivery。
+- **Creator Side（Moodify CLI）：`PROCESS`** — 生产端，专业完成流（Import → Analyze → Diagnose → Plan → Process → Verify → Export），改善音乐本身。
 
 **Public promise（现状声明，非远景承诺）：**
-Moodify 提供以 `PLAY` 为核心的消费端聆听体验，同时提供以 `PROCESS` 为核心的生产端接口；两者共享同一个 Moodify Core（声音智能）。云端准备（识别、分析、重建、渲染）是内部生产环节，不要求消费端用户理解。
+Moodify 提供以 `PLAY` 为核心的消费端聆听体验，同时提供以 `PROCESS` 为核心的生产端专业完成层；两者共享同一个 Moodify Core（声音智能）。完成会话的产出携带 Mix Graph、参数与证据，不是黑箱 wav。云端准备（识别、分析、重建、渲染）是内部生产环节，不要求消费端用户理解。
 
 ## Internal Systems
 
@@ -56,4 +56,4 @@ Public Brand 的品牌信念、语言层级和三站职责以 [`docs/brand/publi
 
 ## 对外命名与角色决议
 
-Public Form Package 01 已解决 CD-011 中的当前阶段品牌表现和域名角色：公开主品牌为 **Moodify**，对外产品面继续为 Moodify Music / Player；三个站点按上方职责收敛。最终收费模型、`.xyz` 迁移后的 301/302/保留策略，以及 Creator 能力的后续可见范围仍为 `HUMAN_DECISION_REQUIRED`。
+Public Form Package 01 已解决 CD-011 中的当前阶段品牌表现和域名角色：公开主品牌为 **Moodify**，对外产品面继续为 Moodify Music / Player（该决议自 Canon v2.0 起由 AI-native Professional Audio Finishing System 覆盖，站点角色不变）；三个站点按上方职责收敛。最终收费模型、`.xyz` 迁移后的 301/302/保留策略，以及 Creator 能力的后续可见范围仍为 `HUMAN_DECISION_REQUIRED`。

@@ -1,6 +1,6 @@
 # AUTHORITY ORDER — Moodify
 
-**Canon v1.2（One Core / Two Interfaces, 2026-09-17）**
+**Canon v2.0（Professional Finishing, 2026-09-20；v1.2 One Core / Two Interfaces 技术宪法延续）**
 
 当指令冲突时，按以下顺序判断。低级来源可以说明「意图」，不能覆盖高级来源证明的「现实」。
 

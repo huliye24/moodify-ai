@@ -1,13 +1,13 @@
 # Repository Status
 
-**Status:** 当前 Canon 与事实状态入口（Canon v1.1 / Public Form v0.1，2026-08-20 更新）。
+**Status:** 当前 Canon 与事实状态入口（Canon v2.0 / Professional Finishing，2026-09-20 更新）。
 **Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](canon/AUTHORITY_ORDER.md)）。
 
-## Canonical Identity（P01 Canon，2026-08-17）
+## Canonical Identity（Canon v2.0，2026-09-20）
 
-> **Moodify Music / Moodify Player** 是对外产品面；第一阶段核心用户动作是 **PLAY**。
+> **Moodify — AI-native Professional Audio Finishing System**（Generated is not finished）；Listener Side 核心动作 **PLAY**，Creator Side 核心动作 **PROCESS**（专业完成流）。
 
-- **对外产品面：** Moodify Music / Player（Music Android 3.1 APK、music-web PWA、云端 music-platform/BFF）。
+- **对外产品面：** Moodify：Listener Side = App/Player（Music Android 3.1 APK、music-web PWA、云端 music-platform/BFF），兼 Preview / A-B / Review / Delivery；Creator Side = CLI（生产端完成流）。
 - **内部系统：** Moodify Ear / Auditory Intelligence（听觉、判断、验证与研究）、Cloud Production System（Intake→…→Render→Delivery）、Classic Reconstruction（内部生产哲学，宪法 v1.0）。
 - **历史身份说明：** 旧表述「The Ear of AI — an Auditory Intelligence System」作为**公开产品身份已失效**（被 W01-P01 Canon 覆盖）；Ear 保留为内部系统资产。完整裁决见 W01-P01 Decision Register CD-001/CD-002。
 
@@ -63,6 +63,7 @@ date: 2026-08-08
 | Cloud runtime（Ear 生产流量） | UNRESOLVED | 云端 API 壳运行，无生产流量（W01-P00） |
 | App integration | CANONICAL（对外面） | apps/music-android 3.1 + deliverables/releases |
 | MAMSE-001..012 | EXPERIMENTAL_ACCEPTED | artifacts/mamse_001..012 |
+| Mix Graph / Professional Finishing Session | ABSENT（目标态已入 Canon v2.0，未实现） | [docs/MOODIFY_PROFESSIONAL_FINISHING_V1.md](MOODIFY_PROFESSIONAL_FINISHING_V1.md)（TARGET） |
 
 Allowed status values: `CANONICAL`, `EXPERIMENTAL`, `LEGACY`, `HISTORICAL`, `ABSENT`, `UNRESOLVED`, plus W01-P00 task states (`IMPLEMENTED_NOT_MERGED` 等) for unmerged work.
 
@@ -70,6 +71,7 @@ Never promote a capability to CANONICAL based only on documentation or an unmerg
 
 ## History
 
+- 2026-09-20 (Canon v2.0): 身份升级为 Professional Finishing（Generated is not finished）；Player 重新定位为消费端接口 + Preview/A-B/Review/Delivery；Mix Graph v0.1 为下一工程包（当前 ABSENT）。
 - 2026-08-17 (W01-P01): 从历史静态快照转为 Canon 入口；身份收敛为 Moodify Music / Player。
 - 2026-08-14: Brand/Core Identity vs Public Product 记录（已并入上方历史身份说明）。
 - 2026-08-08: 原 Ear of AI 身份基线（保留为历史）。

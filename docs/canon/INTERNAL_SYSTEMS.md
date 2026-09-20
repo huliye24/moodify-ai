@@ -1,10 +1,12 @@
 # INTERNAL SYSTEMS — Moodify
 
-**Canon v1.2（One Core / Two Interfaces, 2026-09-17；本表内部系统定义自 v1.0 延续）**
+**Canon v2.0（Professional Finishing, 2026-09-20；v1.2 One Core / Two Interfaces 延续，本表内部系统定义自 v1.0 延续）**
 
 以下系统是 Moodify 的内部能力，不构成对外产品面。保留其研究与工程资产，不删除。
 
 > **注（v1.2）：** 自 Canon v1.2 起，`Moodify Core` 成为跨生产端/消费端的共享声音智能资产；本文件所列 Ear / Cloud Production / state machine / 外部能力仍为内部系统，但其声音算法资产将渐进归入 Core，interface 不得私藏第二套实现。
+
+> **注（v2.0）：** Professional Finishing Session / Mix Graph（v0.1 目标态）属于 Core 生产能力的内部复杂度，不构成第二个对外产品面；目标架构见 [MOODIFY_PROFESSIONAL_FINISHING_V1.md](../MOODIFY_PROFESSIONAL_FINISHING_V1.md)。
 
 ## 1. Moodify Ear / Auditory Intelligence
 

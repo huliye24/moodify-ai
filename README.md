@@ -1,10 +1,10 @@
 # Moodify
 
-**One Core, Two Interfaces — Production CLI + Listening App**
+**AI-native Professional Audio Finishing System — One Core, Two Interfaces**
 
-> Moodify builds the shared audio intelligence that powers both production and playback.
+> **Generated is not finished.** Moodify is the professional finishing layer between AI music generation and distribution.
 >
-> Moodify 正在构建 AI 时代音乐产业的听觉智能基础设施：一个 Core，两个接口。
+> **生成 ≠ 完成。** Moodify 是 AI 音乐与发行之间的专业完成层：一个 Core，两个接口。
 
 ```text
              Moodify
@@ -29,7 +29,7 @@ PROCESS              PLAY
 
 AI can now generate music at scale. The music industry still lacks reliable infrastructure to **listen to, evaluate, and process** that music. Moodify is building the auditory intelligence layer that fills this gap — the "ears" of the AI music economy.
 
-Moodify is a **one-Core, two-interface platform**: the same Core powers a production interface (CLI) that *changes audio assets* and a listening interface (App) that *changes how music is heard*. We are not a music app company; we are an **AI audio intelligence infrastructure company** whose engine measures, understands, scores, and processes audio, and whose interfaces turn that capability into production and playback.
+Moodify is an **AI-native professional audio finishing system** built as a **one-Core, two-interface platform**: the same Core powers a production interface (CLI) that takes raw or generated audio through Import → Analyze → Diagnose → Plan → Process → Verify → Export, and a listening interface (App) that *changes how music is heard* and serves as preview / A-B / review / delivery for finishing sessions. We are not a music app company; we are an **AI audio intelligence infrastructure company** whose engine measures, understands, scores, and processes audio, and whose interfaces turn that capability into production and playback.
 
 ## Core Capabilities
 
@@ -52,6 +52,7 @@ AI mastering and industrial audio processing.
 - Identity preservation gates — processing never destroys musical identity
 - Commercial release standardization for streaming distribution
 - Audio reconstruction and parameter optimization
+- Mix Graph v0.1（目标态，TARGET）：source → EQ → compression → stereo → limiter → verify，可序列化 / 可旁路 / 可回退，见 [docs/MOODIFY_PROFESSIONAL_FINISHING_V1.md](docs/MOODIFY_PROFESSIONAL_FINISHING_V1.md)
 
 ### 3. Moodify Rating — AI Music Asset Intelligence
 
