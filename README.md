@@ -1,3 +1,5 @@
+<p align="center"><img src="brand/assets/moodify-horizontal.png" alt="Moodify — Every voice deserves to be heard" width="100%"></p>
+
 # Moodify
 
 **AI Audio Intelligence Infrastructure — Moodify Music / Moodify Player**
