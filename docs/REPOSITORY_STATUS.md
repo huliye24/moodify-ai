@@ -1,17 +1,19 @@
 # Repository Status
 
-**Status:** 当前 Canon 与事实状态入口（Canon v1.1 / Public Form v0.1，2026-08-20 更新）。
+**Status:** 当前 Canon 与事实状态入口（Canon v2.1 / Sound Protocol，2026-09-23 更新）。
 **Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](canon/AUTHORITY_ORDER.md)）。
 
-## Canonical Identity（P01 Canon，2026-08-17）
+## Canonical Identity（Canon v2.1）
 
-> **Moodify Music / Moodify Player** 是对外产品面；第一阶段核心用户动作是 **PLAY**。
+> **Moodify Sound Protocol** 是对外身份；CLI 执行协议作业，App 保留播放和审听。
 
-- **对外产品面：** Moodify Music / Player（Music Android 3.1 APK、music-web PWA、云端 music-platform/BFF）。
+- **对外产品面：** MSP/0.1 CLI 参考实现；App/Player（Music Android 3.1 APK、music-web PWA、云端 music-platform/BFF）继续提供播放与审听。
 - **内部系统：** Moodify Ear / Auditory Intelligence（听觉、判断、验证与研究）、Cloud Production System（Intake→…→Render→Delivery）、Classic Reconstruction（内部生产哲学，宪法 v1.0）。
 - **历史身份说明：** 旧表述「The Ear of AI — an Auditory Intelligence System」作为**公开产品身份已失效**（被 W01-P01 Canon 覆盖）；Ear 保留为内部系统资产。完整裁决见 W01-P01 Decision Register CD-001/CD-002。
 
 ## Current Verified Mainline（仓库侧）
+
+MSP/0.1 仓库侧实现：`moodify protocol validate|process`；JSON 作业 → 既有 Core 预设处理 → WAV、诊断与哈希清单。仅证明执行路径，不证明自动听感验证或云端部署。协议详情见 [`docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`](protocol/MOODIFY_SOUND_PROTOCOL_0_1.md)。
 
 ```text
 Import -> Analyze -> Diagnose -> Process -> Export

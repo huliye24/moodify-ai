@@ -1,7 +1,7 @@
 # CURRENT CANON — Moodify
 
-**Version:** 1.1（Public Form Package 01）
-**Date:** 2026-08-19
+**Version:** 2.1（Sound Protocol；One Core / Multiple Interfaces）
+**Date:** 2026-09-23
 **Authority:** root `AGENTS.md` → `docs/canon/*`
 **Supersedes for product identity:** any earlier document that claims Moodify's outward product is "The Ear of AI" or that presents Ear as a public product surface.
 **Related:** [PRODUCT_BOUNDARY.md](PRODUCT_BOUNDARY.md) · [INTERNAL_SYSTEMS.md](INTERNAL_SYSTEMS.md) · [AUTHORITY_ORDER.md](AUTHORITY_ORDER.md) · [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md) · [Public Brand Authority](../brand/public/README.md) · [Classic Reconstruction Constitution](../CLASSIC_RECONSTRUCTION_CONSTITUTION.md)（内部生产哲学）
@@ -10,15 +10,16 @@
 
 ## 1. External Product（对外产品）
 
-> **Moodify Music / Moodify Player**
+> **Moodify Sound Protocol — 一个 Core，多个接口。**
 
-第一阶段核心用户动作：
+AI / Agent 通过 CLI 提交可校验的声音处理作业；App 保留为播放、预览和人工审听接口。MSP/0.1 当前只实现预设作业与执行证据；可编辑 Mix Graph 和自动听感验证仍为目标态，详见[协议说明](../protocol/MOODIFY_SOUND_PROTOCOL_0_1.md)。
 
 ```text
-PLAY
+MSP job -> CLI PROCESS -> Core -> processed audio + evidence -> human review
+App PLAY / preview / review
 ```
 
-用户外部体验保持极简：
+消费端体验保持极简：
 
 ```text
 Source / Cloud-prepared Track
@@ -55,8 +56,8 @@ Moodify Ear / Auditory Intelligence 是**内部听觉、判断、验证与研究
 
 ## 3. Canon 不变量
 
-1. **一个对外产品身份**：Moodify Music / Player。Ear 不成为第二个公开产品面。
-2. **PLAY 优先**：第一阶段一切对外体验围绕播放。
+1. **一个对外产品身份**：Moodify Sound Protocol。Ear 不成为第二个公开产品面。
+2. **协议优先**：CLI 执行 PROCESS；App 保留 PLAY / 审听。两者共享 Core。
 3. **内部可以复杂**：生产、判断、证据、学习在内部承担。
 4. **Canon 不虚构现实**：云端/生产能力以 P00 现实快照与运行时证据为准，未验证不写成已运行。
 5. **历史文档不能反向覆盖当前 Canon**（见 [AUTHORITY_ORDER.md](AUTHORITY_ORDER.md)）。

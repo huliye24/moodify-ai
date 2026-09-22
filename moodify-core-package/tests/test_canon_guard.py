@@ -31,7 +31,7 @@ def test_guard_catches_ear_as_product_regression():
     fake = {
         "README.md": "# Moodify\n\n> Moodify is The Ear of AI — an Auditory Intelligence System.\n" + "\n" * 50,
         "AGENTS.md": "# AGENTS\n\nMoodify is The Ear of AI — an Auditory Intelligence System.\n" + "\n" * 50,
-        "docs/canon/CURRENT_CANON.md": "Moodify Music\nCANON_CHANGE = YES\n",
+        "docs/canon/CURRENT_CANON.md": "Moodify Sound Protocol\nCANON_CHANGE = YES\n",
         "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
         "docs/canon/PRODUCT_BOUNDARY.md": "Moodify Music\n",
         "docs/canon/INTERNAL_SYSTEMS.md": "Moodify Ear\n",
