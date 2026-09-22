@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-09-23 — Sound Protocol（v2.1）
+
+- **CANON_CHANGE = YES。** 用户明确要求项目改为声音协议，让 AI / Agent 通过 CLI 调用并处理声音。
+- **Why / evidence：** 2026-09-23 人类直接指令；仓库已有 `moodify-core-package`、`v01_pipeline.process_audio` 和 `moodify` CLI 入口，可在同一 Core 上建立协议执行层。
+- **Boundary：** CLI 成为首要协议执行接口；App 留作播放/审听接口；不新增第二 DSP Core。MSP/0.1 仅是显式预设处理和执行证据，不声称 Mix Graph、自动质量验收或云端服务已完成。
+- **Affected authority files：** `AGENTS.md`、`README.md`、`docs/canon/CURRENT_CANON.md`、`docs/canon/PRODUCT_BOUNDARY.md`、`docs/REPOSITORY_STATUS.md`、本文件；新增 `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`。
+- **Migration：** 保留既有 `analyze`、`show`、`local-analyze`、`cache` 与 App；新增 `moodify protocol validate|process`。旧 v2.0 双接口文字作为历史背景，但产品身份由 v2.1 覆盖。
+- **Rollback：** 移除协议命令和 `sound_protocol.py`，回退本条与上述定位文档至 v2.0；既有 Core 与 App 不受影响。
+
 ## 2026-09-20 — Professional Finishing（v2.0）
 
 - **CANON_CHANGE = YES。** 人类已明确产品方向（2026-09-20 指令）：Moodify 不再把 Player 当核心产品，转为 AI 音乐与发行之间的专业完成层。AI 仅执行落地，不重写产品哲学。

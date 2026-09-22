@@ -4,7 +4,7 @@ This file defines the canonical context for AI coding agents working in this rep
 
 ## Product Identity
 
-**External product:** Moodify — AI-native Professional Audio Finishing System（一个 Core，两个接口）。
+**External product:** Moodify Sound Protocol — AI / Agent 可通过 CLI 调用的声音处理协议；一个共享 Core，CLI 为首要执行接口，App 为播放/审听接口。协议 v0.1 的实际边界见 `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`。
 
 **产品命题（Product thesis）：Generated is not finished.（生成 ≠ 完成。）**
 

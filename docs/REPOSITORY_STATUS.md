@@ -1,6 +1,6 @@
 # Repository Status
 
-**Status:** 当前 Canon 与事实状态入口（Canon v2.0 / Professional Finishing，2026-09-20 更新）。
+**Status:** 当前 Canon 与事实状态入口（Canon v2.1 / Sound Protocol，2026-09-23 更新）。
 **Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](canon/AUTHORITY_ORDER.md)）。
 
 ## Canonical Identity（Canon v2.0，2026-09-20）
@@ -12,6 +12,8 @@
 - **历史身份说明：** 旧表述「The Ear of AI — an Auditory Intelligence System」作为**公开产品身份已失效**（被 W01-P01 Canon 覆盖）；Ear 保留为内部系统资产。完整裁决见 W01-P01 Decision Register CD-001/CD-002。
 
 ## Current Verified Mainline（仓库侧）
+
+MSP/0.1 仓库侧实现：`moodify protocol validate|process`；JSON 作业 → 既有 Core 预设处理 → WAV、诊断与哈希清单。仅证明执行路径，不证明自动听感验证或云端部署。协议详情见 [`docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`](protocol/MOODIFY_SOUND_PROTOCOL_0_1.md)。
 
 ```text
 Import -> Analyze -> Diagnose -> Process -> Export

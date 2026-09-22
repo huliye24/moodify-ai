@@ -1,10 +1,10 @@
 # PRODUCT BOUNDARY — Moodify
 
-**Canon v2.0（Professional Finishing, 2026-09-20；v1.2 One Core / Two Interfaces 延续）**
+**Canon v2.1（Sound Protocol, 2026-09-23；One Core / Two Interfaces 延续）**
 
 ## External Product
 
-**Name:** Moodify — AI-native Professional Audio Finishing System（一个 Core，两个接口）。产品命题：**Generated is not finished.**
+**Name:** Moodify Sound Protocol（一个 Core，CLI 首要执行，App 播放/审听）。产品命题：**Generated is not finished.** 现有 MSP/0.1 只提供受限预设处理，不可将其表述为已完成的专业 Mix Graph 或自动质量验证。
 
 **Primary user actions:**
 

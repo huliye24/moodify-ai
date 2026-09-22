@@ -1,7 +1,7 @@
 # CURRENT CANON — Moodify
 
-**Version:** 2.0（Professional Finishing；延续 v1.2 One Core / Two Interfaces）
-**Date:** 2026-09-20
+**Version:** 2.1（Sound Protocol；延续 v2.0 Professional Finishing 与 One Core / Two Interfaces）
+**Date:** 2026-09-23
 **Authority:** root `AGENTS.md` → `docs/canon/*`
 **Supersedes for product identity:** any earlier document that claims Moodify's outward product is "The Ear of AI", that presents Ear as a public product surface, that defines Moodify as **only** a Player with a single `PLAY` action, or that frames AI processing as a black-box one-shot output.
 **Related:** [PRODUCT_BOUNDARY.md](PRODUCT_BOUNDARY.md) · [INTERNAL_SYSTEMS.md](INTERNAL_SYSTEMS.md) · [AUTHORITY_ORDER.md](AUTHORITY_ORDER.md) · [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md) · [MOODIFY_PROFESSIONAL_FINISHING_V1.md](../MOODIFY_PROFESSIONAL_FINISHING_V1.md)（目标架构，TARGET）· [Public Brand Authority](../brand/public/README.md) · [Classic Reconstruction Constitution](../CLASSIC_RECONSTRUCTION_CONSTITUTION.md)（内部生产哲学）
@@ -9,6 +9,8 @@
 ---
 
 ## 1. External Product（对外产品）
+
+**2026-09-23 协议优先修订：** Moodify 对外首先是 **Sound Protocol**，供 AI / Agent 通过 CLI 提交可校验的声音处理作业。CLI 是首要执行接口；App 保留为播放、预览和人工审听接口。专业完成是协议要服务的生产目标，不再是唯一产品类别名。MSP/0.1 当前只实现预设作业与证据清单；可编辑 Mix Graph 和自动验证仍为目标态，详见 [协议说明](../protocol/MOODIFY_SOUND_PROTOCOL_0_1.md)。下文 v2.0 的双接口结构继续有效，但其产品身份标题由本段覆盖。
 
 > **Moodify — AI-native Professional Audio Finishing System（一个 Core，两个接口）**
 >
