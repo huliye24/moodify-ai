@@ -2,11 +2,26 @@
 
 # Moodify
 
-**AI Audio Intelligence Infrastructure — Moodify Music / Moodify Player**
+**Moodify Sound Protocol — sound processing through one shared Core**
 
-> Moodify builds the intelligence layer for the future of music.
+> **Generated is not finished.** AI and agents can call Moodify through a declarative sound job and CLI; humans retain final listening and release authority.
 >
-> Moodify 正在构建 AI 时代音乐产业的听觉智能基础设施。
+> **生成 ≠ 完成。** Moodify 以声音协议为核心，让 AI / Agent 通过 CLI 调用同一个 Core 处理声音；最终审听与发布由人决定。
+
+```text
+             Moodify
+          Shared Core
+        /                \
+Creator Side         Listener Side
+Moodify CLI          Moodify App
+PROTOCOL / PROCESS   PLAY / REVIEW
+```
+
+- **Moodify CLI** — Production Interface（声音生产端，Creator Side）。核心动作 `PROCESS`。**Makes music sound better.**
+- **Moodify App / Player** — Listening Interface（声音消费端，Listener Side）。核心动作 `PLAY`。**Makes music play better.**
+- **Moodify Core** — 二者共享的声音智能（analysis / dsp / processing / playback / profiles / verification / contracts）。**Powers both.**
+
+首版 [Moodify Sound Protocol 0.1](docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md) 提供可校验 JSON 作业和 `moodify protocol validate|process`。它调用现有 Core 的预设处理，输出参数、诊断及文件哈希；`processed_review_required` 不等于通过专业验证。可编辑 Mix Graph 仍是目标态。
 
 [![Test](https://github.com/huliye24/moodify-ai/actions/workflows/test.yml/badge.svg)](https://github.com/huliye24/moodify-ai/actions/workflows/test.yml)
 [![Python](https://img.shields.io/badge/Python-%3E%3D3.10-3776AB?logo=python&logoColor=white)](moodify-core-package/pyproject.toml)
@@ -16,9 +31,35 @@
 
 ## What Moodify Is
 
-AI can now generate music at scale. The music industry still lacks reliable infrastructure to **listen to, evaluate, and process** that music. Moodify is building the auditory intelligence layer that fills this gap — the "ears" of the AI music economy.
+Moodify makes sound processing callable by humans, AI systems and agents. A job describes the input, selected processing preset and output location. The CLI validates the job, runs the shared Core and returns a machine-readable record of what happened.
 
-We are not a music app company. We are an **AI audio intelligence infrastructure company**. Our engine measures, understands, scores, and processes audio; our product modules turn that capability into industry-ready services.
+Moodify is a **sound protocol with a CLI reference runtime**. AI systems and agents submit explicit processing jobs; the CLI executes them through the shared Core and returns machine-readable evidence. The App remains a listening/review interface. The implemented 0.1 path is preset-based processing; a complete Import → Analyze → Diagnose → Plan → Process → Verify → Export finishing session and editable Mix Graph remain targets, not current protocol guarantees.
+
+## Quick start · 协议调用
+
+从仓库根目录安装 CLI（建议使用虚拟环境）：
+
+```bash
+python -m pip install -e moodify-core-package
+```
+
+将下列内容保存为 `job.json`，并把音频放在同目录的 `audio/source.wav`。作业中的相对路径以 `job.json` 所在目录为基准。
+
+```json
+{
+  "protocol": "moodify.sound/0.1",
+  "source": "audio/source.wav",
+  "preset": "clean_master",
+  "output_dir": "outputs"
+}
+```
+
+```bash
+moodify protocol validate job.json
+moodify protocol process job.json
+```
+
+CLI 向标准输出写入 JSON；错误向标准错误输出写入 JSON，退出码为 2。处理结果包含 WAV 路径、输入/输出 SHA-256、实际预设参数和诊断，状态为 `processed_review_required`。**请人工审听后再发布**。当前可选预设：`clean_master`、`warm_vocal`、`wide_space`。完整字段与限制见[协议文档](docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md)。
 
 ## Four Product Pillars
 
@@ -88,10 +129,9 @@ The engine is a pure capability layer — it analyzes, scores, and understands a
 
 Full architecture specification: [docs/MOODIFY_ARCHITECTURE_V1.md](docs/MOODIFY_ARCHITECTURE_V1.md)
 
-## Quick Demo
+## Legacy analysis demo
 
-The Intelligence Engine is live. One command turns any music file into a
-professional AI audio intelligence report:
+The older `demo/` analysis path remains in the repository. It is separate from the MSP/0.1 job contract above and is kept for compatibility:
 
 ```bash
 pip install -e demo          # or run without installing (repo root):

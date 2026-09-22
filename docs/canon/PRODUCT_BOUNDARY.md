@@ -1,15 +1,15 @@
 # PRODUCT BOUNDARY — Moodify
 
-**Canon v1.1（Public Form Package 01, 2026-08-19）**
+**Canon v2.1（Sound Protocol, 2026-09-23；One Core / Two Interfaces 延续）**
 
 ## External Product
 
-**Name:** Moodify Music / Moodify Player
+**Name:** Moodify Sound Protocol（一个 Core，CLI 首要执行，App 播放/审听）。产品命题：**Generated is not finished.** 现有 MSP/0.1 只提供受限预设处理，不可将其表述为已完成的专业 Mix Graph 或自动质量验证。
 
-**Primary user action:** PLAY
+**Primary actions:** CLI `PROCESS`；App `PLAY` / 人工审听。
 
 **Public promise（现状声明，非远景承诺）：**
-Moodify 提供以 PLAY 为核心的音乐聆听体验。来源可以是本地文件或云端准备曲目；
+Moodify 提供可由 AI / Agent 调用的声音处理协议；MSP/0.1 产出带参数、诊断与文件哈希的处理结果，仍需人工审听。App 保留以 PLAY 为核心的音乐聆听体验。来源可以是本地文件或云端准备曲目；
 云端准备（识别、分析、重建、渲染）是内部生产环节，不要求用户理解。
 
 ## Internal Systems

@@ -4,12 +4,12 @@ This file defines the canonical context for AI coding agents working in this rep
 
 ## Product Identity
 
-**External product:** Moodify Music / Moodify Player
+**External product:** Moodify Sound Protocol — AI / Agent 可通过 CLI 调用的声音处理协议；一个共享 Core，CLI 为首要执行接口，App 为播放/审听接口。协议 v0.1 的实际边界见 `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`。
 
-**Core user action:** PLAY
+**Core actions:** CLI `PROCESS`; App `PLAY` / review. Both use the same Core.
 
 ```text
-Source / Cloud-prepared Track -> Moodify -> PLAY
+Agent / human -> MSP job -> Moodify CLI -> shared Core -> processed audio + evidence -> human review
 ```
 
 **Internal systems:**
@@ -18,7 +18,7 @@ Source / Cloud-prepared Track -> Moodify -> PLAY
 - Cloud Production System — Intake → Analyze → Stem → Judge → Intervene → Render → Verify → Evidence
 - Classic Reconstruction — 内部生产哲学（宪法 v1.0，决策驱动受控重建）
 
-Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress the repository identity back to "The Ear of AI" as a public product, "AI music post-processing", "automatic mastering", or a preset/DSP product. Do not create a second public product identity alongside Moodify Music / Player.
+Ear 是 Moodify 的内部听觉智力，不是对外产品面。不得把 MSP/0.1 的预设处理误称为自动母带或已完成的专业验证；不得建立第二套 DSP Core。
 
 ## Canon Reference
 
@@ -36,7 +36,7 @@ Public brand language and public-site roles then resolve through `docs/brand/pub
 
 ## Important Distinction
 
-- 对外：Moodify Music / Player，用户只做 PLAY。
+- 对外：Moodify Sound Protocol；AI / Agent 通过 CLI 提交显式作业，App 负责播放与人工审听。
 - 内部：Ear / analysis / stem / judgment / intervention / preset decision / verification / evidence / learning / cloud production。复杂度由 Moodify 承担。
 - 内部处理复杂度不是对外卖点。
 - Public Form 品牌信念：**每一种声音，都值得被世界听见。 / Every voice deserves to be heard.**

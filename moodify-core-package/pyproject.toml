@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "moodify"
 version = "0.1.0"
-description = "Moodify — The Ear of AI: an auditory intelligence system for analyzing, judging, intervening on, verifying, and learning from audio"
+description = "Moodify Sound Protocol and CLI reference runtime for shared-Core audio processing"
 authors = [{name = "文川院 / Moodify 声音实验室"}]
 license = {text = "GPL-3.0-only"}
 readme = "README.md"

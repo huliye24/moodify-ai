@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from moodify.release import PRODUCT_VERSION, analyze_to_case, reopen_case
@@ -27,6 +28,9 @@ def main(argv: list[str] | None = None) -> int:
     cache.add_argument("action", choices=("size", "clear-all", "clear-source"))
     cache.add_argument("--cache-root", default=".moodify/cache")
     cache.add_argument("--source-sha256")
+    protocol = commands.add_parser("protocol", help="validate or execute an MSP/0.1 sound job")
+    protocol.add_argument("action", choices=("validate", "process"))
+    protocol.add_argument("job", help="JSON job file; relative paths resolve beside it")
     args = parser.parse_args(argv)
     if args.command == "analyze":
         result = analyze_to_case(Path(args.audio), Path(args.cases_root))
@@ -39,6 +43,15 @@ def main(argv: list[str] | None = None) -> int:
             Path(args.audio), Path(args.cache_root), Path(args.manifest),
         )
         result = {"report": outputs["report"], "execution": diagnostics.to_dict()}
+    elif args.command == "protocol":
+        from moodify.sound_protocol import ProtocolError, execute_job, load_job
+
+        try:
+            job = load_job(Path(args.job))
+            result = {"status": "valid", **job} if args.action == "validate" else execute_job(job)
+        except ProtocolError as exc:
+            print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
+            return 2
     else:
         from moodify.auditory.execution.cache import LocalCache
 
