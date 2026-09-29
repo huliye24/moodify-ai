@@ -1,10 +1,11 @@
 """Session executor tests: rendering, bypass semantics, evidence, guards."""
 
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 import soundfile as sf
-from pathlib import Path
 
 from moodify.audio_io import load_audio
 from moodify.mix_graph import MixGraphError, run_session

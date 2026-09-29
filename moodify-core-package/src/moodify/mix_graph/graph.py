@@ -10,8 +10,8 @@ from typing import Any
 
 from moodify.mix_graph.schema import (
     AUDIO_EXTENSIONS,
-    MixGraphError,
     SCHEMA_ID,
+    MixGraphError,
     canonical_json,
     validate_graph,
 )

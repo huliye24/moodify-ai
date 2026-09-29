@@ -134,7 +134,7 @@ def _source_is_stereo(path: Path) -> bool:
 
         info = sf.info(str(path))
         return info.channels >= 2
-    except Exception:
+    except (OSError, RuntimeError):
         return False
 
 

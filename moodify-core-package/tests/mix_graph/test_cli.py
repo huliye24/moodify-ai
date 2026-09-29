@@ -3,6 +3,7 @@
 import json
 
 import pytest
+
 from moodify.release_cli import main
 
 pytestmark = [pytest.mark.v01]
