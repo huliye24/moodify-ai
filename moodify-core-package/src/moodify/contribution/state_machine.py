@@ -144,8 +144,6 @@ class StateMachine:
         if review_data is not None:
             if 'metadata' not in updated_record:
                 updated_record['metadata'] = {}
-            if 'review' not in updated_record['metadata']:
-                updated_record['metadata']['review'] = {}
 
             # Handle both regular review and final review
             if 'finalReviewer' in review_data:
@@ -158,21 +156,23 @@ class StateMachine:
                 if 'appliedAt' in review_data:
                     final_review['appliedAt'] = review_data['appliedAt']
                 updated_record['metadata']['review'] = final_review
+                updated_record['review'] = final_review
             else:
-                # This is a regular review
+                # This is a regular review. Optional fields degrade gracefully:
+                # missing reviewer/reviewDate get deterministic defaults instead
+                # of raising KeyError on partial review payloads.
                 regular_review = {
-                    'reviewer': review_data['reviewer'],
-                    'reviewDate': review_data['reviewDate']
+                    'reviewer': review_data.get('reviewer', 'system'),
+                    'reviewDate': review_data.get('reviewDate', datetime.utcnow().isoformat())
                 }
-                if 'score' in review_data:
-                    regular_review['score'] = review_data['score']
-                if 'feedback' in review_data:
-                    regular_review['feedback'] = review_data['feedback']
-                if 'recommendation' in review_data:
-                    regular_review['recommendation'] = review_data['recommendation']
-                if 'appliedAt' in review_data:
-                    regular_review['appliedAt'] = review_data['appliedAt']
+                for optional_key in ('score', 'feedback', 'recommendation', 'appliedAt',
+                                     'reasons', 'reason'):
+                    if optional_key in review_data:
+                        regular_review[optional_key] = review_data[optional_key]
                 updated_record['metadata']['review'] = regular_review
+                # Top-level review mirrors metadata.review per the reference
+                # CONTRIBUTION_SPEC record shape ("review" is a first-class field).
+                updated_record['review'] = regular_review
 
         # Handle immutable fields after certain transitions
         if target_status in ['rejected', 'finalized']:

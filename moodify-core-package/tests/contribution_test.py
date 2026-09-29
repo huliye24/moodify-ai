@@ -12,6 +12,7 @@ from moodify.contribution import (
     Scorer,
     StateMachine
 )
+from moodify.contribution.schema.contribution import generate_content_fingerprint
 
 
 class TestContributionCore:
@@ -64,7 +65,7 @@ class TestContributionCore:
                     'verifiedBy': 'system'
                 },
                 'uri': 'https://github.com/example/repo/pull/123',
-                'digest': 'sha256:abc123'
+                'digest': 'sha256:' + 'ab' * 32
             }
         ]
 
@@ -192,11 +193,12 @@ class TestContributionCore:
 
     def test_add_evidence(self, core, sample_contributor, sample_content, sample_evidence):
         """Test adding evidence to a contribution."""
-        # Create and submit
+        # Create and submit (starting from the sample evidence item)
         contribution, _ = core.create_contribution(
             contributor=sample_contributor,
             category='code',
-            content=sample_content
+            content=sample_content,
+            evidence=sample_evidence
         )
         core.submit_contribution(contribution['contributionId'])
 
@@ -356,7 +358,7 @@ class TestContributionCore:
             'observedAt': '2026-08-29T10:00:00.000Z',
             'verification': {'status': 'verified', 'method': 'github_api'},
             'uri': 'https://github.com/example/repo/pull/123',
-            'digest': 'sha256:abc123'
+            'digest': 'sha256:' + 'ab' * 32
         }
 
         core.add_evidence(contribution['contributionId'], duplicate_evidence)
@@ -411,6 +413,15 @@ class TestContributionValidator:
             'evidence': [],
             'metadata': {}
         }
+        # The validator recomputes and compares the fingerprint, so it must be
+        # the real one for this payload.
+        data['contentFingerprint'] = generate_content_fingerprint({
+            'contributor': data['contributor'],
+            'category': data['category'],
+            'content': data['content'],
+            'evidence': data['evidence'],
+            'schemaVersion': data['schemaVersion']
+        })
 
         is_valid, errors = validator.validate_contribution(data)
         assert is_valid
@@ -430,6 +441,15 @@ class TestContributionValidator:
             'evidence': [],
             'metadata': {}
         }
+        # Use the real fingerprint so the mismatch check passes and validation
+        # reaches the contributor rules this test targets.
+        data['contentFingerprint'] = generate_content_fingerprint({
+            'contributor': data['contributor'],
+            'category': data['category'],
+            'content': data['content'],
+            'evidence': data['evidence'],
+            'schemaVersion': data['schemaVersion']
+        })
 
         is_valid, errors = validator.validate_contribution(data)
         assert not is_valid

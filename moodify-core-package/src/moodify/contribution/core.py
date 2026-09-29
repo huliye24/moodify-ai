@@ -52,6 +52,13 @@ class ContributionCore:
         Returns:
             Tuple of (contribution_record, errors)
         """
+        # Validate contributor identity first: fingerprinting and ID generation
+        # index into contributor['type']/['id'], so invalid input must fail fast
+        # with a domain error instead of raising KeyError.
+        contributor_errors = self.validator.validate_contributor_identity(contributor)
+        if contributor_errors:
+            return {}, contributor_errors
+
         # Generate deterministic values
         submitted_at = datetime.utcnow().isoformat()
         content_fingerprint = schema_generate_content_fingerprint({
@@ -84,7 +91,14 @@ class ContributionCore:
             'evidence': evidence or [],
             'metadata': {
                 'createdBy': 'system',
-                'createdAt': datetime.utcnow().isoformat()
+                'createdAt': datetime.utcnow().isoformat(),
+                'history': [
+                    {
+                        'status': 'draft',
+                        'action': 'created',
+                        'timestamp': submitted_at
+                    }
+                ]
             }
         }
 
@@ -127,6 +141,8 @@ class ContributionCore:
             if not is_valid:
                 return {}, errors
 
+            self._append_history(updated_contribution, 'submitted', 'submitted')
+
             # Store updated contribution
             if self.storage_path:
                 self._store_contribution(updated_contribution)
@@ -157,10 +173,21 @@ class ContributionCore:
         if not contribution:
             return {}, [f"Contribution {contribution_id} not found"]
 
-        # Apply transition
+        # Apply transition. A review arriving on a 'submitted' record composes
+        # the mandatory under_review step, so the strict transition graph is
+        # preserved while the review API stays one call. From any other state
+        # the decision is applied directly and the state machine rejects
+        # illegal jumps (e.g. draft -> verified).
         try:
+            current_record = contribution
+            if current_record.get('status') == 'submitted':
+                current_record = self.state_machine.apply_transition(
+                    current_record,
+                    'under_review',
+                    review_data
+                )
             updated_contribution = self.state_machine.apply_transition(
-                contribution,
+                current_record,
                 decision,
                 review_data
             )
@@ -169,6 +196,8 @@ class ContributionCore:
             is_valid, errors = self.validator.validate_contribution(updated_contribution)
             if not is_valid:
                 return {}, errors
+
+            self._append_history(updated_contribution, decision, 'reviewed')
 
             # Store updated contribution
             if self.storage_path:
@@ -261,6 +290,8 @@ class ContributionCore:
             if not is_valid:
                 return {}, errors
 
+            self._append_history(contribution, 'scored', 'scored')
+
             # Store updated contribution
             if self.storage_path:
                 self._store_contribution(contribution)
@@ -297,6 +328,8 @@ class ContributionCore:
             is_valid, errors = self.validator.validate_contribution(updated_contribution)
             if not is_valid:
                 return {}, errors
+
+            self._append_history(updated_contribution, 'finalized', 'finalized')
 
             # Store updated contribution
             if self.storage_path:
@@ -342,6 +375,12 @@ class ContributionCore:
         contribution = self._load_contribution(contribution_id)
         if not contribution:
             return []
+
+        # Records created by this core carry an accumulated history ledger in
+        # metadata; prefer it when present.
+        recorded_history = (contribution.get('metadata') or {}).get('history')
+        if recorded_history:
+            return recorded_history
 
         history = []
         current_state = contribution.copy()
@@ -432,6 +471,22 @@ class ContributionCore:
         contribution_path = self.storage_path / f"{contribution['contributionId']}.json"
         with open(contribution_path, 'w', encoding='utf-8') as f:
             json.dump(contribution, f, indent=2, ensure_ascii=False)
+
+    def _append_history(self, contribution: Dict[str, Any], status: str, action: str) -> None:
+        """Append a state-change entry to the record's history ledger.
+
+        Args:
+            contribution: Contribution record to update in place
+            status: Status reached by the recorded action
+            action: Short action label ('created', 'submitted', 'reviewed', ...)
+        """
+        metadata = contribution.setdefault('metadata', {})
+        history = metadata.setdefault('history', [])
+        history.append({
+            'status': status,
+            'action': action,
+            'timestamp': datetime.utcnow().isoformat()
+        })
 
     def _get_mock_contribution(self, contribution_id: str) -> Optional[Dict[str, Any]]:
         """Get mock contribution for demo purposes.

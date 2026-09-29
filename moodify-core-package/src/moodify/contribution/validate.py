@@ -117,6 +117,17 @@ class ContributionValidator:
 
         return errors
 
+    def validate_contributor_identity(self, contributor: Dict) -> List[str]:
+        """Validate a standalone contributor identity object.
+
+        Args:
+            contributor: Contributor identity {'type': str, 'id': str}
+
+        Returns:
+            List of validation errors (empty if valid)
+        """
+        return self._validate_contributor(contributor)
+
     def _validate_evidence(self, evidence: List, category: str) -> List[str]:
         """Validate evidence items."""
         errors = []

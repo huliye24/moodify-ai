@@ -81,7 +81,17 @@ class ContributionSchema:
         # Process evidence items
         evidence_items = []
         for evidence in data.get('evidence', []):
-            evidence_items.append(EvidenceItemSchema(**evidence))
+            evidence_items.append(
+                EvidenceItemSchema(
+                    evidence_id=evidence.get('evidenceId', ''),
+                    evidence_type=evidence.get('type', ''),
+                    observed_at=evidence.get('observedAt', ''),
+                    verification=evidence.get('verification', {}),
+                    uri=evidence.get('uri'),
+                    digest=evidence.get('digest'),
+                    metadata=evidence.get('metadata')
+                )
+            )
 
         # Process metadata
         metadata = None
@@ -271,12 +281,12 @@ CONTRIBUTION_JSON_SCHEMA = {
             'type': 'array',
             'items': {
                 'type': 'object',
-                'required': ['evidenceId', 'evidenceType', 'observedAt', 'verification'],
+                'required': ['evidenceId', 'type', 'observedAt', 'verification'],
                 'properties': {
                     'evidenceId': {
                         'type': 'string'
                     },
-                    'evidenceType': {
+                    'type': {
                         'type': 'string',
                         'enum': ['pull_request', 'commit', 'issue', 'merge_request', 'code_review']
                     },
@@ -310,7 +320,7 @@ CONTRIBUTION_JSON_SCHEMA = {
                     },
                     'digest': {
                         'type': 'string',
-                        'pattern': '^[a-f0-9]+$'
+                        'pattern': '^(sha256:[0-9a-f]{64})?$'
                     },
                     'metadata': {
                         'type': 'object'
@@ -352,7 +362,7 @@ CONTRIBUTION_JSON_SCHEMA = {
                             'properties': {
                                 'finalReviewer': {'type': 'string'},
                                 'finalDate': {'type': 'string', 'format': 'date-time'},
-                                'finalDecision': {'type': 'string', 'enum': ['approved', 'rejected']},
+                                'finalDecision': {'type': 'string'},
                                 'appliedAt': {'type': 'string', 'format': 'date-time'}
                             },
                             'required': ['finalReviewer', 'finalDate', 'finalDecision']
@@ -360,6 +370,11 @@ CONTRIBUTION_JSON_SCHEMA = {
                     ]
                 }
             }
+        },
+        # Top-level review, per the reference CONTRIBUTION_SPEC record shape
+        # ("review": null) and contribution.schema.json ("object|null").
+        'review': {
+            'type': ['object', 'null']
         },
         'scores': {
             'type': 'object',

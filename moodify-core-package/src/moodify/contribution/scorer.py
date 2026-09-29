@@ -95,14 +95,18 @@ class Scorer:
         Returns:
             ScoreResult containing all dimension scores and final score
         """
-        # Simple validation for reputation evidence fields
-        required_fields = ['contribution', 'impact', 'quality', 'persistence', 'early']
+        # Validate explicit dimension scores when present. Absent dimensions are
+        # not an error: _extract_dimension_scores derives them from evidence
+        # factors (defaulting to the neutral 5.0), so requiring all five
+        # explicit scores here would make factor-based scoring impossible.
+        dimension_fields = ['contribution', 'impact', 'quality', 'persistence', 'early']
         errors = []
 
-        for field in required_fields:
-            if field not in reputation_evidence:
-                errors.append(f"Missing required field: {field}")
-            elif not isinstance(reputation_evidence[field], (int, float)) or not (1 <= reputation_evidence[field] <= 10):
+        for field in dimension_fields:
+            if field in reputation_evidence and (
+                not isinstance(reputation_evidence[field], (int, float))
+                or not (1 <= reputation_evidence[field] <= 10)
+            ):
                 errors.append(f"Field '{field}' must be a number between 1 and 10")
 
         if errors:
@@ -198,9 +202,13 @@ class Scorer:
         # Common factor extraction patterns
         factor_path = factor.split('.')
 
-        # Look for exact match
+        # Look for exact match; non-numeric values (e.g. nested factor
+        # dictionaries like {'commits': 5}) are not scores, skip them.
         if factor in evidence:
-            return self._clamp_score(evidence[factor], None)
+            value = evidence[factor]
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                return self._clamp_score(value, None)
+            return None
 
         # Look for nested paths
         current = evidence
@@ -210,7 +218,7 @@ class Scorer:
             else:
                 return None
 
-        if isinstance(current, (int, float)):
+        if isinstance(current, (int, float)) and not isinstance(current, bool):
             return self._clamp_score(current, None)
 
         return None
