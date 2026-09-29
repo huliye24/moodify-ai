@@ -17,7 +17,7 @@
    personal_sign RPC. Wallet RPCs that could authorize transfers or
    transactions are never invoked. */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { GENESIS_CONFIG } from "../../lib/genesis-config";
 import { checksumAddress, shortenAddress } from "../../lib/evm-address";
@@ -179,13 +179,12 @@ function ParticipantCard({ participant, isNew }: { participant: Participant; isN
 }
 
 export default function GenesisPage() {
-  // `phase` is the explicit UI state machine (G-002 spec). Initial phase
-  // is derived from whether an injected wallet exists — never auto-connect.
-  const [phase, setPhase] = useState<Phase>(
-    typeof window !== "undefined" && Boolean(window.ethereum)
-      ? "wallet-disconnected"
-      : "idle",
-  );
+  // First render must match between server and client — `window` is undefined
+  // during SSR, so we always start with the "idle / no wallet" defaults and
+  // detect the injected provider inside a post-hydration effect. State
+  // updates after hydration are not subject to the hydration check.
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [hasWallet, setHasWallet] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
   const [challenge, setChallenge] = useState<NonceChallenge | null>(null);
@@ -195,16 +194,19 @@ export default function GenesisPage() {
   const accountsHandlerRef = useRef<((...args: unknown[]) => void) | null>(null);
   const chainHandlerRef = useRef<((...args: unknown[]) => void) | null>(null);
 
-  const hasWallet = useMemo(() => typeof window !== "undefined" && Boolean(window.ethereum), []);
-
-  // Initial detection: wire change listeners and reset transient wallet state.
-  // We never auto-connect (per spec: explicit user action). The phase reset is
-  // done via the state initializer above; this effect only attaches and
-  // detaches provider event listeners.
+  // Post-hydration detection: decide whether an injected wallet exists and
+  // update `hasWallet` / `phase` to match. This effect also attaches and
+  // detaches provider event listeners. We never auto-connect (per spec:
+  // explicit user action).
   useEffect(() => {
     const provider = getProvider();
     providerRef.current = provider;
-    if (!provider) return;
+    if (!provider) {
+      setHasWallet(false);
+      return;
+    }
+    setHasWallet(true);
+    setPhase((p) => (p === "registered" || p === "already-registered") ? p : "wallet-disconnected");
     const onAccountsChanged = (accounts: unknown) => {
       const list = accounts as string[];
       if (!list || list.length === 0) {

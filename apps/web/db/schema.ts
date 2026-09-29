@@ -248,3 +248,336 @@ export const genesisNonces = sqliteTable("genesis_nonces", {
   index("genesis_nonces_address_expires_idx").on(table.walletAddress, table.expiresAt),
   index("genesis_nonces_used_idx").on(table.usedAt)
 ]);
+
+// MOOD Node Registry Tables
+export const nodes = sqliteTable("nodes", {
+  id: text("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description").default(""),
+
+  // Identity Management
+  stableId: text("stable_id").notNull(),
+  nodeIdAlias: text("node_id_alias"),
+  publicKey: text("public_key"),
+  ipHash: text("ip_hash"),
+
+  // Node Roles
+  role: text("role", {
+    enum: ["compute", "ai", "storage", "verification"]
+  }).notNull(),
+
+  // Node Status
+  status: text("status", {
+    enum: ["draft", "active", "degraded", "offline", "maintenance", "retired"]
+  }).notNull().default("draft"),
+
+  // Cloud Provider Information
+  cloudProvider: text("cloud_provider"),
+  region: text("region"),
+  availabilityZone: text("availability_zone"),
+
+  // Machine Configuration
+  instanceType: text("instance_type"),
+  hostname: text("hostname"),
+  operatingSystem: text("operating_system"),
+  kernelVersion: text("kernel_version"),
+
+  // Capacity Fields
+  cpuCores: integer("cpu_cores"),
+  cpuModel: text("cpu_model"),
+  memoryGB: integer("memory_gb"),
+  storageGB: integer("storage_gb"),
+  bandwidthMbps: integer("bandwidth_mbps"),
+
+  // GPU Support
+  hasGPU: integer("has_gpu", { mode: "boolean" }).default(false),
+  gpuCount: integer("gpu_count").default(0),
+  gpuModel: text("gpu_model"),
+  gpuMemoryGB: integer("gpu_memory_gb").default(0),
+
+  // Geographic Information
+  country: text("country"),
+  city: text("city"),
+  latitude: text("latitude"),
+  longitude: text("longitude"),
+
+  // Operator Information
+  operatorType: text("operator_type", {
+    enum: ["resident", "organization"]
+  }),
+  operatorResidentId: text("operator_resident_id"),
+  operatorOrganizationId: text("operator_organization_id"),
+
+  // Timestamps
+  ...timestamps,
+  lastHeartbeatAt: text("last_heartbeat_at"),
+  lastSyncAt: text("last_sync_at"),
+
+  // Metadata
+  metadata: text("metadata", { mode: "json" }).default(sql`'{}'`),
+  tags: text("tags", { mode: "json" }).default(sql`'[]'`),
+}, (table) => [
+  index("nodes_role_status_idx").on(table.role, table.status),
+  index("nodes_operator_resident_idx").on(table.operatorResidentId),
+  index("nodes_operator_org_idx").on(table.operatorOrganizationId),
+  index("nodes_cloud_provider_idx").on(table.cloudProvider),
+  index("nodes_created_idx").on(table.createdAt),
+  index("nodes_last_heartbeat_idx").on(table.lastHeartbeatAt),
+]);
+
+export const nodeCapacityHistory = sqliteTable("node_capacity_history", {
+  id: text("id").primaryKey(),
+  nodeId: text("node_id").notNull().references(() => nodes.id, { onDelete: "cascade" }),
+
+  // Timestamp
+  recordedAt: text("recorded_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+
+  // Capacity Metrics
+  cpuUsagePercent: integer("cpu_usage_percent"),
+  memoryUsagePercent: integer("memory_usage_percent"),
+  storageUsagePercent: integer("storage_usage_percent"),
+  networkInMbps: integer("network_in_mbps"),
+  networkOutMbps: integer("network_out_mbps"),
+
+  // Process Count
+  processCount: integer("process_count").default(0),
+
+  // Load Average
+  loadAvg1: text("load_avg_1"),
+  loadAvg5: text("load_avg_5"),
+  loadAvg15: text("load_avg_15"),
+
+  // Disk I/O
+  diskReadKBs: integer("disk_read_kbs"),
+  diskWriteKBs: integer("disk_write_kbs"),
+
+  // System Information
+  uptimeSeconds: integer("uptime_seconds"),
+  temperature: integer("temperature"),
+
+  // Metadata
+  metadata: text("metadata", { mode: "json" }).default(sql`'{}'`),
+}, (table) => [
+  index("node_capacity_history_node_idx").on(table.nodeId),
+  index("node_capacity_history_recorded_idx").on(table.recordedAt),
+]);
+
+export const nodeHealth = sqliteTable("node_health", {
+  id: text("id").primaryKey(),
+  nodeId: text("node_id").notNull().references(() => nodes.id, { onDelete: "cascade" }),
+
+  // Health Status
+  status: text("status", {
+    enum: ["healthy", "degraded", "unhealthy", "unknown"]
+  }).notNull(),
+
+  // Check Timestamp
+  checkedAt: text("checked_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+
+  // Latency Measurements
+  apiLatencyMs: integer("api_latency_ms"),
+  dbLatencyMs: integer("db_latency_ms"),
+  externalServiceLatencyMs: integer("external_service_latency_ms"),
+
+  // Service Availability
+  servicesAvailable: integer("services_available", { mode: "boolean" }).default(true),
+  criticalServicesHealthy: integer("critical_services_healthy", { mode: "boolean" }).default(true),
+
+  // Error Counts
+  errorCount24h: integer("error_count_24h").default(0),
+  warningCount24h: integer("warning_count_24h").default(0),
+
+  // Resource Thresholds
+  cpuThreshold: integer("cpu_threshold").default(90),
+  memoryThreshold: integer("memory_threshold").default(90),
+  diskThreshold: integer("disk_threshold").default(90),
+
+  // Health Score
+  healthScore: integer("health_score").default(100),
+
+  // Details
+  details: text("details", { mode: "json" }).default(sql`'{}'`),
+  recommendations: text("recommendations", { mode: "json" }).default(sql`'[]'`),
+
+  // Maintenance Windows
+  inMaintenanceWindow: integer("in_maintenance_window", { mode: "boolean" }).default(false),
+  maintenanceReason: text("maintenance_reason"),
+}, (table) => [
+  index("node_health_node_idx").on(table.nodeId),
+  index("node_health_checked_idx").on(table.checkedAt),
+  index("node_health_status_idx").on(table.status),
+]);
+
+export const nodeServiceProofs = sqliteTable("node_service_proofs", {
+  id: text("id").primaryKey(),
+  nodeId: text("node_id").notNull().references(() => nodes.id, { onDelete: "cascade" }),
+
+  // Proof Type
+  proofType: text("proof_type", {
+    enum: ["health", "capacity", "performance", "security", "compliance", "custom"]
+  }).notNull(),
+
+  // Proof Status
+  status: text("status", {
+    enum: ["pending", "validating", "verified", "failed", "expired"]
+  }).notNull().default("pending"),
+
+  // Proof Metadata
+  proofId: text("proof_id").notNull().unique(),
+  proofVersion: text("proof_version").default("1.0"),
+
+  // Timestamps
+  ...timestamps,
+  validatedAt: text("validated_at"),
+  expiresAt: text("expires_at"),
+
+  // Proof Data
+  proofData: text("proof_data", { mode: "json" }).notNull(),
+  validationResult: text("validation_result", { mode: "json" }),
+  verificationMethod: text("verification_method"),
+
+  // Validator Information
+  validatorId: text("validator_id"),
+  validatorSignature: text("validator_signature"),
+
+  // Error Information
+  errorType: text("error_type"),
+  errorMessage: text("error_message"),
+
+  // Metadata
+  metadata: text("metadata", { mode: "json" }).default(sql`'{}'`),
+}, (table) => [
+  index("node_service_proofs_node_idx").on(table.nodeId),
+  index("node_service_proofs_type_idx").on(table.proofType),
+  index("node_service_proofs_status_idx").on(table.status),
+  index("node_service_proofs_expires_idx").on(table.expiresAt),
+]);
+
+export const nodeEvents = sqliteTable("node_events", {
+  id: text("id").primaryKey(),
+  nodeId: text("node_id").notNull().references(() => nodes.id, { onDelete: "cascade" }),
+
+  // Event Type
+  eventType: text("event_type", {
+    enum: [
+      "node_created", "node_updated", "node_deleted",
+      "status_changed", "heartbeat_received", "heartbeat_missed",
+      "capacity_updated", "health_check", "service_proof_created",
+      "service_proof_verified", "service_proof_failed", "maintenance_started",
+      "maintenance_ended", "alert_triggered", "alert_resolved"
+    ]
+  }).notNull(),
+
+  // Event Data
+  eventData: text("event_data", { mode: "json" }).default(sql`'{}'`),
+
+  // Timestamp
+  timestamp: text("timestamp").notNull().default(sql`CURRENT_TIMESTAMP`),
+
+  // Severity Level
+  severity: text("severity", {
+    enum: ["info", "warning", "error", "critical"]
+  }).default("info"),
+
+  // User/Agent Responsible
+  actorType: text("actor_type", {
+    enum: ["system", "operator", "admin", "user"]
+  }),
+  actorId: text("actor_id"),
+
+  // Related Information
+  correlationId: text("correlation_id"),
+  referenceId: text("reference_id"),
+
+  // Metadata
+  metadata: text("metadata", { mode: "json" }).default(sql`'{}'`),
+}, (table) => [
+  index("node_events_node_idx").on(table.nodeId),
+  index("node_events_type_idx").on(table.eventType),
+  index("node_events_timestamp_idx").on(table.timestamp),
+  index("node_events_severity_idx").on(table.severity),
+]);
+
+export const operators = sqliteTable("operators", {
+  id: text("id").primaryKey(),
+
+  // Operator Type
+  type: text("type", {
+    enum: ["resident", "organization"]
+  }).notNull(),
+
+  // Resident Operator Fields
+  residentId: text("resident_id"),
+
+  // Organization Operator Fields
+  organizationId: text("organization_id"),
+  organizationName: text("organization_name"),
+
+  // Contact Information
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+
+  // Administrative Information
+  responsibleParty: text("responsible_party"),
+  role: text("role"),
+
+  // Status
+  status: text("status", {
+    enum: ["active", "inactive", "suspended", "pending"]
+  }).notNull().default("active"),
+
+  // Authentication
+  apiKeys: text("api_keys", { mode: "json" }).default(sql`'[]'`),
+  permissions: text("permissions", { mode: "json" }).default(sql`'[]'`),
+
+  // Timestamps
+  ...timestamps,
+  lastLoginAt: text("last_login_at"),
+
+  // Compliance
+  termsAcceptedAt: text("terms_accepted_at"),
+  lastComplianceReviewAt: text("last_compliance_review_at"),
+
+  // Metadata
+  metadata: text("metadata", { mode: "json" }).default(sql`'{}'`),
+}, (table) => [
+  index("operators_type_idx").on(table.type),
+  index("operators_resident_idx").on(table.residentId),
+  index("operators_org_idx").on(table.organizationId),
+  index("operators_status_idx").on(table.status),
+]);
+
+export const nodeObservatoryMetrics = sqliteTable("node_observatory_metrics", {
+  id: text("id").primaryKey(),
+  nodeId: text("node_id").notNull().references(() => nodes.id, { onDelete: "cascade" }),
+
+  // Metric Type
+  metricType: text("metric_type", {
+    enum: ["uptime", "performance", "reliability", "availability", "latency", "throughput"]
+  }).notNull(),
+
+  // Metric Value
+  value: text("value").notNull(),
+  unit: text("unit"),
+
+  // Time Period
+  periodStart: text("period_start").notNull(),
+  periodEnd: text("period_end").notNull(),
+
+  // Aggregation
+  aggregation: text("aggregation", {
+    enum: ["avg", "min", "max", "sum", "count", "p50", "p95", "p99"]
+  }).default("avg"),
+
+  // Timestamp
+  recordedAt: text("recorded_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+
+  // Metadata
+  metadata: text("metadata", { mode: "json" }).default(sql`'{}'`),
+}, (table) => [
+  index("node_observatory_metrics_node_idx").on(table.nodeId),
+  index("node_observatory_metrics_type_idx").on(table.metricType),
+  index("node_observatory_metrics_period_idx").on(table.periodStart, table.periodEnd),
+  index("node_observatory_metrics_recorded_idx").on(table.recordedAt),
+]);
