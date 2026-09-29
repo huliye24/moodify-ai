@@ -53,6 +53,7 @@ date: 2026-08-08
 | Wave/spectral analysis | CANONICAL | `v01_analyzer.py`; analyzer tests |
 | Diagnosis | CANONICAL | `v01_diagnostics.py`; diagnosis tests |
 | Controlled intervention / DSP | CANONICAL | `v01_pipeline.py`, `processing/pedalboard_chain.py` |
+| Mix Graph finishing session | EXPERIMENTAL（本地 CLI 已实现，schema 未冻结） | `src/moodify/mix_graph`；`moodify finishing new/render/verify/export`；golden `artifacts/mix_graph_v01/golden`（确定性重放已证：同图同源两次渲染逐位一致，2026-09-29）。MSP/0.1 协议载荷层尚不承载图（目标态 v0.2） |
 | Reconstruction objective / identity guard / era diagnostic | IMPLEMENTED_NOT_MERGED | `src/moodify/reconstruction_objective|identity_guard|era_diagnostic`（分支） |
 | Data factory | CANONICAL | `data_factory`；10-song pilot 10/10（artifacts/mfy_24x7_data_pipeline_001） |
 | Node queue / worker | CANONICAL（云端实跑） | `node`；LA/杭州部署（W01-P00 03 报告） |
