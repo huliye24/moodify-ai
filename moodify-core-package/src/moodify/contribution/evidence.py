@@ -1,11 +1,8 @@
 """Evidence bundle management and verification."""
 
-import hashlib
-import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Iterator
 from dataclasses import dataclass
-from pathlib import Path
 
 from .validate import ContributionValidator
 

@@ -2,12 +2,9 @@
 
 import json
 import jsonschema
-from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
 from pathlib import Path
 
-from .ids import generate_content_fingerprint, normalize_wallet_address
-from .schema.contribution import ContributionSchema
 from .schema.contribution import validate_contribution, CONTRIBUTION_JSON_SCHEMA, generate_content_fingerprint as schema_generate_content_fingerprint
 
 

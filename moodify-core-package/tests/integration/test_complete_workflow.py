@@ -1,13 +1,12 @@
 """Integration tests for the complete contribution workflow."""
 
-import json
 import pytest
 import tempfile
 import shutil
 from pathlib import Path
 from datetime import datetime, timezone
 
-from moodify.contribution import ContributionCore, EvidenceBundle, Scorer
+from moodify.contribution import ContributionCore, EvidenceBundle
 
 
 class TestCompleteWorkflow:

@@ -3,12 +3,9 @@
 import argparse
 import json
 import sys
-from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 
 from .core import ContributionCore
-from .evidence import EvidenceBundle
-from .scorer import Scorer
 
 
 def load_json_file(file_path: str) -> Dict[str, Any]:
@@ -298,7 +295,7 @@ def get_allowed_transitions_command(args) -> None:
         print(f"No allowed transitions for contribution {args.contribution_id}")
         sys.exit(1)
 
-    print(f"Allowed transitions from current status:")
+    print("Allowed transitions from current status:")
     for transition in transitions:
         print(f"  - {transition}")
 

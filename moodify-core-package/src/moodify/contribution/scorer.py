@@ -1,9 +1,7 @@
 """Scoring system for reputation evidence across multiple dimensions."""
 
-import json
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
-from pathlib import Path
 
 from .validate import ValidationError
 

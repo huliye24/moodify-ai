@@ -1,18 +1,14 @@
 """Comprehensive test suite for the contribution core module."""
 
-import json
 import pytest
 import tempfile
 import shutil
 from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
 
 from moodify.contribution import (
     ContributionCore,
     ContributionValidator,
     EvidenceBundle,
-    EvidenceItem,
     Scorer,
     StateMachine
 )

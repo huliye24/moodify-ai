@@ -2,8 +2,7 @@
 
 import hashlib
 import json
-from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 
 def normalize_wallet_address(address: str) -> str:

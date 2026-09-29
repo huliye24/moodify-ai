@@ -3,9 +3,7 @@
 from enum import Enum
 from typing import Dict, Any, Optional, List
 from datetime import datetime
-from dataclasses import dataclass
 
-from .validate import ValidationError
 
 
 class ContributionStatus(Enum):

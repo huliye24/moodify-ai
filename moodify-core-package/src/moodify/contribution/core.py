@@ -1,7 +1,6 @@
 """Core contribution engine that orchestrates all components."""
 
 import json
-import uuid
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
 from pathlib import Path
@@ -10,9 +9,8 @@ from .ids import generate_contribution_id
 from .schema.contribution import generate_content_fingerprint as schema_generate_content_fingerprint
 from .validate import ContributionValidator, ValidationError
 from .state_machine import StateMachine, TransitionNotAllowedError
-from .evidence import EvidenceBundle, EvidenceItem, EvidenceDuplicateDetector
-from .scorer import Scorer, ScoreResult
-from .schema.contribution import ContributionSchema
+from .evidence import EvidenceBundle, EvidenceDuplicateDetector
+from .scorer import Scorer
 
 
 class ContributionCore:
