@@ -18,8 +18,9 @@ const state = {
   termCwd: undefined, // undefined = terminal never created
   drawerVisible: false, // engineering terminal stays hidden until asked for
   streamH: 200,         // 编译器对话抽屉高度（可拖动）
-  streamOpen: false,    // 对话抽屉整块（输入行+对话区）是否展开
+  streamOpen: false,    // 对话区是否展开
   streamUnread: false,  // 抽屉收起时有新内容待读
+  convStarted: false,   // 本会话是否已开始 AI 对话（决定抽屉把手是否出现）
 };
 
 const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'bench'];
@@ -457,13 +458,13 @@ const compiler = {
   lastAssistantText: '',
 };
 
-/** 对话抽屉（GoLand 终端式，零占位）：默认整块隐藏只剩贴边细条；拖动/双击开合。 */
+/** 对话抽屉：平时只有输入框+发送；开始对话后抽屉出现（可拖动/可收起，收起后细条是把手）。 */
 function openStream(height) {
   if (height) state.streamH = height;
   state.streamOpen = true;
   $('compiler-stream').hidden = false;
   $('compiler-stream').style.height = `${state.streamH}px`;
-  $('dock-input-row').hidden = false;
+  $('stream-bar').hidden = false;
   state.streamUnread = false;
   updateStreamDot();
   $('compiler-stream').scrollTop = $('compiler-stream').scrollHeight;
@@ -472,12 +473,13 @@ function openStream(height) {
 function closeStream() {
   state.streamOpen = false;
   $('compiler-stream').hidden = true;
-  $('dock-input-row').hidden = true;
+  // 细条保留为把手（对话已开始才有）；输入行常驻
+  $('stream-bar').hidden = !state.convStarted;
   updateStreamDot();
 }
 
 function updateStreamDot() {
-  // 整块藏着时：有内容在产生或待读 → 细条上亮点提示
+  // 抽屉收起时：有内容在产生或待读 → 把手上亮点提示
   $('stream-dot').hidden = state.streamOpen || !(compiler.busy || state.streamUnread);
 }
 
@@ -503,8 +505,8 @@ function initStreamBar() {
   window.addEventListener('mousemove', (e) => {
     if (!dragging) return;
     const h = Math.min(Math.round(window.innerHeight * 0.6), Math.max(0, h0 + (y0 - e.clientY)));
-    if (h < 80) {
-      closeStream(); // 拖到底 = 整块隐藏
+    if (h < 60) {
+      closeStream(); // 拖到底 = 收起对话区（输入行保留）
     } else {
       openStream(h);
     }
@@ -557,9 +559,13 @@ function setCompilerBusy(busy) {
   $('compiler-input').disabled = busy || !worldOpen;
 }
 
-/** 意图命令条入口：惰性开线程，回答与操作都发生在 dock 里。 */
+/** 意图命令条入口：惰性开线程，回答与操作都发生在 dock 里。首次发送弹出对话抽屉。 */
 async function intentSend(text) {
   if (!text.trim() || !state.caseDir || compiler.busy) return;
+  if (!state.convStarted) {
+    state.convStarted = true;
+    openStream(); // 开始 AI 对话：抽屉对话区从此出现
+  }
   if (!compiler.ready) {
     const ok = await ensureCompiler();
     if (!ok) return;
@@ -576,8 +582,7 @@ async function ensureCompiler() {
   const status = $('setup-status');
   const res = await window.moodify.codexEnsure();
   if (!res.ok || !res.provider) {
-    if (!$('compiler-setup').hidden) return false; // 已展示过设置卡，不反复拉抽屉
-    openStream(); // 设置卡必须可见可操作
+    // 设置卡在输入行上方原位显示（输入行常驻，不依赖抽屉开合）
     $('compiler-setup').hidden = false;
     status.textContent = !res.ok
       ? `内核启动失败：${res.reason}`
