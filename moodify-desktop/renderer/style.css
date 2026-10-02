@@ -121,7 +121,7 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 
 /* ——— 顶部标签页：数据 / 图表·波谱 / 后处理 ——— */
 
-#tabs { flex: none; display: flex; gap: 2px; padding: 6px 20px 0; border-bottom: 1px solid var(--hairline); }
+#tabs { flex: none; display: flex; gap: 2px; padding: 4px 16px 0; border-bottom: 1px solid var(--hairline); }
 .tab {
   border: none;
   background: transparent;
@@ -132,19 +132,19 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 .tab:hover { background: var(--accent-soft); color: var(--fg); }
 .tab.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
 
-#views { flex: 1; overflow: auto; padding: 14px 20px; }
+#views { flex: 1; overflow: auto; padding: 10px 16px; }
 #wave-wrap { margin-bottom: 8px; }
 #waveform { display: block; }
 
+/* 空态：水印缩进角落顶格，不占全屏；进入世界即被结果整体顶掉 */
 #view-empty {
-  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .watermark {
-  opacity: 0.07;
-  max-width: 340px;
+  opacity: 0.06;
+  width: 130px;
+  margin-top: 6px;
   user-select: none;
   pointer-events: none;
 }
@@ -212,7 +212,7 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 }
 #dock-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 10px;
 }

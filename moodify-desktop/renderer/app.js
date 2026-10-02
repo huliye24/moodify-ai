@@ -176,8 +176,8 @@ async function openReport(reportPath) {
   selectView('wave'); // 落在波谱：音乐本身先行
   fitTerminalSoon();
   const entryDir = state.caseDir;
-  const wave = renderWaveform(entryDir);   // 波形先行：解码完即有内容可看
-  await renderSpectrum(entryDir);
+  await renderSpectrum(entryDir);        // 本地 PNG 即刻顶格可见
+  const wave = renderWaveform(entryDir); // 波形解码好后就地现身
   await wave;
   await renderCharts(reportPath); // 检测图表后台补齐（图表页）
   await ensureTerminal();
@@ -262,8 +262,7 @@ const WAVE_PEAK_COLS = 2000;
 async function renderWaveform(entryDir) {
   const wrap = $('wave-wrap');
   const src = await window.moodify.resolveSource(entryDir);
-  if (!src || state.caseDir !== entryDir) { wrap.hidden = true; return; }
-  wrap.hidden = false;
+  if (!src || state.caseDir !== entryDir) return;
   try {
     const bytes = await window.moodify.readAudio(src);
     const ab = bytes instanceof ArrayBuffer ? bytes
@@ -276,8 +275,11 @@ async function renderWaveform(entryDir) {
     $('wave-caption').textContent =
       `${src.split(/[\\/]/).pop()} · ${audio.numberOfChannels}ch @ ${audio.sampleRate}Hz`
       + ` · ${audio.duration.toFixed(1)}s`;
+    wrap.hidden = false; // 画好再现身：解码期间频谱先顶格，不留空白块
     drawWaveform();
-  } catch { wrap.hidden = true; } // 波形是增益，不是依赖：失败静默降级为图表
+  } catch {
+    if (state.caseDir === entryDir) wrap.hidden = true; // 波形是增益，失败静默降级
+  }
 }
 
 function buildWavePeaks(audio) {
@@ -586,10 +588,6 @@ async function ensureCompiler() {
   }
   $('compiler-setup').hidden = true;
   compiler.ready = true;
-  const ws = res.windowsSandbox ? res.windowsSandbox.status : 'unknown';
-  $('compiler-subtitle').textContent =
-    `Codex 内核 · ${res.provider.model || res.provider.kind} · Windows 沙箱：${ws}`
-    + (ws === 'ready' ? ' · 边界：workspace-write + 命令审批' : ' · 边界降级为 read-only（诚实显示）');
   return true;
 }
 
