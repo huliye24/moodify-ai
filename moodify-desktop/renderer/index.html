@@ -29,6 +29,12 @@
       <button id="rail-fix" title="修音工作台" aria-label="修音工作台">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4v16M12 4v16M19 4v16"/><circle cx="5" cy="9" r="2.2"/><circle cx="12" cy="15" r="2.2"/><circle cx="19" cy="7" r="2.2"/></svg>
       </button>
+      <button id="rail-stems" title="分离工作台（四轨分离）" aria-label="分离工作台">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l9 5.5-9 5.5-9-5.5z"/><path d="M3.5 14.5l8.5 5.2 8.5-5.2"/></svg>
+      </button>
+      <button id="rail-score" title="曲谱工作台（音频 → MIDI → 曲谱）" aria-label="曲谱工作台">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18.5V6l10-2v11.5"/><circle cx="6.5" cy="18.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/></svg>
+      </button>
       <button id="rail-history" title="世界（双击进入；时钟=世界历史）" aria-label="世界">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
       </button>
@@ -94,6 +100,28 @@
             </div>
           </div>
         </section>
+
+        <!-- 分离工作台：引擎 A=DSP 快速分离（本壳自带）；模型精分离后续接入 -->
+        <section id="view-stems" class="workspace-view" hidden>
+          <div id="stems-head">
+            <button id="stems-run" class="primary">快速分离</button>
+            <span class="muted stems-engine">引擎：DSP 中置估计 + HPSS（非模型）</span>
+          </div>
+          <div id="stems-progress" class="tool-progress" hidden></div>
+          <div class="bench-tracks" id="stems-tracks"></div>
+        </section>
+
+        <!-- 曲谱工作台：音频 → MIDI（basic-pitch）→ MusicXML（music21）→ 壳内渲染（OSMD） -->
+        <section id="view-score" class="workspace-view" hidden>
+          <div class="score-actions">
+            <select id="score-audio" title="选择音频（源或分离轨）"></select>
+            <button id="score-to-midi" class="primary">转 MIDI</button>
+            <select id="score-midi" title="选择 MIDI"></select>
+            <button id="score-render" class="primary">生成曲谱</button>
+          </div>
+          <div id="score-progress" class="tool-progress" hidden></div>
+          <div id="score-sheet"></div>
+        </section>
       </div>
     </main>
   </div>
@@ -154,6 +182,8 @@
   <!-- wavesurfer.js 6.6.4 (BSD-3-Clause) © katspaugh & contributors — 修音/混音工作台波形引擎 -->
   <script src="vendor/wavesurfer.min.js"></script>
   <script src="vendor/wavesurfer.timeline.min.js"></script>
+  <!-- OpenSheetMusicDisplay 1.9.4 (BSD-3-Clause) © PhonicScore — 曲谱工作台渲染引擎 -->
+  <script src="vendor/opensheetmusicdisplay.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -452,6 +452,152 @@ function registerIpc() {
     }
     return lastJsonLine(result.stdout);
   });
+
+  registerStudioToolIpc();
+}
+
+// ——— 分离 / MIDI / 曲谱：显式动作，产物落 case 目录（世界产物）———
+//
+// 引擎 A「快速分离」= DSP 中置估计 + HPSS（本壳自带脚本，.venv-basic-pitch
+// 里的 librosa 即可跑，秒级，非模型）；MIDI = basic-pitch（onnx 序列化，
+// Apache-2.0）；曲谱 = music21（MIT）转 MusicXML，壳内 OSMD（BSD-3）渲染。
+// 模型引擎（Demucs / BS-RoFormer）为后续「精分离」档，接入时同走 runLong。
+// 所有 python 子进程强制 PYTHONUTF8=1；长任务单飞锁，进度行实时转发渲染层。
+
+const TOOLS_ROOT = path.join(__dirname, '..', 'scripts');
+const VENVS = {
+  'basic-pitch': path.join(__dirname, '..', '..', '.venv-basic-pitch'),
+  score: path.join(__dirname, '..', '..', '.venv-score'),
+};
+
+function pyExe(venvName) {
+  const exe = path.join(VENVS[venvName], 'Scripts', 'python.exe');
+  return fs.existsSync(exe) ? exe : PYTHON;
+}
+
+function insideDir(dir, p) {
+  const rel = path.relative(dir, p);
+  return Boolean(rel) && !rel.startsWith('..') && !path.isAbsolute(rel);
+}
+
+const longRuns = new Map(); // kind -> child process（单飞锁）
+
+function runLong(kind, exe, args) {
+  return new Promise((resolve) => {
+    if (longRuns.has(kind)) {
+      resolve({ ok: false, reason: '上一个同类任务还在进行中' });
+      return;
+    }
+    const send = (line) => {
+      for (const win of BrowserWindow.getAllWindows()) {
+        if (!win.isDestroyed()) win.webContents.send('tool:progress', kind, line);
+      }
+    };
+    let child;
+    try {
+      child = spawn(exe, args, { env: pythonEnv() });
+    } catch (err) {
+      resolve({ ok: false, reason: err.message });
+      return;
+    }
+    longRuns.set(kind, child);
+    let tail = '';
+    const feed = (d) => {
+      tail += d.toString('utf8');
+      const lines = tail.split(/\r?\n/);
+      tail = lines.pop();
+      for (const line of lines) {
+        if (line.trim()) send(line.trim());
+      }
+    };
+    child.stdout.on('data', feed);
+    child.stderr.on('data', feed);
+    child.on('error', (err) => {
+      longRuns.delete(kind);
+      resolve({ ok: false, reason: err.message });
+    });
+    child.on('close', (code) => {
+      longRuns.delete(kind);
+      if (tail.trim()) send(tail.trim());
+      resolve({ ok: code === 0, code });
+    });
+  });
+}
+
+function resolveCaseSource(caseDir) {
+  try {
+    const p = JSON.parse(fs.readFileSync(path.join(caseDir, 'source_path.json'), 'utf8')).path;
+    return p && fs.existsSync(p) ? p : null;
+  } catch { return null; }
+}
+
+function listCaseFiles(caseDir, subdir, exts) {
+  const dir = path.join(caseDir, subdir);
+  let entries = [];
+  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return []; }
+  return entries
+    .filter((e) => e.isFile() && exts.some((x) => e.name.toLowerCase().endsWith(x)))
+    .map((e) => {
+      const full = path.join(dir, e.name);
+      let size = 0;
+      try { size = fs.statSync(full).size; } catch { /* raced deletion */ }
+      return { name: e.name, path: full, size };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function registerStudioToolIpc() {
+  ipcMain.handle('casefiles:list', (_e, caseDir, subdir, exts) =>
+    listCaseFiles(caseDir, subdir, exts));
+
+  // 快速分离（引擎 A）：源音频 → case/stems/ 四轨 + manifest.json
+  ipcMain.handle('stems:run', async (_e, caseDir) => {
+    const src = resolveCaseSource(caseDir);
+    if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+    const outdir = path.join(caseDir, 'stems');
+    fs.mkdirSync(outdir, { recursive: true });
+    return runLong('stems', pyExe('basic-pitch'), [
+      path.join(TOOLS_ROOT, 'dsp_separate.py'), src, '--outdir', outdir,
+    ]);
+  });
+
+  // 音频 → MIDI（basic-pitch onnx）：输入限源音频或 case 内分离轨 → case/midi/
+  ipcMain.handle('midi:run', async (_e, caseDir, audioPath) => {
+    const src = resolveCaseSource(caseDir);
+    const allowed = (src && path.resolve(audioPath) === path.resolve(src))
+      || insideDir(caseDir, path.resolve(audioPath));
+    if (!allowed) return { ok: false, reason: '输入音频必须是世界源或 case 内分离轨' };
+    if (!fs.existsSync(audioPath)) return { ok: false, reason: '输入音频不存在' };
+    const bpExe = path.join(VENVS['basic-pitch'], 'Scripts', 'basic-pitch.exe');
+    if (!fs.existsSync(bpExe)) return { ok: false, reason: '未找到 basic-pitch（.venv-basic-pitch）' };
+    const outdir = path.join(caseDir, 'midi');
+    fs.mkdirSync(outdir, { recursive: true });
+    return runLong('midi', bpExe, [
+      '--save-midi', '--model-serialization', 'onnx', outdir, audioPath,
+    ]);
+  });
+
+  // MIDI → MusicXML（music21）→ case/score/；渲染由壳内 OSMD 完成
+  ipcMain.handle('score:run', async (_e, caseDir, midiPath) => {
+    if (!insideDir(caseDir, path.resolve(midiPath))) {
+      return { ok: false, reason: 'MIDI 必须在世界目录内（case/midi/）' };
+    }
+    if (!fs.existsSync(midiPath)) return { ok: false, reason: 'MIDI 文件不存在' };
+    const outdir = path.join(caseDir, 'score');
+    fs.mkdirSync(outdir, { recursive: true });
+    const base = path.basename(midiPath).replace(/\.(mid|midi)$/i, '');
+    const out = path.join(outdir, `${base}.musicxml`);
+    const res = await runLong('score', pyExe('score'), [
+      path.join(TOOLS_ROOT, 'midi_to_musicxml.py'), midiPath, out,
+    ]);
+    return res.ok ? { ...res, musicxml: out } : res;
+  });
+
+  // 壳内曲谱渲染需要读 MusicXML 文本；只放行世界目录内文件
+  ipcMain.handle('text:read', (_e, caseDir, filePath) => {
+    if (!insideDir(caseDir, path.resolve(filePath))) throw new Error('路径越出世界目录');
+    return fs.promises.readFile(filePath, 'utf8');
+  });
 }
 
 function createWindow() {

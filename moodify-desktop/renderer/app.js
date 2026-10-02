@@ -23,7 +23,7 @@ const state = {
   convStarted: false,   // 本会话是否已开始 AI 对话（决定抽屉把手是否出现）
 };
 
-const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'bench'];
+const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
 const VIEW_TAB = {
   data: 'tab-data',
   spectrum: 'tab-spectrum',
@@ -130,11 +130,13 @@ function showError(message) {
 
 function selectView(name) {
   for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
-  $('tabs').hidden = name === 'empty' || name === 'bench';
+  $('tabs').hidden = name === 'empty' || name === 'bench' || name === 'stems' || name === 'score';
   for (const [view, tabId] of Object.entries(VIEW_TAB)) {
     $(tabId).classList.toggle('active', view === name);
   }
   $('rail-fix').classList.toggle('active', name === 'bench');
+  $('rail-stems').classList.toggle('active', name === 'stems');
+  $('rail-score').classList.toggle('active', name === 'score');
 }
 
 async function openReport(reportPath) {
@@ -148,6 +150,7 @@ async function openReport(reportPath) {
   state.reportPath = reportPath;
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
   destroyBench(); // 换世界：旧工作台实例销毁
+  resetStudioTools(); // 换世界：分离/曲谱工作台复位（产物留在旧世界目录）
 
   $('source-name').textContent = (report.source || {}).name || '?';
   $('case-title').hidden = false;
@@ -329,6 +332,247 @@ function openBench() {
   if (!state.caseDir) return;
   selectView('bench');
   requestAnimationFrame(applyZoom); // 从隐藏态回来，宽度恢复后重画
+}
+
+// ——— 分离工作台（图标栏第 4 位）：引擎 A=DSP 快速分离；模型精分离后续接入 ———
+
+const STEM_LABELS = {
+  vocals: '人声（中置估计）',
+  instrumental: '伴奏（源 − 中置）',
+  harmonic: '谐波（持续音）',
+  percussive: '打击（瞬态）',
+};
+const stemWS = []; // 分离轨 WaveSurfer 实例（与 #stems-tracks 子行同序）
+
+function destroyStemWaves() {
+  for (const ws of stemWS) { try { ws.destroy(); } catch { /* already gone */ } }
+  stemWS.length = 0;
+}
+
+async function openStems() {
+  if (!state.caseDir) return;
+  selectView('stems');
+  destroyStemWaves();
+  const box = $('stems-tracks');
+  box.textContent = '';
+  let stems = [];
+  try { stems = await window.moodify.listCaseFiles(state.caseDir, 'stems', ['.wav']); } catch { /* empty */ }
+  if (!stems.length) return;
+
+  const caseDir = state.caseDir; // 异步解码期间换世界的守卫
+  for (const stem of stems) {
+    const row = document.createElement('div');
+    row.className = 'track stem-row';
+    const strip = document.createElement('div');
+    strip.className = 'track-strip';
+    const head = document.createElement('div');
+    head.className = 'stem-head';
+    const label = STEM_LABELS[stemBase(stem.name)] || stem.name;
+    head.innerHTML = `<span class="stem-name"></span>`
+      + `<button class="ghost stem-play" title="试听">▶</button>`;
+    head.querySelector('.stem-name').textContent = label;
+    const wave = document.createElement('div');
+    wave.className = 'ws-wave stem-wave';
+    strip.appendChild(head);
+    strip.appendChild(wave);
+    row.appendChild(strip);
+    box.appendChild(row);
+
+    // 惰性解码：点试听才载入波形（省内存，换轨互斥）
+    const btn = head.querySelector('.stem-play');
+    btn.addEventListener('click', async () => {
+      if (btn.dataset.playing === '1') { stopStemWaves(); return; }
+      stopStemWaves();
+      if (state.caseDir !== caseDir) return;
+      try {
+        const bytes = await window.moodify.readAudio(stem.path);
+        const ab = bytes instanceof ArrayBuffer ? bytes
+          : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        const ctx = new AudioContext();
+        const audio = await ctx.decodeAudioData(ab);
+        await ctx.close();
+        if (state.caseDir !== caseDir) return;
+        const ws = WaveSurfer.create({
+          container: wave,
+          backend: 'WebAudio',
+          height: 56,
+          waveColor: 'rgba(79, 70, 229, 0.38)',
+          progressColor: 'rgba(79, 70, 229, 0.82)',
+          cursorColor: '#16181d',
+          cursorWidth: 1,
+        });
+        ws.on('finish', () => { btn.textContent = '▶'; btn.dataset.playing = '0'; });
+        ws.loadDecodedBuffer(audio);
+        ws.play();
+        btn.textContent = '⏸';
+        btn.dataset.playing = '1';
+        stemWS.push(ws);
+      } catch { btn.textContent = '▶'; btn.dataset.playing = '0'; }
+    });
+  }
+}
+
+function stemBase(name) {
+  const m = name.match(/__(vocals|instrumental|harmonic|percussive)\.wav$/i);
+  return m ? m[1].toLowerCase() : name;
+}
+
+function stopStemWaves() {
+  for (const ws of stemWS) { try { ws.pause(); } catch { /* already gone */ } }
+  document.querySelectorAll('#stems-tracks .stem-play').forEach((b) => {
+    b.textContent = '▶';
+    b.dataset.playing = '0';
+  });
+}
+
+async function runStems() {
+  if (!state.caseDir) return;
+  const btn = $('stems-run');
+  btn.disabled = true;
+  showToolProgress('stems', '分离中…');
+  try {
+    const res = await window.moodify.stemsRun(state.caseDir);
+    if (!res.ok) showToolProgress('stems', `分离失败（code ${res.code ?? '?'} ${res.reason || ''}）`);
+    else showToolProgress('stems', '完成。');
+    await openStems(); // 重扫产物入列
+  } catch (err) {
+    showToolProgress('stems', `分离失败：${err.message || err}`);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ——— 曲谱工作台（图标栏第 5 位）：音频 → MIDI → MusicXML → 壳内渲染 ———
+
+let scoreSelectsDirty = true;
+
+function setSelectOptions(sel, items, emptyLabel) {
+  sel.textContent = '';
+  if (!items.length) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = emptyLabel;
+    sel.appendChild(opt);
+    return;
+  }
+  for (const it of items) {
+    const opt = document.createElement('option');
+    opt.value = it.path;
+    opt.textContent = it.label;
+    sel.appendChild(opt);
+  }
+}
+
+async function refreshScoreSelects() {
+  if (!state.caseDir) return;
+  const [stems, mids] = await Promise.all([
+    window.moodify.listCaseFiles(state.caseDir, 'stems', ['.wav']).catch(() => []),
+    window.moodify.listCaseFiles(state.caseDir, 'midi', ['.mid', '.midi']).catch(() => []),
+  ]);
+  const src = await window.moodify.resolveSource(state.caseDir);
+  const audioItems = [];
+  if (src) audioItems.push({ path: src, label: `源：${src.split(/[\\/]/).pop()}` });
+  for (const s of stems) audioItems.push({ path: s.path, label: s.name });
+  setSelectOptions($('score-audio'), audioItems, '（先分离或打开世界）');
+  setSelectOptions($('score-midi'), mids.map((m) => ({ path: m.path, label: m.name })),
+    '（还没有 MIDI：先转 MIDI）');
+}
+
+async function openScore() {
+  if (!state.caseDir) return;
+  selectView('score');
+  if (scoreSelectsDirty) {
+    await refreshScoreSelects();
+    scoreSelectsDirty = false;
+  }
+}
+
+async function runMidi() {
+  if (!state.caseDir) return;
+  const audioPath = $('score-audio').value;
+  if (!audioPath) return;
+  const btn = $('score-to-midi');
+  btn.disabled = true;
+  showToolProgress('midi', '转 MIDI 中（basic-pitch）…');
+  try {
+    const res = await window.moodify.midiRun(state.caseDir, audioPath);
+    showToolProgress('midi', res.ok ? 'MIDI 完成。' : `转 MIDI 失败（${res.reason || `code ${res.code}`}）`);
+    scoreSelectsDirty = true;
+    await refreshScoreSelects();
+    scoreSelectsDirty = false;
+  } catch (err) {
+    showToolProgress('midi', `转 MIDI 失败：${err.message || err}`);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function runScore() {
+  if (!state.caseDir) return;
+  const midiPath = $('score-midi').value;
+  if (!midiPath) return;
+  const btn = $('score-render');
+  btn.disabled = true;
+  showToolProgress('score', 'MusicXML 转换中（music21）…');
+  try {
+    const res = await window.moodify.scoreRun(state.caseDir, midiPath);
+    if (!res.ok) {
+      showToolProgress('score', `曲谱失败（${res.reason || `code ${res.code}`}）`);
+      return;
+    }
+    showToolProgress('score', '曲谱完成。');
+    await renderScoreSheet(res.musicxml || midiPath.replace(/\.(mid|midi)$/i, '.musicxml'));
+  } catch (err) {
+    showToolProgress('score', `曲谱失败：${err.message || err}`);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function renderScoreSheet(xmlPath) {
+  const sheet = $('score-sheet');
+  sheet.textContent = '';
+  const xml = await window.moodify.readText(state.caseDir, xmlPath);
+  const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(sheet, {
+    drawTitle: false,
+    drawComposer: false,
+    drawCredits: false,
+    drawSubtitle: false,
+    autoResize: false,
+  });
+  await osmd.load(xml);
+  osmd.zoom = 0.85;
+  osmd.render();
+}
+
+function showToolProgress(kind, text) {
+  const box = $(kind === 'stems' ? 'stems-progress' : 'score-progress');
+  box.hidden = false;
+  box.textContent = text;
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendToolProgress(kind, line) {
+  const box = $(kind === 'stems' ? 'stems-progress' : 'score-progress');
+  box.hidden = false;
+  box.textContent += (box.textContent ? '\n' : '') + line;
+  box.scrollTop = box.scrollHeight;
+}
+
+function clearToolProgress() {
+  $('stems-progress').hidden = true;
+  $('stems-progress').textContent = '';
+  $('score-progress').hidden = true;
+  $('score-progress').textContent = '';
+}
+
+function resetStudioTools() {
+  // 换世界：清分离轨、曲谱画布与选择列表（产物留在旧世界目录里）
+  destroyStemWaves();
+  $('stems-tracks').textContent = '';
+  $('score-sheet').textContent = '';
+  scoreSelectsDirty = true;
+  clearToolProgress();
 }
 
 function renderPlan(report) {
@@ -785,6 +1029,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     sourceWS.playPause();
   });
+  $('rail-stems').addEventListener('click', openStems);
+  $('rail-score').addEventListener('click', openScore);
+  $('stems-run').addEventListener('click', runStems);
+  $('score-to-midi').addEventListener('click', runMidi);
+  $('score-render').addEventListener('click', runScore);
+  window.moodify.onToolProgress((kind, line) => appendToolProgress(kind, line));
   initStreamBar();
   const sendIntent = () => {
     const text = $('compiler-input').value;

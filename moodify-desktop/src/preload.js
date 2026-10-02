@@ -43,4 +43,12 @@ contextBridge.exposeInMainWorld('moodify', {
   codexSavePlan: (caseDir, text) => ipcRenderer.invoke('codex:save-plan', caseDir, text),
   onCodexEvent: (cb) => ipcRenderer.on('codex:event', (_e, notification) => cb(notification)),
   onCodexServerRequest: (cb) => ipcRenderer.on('codex:server-request', (_e, request) => cb(request)),
+
+  // 分离 / MIDI / 曲谱：显式动作，产物落世界目录
+  listCaseFiles: (caseDir, subdir, exts) => ipcRenderer.invoke('casefiles:list', caseDir, subdir, exts),
+  stemsRun: (caseDir) => ipcRenderer.invoke('stems:run', caseDir),
+  midiRun: (caseDir, audioPath) => ipcRenderer.invoke('midi:run', caseDir, audioPath),
+  scoreRun: (caseDir, midiPath) => ipcRenderer.invoke('score:run', caseDir, midiPath),
+  readText: (caseDir, filePath) => ipcRenderer.invoke('text:read', caseDir, filePath),
+  onToolProgress: (cb) => ipcRenderer.on('tool:progress', (_e, kind, line) => cb(kind, line)),
 });
