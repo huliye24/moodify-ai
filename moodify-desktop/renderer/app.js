@@ -617,14 +617,14 @@ function initCompilerSetup() {
   const kindSel = $('setup-kind');
   kindSel.addEventListener('change', () => {
     $('setup-baseurl').hidden = kindSel.value !== 'custom';
-    $('setup-model').placeholder = kindSel.value === 'glm' ? 'glm-4.7'
+    $('setup-model').placeholder = kindSel.value === 'deepseek' ? 'deepseek-v4-pro'
       : kindSel.value === 'openai' ? 'gpt-5.1-codex' : 'model-name';
   });
   $('setup-save').addEventListener('click', async () => {
     const status = $('setup-status');
     const kind = kindSel.value;
     const model = $('setup-model').value.trim()
-      || (kind === 'glm' ? 'glm-4.7' : kind === 'openai' ? 'gpt-5.1-codex' : '');
+      || (kind === 'deepseek' ? 'deepseek-v4-pro' : kind === 'openai' ? 'gpt-5.1-codex' : '');
     const apiKey = $('setup-key').value.trim();
     if (!apiKey && kind !== 'openai') { status.textContent = '请粘贴 API Key。'; return; }
     status.textContent = '保存中…';

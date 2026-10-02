@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — Moodify Studio W2 修正：wire_api=responses + 提供方定稿 DeepSeek（真轮次已验证）（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 仍属 W2 编译器实现事实的修正（R7 可见性），产品身份与边界不变。
+- **事实修正 1：** codex ≥0.160（2026-02）**硬移除 `wire_api="chat"`**（上游 discussion 7782）；GLM 开放平台仅提供 chat/completions（`/v4/responses` 404），与当前 codex 不可直连。设置卡 GLM 选项移除；GLM key 有效但仅 chat（如需接入须自建转译桥，记 W2 残余）。
+- **事实修正 2：** 人类指令"用 deepseek api"。DeepSeek 具备**原生 Responses API**（对照验证：假路径 404 / `/responses` 402 计费位）。提供方三选一定为 **DeepSeek / OpenAI / 自定义（OpenAI 兼容 Responses）**；main.js 全部 provider 一律 `wire_api="responses"`；DeepSeek 一等 kind（`https://api.deepseek.com/`、`DEEPSEEK_API_KEY`、默认 `deepseek-v4-pro`）。
+- **端到端验证：** 冒烟脚本真轮次打通——initialize → thread/start（生效沙箱 readOnly）→ turn/start → 流式 delta → turn/completed，`deepseek-v4-pro` 正确应答。密钥仅存本机 `~/.moodify/codex`。
+- **新发现残余：** codex 会尝试加载用户全局 `~/.agents/skills/`（本机加载失败，未进上下文；但产品面编译器不应读取用户个人 skills，待配置隔离）。
+- **Affected files：** `moodify-desktop/src/main.js`、`renderer/index.html`、`renderer/app.js`、定义文档 §9 修正案 2、`docs/REPOSITORY_STATUS.md`、本文件。
+
 ## 2026-10-02 — Moodify Studio W2：Mood 编译器内核换 Codex（app-server 协议嵌入，claude CLI 完全替换）（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因 Mood 编译器的内核通道整体换轨（R7 可见性）。权威依据：`docs/plan/2026-10-02_MOODIFY_STUDIO_PRODUCT_DEFINITION.md` §9 修正案（人类三项裁决：**B 协议嵌入一步到位 / 模型安装时可选 / claude CLI 完全替换**——取代原裁决 1"先用 claude CLI 过渡"）。

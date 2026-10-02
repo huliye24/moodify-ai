@@ -140,7 +140,7 @@ function killAllTerminals() {
 //
 // Human adjudication 2026-10-02: embed openai/codex (Apache-2.0) as the
 // compiler kernel via its app-server protocol; provider selectable at setup
-// (GLM / OpenAI / custom); the claude CLI channel is fully replaced.
+// (DeepSeek / OpenAI / custom); the claude CLI channel is fully replaced.
 // Config lives in an isolated CODEX_HOME so the user's own codex is untouched.
 
 const CODEX_HOME = process.env.MOODIFY_CODEX_HOME
@@ -276,21 +276,23 @@ function writeProviderConfig(state) {
   fs.mkdirSync(CODEX_HOME, { recursive: true });
   const p = state.active;
   const lines = [];
+  // codex >=0.160 (Feb 2026) hard-removed the chat wire API: every provider
+  // must speak the Responses API. DeepSeek serves /responses natively.
   if (p.kind === 'openai') {
     lines.push(`model = ${JSON.stringify(p.model || 'gpt-5.1-codex')}`);
     lines.push('preferred_auth_method = "apikey"');
   } else {
+    const providerId = p.kind === 'deepseek' ? 'deepseek' : 'custom';
     lines.push(`model = ${JSON.stringify(p.model)}`);
-    lines.push(`model_provider = ${JSON.stringify(p.kind === 'glm' ? 'glm' : 'custom')}`);
+    lines.push(`model_provider = ${JSON.stringify(providerId)}`);
     lines.push('');
-    const baseUrl = p.kind === 'glm'
-      ? 'https://open.bigmodel.cn/api/paas/v4/'
+    const baseUrl = p.kind === 'deepseek'
+      ? 'https://api.deepseek.com/'
       : p.baseUrl.replace(/\/?$/, '/');
-    const providerId = p.kind === 'glm' ? 'glm' : 'custom';
     lines.push(`[model_providers.${providerId}]`);
-    lines.push(`name = ${JSON.stringify(p.kind === 'glm' ? 'GLM' : 'Custom (Moodify)')}`);
+    lines.push(`name = ${JSON.stringify(p.kind === 'deepseek' ? 'DeepSeek' : 'Custom (Moodify)')}`);
     lines.push(`base_url = ${JSON.stringify(baseUrl)}`);
-    lines.push('wire_api = "chat"');
+    lines.push('wire_api = "responses"');
     lines.push(`env_key = ${JSON.stringify(p.apiKeyEnv)}`);
   }
   fs.writeFileSync(path.join(CODEX_HOME, 'config.toml'), lines.join('\n') + '\n', 'utf8');
@@ -326,7 +328,7 @@ function registerCodexIpc() {
   ipcMain.handle('codex:provider:set', async (_e, provider) => {
     const kind = provider.kind;
     const apiKeyEnv = kind === 'openai' ? 'OPENAI_API_KEY'
-      : kind === 'glm' ? 'GLM_API_KEY' : 'MOODIFY_CUSTOM_API_KEY';
+      : kind === 'deepseek' ? 'DEEPSEEK_API_KEY' : 'MOODIFY_CUSTOM_API_KEY';
     const active = { kind, model: provider.model, apiKeyEnv, apiKey: provider.apiKey };
     if (kind === 'custom') active.baseUrl = provider.baseUrl;
     writeProviderConfig({ active });

@@ -95,3 +95,8 @@
 - 边界执行：thread/start 请求 `sandbox=workspace-write` + `approvalPolicy=untrusted`；审批请求（命令/文件修改）原生进 UI（批准 / 本次会话批准 / 拒绝）。**诚实发现：本机 `windowsSandbox/readiness` = notConfigured，生效沙箱降级为 read-only，UI 如实显示生效边界而非请求值；沙箱配置向导（`windowsSandbox/setupStart`）暂不自动触发，列为残余项。**
 - 隔离：`CODEX_HOME=~/.moodify/codex`（config.toml + providers.json），不碰用户自己的 `~/.codex`。
 - 方案产物：编译器"保存方案"按钮把最后一条助手消息写为 `case_dir/plan.md`（取代 plan_claude.md）。
+
+**修正案 2（当日晚）：模型提供方定稿 DeepSeek（人类指令"用 deepseek api"）**
+- 实测发现：codex ≥0.160（2026-02 起）**硬移除 `wire_api="chat"`**（上游 discussion 7782，永久趋势）；GLM 开放平台只有 chat/completions（`/v4/responses` 404），与 codex 当前版不可直连——GLM 选项移除（GLM key 本身有效，若未来要接需自建 chat→responses 转译桥，已记残余项）。
+- **DeepSeek 有原生 Responses API**（对照验证：假路径 404，`/responses` 402 计费位），codex 直连无需桥。提供方三选一定为 **DeepSeek / OpenAI / 自定义（OpenAI 兼容 Responses）**；DeepSeek 为一等 kind（base_url `https://api.deepseek.com/`，env `DEEPSEEK_API_KEY`，默认模型 `deepseek-v4-pro`，V4 代 1M ctx；可选 `deepseek-flash`）。
+- **端到端真轮次已验证**（2026-10-02 冒烟脚本）：initialize → thread/start（生效沙箱 readOnly）→ turn/start → 流式 delta → turn/completed，`deepseek-v4-pro` 正确回复。配置与密钥仅存本机 `~/.moodify/codex`。
