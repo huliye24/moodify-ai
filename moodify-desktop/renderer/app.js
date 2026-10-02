@@ -18,6 +18,7 @@ const state = {
   termCwd: undefined, // undefined = terminal never created
   drawerVisible: false, // engineering terminal stays hidden until asked for
   streamH: 200,         // 编译器对话抽屉高度（可拖动）
+  streamOpen: false,    // 对话抽屉整块（输入行+对话区）是否展开
   streamUnread: false,  // 抽屉收起时有新内容待读
 };
 
@@ -456,30 +457,32 @@ const compiler = {
   lastAssistantText: '',
 };
 
-/** 对话抽屉（GoLand 终端式）：默认隐藏只剩输入框；拉杆拖动开合，双击切换。 */
+/** 对话抽屉（GoLand 终端式，零占位）：默认整块隐藏只剩贴边细条；拖动/双击开合。 */
 function openStream(height) {
   if (height) state.streamH = height;
-  const stream = $('compiler-stream');
-  stream.hidden = false;
-  stream.style.height = `${state.streamH}px`;
+  state.streamOpen = true;
+  $('compiler-stream').hidden = false;
+  $('compiler-stream').style.height = `${state.streamH}px`;
+  $('dock-input-row').hidden = false;
   state.streamUnread = false;
   updateStreamDot();
-  stream.scrollTop = stream.scrollHeight;
+  $('compiler-stream').scrollTop = $('compiler-stream').scrollHeight;
 }
 
 function closeStream() {
+  state.streamOpen = false;
   $('compiler-stream').hidden = true;
+  $('dock-input-row').hidden = true;
   updateStreamDot();
 }
 
 function updateStreamDot() {
-  // 对话区藏着时：有内容在产生或待读 → 拉杆上亮点提示
-  $('stream-dot').hidden = !$('compiler-stream').hidden
-    || !(compiler.busy || state.streamUnread);
+  // 整块藏着时：有内容在产生或待读 → 细条上亮点提示
+  $('stream-dot').hidden = state.streamOpen || !(compiler.busy || state.streamUnread);
 }
 
 function showDockStream() {
-  if ($('compiler-stream').hidden) {
+  if (!state.streamOpen) {
     state.streamUnread = true; // 有新内容但抽屉收着
   }
   updateStreamDot();
@@ -494,14 +497,14 @@ function initStreamBar() {
     if (e.target.closest('button')) return;
     dragging = true;
     y0 = e.clientY;
-    h0 = $('compiler-stream').hidden ? 0 : state.streamH;
+    h0 = state.streamOpen ? state.streamH : 0;
     e.preventDefault();
   });
   window.addEventListener('mousemove', (e) => {
     if (!dragging) return;
     const h = Math.min(Math.round(window.innerHeight * 0.6), Math.max(0, h0 + (y0 - e.clientY)));
-    if (h < 60) {
-      closeStream(); // 拖到底 = 隐藏（GoLand 式收起）
+    if (h < 80) {
+      closeStream(); // 拖到底 = 整块隐藏
     } else {
       openStream(h);
     }
@@ -509,8 +512,8 @@ function initStreamBar() {
   window.addEventListener('mouseup', () => { dragging = false; });
   bar.addEventListener('dblclick', (e) => {
     if (e.target.closest('button')) return;
-    if ($('compiler-stream').hidden) openStream();
-    else closeStream();
+    if (state.streamOpen) closeStream();
+    else openStream();
   });
 }
 
@@ -572,14 +575,13 @@ async function intentSend(text) {
 async function ensureCompiler() {
   const status = $('setup-status');
   const res = await window.moodify.codexEnsure();
-  if (!res.ok) {
+  if (!res.ok || !res.provider) {
+    if (!$('compiler-setup').hidden) return false; // 已展示过设置卡，不反复拉抽屉
+    openStream(); // 设置卡必须可见可操作
     $('compiler-setup').hidden = false;
-    status.textContent = `内核启动失败：${res.reason}`;
-    return false;
-  }
-  if (!res.provider) {
-    $('compiler-setup').hidden = false;
-    status.textContent = '首次使用：选择模型提供方并粘贴 API Key（仅存本机 ~/.moodify/codex）。';
+    status.textContent = !res.ok
+      ? `内核启动失败：${res.reason}`
+      : '首次使用：选择模型提供方并粘贴 API Key（仅存本机 ~/.moodify/codex）。';
     return false;
   }
   $('compiler-setup').hidden = true;

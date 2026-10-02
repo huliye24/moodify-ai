@@ -110,12 +110,14 @@
   </div>
 
   <!-- 意图命令条 = Mood 编译器之家：写文字 → DeepSeek 回答与操作；唯一 AI 门。
-       对话区默认隐藏（GoLand 终端式）：拉杆拖动开合，双击切换，默认只剩输入对话框。 -->
+       零占位（GoLand 终端式）：默认整块隐藏只剩贴边细条，拉上来才出现输入行与对话区，
+       让用户先看数据/频谱/图表。 -->
   <div id="intent-dock">
-    <div id="stream-bar" title="拖动展开/收起对话，双击切换">
+    <div id="stream-bar" title="拖动展开 AI 对话，双击切换">
       <span id="stream-dot" hidden></span>
       <span class="grip">⋯</span>
       <span class="drawer-actions">
+        <button id="drawer-toggle2" class="ghost" title="工程终端（ffmpeg / python / CLI）">⌘_</button>
         <button id="compiler-save" class="ghost" hidden title="把最后一条方案存为 plan.md">保存方案</button>
         <button id="compiler-stop" class="ghost" hidden>停止</button>
       </span>
@@ -142,10 +144,9 @@
       <p class="muted caption" id="setup-status"></p>
     </div>
     <p class="muted caption" id="compiler-note" hidden></p>
-    <div class="dock-input-row">
+    <div class="dock-input-row" id="dock-input-row" hidden>
       <textarea id="compiler-input" rows="1" title="直接输入，⏎ 发送" disabled></textarea>
       <button id="compiler-send" class="primary" disabled>发送</button>
-      <button id="drawer-toggle2" class="ghost" title="工程终端（ffmpeg / python / CLI）">⌘_</button>
     </div>
   </div>
 
