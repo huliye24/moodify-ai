@@ -15,7 +15,10 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    import matplotlib.figure
 
 _WINDOW_TITLE = "Moodify — 听觉报告"
 
@@ -96,6 +99,85 @@ def _format_value(value: Any) -> str:
     return str(value)
 
 
+# ——— 图表：只画实测事实（matplotlib，MATLAB 风格；不做阈值着色，不构成判断） ———
+
+_DB_UNITS = {"LUFS", "dBFS", "dB", "LU"}
+
+
+def select_chart_measurements(measurements: list[dict[str, Any]]) -> dict[str, list[tuple[str, float]]]:
+    """Split raw measurements into chart-ready series (pure, unit-honest).
+
+    Bands share one ratio axis; loudness/level values share one dB axis;
+    stereo ratios share a 0..1 axis. Values with other units are never
+    mixed onto an axis they do not belong to.
+    """
+    bands = [(m["id"], float(m["value"])) for m in measurements
+             if m.get("group") == "bands"]
+    levels = [(m["id"], float(m["value"])) for m in measurements
+              if m.get("group") == "loudness" and m.get("unit") in _DB_UNITS]
+    stereo = [(m["id"], float(m["value"])) for m in measurements
+              if m.get("group") == "stereo" and m.get("unit") == "ratio"]
+    return {"bands": bands, "levels_db": levels, "stereo_ratios": stereo}
+
+
+def _chart_style() -> None:
+    import matplotlib
+
+    matplotlib.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
+    matplotlib.rcParams["axes.unicode_minus"] = False
+
+
+def _barh_figure(rows: list[tuple[str, float]], title: str, xlabel: str,
+                 log_x: bool, value_fmt: str = "{:.4g}") -> matplotlib.figure.Figure:
+    from matplotlib.figure import Figure
+
+    _chart_style()
+    fig = Figure(figsize=(7.6, max(2.2, 0.42 * len(rows) + 1.1)), dpi=100)
+    axis = fig.add_subplot(111)
+    if not rows:
+        axis.set_title(title, fontsize=11)
+        axis.text(0.5, 0.5, "无可绘图数据", ha="center", va="center",
+                  transform=axis.transAxes, color="#555")
+        axis.set_axis_off()
+        return fig
+    labels = [name for name, _ in rows]
+    values = [value for _, value in rows]
+    positions = range(len(rows))
+    axis.barh(positions, values, color="#4878a8", align="center")
+    axis.set_yticks(list(positions))
+    axis.set_yticklabels(labels, fontsize=8)
+    axis.invert_yaxis()
+    if log_x:
+        axis.set_xscale("log")
+    axis.set_xlabel(xlabel, fontsize=9)
+    axis.set_title(title, fontsize=11)
+    axis.grid(True, axis="x", alpha=0.3)
+    if log_x:
+        axis.set_xlim(right=max(values) * 3)
+    span = (max(values) - min(values)) or 1.0
+    for y_pos, value in zip(positions, values):
+        offset = span * 0.015
+        axis.text(value + (offset if not log_x else value * 0.06 + max(values) * 1e-4),
+                  y_pos, value_fmt.format(value), va="center", fontsize=7.5, color="#333")
+    fig.tight_layout()
+    return fig
+
+
+def build_band_figure(rows: list[tuple[str, float]]) -> matplotlib.figure.Figure:
+    """Band energy ratios span four orders of magnitude — log axis keeps the
+    top and the air band visible at once. Descriptive only: no threshold
+    coloring (0/16 thresholds calibrated)."""
+    return _barh_figure(rows, "频段能量占比（实测）", "ratio（log 轴）", log_x=True)
+
+
+def build_level_figure(rows: list[tuple[str, float]]) -> matplotlib.figure.Figure:
+    return _barh_figure(rows, "电平与响度（实测）", "dB 域（LUFS/dBFS/dB/LU）", log_x=False)
+
+
+def build_stereo_figure(rows: list[tuple[str, float]]) -> matplotlib.figure.Figure:
+    return _barh_figure(rows, "立体声分布（实测）", "ratio", log_x=False)
+
+
 def launch(report_path: Path) -> int:
     """Open the window for a persisted report.json. Returns process exit code."""
     try:
@@ -155,6 +237,58 @@ def launch(report_path: Path) -> int:
     tree.configure(yscrollcommand=scroll.set)
     tree.pack(side="left", fill="both", expand=True)
     scroll.pack(side="right", fill="y")
+
+    # — 图表（实测事实可视化；MATLAB 风格 matplotlib，无阈值着色） —
+    charts = ttk.Notebook(notebook)
+    notebook.add(charts, text="图表")
+
+    spec_frame = ttk.Frame(charts)
+    charts.add(spec_frame, text="频谱")
+    scan_dir = report_path.parent / "scan"
+    spec_shown = False
+    for png_name in ("spectrum_log.png", "spectrum_linear.png"):
+        png_path = scan_dir / png_name
+        if not png_path.is_file():
+            continue
+        try:
+            photo = tk.PhotoImage(file=str(png_path))
+            factor = max(1, photo.width() // 820, photo.height() // 480)
+            if factor > 1:
+                photo = photo.subsample(factor)
+            ttk.Label(spec_frame, image=photo).pack(padx=8, pady=8)
+            spec_frame.image = photo  # keep a reference (photo is GC-able otherwise)
+            spec_shown = True
+            break
+        except tk.TclError:
+            continue
+    if not spec_shown:
+        ttk.Label(spec_frame, foreground="#555",
+                  text="无频谱图产物（scan/spectrum_*.png 缺失）").pack(padx=12, pady=12)
+    ttk.Label(spec_frame, foreground="#555",
+              text="实测频谱渲染；不构成审美或平台适配判断").pack(pady=(0, 8))
+
+    chart_series = select_chart_measurements(report.get("measurements") or [])
+    for sub_title, rows, builder in (
+            ("频段", chart_series["bands"], build_band_figure),
+            ("电平", chart_series["levels_db"], build_level_figure),
+            ("立体声", chart_series["stereo_ratios"], build_stereo_figure)):
+        sub_frame = ttk.Frame(charts)
+        charts.add(sub_frame, text=sub_title)
+        if not rows:
+            ttk.Label(sub_frame, foreground="#555",
+                      text="无可绘图数据").pack(padx=12, pady=12)
+            continue
+        try:
+            from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+        except ImportError:
+            ttk.Label(sub_frame, foreground="#555",
+                      text="matplotlib 不可用，图表跳过").pack(padx=12, pady=12)
+            continue
+        canvas = FigureCanvasTkAgg(builder(rows), master=sub_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True, padx=8, pady=8)
+        ttk.Label(sub_frame, foreground="#555",
+                  text="实测值展示；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断").pack(pady=(0, 6))
 
     # — 发现 —
     findings_frame = ttk.Frame(notebook)
