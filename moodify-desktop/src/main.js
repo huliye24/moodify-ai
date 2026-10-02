@@ -84,9 +84,16 @@ function registerTerminalIpc() {
   ipcMain.handle('pty:create', async (event, termId, cwd) => {
     if (terms.has(termId)) return true;
     const pty = require('node-pty');
+    // cwd must exist or node-pty fails with 267 (invalid directory); the
+    // archive root may not exist yet on first run — create it, never crash
+    let dir = cwd;
+    if (!dir || !fs.existsSync(dir)) {
+      try { fs.mkdirSync(CASES_ROOT, { recursive: true }); } catch { /* read-only home */ }
+      dir = fs.existsSync(CASES_ROOT) ? CASES_ROOT : os.homedir();
+    }
     const term = pty.spawn(process.env.ComSpec || 'powershell.exe', [], {
       name: 'xterm-256color',
-      cwd: fs.existsSync(cwd) ? cwd : CASES_ROOT,
+      cwd: dir,
       env: { ...codexEnv(), PYTHONUTF8: '1' },
     });
     const win = BrowserWindow.fromWebContents(event.sender);

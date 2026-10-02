@@ -56,7 +56,6 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 #case-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
 #case-title h1 { margin: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #case-title p { margin: 2px 0 0; font-size: 12px; }
-#close-case { padding: 2px 8px; }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 
 .badge {
@@ -230,22 +229,32 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 .approval-actions { display: flex; gap: 8px; }
 .approval-actions button { padding: 3px 10px; font-size: 12px; }
 
-.compiler-input-row {
+/* ——— 意图命令条（MC 聊天栏位，常驻底部；编译器是唯一 AI 门）——— */
+
+#intent-dock {
+  flex: none;
   display: flex;
   gap: 8px;
-  margin: 10px 0 0;
   align-items: flex-end;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--hairline);
+  background: var(--bg);
 }
-.compiler-input-row textarea {
+#intent-dock textarea {
   flex: 1;
   font: inherit;
   border: 1px solid var(--hairline);
   border-radius: 8px;
   padding: 8px 10px;
-  resize: vertical;
-  min-height: 44px;
+  resize: none;
+  min-height: 36px;
+  max-height: 96px;
+  overflow-y: auto;
 }
-.compiler-input-row textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+#intent-dock textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+#intent-dock textarea:disabled { background: #f9fafb; }
+#intent-dock #compiler-send { flex: none; }
+#intent-dock #drawer-toggle2 { flex: none; padding: 7px 10px; font-family: Consolas, monospace; }
 
 .draft-head { font-size: 14px; margin: 4px 0 6px; }
 
@@ -256,18 +265,17 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 #plan-body ul { margin: 4px 0; padding-left: 20px; }
 #plan-body li { margin: 2px 0; }
 
-/* ——— 底部终端抽屉 ——— */
+/* ——— 工程终端（默认隐藏；纯工程面，无 AI 通道）——— */
 
 #drawer {
   flex: none;
   display: flex;
   flex-direction: column;
   height: 240px;
-  min-height: 34px;
   border-top: 1px solid var(--hairline);
   background: var(--bg);
 }
-#drawer.collapsed { height: 34px !important; }
+#drawer[hidden] { display: none; }
 #drawer-bar {
   height: 34px;
   flex: none;
@@ -281,12 +289,10 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   user-select: none;
   overflow: hidden;
 }
-#drawer.collapsed #drawer-bar { cursor: default; }
 #drawer-bar .muted { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .drawer-actions { display: flex; align-items: center; gap: 6px; flex: none; }
 .drawer-actions button { padding: 2px 8px; font-size: 12px; }
 #terminal { flex: 1; min-height: 0; padding: 4px 8px; overflow: hidden; }
-#drawer.collapsed #terminal { display: none; }
 
 .error {
   color: #b91c1c;

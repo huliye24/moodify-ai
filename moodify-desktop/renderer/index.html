@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 顶栏：logo + 当前 case + 事件状态（只在有事发生时出现） -->
+  <!-- 顶栏：logo + 当前世界 + 事件状态（只在有事发生时出现）。无关闭：世界不关闭，只切换。 -->
   <header id="topbar">
     <img class="logo" src="assets/moodify_logo.png" alt="Moodify">
     <div id="case-title" hidden>
@@ -17,7 +17,6 @@
         <h1 id="source-name"></h1>
         <p class="muted" id="report-meta"></p>
       </div>
-      <button id="close-case" class="ghost" title="关闭当前 case">✕</button>
     </div>
     <div class="top-actions">
       <span id="status-line" class="muted" hidden></span>
@@ -27,23 +26,29 @@
   </header>
 
   <div id="main-row">
-    <!-- 左图标栏（PS/PyCharm 式）：打开 / 历史 / Mood 编译器 -->
+    <!-- 左图标栏（PS/PyCharm 式）：打开 / 世界 / 观察 / 数据 / Mood 编译器 -->
     <nav id="rail">
-      <button id="rail-open" title="打开音频文件" aria-label="打开音频文件">
+      <button id="rail-open" title="打开音频文件（创建/进入世界）" aria-label="打开音频文件">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
       </button>
-      <button id="rail-history" title="历史档案" aria-label="历史档案">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+      <button id="rail-history" title="世界（双击进入）" aria-label="世界">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c-5.5 5.5-5.5 11.5 0 17M12 3.5c5.5 5.5 5.5 11.5 0 17"/></svg>
+      </button>
+      <button id="rail-charts" title="观察（图表）" aria-label="观察" disabled>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5v-17M3.5 20.5h17"/><path d="M7 16v-5M11.5 16V7M16 16v-8M20.5 16v-3"/></svg>
+      </button>
+      <button id="rail-data" title="数据（测量表）" aria-label="数据" disabled>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 4.5h17v15h-17zM3.5 9.5h17M3.5 14.5h17M9.5 4.5v15M15.5 4.5v15"/></svg>
       </button>
       <button id="rail-compiler" title="Mood 编译器" aria-label="Mood 编译器" disabled>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>
       </button>
     </nav>
 
-    <!-- 历史档案面板：从左滑出，可收起 -->
+    <!-- 世界面板：从左滑出，可收起；双击 = 进入该世界（不关闭当前） -->
     <aside id="history-panel" hidden>
       <div class="list-head">
-        <span class="muted">历史档案（双击打开）</span>
+        <span class="muted">世界（双击进入）</span>
         <button id="refresh" class="ghost">刷新</button>
       </div>
       <table class="data">
@@ -78,10 +83,10 @@
           <div class="plan-gen-head">
             <div>
               <h3>Mood 编译器</h3>
-              <p class="muted" id="compiler-subtitle">Codex 内核 · 基于本 case 的 report.json / measurements.json / judgment_rules.json</p>
+              <p class="muted" id="compiler-subtitle">Codex 内核 · 基于本世界的 report.json / measurements.json / judgment_rules.json</p>
             </div>
             <div class="plan-gen-actions">
-              <button id="compiler-plan-btn" class="primary" disabled title="打开 case 后可用">生成方案</button>
+              <button id="compiler-plan-btn" class="primary" disabled title="打开世界后可用">生成方案</button>
               <button id="compiler-stop" class="ghost" hidden>停止</button>
               <button id="compiler-save" class="ghost" hidden title="把最后一条方案存为 plan.md">保存方案</button>
             </div>
@@ -109,30 +114,31 @@
           </div>
 
           <div id="compiler-stream" class="compiler-stream"></div>
-
-          <div class="compiler-input-row">
-            <textarea id="compiler-input" rows="2" placeholder="向 Mood 编译器描述你的诉求（⏎ 发送，Shift+⏎ 换行）"></textarea>
-            <button id="compiler-send" class="primary" disabled>发送</button>
-          </div>
           <p class="muted caption" id="compiler-note" hidden></p>
         </div>
         <h3 class="draft-head">规则草案（保守，DRAFT_PLAN_NOT_EXECUTED）</h3>
         <div id="plan-body"></div>
-        <p class="muted caption">本页只呈现 L1 技术测量与保守草案；不含听感、音乐或商业判断。方案不等于执行。</p>
+        <p class="muted caption">本页只呈现 L1 技术测量与保守草案；不含听感、音乐或商业判断。渲染是显式动作（W5 接入）。</p>
       </section>
     </main>
   </div>
 
-  <!-- 底部终端抽屉：拖拽调高度，双击标题或箭头收起 -->
-  <div id="drawer">
-    <div id="drawer-bar" title="拖拽调高度，双击收起/展开">
+  <!-- 工程终端：默认隐藏，纯工程面（ffmpeg/python/CLI）；无 AI 通道 -->
+  <div id="drawer" hidden>
+    <div id="drawer-bar" title="拖拽调高度，双击收起">
       <span class="muted" id="term-cwd"></span>
       <span class="drawer-actions">
-        <button id="launch-codex" class="ghost">在此目录打开 Codex</button>
-        <button id="drawer-toggle" class="ghost" title="收起/展开终端">▾</button>
+        <button id="drawer-toggle" class="ghost" title="收起终端">▾</button>
       </span>
     </div>
     <div id="terminal"></div>
+  </div>
+
+  <!-- 意图命令条：审美意图从这里进入（MC 聊天栏位），编译器是唯一 AI 门 -->
+  <div id="intent-dock">
+    <textarea id="compiler-input" rows="1" placeholder="说出你的审美意图，如「70 年代暖声，人声再近一点」（⏎ 发送，Shift+⏎ 换行）" disabled></textarea>
+    <button id="compiler-send" class="primary" disabled>发送</button>
+    <button id="drawer-toggle2" class="ghost" title="工程终端（ffmpeg / python / CLI）">⌘_</button>
   </div>
 
   <script src="vendor/xterm.js"></script>

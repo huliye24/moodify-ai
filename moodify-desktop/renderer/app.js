@@ -1,8 +1,10 @@
 /**
- * Moodify Studio — renderer. Vanilla DOM, no frameworks: an IDE-style shell
- * (icon rail + central workspace + terminal drawer) around the fixed product
- * flow: pick a song → detect → data & charts → plan. All measurement truth
- * comes from the core's report.json; the plan is authored by Claude Code.
+ * Moodify Studio — renderer (v0.2 World Loop). Vanilla DOM, no frameworks:
+ * an IDE-style shell (icon rail + central workspace + intent dock) around a
+ * creative loop: enter a world (song) once → observe charts → speak an
+ * aesthetic intent → compile → (render, W5) → compare. Worlds never close —
+ * they switch. The compiler is the only AI door; the terminal is engineering-
+ * only. Measurement truth always comes from the core's report.json.
  */
 
 const $ = (id) => document.getElementById(id);
@@ -14,10 +16,11 @@ const state = {
   fit: null,         // FitAddon
   termId: null,
   termCwd: undefined, // undefined = terminal never created
-  drawerCollapsed: false,
+  drawerVisible: false, // engineering terminal stays hidden until asked for
 };
 
 const VIEWS = ['empty', 'data', 'charts', 'plan'];
+const VIEW_RAIL = { charts: 'rail-charts', data: 'rail-data', plan: 'rail-compiler' };
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -119,7 +122,9 @@ function showError(message) {
 
 function selectView(name) {
   for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
-  $('rail-compiler').classList.toggle('active', name === 'plan');
+  for (const [view, railId] of Object.entries(VIEW_RAIL)) {
+    $(railId).classList.toggle('active', view === name);
+  }
 }
 
 async function openReport(reportPath) {
@@ -160,38 +165,17 @@ async function openReport(reportPath) {
     $('compiler-save').hidden = true;
   }
 
+  $('rail-charts').disabled = false;
+  $('rail-data').disabled = false;
   $('rail-compiler').disabled = false;
+  setCompilerBusy(compiler.busy); // intent bar unlocks with the world
   toggleHistoryPanel(false);
   renderMeasurements(report.measurements || []);
   renderPlan(report);
-  selectView('data');
+  selectView('charts'); // 图表优先：进入世界先看观察
   fitTerminalSoon();
   await renderCharts(reportPath, report);
   await ensureTerminal();
-}
-
-function closeCase() {
-  state.reportPath = null;
-  state.caseDir = null;
-  $('case-title').hidden = true;
-  $('badge-overall').hidden = true;
-  $('badge-decision').hidden = true;
-  $('rail-compiler').disabled = true;
-  $('rail-compiler').classList.remove('active');
-  compiler.threadId = null;
-  compiler.threadCwd = null;
-  $('compiler-stream').textContent = '';
-  selectView('empty');
-  setStatus('');
-  // fresh terminal for whatever comes next (cwd follows the case)
-  if (state.term) {
-    window.moodify.termKill(state.termId);
-    state.term.dispose();
-    state.term = null;
-    state.fit = null;
-    state.termId = null;
-    state.termCwd = undefined;
-  }
 }
 
 function renderMeasurements(measurements) {
@@ -323,7 +307,7 @@ function renderPlan(report) {
 // ——— terminal drawer (xterm.js + node-pty, cwd = case dir) ———
 
 function ensureTerminal() {
-  if (state.drawerCollapsed) return;
+  if (!state.drawerVisible) return;
   if (state.term && state.termCwd === state.caseDir) { fitTerminalSoon(); return; }
   if (state.term) {
     window.moodify.termKill(state.termId);
@@ -356,24 +340,24 @@ function fitTerminalSoon() {
   });
 }
 
-function setDrawerCollapsed(collapsed) {
-  state.drawerCollapsed = collapsed;
-  $('drawer').classList.toggle('collapsed', collapsed);
-  $('drawer-toggle').textContent = collapsed ? '▴' : '▾';
-  if (!collapsed) ensureTerminal();
+function setDrawerVisible(visible) {
+  state.drawerVisible = visible;
+  $('drawer').hidden = !visible;
+  if (visible) ensureTerminal();
 }
 
 function initDrawer() {
-  $('drawer-toggle').addEventListener('click', () => setDrawerCollapsed(!state.drawerCollapsed));
+  $('drawer-toggle').addEventListener('click', () => setDrawerVisible(false));
+  $('drawer-toggle2').addEventListener('click', () => setDrawerVisible(!state.drawerVisible));
   const bar = $('drawer-bar');
   bar.addEventListener('dblclick', (e) => {
     if (e.target.closest('button')) return;
-    setDrawerCollapsed(!state.drawerCollapsed);
+    setDrawerVisible(false);
   });
   // drag the bar up/down to resize; buttons keep their click behavior
   let startY = 0, startH = 0, dragging = false;
   bar.addEventListener('mousedown', (e) => {
-    if (e.target.closest('button') || state.drawerCollapsed) return;
+    if (e.target.closest('button') || !state.drawerVisible) return;
     dragging = true;
     startY = e.clientY;
     startH = $('drawer').getBoundingClientRect().height;
@@ -387,14 +371,6 @@ function initDrawer() {
   });
   window.addEventListener('mouseup', () => { dragging = false; });
   window.addEventListener('resize', fitTerminalSoon);
-}
-
-function launchCodexInTerminal() {
-  setDrawerCollapsed(false);
-  // give a freshly spawned shell a moment before typing into it
-  setTimeout(() => {
-    if (state.termId) window.moodify.termRunCommand(state.termId, 'codex');
-  }, 600);
 }
 
 window.moodify.onPtyData((termId, data) => {
@@ -456,9 +432,26 @@ function compilerNote(text) {
 function setCompilerBusy(busy) {
   compiler.busy = busy;
   $('compiler-stop').hidden = !busy;
-  $('compiler-plan-btn').disabled = busy || !state.caseDir || !compiler.threadId;
-  $('compiler-send').disabled = busy || !compiler.threadId;
-  $('compiler-input').disabled = busy;
+  const worldOpen = Boolean(state.caseDir);
+  $('compiler-plan-btn').disabled = busy || !worldOpen;
+  $('compiler-send').disabled = busy || !worldOpen;
+  $('compiler-input').disabled = busy || !worldOpen;
+}
+
+/** 意图命令条入口：惰性开线程，发送即切到编译器视图。 */
+async function intentSend(text) {
+  if (!text.trim() || !state.caseDir || compiler.busy) return;
+  selectView('plan');
+  if (!compiler.ready) {
+    const ok = await ensureCompiler();
+    if (!ok) return;
+  }
+  if (!compiler.threadId || compiler.threadCwd !== state.caseDir) {
+    compiler.busy = true; // gate re-entry while the thread opens (async)
+    try { await openCompilerThread(); } finally { compiler.busy = false; }
+    setCompilerBusy(false);
+  }
+  await compilerSend(text);
 }
 
 async function ensureCompiler() {
@@ -515,9 +508,7 @@ async function compilerSend(text) {
 }
 
 async function sendPlanRequest() {
-  if (!compiler.ready) return;
-  if (!compiler.threadId || compiler.threadCwd !== state.caseDir) await openCompilerThread();
-  await compilerSend(PLAN_PROMPT);
+  await intentSend(PLAN_PROMPT);
 }
 
 async function savePlan() {
@@ -647,37 +638,41 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   $('rail-open').addEventListener('click', pickAndAnalyze);
   $('rail-history').addEventListener('click', () => toggleHistoryPanel());
+  $('rail-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
+  $('rail-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
   $('rail-compiler').addEventListener('click', () => {
     if (state.caseDir) {
       selectView('plan');
       if (!compiler.threadId || compiler.threadCwd !== state.caseDir) openCompilerThread();
     }
   });
-  $('close-case').addEventListener('click', closeCase);
   $('refresh').addEventListener('click', refreshArchive);
-  $('compiler-send').addEventListener('click', () => {
+  const sendIntent = () => {
     const text = $('compiler-input').value;
     $('compiler-input').value = '';
-    compilerSend(text);
-  });
+    $('compiler-input').style.height = '';
+    intentSend(text);
+  };
+  $('compiler-send').addEventListener('click', sendIntent);
   $('compiler-input').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const text = $('compiler-input').value;
-      $('compiler-input').value = '';
-      compilerSend(text);
+      sendIntent();
     }
+  });
+  $('compiler-input').addEventListener('input', (e) => {
+    const el = e.target;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(96, el.scrollHeight)}px`;
   });
   $('compiler-plan-btn').addEventListener('click', sendPlanRequest);
   $('compiler-stop').addEventListener('click', () => window.moodify.codexInterrupt(compiler.threadId));
   $('compiler-save').addEventListener('click', savePlan);
-  $('launch-codex').addEventListener('click', launchCodexInTerminal);
   window.moodify.onCodexEvent(handleCodexEvent);
   window.moodify.onCodexServerRequest(handleCodexServerRequest);
   initCompilerSetup();
   initDrawer();
   initDrop();
-  if (!state.drawerCollapsed) ensureTerminal();
   await ensureCompiler();
   await refreshArchive();
 });
