@@ -250,3 +250,7 @@ docs/experiments/**/*.zip
 
 # Company Home static HTML is canonical public-site source.
 !ops/web_origin/site/rongjingwenchuan/*.html
+
+# Brand assets for the one-shell product (whitelisted against *.png above)
+!moodify-core-package/src/moodify/ui/assets/*.png
+!moodify-desktop/renderer/assets/*.png

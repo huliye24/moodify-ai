@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — 桌面壳迁 Electron：单壳产品形态不变，壳技术换轨（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因产品显示面的壳技术换轨（R7 可见性）。人类指令原话要点："这个软件没有做好，我希望做成 electron，你试着去做一下"。
+- **Why / evidence：** 2026-10-02 人类看过 tkinter 壳后裁决换 Electron。单壳白底 + 公司 logo + 固定流程（选歌 → 检测 → 数据/图表 → 修音与混音方案）**形态原样迁移**。
+- **Boundary：** 新增 `moodify-desktop/`（Electron 壳，main/preload/renderer，零 npm 运行时依赖，contextIsolation 开、nodeIntegration 关、CSP 收紧）。壳只编排核心：检测走 `python -m moodify.release_cli demo --no-open`（同 0.2 validate/execute 路径）；图表走 `moodify.ui.chart_export` 桥（与 Tk 壳同一批图函数，Agg 出 PNG，零新图表语义）；档案扫描/报告渲染在壳内只读 report.json。所有 python 子进程强制 `PYTHONUTF8=1`（GBK 陷阱为产品级缺陷）。**核心 pip-only 裁决不变**：Electron 是公司桌面壳，不是核心分发形态。tkinter 壳保留为回退（同产品、两套渲染端，不是两个产品壳）。同批修复：`.gitignore` `*.png` 吞品牌资产（第三次同坑类：*.tar.gz、*.html、*.png）——白名单 `moodify-core-package/src/moodify/ui/assets/*.png` 与 `moodify-desktop/renderer/assets/*.png`。
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件。代码面：`moodify-desktop/`（新：package.json、src/main.js、src/preload.js、renderer/）、`moodify/ui/chart_export.py`（新）、`tests/ui/test_chart_export.py`（新）、`.gitignore`（白名单）。
+- **Migration：** 无破坏性变更；CLI 命令面、0.2 报告 schema、协议链路不变。`npm start` 运行（`MOODIFY_CASES_ROOT`/`MOODIFY_PYTHON` 可覆写）。
+- **Rollback：** 删除 `moodify-desktop/`、回退 chart_export 与 gitignore 白名单即可；Tk 壳始终可用，核心不受影响。
+
 ## 2026-10-02 — 产品定义定稿：单壳白底公司桌面软件 + 固定流程；实验台移除（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因这是产品显示面的定稿决策（R7 可见性）。人类指令原话要点：不要两个壳，实验台去掉；恢复数据/图表/后处理方案的壳；用公司 logo（`E:\moodify\logo`，采用 `moodify-horizontal.png`）做成公司的桌面端软件，采用白色；流程固定：选择歌曲 → 检测 → 根据数据和图表给出修音与混音方案。

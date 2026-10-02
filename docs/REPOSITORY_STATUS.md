@@ -75,6 +75,7 @@ Never promote a capability to CANONICAL based only on documentation or an unmerg
 
 ## History
 
+- 2026-10-02 (桌面壳迁 Electron): 人类裁决"做成 electron"——新增 `moodify-desktop/`（Electron 壳：白底 + 公司 logo + 固定流程原样迁移；零 npm 运行时依赖，contextIsolation + CSP 收紧）。壳只编排核心：检测 = `python -m moodify.release_cli demo --no-open`（同 0.2 协议路径）；图表 = `moodify.ui.chart_export` 桥（Tk 同一批图函数，Agg 出 PNG）；档案/报告只读 report.json。python 子进程强制 `PYTHONUTF8=1`（GBK 陷阱）。核心 pip-only 裁决不变；tkinter 壳保留为回退。同批修 `.gitignore` `*.png` 吞品牌资产（第三次同坑类），白名单两处品牌资产目录。
 - 2026-10-02 (产品定义定稿): 人类裁决**单壳白底公司桌面软件**——"不要 2 个壳"，实验台（`moodify.ui.lab`，8e32e85e）整体移除；产品 = 档案中枢（选歌/历史）+ 报告视图（数据/图表/后处理方案）同一壳内导航；**固定流程**：选择歌曲 → 检测 → 根据数据和图表给出修音与混音方案。新增 `moodify.ui.theme`（白底主题/公司 logo/窗口图标；品牌资产 `moodify/ui/assets/*.png`，package-data 入包，缺失时优雅降级）。
 - 2026-10-02 (实验台 v0.1，已被同日产品定义定稿移除): 人类裁决"先要有科研一样的 GUI"——新增 `moodify.ui.lab`（观测/目录/实验三区，引擎零改动，GUI-first 教义）；人类看过窗口后改裁决"不要 2 个壳"，实验台存活一版即移除；科研可观测性由报告三件套与档案事实承载。
 - 2026-10-02 (桌面应用中枢): 新增 `moodify app` 与 `moodify.ui.app`——GUI 操作闭环：文件对话框选歌 → 应用内后台线程分析（Tk 主线程零阻塞，queue 轮询）→ 自动存档 `~/.moodify/cases`（永久档案）→ 历史列表双击秒开（不重新分析）；报告视图内"← 档案"窗口内导航。同批按人类逐项指令完成 UI 简化：删"发现"页签（触发式折叠进方案页）、删"打开 HTML/退出"页脚按钮、删"边界与来源"页签（诚实边界改为上下文行：图表题注 / 方案状态注 / L1-only 页脚文字）；完整细节仍存 report.json/md/html。CLI 侧 `_spawn_ui_module` 泛化（app 与 report_window 共用独立进程派生）。
