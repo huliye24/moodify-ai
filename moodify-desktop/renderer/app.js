@@ -255,9 +255,6 @@ async function renderWaveform(entryDir) {
     const audio = await ctx.decodeAudioData(ab);
     await ctx.close();
     if (state.caseDir !== entryDir) return; // world switched mid-decode
-    $('source-meta').textContent =
-      `${src.split(/[\\/]/).pop()} · ${audio.numberOfChannels}ch @ ${audio.sampleRate}Hz`
-      + ` · ${audio.duration.toFixed(1)}s`;
     $('source-track').hidden = false;
     mountSourceWave(audio);
   } catch {
@@ -265,12 +262,18 @@ async function renderWaveform(entryDir) {
   }
 }
 
+function fmtTime(t) {
+  const m = Math.floor(t / 60);
+  const s = t - m * 60;
+  return `${m}:${s < 10 ? '0' : ''}${s.toFixed(1)}`;
+}
+
 function mountSourceWave(audioBuffer) {
   if (sourceWS) { try { sourceWS.destroy(); } catch { /* already gone */ } }
   sourceWS = WaveSurfer.create({
     container: $('wave-source'),
     backend: 'WebAudio',
-    height: 60,
+    height: 96,
     splitChannels: true,
     responsive: true,
     scroll: true,
@@ -287,6 +290,13 @@ function mountSourceWave(audioBuffer) {
       secondaryFontColor: '#c7cbd1',
     })],
   });
+  $('bench-time').textContent = `0:00.0 / ${fmtTime(audioBuffer.duration)}`;
+  sourceWS.on('timeupdate', (t) => {
+    if (sourceWS) $('bench-time').textContent = `${fmtTime(t)} / ${fmtTime(sourceWS.getDuration() || 0)}`;
+  });
+  sourceWS.on('play', () => { $('bench-play').textContent = '⏸'; });
+  sourceWS.on('pause', () => { $('bench-play').textContent = '▶'; });
+  sourceWS.on('finish', () => { $('bench-play').textContent = '▶'; });
   sourceWS.loadDecodedBuffer(audioBuffer);
 }
 
@@ -294,6 +304,8 @@ function destroyBench() {
   if (sourceWS) { try { sourceWS.destroy(); } catch { /* already gone */ } }
   sourceWS = null;
   $('source-track').hidden = true;
+  $('bench-time').textContent = '0:00.0';
+  $('bench-play').textContent = '▶';
   zoomPx = null;
 }
 
@@ -761,6 +773,18 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('zoom-in').addEventListener('click', () => setZoom(1.5));
   $('zoom-out').addEventListener('click', () => setZoom(1 / 1.5));
   $('zoom-fit').addEventListener('click', () => { zoomPx = null; applyZoom(); });
+  $('bench-play').addEventListener('click', (e) => {
+    e.currentTarget.blur(); // 空格留给全局走带快捷键，不让按钮吃掉
+    if (sourceWS) sourceWS.playPause();
+  });
+  // 空格 = 播放/暂停（工作台激活且焦点不在输入区时）
+  window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' || !sourceWS || $('view-bench').hidden) return;
+    const el = document.activeElement;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+    e.preventDefault();
+    sourceWS.playPause();
+  });
   initStreamBar();
   const sendIntent = () => {
     const text = $('compiler-input').value;

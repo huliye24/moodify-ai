@@ -75,6 +75,10 @@
 
         <section id="view-bench" class="workspace-view" hidden>
           <div id="bench-head">
+            <span class="drawer-actions" id="bench-transport">
+              <button id="bench-play" class="ghost" title="播放 / 暂停（空格）">▶</button>
+              <span id="bench-time">0:00.0</span>
+            </span>
             <span class="drawer-actions" id="bench-zoom">
               <button id="zoom-out" class="ghost" title="缩小">－</button>
               <button id="zoom-in" class="ghost" title="放大">＋</button>
@@ -83,10 +87,6 @@
           </div>
           <div class="bench-tracks">
             <div class="track" id="source-track" hidden>
-              <div class="track-head">
-                <span class="track-name">源</span>
-                <span class="muted track-meta" id="source-meta"></span>
-              </div>
               <div class="track-strip">
                 <div id="ruler-source" class="ws-ruler"></div>
                 <div id="wave-source" class="ws-wave"></div>
