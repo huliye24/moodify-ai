@@ -274,7 +274,7 @@ MSP_REPORT_SCHEMA = {
             "additionalProperties": False,
             "required": ["type", "source"],
             "properties": {
-                "type": {"const": "analyze"},
+                "type": {"enum": ["analyze", "compare"]},
                 "source": {"type": "string"},
             },
         },
@@ -282,7 +282,10 @@ MSP_REPORT_SCHEMA = {
             "type": "object",
             "additionalProperties": False,
             "required": ["case_id"],
-            "properties": {"case_id": {"type": "string"}},
+            "properties": {
+                "case_id": {"type": "string"},
+                "case_root": {"type": "string"},
+            },
         },
         "source": {
             "type": "object",
@@ -414,7 +417,93 @@ MSP_REPORT_SCHEMA = {
                 "ffmpeg": {"type": "string"},
             },
         },
+        "comparison": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["reference", "loudness_normalization", "metric_deltas",
+                         "band_deltas", "delta_spectrograms", "pair_checks",
+                         "visibility_note"],
+            "properties": {
+                "reference": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["name", "sha256", "case_id", "case_root"],
+                    "properties": {
+                        "name": {"type": "string"},
+                        "sha256": {"type": "string"},
+                        "case_id": {"type": "string"},
+                        "case_root": {"type": "string"},
+                        "duration_s": {"type": ["number", "null"]},
+                        "channels": {"type": ["integer", "null"]},
+                        "sample_rate": {"type": ["integer", "null"]},
+                    },
+                },
+                "loudness_normalization": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["gain_db", "valid", "method"],
+                    "properties": {
+                        "gain_db": {"type": ["number", "null"]},
+                        "valid": {"type": "boolean"},
+                        "method": {"type": "string"},
+                    },
+                },
+                "metric_deltas": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["id", "before", "after", "absolute_delta",
+                                     "unit", "direction"],
+                        "properties": {
+                            "id": {"type": "string"},
+                            "before": {"type": ["number", "null"]},
+                            "after": {"type": ["number", "null"]},
+                            "absolute_delta": {"type": ["number", "null"]},
+                            "relative_delta": {"type": ["number", "null"]},
+                            "unit": {"type": ["string", "null"]},
+                            "direction": {"enum": ["INCREASE", "DECREASE", "UNCHANGED"]},
+                            "visibility": {"type": "string"},
+                            "group": {"type": "string"},
+                        },
+                    },
+                },
+                "band_deltas": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["raw", "normalized"],
+                    "properties": {
+                        "raw": {"type": "object",
+                                "additionalProperties": {"type": ["number", "null"]}},
+                        "normalized": {"type": "object",
+                                       "additionalProperties": {"type": ["number", "null"]}},
+                    },
+                },
+                "delta_spectrograms": {"type": "array", "items": {"type": "string"}},
+                "pair_checks": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["profile_hash_match", "duration_within_tolerance",
+                                 "channels_match", "duration_tolerance_s"],
+                    "properties": {
+                        "profile_hash_match": {"type": "boolean"},
+                        "duration_within_tolerance": {"type": "boolean"},
+                        "channels_match": {"type": "boolean"},
+                        "duration_tolerance_s": {"type": "number"},
+                    },
+                },
+                "visibility_note": {"type": "string"},
+            },
+        },
     },
+    # A compare job must carry its comparison evidence; analyze reports must
+    # not (the boundary between L1-only and L1+L2 stays machine-checkable).
+    "allOf": [{
+        "if": {"properties": {"job": {"properties": {"type": {"const": "compare"}}}},
+               "required": ["job"]},
+        "then": {"required": ["comparison"]},
+        "else": {"not": {"required": ["comparison"]}},
+    }],
 }
 
 
@@ -422,13 +511,15 @@ class ReportError(ValueError):
     """Raised when a 0.2 report cannot be assembled or fails schema validation."""
 
 
-def build_protocol_report(case_root: Path) -> dict:
-    """Assemble, schema-validate and persist ``report.json`` for a 1.0 case."""
-    from moodify.auditory.decode import ffmpeg_version
-    from moodify.auditory.judgment import JUDGMENT_RULES_VERSION
-    from moodify.release import PRODUCT_VERSION, PROFILE_ID
-    from moodify.auditory.profiles import get_profile
+L2_VISIBILITY_NOTE = (
+    "对比层只描述候选相对参考的相对变化方向与幅度（响度对齐后）。"
+    "“变化是否更好”的显著性阈值属于 Layer C 校准，本层不判断；"
+    "听感结论仍需人类或算法评审权威。"
+)
 
+
+def _load_case_bundle(case_root: Path) -> tuple[dict, dict, dict]:
+    """Load (case, metrics, auditory_report) or fail closed."""
     case_root = case_root.resolve()
     case_path = case_root / "case.json"
     metrics_path = case_root / "scan" / "metrics.json"
@@ -436,10 +527,37 @@ def build_protocol_report(case_root: Path) -> dict:
     for path in (case_path, metrics_path, auditory_path):
         if not path.is_file():
             raise ReportError(f"case bundle is missing {path.name}: {case_root}")
+    return (
+        json.loads(case_path.read_text(encoding="utf-8")),
+        json.loads(metrics_path.read_text(encoding="utf-8")),
+        json.loads(auditory_path.read_text(encoding="utf-8")),
+    )
 
-    case = json.loads(case_path.read_text(encoding="utf-8"))
-    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
-    auditory = json.loads(auditory_path.read_text(encoding="utf-8"))
+
+def build_protocol_report(case_root: Path) -> dict:
+    """Assemble, schema-validate and persist ``report.json`` for a 1.0 case."""
+    report = _assemble_report(case_root, job_type="analyze")
+    case_root = case_root.resolve()
+    (case_root / "report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8",
+    )
+    return report
+
+
+def _assemble_report(
+    case_root: Path,
+    *,
+    job_type: str,
+    comparison: dict | None = None,
+    candidate_case_root: Path | None = None,
+) -> dict:
+    from moodify.auditory.decode import ffmpeg_version
+    from moodify.auditory.judgment import JUDGMENT_RULES_VERSION
+    from moodify.release import PRODUCT_VERSION, PROFILE_ID
+    from moodify.auditory.profiles import get_profile
+
+    case_root = case_root.resolve()
+    case, metrics, auditory = _load_case_bundle(case_root)
 
     findings = _findings(metrics)
     decision, reasons = analyze_workflow_decision(findings)
@@ -457,12 +575,18 @@ def build_protocol_report(case_root: Path) -> dict:
 
     profile = get_profile(PROFILE_ID)
     job_source = auditory.get("source_name", "")
+    # The compare report's subject is the candidate; its bundle still lives in
+    # the candidate case root, so the persisted report carries the root path
+    # for re-render image loading.
+    case_block: dict = {"case_id": case.get("case_id", "")}
+    if job_type == "compare":
+        case_block["case_root"] = str((candidate_case_root or case_root).resolve())
     report = {
         "protocol": "moodify.sound/0.2",
         "report_schema_version": REPORT_SCHEMA_VERSION,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "job": {"type": "analyze", "source": job_source},
-        "case": {"case_id": case.get("case_id", "")},
+        "job": {"type": job_type, "source": job_source},
+        "case": case_block,
         "source": {
             "name": source_name,
             "sha256": sha256,
@@ -482,7 +606,7 @@ def build_protocol_report(case_root: Path) -> dict:
         "plan": _plan(findings, job_source),
         "judgment_boundary": {
             "layer1_measurement": "EXECUTED",
-            "layer2_comparison": "NOT_RUN",
+            "layer2_comparison": "EXECUTED" if comparison is not None else "NOT_RUN",
             "layer3_musical_judgment": "NOT_PROMISED",
             "layer4_production_judgment": "NOT_PROMISED",
             "layer5_cultural_judgment": "NOT_PROMISED",
@@ -501,11 +625,103 @@ def build_protocol_report(case_root: Path) -> dict:
             "ffmpeg": ffmpeg_version(),
         },
     }
+    if comparison is not None:
+        report["comparison"] = comparison
     try:
         jsonschema_validate(report, MSP_REPORT_SCHEMA)
     except ValidationError as exc:
         raise ReportError(f"protocol report failed schema validation: {exc.message}") from exc
-    (case_root / "report.json").write_text(
+    return report
+
+
+def _comparison_section(
+    deltas,
+    reference_evidence,
+    *,
+    reference_name: str,
+    reference_sha256: str,
+    reference_case_root: Path,
+    pair_checks: dict,
+) -> dict:
+    """Build the schema-shaped ``comparison`` section from a DeltaResult."""
+    rows: list[dict] = []
+    for key, entry in deltas.metric_delta.items():
+        row = {
+            "id": key,
+            "before": entry["before"],
+            "after": entry["after"],
+            "absolute_delta": entry["absolute_delta"],
+            "relative_delta": entry.get("relative_delta"),
+            "unit": entry["unit"],
+            "direction": entry["direction"],
+            "group": "bands" if key in _BAND_METRICS else METRIC_GROUPS.get(key, "other"),
+        }
+        if key in VISIBILITY:
+            row["visibility"] = VISIBILITY[key]
+        rows.append(row)
+    metrics = reference_evidence.metrics
+    reference_block = {
+        "name": reference_name,
+        "sha256": reference_sha256,
+        "case_id": reference_evidence.case_id,
+        "case_root": str(reference_case_root.resolve()),
+        "duration_s": _metric_value(metrics, "duration"),
+        "channels": _metric_value(metrics, "channels"),
+        "sample_rate": _metric_value(metrics, "sample_rate"),
+    }
+    return {
+        "reference": reference_block,
+        "loudness_normalization": {
+            "gain_db": deltas.normalization_gain_db if deltas.normalization_valid else None,
+            "valid": deltas.normalization_valid,
+            "method": deltas.normalized_method,
+        },
+        "metric_deltas": rows,
+        "band_deltas": {
+            "raw": deltas.raw_band_deltas,
+            "normalized": deltas.normalized_band_deltas,
+        },
+        "delta_spectrograms": ["delta_spectrum_linear.png", "delta_spectrum_log.png"],
+        "pair_checks": pair_checks,
+        "visibility_note": L2_VISIBILITY_NOTE,
+    }
+
+
+def build_compare_report(
+    compare_root: Path,
+    *,
+    candidate_case_root: Path,
+    reference_case_root: Path,
+    reference_evidence,
+    deltas,
+    pair_checks: dict,
+) -> dict:
+    """Assemble, schema-validate and persist a 0.2 ``compare`` report.
+
+    The report subject is the candidate; the reference enters only through the
+    comparison section. *compare_root* must already exist (the caller renders
+    delta spectrograms into it first).
+    """
+    compare_root = compare_root.resolve()
+    candidate_case_root = candidate_case_root.resolve()
+    reference_case_root = reference_case_root.resolve()
+    ref_case, _ref_metrics, ref_auditory = _load_case_bundle(reference_case_root)
+    comparison = _comparison_section(
+        deltas,
+        reference_evidence,
+        reference_name=ref_auditory.get("source_name") or reference_case_root.name,
+        reference_sha256=(ref_auditory.get("source_sha256")
+                          or ref_case.get("source_id") or "sha256:unknown"),
+        reference_case_root=reference_case_root,
+        pair_checks=pair_checks,
+    )
+    report = _assemble_report(
+        candidate_case_root,
+        job_type="compare",
+        comparison=comparison,
+        candidate_case_root=candidate_case_root,
+    )
+    (compare_root / "report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8",
     )
     return report
@@ -532,6 +748,10 @@ def write_report_bundle(case_root: Path, *, rewrite_json: bool = True) -> dict:
         report = build_protocol_report(case_root)
     else:
         report = json.loads(report_path.read_text(encoding="utf-8"))
+        if "comparison" in report:
+            # compare reports keep their images across three roots; re-render
+            # them through the compare-aware loader
+            return write_compare_bundle(case_root, report)
     images: dict[str, bytes] = {}
     for name in report["representation"]["spectrograms"]:
         path = case_root / name
@@ -540,5 +760,39 @@ def write_report_bundle(case_root: Path, *, rewrite_json: bool = True) -> dict:
     (case_root / "report.md").write_text(
         render_report_markdown(report), encoding="utf-8")
     (case_root / "report.html").write_text(
+        render_report_html(report, images), encoding="utf-8")
+    return report
+
+
+def write_compare_bundle(compare_root: Path, report: dict) -> dict:
+    """Render a compare report's markdown/HTML twins from assembled JSON.
+
+    Image namespaces in a compare report:
+    - ``scan/spectrum_*.png``      — candidate spectrograms, from ``case.case_root``
+    - ``reference/scan/spectrum_*``— reference spectrograms, from
+      ``comparison.reference.case_root``
+    - ``delta_spectrum_*.png``     — delta images, from the compare root itself
+    """
+    from moodify.auditory.report_render import render_report_html, render_report_markdown
+
+    compare_root = compare_root.resolve()
+    candidate_root = Path(report["case"]["case_root"])
+    reference_root = Path(report["comparison"]["reference"]["case_root"])
+    images: dict[str, bytes] = {}
+    for name in report["representation"]["spectrograms"]:
+        path = candidate_root / name
+        if path.is_file():
+            images[name] = path.read_bytes()
+    for name in report["comparison"]["delta_spectrograms"]:
+        path = compare_root / name
+        if path.is_file():
+            images[name] = path.read_bytes()
+    for name in ("scan/spectrum_linear.png", "scan/spectrum_log.png"):
+        path = reference_root / name
+        if path.is_file():
+            images[f"reference/{name}"] = path.read_bytes()
+    (compare_root / "report.md").write_text(
+        render_report_markdown(report), encoding="utf-8")
+    (compare_root / "report.html").write_text(
         render_report_html(report, images), encoding="utf-8")
     return report

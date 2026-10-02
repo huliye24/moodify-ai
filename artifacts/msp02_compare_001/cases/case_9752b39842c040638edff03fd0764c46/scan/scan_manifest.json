@@ -1,0 +1,52 @@
+{
+  "case_id": "case_9752b39842c040638edff03fd0764c46",
+  "stage": "source",
+  "input_path": "E:\\moodify\\demo\\input\\example.mp3",
+  "input_sha256": "a7b3ca0b99c28f9e15e9bbf585b9a6760fb118c9ad2181c7e7825517fb521f57",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "scan_profile_hash": "f0ff177ddc7b05d3a934848b9fd55d79a453b908707231360e772850afde45f1",
+  "artifacts": {
+    "spectrum_linear": {
+      "path": "E:\\moodify\\artifacts\\msp02_compare_001\\cases\\case_9752b39842c040638edff03fd0764c46\\scan\\spectrum_linear.png",
+      "sha256": "19521576fab9beb35c521143e894e514128d11425de69116633bfadc2c8a53db",
+      "size_bytes": 1495991
+    },
+    "spectrum_log": {
+      "path": "E:\\moodify\\artifacts\\msp02_compare_001\\cases\\case_9752b39842c040638edff03fd0764c46\\scan\\spectrum_log.png",
+      "sha256": "ece9a3de2ac38a7b039e044ed28919c06441bac0f416b8c64d7adf8a9e0ebc32",
+      "size_bytes": 1278395
+    },
+    "metrics": {
+      "path": "E:\\moodify\\artifacts\\msp02_compare_001\\cases\\case_9752b39842c040638edff03fd0764c46\\scan\\metrics.json",
+      "sha256": "b7922151847f4a634bb7bab186655469ff9d2d15041d96926576ca8045e2686d",
+      "size_bytes": 7967
+    },
+    "timeline": {
+      "path": "E:\\moodify\\artifacts\\msp02_compare_001\\cases\\case_9752b39842c040638edff03fd0764c46\\scan\\timeline_metrics.jsonl",
+      "sha256": "acfff5544d3acfadb142521a9940e71e0287174f1b8f1f9ecabe08ee6001721b",
+      "size_bytes": 115805
+    },
+    "analysis_data": {
+      "path": "E:\\moodify\\artifacts\\msp02_compare_001\\cases\\case_9752b39842c040638edff03fd0764c46\\scan\\analysis_data.npz",
+      "sha256": "642fe0a589380767a32edaa156a1e61b4e2d4ba2eae1a61361c2968bd8daf254",
+      "size_bytes": 7147647
+    }
+  },
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "numpy_version": "2.4.6",
+    "ffmpeg": null
+  },
+  "commands": [
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i E:\\moodify\\demo\\input\\example.mp3 -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=lin:win_func=hann:legend=1:drange=120:limit=0 E:\\moodify\\artifacts\\msp02_compare_001\\cases\\case_9752b39842c040638edff03fd0764c46\\scan\\spectrum_linear.png",
+      "return_code": 0
+    },
+    {
+      "command": "C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.exe -v error -y -i E:\\moodify\\demo\\input\\example.mp3 -lavfi aresample=48000,showspectrumpic=s=1600x760:mode=combined:color=viridis:scale=log:fscale=log:win_func=hann:legend=1:drange=120:limit=0 E:\\moodify\\artifacts\\msp02_compare_001\\cases\\case_9752b39842c040638edff03fd0764c46\\scan\\spectrum_log.png",
+      "return_code": 0
+    }
+  ],
+  "generated_at": "2026-10-02T05:13:04.090083+00:00"
+}

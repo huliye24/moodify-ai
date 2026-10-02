@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — MSP/0.2 compare 作业与 L2 对比层（Layer B，CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 仍是 v2.1 Sound Protocol 边界内的协议能力新增（设计提案 §6 Layer B 承诺边界），不改产品身份、authority order、One Core 规则；记录于此因新增协议语义与 CLI 表面（R7 可见性）。
+- **Why / evidence：** 2026-10-02 人类指令「继续」Layer B（比较层）；仓库已有 `auditory/comparison.py` 的 validate_pair/compute_deltas/Δ 频谱图机器（AS-001），Layer B 只做协议化，不新增 DSP、不新增阈值。
+- **Boundary：** compare 作业 = analyze×2（同一扫描剖面）+ 配对校验（profile 哈希/时长 ±50ms/声道，fail-closed）+ 响度对齐 delta（gain-to-before-LUFS）。`judgment_boundary.layer2_comparison` 仅 compare 报告为 EXECUTED；**delta 只描述、不评级**（显著性阈值属 Layer C 校准，`visibility_note` 写入报告本体）。schema 双向强制：analyze 报告不得携带 comparison，compare 报告必须携带。同 case 的 `validate_pair` 语义不变。
+- **Affected authority files：** `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_2.md`、`docs/REPOSITORY_STATUS.md`。代码面：`sound_protocol.py`（compare 校验/执行）、`protocol_report.py`（comparison section + build_compare_report + write_compare_bundle）、`report_render.py`（L2 md/html 渲染 + contact-sheet）、`comparison.py`（validate_compare_pair）。
+- **Migration：** 无破坏性变更；analyze/process 作业行为不变，report schema 仍为 EXPERIMENTAL 未冻结态下的 0.2 修订。
+- **Rollback：** 回退上述四个代码文件的 compare 支面即可；analyze 链路与既有 case/compare 证据包不受影响。
+
 ## 2026-10-02 — MSP/0.2 analyze 作业与报告三件套（Layer A，CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 本条是在 v2.1 Sound Protocol 边界内的协议能力新增，不改产品身份、不改 authority order、不改 One Core 规则；记录于此是因为它新增了对外的协议文档与 CLI 表面（R7 可见性）。

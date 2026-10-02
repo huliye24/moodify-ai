@@ -105,6 +105,36 @@ def render_report_markdown(report: dict) -> str:
             )
     lines.append("")
 
+    comparison = report.get("comparison")
+    if comparison:
+        ref = comparison["reference"]
+        norm = comparison["loudness_normalization"]
+        checks = comparison["pair_checks"]
+        lines.append("## 对比层（L2）")
+        lines.append("")
+        lines.append(f"- 参考：`{ref['name']}` / `{ref['sha256']}`（case `{ref['case_id']}`）")
+        if norm["valid"]:
+            lines.append(f"- 响度对齐：有效，增益 {norm['gain_db']:+g} dB（{norm['method']}）")
+        else:
+            lines.append("- 响度对齐：不可用（delta 仅原始值，未对齐）")
+        lines.append(
+            f"- 配对校验：profile 哈希一致 · 时长差 ≤{checks['duration_tolerance_s']:g}s · 声道一致"
+        )
+        lines.append("")
+        lines.append("| 指标 | 参考 | 候选 | Δ | 单位 | 方向 |")
+        lines.append("| --- | --- | --- | --- | --- | --- |")
+        for row in comparison["metric_deltas"]:
+            lines.append(
+                f"| `{row['id']}` | {_fmt(row['before'])} | {_fmt(row['after'])} "
+                f"| {_fmt(row['absolute_delta'])} | {_fmt(row['unit'])} | {row['direction']} |"
+            )
+        lines.append("")
+        lines.append("- Δ 频谱图（响度对齐后）："
+                     + ", ".join(f"`{name}`" for name in comparison["delta_spectrograms"]))
+        lines.append("")
+        lines.append(f"> {comparison['visibility_note']}")
+        lines.append("")
+
     lines.append("## 发现")
     if not report["findings"]:
         lines.append("")
@@ -245,6 +275,54 @@ def render_report_html(report: dict, images: dict[str, bytes] | None = None) -> 
         out.append("</tbody></table>")
     out.append("</section>")
 
+    comparison = report.get("comparison")
+    if comparison:
+        ref = comparison["reference"]
+        norm = comparison["loudness_normalization"]
+        checks = comparison["pair_checks"]
+        out.append('<section id="comparison"><h2>对比层（L2）</h2>')
+        out.append('<table><tbody>')
+        out.append(f"<tr><td>参考</td><td><code>{esc(ref['name'])}</code> · "
+                   f"<code>{esc(ref['sha256'])}</code> · case "
+                   f"<code>{esc(ref['case_id'])}</code></td></tr>")
+        if norm["valid"]:
+            out.append(f"<tr><td>响度对齐</td><td>有效，增益 "
+                       f"<strong>{norm['gain_db']:+g}</strong> dB"
+                       f"（{esc(norm['method'])}）</td></tr>")
+        else:
+            out.append("<tr><td>响度对齐</td><td>不可用（delta 仅原始值，未对齐）</td></tr>")
+        out.append(f"<tr><td>配对校验</td><td>profile 哈希一致 · 时长差 "
+                   f"≤{checks['duration_tolerance_s']:g}s · 声道一致</td></tr>")
+        out.append("</tbody></table>")
+        out.append('<table><thead><tr><th>指标</th><th>参考</th><th>候选</th>'
+                   '<th>Δ</th><th>单位</th><th>方向</th></tr></thead><tbody>')
+        for row in comparison["metric_deltas"]:
+            out.append(
+                f"<tr><td><code>{esc(row['id'])}</code></td>"
+                f"<td class=\"num\">{esc(_fmt(row['before']))}</td>"
+                f"<td class=\"num\">{esc(_fmt(row['after']))}</td>"
+                f"<td class=\"num\">{esc(_fmt(row['absolute_delta']))}</td>"
+                f"<td>{esc(_fmt(row['unit']))}</td><td>{esc(row['direction'])}</td></tr>"
+            )
+        out.append("</tbody></table>")
+        gallery = [("reference/scan/spectrum_linear.png", "参考频谱（linear）"),
+                   ("reference/scan/spectrum_log.png", "参考频谱（log）"),
+                   ("delta_spectrum_linear.png", "Δ 频谱（linear，响度对齐后）"),
+                   ("delta_spectrum_log.png", "Δ 频谱（log，响度对齐后）")]
+        out.append('<div class="gallery">')
+        for name, title in gallery:
+            data = images.get(name)
+            caption = esc(title)
+            if data is None:
+                out.append(f'<p class="missing">缺少图像 <code>{esc(name)}</code></p>')
+                continue
+            b64 = base64.b64encode(data).decode("ascii")
+            out.append(f'<figure><img alt="{caption}" src="data:image/png;base64,{b64}">'
+                       f'<figcaption>{caption}</figcaption></figure>')
+        out.append("</div>")
+        out.append(f'<p class="muted">{esc(comparison["visibility_note"])}</p>')
+        out.append("</section>")
+
     out.append('<section id="findings"><h2>发现</h2>')
     if not report["findings"]:
         out.append('<p class="muted">无。未发现触发阈值的技术风险。</p>')
@@ -357,6 +435,9 @@ pre { background:var(--panel); border:1px solid var(--line); border-radius:6px;
 figure { margin:10px 0 18px; }
 figure img { max-width:100%; border:1px solid var(--line); border-radius:6px; }
 figcaption { font-size:12.5px; color:var(--muted); margin-top:4px; }
+.gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+           gap:14px; margin:10px 0; }
+.gallery figure { margin:0; }
 .muted { color:var(--muted); }
 .missing { color:var(--warn); }
 .warn-note { color:var(--warn); }

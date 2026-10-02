@@ -70,6 +70,34 @@ def validate_pair(before: ScanEvidence, after: ScanEvidence) -> None:
         )
 
 
+def validate_compare_pair(reference: ScanEvidence, candidate: ScanEvidence) -> dict:
+    """Pair checks for MSP/0.2 compare jobs (reference vs candidate).
+
+    Same protective checks as ``validate_pair`` (profile basis, duration,
+    channels) but independent cases are expected, not rejected: a compare job
+    analyzes two separate audio files, so case IDs necessarily differ.
+    """
+    if reference.profile_hash != candidate.profile_hash:
+        raise ScanProfileMismatch("reference/candidate scan profile hashes differ")
+    duration_ok = abs(reference.duration_s - candidate.duration_s) <= DURATION_TOLERANCE_S
+    if not duration_ok:
+        raise ComparisonDurationMismatch(
+            f"duration mismatch: reference={reference.duration_s:.3f}s "
+            f"candidate={candidate.duration_s:.3f}s"
+        )
+    if reference.channels != candidate.channels:
+        raise ComparisonChannelMismatch(
+            f"channel mismatch: reference={reference.channels} "
+            f"candidate={candidate.channels}"
+        )
+    return {
+        "profile_hash_match": True,
+        "duration_within_tolerance": duration_ok,
+        "channels_match": True,
+        "duration_tolerance_s": DURATION_TOLERANCE_S,
+    }
+
+
 def _metric_value(metrics: dict, key: str) -> float | None:
     entry = metrics.get(key)
     if not isinstance(entry, dict):

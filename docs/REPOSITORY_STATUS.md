@@ -66,7 +66,7 @@ date: 2026-08-08
 | Cloud runtime（Ear 生产流量） | UNRESOLVED | 云端 API 壳运行，无生产流量（W01-P00） |
 | App integration | CANONICAL（对外面） | apps/music-android 3.1 + deliverables/releases |
 | MAMSE-001..012 | EXPERIMENTAL_ACCEPTED | artifacts/mamse_001..012 |
-| MSP/0.2 analyze 作业 + 0.2 报告三件套 | EXPERIMENTAL（本地 CLI 已实现，report schema 未冻结；运行时依赖 ffmpeg） | `sound_protocol.py`、`auditory/protocol_report.py`、`auditory/report_render.py`；`moodify protocol process`（0.2 analyze 作业）与 `moodify report` |
+| MSP/0.2 analyze/compare 作业 + 0.2 报告三件套 | EXPERIMENTAL（本地 CLI 已实现，report schema 未冻结；运行时依赖 ffmpeg） | `sound_protocol.py`、`auditory/protocol_report.py`、`auditory/report_render.py`、`auditory/comparison.py`；`moodify protocol process`（0.2 analyze/compare 作业）与 `moodify report`；compare 证据 `artifacts/msp02_compare_001/` |
 
 Allowed status values: `CANONICAL`, `EXPERIMENTAL`, `LEGACY`, `HISTORICAL`, `ABSENT`, `UNRESOLVED`, plus W01-P00 task states (`IMPLEMENTED_NOT_MERGED` 等) for unmerged work.
 
