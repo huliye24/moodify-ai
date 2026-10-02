@@ -26,13 +26,16 @@
   </header>
 
   <div id="main-row">
-    <!-- 左图标栏：打开 / 世界（视图走顶部标签页） -->
+    <!-- 左图标栏：1 打开 / 2 修音 / 3 世界（时钟=世界历史；视图主体走顶部标签页） -->
     <nav id="rail">
       <button id="rail-open" title="打开音频文件（创建/进入世界）" aria-label="打开音频文件">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
       </button>
-      <button id="rail-history" title="世界（双击进入）" aria-label="世界">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c-5.5 5.5-5.5 11.5 0 17M12 3.5c5.5 5.5 5.5 11.5 0 17"/></svg>
+      <button id="rail-fix" title="修音工作台" aria-label="修音工作台">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4v16M12 4v16M19 4v16"/><circle cx="5" cy="9" r="2.2"/><circle cx="12" cy="15" r="2.2"/><circle cx="19" cy="7" r="2.2"/></svg>
+      </button>
+      <button id="rail-history" title="世界（双击进入；时钟=世界历史）" aria-label="世界">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
       </button>
     </nav>
 
@@ -55,13 +58,14 @@
     <main id="workspace">
       <nav id="tabs" hidden>
         <button class="tab" id="tab-wave">波谱</button>
+        <button class="tab" id="tab-fix">修音</button>
         <button class="tab" id="tab-charts">图表</button>
         <button class="tab" id="tab-data">数据</button>
       </nav>
       <div id="views">
-        <section id="view-empty" class="workspace-view">
-          <img class="watermark" src="assets/moodify_logo.png" alt="">
-        </section>
+        <!-- 产品水印：透明底纹，常驻工作区背景层；结果内容叠加其上，不占布局 -->
+        <img id="wm" src="assets/moodify_watermark.png" alt="">
+        <section id="view-empty" class="workspace-view"></section>
 
         <section id="view-wave" class="workspace-view" hidden>
           <div id="wave-wrap" hidden>
@@ -70,6 +74,19 @@
           </div>
           <div id="spectrum-body" class="charts"></div>
           <p class="muted caption">音乐的声谱（实测渲染）；不构成审美或平台适配判断。</p>
+        </section>
+
+        <section id="view-fix" class="workspace-view" hidden>
+          <div id="fix-tracks" class="fix-tracks">
+            <div class="track" id="fix-source-track" hidden>
+              <div class="track-head">
+                <span class="track-name">源</span>
+                <span class="muted track-meta" id="fix-meta"></span>
+              </div>
+              <div class="track-strip"><canvas id="fix-strip" height="88"></canvas></div>
+            </div>
+          </div>
+          <p class="muted caption">源轨（只读）；渲染出的版本以轨道条形式叠加于此。</p>
         </section>
 
         <section id="view-charts" class="workspace-view" hidden>
@@ -105,7 +122,6 @@
     <div id="compiler-stream" class="compiler-stream" hidden></div>
     <div id="dock-bar" hidden>
       <span class="drawer-actions">
-        <button id="compiler-plan-btn" class="ghost" disabled title="打开世界后可用">生成方案</button>
         <button id="compiler-stop" class="ghost" hidden>停止</button>
         <button id="compiler-save" class="ghost" hidden title="把最后一条方案存为 plan.md">保存方案</button>
       </span>

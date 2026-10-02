@@ -20,8 +20,8 @@ const state = {
   wave: null,           // {lanes:[Float32Array(min,max)…], duration} peaks cache
 };
 
-const VIEWS = ['empty', 'wave', 'charts', 'data'];
-const VIEW_TAB = { wave: 'tab-wave', charts: 'tab-charts', data: 'tab-data' };
+const VIEWS = ['empty', 'wave', 'fix', 'charts', 'data'];
+const VIEW_TAB = { wave: 'tab-wave', fix: 'tab-fix', charts: 'tab-charts', data: 'tab-data' };
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -127,6 +127,7 @@ function selectView(name) {
   for (const [view, tabId] of Object.entries(VIEW_TAB)) {
     $(tabId).classList.toggle('active', view === name);
   }
+  $('rail-fix').classList.toggle('active', name === 'fix');
 }
 
 async function openReport(reportPath) {
@@ -272,11 +273,15 @@ async function renderWaveform(entryDir) {
     await ctx.close();
     if (state.caseDir !== entryDir) return; // world switched mid-decode
     state.wave = buildWavePeaks(audio);
-    $('wave-caption').textContent =
+    const meta =
       `${src.split(/[\\/]/).pop()} · ${audio.numberOfChannels}ch @ ${audio.sampleRate}Hz`
       + ` · ${audio.duration.toFixed(1)}s`;
+    $('wave-caption').textContent = meta;
+    $('fix-meta').textContent = meta;
     wrap.hidden = false; // 画好再现身：解码期间频谱先顶格，不留空白块
+    $('fix-source-track').hidden = false;
     drawWaveform();
+    drawFixStrip();
   } catch {
     if (state.caseDir === entryDir) wrap.hidden = true; // 波形是增益，失败静默降级
   }
@@ -357,6 +362,57 @@ function drawWaveform() {
   }
 }
 
+/** 修音工作台：AU/Pr 式源轨条（声道取包络并集的概览；与波谱页共用峰值缓存）。 */
+function drawFixStrip() {
+  const section = $('view-fix');
+  const track = $('fix-source-track');
+  if (!state.wave || section.hidden || track.hidden) return;
+  const { lanes, duration } = state.wave;
+  const canvas = $('fix-strip');
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = Math.max(400, canvas.parentElement.clientWidth);
+  const laneH = 72, rulerH = 16;
+  const cssH = laneH + rulerH;
+  canvas.style.width = '100%';
+  canvas.style.height = `${cssH}px`;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  const g = canvas.getContext('2d');
+  g.scale(dpr, dpr);
+  const cols = lanes[0].length / 2;
+  const mid = laneH / 2, half = laneH / 2 - 2;
+  g.fillStyle = '#f6f7ff';
+  g.fillRect(0, 0, cssW, laneH);
+  g.strokeStyle = '#e5e7eb';
+  g.strokeRect(0.5, 0.5, cssW - 1, laneH - 1);
+  g.strokeStyle = '#d1d5db';
+  g.beginPath(); g.moveTo(0, mid); g.lineTo(cssW, mid); g.stroke();
+  g.fillStyle = 'rgba(79, 70, 229, 0.78)';
+  for (let x = 0; x < cssW; x++) {
+    const c = Math.min(cols - 1, Math.floor((x / cssW) * cols));
+    let mn = 1.0, mx = -1.0;
+    for (const lane of lanes) {
+      if (lane[c * 2] < mn) mn = lane[c * 2];
+      if (lane[c * 2 + 1] > mx) mx = lane[c * 2 + 1];
+    }
+    const yMax = mid + mx * half;
+    const yMin = mid + mn * half;
+    g.fillRect(x, yMax, 1, Math.max(1, yMin - yMax));
+  }
+  const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300];
+  const stepSize = steps.find((s) => duration / s <= 10) || 600;
+  g.font = '10px "Segoe UI", sans-serif';
+  for (let t = 0; t <= duration; t += stepSize) {
+    const x = (t / duration) * cssW;
+    g.strokeStyle = '#f3f4f6';
+    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, laneH); g.stroke();
+    g.fillStyle = '#9ca3af';
+    const m = Math.floor(t / 60);
+    const s = Math.round(t % 60);
+    g.fillText(`${m}:${String(s).padStart(2, '0')}`, x + 2, cssH - 4);
+  }
+}
+
 function renderPlan(report) {
   const plan = report.plan || {};
   const findings = report.findings || [];
@@ -415,6 +471,13 @@ function renderPlan(report) {
     }
     body.appendChild(ul);
   }
+}
+
+/** 修音视图入口（tab 与 rail 共用）：先切视图再补画，画时宽度才有效。 */
+function openFixView() {
+  if (!state.caseDir) return;
+  selectView('fix');
+  drawFixStrip();
 }
 
 // ——— terminal drawer (xterm.js + node-pty, cwd = case dir) ———
@@ -497,13 +560,6 @@ window.moodify.onPtyExit((termId) => {
 
 // ——— Mood 编译器（Codex app-server kernel; claude channel fully replaced）———
 
-const PLAN_PROMPT = [
-  '请读取当前目录下的 report.json、measurements.json、judgment_rules.json，基于 L1 技术测量给出',
-  '【修音与混音方案】：1) 目标（可测量）；2) 逐步算子建议（算子/参数/理由，映射到标准算子',
-  ' gain/eq/limiter/compressor/stereo 等）；3) 验收指标（使用 report.json 中同 id 指标）；',
-  '4) 风险与边界（阈值 0/16 calibrated，全部 DEFAULT_UNCALIBRATED）。只输出方案正文（Markdown）。',
-].join('');
-
 const compiler = {
   ready: false,
   threadId: null,
@@ -553,7 +609,6 @@ function setCompilerBusy(busy) {
   compiler.busy = busy;
   $('compiler-stop').hidden = !busy;
   const worldOpen = Boolean(state.caseDir);
-  $('compiler-plan-btn').disabled = busy || !worldOpen;
   $('compiler-send').disabled = busy || !worldOpen;
   $('compiler-input').disabled = busy || !worldOpen;
 }
@@ -620,10 +675,6 @@ async function compilerSend(text) {
     compilerNote(`发送失败：${res.reason}`);
     setCompilerBusy(false);
   }
-}
-
-async function sendPlanRequest() {
-  await intentSend(PLAN_PROMPT);
 }
 
 async function savePlan() {
@@ -758,9 +809,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     selectView('wave');
     drawWaveform(); // 隐藏期间 clientWidth 归零过，重画一次
   });
+  $('tab-fix').addEventListener('click', openFixView);
+  $('rail-fix').addEventListener('click', openFixView);
   $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
   $('tab-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
-  window.addEventListener('resize', drawWaveform);
+  window.addEventListener('resize', () => { drawWaveform(); drawFixStrip(); });
   $('refresh').addEventListener('click', refreshArchive);
   const sendIntent = () => {
     const text = $('compiler-input').value;
@@ -780,7 +833,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     el.style.height = 'auto';
     el.style.height = `${Math.min(96, el.scrollHeight)}px`;
   });
-  $('compiler-plan-btn').addEventListener('click', sendPlanRequest);
   $('compiler-stop').addEventListener('click', () => window.moodify.codexInterrupt(compiler.threadId));
   $('compiler-save').addEventListener('click', savePlan);
   window.moodify.onCodexEvent(handleCodexEvent);
