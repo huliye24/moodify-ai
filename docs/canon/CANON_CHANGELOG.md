@@ -2,6 +2,14 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — Moodify Studio W1：IDE 布局骨架（图标栏 + 中央工作区 + 终端抽屉）（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因产品显示面骨架级重构（R7 可见性）。权威依据：`docs/plan/2026-10-02_MOODIFY_STUDIO_PRODUCT_DEFINITION.md`（人类四项裁决：claude CLI 过渡 / 贡献值本地账本 MVP / 一次到位 + 左侧 dock / 终端共存）。
+- **Boundary：** `moodify-desktop/` 渲染层重构为 IDE 骨架：44px 左图标栏（打开/历史档案/Mood 编译器，无功能的设置图标不渲染——无用元素必删）；历史档案收进左侧滑出面板（PS 式，双击打开 case）；中央工作区 = 空态/数据/图表/方案四视图（空态只有 logo 水印，**无占位文字**）；底部终端抽屉全局常驻（拖拽调高度、双击/箭头收起、cwd 跟随 case，"在此目录打开 Claude Code"移入抽屉标题栏）。新增拖拽音频入工作区即检测（Electron 32+ 移除 File.path，经 preload webUtils.getPathForFile）。**核心零改动；固定流程四步不变；W2 编译器对话、W3 贡献值账本未开工。**
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件、`docs/plan/2026-10-02_MOODIFY_STUDIO_PRODUCT_DEFINITION.md`（W1 依据）。代码面：`moodify-desktop/renderer/index.html`（骨架重构）、`renderer/style.css`（IDE 布局）、`renderer/app.js`（视图状态机/历史面板/抽屉/拖放）、`src/preload.js`（pathForFile 桥）。
+- **Migration：** 无破坏性变更；CLI 命令面、0.2 报告 schema、核心包无变化。
+- **Rollback：** 回退本 commit 即恢复页签式布局（615bd4f9）；定义文档保留。
+
 ## 2026-10-02 — 方案由 Claude Code 执笔 + 内嵌终端：测量事实与方案文本的责任分离（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因固定流程的"方案"一环改变了生成主体（R7 可见性）。人类指令原话要点："数据和图表出来之后，通过 claude code 去给出方案，里面可以加一个终端吗？可以打开 claude code"；同批：空态占位文字（"空闲，选择一首歌开始检测"）一律不要。

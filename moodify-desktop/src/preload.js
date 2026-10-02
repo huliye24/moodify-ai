@@ -5,11 +5,15 @@
  * let Claude Code author the plan. No node APIs reach the renderer.
  */
 
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('moodify', {
   env: () => ipcRenderer.invoke('env'),
   pickAudio: () => ipcRenderer.invoke('pick-audio'),
+  // drag-drop: Electron 32+ removed File.path — resolve via webUtils
+  pathForFile: (file) => {
+    try { return webUtils.getPathForFile(file); } catch { return file && file.path ? file.path : null; }
+  },
   listArchive: () => ipcRenderer.invoke('archive:list'),
   runAnalysis: (audioPath) => ipcRenderer.invoke('analysis:run', audioPath),
   readReport: (reportPath) => ipcRenderer.invoke('report:read', reportPath),

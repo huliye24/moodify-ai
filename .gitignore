@@ -254,3 +254,6 @@ docs/experiments/**/*.zip
 # Brand assets for the one-shell product (whitelisted against *.png above)
 !moodify-core-package/src/moodify/ui/assets/*.png
 !moodify-desktop/renderer/assets/*.png
+
+# Studio shell markup (whitelisted against *.html above)
+!moodify-desktop/renderer/index.html

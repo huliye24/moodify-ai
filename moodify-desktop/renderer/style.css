@@ -1,4 +1,4 @@
-/* Moodify one-shell product — white, hairline, brand accent. */
+/* Moodify Studio — IDE 骨架（图标栏 + 中央工作区 + 终端抽屉），白底 hairline 品牌色。 */
 
 :root {
   --bg: #ffffff;
@@ -11,35 +11,20 @@
 
 * { box-sizing: border-box; }
 
+html, body { height: 100%; }
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
   font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
   font-size: 14px;
-}
-
-section { padding: 0 24px 24px; }
-
-.topbar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 0 10px;
-  border-bottom: 1px solid var(--hairline);
+  flex-direction: column;
+  overflow: hidden;
 }
-
-.logo { height: 52px; display: block; }
-.logo.small { height: 40px; margin-right: 12px; }
-
-.report-title { display: flex; align-items: center; }
-.report-title h1 { margin: 0; font-size: 18px; }
-.report-title p { margin: 2px 0 0; }
-
-.top-actions { display: flex; align-items: center; gap: 14px; }
 
 .muted { color: var(--muted); }
-.archive-path { margin: 8px 0 0; font-size: 12px; }
 
 button {
   font: inherit;
@@ -57,32 +42,23 @@ button.primary:disabled { opacity: 0.55; cursor: default; }
 button.ghost { border: none; color: var(--muted); }
 button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 
-.list-head {
+/* ——— 顶栏 ——— */
+
+#topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 18px 0 6px;
-}
-
-table.data {
-  width: 100%;
-  border-collapse: collapse;
-}
-table.data th {
-  text-align: left;
-  color: var(--muted);
-  font-weight: normal;
+  gap: 14px;
+  padding: 10px 16px 8px;
   border-bottom: 1px solid var(--hairline);
-  padding: 8px 10px;
+  flex: none;
 }
-table.data td {
-  border-bottom: 1px solid var(--hairline);
-  padding: 8px 10px;
-}
-table.data tbody tr:hover { background: var(--accent-soft); cursor: pointer; }
-table.data tbody tr.static:hover { background: transparent; cursor: default; }
+.logo { height: 40px; display: block; }
+#case-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+#case-title h1 { margin: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#case-title p { margin: 2px 0 0; font-size: 12px; }
+#close-case { padding: 2px 8px; }
+.top-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 
-.badges { display: flex; gap: 8px; margin: 12px 0 0; }
 .badge {
   background: var(--accent-soft);
   color: var(--accent);
@@ -91,24 +67,88 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   font-size: 12px;
 }
 
-.tabs {
+/* ——— 主行：图标栏 | 历史面板 | 工作区 ——— */
+
+#main-row { flex: 1; display: flex; min-height: 0; }
+
+#rail {
+  width: 44px;
+  flex: none;
+  border-right: 1px solid var(--hairline);
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
   gap: 4px;
-  margin-top: 14px;
-  border-bottom: 1px solid var(--hairline);
 }
-.tab {
+#rail button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
   border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
+  border-radius: 8px;
   background: transparent;
   color: var(--muted);
-  padding: 9px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.tab:hover { background: transparent; color: var(--fg); }
-.tab.active { color: var(--fg); border-bottom-color: var(--accent); }
+#rail button:hover { background: var(--accent-soft); color: var(--fg); }
+#rail button.active { background: var(--accent-soft); color: var(--accent); }
+#rail button:disabled { opacity: 0.35; background: transparent; cursor: default; }
+#rail button:disabled:hover { color: var(--muted); }
 
-.tab-panel { padding-top: 12px; }
+#history-panel {
+  width: 320px;
+  flex: none;
+  border-right: 1px solid var(--hairline);
+  padding: 10px 12px;
+  overflow: auto;
+  animation: slide-in 0.15s ease;
+}
+@keyframes slide-in {
+  from { transform: translateX(-16px); opacity: 0.4; }
+}
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 6px;
+}
+.archive-path { margin: 10px 0 0; font-size: 11.5px; word-break: break-all; }
+
+#workspace { flex: 1; overflow: auto; padding: 14px 20px; position: relative; }
+#workspace.drop-target { outline: 2px dashed var(--accent); outline-offset: -6px; border-radius: 8px; }
+
+#view-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.watermark {
+  opacity: 0.07;
+  max-width: 340px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ——— 数据表 ——— */
+
+table.data { width: 100%; border-collapse: collapse; }
+table.data th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: normal;
+  border-bottom: 1px solid var(--hairline);
+  padding: 8px 10px;
+}
+table.data td { border-bottom: 1px solid var(--hairline); padding: 8px 10px; }
+table.data tbody tr:hover { background: var(--accent-soft); cursor: pointer; }
+table.data tbody tr.static:hover { background: transparent; cursor: default; }
+#history-panel table.data th, #history-panel table.data td { padding: 6px 8px; font-size: 12.5px; }
+
+/* ——— 图表 ——— */
 
 .charts { display: flex; flex-direction: column; gap: 14px; }
 .charts figure { margin: 0; }
@@ -119,17 +159,10 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   background: #fff;
 }
 .charts figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; }
-
 .caption { margin-top: 14px; font-size: 12px; }
 
-#plan-body h3 { font-size: 14px; margin: 14px 0 6px; }
-#plan-body .node { margin: 0 0 10px; }
-#plan-body .node .op { font-weight: 600; }
-#plan-body .node .reason { color: var(--muted); margin: 2px 0 0 16px; }
-#plan-body ul { margin: 4px 0; padding-left: 20px; }
-#plan-body li { margin: 2px 0; }
+/* ——— Mood 编译器（方案）——— */
 
-/* Claude-Code-authored plan (one-shot, streamed, saved as plan_claude.md) */
 .plan-gen {
   border: 1px solid var(--hairline);
   border-radius: 10px;
@@ -161,20 +194,44 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 }
 .draft-head { font-size: 14px; margin: 4px 0 6px; }
 
-/* embedded terminal (xterm.js over node-pty, cwd = case dir) */
-.term-head {
+#plan-body h3 { font-size: 14px; margin: 14px 0 6px; }
+#plan-body .node { margin: 0 0 10px; }
+#plan-body .node .op { font-weight: 600; }
+#plan-body .node .reason { color: var(--muted); margin: 2px 0 0 16px; }
+#plan-body ul { margin: 4px 0; padding-left: 20px; }
+#plan-body li { margin: 2px 0; }
+
+/* ——— 底部终端抽屉 ——— */
+
+#drawer {
+  flex: none;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  height: 240px;
+  min-height: 34px;
+  border-top: 1px solid var(--hairline);
+  background: var(--bg);
+}
+#drawer.collapsed { height: 34px !important; }
+#drawer-bar {
+  height: 34px;
+  flex: none;
+  display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 10px;
+  background: #fafafa;
+  cursor: row-resize;
+  user-select: none;
+  overflow: hidden;
 }
-#terminal {
-  height: 440px;
-  border: 1px solid var(--hairline);
-  border-radius: 8px;
-  padding: 6px 8px;
-  background: #fff;
-}
+#drawer.collapsed #drawer-bar { cursor: default; }
+#drawer-bar .muted { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.drawer-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+.drawer-actions button { padding: 2px 8px; font-size: 12px; }
+#terminal { flex: 1; min-height: 0; padding: 4px 8px; overflow: hidden; }
+#drawer.collapsed #terminal { display: none; }
 
 .error {
   color: #b91c1c;

@@ -1,8 +1,8 @@
 /**
- * Moodify desktop shell — renderer. Vanilla DOM, no frameworks: the product
- * is one shell with a fixed flow (pick a song → detect → data & charts →
- * plan). All measurement truth comes from the core's report.json; nothing
- * is recomputed or re-judged here.
+ * Moodify Studio — renderer. Vanilla DOM, no frameworks: an IDE-style shell
+ * (icon rail + central workspace + terminal drawer) around the fixed product
+ * flow: pick a song → detect → data & charts → plan. All measurement truth
+ * comes from the core's report.json; the plan is authored by Claude Code.
  */
 
 const $ = (id) => document.getElementById(id);
@@ -10,11 +10,15 @@ const state = {
   reportPath: null,
   caseDir: null,
   elapsedTimer: null,
-  term: null,       // xterm.Terminal
+  term: null,        // xterm.Terminal
+  fit: null,         // FitAddon
   termId: null,
-  termCwd: null,
+  termCwd: undefined, // undefined = terminal never created
   planRunning: false,
+  drawerCollapsed: false,
 };
+
+const VIEWS = ['empty', 'data', 'charts', 'plan'];
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -25,7 +29,13 @@ function fmt(value) {
   return value === null || value === undefined ? '—' : String(value);
 }
 
-// ——— hub ———
+function setStatus(text) {
+  const el = $('status-line');
+  el.textContent = text;
+  el.hidden = !text;
+}
+
+// ——— history archive (left slide-out panel) ———
 
 async function refreshArchive() {
   const rows = await window.moodify.listArchive();
@@ -37,7 +47,7 @@ async function refreshArchive() {
     const td = document.createElement('td');
     td.colSpan = 4;
     td.className = 'muted';
-    td.textContent = '档案为空——打开一首歌开始检测';
+    td.textContent = '档案为空';
     tr.appendChild(td);
     body.appendChild(tr);
     return;
@@ -54,23 +64,30 @@ async function refreshArchive() {
   }
 }
 
-function setStatus(text) {
-  const el = $('status-line');
-  el.textContent = text;
-  el.hidden = !text;
+function toggleHistoryPanel(force) {
+  const panel = $('history-panel');
+  const show = force !== undefined ? force : panel.hidden;
+  panel.hidden = !show;
+  $('rail-history').classList.toggle('active', show);
 }
+
+// ——— detection (fixed flow step 1→2) ———
 
 async function pickAndAnalyze() {
   const audioPath = await window.moodify.pickAudio();
-  if (!audioPath) return;
-  const button = $('open-audio');
+  if (audioPath) await runAnalysisPath(audioPath);
+}
+
+async function runAnalysisPath(audioPath) {
+  const button = $('rail-open');
   button.disabled = true;
+  const name = audioPath.split(/[\\/]/).pop();
   const startedAt = Date.now();
   clearInterval(state.elapsedTimer);
   state.elapsedTimer = setInterval(() => {
-    setStatus(`检测中：${audioPath.split(/[\\/]/).pop()} …（${Math.round((Date.now() - startedAt) / 1000)}s，完整测量链路）`);
+    setStatus(`检测中：${name} …（${Math.round((Date.now() - startedAt) / 1000)}s，完整测量链路）`);
   }, 500);
-  setStatus(`检测中：${audioPath.split(/[\\/]/).pop()} …（完整测量链路，约几十秒到几分钟）`);
+  setStatus(`检测中：${name} …（完整测量链路，约几十秒到几分钟）`);
   try {
     const result = await window.moodify.runAnalysis(audioPath);
     clearInterval(state.elapsedTimer);
@@ -87,19 +104,24 @@ async function pickAndAnalyze() {
 }
 
 function showError(message) {
-  const hub = $('hub-view');
+  const ws = $('workspace');
   let box = $('error-box');
   if (!box) {
     box = document.createElement('div');
     box.id = 'error-box';
     box.className = 'error';
-    hub.appendChild(box);
+    ws.prepend(box);
   }
   box.textContent = message;
   setTimeout(() => box.remove(), 12000);
 }
 
-// ——— report view ———
+// ——— workspace views ———
+
+function selectView(name) {
+  for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
+  $('rail-compiler').classList.toggle('active', name === 'plan');
+}
 
 async function openReport(reportPath) {
   let report;
@@ -111,12 +133,6 @@ async function openReport(reportPath) {
   }
   state.reportPath = reportPath;
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
-  $('hub-view').hidden = true;
-  $('report-view').hidden = false;
-  $('plan-output').hidden = true;
-  $('plan-output').textContent = '';
-  $('plan-saved').hidden = true;
-  $('term-cwd').textContent = `目录：${state.caseDir}`;
 
   const source = report.source || {};
   const technical = report.technical_state || {};
@@ -131,11 +147,43 @@ async function openReport(reportPath) {
   ].join(' · ');
   $('badge-overall').textContent = technical.overall || '?';
   $('badge-decision').textContent = technical.workflow_decision || '?';
+  $('badge-overall').hidden = false;
+  $('badge-decision').hidden = false;
+  $('case-title').hidden = false;
 
+  $('plan-output').hidden = true;
+  $('plan-output').textContent = '';
+  $('plan-saved').hidden = true;
+
+  $('rail-compiler').disabled = false;
+  toggleHistoryPanel(false);
   renderMeasurements(report.measurements || []);
   renderPlan(report);
-  selectTab('data');
+  selectView('data');
+  fitTerminalSoon();
   await renderCharts(reportPath, report);
+  await ensureTerminal();
+}
+
+function closeCase() {
+  state.reportPath = null;
+  state.caseDir = null;
+  $('case-title').hidden = true;
+  $('badge-overall').hidden = true;
+  $('badge-decision').hidden = true;
+  $('rail-compiler').disabled = true;
+  $('rail-compiler').classList.remove('active');
+  selectView('empty');
+  setStatus('');
+  // fresh terminal for whatever comes next (cwd follows the case)
+  if (state.term) {
+    window.moodify.termKill(state.termId);
+    state.term.dispose();
+    state.term = null;
+    state.fit = null;
+    state.termId = null;
+    state.termCwd = undefined;
+  }
 }
 
 function renderMeasurements(measurements) {
@@ -145,7 +193,7 @@ function renderMeasurements(measurements) {
     const tr = document.createElement('tr');
     for (const key of ['id', 'value', 'unit', 'status', 'group']) {
       const td = document.createElement('td');
-      td.textContent = key === 'value' ? fmt(m[key]) : fmt(m[key]);
+      td.textContent = fmt(m[key]);
       tr.appendChild(td);
     }
     body.appendChild(tr);
@@ -264,26 +312,15 @@ function renderPlan(report) {
   }
 }
 
-// ——— navigation ———
-
-function selectTab(name) {
-  for (const tab of document.querySelectorAll('.tab')) {
-    tab.classList.toggle('active', tab.dataset.tab === name);
-  }
-  for (const panel of document.querySelectorAll('.tab-panel')) {
-    panel.hidden = panel.id !== `tab-${name}`;
-  }
-  if (name === 'terminal') {
-    ensureTerminal();
-    if (state.term) state.term.focus();
-  }
-}
-
-// ——— embedded terminal (xterm.js + node-pty, cwd = case dir) ———
+// ——— terminal drawer (xterm.js + node-pty, cwd = case dir) ———
 
 function ensureTerminal() {
-  if (state.term && state.termCwd === state.caseDir) return;
-  if (state.term) window.moodify.termKill(state.termId);
+  if (state.drawerCollapsed) return;
+  if (state.term && state.termCwd === state.caseDir) { fitTerminalSoon(); return; }
+  if (state.term) {
+    window.moodify.termKill(state.termId);
+    state.term.dispose();
+  }
   $('terminal').textContent = '';
   const term = new window.Terminal({
     fontSize: 13,
@@ -294,15 +331,62 @@ function ensureTerminal() {
   const fit = new window.FitAddon.FitAddon();
   term.loadAddon(fit);
   term.open($('terminal'));
-  fit.fit();
-  const termId = `term-${Date.now()}`;
   state.term = term;
-  state.termId = termId;
+  state.fit = fit;
+  state.termId = `term-${Date.now()}`;
   state.termCwd = state.caseDir;
-  term.onData((data) => window.moodify.termWrite(termId, data));
-  term.onResize(({ cols, rows }) => window.moodify.termResize(termId, cols, rows));
-  window.addEventListener('resize', () => fit.fit());
-  window.moodify.createTerminal(termId, state.caseDir);
+  term.onData((data) => window.moodify.termWrite(state.termId, data));
+  term.onResize(({ cols, rows }) => window.moodify.termResize(state.termId, cols, rows));
+  window.moodify.createTerminal(state.termId, state.caseDir);
+  $('term-cwd').textContent = state.caseDir ? `目录：${state.caseDir}` : '目录：档案根';
+  fitTerminalSoon();
+}
+
+function fitTerminalSoon() {
+  requestAnimationFrame(() => {
+    if (state.fit) { try { state.fit.fit(); } catch { /* not visible yet */ } }
+  });
+}
+
+function setDrawerCollapsed(collapsed) {
+  state.drawerCollapsed = collapsed;
+  $('drawer').classList.toggle('collapsed', collapsed);
+  $('drawer-toggle').textContent = collapsed ? '▴' : '▾';
+  if (!collapsed) ensureTerminal();
+}
+
+function initDrawer() {
+  $('drawer-toggle').addEventListener('click', () => setDrawerCollapsed(!state.drawerCollapsed));
+  const bar = $('drawer-bar');
+  bar.addEventListener('dblclick', (e) => {
+    if (e.target.closest('button')) return;
+    setDrawerCollapsed(!state.drawerCollapsed);
+  });
+  // drag the bar up/down to resize; buttons keep their click behavior
+  let startY = 0, startH = 0, dragging = false;
+  bar.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button') || state.drawerCollapsed) return;
+    dragging = true;
+    startY = e.clientY;
+    startH = $('drawer').getBoundingClientRect().height;
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const h = Math.min(600, Math.max(90, startH + (startY - e.clientY)));
+    $('drawer').style.height = `${h}px`;
+    fitTerminalSoon();
+  });
+  window.addEventListener('mouseup', () => { dragging = false; });
+  window.addEventListener('resize', fitTerminalSoon);
+}
+
+function launchClaudeInTerminal() {
+  setDrawerCollapsed(false);
+  // give a freshly spawned shell a moment before typing into it
+  setTimeout(() => {
+    if (state.termId) window.moodify.termRunCommand(state.termId, 'claude');
+  }, 600);
 }
 
 window.moodify.onPtyData((termId, data) => {
@@ -314,7 +398,7 @@ window.moodify.onPtyExit((termId) => {
   }
 });
 
-// ——— plan generation by Claude Code (one-shot, streamed, saved to the case) ———
+// ——— Mood 编译器（plan generation; claude CLI kernel, direct API later）———
 
 async function generatePlan() {
   if (state.planRunning || !state.caseDir) return;
@@ -341,14 +425,6 @@ async function generatePlan() {
   }
 }
 
-function launchClaudeInTerminal() {
-  selectTab('terminal');
-  // give a freshly spawned shell a moment before typing into it
-  setTimeout(() => {
-    if (state.termId) window.moodify.termRunCommand(state.termId, 'claude');
-  }, 600);
-}
-
 window.moodify.onPlanChunk((text) => {
   const output = $('plan-output');
   output.textContent += text;
@@ -364,33 +440,51 @@ window.moodify.onPlanDone((code, savedPath) => {
     saved.textContent = `已保存：${savedPath}`;
     saved.hidden = false;
   } else if (code !== 0) {
-    saved.textContent = `生成未完成（退出码 ${code}）——可在终端页手动运行 claude 继续。`;
+    saved.textContent = `生成未完成（退出码 ${code}）——可在终端手动运行 claude 继续。`;
     saved.hidden = false;
   }
 });
-
-function backToArchive() {
-  $('report-view').hidden = true;
-  $('hub-view').hidden = false;
-  setStatus('');
-}
 
 // ——— boot ———
 
 window.addEventListener('DOMContentLoaded', async () => {
   const env = await window.moodify.env();
-  $('archive-path').textContent = `档案目录：${env.casesRoot}`;
+  $('archive-path').textContent = env.casesRoot;
   if (!env.coreReady) {
     setStatus('核心不可用 — 请先安装 moodify 包（pip install -e moodify-core-package）');
   }
-  $('open-audio').addEventListener('click', pickAndAnalyze);
+
+  $('rail-open').addEventListener('click', pickAndAnalyze);
+  $('rail-history').addEventListener('click', () => toggleHistoryPanel());
+  $('rail-compiler').addEventListener('click', () => {
+    if (state.caseDir) selectView('plan');
+  });
+  $('close-case').addEventListener('click', closeCase);
   $('refresh').addEventListener('click', refreshArchive);
-  $('back-archive').addEventListener('click', backToArchive);
   $('generate-plan').addEventListener('click', generatePlan);
   $('stop-plan').addEventListener('click', () => window.moodify.stopPlan());
   $('launch-claude').addEventListener('click', launchClaudeInTerminal);
-  for (const tab of document.querySelectorAll('.tab')) {
-    tab.addEventListener('click', () => selectTab(tab.dataset.tab));
-  }
+  initDrawer();
+  initDrop();
+  if (!state.drawerCollapsed) ensureTerminal();
   await refreshArchive();
 });
+
+// ——— drag & drop audio onto the workspace ———
+
+function initDrop() {
+  const ws = $('workspace');
+  ws.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    ws.classList.add('drop-target');
+  });
+  ws.addEventListener('dragleave', () => ws.classList.remove('drop-target'));
+  ws.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    ws.classList.remove('drop-target');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!file) return;
+    const p = await window.moodify.pathForFile(file);
+    if (p) await runAnalysisPath(p);
+  });
+}

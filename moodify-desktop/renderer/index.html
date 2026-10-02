@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' file:; style-src 'self'">
+  <title>Moodify Studio</title>
+  <link rel="stylesheet" href="vendor/xterm.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 顶栏：logo + 当前 case + 事件状态（只在有事发生时出现） -->
+  <header id="topbar">
+    <img class="logo" src="assets/moodify_logo.png" alt="Moodify">
+    <div id="case-title" hidden>
+      <div>
+        <h1 id="source-name"></h1>
+        <p class="muted" id="report-meta"></p>
+      </div>
+      <button id="close-case" class="ghost" title="关闭当前 case">✕</button>
+    </div>
+    <div class="top-actions">
+      <span id="status-line" class="muted" hidden></span>
+      <span id="badge-overall" class="badge" hidden></span>
+      <span id="badge-decision" class="badge" hidden></span>
+    </div>
+  </header>
+
+  <div id="main-row">
+    <!-- 左图标栏（PS/PyCharm 式）：打开 / 历史 / Mood 编译器 -->
+    <nav id="rail">
+      <button id="rail-open" title="打开音频文件" aria-label="打开音频文件">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+      </button>
+      <button id="rail-history" title="历史档案" aria-label="历史档案">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+      </button>
+      <button id="rail-compiler" title="Mood 编译器" aria-label="Mood 编译器" disabled>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>
+      </button>
+    </nav>
+
+    <!-- 历史档案面板：从左滑出，可收起 -->
+    <aside id="history-panel" hidden>
+      <div class="list-head">
+        <span class="muted">历史档案（双击打开）</span>
+        <button id="refresh" class="ghost">刷新</button>
+      </div>
+      <table class="data">
+        <thead><tr>
+          <th>源文件</th><th>分析时间</th><th>状态</th><th>判定</th>
+        </tr></thead>
+        <tbody id="archive-body"></tbody>
+      </table>
+      <p class="muted archive-path" id="archive-path"></p>
+    </aside>
+
+    <!-- 中央工作区：空态 / 数据 / 图表 / 方案（Mood 编译器） -->
+    <main id="workspace">
+      <section id="view-empty" class="workspace-view">
+        <img class="watermark" src="assets/moodify_logo.png" alt="">
+      </section>
+
+      <section id="view-data" class="workspace-view" hidden>
+        <table class="data">
+          <thead><tr><th>指标</th><th>值</th><th>单位</th><th>状态</th><th>组</th></tr></thead>
+          <tbody id="measure-body"></tbody>
+        </table>
+      </section>
+
+      <section id="view-charts" class="workspace-view" hidden>
+        <div id="charts-body" class="charts"></div>
+        <p class="muted caption">实测值展示；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断。</p>
+      </section>
+
+      <section id="view-plan" class="workspace-view" hidden>
+        <div class="plan-gen">
+          <div class="plan-gen-head">
+            <div>
+              <h3>修音与混音方案（Mood 编译器）</h3>
+              <p class="muted">基于本 case 的 report.json / measurements.json / judgment_rules.json 生成</p>
+            </div>
+            <div class="plan-gen-actions">
+              <button id="generate-plan" class="primary">生成方案</button>
+              <button id="stop-plan" class="ghost" hidden>停止</button>
+            </div>
+          </div>
+          <pre id="plan-output" class="plan-output" hidden></pre>
+          <p class="muted caption" id="plan-saved" hidden></p>
+        </div>
+        <h3 class="draft-head">规则草案（保守，DRAFT_PLAN_NOT_EXECUTED）</h3>
+        <div id="plan-body"></div>
+        <p class="muted caption">本页只呈现 L1 技术测量与保守草案；不含听感、音乐或商业判断。方案不等于执行。</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- 底部终端抽屉：拖拽调高度，双击标题或箭头收起 -->
+  <div id="drawer">
+    <div id="drawer-bar" title="拖拽调高度，双击收起/展开">
+      <span class="muted" id="term-cwd"></span>
+      <span class="drawer-actions">
+        <button id="launch-claude" class="ghost">在此目录打开 Claude Code</button>
+        <button id="drawer-toggle" class="ghost" title="收起/展开终端">▾</button>
+      </span>
+    </div>
+    <div id="terminal"></div>
+  </div>
+
+  <script src="vendor/xterm.js"></script>
+  <script src="vendor/addon-fit.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
