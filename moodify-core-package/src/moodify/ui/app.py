@@ -1,10 +1,12 @@
-"""Moodify desktop app — open audio, analyze in place, browse the archive.
+"""Moodify desktop app — the company's one-shell desktop software.
 
-The GUI entry the human asked for (2026-10-02): pick a song with a file
-dialog, analyze it inside the app (worker thread, UI stays responsive),
-and every case lands in a permanent archive that reopens instantly from
-the history list — no re-analysis. Everything happens inside the Moodify
-window; nothing here leads out of the ecosystem.
+Product definition (human, 2026-10-02): ONE shell, white, carrying the
+company logo. The flow is fixed: pick a song → detect → data & charts →
+repair/mixing plan. Pick a song with the file dialog, analyze inside the
+app (worker thread, UI stays responsive), and every case lands in a
+permanent archive that reopens instantly from the history list — no
+re-analysis. The report view (数据 / 图表 / 后处理方案) is the same shell
+navigated in place; nothing here leads out of the ecosystem.
 
 Run standalone:
 
@@ -24,6 +26,7 @@ from pathlib import Path
 from typing import Any
 
 from moodify.ui.report_window import build_report_frame
+from moodify.ui.theme import apply_white_theme, load_logo, set_app_icon
 
 DEFAULT_CASES_ROOT = Path.home() / ".moodify" / "cases"
 
@@ -101,7 +104,8 @@ class MoodifyApp:
             style.theme_use("clam")
         except tk.TclError:
             pass
-        style.configure("Badge.TLabel", padding=(8, 2))
+        apply_white_theme(self.root, style)
+        set_app_icon(self.root)
 
         self._show_hub()
         self._poll()
@@ -112,17 +116,20 @@ class MoodifyApp:
         from tkinter import ttk
 
         self._clear()
-        top = ttk.Frame(self.root, padding=(12, 10))
+        top = ttk.Frame(self.root, padding=(14, 12))
         top.pack(fill="x")
+        logo = load_logo(280)
+        if logo is not None:
+            ttk.Label(top, image=logo).pack(side="left")
+            top.image = logo  # keep a reference (photo is GC-able otherwise)
         self.open_button = ttk.Button(top, text="打开音频文件…", command=self._open_audio)
-        self.open_button.pack(side="left")
-        ttk.Button(top, text="实验台", command=self._show_lab).pack(side="right")
-        self.status_var = tk.StringVar(value="空闲 — 选择一首歌开始分析")
-        ttk.Label(top, textvariable=self.status_var, foreground="#555").pack(
-            side="left", padx=12)
+        self.open_button.pack(side="right")
+        self.status_var = tk.StringVar(value="空闲 — 选择一首歌开始检测")
+        ttk.Label(top, textvariable=self.status_var, style="Muted.TLabel").pack(
+            side="right", padx=12)
 
         ttk.Label(self.root, text=f"档案目录：{self.cases_root}",
-                  foreground="#888").pack(anchor="w", padx=12)
+                  style="Muted.TLabel").pack(anchor="w", padx=14)
 
         list_frame = ttk.Frame(self.root, padding=(12, 4))
         list_frame.pack(fill="both", expand=True)
@@ -147,12 +154,6 @@ class MoodifyApp:
     def _clear(self) -> None:
         for child in self.root.winfo_children():
             child.destroy()
-
-    def _show_lab(self) -> None:
-        from moodify.ui.lab import build_lab_frame
-
-        self._clear()
-        build_lab_frame(self.root, self.cases_root, on_back=self._show_hub)
 
     def _refresh(self) -> None:
         rows = scan_case_archive(self.cases_root)

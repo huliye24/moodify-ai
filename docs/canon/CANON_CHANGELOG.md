@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — 产品定义定稿：单壳白底公司桌面软件 + 固定流程；实验台移除（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因这是产品显示面的定稿决策（R7 可见性）。人类指令原话要点：不要两个壳，实验台去掉；恢复数据/图表/后处理方案的壳；用公司 logo（`E:\moodify\logo`，采用 `moodify-horizontal.png`）做成公司的桌面端软件，采用白色；流程固定：选择歌曲 → 检测 → 根据数据和图表给出修音与混音方案。
+- **Why / evidence：** 2026-10-02 人类看过实验台窗口后裁决"我不要 2 个壳"——科研可观测性由报告三件套（json/md/html）与档案事实承载，不设独立研究壳。
+- **Boundary：** 删除 `moodify.ui.lab`（上一条目所记实验台，存活一版即被人类裁决移除）；应用回到单壳 = 档案中枢（选歌/历史）+ 报告视图（数据/图表/后处理方案，同壳内导航）。新增 `moodify.ui.theme`（白底主题、公司 logo、窗口图标；品牌资产 `moodify/ui/assets/*.png` 入包，pyproject package-data 声明；资产缺失时优雅降级为文字，不崩测量工具）。固定流程以产品窗口呈现：选歌 → 检测 → 数据/图表 → 后处理方案（修音与混音草案，DRAFT_PLAN_NOT_EXECUTED）。compare/观测能力仍走 CLI 与报告导出物（引擎未动）。
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件。代码面：`moodify/ui/theme.py`（新）、`moodify/ui/assets/`（品牌资产，公司版权）、`moodify/ui/app.py`（单壳白底）、`moodify/ui/report_window.py`（同壳品牌化）、`pyproject.toml`（package-data）、删除 `moodify/ui/lab.py` 与 `tests/ui/test_lab.py`。
+- **Migration：** 无破坏性变更；CLI 命令面不变；0.2 报告 schema 未动。
+- **Rollback：** 回退本 commit 即恢复实验台（8e32e85e 仍在历史）；品牌资产与主题模块独立可回退。
+
 ## 2026-10-02 — Moodify 实验台：科研 GUI 优先，GUI-first 开发教义（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因开发教义与人机界面优先级翻转是产品级决策（R7 可见性）。人类指令原话要点：先要有科研一样的 GUI，然后才可以有 CLI——要知道在发生什么、可以发生什么、怎么优化迭代。

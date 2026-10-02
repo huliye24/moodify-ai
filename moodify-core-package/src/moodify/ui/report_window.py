@@ -189,6 +189,8 @@ def build_report_frame(parent, report: dict[str, Any], report_path: Path,
     import tkinter as tk
     from tkinter import ttk
 
+    from moodify.ui.theme import load_logo
+
     view_model = build_report_view_model(report)
     frame = ttk.Frame(parent)
 
@@ -196,6 +198,10 @@ def build_report_frame(parent, report: dict[str, Any], report_path: Path,
     header.pack(fill="x")
     title_line = ttk.Frame(header)
     title_line.pack(fill="x")
+    logo = load_logo(168)
+    if logo is not None:
+        ttk.Label(title_line, image=logo).pack(side="left", padx=(0, 14))
+        title_line.image = logo
     ttk.Label(title_line, text=view_model["source_name"], font=("TkDefaultFont", 14, "bold")
               ).pack(side="left")
     if on_back is not None:
@@ -342,7 +348,10 @@ def launch(report_path: Path) -> int:
         style.theme_use("clam")
     except tk.TclError:
         pass
-    style.configure("Badge.TLabel", padding=(8, 2))
+    from moodify.ui.theme import apply_white_theme, set_app_icon
+
+    apply_white_theme(root, style)
+    set_app_icon(root)
     build_report_frame(root, report, Path(report_path))
     root.mainloop()
     return 0
