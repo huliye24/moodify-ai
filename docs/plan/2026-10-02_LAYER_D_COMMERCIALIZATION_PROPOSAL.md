@@ -1,7 +1,7 @@
 # Layer D — 商业化前置 独立提案
 
 **日期：** 2026-10-02
-**状态：** PROPOSAL — 待人类裁决（§5）
+**状态：** ADJUDICATED — 四项裁决已落（§8）；D-0 工程前置已实施（§9）
 **Canon 依据：** v2.1 Sound Protocol（`b6673830`）+ v2.0 Professional Finishing（`a69c3e3c`）
 **上游：** `docs/plan/2026-10-02_MSP02_ANALYSIS_JOB_AND_DISPLAY_DESIGN.md` §6（Layer A `68af88e4` / B `f7ceb999` / C `a868ccdc` 已完成，五道门全绿）
 **授权记录：** 2026-10-02 人类指令「去做」（对 Layer D 开工的授权）；本提案按该层自身约定「开工前须独立提案」编写
@@ -84,6 +84,29 @@ F9：公共品牌已冻结，无需重新发明；商业面的命名沿用 Moodi
 
 定价数字、收款/支付集成、市场推广、官网改版、token/链上任何动作、App 消费端商业化、对尚不存在的客户做任何承诺。
 
+## 8. 裁决记录（2026-10-02，人类逐项裁决）
+
+| # | 裁决 | 与推荐的差异 | 落地含义 |
+|---|---|---|---|
+| LD-1 | **保持 GPL-3.0-only** | 否决了双许可推荐 | LICENSE/SPDX 零改动；商业化 = 服务/支持/托管，不卖闭源授权 |
+| LD-2 | **仅 pip** | 否决了容器推荐 | pip/PyPI 是唯一分发形态；云端与私有部署均用裸 Python 安装；无容器、无单二进制 |
+| LD-3 | **先私有部署交付** | 否决了云 MVP 推荐 | 不上云、不建 API key/账本；交付物 = 可安装包 + 部署/安装文档 + doctor 探测 |
+| LD-4 | **定价延后** | 与推荐一致 | 只落定价结构占位（计价维度候选 + 数字 HUMAN_DECISION_REQUIRED），见下 |
+
+**定价结构占位（LD-4，数字永远人类给）：**
+- 计价维度候选：per-audio-minute（分析/完成时长）、per-seat（私有部署年费，含更新与支持）、per-project（按项目打包）。
+- 原则占位：GPL-3.0-only 下可售的是**服务与劳动**（部署、集成、调优、支持、托管），不是软件许可本身；定价文档落地时必须引用本条。
+
+## 9. D-0 工程前置实施记录（2026-10-02，代码见后续 commit）
+
+| 项 | 状态 | 证据 |
+|---|---|---|
+| D-ENG-1 版本统一 | ✅ pyproject `0.1.0` → `1.0.0-rc.1`，与 `release.PRODUCT_VERSION` 一致；测试钉死两者相等 | `tests/test_layer_d_packaging.py::test_package_version_matches_runtime_version` |
+| D-ENG-2 doctor | ✅ `moodify doctor`：stdout 恒 JSON，python/core/判断规则版本/ffmpeg（复用运行时解析器 `_which_ffmpeg`，含 winget 路径）/8 个关键依赖可导入性+版本；诊断恒 exit 0，可用性由 `ready` 字段承载；缺失时给 `hint` | 同上 3 个 doctor 测试 |
+| D-ENG-3 构建验证 | ✅ `python -m build` 出 sdist+wheel（`moodify-1.0.0rc1`）；干净 venv 安装 + `moodify --version` + `moodify doctor` 冒烟 | `artifacts/msp02_layer_d_001/`（build_dist/ + doctor_clean_install.json） |
+
+**未做（被裁决或显式后置）：** D-1 license 落地 = 按 LD-1 为零改动（无工作）；D-2 发布渠道 = 公开 PyPI 上架是外部发布动作，须人类另行明确指令；D-3 云端计量 = 按 LD-3 关闭（改为私有部署交付路径，已由 D-0 三项 + doctor 覆盖）；D-4 = 结构占位已落 §8，等人类给数字。
+
 ---
 
-*事实边界：§2 勘察快照为 2026-10-02 状态。F7 节点事实来自记忆与既有证据包，未做当日连通性验证——D-3 开工前须先做节点探活。*
+*事实边界：§2 勘察快照为 2026-10-02 状态。F7 节点事实来自记忆与既有证据包，未做当日连通性验证——云端方向已按 LD-3 关闭，该验证仅在推翻裁决时需要。*

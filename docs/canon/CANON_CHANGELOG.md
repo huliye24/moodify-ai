@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — 商业化路径裁决：GPL-only 服务模式 + 仅 pip 私有部署（Layer D，CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因商业化路径是产品级决策（R7 可见性）。
+- **Why / evidence：** 2026-10-02 人类对 Layer D 独立提案四项逐一裁决（提案 `docs/plan/2026-10-02_LAYER_D_COMMERCIALIZATION_PROPOSAL.md` §8 裁决记录；AI 推荐的双许可与容器方案被否，按人类裁决执行）。
+- **Boundary：** license 保持 **GPL-3.0-only**（可售的是服务与劳动——部署、集成、调优、支持、托管——不是软件许可本身）；**pip/PyPI 为唯一分发形态**（无容器、无单二进制）；交付走**私有部署**（不上云、不建 API key/用量账本/计费）；**定价延后**（计价维度结构占位已落提案 §8，数字永久 HUMAN_DECISION_REQUIRED）。
+- **Affected authority files：** `docs/plan/2026-10-02_LAYER_D_COMMERCIALIZATION_PROPOSAL.md`、`docs/REPOSITORY_STATUS.md`、本文件。代码面（D-0 工程前置）：`release_cli.py`（`moodify doctor` 环境探测）、`pyproject.toml`（版本统一至 1.0.0-rc.1）、`tests/test_layer_d_packaging.py`（版本一致钉死 + doctor 测试）。
+- **Migration：** 无破坏性变更；doctor 为新增只读诊断命令（恒 exit 0，可用性由 `ready` 字段承载）。
+- **Rollback：** 回退 D-0 代码 commit 与本条即可；裁决本身记录于提案 §8，回退代码不回退裁决记录。
+
 ## 2026-10-02 — 阈值来源化与敏感性验证（MSP 0.2 Layer C，CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 判定层能力新增（设计提案 §6 Layer C 承诺边界），不改产品身份、authority order、One Core 规则；记录于此因它修订了判定规则的版本语义（R7 可见性）。

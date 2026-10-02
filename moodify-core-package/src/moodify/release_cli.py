@@ -38,6 +38,8 @@ def main(argv: list[str] | None = None) -> int:
         "report", help="re-render report.md/report.html from a persisted 0.2 report.json")
     report_cmd.add_argument("target", help="case_id (resolved under --cases-root) or path to report.json")
     report_cmd.add_argument("--cases-root", default="outputs/moodify_cases")
+    commands.add_parser(
+        "doctor", help="environment probe: python/core/dependencies/ffmpeg (stdout JSON)")
     finishing = commands.add_parser(
         "finishing", help="mix graph finishing sessions (moodify.mix_graph/0.1, EXPERIMENTAL)")
     finishing_sub = finishing.add_subparsers(dest="finishing_action", required=True)
@@ -157,6 +159,8 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False),
                   file=sys.stderr)
             return 2
+    elif args.command == "doctor":
+        result = _doctor_report()
     else:
         from moodify.auditory.execution.cache import LocalCache
 
@@ -173,6 +177,63 @@ def main(argv: list[str] | None = None) -> int:
             result = {"cleared_source": args.source_sha256}
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     return 0
+
+
+_DOCTOR_PACKAGES = (
+    "numpy", "scipy", "librosa", "soundfile", "pyloudnorm",
+    "jsonschema", "pedalboard", "matplotlib",
+)
+
+
+def _doctor_report() -> dict:
+    """Layer D (D-ENG-2): first-contact environment probe.
+
+    stdout-JSON discipline: the diagnostic itself always succeeds (exit 0);
+    whether the environment is usable is carried by ``ready`` so agents can
+    branch on data instead of parsing exit codes.
+    """
+    import importlib
+    import importlib.metadata
+    import platform
+
+    from moodify.auditory.decode import FfmpegNotFound, _which_ffmpeg, ffmpeg_version
+    from moodify.auditory.judgment import JUDGMENT_RULES_VERSION
+
+    packages: dict[str, dict] = {}
+    for name in _DOCTOR_PACKAGES:
+        try:
+            importlib.import_module(name)
+        except Exception as exc:  # a broken dep must not crash the probe
+            packages[name] = {"importable": False,
+                              "error": f"{type(exc).__name__}: {exc}"}
+            continue
+        try:
+            version: str | None = importlib.metadata.version(name)
+        except Exception:
+            version = None
+        packages[name] = {"importable": True, "version": version}
+
+    try:
+        # resolve exactly like the runtime does (PATH + Windows winget links)
+        ffmpeg_path = _which_ffmpeg()
+        ffmpeg_report = {"found": True, "path": ffmpeg_path,
+                         "version": ffmpeg_version()}
+    except FfmpegNotFound:
+        ffmpeg_report = {"found": False, "path": None, "version": None}
+
+    deps_ok = all(entry["importable"] for entry in packages.values())
+    ready = ffmpeg_report["found"] and deps_ok
+    return {
+        "status": "ok",
+        "ready": ready,
+        "python": platform.python_version(),
+        "core_version": PRODUCT_VERSION,
+        "judgment_rules_version": JUDGMENT_RULES_VERSION,
+        "ffmpeg": ffmpeg_report,
+        "packages": packages,
+        **({} if ready else {"hint": "install ffmpeg and ensure it is on PATH; "
+                                     "re-run `moodify doctor` to verify"}),
+    }
 
 
 def _summarize_analysis(result: dict) -> str:

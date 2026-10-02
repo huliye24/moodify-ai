@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "moodify"
-version = "0.1.0"
+version = "1.0.0-rc.1"
 description = "Moodify Sound Protocol and CLI reference runtime for shared-Core audio processing"
 authors = [{name = "文川院 / Moodify 声音实验室"}]
 license = {text = "GPL-3.0-only"}
