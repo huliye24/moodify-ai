@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — Moodify 报告窗口：产品显示面收归自有壳（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因新增了对外 UI 表面（R7 可见性）。人类指令原话要点：报告不在浏览器打开，而在 Moodify 自己的 UI 界面打开——否则后续难调整、产权有问题。
+- **Why / evidence：** 2026-10-02 人类对核心时刻演示的纠正；此前 report.html 弹在系统浏览器（窗口壳属第三方）。
+- **Boundary：** 新增 `moodify.ui` 包（Moodify 未来 UI 的家）+ `moodify.ui.report_window`（tkinter 标准库实现，**零新依赖**）；窗口渲染与 report.md/html 同源同事实（report.json），无新测量、无新判断、不执行方案。窗口在独立进程运行，CLI 恒秒回 JSON（agent 不等人类关窗）。`moodify demo` 窗口优先，`--browser` 降级为查看 HTML 导出物。report.html/md 降级为**导出物**（存证/外发），产品显示面 = Moodify 窗口。
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件。代码面：`moodify/ui/`（新）、`release_cli.py`（demo 命令 + `_display_report`）、`tests/ui/test_report_window.py`、`tests/test_demo_command.py`。
+- **Migration：** 无破坏性变更；0.2 报告 schema 未动（窗口是渲染端）。
+- **Rollback：** 删除 `moodify/ui/`、回退 `release_cli.py` demo 支面与本条即可；报告三件套与协议链路不受影响。
+
 ## 2026-10-02 — 商业化路径裁决：GPL-only 服务模式 + 仅 pip 私有部署（Layer D，CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因商业化路径是产品级决策（R7 可见性）。

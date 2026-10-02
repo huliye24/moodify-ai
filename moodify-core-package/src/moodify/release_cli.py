@@ -40,6 +40,18 @@ def main(argv: list[str] | None = None) -> int:
     report_cmd.add_argument("--cases-root", default="outputs/moodify_cases")
     commands.add_parser(
         "doctor", help="environment probe: python/core/dependencies/ffmpeg (stdout JSON)")
+    demo = commands.add_parser(
+        "demo",
+        help="one-shot core moment: analyze audio, render the 0.2 report "
+             "and open it in the Moodify report window")
+    demo.add_argument("audio")
+    demo.add_argument("--cases-root", default="outputs/moodify_cases")
+    demo.add_argument("--browser", action="store_true",
+                      help="open the HTML export in the system browser instead "
+                           "of the Moodify window")
+    demo.add_argument("--no-open", action="store_true",
+                      help="render only; display nothing "
+                           "(report paths stay in stdout JSON)")
     finishing = commands.add_parser(
         "finishing", help="mix graph finishing sessions (moodify.mix_graph/0.1, EXPERIMENTAL)")
     finishing_sub = finishing.add_subparsers(dest="finishing_action", required=True)
@@ -161,6 +173,31 @@ def main(argv: list[str] | None = None) -> int:
             return 2
     elif args.command == "doctor":
         result = _doctor_report()
+    elif args.command == "demo":
+        from moodify.sound_protocol import (
+            PROTOCOL_V02,
+            ProtocolError,
+            execute_job,
+            validate_job,
+        )
+
+        try:
+            job = validate_job(
+                {"protocol": PROTOCOL_V02, "type": "analyze",
+                 "source": args.audio, "output_dir": args.cases_root},
+                Path.cwd(),
+            )
+            result = execute_job(job)
+        except ProtocolError as exc:
+            print(json.dumps({"status": "error", "error": str(exc)},
+                             ensure_ascii=False), file=sys.stderr)
+            return 2
+        if not args.no_open:
+            display = _display_report(Path(result["reports"]["json"]),
+                                      Path(result["reports"]["html"]),
+                                      prefer_browser=args.browser)
+            if display is not None:
+                result = {**result, "display": display}
     else:
         from moodify.auditory.execution.cache import LocalCache
 
@@ -183,6 +220,47 @@ _DOCTOR_PACKAGES = (
     "numpy", "scipy", "librosa", "soundfile", "pyloudnorm",
     "jsonschema", "pedalboard", "matplotlib",
 )
+
+
+def _display_report(report_json: Path, report_html: Path,
+                    prefer_browser: bool = False) -> dict | None:
+    """Surface the rendered report; returns machine-readable display data.
+
+    The Moodify window (``moodify.ui``) is the product display surface and
+    runs in a detached process so the CLI exits immediately — an agent
+    calling this command must never wait on a human closing a window. The
+    browser remains an export-viewing fallback.
+    """
+    if not prefer_browser:
+        window = _spawn_report_window(report_json)
+        if window is not None:
+            return window
+    try:
+        import webbrowser
+
+        webbrowser.open(report_html.resolve().as_uri())
+        return {"mode": "browser"}
+    except OSError:
+        return None
+
+
+def _spawn_report_window(report_json: Path) -> dict | None:
+    import subprocess
+    import sys
+
+    kwargs: dict = {}
+    if sys.platform == "win32":
+        kwargs["creationflags"] = (getattr(subprocess, "DETACHED_PROCESS", 0)
+                                   | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0))
+    else:
+        kwargs["start_new_session"] = True
+    try:
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "moodify.ui.report_window", str(report_json)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, **kwargs)
+    except OSError:
+        return None
+    return {"mode": "window", "pid": proc.pid}
 
 
 def _doctor_report() -> dict:
