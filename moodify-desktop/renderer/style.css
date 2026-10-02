@@ -58,14 +58,6 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 #case-title p { margin: 2px 0 0; font-size: 12px; }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 
-.badge {
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-radius: 999px;
-  padding: 3px 12px;
-  font-size: 12px;
-}
-
 /* ——— 主行：图标栏 | 历史面板 | 工作区 ——— */
 
 #main-row { flex: 1; display: flex; min-height: 0; }
@@ -144,12 +136,18 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 
 /* ——— 修音工作台：AU/Pr 式轨道条（观察三页之外的模式；内含 修音/混音 分页）——— */
 
+#bench-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
 #bench-tabs {
   display: flex;
   gap: 2px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid var(--hairline);
 }
+#bench-zoom { padding-bottom: 6px; }
+#bench-zoom button { padding: 2px 10px; font-size: 12px; }
 .fix-tracks { display: flex; flex-direction: column; gap: 8px; }
 .track {
   display: grid;
@@ -171,7 +169,8 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 .track-name { font-weight: 600; font-size: 13px; }
 .track-meta { font-size: 11px; word-break: break-all; }
 .track-strip { min-width: 0; }
-.track-strip canvas { display: block; }
+.ws-ruler { height: 22px; }
+.ws-wave { background: #fff; border-top: 1px solid var(--hairline); }
 
 /* ——— 数据表 ——— */
 
@@ -225,8 +224,23 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 .setup-row input#setup-model { width: 160px; }
 .setup-row input#setup-baseurl { flex: 1; min-width: 200px; }
 
+/* 编译器对话抽屉：高度由拖动拉杆控制（默认 200px，范围 80px–60vh） */
+#stream-bar {
+  flex: none;
+  height: 16px;
+  border-top: 1px solid var(--hairline);
+  border-radius: 6px 6px 0 0;
+  background: #fafafa;
+  color: #b7bcc5;
+  font-size: 10px;
+  text-align: center;
+  line-height: 8px;
+  cursor: row-resize;
+  user-select: none;
+}
+#stream-bar:hover { color: var(--muted); background: var(--accent-soft); }
 .compiler-stream {
-  max-height: 200px;
+  height: 200px;
   overflow: auto;
   display: flex;
   flex-direction: column;

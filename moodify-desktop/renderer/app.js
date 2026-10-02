@@ -17,8 +17,8 @@ const state = {
   termId: null,
   termCwd: undefined, // undefined = terminal never created
   drawerVisible: false, // engineering terminal stays hidden until asked for
-  wave: null,           // {lanes:[Float32Array(min,max)…], duration} peaks cache
   bench: 'fix',         // 修音工作台当前分页：'fix' | 'mix'
+  streamH: 200,         // 编译器对话抽屉高度（可拖动）
 };
 
 const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'bench'];
@@ -99,7 +99,7 @@ async function runAnalysisPath(audioPath) {
   try {
     const result = await window.moodify.runAnalysis(audioPath);
     clearInterval(state.elapsedTimer);
-    setStatus('检测完成');
+    setStatus(''); // 检测完成直接出结果，不留状态文字
     await refreshArchive();
     await openReport(result.reports.json);
   } catch (err) {
@@ -145,24 +145,10 @@ async function openReport(reportPath) {
   }
   state.reportPath = reportPath;
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
-  state.wave = null;
-  selectBench('fix'); // 换世界：工作台回到修音分页
+  destroyBench(); // 换世界：旧工作台实例销毁
+  selectBench('fix'); // 工作台回到修音分页
 
-  const source = report.source || {};
-  const technical = report.technical_state || {};
-  const caseInfo = report.case || {};
-  $('source-name').textContent = source.name || '?';
-  $('report-meta').textContent = [
-    `case ${caseInfo.case_id || '?'}`,
-    report.protocol || '?',
-    `${fmt(source.duration_s)}s`,
-    `${fmt(source.channels)}ch @ ${fmt(source.sample_rate)}Hz`,
-    `生成于 ${report.generated_at || '?'}`,
-  ].join(' · ');
-  $('badge-overall').textContent = technical.overall || '?';
-  $('badge-decision').textContent = technical.workflow_decision || '?';
-  $('badge-overall').hidden = false;
-  $('badge-decision').hidden = false;
+  $('source-name').textContent = (report.source || {}).name || '?';
   $('case-title').hidden = false;
 
   // stale compiler thread from another case is dropped; a fresh one opens on demand
@@ -250,9 +236,11 @@ function imageExists(src) {
   });
 }
 
-// ——— 波形（Audacity 式）：Web Audio 解码源音频 → 峰值包络 → canvas ———
+// ——— 修音/混音工作台波形：wavesurfer.js v6（BSD-3，vendor 内嵌）———
+// 缩放 / 滚动 / 播放头 / 点击定位 / 精细时间标尺；L/R 分声道渲染。
 
-const WAVE_PEAK_COLS = 2000;
+const bench = { fix: null, mix: null }; // WaveSurfer 实例，每个工作台一份
+let zoomPx = null; // 每秒像素；null = 适配全曲
 
 async function renderWaveform(entryDir) {
   const src = await window.moodify.resolveSource(entryDir);
@@ -265,7 +253,6 @@ async function renderWaveform(entryDir) {
     const audio = await ctx.decodeAudioData(ab);
     await ctx.close();
     if (state.caseDir !== entryDir) return; // world switched mid-decode
-    state.wave = buildWavePeaks(audio);
     const meta =
       `${src.split(/[\\/]/).pop()} · ${audio.numberOfChannels}ch @ ${audio.sampleRate}Hz`
       + ` · ${audio.duration.toFixed(1)}s`;
@@ -273,95 +260,71 @@ async function renderWaveform(entryDir) {
     $('mix-meta').textContent = meta;
     $('fix-source-track').hidden = false;
     $('mix-source-track').hidden = false;
-    drawTrackWave('fix-strip', 'bench-fix');
-    drawTrackWave('mix-strip', 'bench-mix');
+    mountTrackWave('fix', audio);
+    mountTrackWave('mix', audio);
   } catch {
     // 轨道波形是增益，解码失败静默降级（数据/频谱/图表不受影响）
   }
 }
 
-function buildWavePeaks(audio) {
-  const cols = WAVE_PEAK_COLS;
-  const lanes = [];
-  for (let ch = 0; ch < Math.min(audio.numberOfChannels, 2); ch++) {
-    const data = audio.getChannelData(ch);
-    const lane = new Float32Array(cols * 2);
-    const step = data.length / cols;
-    for (let c = 0; c < cols; c++) {
-      const start = Math.floor(c * step);
-      const end = Math.min(Math.floor((c + 1) * step), data.length);
-      let min = 1.0, max = -1.0;
-      for (let i = start; i < end; i++) {
-        if (data[i] < min) min = data[i];
-        if (data[i] > max) max = data[i];
-      }
-      lane[c * 2] = min > max ? 0 : min;
-      lane[c * 2 + 1] = min > max ? 0 : max;
-    }
-    lanes.push(lane);
-  }
-  return { lanes, duration: audio.duration };
+function mountTrackWave(which, audioBuffer) {
+  if (bench[which]) { try { bench[which].destroy(); } catch { /* already gone */ } }
+  bench[which] = WaveSurfer.create({
+    container: $(`wave-${which}`),
+    backend: 'WebAudio',
+    height: 60,
+    splitChannels: true,
+    responsive: true,
+    scroll: true,
+    waveColor: 'rgba(79, 70, 229, 0.38)',
+    progressColor: 'rgba(79, 70, 229, 0.82)',
+    cursorColor: '#16181d',
+    cursorWidth: 1,
+    plugins: [WaveSurfer.timeline.create({
+      container: $(`ruler-${which}`),
+      fontSize: 10,
+      primaryColor: '#d1d5db',
+      secondaryColor: '#f3f4f6',
+      primaryFontColor: '#9ca3af',
+      secondaryFontColor: '#c7cbd1',
+    })],
+  });
+  bench[which].loadDecodedBuffer(audioBuffer);
 }
 
-/** 轨道条渲染（AU 式 L/R 泳道 + 诚实时间标尺）；修音/混音两个工作台共用。 */
-function drawTrackWave(canvasId, sectionId) {
-  if (!state.wave) return;
-  const section = $(sectionId);
-  if (section.hidden) return; // 隐藏期间宽度为 0，切回时由入口重画
-  const canvas = $(canvasId);
-  const { lanes, duration } = state.wave;
-  const dpr = window.devicePixelRatio || 1;
-  const cssW = Math.max(400, canvas.parentElement.clientWidth);
-  const laneH = 56, gap = 5, rulerH = 16;
-  const cssH = laneH * lanes.length + gap * (lanes.length - 1) + rulerH;
-  canvas.style.width = '100%';
-  canvas.style.height = `${cssH}px`;
-  canvas.width = Math.round(cssW * dpr);
-  canvas.height = Math.round(cssH * dpr);
-  const g = canvas.getContext('2d');
-  g.scale(dpr, dpr);
-  const cols = lanes[0].length / 2;
-  const half = laneH / 2 - 2;
-  lanes.forEach((lane, ch) => {
-    const y0 = ch * (laneH + gap);
-    const mid = y0 + laneH / 2;
-    g.fillStyle = '#f6f7ff';
-    g.fillRect(0, y0, cssW, laneH);
-    g.strokeStyle = '#e5e7eb';
-    g.strokeRect(0.5, y0 + 0.5, cssW - 1, laneH - 1);
-    g.strokeStyle = '#d1d5db';
-    g.beginPath(); g.moveTo(0, mid); g.lineTo(cssW, mid); g.stroke();
-    g.fillStyle = 'rgba(79, 70, 229, 0.78)';
-    for (let x = 0; x < cssW; x++) {
-      const c = Math.min(cols - 1, Math.floor((x / cssW) * cols));
-      const yMax = mid + lane[c * 2 + 1] * half;
-      const yMin = mid + lane[c * 2] * half;
-      g.fillRect(x, yMax, 1, Math.max(1, yMin - yMax));
-    }
-    g.fillStyle = '#9ca3af';
-    g.font = '10px "Segoe UI", sans-serif';
-    g.fillText(ch === 0 ? 'L' : 'R', 4, y0 + 11);
-  });
-  const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300];
-  const stepSize = steps.find((s) => duration / s <= 10) || 600;
-  g.font = '10px "Segoe UI", sans-serif';
-  for (let t = 0; t <= duration; t += stepSize) {
-    const x = (t / duration) * cssW;
-    g.strokeStyle = '#f3f4f6';
-    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, cssH - rulerH); g.stroke();
-    g.fillStyle = '#9ca3af';
-    const m = Math.floor(t / 60);
-    const s = Math.round(t % 60);
-    g.fillText(`${m}:${String(s).padStart(2, '0')}`, x + 2, cssH - 4);
+function destroyBench() {
+  for (const which of ['fix', 'mix']) {
+    if (bench[which]) { try { bench[which].destroy(); } catch { /* already gone */ } }
+    bench[which] = null;
+    $(`${which}-source-track`).hidden = true;
   }
+  zoomPx = null;
+}
+
+function applyZoom() {
+  for (const which of ['fix', 'mix']) {
+    const ws = bench[which];
+    const el = $(`wave-${which}`);
+    if (!ws || !el || el.clientWidth < 10) continue; // 隐藏页宽度为 0，跳过
+    const fitPx = el.clientWidth / (ws.getDuration() || 1);
+    ws.zoom(Math.max(zoomPx || fitPx, fitPx));
+  }
+}
+
+function setZoom(factor) {
+  const el = $(`wave-${state.bench}`);
+  const ws = bench[state.bench];
+  if (!ws || !el || el.clientWidth < 10) return;
+  const fitPx = el.clientWidth / (ws.getDuration() || 1);
+  zoomPx = Math.min(800, Math.max(fitPx, (zoomPx || fitPx) * factor));
+  applyZoom();
 }
 
 /** 修音工作台（图标栏第 2 位）：观察三页之外的创造模式，内含 修音/混音 分页。 */
 function openBench() {
   if (!state.caseDir) return;
   selectView('bench');
-  drawTrackWave('fix-strip', 'bench-fix');
-  drawTrackWave('mix-strip', 'bench-mix');
+  requestAnimationFrame(applyZoom); // 从隐藏态回来，宽度恢复后重画
 }
 
 function selectBench(which) {
@@ -370,7 +333,7 @@ function selectBench(which) {
   $('bench-tab-mix').classList.toggle('active', which === 'mix');
   $('bench-fix').hidden = which !== 'fix';
   $('bench-mix').hidden = which !== 'mix';
-  drawTrackWave(`${which}-strip`, `bench-${which}`);
+  requestAnimationFrame(applyZoom);
 }
 
 function renderPlan(report) {
@@ -514,7 +477,37 @@ const compiler = {
 
 function showDockStream() {
   $('compiler-stream').hidden = false;
+  $('stream-bar').hidden = false;
   $('dock-bar').hidden = false;
+}
+
+/** 编译器对话抽屉：拖顶栏调高度（80px–60vh），双击收起/展开。 */
+function initStreamBar() {
+  const bar = $('stream-bar');
+  const stream = $('compiler-stream');
+  const apply = () => { stream.style.height = `${state.streamH}px`; };
+  let y0 = 0, h0 = 0, dragging = false;
+  bar.addEventListener('mousedown', (e) => {
+    dragging = true;
+    y0 = e.clientY;
+    h0 = state.streamH;
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    state.streamH = Math.min(Math.round(window.innerHeight * 0.6),
+      Math.max(80, h0 + (y0 - e.clientY)));
+    apply();
+  });
+  window.addEventListener('mouseup', () => { dragging = false; });
+  bar.addEventListener('dblclick', () => {
+    if (stream.hidden) {
+      stream.hidden = false;
+      apply();
+    } else {
+      stream.hidden = true;
+    }
+  });
 }
 
 function compilerBubble(role, text) {
@@ -753,10 +746,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('rail-fix').addEventListener('click', openBench);
   $('bench-tab-fix').addEventListener('click', () => selectBench('fix'));
   $('bench-tab-mix').addEventListener('click', () => selectBench('mix'));
-  window.addEventListener('resize', () => {
-    drawTrackWave('fix-strip', 'bench-fix');
-    drawTrackWave('mix-strip', 'bench-mix');
-  });
+  $('zoom-in').addEventListener('click', () => setZoom(1.5));
+  $('zoom-out').addEventListener('click', () => setZoom(1 / 1.5));
+  $('zoom-fit').addEventListener('click', () => { zoomPx = null; applyZoom(); });
+  initStreamBar();
   const sendIntent = () => {
     const text = $('compiler-input').value;
     $('compiler-input').value = '';

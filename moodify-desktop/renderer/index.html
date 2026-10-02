@@ -9,19 +9,14 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 顶栏：logo + 当前世界 + 事件状态（只在有事发生时出现）。无关闭：世界不关闭，只切换。 -->
+  <!-- 顶栏：logo + 当前世界名。无关闭：世界不关闭，只切换。 -->
   <header id="topbar">
     <img class="logo" src="assets/moodify_logo.png" alt="Moodify">
     <div id="case-title" hidden>
-      <div>
-        <h1 id="source-name"></h1>
-        <p class="muted" id="report-meta"></p>
-      </div>
+      <h1 id="source-name"></h1>
     </div>
     <div class="top-actions">
       <span id="status-line" class="muted" hidden></span>
-      <span id="badge-overall" class="badge" hidden></span>
-      <span id="badge-decision" class="badge" hidden></span>
     </div>
   </header>
 
@@ -79,10 +74,17 @@
         </section>
 
         <section id="view-bench" class="workspace-view" hidden>
-          <nav id="bench-tabs">
-            <button class="tab active" id="bench-tab-fix">修音</button>
-            <button class="tab" id="bench-tab-mix">混音</button>
-          </nav>
+          <div id="bench-head">
+            <nav id="bench-tabs">
+              <button class="tab active" id="bench-tab-fix">修音</button>
+              <button class="tab" id="bench-tab-mix">混音</button>
+            </nav>
+            <span class="drawer-actions" id="bench-zoom">
+              <button id="zoom-out" class="ghost" title="缩小">－</button>
+              <button id="zoom-in" class="ghost" title="放大">＋</button>
+              <button id="zoom-fit" class="ghost" title="适配全曲">适配</button>
+            </span>
+          </div>
           <div id="bench-fix">
             <div class="fix-tracks">
               <div class="track" id="fix-source-track" hidden>
@@ -90,7 +92,10 @@
                   <span class="track-name">源</span>
                   <span class="muted track-meta" id="fix-meta"></span>
                 </div>
-                <div class="track-strip"><canvas id="fix-strip" height="140"></canvas></div>
+                <div class="track-strip">
+                  <div id="ruler-fix" class="ws-ruler"></div>
+                  <div id="wave-fix" class="ws-wave"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -101,7 +106,10 @@
                   <span class="track-name">源</span>
                   <span class="muted track-meta" id="mix-meta"></span>
                 </div>
-                <div class="track-strip"><canvas id="mix-strip" height="140"></canvas></div>
+                <div class="track-strip">
+                  <div id="ruler-mix" class="ws-ruler"></div>
+                  <div id="wave-mix" class="ws-wave"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -123,6 +131,7 @@
 
   <!-- 意图命令条 = Mood 编译器之家：写文字 → DeepSeek 回答与操作；唯一 AI 门 -->
   <div id="intent-dock">
+    <div id="stream-bar" hidden title="拖动调高度，双击收起/展开">⋯</div>
     <div id="compiler-stream" class="compiler-stream" hidden></div>
     <div id="dock-bar" hidden>
       <span class="drawer-actions">
@@ -160,6 +169,9 @@
 
   <script src="vendor/xterm.js"></script>
   <script src="vendor/addon-fit.js"></script>
+  <!-- wavesurfer.js 6.6.4 (BSD-3-Clause) © katspaugh & contributors — 修音/混音工作台波形引擎 -->
+  <script src="vendor/wavesurfer.min.js"></script>
+  <script src="vendor/wavesurfer.timeline.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
