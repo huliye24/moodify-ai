@@ -75,6 +75,7 @@ Never promote a capability to CANONICAL based only on documentation or an unmerg
 
 ## History
 
+- 2026-10-02 (方案由 Claude Code 执笔 + 内嵌终端): 人类裁决——数据/图表出来后方案改由 **Claude Code** 生成（`claude -p` 读 case 导出物，流式显示并存 `plan_claude.md`；与核心保守草案并列呈现），报告视图新增**终端页**（node-pty + xterm.js 真实终端，cwd=case 目录，按钮一键 `claude` 交互续写）；空态占位文字全部移除（状态行只在有事发生时出现）。**核心零改动**：方案文本是 Claude Code 产出物，Moodify 核心只供测量事实（责任分离）；DRAFT_PLAN_NOT_EXECUTED 边界不变。仅动 `moodify-desktop/`。
 - 2026-10-02 (桌面壳迁 Electron): 人类裁决"做成 electron"——新增 `moodify-desktop/`（Electron 壳：白底 + 公司 logo + 固定流程原样迁移；零 npm 运行时依赖，contextIsolation + CSP 收紧）。壳只编排核心：检测 = `python -m moodify.release_cli demo --no-open`（同 0.2 协议路径）；图表 = `moodify.ui.chart_export` 桥（Tk 同一批图函数，Agg 出 PNG）；档案/报告只读 report.json。python 子进程强制 `PYTHONUTF8=1`（GBK 陷阱）。核心 pip-only 裁决不变；tkinter 壳保留为回退。同批修 `.gitignore` `*.png` 吞品牌资产（第三次同坑类），白名单两处品牌资产目录。
 - 2026-10-02 (产品定义定稿): 人类裁决**单壳白底公司桌面软件**——"不要 2 个壳"，实验台（`moodify.ui.lab`，8e32e85e）整体移除；产品 = 档案中枢（选歌/历史）+ 报告视图（数据/图表/后处理方案）同一壳内导航；**固定流程**：选择歌曲 → 检测 → 根据数据和图表给出修音与混音方案。新增 `moodify.ui.theme`（白底主题/公司 logo/窗口图标；品牌资产 `moodify/ui/assets/*.png`，package-data 入包，缺失时优雅降级）。
 - 2026-10-02 (实验台 v0.1，已被同日产品定义定稿移除): 人类裁决"先要有科研一样的 GUI"——新增 `moodify.ui.lab`（观测/目录/实验三区，引擎零改动，GUI-first 教义）；人类看过窗口后改裁决"不要 2 个壳"，实验台存活一版即移除；科研可观测性由报告三件套与档案事实承载。

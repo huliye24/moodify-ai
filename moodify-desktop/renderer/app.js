@@ -6,7 +6,15 @@
  */
 
 const $ = (id) => document.getElementById(id);
-const state = { reportPath: null, elapsedTimer: null };
+const state = {
+  reportPath: null,
+  caseDir: null,
+  elapsedTimer: null,
+  term: null,       // xterm.Terminal
+  termId: null,
+  termCwd: null,
+  planRunning: false,
+};
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -47,7 +55,9 @@ async function refreshArchive() {
 }
 
 function setStatus(text) {
-  $('status-line').textContent = text;
+  const el = $('status-line');
+  el.textContent = text;
+  el.hidden = !text;
 }
 
 async function pickAndAnalyze() {
@@ -100,8 +110,13 @@ async function openReport(reportPath) {
     return;
   }
   state.reportPath = reportPath;
+  state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
   $('hub-view').hidden = true;
   $('report-view').hidden = false;
+  $('plan-output').hidden = true;
+  $('plan-output').textContent = '';
+  $('plan-saved').hidden = true;
+  $('term-cwd').textContent = `目录：${state.caseDir}`;
 
   const source = report.source || {};
   const technical = report.technical_state || {};
@@ -258,12 +273,106 @@ function selectTab(name) {
   for (const panel of document.querySelectorAll('.tab-panel')) {
     panel.hidden = panel.id !== `tab-${name}`;
   }
+  if (name === 'terminal') {
+    ensureTerminal();
+    if (state.term) state.term.focus();
+  }
 }
+
+// ——— embedded terminal (xterm.js + node-pty, cwd = case dir) ———
+
+function ensureTerminal() {
+  if (state.term && state.termCwd === state.caseDir) return;
+  if (state.term) window.moodify.termKill(state.termId);
+  $('terminal').textContent = '';
+  const term = new window.Terminal({
+    fontSize: 13,
+    fontFamily: 'Consolas, "Courier New", monospace',
+    cursorBlink: true,
+    theme: { background: '#ffffff', foreground: '#16181d', cursor: '#4f46e5' },
+  });
+  const fit = new window.FitAddon.FitAddon();
+  term.loadAddon(fit);
+  term.open($('terminal'));
+  fit.fit();
+  const termId = `term-${Date.now()}`;
+  state.term = term;
+  state.termId = termId;
+  state.termCwd = state.caseDir;
+  term.onData((data) => window.moodify.termWrite(termId, data));
+  term.onResize(({ cols, rows }) => window.moodify.termResize(termId, cols, rows));
+  window.addEventListener('resize', () => fit.fit());
+  window.moodify.createTerminal(termId, state.caseDir);
+}
+
+window.moodify.onPtyData((termId, data) => {
+  if (state.term && termId === state.termId) state.term.write(data);
+});
+window.moodify.onPtyExit((termId) => {
+  if (state.term && termId === state.termId) {
+    state.term.write('\r\n\x1b[90m[进程已退出]\x1b[0m\r\n');
+  }
+});
+
+// ——— plan generation by Claude Code (one-shot, streamed, saved to the case) ———
+
+async function generatePlan() {
+  if (state.planRunning || !state.caseDir) return;
+  state.planRunning = true;
+  const output = $('plan-output');
+  output.hidden = false;
+  output.textContent = '';
+  $('plan-saved').hidden = true;
+  $('generate-plan').disabled = true;
+  $('stop-plan').hidden = false;
+  try {
+    const started = await window.moodify.generatePlan(state.caseDir);
+    if (started && started.started === false) {
+      state.planRunning = false;
+      $('generate-plan').disabled = false;
+      $('stop-plan').hidden = true;
+      setStatus(started.reason || '未能启动生成');
+    }
+  } catch (err) {
+    state.planRunning = false;
+    $('generate-plan').disabled = false;
+    $('stop-plan').hidden = true;
+    output.textContent += `\n[启动失败] ${err.message || err}\n`;
+  }
+}
+
+function launchClaudeInTerminal() {
+  selectTab('terminal');
+  // give a freshly spawned shell a moment before typing into it
+  setTimeout(() => {
+    if (state.termId) window.moodify.termRunCommand(state.termId, 'claude');
+  }, 600);
+}
+
+window.moodify.onPlanChunk((text) => {
+  const output = $('plan-output');
+  output.textContent += text;
+  output.scrollTop = output.scrollHeight;
+});
+
+window.moodify.onPlanDone((code, savedPath) => {
+  state.planRunning = false;
+  $('generate-plan').disabled = false;
+  $('stop-plan').hidden = true;
+  const saved = $('plan-saved');
+  if (code === 0 && savedPath) {
+    saved.textContent = `已保存：${savedPath}`;
+    saved.hidden = false;
+  } else if (code !== 0) {
+    saved.textContent = `生成未完成（退出码 ${code}）——可在终端页手动运行 claude 继续。`;
+    saved.hidden = false;
+  }
+});
 
 function backToArchive() {
   $('report-view').hidden = true;
   $('hub-view').hidden = false;
-  setStatus('空闲 — 选择一首歌开始检测');
+  setStatus('');
 }
 
 // ——— boot ———
@@ -277,6 +386,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('open-audio').addEventListener('click', pickAndAnalyze);
   $('refresh').addEventListener('click', refreshArchive);
   $('back-archive').addEventListener('click', backToArchive);
+  $('generate-plan').addEventListener('click', generatePlan);
+  $('stop-plan').addEventListener('click', () => window.moodify.stopPlan());
+  $('launch-claude').addEventListener('click', launchClaudeInTerminal);
   for (const tab of document.querySelectorAll('.tab')) {
     tab.addEventListener('click', () => selectTab(tab.dataset.tab));
   }

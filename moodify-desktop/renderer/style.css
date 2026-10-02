@@ -129,6 +129,53 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 #plan-body ul { margin: 4px 0; padding-left: 20px; }
 #plan-body li { margin: 2px 0; }
 
+/* Claude-Code-authored plan (one-shot, streamed, saved as plan_claude.md) */
+.plan-gen {
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.plan-gen-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.plan-gen-head h3 { margin: 0; font-size: 15px; }
+.plan-gen-head p { margin: 4px 0 0; font-size: 12px; }
+.plan-gen-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.plan-output {
+  background: #f9fafb;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 12px 0 0;
+  max-height: 320px;
+  overflow: auto;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.draft-head { font-size: 14px; margin: 4px 0 6px; }
+
+/* embedded terminal (xterm.js over node-pty, cwd = case dir) */
+.term-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#terminal {
+  height: 440px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: #fff;
+}
+
 .error {
   color: #b91c1c;
   background: #fef2f2;

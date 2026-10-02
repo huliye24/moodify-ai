@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — 方案由 Claude Code 执笔 + 内嵌终端：测量事实与方案文本的责任分离（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因固定流程的"方案"一环改变了生成主体（R7 可见性）。人类指令原话要点："数据和图表出来之后，通过 claude code 去给出方案，里面可以加一个终端吗？可以打开 claude code"；同批：空态占位文字（"空闲，选择一首歌开始检测"）一律不要。
+- **Why / evidence：** 固定流程（选歌 → 检测 → 数据/图表 → 方案）中，数据与图表是核心测量事实；方案正文改由 Claude Code 基于 case 导出物（report.json / measurements.json / judgment_rules.json）生成——**Moodify 核心只供测量事实，方案文本是 Claude Code 产出物**，两者责任分离。
+- **Boundary：** `moodify-desktop/` 新增两能力：① 后处理方案页一键生成——`claude -p <方案提示词> --allowedTools Read,Glob,Grep`（cwd=case 目录，输出流式显示并存为 `case_dir/plan_claude.md`；与既有保守草案 DRAFT_PLAN_NOT_EXECUTED 并列，草案仍来自核心规则）；② 终端页——node-pty + xterm.js 真实终端（cwd=case 目录），"在此目录打开 Claude Code"按钮把 `claude` 敲进 shell，用户可交互续写方案。壳不变承诺：contextIsolation 开、CSP 收紧、零新遥测；pty 环境同样强制 `PYTHONUTF8=1`。空态占位文字全部移除（状态行只在有事发生时出现）。**核心零改动**：本条只动 `moodify-desktop/`，`moodify` 包无 diff。
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件。代码面：`moodify-desktop/src/main.js`（pty + claude IPC）、`src/preload.js`（桥）、`renderer/index.html`（终端页 + 方案生成区）、`renderer/app.js`、`renderer/style.css`、`scripts/vendor-xterm.js`（postinstall 复制 xterm dist 进 renderer/vendor）、`package.json`（deps: @xterm/xterm、@xterm/addon-fit、node-pty）。
+- **Migration：** 无破坏性变更；CLI 命令面、0.2 报告 schema、核心包无变化。`npm install` 后 `npm start`（postinstall 自动 vendor xterm）。
+- **Rollback：** 回退本 commit 即移除终端页与方案生成区；plan_claude.md 属 case 导出物，删除不影响核心档案完整性。
+
 ## 2026-10-02 — 桌面壳迁 Electron：单壳产品形态不变，壳技术换轨（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因产品显示面的壳技术换轨（R7 可见性）。人类指令原话要点："这个软件没有做好，我希望做成 electron，你试着去做一下"。
