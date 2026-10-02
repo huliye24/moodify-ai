@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — Moodify 桌面应用中枢：打开文件 + 历史档案 + 界面内完成分析（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因产品显示面再次扩展（R7 可见性）。人类指令原话要点：增加打开文件让用户选歌，要有历史记录与保存档案，不用每次重复打开处理——需要一点 GUI 操作。
+- **Why / evidence：** 2026-10-02 人类在报告窗口评审后提出应用化需求；单文件命令（`moodify demo`）不承载"回到历史档案"的产品体验。
+- **Boundary：** 新增 `moodify.ui.app`（应用中枢）与 `moodify app` CLI 命令：文件对话框选歌 → 后台线程走 0.2 validate/execute 协议路径（无新 DSP）→ 每次分析自动存档 `~/.moodify/cases`（app 自有，跨工作目录稳定）→ 历史列表双击秒开（不重新分析）；报告视图内"← 档案"在窗口内部导航，无出口元素。同批 UI 简化（人类逐项指令）：删除"发现"页签（触发式折叠进方案页）、删除"打开 HTML 报告/退出"页脚按钮、删除"边界与来源"页签（诚实边界改为上下文行：图表题注、方案状态注、L1-only 页脚文字）；完整细节仍存于 report.json/md/html 导出物。
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件。代码面：`moodify/ui/app.py`（新）、`moodify/ui/report_window.py`（`build_report_frame` 可嵌入化 + 简化）、`release_cli.py`（`app` 命令 + `_spawn_ui_module` 泛化）、`tests/ui/test_app.py`（新）、`tests/ui/test_report_window.py`。
+- **Migration：** 无破坏性变更；`moodify demo` 行为不变（`_spawn_report_window` 成为 `_spawn_ui_module` 的薄封装）。
+- **Rollback：** 删除 `moodify/ui/app.py`、`tests/ui/test_app.py`、回退 `release_cli.py` app 支面与本条即可；报告窗口简化独立回退不影响协议链路。
+
 ## 2026-10-02 — Moodify 报告窗口：产品显示面收归自有壳（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因新增了对外 UI 表面（R7 可见性）。人类指令原话要点：报告不在浏览器打开，而在 Moodify 自己的 UI 界面打开——否则后续难调整、产权有问题。

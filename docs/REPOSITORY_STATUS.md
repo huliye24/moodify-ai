@@ -66,7 +66,7 @@ date: 2026-08-08
 | Cloud runtime（Ear 生产流量） | UNRESOLVED | 云端 API 壳运行，无生产流量（W01-P00） |
 | App integration | CANONICAL（对外面） | apps/music-android 3.1 + deliverables/releases |
 | MAMSE-001..012 | EXPERIMENTAL_ACCEPTED | artifacts/mamse_001..012 |
-| MSP/0.2 analyze/compare 作业 + 0.2 报告三件套 + 阈值来源化（Layer C） | EXPERIMENTAL（本地 CLI 已实现，report schema 未冻结；运行时依赖 ffmpeg；16 条判定阈值全部 DEFAULT_UNCALIBRATED） | `sound_protocol.py`、`auditory/protocol_report.py`、`auditory/report_render.py`、`auditory/comparison.py`、`auditory/judgment.py`（THRESHOLD_PROVENANCE，judgment-rules v1.1）、`auditory/sensitivity.py`；`moodify protocol process`（0.2 analyze/compare 作业）、`moodify report` 与 `moodify demo`（一键到 Moodify 报告窗口）；证据 `artifacts/msp02_compare_001/`、`artifacts/msp02_calibration_001/` |
+| MSP/0.2 analyze/compare 作业 + 0.2 报告三件套 + 阈值来源化（Layer C） | EXPERIMENTAL（本地 CLI 已实现，report schema 未冻结；运行时依赖 ffmpeg；16 条判定阈值全部 DEFAULT_UNCALIBRATED） | `sound_protocol.py`、`auditory/protocol_report.py`、`auditory/report_render.py`、`auditory/comparison.py`、`auditory/judgment.py`（THRESHOLD_PROVENANCE，judgment-rules v1.1）、`auditory/sensitivity.py`；`moodify protocol process`（0.2 analyze/compare 作业）、`moodify report`、`moodify demo`（一键到 Moodify 报告窗口）与 `moodify app`（桌面应用中枢：选歌/分析/历史档案）；证据 `artifacts/msp02_compare_001/`、`artifacts/msp02_calibration_001/` |
 | 私有部署交付（pip 唯一通道，Layer D 裁决） | READY（wheel 构建 + 干净 venv 安装 + doctor 冒烟已证；公开 PyPI 上架待人类指令；商业 = 服务/支持，不卖许可） | `release_cli.py`（`moodify doctor`）、`pyproject.toml`（版本 1.0.0-rc.1 统一）；裁决记录 `docs/plan/2026-10-02_LAYER_D_COMMERCIALIZATION_PROPOSAL.md` §8；证据 `artifacts/msp02_layer_d_001/` |
 
 Allowed status values: `CANONICAL`, `EXPERIMENTAL`, `LEGACY`, `HISTORICAL`, `ABSENT`, `UNRESOLVED`, plus W01-P00 task states (`IMPLEMENTED_NOT_MERGED` 等) for unmerged work.
@@ -75,6 +75,7 @@ Never promote a capability to CANONICAL based only on documentation or an unmerg
 
 ## History
 
+- 2026-10-02 (桌面应用中枢): 新增 `moodify app` 与 `moodify.ui.app`——GUI 操作闭环：文件对话框选歌 → 应用内后台线程分析（Tk 主线程零阻塞，queue 轮询）→ 自动存档 `~/.moodify/cases`（永久档案）→ 历史列表双击秒开（不重新分析）；报告视图内"← 档案"窗口内导航。同批按人类逐项指令完成 UI 简化：删"发现"页签（触发式折叠进方案页）、删"打开 HTML/退出"页脚按钮、删"边界与来源"页签（诚实边界改为上下文行：图表题注 / 方案状态注 / L1-only 页脚文字）；完整细节仍存 report.json/md/html。CLI 侧 `_spawn_ui_module` 泛化（app 与 report_window 共用独立进程派生）。
 - 2026-10-02 (Layer D 商业化前置): 人类四项裁决落定——GPL-3.0-only 保持（卖服务不卖许可）、仅 pip 分发、私有部署交付（不上云不计费）、定价延后；D-0 工程前置实施（版本统一 1.0.0-rc.1、`moodify doctor`、sdist+wheel 构建 + 干净 venv 安装冒烟）。裁决记录见 `docs/plan/2026-10-02_LAYER_D_COMMERCIALIZATION_PROPOSAL.md` §8。公开 PyPI 上架待人类另行指令。
 - 2026-10-02 (核心时刻一键到屏): 新增 `moodify demo <audio>`——一条命令完成 0.2 analyze 作业（同 validate/execute 协议路径，无新 DSP、无新阈值）+ 渲染报告三件套 + 在 **Moodify 自己的报告窗口**（`moodify.ui`，tkinter 标准库实现，零新依赖）弹出报告；窗口在独立进程运行，CLI 秒回 JSON（agent 永不等待人类关窗）；`--browser` 退回浏览器看 HTML 导出物，`--no-open` 只渲染。窗口含**图表页**（MATLAB 风格 matplotlib 嵌入，TkAgg，零新依赖）：实测频谱 PNG + 频段能量（log 轴）+ 电平响度（dB 域）+ 立体声分布；图表只画实测事实、无阈值着色（0/16 calibrated 边界在图上显式声明）。修音方案以 `DRAFT_PLAN_NOT_EXECUTED` 草案呈现（方案≠执行；执行需显式 process/finishing 作业）。同批修复：ffmpeg/ffprobe 子进程输出显式 UTF-8 解码（中文 Windows GBK 环境下非 ASCII 文件名会导致解码崩溃——真实曲库首发即触发）。
 - 2026-10-02 (MSP/0.2 Layer C): 阈值来源化——`UNIVERSAL_THRESHOLDS` 16 条全部带 source/date/status（judgment-rules v1.1，纯增量元数据，数值自 5452ff44 冻结未变）；现状诚实记录 0/16 calibrated，全部 DEFAULT_UNCALIBRATED；敏感性报告（生产判定路径翻转点 16/16 一致 + lab 阶梯可达性桥）落 `artifacts/msp02_calibration_001/`。感知显著性校准仍不存在。

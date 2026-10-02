@@ -67,16 +67,14 @@ def test_view_model_measurements_format_numbers():
 
 def test_view_model_findings_carry_calibration():
     vm = build_report_view_model(_report())
-    assert vm["findings_empty_text"] == ""
     assert vm["findings"][0]["calibration_status"] == "DEFAULT_UNCALIBRATED"
 
 
-def test_view_model_findings_empty_honest_text():
+def test_view_model_findings_empty_stays_empty():
     report = _report()
     report["findings"] = []
     vm = build_report_view_model(report)
     assert vm["findings"] == []
-    assert vm["findings_empty_text"] == "无（未触发阈值）"
 
 
 def test_view_model_plan_is_draft_and_boundary_complete():
@@ -102,7 +100,7 @@ def test_view_model_tolerates_missing_optional_sections():
                                   "provenance": None})
     assert vm["source_name"] == "?"
     assert vm["measurements"] == []
-    assert vm["findings_empty_text"] == "无（未触发阈值）"
+    assert vm["findings"] == []
     assert vm["plan_status"] == "?"
     assert all(layer["state"] == "?" for layer in vm["boundary"])
 

@@ -52,6 +52,11 @@ def main(argv: list[str] | None = None) -> int:
     demo.add_argument("--no-open", action="store_true",
                       help="render only; display nothing "
                            "(report paths stay in stdout JSON)")
+    app_cmd = commands.add_parser(
+        "app", help="open the Moodify desktop app: pick audio, analyze in place, "
+                    "browse the permanent case archive")
+    app_cmd.add_argument("cases_root", nargs="?", default=None,
+                         help="archive root (default: ~/.moodify/cases)")
     finishing = commands.add_parser(
         "finishing", help="mix graph finishing sessions (moodify.mix_graph/0.1, EXPERIMENTAL)")
     finishing_sub = finishing.add_subparsers(dest="finishing_action", required=True)
@@ -198,6 +203,14 @@ def main(argv: list[str] | None = None) -> int:
                                       prefer_browser=args.browser)
             if display is not None:
                 result = {**result, "display": display}
+    elif args.command == "app":
+        from moodify.ui.app import DEFAULT_CASES_ROOT
+
+        cases_root = (Path(args.cases_root).expanduser()
+                      if args.cases_root else DEFAULT_CASES_ROOT)
+        window = _spawn_ui_module("moodify.ui.app", str(cases_root))
+        result = {"command": "app", "cases_root": str(cases_root),
+                  "display": window}
     else:
         from moodify.auditory.execution.cache import LocalCache
 
@@ -244,7 +257,9 @@ def _display_report(report_json: Path, report_html: Path,
         return None
 
 
-def _spawn_report_window(report_json: Path) -> dict | None:
+def _spawn_ui_module(module: str, *args: str) -> dict | None:
+    """Launch a ``moodify.ui`` module detached; the CLI must never wait on a
+    human closing a window. Returns None when spawning is impossible."""
     import subprocess
     import sys
 
@@ -256,11 +271,15 @@ def _spawn_report_window(report_json: Path) -> dict | None:
         kwargs["start_new_session"] = True
     try:
         proc = subprocess.Popen(
-            [sys.executable, "-m", "moodify.ui.report_window", str(report_json)],
+            [sys.executable, "-m", module, *args],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, **kwargs)
     except OSError:
         return None
     return {"mode": "window", "pid": proc.pid}
+
+
+def _spawn_report_window(report_json: Path) -> dict | None:
+    return _spawn_ui_module("moodify.ui.report_window", str(report_json))
 
 
 def _doctor_report() -> dict:

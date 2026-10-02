@@ -73,7 +73,6 @@ def build_report_view_model(report: dict[str, Any]) -> dict[str, Any]:
         "generated_at": report.get("generated_at", "?"),
         "measurements": measurements,
         "findings": findings,
-        "findings_empty_text": "无（未触发阈值）" if not findings else "",
         "plan_status": plan.get("status", "?"),
         "plan_nodes": [
             {"operator": n.get("operator", "?"), "reason": n.get("reason", "")}
@@ -178,36 +177,29 @@ def build_stereo_figure(rows: list[tuple[str, float]]) -> matplotlib.figure.Figu
     return _barh_figure(rows, "立体声分布（实测）", "ratio", log_x=False)
 
 
-def launch(report_path: Path) -> int:
-    """Open the window for a persisted report.json. Returns process exit code."""
-    try:
-        report = json.loads(report_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        print(f"cannot read report: {exc}", file=sys.stderr)
-        return 2
+def build_report_frame(parent, report: dict[str, Any], report_path: Path,
+                       on_back: Any = None):
+    """Build the report view inside ``parent`` (a Tk widget).
+
+    Used by the standalone report window (``launch``) and embedded by the
+    desktop app hub. ``on_back`` adds an in-app "← 档案" navigation button;
+    with no callback (single-case view) the window shows nothing that
+    leads out of the report.
+    """
+    import tkinter as tk
+    from tkinter import ttk
+
     view_model = build_report_view_model(report)
-    try:
-        import tkinter as tk
-        from tkinter import ttk
-    except ImportError:
-        print("tkinter is not available in this Python build", file=sys.stderr)
-        return 3
+    frame = ttk.Frame(parent)
 
-    root = tk.Tk()
-    root.title(view_model["title"])
-    root.minsize(880, 560)
-
-    style = ttk.Style(root)
-    try:
-        style.theme_use("clam")
-    except tk.TclError:
-        pass
-    style.configure("Badge.TLabel", padding=(8, 2))
-
-    header = ttk.Frame(root, padding=(12, 10))
+    header = ttk.Frame(frame, padding=(12, 10))
     header.pack(fill="x")
-    ttk.Label(header, text=view_model["source_name"], font=("TkDefaultFont", 14, "bold")
-              ).pack(anchor="w")
+    title_line = ttk.Frame(header)
+    title_line.pack(fill="x")
+    ttk.Label(title_line, text=view_model["source_name"], font=("TkDefaultFont", 14, "bold")
+              ).pack(side="left")
+    if on_back is not None:
+        ttk.Button(title_line, text="← 档案", command=on_back).pack(side="right")
     badge_line = ttk.Frame(header)
     badge_line.pack(anchor="w", pady=(4, 0))
     for text, kind in ((view_model["overall"], "state"),
@@ -219,7 +211,7 @@ def launch(report_path: Path) -> int:
             f"生成于 {view_model['generated_at']}")
     ttk.Label(header, text=meta, foreground="#555").pack(anchor="w", pady=(4, 0))
 
-    notebook = ttk.Notebook(root)
+    notebook = ttk.Notebook(frame)
     notebook.pack(fill="both", expand=True, padx=12, pady=8)
 
     # — 测量 —
@@ -290,26 +282,18 @@ def launch(report_path: Path) -> int:
         ttk.Label(sub_frame, foreground="#555",
                   text="实测值展示；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断").pack(pady=(0, 6))
 
-    # — 发现 —
-    findings_frame = ttk.Frame(notebook)
-    notebook.add(findings_frame, text="发现")
-    findings_text = tk.Text(findings_frame, wrap="word", borderwidth=0, height=10)
-    if view_model["findings"]:
-        for f in view_model["findings"]:
-            calib = f" · 阈值 {f['calibration_status']}" if f["calibration_status"] else ""
-            findings_text.insert("end", f"[{f['severity']}] {f['code']}{calib}\n", "finding_head")
-            findings_text.insert("end", f"  {f['message']}\n\n")
-    else:
-        findings_text.insert("end", view_model["findings_empty_text"] + "\n")
-    findings_text.configure(state="disabled")
-    findings_text.pack(fill="both", expand=True)
-
-    # — 后处理方案 —
+    # — 后处理方案（触发判定规则的发现折叠在此：没有发现时保持纯净） —
     plan_frame = ttk.Frame(notebook)
     notebook.add(plan_frame, text="后处理方案")
     plan_text = tk.Text(plan_frame, wrap="word", borderwidth=0)
     plan_text.insert("end", f"状态：{view_model['plan_status']}", "badge")
     plan_text.insert("end", "（方案不等于执行；执行需显式提交 process 作业）\n\n", "muted")
+    if view_model["findings"]:
+        plan_text.insert("end", "发现\n", "section")
+        for f in view_model["findings"]:
+            calib = f" · 阈值 {f['calibration_status']}" if f["calibration_status"] else ""
+            plan_text.insert("end", f"[{f['severity']}] {f['code']}{calib}\n", "finding_head")
+            plan_text.insert("end", f"  {f['message']}\n\n")
     if view_model["plan_nodes"]:
         for node in view_model["plan_nodes"]:
             plan_text.insert("end", f"◆ {node['operator']}\n  {node['reason']}\n\n")
@@ -321,44 +305,45 @@ def launch(report_path: Path) -> int:
         plan_text.insert("end", "\n下一步：\n")
         for action in view_model["plan_next_actions"]:
             plan_text.insert("end", f"→ {action}\n")
+    plan_text.insert("end", "\n本窗口只呈现 L1 技术测量与保守草案；不含听感、音乐或商业判断。\n", "muted")
     plan_text.configure(state="disabled")
     plan_text.pack(fill="both", expand=True)
-
-    # — 边界与来源 —
-    boundary_frame = ttk.Frame(notebook)
-    notebook.add(boundary_frame, text="边界与来源")
-    boundary_text = tk.Text(boundary_frame, wrap="word", borderwidth=0)
-    boundary_text.insert("end", "判断边界\n", "section")
-    for layer in view_model["boundary"]:
-        boundary_text.insert("end", f"· {layer['layer']}：{layer['state']}\n")
-    summary = view_model["calibration_summary"]
-    if summary.get("calibrated") is not None:
-        boundary_text.insert("end", "\n阈值校准\n", "section")
-        boundary_text.insert(
-            "end",
-            f"· {summary['calibrated']}/{summary['calibrated'] + summary['default_uncalibrated']} "
-            f"条已校准，其余 DEFAULT_UNCALIBRATED\n")
-        if summary.get("note"):
-            boundary_text.insert("end", f"· {summary['note']}\n")
-    boundary_text.configure(state="disabled")
-    boundary_text.pack(fill="both", expand=True)
 
     for tag, kwargs in (("finding_head", {"font": ("TkDefaultFont", 10, "bold")}),
                         ("badge", {"font": ("TkDefaultFont", 10, "bold")}),
                         ("muted", {"foreground": "#555"}),
                         ("section", {"font": ("TkDefaultFont", 11, "bold")})):
-        findings_text.tag_configure(tag, **kwargs)
         plan_text.tag_configure(tag, **kwargs)
-        boundary_text.tag_configure(tag, **kwargs)
 
-    footer = ttk.Frame(root, padding=(12, 8))
-    footer.pack(fill="x")
-    html_path = report_path.with_name("report.html")
-    if html_path.is_file():
-        ttk.Button(footer, text="打开 HTML 报告（导出物）",
-                   command=lambda: _open_html(html_path)).pack(side="left")
-    ttk.Button(footer, text="退出", command=root.destroy).pack(side="right")
+    # no footer buttons by design: nothing inside the window leads out of the
+    # Moodify ecosystem — the OS title bar closes the window
+    return frame
 
+
+def launch(report_path: Path) -> int:
+    """Open a standalone report window for one persisted case. Returns exit code."""
+    try:
+        report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"cannot read report: {exc}", file=sys.stderr)
+        return 2
+    try:
+        import tkinter as tk
+        from tkinter import ttk
+    except ImportError:
+        print("tkinter is not available in this Python build", file=sys.stderr)
+        return 3
+
+    root = tk.Tk()
+    root.title(_WINDOW_TITLE)
+    root.minsize(880, 560)
+    style = ttk.Style(root)
+    try:
+        style.theme_use("clam")
+    except tk.TclError:
+        pass
+    style.configure("Badge.TLabel", padding=(8, 2))
+    build_report_frame(root, report, Path(report_path))
     root.mainloop()
     return 0
 
@@ -367,12 +352,6 @@ def _fmt_num(value: Any) -> str:
     if isinstance(value, float):
         return f"{value:g}"
     return "—" if value is None else str(value)
-
-
-def _open_html(html_path: Path) -> None:
-    import webbrowser
-
-    webbrowser.open(html_path.resolve().as_uri())
 
 
 if __name__ == "__main__":
