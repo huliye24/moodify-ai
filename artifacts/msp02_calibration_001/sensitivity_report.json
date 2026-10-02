@@ -1,0 +1,513 @@
+{
+  "sensitivity_version": "threshold-sensitivity-v1",
+  "judgment_rules_version": "1.1",
+  "code_under_test": "moodify.auditory.judgment.evaluate_risk_flags",
+  "method": "翻转点扫描：对每条规则沿其驱动量做单调段二分（或离散探测），观测裁决翻转点并与声明阈值比对；无音频、无 DSP。",
+  "rules": [
+    {
+      "rule": "true_peak_margin_reduced",
+      "metric": "true_peak_dbfs",
+      "probe": "after_true_peak_dbfs (before=-0.1, delta<0)",
+      "segments": [
+        {
+          "bracket": [
+            -1.4,
+            -0.2
+          ],
+          "declared_flip": -0.5,
+          "observed_flip": -0.5,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "excessive_loudness_increase",
+      "metric": "integrated_lufs",
+      "probe": "integrated_lufs delta (before=-14)",
+      "segments": [
+        {
+          "bracket": [
+            0.0,
+            8.0
+          ],
+          "declared_flip": 4.0,
+          "observed_flip": 4.0,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "excessive_dynamic_compression",
+      "metric": "crest_factor_db",
+      "probe": "crest_factor_db delta (before=10)",
+      "segments": [
+        {
+          "bracket": [
+            -8.0,
+            -0.5
+          ],
+          "declared_flip": -4.0,
+          "observed_flip": -4.0,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "crest_factor_collapse",
+      "metric": "crest_factor_db",
+      "probe": "after crest_factor_db (before=10)",
+      "segments": [
+        {
+          "bracket": [
+            0.5,
+            8.0
+          ],
+          "declared_flip": 4.0,
+          "observed_flip": 4.0,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "new_clipping",
+      "metric": "clipping_sample_count",
+      "probe": "after clipping_sample_count (before=0)",
+      "declared_flip": "> max_count (0) → first firing value 1",
+      "observed_flip": 1,
+      "match": true,
+      "method": "discrete_probes"
+    },
+    {
+      "rule": "low_frequency_overaccumulation",
+      "metric": "bass_60_120_hz",
+      "probe": "bass_60_120_hz delta (before=0.10)",
+      "segments": [
+        {
+          "bracket": [
+            0.0,
+            0.06
+          ],
+          "declared_flip": 0.03,
+          "observed_flip": 0.03,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "high_frequency_overaccumulation",
+      "metric": "brilliance_5000_10000_hz",
+      "probe": "brilliance_5000_10000_hz delta (before=0.08)",
+      "segments": [
+        {
+          "bracket": [
+            0.0,
+            0.1
+          ],
+          "declared_flip": 0.05,
+          "observed_flip": 0.05,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "new_high_frequency_cutoff",
+      "metric": "estimated_high_frequency_cutoff_hz",
+      "probe": "estimated_high_frequency_cutoff_hz delta (before=15000)",
+      "segments": [
+        {
+          "bracket": [
+            -6000.0,
+            -100.0
+          ],
+          "declared_flip": -3000.0,
+          "observed_flip": -3000.0,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "stereo_phase_risk_increased",
+      "metric": "phase_risk_ratio",
+      "probe": "phase_risk_ratio delta (before=0.05)",
+      "segments": [
+        {
+          "bracket": [
+            0.0,
+            0.04
+          ],
+          "declared_flip": 0.02,
+          "observed_flip": 0.02,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "negative_correlation_increased",
+      "metric": "negative_correlation_ratio",
+      "probe": "negative_correlation_ratio delta (before=0.02)",
+      "segments": [
+        {
+          "bracket": [
+            0.0,
+            0.04
+          ],
+          "declared_flip": 0.02,
+          "observed_flip": 0.02,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "duration_changed",
+      "metric": "duration",
+      "probe": "duration delta (before=180); symmetric |delta| rule",
+      "segments": [
+        {
+          "bracket": [
+            0.0,
+            0.2
+          ],
+          "declared_flip": 0.05,
+          "observed_flip": 0.05,
+          "match": true
+        },
+        {
+          "bracket": [
+            -0.2,
+            0.0
+          ],
+          "declared_flip": -0.05,
+          "observed_flip": -0.05,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "channel_layout_changed",
+      "metric": "channels",
+      "probe": "channels delta (before=2)",
+      "declared_flip": "!= 0 → first firing value 1",
+      "observed_flip": 1,
+      "match": true,
+      "method": "discrete_probes"
+    },
+    {
+      "rule": "sample_rate_changed",
+      "metric": "sample_rate",
+      "probe": "sample_rate delta (before=44100)",
+      "declared_flip": "!= 0 → first firing value 1",
+      "observed_flip": 1,
+      "match": true,
+      "method": "discrete_probes"
+    },
+    {
+      "rule": "silence_structure_changed",
+      "metric": "silence_ratio",
+      "probe": "silence_ratio delta (before=0.10); symmetric |delta| rule",
+      "segments": [
+        {
+          "bracket": [
+            0.0,
+            0.2
+          ],
+          "declared_flip": 0.05,
+          "observed_flip": 0.05,
+          "match": true
+        },
+        {
+          "bracket": [
+            -0.2,
+            0.0
+          ],
+          "declared_flip": -0.05,
+          "observed_flip": -0.05,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    },
+    {
+      "rule": "invalid_audio_samples",
+      "metric": "invalid_sample_count",
+      "probe": "after invalid_sample_count (before=0)",
+      "declared_flip": "> max_count (0) → first firing value 1",
+      "observed_flip": 1,
+      "match": true,
+      "method": "discrete_probes"
+    },
+    {
+      "rule": "analysis_confidence_low",
+      "metric": "finite_sample_ratio",
+      "probe": "after finite_sample_ratio",
+      "segments": [
+        {
+          "bracket": [
+            0.9,
+            1.0
+          ],
+          "declared_flip": 0.999,
+          "observed_flip": 0.999,
+          "match": true
+        }
+      ],
+      "match": true,
+      "method": "bisection"
+    }
+  ],
+  "lab_calibration_bridge": {
+    "purpose": "可达性映射：记录哪些 lab 阶梯能产生越过阈值的刺激；由阶梯运行推导校准值是 lab 校准线的后续工作，本层不声称。",
+    "rules": {
+      "new_clipping": {
+        "operator": "HARD_CLIP",
+        "ladder": [
+          {
+            "threshold": 0.999,
+            "pre_gain_db": 12.0,
+            "region_start_ms": 2000,
+            "region_end_ms": 2600
+          },
+          {
+            "threshold": 1.0,
+            "pre_gain_db": 12.0,
+            "region_start_ms": 2000,
+            "region_end_ms": 2600
+          }
+        ],
+        "comparable": true,
+        "note": "阶梯满幅削波必然越过 max_count=0（定义性规则，无需校准）"
+      },
+      "true_peak_margin_reduced": {
+        "operator": "NEAR_CLIP",
+        "ladder": [
+          {
+            "threshold": 0.95,
+            "pre_gain_db": 12.0,
+            "region_start_ms": 2000,
+            "region_end_ms": 2600
+          },
+          {
+            "threshold": 0.98,
+            "pre_gain_db": 12.0,
+            "region_start_ms": 2000,
+            "region_end_ms": 2600
+          }
+        ],
+        "comparable": false,
+        "note": "阶梯参数是削波阈值，与真峰余量阈值不同单位"
+      },
+      "excessive_loudness_increase": {
+        "operator": "GAIN_STEP",
+        "param": "gain_db",
+        "ladder": [
+          {
+            "gain_db": 8.0,
+            "region_start_ms": 3000,
+            "region_end_ms": 4600
+          },
+          {
+            "gain_db": 12.0,
+            "region_start_ms": 3000,
+            "region_end_ms": 4600
+          }
+        ],
+        "comparable": true,
+        "note": "阶梯 gain_db (8/12 dB) 越过 max_increase_db=4.0：lab 可产生跨阈值刺激"
+      },
+      "excessive_dynamic_compression": {
+        "operator": "DYNAMIC_COMPRESSION",
+        "param": "ratio",
+        "ladder": [
+          {
+            "ratio": 2.0,
+            "threshold": 0.15,
+            "region_start_ms": 0,
+            "region_end_ms": 0
+          },
+          {
+            "ratio": 4.0,
+            "threshold": 0.15,
+            "region_start_ms": 0,
+            "region_end_ms": 0
+          }
+        ],
+        "comparable": false,
+        "note": "压缩比与 crest 降幅不同单位，可达性需运行推导"
+      },
+      "crest_factor_collapse": {
+        "operator": "DYNAMIC_COMPRESSION",
+        "param": "ratio",
+        "ladder": [
+          {
+            "ratio": 2.0,
+            "threshold": 0.15,
+            "region_start_ms": 0,
+            "region_end_ms": 0
+          },
+          {
+            "ratio": 4.0,
+            "threshold": 0.15,
+            "region_start_ms": 0,
+            "region_end_ms": 0
+          }
+        ],
+        "comparable": false,
+        "note": "同上"
+      },
+      "new_high_frequency_cutoff": {
+        "operator": "LOWPASS",
+        "param": "cutoff_hz",
+        "ladder": [
+          {
+            "cutoff_hz": 12000,
+            "region_start_ms": 2000,
+            "region_end_ms": 4000
+          },
+          {
+            "cutoff_hz": 8000,
+            "region_start_ms": 2000,
+            "region_end_ms": 4000
+          },
+          {
+            "cutoff_hz": 4000,
+            "region_start_ms": 2000,
+            "region_end_ms": 4000
+          }
+        ],
+        "comparable": false,
+        "note": "截止频率与截止降幅 delta 不同单位"
+      },
+      "stereo_phase_risk_increased": {
+        "operator": "ANTIPHASE_REGION",
+        "ladder": [
+          {
+            "region_start_ms": 1500,
+            "region_end_ms": 2500
+          },
+          {
+            "region_start_ms": 1500,
+            "region_end_ms": 3500
+          }
+        ],
+        "comparable": false,
+        "note": "区域长度与相位风险比值不同单位"
+      },
+      "negative_correlation_increased": {
+        "operator": "ANTIPHASE_REGION",
+        "ladder": [
+          {
+            "region_start_ms": 1500,
+            "region_end_ms": 2500
+          },
+          {
+            "region_start_ms": 1500,
+            "region_end_ms": 3500
+          }
+        ],
+        "comparable": false,
+        "note": "同上"
+      },
+      "silence_structure_changed": {
+        "operator": "SILENCE_INSERT",
+        "param": "duration_ms",
+        "ladder": [
+          {
+            "duration_ms": 300,
+            "region_start_ms": 4000,
+            "region_end_ms": 4300
+          },
+          {
+            "duration_ms": 600,
+            "region_start_ms": 4000,
+            "region_end_ms": 4600
+          },
+          {
+            "duration_ms": 1000,
+            "region_start_ms": 4000,
+            "region_end_ms": 5000
+          }
+        ],
+        "comparable": false,
+        "note": "插入时长与 silence_ratio delta 不同单位"
+      },
+      "duration_changed": {
+        "operator": "SILENCE_INSERT",
+        "param": "duration_ms",
+        "ladder": [
+          {
+            "duration_ms": 300,
+            "region_start_ms": 4000,
+            "region_end_ms": 4300
+          },
+          {
+            "duration_ms": 600,
+            "region_start_ms": 4000,
+            "region_end_ms": 4600
+          },
+          {
+            "duration_ms": 1000,
+            "region_start_ms": 4000,
+            "region_end_ms": 5000
+          }
+        ],
+        "comparable": true,
+        "note": "插入时长（300/600/1000 ms）越过 ±50 ms 容差"
+      },
+      "low_frequency_overaccumulation": {
+        "operator": null,
+        "comparable": false,
+        "note": "lab 尚无针对低频能量堆积的算子"
+      },
+      "high_frequency_overaccumulation": {
+        "operator": null,
+        "comparable": false,
+        "note": "lab 尚无针对高频能量堆积的算子"
+      },
+      "analysis_confidence_low": {
+        "operator": null,
+        "comparable": false,
+        "note": "lab 尚无对应算子；测量健康门不是刺激属性"
+      },
+      "channel_layout_changed": {
+        "operator": null,
+        "comparable": false,
+        "note": "定义性不变量，不适用校准"
+      },
+      "sample_rate_changed": {
+        "operator": null,
+        "comparable": false,
+        "note": "定义性不变量，不适用校准"
+      },
+      "invalid_audio_samples": {
+        "operator": null,
+        "comparable": false,
+        "note": "定义性不变量，不适用校准"
+      }
+    }
+  },
+  "summary": {
+    "rules_total": 16,
+    "flip_points_verified": 16,
+    "all_match": true
+  }
+}

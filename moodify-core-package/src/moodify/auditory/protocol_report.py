@@ -27,6 +27,13 @@ from pathlib import Path
 
 from jsonschema import ValidationError, validate as jsonschema_validate
 
+from moodify.auditory.judgment import (
+    JUDGMENT_RULES_VERSION,
+    THRESHOLD_PROVENANCE,
+    UNIVERSAL_THRESHOLDS,
+    calibration_summary,
+)
+
 REPORT_SCHEMA_VERSION = "moodify.msp_report/0.2"
 
 # Visibility registry (POSC_011). One entry per metric the scan can emit; a
@@ -108,9 +115,29 @@ _BAND_METRICS = (
 # Absolute checks for the standalone analysis path. The delta rules in
 # judgment.py need a before/after pair; a single analyzed source has none, so
 # the report layer applies the absolute reading of the same versioned
-# thresholds (judgment-rules-v1.0). Only checks whose limits already exist in
-# UNIVERSAL_THRESHOLDS are implemented here — no new thresholds in Layer A.
-_ABSOLUTE_CHECK_VERSION = "judgment-rules-v1.0-absolute"
+# thresholds. Only checks whose limits already exist in UNIVERSAL_THRESHOLDS
+# are implemented here — no new thresholds in this layer.
+_ABSOLUTE_CHECK_VERSION = f"judgment-rules-v{JUDGMENT_RULES_VERSION}-absolute"
+_TP_MARGIN_DB = UNIVERSAL_THRESHOLDS["true_peak_margin_reduced"]["min_margin_db"]
+
+# Findings carry the calibration status of the threshold that produced them
+# (Layer C provenance), so consumers see the trust level inside the report.
+_CALIBRATION_BY_FINDING_CODE = {
+    "CLIPPING_PRESENT": "new_clipping",
+    "TRUE_PEAK_MARGIN_EXCEEDED": "true_peak_margin_reduced",
+}
+
+
+def _calibration_fields(rule_key: str | None) -> dict:
+    prov = THRESHOLD_PROVENANCE.get(rule_key) if rule_key else None
+    if prov is None:
+        return {"reference_basis": rule_key, "calibration_status": None,
+                "threshold_source_class": None}
+    return {
+        "reference_basis": rule_key,
+        "calibration_status": prov["calibration_status"],
+        "threshold_source_class": prov["source_class"],
+    }
 
 
 def _absolute_flags(metrics: dict) -> list[dict]:
@@ -127,14 +154,16 @@ def _absolute_flags(metrics: dict) -> list[dict]:
             "message": "source contains full-scale samples",
             "metric": "clipping_sample_count", "observed_value": clipping,
             "unit": "count", "classification": "TECHNICAL_RISK", "confidence": 0.9,
+            **_calibration_fields(_CALIBRATION_BY_FINDING_CODE["CLIPPING_PRESENT"]),
         })
     true_peak = value("true_peak_dbfs")
-    if true_peak is not None and true_peak > -0.5:
+    if true_peak is not None and true_peak > -_TP_MARGIN_DB:
         flags.append({
             "code": "TRUE_PEAK_MARGIN_EXCEEDED", "severity": "WARNING",
-            "message": "true peak margin below 0.5 dB",
+            "message": f"true peak margin below {_TP_MARGIN_DB:g} dB",
             "metric": "true_peak_dbfs", "observed_value": true_peak,
             "unit": "dBFS", "classification": "TECHNICAL_RISK", "confidence": 0.9,
+            **_calibration_fields(_CALIBRATION_BY_FINDING_CODE["TRUE_PEAK_MARGIN_EXCEEDED"]),
         })
     return flags
 
@@ -146,8 +175,9 @@ _PLAN_NODE_DRAFTS: dict[str, dict] = {
     "TRUE_PEAK_MARGIN_EXCEEDED": {
         "op": "limiter",
         "params": {"ceiling_dbfs": -1.0},
-        "reason": "true peak margin below 0.5 dB; a -1 dBFS ceiling restores "
-                  "inter-sample headroom without touching tonal balance",
+        "reason": f"true peak margin below {_TP_MARGIN_DB:g} dB; a -1 dBFS "
+                  "ceiling restores inter-sample headroom without touching "
+                  "tonal balance",
     },
 }
 
@@ -245,6 +275,7 @@ def _findings(metrics: dict) -> list[dict]:
             "confidence": flag.confidence,
             "evidence_refs": list(flag.evidence_refs),
             "check": "delta_rule",
+            **_calibration_fields(flag.reference_basis),
         })
     for flag in _absolute_flags(metrics):
         rows.append({
@@ -350,6 +381,9 @@ MSP_REPORT_SCHEMA = {
                     "confidence": {"type": ["number", "null"]},
                     "evidence_refs": {"type": "array", "items": {"type": "string"}},
                     "check": {"enum": ["delta_rule", "absolute_rule"]},
+                    "reference_basis": {"type": ["string", "null"]},
+                    "calibration_status": {"type": ["string", "null"]},
+                    "threshold_source_class": {"type": ["string", "null"]},
                 },
             },
         },
@@ -414,6 +448,22 @@ MSP_REPORT_SCHEMA = {
                 "profile_id": {"type": "string"},
                 "profile_parameters_sha256": {"type": "string"},
                 "judgment_rules_version": {"type": "string"},
+                "judgment_calibration": {
+                    "type": "object",
+                    "required": ["registry_version", "rules_total", "calibrated",
+                                 "default_uncalibrated", "by_source_class",
+                                 "uncalibrated_rules", "note"],
+                    "properties": {
+                        "registry_version": {"type": "string"},
+                        "rules_total": {"type": "integer"},
+                        "calibrated": {"type": "integer"},
+                        "default_uncalibrated": {"type": "integer"},
+                        "by_source_class": {"type": "object"},
+                        "uncalibrated_rules": {"type": "array",
+                                               "items": {"type": "string"}},
+                        "note": {"type": "string"},
+                    },
+                },
                 "ffmpeg": {"type": "string"},
             },
         },
@@ -552,7 +602,6 @@ def _assemble_report(
     candidate_case_root: Path | None = None,
 ) -> dict:
     from moodify.auditory.decode import ffmpeg_version
-    from moodify.auditory.judgment import JUDGMENT_RULES_VERSION
     from moodify.release import PRODUCT_VERSION, PROFILE_ID
     from moodify.auditory.profiles import get_profile
 
@@ -622,6 +671,7 @@ def _assemble_report(
             "profile_parameters_sha256": "sha256:"
             + hashlib.sha256(profile.canonical().encode("utf-8")).hexdigest(),
             "judgment_rules_version": JUDGMENT_RULES_VERSION,
+            "judgment_calibration": calibration_summary(),
             "ffmpeg": ffmpeg_version(),
         },
     }

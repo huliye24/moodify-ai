@@ -150,6 +150,9 @@ def render_report_markdown(report: dict) -> str:
                 detail.append(f"指标 `{finding['metric']}` = {_fmt(finding.get('observed_value'))}"
                               f" {_fmt(finding.get('unit'))}".rstrip())
             detail.append(f"检查方式 {finding['check']}")
+            if finding.get("calibration_status"):
+                detail.append(f"阈值来源 {finding.get('threshold_source_class')}"
+                              f" · {finding['calibration_status']}")
             if finding.get("evidence_refs"):
                 detail.append("证据 " + ", ".join(f"`{ref}`" for ref in finding["evidence_refs"]))
             lines.append(f"  - {'；'.join(detail)}")
@@ -196,6 +199,14 @@ def render_report_markdown(report: dict) -> str:
     prov = report["provenance"]
     lines.append(f"- Core {prov['core_version']} · 判断规则 {prov['judgment_rules_version']}"
                  f" · ffmpeg {prov['ffmpeg']}")
+    calib = prov.get("judgment_calibration")
+    if calib:
+        lines.append(
+            f"- 阈值校准：{calib['calibrated']}/{calib['rules_total']} 已校准 · "
+            f"{calib['default_uncalibrated']} 条 DEFAULT_UNCALIBRATED"
+            "（工程默认，未经听感校准）"
+        )
+        lines.append(f"- {calib['note']}")
     lines.append(f"- profile 参数哈希：`{prov['profile_parameters_sha256']}`")
     lines.append("")
     lines.append("> 本报告只覆盖 L1 测量层（以及标注为 EXECUTED 的层）。未标注 EXECUTED 的层"
@@ -338,6 +349,9 @@ def render_report_html(report: dict, images: dict[str, bytes] | None = None) -> 
             f'= <strong>{esc(_fmt(finding.get("observed_value")))}</strong> '
             f'{esc(_fmt(finding.get("unit")))} · 检查方式 {esc(finding["check"])}'
         )
+        if finding.get("calibration_status"):
+            out.append(f" · 阈值来源 {esc(str(finding.get('threshold_source_class')))}"
+                       f" · {esc(finding['calibration_status'])}")
         if finding.get("evidence_refs"):
             refs = " ".join(f"<code>{esc(ref)}</code>" for ref in finding["evidence_refs"])
             out.append(f" · 证据 {refs}")
@@ -379,6 +393,13 @@ def render_report_html(report: dict, images: dict[str, bytes] | None = None) -> 
         out.append(f"<tr><td>STFT 阵列</td><td><code>{esc(rep['stft_arrays'])}</code></td></tr>")
     out.append(f"<tr><td>Core</td><td>{esc(prov['core_version'])} · 判断规则 "
                f"{esc(prov['judgment_rules_version'])} · ffmpeg {esc(prov['ffmpeg'])}</td></tr>")
+    calib = prov.get("judgment_calibration")
+    if calib:
+        out.append(f"<tr><td>阈值校准</td><td>{calib['calibrated']}/"
+                   f"{calib['rules_total']} 已校准 · "
+                   f"{calib['default_uncalibrated']} 条 DEFAULT_UNCALIBRATED"
+                   f"（工程默认，未经听感校准）<br><span class=\"vis\">"
+                   f"{esc(calib['note'])}</span></td></tr>")
     out.append(f"<tr><td>profile 参数哈希</td><td><code>"
                f"{esc(prov['profile_parameters_sha256'])}</code></td></tr>")
     out.append("</tbody></table>")

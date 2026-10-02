@@ -72,14 +72,26 @@ Re-rendering without recomputation (works for analyze and compare report trios):
 moodify report <case_id|path/to/report.json>
 ```
 
+## Threshold provenance and calibration (Layer C)
+
+Every threshold in `UNIVERSAL_THRESHOLDS` (judgment-rules **v1.1**) carries provenance in `THRESHOLD_PROVENANCE`: `source_class` (`STANDARD` | `EXPERIMENTAL` | `DEFAULT`), the citation itself, the date and commit where the value was fixed (`2026-08-02`, `5452ff44` — the value set is unchanged since introduction), `calibration_status`, and whether the limit is `calibratable`. Status 2026-10-02: **0 STANDARD / 0 EXPERIMENTAL / 16 DEFAULT** — every limit is published as `DEFAULT_UNCALIBRATED`. Uncalibrated thresholds are engineering defaults and must not be consumed as perceptually validated limits.
+
+Where this surfaces:
+
+- every case bundle's `judgment_rules.json` carries `threshold_provenance` and `calibration_summary`;
+- every report carries `provenance.judgment_calibration` (machine-readable) plus the calibration counts and note in the rendered md/html provenance section; findings carry `reference_basis` / `calibration_status` / `threshold_source_class`;
+- the sensitivity report (`moodify.auditory.sensitivity`, evidence pack `artifacts/msp02_calibration_001/`) sweeps every rule through the production `evaluate_risk_flags` path — all 16 observed flip points equal the declared thresholds — and maps rules to `auditory.lab` perturbation ladders able to produce threshold-crossing stimuli (reachability only; no threshold value is derived from ladders yet).
+
+Layer C discipline is provenance only: changing a threshold value is a recalibration and requires experiment evidence plus a human-decision record (pinned by tests).
+
 ## What this does not claim
 
 The report is evidence of *what was measured*, not evidence that audio sounds good, that identity is preserved, or that the draft plan is correct. The plan has not been executed. Layer 2 reports relative deltas; it does not judge whether they are improvements (no significance thresholds exist in this layer). Layers 3–5 are human/production judgment the machine does not promise. Agents must not treat `analyzed_review_required`/`compared_review_required` as `verified`, and must not execute `plan.nodes` without an explicit 0.2 `process` (or Mix Graph) job.
 
 ## Freeze gate
 
-Before `moodify.msp_report/0.2` or `moodify.sound/0.2` is promoted from EXPERIMENTAL to frozen: golden evidence packs under `artifacts/` — `msp02_analysis_001` (analyze: four cases incl. a clipped negative control) and `msp02_compare_001` (compare: loudness-aligned A/B golden pairs) — with full report trios, byte-identical re-render proof for md/html, and the schema round-trip tests — same precedent as the Mix Graph v0.1 golden freeze.
+Before `moodify.msp_report/0.2` or `moodify.sound/0.2` is promoted from EXPERIMENTAL to frozen: golden evidence packs under `artifacts/` — `msp02_analysis_001` (analyze: four cases incl. a clipped negative control), `msp02_compare_001` (compare: loudness-aligned A/B golden pairs), and `msp02_calibration_001` (threshold provenance registry + sensitivity report) — with full report trios, byte-identical re-render proof for md/html, and the schema round-trip tests — same precedent as the Mix Graph v0.1 golden freeze.
 
 ## Scope and next version
 
-MSP/0.2 exposes read-only analysis, loudness-aligned comparison, and the 0.1 process surface on one Core. Mix Graph payloads over the protocol (v0.3 target), Layer C significance calibration, and cloud execution remain targets, not implemented claims. Version strings are exact; incompatible jobs must fail rather than be guessed into a new format.
+MSP/0.2 exposes read-only analysis, loudness-aligned comparison, threshold provenance, and the 0.1 process surface on one Core. Mix Graph payloads over the protocol (v0.3 target), perceptual significance calibration (grading deltas as better/worse — Layer C delivered provenance and sensitivity verification, not perceptual limits), and cloud execution remain targets, not implemented claims. Version strings are exact; incompatible jobs must fail rather than be guessed into a new format.

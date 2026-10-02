@@ -2,6 +2,11 @@
 
 Moodify never grants artistic approval; it only decides whether a
 candidate passes to human listening. Rules are versioned and recorded.
+
+Since judgment-rules-v1.1 every threshold also carries provenance
+(``THRESHOLD_PROVENANCE``): where its value came from, when it was fixed,
+and whether calibration evidence exists. Provenance-only discipline: this
+layer records trust level, it never recalibrates a value.
 """
 
 from __future__ import annotations
@@ -11,9 +16,12 @@ from pathlib import Path
 
 from moodify.auditory.models import Judgment, RiskFlag
 
-JUDGMENT_RULES_VERSION = "1.0"
+JUDGMENT_RULES_VERSION = "1.1"
 
-# Universal technical risk thresholds (configurable + versioned)
+# Universal technical risk thresholds (configurable + versioned).
+# Values are frozen since their introduction (5452ff44, 2026-08-02, AS-001);
+# v1.1 adds provenance metadata only. Any value change is a recalibration and
+# requires its own human-decision record and experiment evidence.
 UNIVERSAL_THRESHOLDS = {
     "true_peak_margin_reduced": {"metric": "true_peak_dbfs", "min_margin_db": 0.5},
     "excessive_loudness_increase": {"metric": "integrated_lufs", "max_increase_db": 4.0},
@@ -32,6 +40,202 @@ UNIVERSAL_THRESHOLDS = {
     "invalid_audio_samples": {"metric": "invalid_sample_count", "max_count": 0},
     "analysis_confidence_low": {"metric": "finite_sample_ratio", "min_ratio": 0.999},
 }
+
+# --- Threshold provenance (Layer C: 来源化与校准) ---------------------------
+# Every threshold declares where its value came from, when it was fixed, and
+# whether calibration evidence exists. Source classes:
+#
+#   STANDARD      — value traceable to a named published standard
+#   EXPERIMENTAL  — value derived from a repo lab experiment (auditory.lab /
+#                   physics sensitivity line); the graduation target
+#   DEFAULT       — engineering default chosen in-repo, no calibration yet
+#
+# Calibration statuses: CALIBRATED, DEFAULT_UNCALIBRATED. Status 2026-10-02:
+# 0 STANDARD / 0 EXPERIMENTAL / 16 DEFAULT — the table is byte-identical
+# since its introduction, and no threshold has been through the lab
+# calibration line yet. This honesty is the point: uncalibrated limits are
+# published as such instead of borrowing credibility from the BS.1770
+# measurement layer underneath them.
+
+CALIBRATION_STANDARD = "STANDARD"
+CALIBRATION_EXPERIMENTAL = "EXPERIMENTAL"
+CALIBRATION_DEFAULT = "DEFAULT"
+STATUS_CALIBRATED = "CALIBRATED"
+STATUS_DEFAULT_UNCALIBRATED = "DEFAULT_UNCALIBRATED"
+THRESHOLD_PROVENANCE_VERSION = "threshold-provenance-v1"
+# 5452ff44 (2026-08-02, AS-001) introduced the table; all later commits carry
+# the identical value set (verified 2026-10-02 over the full commit history).
+_PROVENANCE_DATE = "2026-08-02"
+_PROVENANCE_COMMIT = "5452ff44"
+
+THRESHOLD_PROVENANCE: dict[str, dict] = {
+    "true_peak_margin_reduced": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering margin on the ITU-R BS.1770 true-peak "
+                  "measurement; delivery practice (EBU R128 / streaming "
+                  "-1 dBTP ceilings) informs the direction, but the 0.5 dB "
+                  "early-warning margin was chosen in-repo.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "excessive_loudness_increase": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default. LUFS measurement is ITU-R BS.1770; "
+                  "the 4 LU relative-increase risk level comes from neither "
+                  "a standard nor a repo experiment.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "excessive_dynamic_compression": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default on crest-factor dynamics; the 4 dB "
+                  "reduction level is not calibrated against listening "
+                  "evidence. Lab DYNAMIC_COMPRESSION ladders exist but no "
+                  "derivation has been performed.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "crest_factor_collapse": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default absolute crest floor; no standard "
+                  "defines a crest floor and no experiment derived 4 dB.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "new_clipping": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": False,
+        "source": "Definitional invariant: any new full-scale sample is "
+                  "flagged. The value is fixed by definition; calibration "
+                  "is not applicable.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "low_frequency_overaccumulation": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default for low-band energy-ratio growth; no "
+                  "calibration experiment performed.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "high_frequency_overaccumulation": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default for high-band energy-ratio growth; no "
+                  "calibration experiment performed.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "new_high_frequency_cutoff": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default for cutoff reduction; lab LOWPASS "
+                  "ladders can produce crossing stimuli but no derivation "
+                  "has been performed.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "stereo_phase_risk_increased": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default; the phase-risk metric is repo-defined "
+                  "(no external standard), threshold not calibrated.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "negative_correlation_increased": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default; negative-correlation ratio is a "
+                  "repo-defined proxy, threshold not calibrated.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "duration_changed": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering tolerance; mirrors DURATION_TOLERANCE_S in "
+                  "auditory/comparison.py (AS-001 rescan consistency), not "
+                  "derived from a standard.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "channel_layout_changed": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": False,
+        "source": "Definitional invariant: channel identity must be "
+                  "preserved. Calibration is not applicable.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "sample_rate_changed": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": False,
+        "source": "Definitional invariant: sample rate must be preserved. "
+                  "Calibration is not applicable.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "silence_structure_changed": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default for silence-ratio change; lab "
+                  "SILENCE_INSERT ladders exist but no derivation has been "
+                  "performed.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "invalid_audio_samples": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": False,
+        "source": "Definitional invariant: non-finite (NaN/Inf) audio "
+                  "samples are defects. Calibration is not applicable.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+    "analysis_confidence_low": {
+        "source_class": CALIBRATION_DEFAULT,
+        "calibration_status": STATUS_DEFAULT_UNCALIBRATED,
+        "calibratable": True,
+        "source": "Engineering default measurement-health gate; the 0.999 "
+                  "finite-sample floor was chosen in-repo.",
+        "date": _PROVENANCE_DATE, "introduced_in": _PROVENANCE_COMMIT,
+    },
+}
+
+
+def calibration_summary() -> dict:
+    """Machine-readable trust summary over ``THRESHOLD_PROVENANCE``."""
+    by_class = {
+        CALIBRATION_STANDARD: 0,
+        CALIBRATION_EXPERIMENTAL: 0,
+        CALIBRATION_DEFAULT: 0,
+    }
+    uncalibrated: list[str] = []
+    for key, prov in THRESHOLD_PROVENANCE.items():
+        by_class[prov["source_class"]] += 1
+        if prov["calibration_status"] == STATUS_DEFAULT_UNCALIBRATED:
+            uncalibrated.append(key)
+    calibrated = sum(
+        1 for p in THRESHOLD_PROVENANCE.values()
+        if p["calibration_status"] == STATUS_CALIBRATED
+    )
+    return {
+        "registry_version": THRESHOLD_PROVENANCE_VERSION,
+        "rules_total": len(THRESHOLD_PROVENANCE),
+        "calibrated": calibrated,
+        "default_uncalibrated": len(uncalibrated),
+        "by_source_class": by_class,
+        "uncalibrated_rules": uncalibrated,
+        "note": "阈值来源化（Layer C）只记录信任级别，不重校准数值；"
+                "DEFAULT_UNCALIBRATED 的阈值是工程默认值，"
+                "不得当作经过听感校准的限值消费。",
+    }
 
 
 def evaluate_risk_flags(metric_delta: dict, before_metrics: dict, after_metrics: dict) -> list[RiskFlag]:
@@ -59,7 +263,8 @@ def evaluate_risk_flags(metric_delta: dict, before_metrics: dict, after_metrics:
 
     tp_d = delta("true_peak_dbfs")
     tp_a = val(after_metrics, "true_peak_dbfs")
-    if tp_d is not None and tp_a is not None and tp_a > -0.5 and tp_d < 0:
+    tp_margin = t["true_peak_margin_reduced"]["min_margin_db"]
+    if tp_d is not None and tp_a is not None and tp_a > -tp_margin and tp_d < 0:
         flags.append(RiskFlag("TRUE_PEAK_MARGIN_REDUCED", "WARNING",
                               "true peak margin reduced toward 0 dBFS",
                               "true_peak_dbfs", val(before_metrics, "true_peak_dbfs"), tp_a))
@@ -320,4 +525,7 @@ def write_judgment_rules(path: Path) -> None:
     path.write_text(json.dumps({
         "judgment_rules_version": JUDGMENT_RULES_VERSION,
         "universal_thresholds": UNIVERSAL_THRESHOLDS,
+        "threshold_provenance_version": THRESHOLD_PROVENANCE_VERSION,
+        "threshold_provenance": THRESHOLD_PROVENANCE,
+        "calibration_summary": calibration_summary(),
     }, ensure_ascii=False, indent=2), encoding="utf-8")

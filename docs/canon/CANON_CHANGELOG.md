@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — 阈值来源化与敏感性验证（MSP 0.2 Layer C，CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 判定层能力新增（设计提案 §6 Layer C 承诺边界），不改产品身份、authority order、One Core 规则；记录于此因它修订了判定规则的版本语义（R7 可见性）。
+- **Why / evidence：** 2026-10-02 人类指令「Layer C — 阈值来源化与校准」；事实基础：`UNIVERSAL_THRESHOLDS` 16 条值集合自 `5452ff44`（2026-08-02，AS-001）引入以来逐位未变（2026-10-02 全提交历史比对验证）。Layer C 只加来源元数据，不改任何数值。
+- **Boundary：** 每条阈值带 `source_class`（STANDARD/EXPERIMENTAL/DEFAULT）、source 引用、date、introduced_in、`calibration_status`、`calibratable`；现状诚实记录为 **0/16 calibrated，全部 `DEFAULT_UNCALIBRATED`**——工程默认值不得当作已验证限值消费，报告内校准计数与 note 对下游显式警示。judgment-rules 版本 1.0→1.1（纯增量元数据，判定行为不变）。敏感性报告 = 生产判定路径 `evaluate_risk_flags` 的翻转点扫描（16/16 与声明阈值一致，纯算术无音频）+ `auditory.lab` 阶梯可达性桥（只映射可达性，不推导校准值；单位不可比显式标 `comparable: false`）。**防重校准护栏：测试钉死全部 16 个数值**；改值 = 重校准，需要实验证据 + 人类决策记录。感知显著性校准（给 delta 定「更好/更坏」）仍不存在。
+- **Affected authority files：** `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_2.md`、`docs/REPOSITORY_STATUS.md`。代码面：`auditory/judgment.py`（THRESHOLD_PROVENANCE + calibration_summary + 判定规则 v1.1 + 真峰规则改读表值，行为不变）、`auditory/protocol_report.py`（findings 校准字段 + `provenance.judgment_calibration` + `_ABSOLUTE_CHECK_VERSION` 派生自规则版本）、`auditory/report_render.py`（校准计数与 note 渲染）、`auditory/sensitivity.py`（新）。
+- **Migration：** 无破坏性变更。`judgment_rules.json` 增量加键（既有 case bundle 不回写，历史证据保持 v1.0 原貌）；报告 schema 仍为 0.2 EXPERIMENTAL 未冻结态下的增量修订（`judgment_calibration` 与 findings 三个可选字段）；analyze/compare 作业行为不变。
+- **Rollback：** 回退上述四个代码文件与本条即可；旧报告无 `judgment_calibration` 字段时渲染按缺省跳过，analyze/compare 链路与既有证据包不受影响。
+
 ## 2026-10-02 — MSP/0.2 compare 作业与 L2 对比层（Layer B，CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 仍是 v2.1 Sound Protocol 边界内的协议能力新增（设计提案 §6 Layer B 承诺边界），不改产品身份、authority order、One Core 规则；记录于此因新增协议语义与 CLI 表面（R7 可见性）。
