@@ -940,6 +940,29 @@ function handleCodexEvent(n) {
   }
 }
 
+/** 顶栏权限开关：standard（逐条审批）↔ full（无沙箱不审批，畅通无阻）。
+ *  权限随线程生效：切换后丢弃当前线程，下一个新线程按新模式打开。 */
+async function initPermToggle() {
+  const btn = $('perm-toggle');
+  const setLabel = (mode) => {
+    btn.textContent = mode === 'full' ? '权限：全开' : '权限：标准';
+    btn.title = mode === 'full'
+      ? 'AI 畅通无阻（无沙箱、不再逐条审批）。点击切回标准保护。'
+      : '标准保护（工作区写入 + 敏感操作逐条审批）。点击切为全开。';
+  };
+  try { setLabel(await window.moodify.permissionGet()); } catch { /* keep default */ }
+  btn.addEventListener('click', async () => {
+    const next = (await window.moodify.permissionGet()) === 'full' ? 'standard' : 'full';
+    await window.moodify.permissionSet(next);
+    setLabel(next);
+    compiler.threadId = null; // 旧线程策略已冻结，丢弃；下个线程按新模式开
+    compiler.threadCwd = null;
+    compilerNote(next === 'full'
+      ? '权限已切为全开：不再逐条审批，新对话线程起生效。'
+      : '权限已切回标准：敏感操作将逐条审批，新对话线程起生效。');
+  });
+}
+
 function handleCodexServerRequest(req) {
   const p = req.params || {};
   if ($('compiler-stream').hidden) openStream(); // 审批卡必须可见可操作
@@ -956,21 +979,28 @@ function handleCodexServerRequest(req) {
     label.textContent = `审批请求：${req.method}`;
   }
   card.appendChild(label);
+  // decision 值按协议代际映射（schema 权威）：
+  //   v2 item/* → accept / acceptForSession / decline
+  //   v1 旧名    → approved / approved_for_session / denied
+  const v2 = req.method.startsWith('item/');
+  const yes = v2 ? 'accept' : 'approved';
+  const session = v2 ? 'acceptForSession' : 'approved_for_session';
+  const no = v2 ? 'decline' : 'denied';
   const actions = document.createElement('div');
   actions.className = 'approval-actions';
-  const mk = (text, decision) => {
+  const mk = (text, decision, primary) => {
     const b = document.createElement('button');
     b.textContent = text;
-    b.className = decision === 'decline' ? 'ghost' : 'primary';
+    b.className = primary ? 'primary' : 'ghost';
     b.addEventListener('click', async () => {
       await window.moodify.codexRespond(req.id, { decision });
       card.remove();
     });
     return b;
   };
-  actions.appendChild(mk('批准', 'accept'));
-  actions.appendChild(mk('本次会话批准', 'acceptForSession'));
-  actions.appendChild(mk('拒绝', 'decline'));
+  actions.appendChild(mk('批准', yes, true));
+  actions.appendChild(mk('本次会话全部允许', session, false));
+  actions.appendChild(mk('拒绝', no, false));
   card.appendChild(actions);
   stream.appendChild(card);
   stream.scrollTop = stream.scrollHeight;
@@ -1059,6 +1089,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   window.moodify.onCodexEvent(handleCodexEvent);
   window.moodify.onCodexServerRequest(handleCodexServerRequest);
   initCompilerSetup();
+  initPermToggle();
   initDrawer();
   initDrop();
   await ensureCompiler();

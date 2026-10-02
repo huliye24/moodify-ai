@@ -43,6 +43,9 @@ contextBridge.exposeInMainWorld('moodify', {
   codexSavePlan: (caseDir, text) => ipcRenderer.invoke('codex:save-plan', caseDir, text),
   onCodexEvent: (cb) => ipcRenderer.on('codex:event', (_e, notification) => cb(notification)),
   onCodexServerRequest: (cb) => ipcRenderer.on('codex:server-request', (_e, request) => cb(request)),
+  // 权限模式：standard（审批）| full（全开，畅通无阻）
+  permissionGet: () => ipcRenderer.invoke('codex:permission:get'),
+  permissionSet: (value) => ipcRenderer.invoke('codex:permission:set', value),
 
   // 分离 / MIDI / 曲谱：显式动作，产物落世界目录
   listCaseFiles: (caseDir, subdir, exts) => ipcRenderer.invoke('casefiles:list', caseDir, subdir, exts),

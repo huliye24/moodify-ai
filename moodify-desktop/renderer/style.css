@@ -60,6 +60,7 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 #case-title h1 { margin: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #case-title p { margin: 2px 0 0; font-size: 12px; }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.top-actions button { padding: 2px 8px; font-size: 12px; flex: none; }
 
 /* ——— 主行：图标栏 | 历史面板 | 工作区 ——— */
 

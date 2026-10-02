@@ -347,13 +347,28 @@ function registerCodexIpc() {
 
   ipcMain.handle('codex:thread-open', async (_e, caseDir) => {
     if (!codex.ready) return { ok: false, reason: '内核未初始化' };
+    // 权限模式（人类裁决 2026-10-02：提供全开档，执行畅通无阻）：
+    //   standard = 工作区写入 + 敏感操作逐条审批
+    //   full     = 无沙箱 + 不审批（danger-full-access / never，schema 枚举已核）
+    // 注：本机 windowsSandbox notConfigured，workspace-write 实际降级 read-only；
+    // full 档不做沙箱尝试，反而能让内核真正执行写入。
+    const full = readProviderState().permission === 'full';
     const result = await codex.request('thread/start', {
       cwd: fs.existsSync(caseDir) ? caseDir : CASES_ROOT,
       baseInstructions: COMPILER_INSTRUCTIONS,
-      sandbox: 'workspace-write',
-      approvalPolicy: 'untrusted',
+      sandbox: full ? 'danger-full-access' : 'workspace-write',
+      approvalPolicy: full ? 'never' : 'untrusted',
     });
     return { ok: true, thread: result };
+  });
+
+  ipcMain.handle('codex:permission:get', async () => readProviderState().permission || 'standard');
+
+  ipcMain.handle('codex:permission:set', async (_e, value) => {
+    const state = readProviderState();
+    state.permission = value === 'full' ? 'full' : 'standard';
+    fs.writeFileSync(path.join(CODEX_HOME, 'providers.json'), JSON.stringify(state, null, 2), 'utf8');
+    return state.permission;
   });
 
   ipcMain.handle('codex:send', async (_e, threadId, text) => {
