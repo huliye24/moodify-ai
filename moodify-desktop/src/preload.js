@@ -19,6 +19,9 @@ contextBridge.exposeInMainWorld('moodify', {
   runAnalysis: (audioPath) => ipcRenderer.invoke('analysis:run', audioPath),
   readReport: (reportPath) => ipcRenderer.invoke('report:read', reportPath),
   renderCharts: (reportPath) => ipcRenderer.invoke('charts:render', reportPath),
+  // waveform: resolve the source audio of a case and read its bytes
+  resolveSource: (caseDir) => ipcRenderer.invoke('source:resolve', caseDir),
+  readAudio: (audioPath) => ipcRenderer.invoke('audio:read', audioPath),
 
   // embedded terminal (node-pty)
   createTerminal: (termId, cwd) => ipcRenderer.invoke('pty:create', termId, cwd),

@@ -424,8 +424,25 @@ function registerIpc() {
       throw new Error((payload && payload.error) || result.stderr.trim().slice(-500)
         || `python exited with code ${result.code}`);
     }
-    return lastJsonLine(result.stdout);
+    const payload = lastJsonLine(result.stdout);
+    // remember where the audio lives so the shell can draw its waveform
+    // (report.json carries only name/sha256); optional, never fatal
+    try {
+      const reportPath = payload && payload.reports && payload.reports.json;
+      if (reportPath) {
+        fs.writeFileSync(path.join(path.dirname(reportPath), 'source_path.json'),
+          JSON.stringify({ path: audioPath }, null, 2), 'utf8');
+      }
+    } catch { /* waveform is optional */ }
+    return payload;
   });
+  ipcMain.handle('source:resolve', (_event, caseDir) => {
+    try {
+      const p = JSON.parse(fs.readFileSync(path.join(caseDir, 'source_path.json'), 'utf8'));
+      return p.path && fs.existsSync(p.path) ? p.path : null;
+    } catch { return null; }
+  });
+  ipcMain.handle('audio:read', (_event, audioPath) => fs.promises.readFile(audioPath));
   ipcMain.handle('charts:render', async (_event, reportPath) => {
     const result = await runPython([
       '-m', 'moodify.ui.chart_export', reportPath, '--out', path.join(path.dirname(reportPath), 'charts'),

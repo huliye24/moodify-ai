@@ -26,22 +26,13 @@
   </header>
 
   <div id="main-row">
-    <!-- 左图标栏（PS/PyCharm 式）：打开 / 世界 / 观察 / 数据 / Mood 编译器 -->
+    <!-- 左图标栏：打开 / 世界（视图走顶部标签页） -->
     <nav id="rail">
       <button id="rail-open" title="打开音频文件（创建/进入世界）" aria-label="打开音频文件">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
       </button>
       <button id="rail-history" title="世界（双击进入）" aria-label="世界">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c-5.5 5.5-5.5 11.5 0 17M12 3.5c5.5 5.5 5.5 11.5 0 17"/></svg>
-      </button>
-      <button id="rail-charts" title="观察（图表）" aria-label="观察" disabled>
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5v-17M3.5 20.5h17"/><path d="M7 16v-5M11.5 16V7M16 16v-8M20.5 16v-3"/></svg>
-      </button>
-      <button id="rail-data" title="数据（测量表）" aria-label="数据" disabled>
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 4.5h17v15h-17zM3.5 9.5h17M3.5 14.5h17M9.5 4.5v15M15.5 4.5v15"/></svg>
-      </button>
-      <button id="rail-compiler" title="Mood 编译器" aria-label="Mood 编译器" disabled>
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>
       </button>
     </nav>
 
@@ -60,23 +51,33 @@
       <p class="muted archive-path" id="archive-path"></p>
     </aside>
 
-    <!-- 中央工作区：空态 / 数据 / 图表 / 方案（Mood 编译器） -->
+    <!-- 中央工作区：顶部标签页（数据 / 图表·波谱 / 后处理）+ 内容直接可见 -->
     <main id="workspace">
-      <section id="view-empty" class="workspace-view">
-        <img class="watermark" src="assets/moodify_logo.png" alt="">
-      </section>
+      <nav id="tabs" hidden>
+        <button class="tab" id="tab-data">数据</button>
+        <button class="tab" id="tab-charts">图表 · 波谱</button>
+        <button class="tab" id="tab-plan">后处理</button>
+      </nav>
+      <div id="views">
+        <section id="view-empty" class="workspace-view">
+          <img class="watermark" src="assets/moodify_logo.png" alt="">
+        </section>
 
-      <section id="view-data" class="workspace-view" hidden>
-        <table class="data">
-          <thead><tr><th>指标</th><th>值</th><th>单位</th><th>状态</th><th>组</th></tr></thead>
-          <tbody id="measure-body"></tbody>
-        </table>
-      </section>
+        <section id="view-data" class="workspace-view" hidden>
+          <table class="data">
+            <thead><tr><th>指标</th><th>值</th><th>单位</th><th>状态</th><th>组</th></tr></thead>
+            <tbody id="measure-body"></tbody>
+          </table>
+        </section>
 
-      <section id="view-charts" class="workspace-view" hidden>
-        <div id="charts-body" class="charts"></div>
-        <p class="muted caption">实测值展示；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断。</p>
-      </section>
+        <section id="view-charts" class="workspace-view" hidden>
+          <div id="wave-wrap" hidden>
+            <canvas id="waveform" height="150"></canvas>
+            <p class="muted caption" id="wave-caption"></p>
+          </div>
+          <div id="charts-body" class="charts"></div>
+          <p class="muted caption">实测值展示；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断。</p>
+        </section>
 
       <section id="view-plan" class="workspace-view" hidden>
         <div class="plan-gen">
@@ -120,6 +121,7 @@
         <div id="plan-body"></div>
         <p class="muted caption">本页只呈现 L1 技术测量与保守草案；不含听感、音乐或商业判断。渲染是显式动作（W5 接入）。</p>
       </section>
+      </div>
     </main>
   </div>
 
@@ -134,9 +136,9 @@
     <div id="terminal"></div>
   </div>
 
-  <!-- 意图命令条：审美意图从这里进入（MC 聊天栏位），编译器是唯一 AI 门 -->
+  <!-- 意图命令条：写文字，编译器回答与操作（MC 聊天栏位，唯一 AI 门） -->
   <div id="intent-dock">
-    <textarea id="compiler-input" rows="1" placeholder="说出你的审美意图，如「70 年代暖声，人声再近一点」（⏎ 发送，Shift+⏎ 换行）" disabled></textarea>
+    <textarea id="compiler-input" rows="1" title="直接输入，⏎ 发送" disabled></textarea>
     <button id="compiler-send" class="primary" disabled>发送</button>
     <button id="drawer-toggle2" class="ghost" title="工程终端（ffmpeg / python / CLI）">⌘_</button>
   </div>

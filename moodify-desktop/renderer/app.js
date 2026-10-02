@@ -17,10 +17,11 @@ const state = {
   termId: null,
   termCwd: undefined, // undefined = terminal never created
   drawerVisible: false, // engineering terminal stays hidden until asked for
+  wave: null,           // {lanes:[Float32Array(min,max)…], duration} peaks cache
 };
 
 const VIEWS = ['empty', 'data', 'charts', 'plan'];
-const VIEW_RAIL = { charts: 'rail-charts', data: 'rail-data', plan: 'rail-compiler' };
+const VIEW_TAB = { data: 'tab-data', charts: 'tab-charts', plan: 'tab-plan' };
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -122,8 +123,9 @@ function showError(message) {
 
 function selectView(name) {
   for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
-  for (const [view, railId] of Object.entries(VIEW_RAIL)) {
-    $(railId).classList.toggle('active', view === name);
+  $('tabs').hidden = name === 'empty';
+  for (const [view, tabId] of Object.entries(VIEW_TAB)) {
+    $(tabId).classList.toggle('active', view === name);
   }
 }
 
@@ -137,6 +139,7 @@ async function openReport(reportPath) {
   }
   state.reportPath = reportPath;
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
+  state.wave = null;
 
   const source = report.source || {};
   const technical = report.technical_state || {};
@@ -165,16 +168,17 @@ async function openReport(reportPath) {
     $('compiler-save').hidden = true;
   }
 
-  $('rail-charts').disabled = false;
-  $('rail-data').disabled = false;
-  $('rail-compiler').disabled = false;
+  $('tabs').hidden = false;
   setCompilerBusy(compiler.busy); // intent bar unlocks with the world
   toggleHistoryPanel(false);
   renderMeasurements(report.measurements || []);
   renderPlan(report);
   selectView('charts'); // 图表优先：进入世界先看观察
   fitTerminalSoon();
+  const entryDir = state.caseDir;
+  const wave = renderWaveform(entryDir);   // 波形先行：解码完即有内容可看
   await renderCharts(reportPath, report);
+  await wave;
   await ensureTerminal();
 }
 
@@ -242,6 +246,106 @@ function figure(pngPath, caption) {
   fig.appendChild(img);
   fig.appendChild(cap);
   return fig;
+}
+
+// ——— 波形（Audacity 式）：Web Audio 解码源音频 → 峰值包络 → canvas ———
+
+const WAVE_PEAK_COLS = 2000;
+
+async function renderWaveform(entryDir) {
+  const wrap = $('wave-wrap');
+  const src = await window.moodify.resolveSource(entryDir);
+  if (!src || state.caseDir !== entryDir) { wrap.hidden = true; return; }
+  wrap.hidden = false;
+  try {
+    const bytes = await window.moodify.readAudio(src);
+    const ab = bytes instanceof ArrayBuffer ? bytes
+      : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    const ctx = new AudioContext();
+    const audio = await ctx.decodeAudioData(ab);
+    await ctx.close();
+    if (state.caseDir !== entryDir) return; // world switched mid-decode
+    state.wave = buildWavePeaks(audio);
+    $('wave-caption').textContent =
+      `${src.split(/[\\/]/).pop()} · ${audio.numberOfChannels}ch @ ${audio.sampleRate}Hz`
+      + ` · ${audio.duration.toFixed(1)}s`;
+    drawWaveform();
+  } catch { wrap.hidden = true; } // 波形是增益，不是依赖：失败静默降级为图表
+}
+
+function buildWavePeaks(audio) {
+  const cols = WAVE_PEAK_COLS;
+  const lanes = [];
+  for (let ch = 0; ch < Math.min(audio.numberOfChannels, 2); ch++) {
+    const data = audio.getChannelData(ch);
+    const lane = new Float32Array(cols * 2);
+    const step = data.length / cols;
+    for (let c = 0; c < cols; c++) {
+      const start = Math.floor(c * step);
+      const end = Math.min(Math.floor((c + 1) * step), data.length);
+      let min = 1.0, max = -1.0;
+      for (let i = start; i < end; i++) {
+        if (data[i] < min) min = data[i];
+        if (data[i] > max) max = data[i];
+      }
+      lane[c * 2] = min > max ? 0 : min;
+      lane[c * 2 + 1] = min > max ? 0 : max;
+    }
+    lanes.push(lane);
+  }
+  return { lanes, duration: audio.duration };
+}
+
+function drawWaveform() {
+  const canvas = $('waveform');
+  const wrap = $('wave-wrap');
+  if (!state.wave || wrap.hidden) return;
+  const { lanes, duration } = state.wave;
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = Math.max(400, wrap.clientWidth);
+  const laneH = 64, gap = 6, rulerH = 18;
+  const cssH = laneH * lanes.length + gap * (lanes.length - 1) + rulerH;
+  canvas.style.width = '100%';
+  canvas.style.height = `${cssH}px`;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  const g = canvas.getContext('2d');
+  g.scale(dpr, dpr);
+  const cols = lanes[0].length / 2;
+  const half = laneH / 2 - 2;
+  lanes.forEach((lane, ch) => {
+    const y0 = ch * (laneH + gap);
+    const mid = y0 + laneH / 2;
+    g.fillStyle = '#f6f7ff';
+    g.fillRect(0, y0, cssW, laneH);
+    g.strokeStyle = '#e5e7eb';
+    g.strokeRect(0.5, y0 + 0.5, cssW - 1, laneH - 1);
+    g.strokeStyle = '#d1d5db';
+    g.beginPath(); g.moveTo(0, mid); g.lineTo(cssW, mid); g.stroke();
+    g.fillStyle = 'rgba(79, 70, 229, 0.78)';
+    for (let x = 0; x < cssW; x++) {
+      const c = Math.min(cols - 1, Math.floor((x / cssW) * cols));
+      const yMax = mid + lane[c * 2 + 1] * half;
+      const yMin = mid + lane[c * 2] * half;
+      g.fillRect(x, yMax, 1, Math.max(1, yMin - yMax));
+    }
+    g.fillStyle = '#9ca3af';
+    g.font = '10px "Segoe UI", sans-serif';
+    g.fillText(ch === 0 ? 'L' : 'R', 4, y0 + 11);
+  });
+  // time ruler（诚实时间轴）
+  const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300];
+  const stepSize = steps.find((s) => duration / s <= 10) || 600;
+  g.font = '10px "Segoe UI", sans-serif';
+  for (let t = 0; t <= duration; t += stepSize) {
+    const x = (t / duration) * cssW;
+    g.strokeStyle = '#f3f4f6';
+    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, cssH - rulerH); g.stroke();
+    g.fillStyle = '#9ca3af';
+    const m = Math.floor(t / 60);
+    const s = Math.round(t % 60);
+    g.fillText(`${m}:${String(s).padStart(2, '0')}`, x + 2, cssH - 5);
+  }
 }
 
 function renderPlan(report) {
@@ -638,14 +742,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   $('rail-open').addEventListener('click', pickAndAnalyze);
   $('rail-history').addEventListener('click', () => toggleHistoryPanel());
-  $('rail-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
-  $('rail-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
-  $('rail-compiler').addEventListener('click', () => {
-    if (state.caseDir) {
-      selectView('plan');
-      if (!compiler.threadId || compiler.threadCwd !== state.caseDir) openCompilerThread();
-    }
+  $('tab-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
+  $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
+  $('tab-plan').addEventListener('click', () => {
+    if (!state.caseDir) return;
+    selectView('plan');
+    if (!compiler.threadId || compiler.threadCwd !== state.caseDir) openCompilerThread();
   });
+  window.addEventListener('resize', drawWaveform);
   $('refresh').addEventListener('click', refreshArchive);
   const sendIntent = () => {
     const text = $('compiler-input').value;
