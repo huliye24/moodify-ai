@@ -18,6 +18,7 @@ const state = {
   termCwd: undefined, // undefined = terminal never created
   drawerVisible: false, // engineering terminal stays hidden until asked for
   streamH: 200,         // 编译器对话抽屉高度（可拖动）
+  streamUnread: false,  // 抽屉收起时有新内容待读
 };
 
 const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'bench'];
@@ -455,38 +456,61 @@ const compiler = {
   lastAssistantText: '',
 };
 
-function showDockStream() {
-  $('compiler-stream').hidden = false;
-  $('stream-bar').hidden = false;
-  $('dock-bar').hidden = false;
+/** 对话抽屉（GoLand 终端式）：默认隐藏只剩输入框；拉杆拖动开合，双击切换。 */
+function openStream(height) {
+  if (height) state.streamH = height;
+  const stream = $('compiler-stream');
+  stream.hidden = false;
+  stream.style.height = `${state.streamH}px`;
+  state.streamUnread = false;
+  updateStreamDot();
+  stream.scrollTop = stream.scrollHeight;
 }
 
-/** 编译器对话抽屉：拖顶栏调高度（80px–60vh），双击收起/展开。 */
+function closeStream() {
+  $('compiler-stream').hidden = true;
+  updateStreamDot();
+}
+
+function updateStreamDot() {
+  // 对话区藏着时：有内容在产生或待读 → 拉杆上亮点提示
+  $('stream-dot').hidden = !$('compiler-stream').hidden
+    || !(compiler.busy || state.streamUnread);
+}
+
+function showDockStream() {
+  if ($('compiler-stream').hidden) {
+    state.streamUnread = true; // 有新内容但抽屉收着
+  }
+  updateStreamDot();
+  const stream = $('compiler-stream');
+  stream.scrollTop = stream.scrollHeight;
+}
+
 function initStreamBar() {
   const bar = $('stream-bar');
-  const stream = $('compiler-stream');
-  const apply = () => { stream.style.height = `${state.streamH}px`; };
   let y0 = 0, h0 = 0, dragging = false;
   bar.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button')) return;
     dragging = true;
     y0 = e.clientY;
-    h0 = state.streamH;
+    h0 = $('compiler-stream').hidden ? 0 : state.streamH;
     e.preventDefault();
   });
   window.addEventListener('mousemove', (e) => {
     if (!dragging) return;
-    state.streamH = Math.min(Math.round(window.innerHeight * 0.6),
-      Math.max(80, h0 + (y0 - e.clientY)));
-    apply();
+    const h = Math.min(Math.round(window.innerHeight * 0.6), Math.max(0, h0 + (y0 - e.clientY)));
+    if (h < 60) {
+      closeStream(); // 拖到底 = 隐藏（GoLand 式收起）
+    } else {
+      openStream(h);
+    }
   });
   window.addEventListener('mouseup', () => { dragging = false; });
-  bar.addEventListener('dblclick', () => {
-    if (stream.hidden) {
-      stream.hidden = false;
-      apply();
-    } else {
-      stream.hidden = true;
-    }
+  bar.addEventListener('dblclick', (e) => {
+    if (e.target.closest('button')) return;
+    if ($('compiler-stream').hidden) openStream();
+    else closeStream();
   });
 }
 
@@ -524,6 +548,7 @@ function compilerNote(text) {
 function setCompilerBusy(busy) {
   compiler.busy = busy;
   $('compiler-stop').hidden = !busy;
+  updateStreamDot();
   const worldOpen = Boolean(state.caseDir);
   $('compiler-send').disabled = busy || !worldOpen;
   $('compiler-input').disabled = busy || !worldOpen;
@@ -653,6 +678,7 @@ function handleCodexEvent(n) {
 
 function handleCodexServerRequest(req) {
   const p = req.params || {};
+  if ($('compiler-stream').hidden) openStream(); // 审批卡必须可见可操作
   const stream = $('compiler-stream');
   const card = document.createElement('div');
   card.className = 'approval';

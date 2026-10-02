@@ -219,21 +219,31 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 .setup-row input#setup-model { width: 160px; }
 .setup-row input#setup-baseurl { flex: 1; min-width: 200px; }
 
-/* 编译器对话抽屉：高度由拖动拉杆控制（默认 200px，范围 80px–60vh） */
+/* 编译器对话抽屉（GoLand 终端式）：拉杆常驻，对话区默认隐藏，拖动/双击开合 */
 #stream-bar {
   flex: none;
-  height: 16px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   border-top: 1px solid var(--hairline);
-  border-radius: 6px 6px 0 0;
   background: #fafafa;
   color: #b7bcc5;
-  font-size: 10px;
-  text-align: center;
-  line-height: 8px;
+  font-size: 11px;
   cursor: row-resize;
   user-select: none;
+  padding: 0 8px;
 }
 #stream-bar:hover { color: var(--muted); background: var(--accent-soft); }
+#stream-bar .grip { flex: 1; text-align: center; letter-spacing: 3px; }
+#stream-bar .drawer-actions button { padding: 1px 8px; font-size: 11.5px; cursor: pointer; }
+#stream-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
 .compiler-stream {
   height: 200px;
   overflow: auto;
@@ -241,14 +251,6 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   flex-direction: column;
   gap: 8px;
 }
-#dock-bar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 10px;
-}
-#dock-bar .drawer-actions button { padding: 2px 8px; font-size: 12px; }
-#dock-bar .muted { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cmsg { border-radius: 8px; padding: 8px 12px; max-width: 92%; }
 .cmsg.user { background: var(--accent-soft); align-self: flex-end; }
 .cmsg.assistant { background: #f9fafb; border: 1px solid var(--hairline); align-self: flex-start; }
@@ -273,8 +275,8 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   flex: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 8px 12px 10px;
+  gap: 5px;
+  padding: 4px 12px 8px;
   border-top: 1px solid var(--hairline);
   background: var(--bg);
 }

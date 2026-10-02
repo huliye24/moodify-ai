@@ -109,16 +109,18 @@
     <div id="terminal"></div>
   </div>
 
-  <!-- 意图命令条 = Mood 编译器之家：写文字 → DeepSeek 回答与操作；唯一 AI 门 -->
+  <!-- 意图命令条 = Mood 编译器之家：写文字 → DeepSeek 回答与操作；唯一 AI 门。
+       对话区默认隐藏（GoLand 终端式）：拉杆拖动开合，双击切换，默认只剩输入对话框。 -->
   <div id="intent-dock">
-    <div id="stream-bar" hidden title="拖动调高度，双击收起/展开">⋯</div>
-    <div id="compiler-stream" class="compiler-stream" hidden></div>
-    <div id="dock-bar" hidden>
+    <div id="stream-bar" title="拖动展开/收起对话，双击切换">
+      <span id="stream-dot" hidden></span>
+      <span class="grip">⋯</span>
       <span class="drawer-actions">
-        <button id="compiler-stop" class="ghost" hidden>停止</button>
         <button id="compiler-save" class="ghost" hidden title="把最后一条方案存为 plan.md">保存方案</button>
+        <button id="compiler-stop" class="ghost" hidden>停止</button>
       </span>
     </div>
+    <div id="compiler-stream" class="compiler-stream" hidden></div>
     <!-- 首次使用：内核与模型提供方设置（安装时可选，随时可改） -->
     <div id="compiler-setup" class="compiler-setup" hidden>
       <div class="setup-row">
