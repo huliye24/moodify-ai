@@ -2,6 +2,16 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — Moodify Studio W2：Mood 编译器内核换 Codex（app-server 协议嵌入，claude CLI 完全替换）（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因 Mood 编译器的内核通道整体换轨（R7 可见性）。权威依据：`docs/plan/2026-10-02_MOODIFY_STUDIO_PRODUCT_DEFINITION.md` §9 修正案（人类三项裁决：**B 协议嵌入一步到位 / 模型安装时可选 / claude CLI 完全替换**——取代原裁决 1"先用 claude CLI 过渡"）。
+- **Boundary：** W1 的 claude CLI 通道整体移除（PLAN_PROMPT 与 claude IPC 不复存在）。新内核 = `@openai/codex` 0.160.0 的 `codex app-server`（JSON-RPC over stdio，协议形状取自二进制 `generate-json-schema`，非猜测）：main 进程单例 `CodexClient`（initialize → thread/start → turn/start，流式 `item/agentMessage/delta`），审批请求（命令/文件修改）原生化进 UI（批准 / 本次会话批准 / 拒绝 → `codex:respond`）。模型提供方三选一（GLM / OpenAI / 自定义 OpenAI 兼容 base_url），首次使用设置卡录入，仅存本机 `CODEX_HOME=~/.moodify/codex`（config.toml + providers.json，不碰用户 `~/.codex`；密钥只在 spawn 时注入 env，`codex:provider:get` 永不回传明文）。thread 的 cwd=case 目录，系统提示词固定"Moodify 后处理方案工程师"；"保存方案"把最后一条助手消息写为 `case_dir/plan.md`。**核心零改动；DRAFT_PLAN_NOT_EXECUTED 不变。**
+- **诚实边界（原样进 UI）：** thread/start 请求 `sandbox=workspace-write` + `approvalPolicy=untrusted`，但本机 `windowsSandbox/readiness` = notConfigured，**生效沙箱降级为 read-only**——UI 显示生效值而非请求值（`Codex 内核 · <model> · Windows 沙箱：<生效>` + 降级说明）。沙箱配置向导 `windowsSandbox/setupStart` 暂不自动触发（W2 残余项）。
+- **License：** `@openai/codex` Apache-2.0，单向兼容 GPL-3.0-only，作为 npm 依赖嵌入（不 fork 源码——上游日更，fork 漂移不可维护；源码仅审计参考），NOTICE 归属随依赖分发保留。
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件、`docs/plan/2026-10-02_MOODIFY_STUDIO_PRODUCT_DEFINITION.md`（§9 修正案）。代码面：`moodify-desktop/src/main.js`（CodexClient + codex IPC）、`src/preload.js`（codex 桥，claude 桥移除）、`renderer/index.html`（编译器面板 + 设置卡）、`renderer/app.js`（编译器对话/审批/设置逻辑）、`renderer/style.css`、`package.json`（+ @openai/codex）。
+- **Migration：** npm install 后 `npm start`；旧 plan_claude.md 不迁移（历史上已存 case 不回写）。真模型轮次待人类在设置卡录入 API Key（推荐 GLM）后首验。
+- **Rollback：** 回退本 commit 恢复 W1 骨架（无编译器对话）；`~/.moodify/codex` 中的本机配置可独立删除。
+
 ## 2026-10-02 — Moodify Studio W1：IDE 布局骨架（图标栏 + 中央工作区 + 终端抽屉）（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因产品显示面骨架级重构（R7 可见性）。权威依据：`docs/plan/2026-10-02_MOODIFY_STUDIO_PRODUCT_DEFINITION.md`（人类四项裁决：claude CLI 过渡 / 贡献值本地账本 MVP / 一次到位 + 左侧 dock / 终端共存）。

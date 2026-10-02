@@ -161,7 +161,7 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 .charts figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; }
 .caption { margin-top: 14px; font-size: 12px; }
 
-/* ——— Mood 编译器（方案）——— */
+/* ——— Mood 编译器 ——— */
 
 .plan-gen {
   border: 1px solid var(--hairline);
@@ -178,20 +178,75 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 .plan-gen-head h3 { margin: 0; font-size: 15px; }
 .plan-gen-head p { margin: 4px 0 0; font-size: 12px; }
 .plan-gen-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.plan-output {
-  background: #f9fafb;
+
+.compiler-setup {
   border: 1px solid var(--hairline);
   border-radius: 8px;
+  background: #f9fafb;
   padding: 12px 14px;
   margin: 12px 0 0;
-  max-height: 320px;
-  overflow: auto;
-  font-family: Consolas, "Courier New", monospace;
-  font-size: 12.5px;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
+.setup-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+.setup-row label { font-size: 12.5px; color: var(--muted); }
+.setup-row input, .setup-row select {
+  font: inherit;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.setup-row input#setup-key { flex: 1; min-width: 220px; }
+.setup-row input#setup-model { width: 160px; }
+.setup-row input#setup-baseurl { flex: 1; min-width: 200px; }
+
+.compiler-stream {
+  max-height: 420px;
+  overflow: auto;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cmsg { border-radius: 8px; padding: 8px 12px; max-width: 92%; }
+.cmsg.user { background: var(--accent-soft); align-self: flex-end; }
+.cmsg.assistant { background: #f9fafb; border: 1px solid var(--hairline); align-self: flex-start; }
+.cmsg-text { white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.55; }
+.cline { font-size: 12px; color: var(--muted); font-family: Consolas, "Courier New", monospace; }
+.cline.cmd { color: var(--accent); }
+.cline.sys { color: var(--muted); }
+.approval {
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  align-self: stretch;
+}
+.approval-title { font-size: 12.5px; margin-bottom: 6px; word-break: break-all; }
+.approval-actions { display: flex; gap: 8px; }
+.approval-actions button { padding: 3px 10px; font-size: 12px; }
+
+.compiler-input-row {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 0;
+  align-items: flex-end;
+}
+.compiler-input-row textarea {
+  flex: 1;
+  font: inherit;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 8px 10px;
+  resize: vertical;
+  min-height: 44px;
+}
+.compiler-input-row textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+
 .draft-head { font-size: 14px; margin: 4px 0 6px; }
 
 #plan-body h3 { font-size: 14px; margin: 14px 0 6px; }

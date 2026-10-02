@@ -14,7 +14,6 @@ const state = {
   fit: null,         // FitAddon
   termId: null,
   termCwd: undefined, // undefined = terminal never created
-  planRunning: false,
   drawerCollapsed: false,
 };
 
@@ -151,9 +150,15 @@ async function openReport(reportPath) {
   $('badge-decision').hidden = false;
   $('case-title').hidden = false;
 
-  $('plan-output').hidden = true;
-  $('plan-output').textContent = '';
-  $('plan-saved').hidden = true;
+  // stale compiler thread from another case is dropped; a fresh one opens on demand
+  if (compiler.threadCwd !== state.caseDir) {
+    compiler.threadId = null;
+    compiler.threadCwd = null;
+    $('compiler-stream').textContent = '';
+    compiler.currentAssistantEl = null;
+    compiler.lastAssistantText = '';
+    $('compiler-save').hidden = true;
+  }
 
   $('rail-compiler').disabled = false;
   toggleHistoryPanel(false);
@@ -173,6 +178,9 @@ function closeCase() {
   $('badge-decision').hidden = true;
   $('rail-compiler').disabled = true;
   $('rail-compiler').classList.remove('active');
+  compiler.threadId = null;
+  compiler.threadCwd = null;
+  $('compiler-stream').textContent = '';
   selectView('empty');
   setStatus('');
   // fresh terminal for whatever comes next (cwd follows the case)
@@ -381,11 +389,11 @@ function initDrawer() {
   window.addEventListener('resize', fitTerminalSoon);
 }
 
-function launchClaudeInTerminal() {
+function launchCodexInTerminal() {
   setDrawerCollapsed(false);
   // give a freshly spawned shell a moment before typing into it
   setTimeout(() => {
-    if (state.termId) window.moodify.termRunCommand(state.termId, 'claude');
+    if (state.termId) window.moodify.termRunCommand(state.termId, 'codex');
   }, 600);
 }
 
@@ -398,52 +406,235 @@ window.moodify.onPtyExit((termId) => {
   }
 });
 
-// ——— Mood 编译器（plan generation; claude CLI kernel, direct API later）———
+// ——— Mood 编译器（Codex app-server kernel; claude channel fully replaced）———
 
-async function generatePlan() {
-  if (state.planRunning || !state.caseDir) return;
-  state.planRunning = true;
-  const output = $('plan-output');
-  output.hidden = false;
-  output.textContent = '';
-  $('plan-saved').hidden = true;
-  $('generate-plan').disabled = true;
-  $('stop-plan').hidden = false;
-  try {
-    const started = await window.moodify.generatePlan(state.caseDir);
-    if (started && started.started === false) {
-      state.planRunning = false;
-      $('generate-plan').disabled = false;
-      $('stop-plan').hidden = true;
-      setStatus(started.reason || '未能启动生成');
-    }
-  } catch (err) {
-    state.planRunning = false;
-    $('generate-plan').disabled = false;
-    $('stop-plan').hidden = true;
-    output.textContent += `\n[启动失败] ${err.message || err}\n`;
+const PLAN_PROMPT = [
+  '请读取当前目录下的 report.json、measurements.json、judgment_rules.json，基于 L1 技术测量给出',
+  '【修音与混音方案】：1) 目标（可测量）；2) 逐步算子建议（算子/参数/理由，映射到标准算子',
+  ' gain/eq/limiter/compressor/stereo 等）；3) 验收指标（使用 report.json 中同 id 指标）；',
+  '4) 风险与边界（阈值 0/16 calibrated，全部 DEFAULT_UNCALIBRATED）。只输出方案正文（Markdown）。',
+].join('');
+
+const compiler = {
+  ready: false,
+  threadId: null,
+  threadCwd: null,
+  busy: false,
+  currentAssistantEl: null,
+  lastAssistantText: '',
+};
+
+function compilerBubble(role, text) {
+  const stream = $('compiler-stream');
+  const div = document.createElement('div');
+  div.className = `cmsg ${role}`;
+  const body = document.createElement('div');
+  body.className = 'cmsg-text';
+  body.textContent = text;
+  div.appendChild(body);
+  stream.appendChild(div);
+  stream.scrollTop = stream.scrollHeight;
+  return body;
+}
+
+function compilerLine(kind, text) {
+  const stream = $('compiler-stream');
+  const div = document.createElement('div');
+  div.className = `cline ${kind}`;
+  div.textContent = text;
+  stream.appendChild(div);
+  stream.scrollTop = stream.scrollHeight;
+  return div;
+}
+
+function compilerNote(text) {
+  const note = $('compiler-note');
+  note.textContent = text;
+  note.hidden = !text;
+}
+
+function setCompilerBusy(busy) {
+  compiler.busy = busy;
+  $('compiler-stop').hidden = !busy;
+  $('compiler-plan-btn').disabled = busy || !state.caseDir || !compiler.threadId;
+  $('compiler-send').disabled = busy || !compiler.threadId;
+  $('compiler-input').disabled = busy;
+}
+
+async function ensureCompiler() {
+  const status = $('setup-status');
+  const res = await window.moodify.codexEnsure();
+  if (!res.ok) {
+    $('compiler-setup').hidden = false;
+    status.textContent = `内核启动失败：${res.reason}`;
+    return false;
+  }
+  if (!res.provider) {
+    $('compiler-setup').hidden = false;
+    status.textContent = '首次使用：选择模型提供方并粘贴 API Key（仅存本机 ~/.moodify/codex）。';
+    return false;
+  }
+  $('compiler-setup').hidden = true;
+  compiler.ready = true;
+  const ws = res.windowsSandbox ? res.windowsSandbox.status : 'unknown';
+  $('compiler-subtitle').textContent =
+    `Codex 内核 · ${res.provider.model || res.provider.kind} · Windows 沙箱：${ws}`
+    + (ws === 'ready' ? ' · 边界：workspace-write + 命令审批' : ' · 边界降级为 read-only（诚实显示）');
+  return true;
+}
+
+async function openCompilerThread() {
+  if (!compiler.ready || !state.caseDir) return;
+  const res = await window.moodify.codexThreadOpen(state.caseDir);
+  if (res.ok) {
+    compiler.threadId = res.thread.thread.id;
+    compiler.threadCwd = state.caseDir;
+    $('compiler-stream').textContent = '';
+    compiler.currentAssistantEl = null;
+    compiler.lastAssistantText = '';
+    $('compiler-save').hidden = true;
+    compilerNote('');
+    setCompilerBusy(false);
+    const effective = res.thread.sandbox && res.thread.sandbox.type ? res.thread.sandbox.type : 'unknown';
+    compilerLine('sys', `线程就绪（cwd = ${state.caseDir}）· 生效沙箱：${effective}`);
+  } else {
+    compilerNote(`线程打开失败：${res.reason}`);
   }
 }
 
-window.moodify.onPlanChunk((text) => {
-  const output = $('plan-output');
-  output.textContent += text;
-  output.scrollTop = output.scrollHeight;
-});
-
-window.moodify.onPlanDone((code, savedPath) => {
-  state.planRunning = false;
-  $('generate-plan').disabled = false;
-  $('stop-plan').hidden = true;
-  const saved = $('plan-saved');
-  if (code === 0 && savedPath) {
-    saved.textContent = `已保存：${savedPath}`;
-    saved.hidden = false;
-  } else if (code !== 0) {
-    saved.textContent = `生成未完成（退出码 ${code}）——可在终端手动运行 claude 继续。`;
-    saved.hidden = false;
+async function compilerSend(text) {
+  if (!compiler.threadId || compiler.busy || !text.trim()) return;
+  compilerBubble('user', text);
+  setCompilerBusy(true);
+  compiler.currentAssistantEl = null;
+  const res = await window.moodify.codexSend(compiler.threadId, text);
+  if (!res.ok) {
+    compilerNote(`发送失败：${res.reason}`);
+    setCompilerBusy(false);
   }
-});
+}
+
+async function sendPlanRequest() {
+  if (!compiler.ready) return;
+  if (!compiler.threadId || compiler.threadCwd !== state.caseDir) await openCompilerThread();
+  await compilerSend(PLAN_PROMPT);
+}
+
+async function savePlan() {
+  if (!compiler.lastAssistantText || !state.caseDir) return;
+  const saved = await window.moodify.codexSavePlan(state.caseDir, compiler.lastAssistantText);
+  compilerNote(`已保存：${saved}`);
+}
+
+function handleCodexEvent(n) {
+  switch (n.method) {
+    case 'item/agentMessage/delta': {
+      if (!compiler.currentAssistantEl) {
+        compiler.currentAssistantEl = compilerBubble('assistant', '');
+      }
+      compiler.currentAssistantEl.textContent += n.params.delta;
+      const stream = $('compiler-stream');
+      stream.scrollTop = stream.scrollHeight;
+      compiler.lastAssistantText = compiler.currentAssistantEl.textContent;
+      $('compiler-save').hidden = false;
+      break;
+    }
+    case 'item/started': {
+      const item = n.params.item || {};
+      if (item.type === 'commandExecution') {
+        compilerLine('cmd', `◆ 命令（待运行）：${item.command}`);
+      } else if (item.type === 'fileChange') {
+        compilerLine('cmd', '◆ 文件修改（待批准）');
+      }
+      break;
+    }
+    case 'item/completed': {
+      const item = n.params.item || {};
+      if (item.type === 'agentMessage') {
+        compiler.currentAssistantEl = null;
+        compiler.lastAssistantText = item.text || '';
+        if (compiler.lastAssistantText) $('compiler-save').hidden = false;
+      } else if (item.type === 'commandExecution') {
+        compilerLine('cmd', `◆ 命令完成（exit ${item.exitCode ?? '?'}）：${item.command}`);
+      } else if (item.type === 'fileChange') {
+        compilerLine('cmd', `◆ 文件修改完成：${Object.keys(item.changes || {}).join(', ')}`);
+      }
+      break;
+    }
+    case 'turn/completed': {
+      setCompilerBusy(false);
+      compiler.currentAssistantEl = null;
+      break;
+    }
+    case 'error':
+      compilerNote(`错误：${(n.params && n.params.message) || ''}`);
+      setCompilerBusy(false);
+      break;
+    case 'warning':
+      compilerNote(`警告：${(n.params && n.params.message) || ''}`);
+      break;
+    default:
+      break;
+  }
+}
+
+function handleCodexServerRequest(req) {
+  const p = req.params || {};
+  const stream = $('compiler-stream');
+  const card = document.createElement('div');
+  card.className = 'approval';
+  const label = document.createElement('div');
+  label.className = 'approval-title';
+  if (req.method === 'item/commandExecution/requestApproval' || req.method === 'execCommandApproval') {
+    label.textContent = `命令审批：${p.command || '?'}`;
+  } else if (req.method === 'item/fileChange/requestApproval' || req.method === 'applyPatchApproval') {
+    label.textContent = `文件修改审批：${p.reason || p.grantRoot || ''}`;
+  } else {
+    label.textContent = `审批请求：${req.method}`;
+  }
+  card.appendChild(label);
+  const actions = document.createElement('div');
+  actions.className = 'approval-actions';
+  const mk = (text, decision) => {
+    const b = document.createElement('button');
+    b.textContent = text;
+    b.className = decision === 'decline' ? 'ghost' : 'primary';
+    b.addEventListener('click', async () => {
+      await window.moodify.codexRespond(req.id, { decision });
+      card.remove();
+    });
+    return b;
+  };
+  actions.appendChild(mk('批准', 'accept'));
+  actions.appendChild(mk('本次会话批准', 'acceptForSession'));
+  actions.appendChild(mk('拒绝', 'decline'));
+  card.appendChild(actions);
+  stream.appendChild(card);
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function initCompilerSetup() {
+  const kindSel = $('setup-kind');
+  kindSel.addEventListener('change', () => {
+    $('setup-baseurl').hidden = kindSel.value !== 'custom';
+    $('setup-model').placeholder = kindSel.value === 'glm' ? 'glm-4.7'
+      : kindSel.value === 'openai' ? 'gpt-5.1-codex' : 'model-name';
+  });
+  $('setup-save').addEventListener('click', async () => {
+    const status = $('setup-status');
+    const kind = kindSel.value;
+    const model = $('setup-model').value.trim()
+      || (kind === 'glm' ? 'glm-4.7' : kind === 'openai' ? 'gpt-5.1-codex' : '');
+    const apiKey = $('setup-key').value.trim();
+    if (!apiKey && kind !== 'openai') { status.textContent = '请粘贴 API Key。'; return; }
+    status.textContent = '保存中…';
+    await window.moodify.codexProviderSet({
+      kind, model, apiKey, baseUrl: $('setup-baseurl').value.trim(),
+    });
+    const ok = await ensureCompiler();
+    if (ok) await openCompilerThread();
+  });
+}
 
 // ——— boot ———
 
@@ -457,16 +648,37 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('rail-open').addEventListener('click', pickAndAnalyze);
   $('rail-history').addEventListener('click', () => toggleHistoryPanel());
   $('rail-compiler').addEventListener('click', () => {
-    if (state.caseDir) selectView('plan');
+    if (state.caseDir) {
+      selectView('plan');
+      if (!compiler.threadId || compiler.threadCwd !== state.caseDir) openCompilerThread();
+    }
   });
   $('close-case').addEventListener('click', closeCase);
   $('refresh').addEventListener('click', refreshArchive);
-  $('generate-plan').addEventListener('click', generatePlan);
-  $('stop-plan').addEventListener('click', () => window.moodify.stopPlan());
-  $('launch-claude').addEventListener('click', launchClaudeInTerminal);
+  $('compiler-send').addEventListener('click', () => {
+    const text = $('compiler-input').value;
+    $('compiler-input').value = '';
+    compilerSend(text);
+  });
+  $('compiler-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const text = $('compiler-input').value;
+      $('compiler-input').value = '';
+      compilerSend(text);
+    }
+  });
+  $('compiler-plan-btn').addEventListener('click', sendPlanRequest);
+  $('compiler-stop').addEventListener('click', () => window.moodify.codexInterrupt(compiler.threadId));
+  $('compiler-save').addEventListener('click', savePlan);
+  $('launch-codex').addEventListener('click', launchCodexInTerminal);
+  window.moodify.onCodexEvent(handleCodexEvent);
+  window.moodify.onCodexServerRequest(handleCodexServerRequest);
+  initCompilerSetup();
   initDrawer();
   initDrop();
   if (!state.drawerCollapsed) ensureTerminal();
+  await ensureCompiler();
   await refreshArchive();
 });
 

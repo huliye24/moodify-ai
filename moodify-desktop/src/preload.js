@@ -1,8 +1,9 @@
 /**
- * Moodify desktop shell — preload bridge.
+ * Moodify Studio — preload bridge.
  * Exposes exactly the product flow: pick a song, run detection, read the
  * report, render its charts, open a terminal in the case directory, and
- * let Claude Code author the plan. No node APIs reach the renderer.
+ * talk to the Mood 编译器 (Codex app-server kernel). No node APIs reach
+ * the renderer.
  */
 
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
@@ -28,9 +29,15 @@ contextBridge.exposeInMainWorld('moodify', {
   onPtyData: (cb) => ipcRenderer.on('pty:data', (_e, termId, data) => cb(termId, data)),
   onPtyExit: (cb) => ipcRenderer.on('pty:exit', (_e, termId, code) => cb(termId, code)),
 
-  // Claude Code plan generation
-  generatePlan: (caseDir) => ipcRenderer.invoke('claude:generate', caseDir),
-  stopPlan: () => ipcRenderer.invoke('claude:stop'),
-  onPlanChunk: (cb) => ipcRenderer.on('claude:chunk', (_e, text) => cb(text)),
-  onPlanDone: (cb) => ipcRenderer.on('claude:done', (_e, code, savedPath) => cb(code, savedPath)),
+  // Mood 编译器 (Codex app-server kernel)
+  codexEnsure: () => ipcRenderer.invoke('codex:ensure'),
+  codexProviderGet: () => ipcRenderer.invoke('codex:provider:get'),
+  codexProviderSet: (provider) => ipcRenderer.invoke('codex:provider:set', provider),
+  codexThreadOpen: (caseDir) => ipcRenderer.invoke('codex:thread-open', caseDir),
+  codexSend: (threadId, text) => ipcRenderer.invoke('codex:send', threadId, text),
+  codexInterrupt: (threadId) => ipcRenderer.invoke('codex:interrupt', threadId),
+  codexRespond: (requestId, result) => ipcRenderer.invoke('codex:respond', requestId, result),
+  codexSavePlan: (caseDir, text) => ipcRenderer.invoke('codex:save-plan', caseDir, text),
+  onCodexEvent: (cb) => ipcRenderer.on('codex:event', (_e, notification) => cb(notification)),
+  onCodexServerRequest: (cb) => ipcRenderer.on('codex:server-request', (_e, request) => cb(request)),
 });

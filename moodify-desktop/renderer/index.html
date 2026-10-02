@@ -77,16 +77,44 @@
         <div class="plan-gen">
           <div class="plan-gen-head">
             <div>
-              <h3>修音与混音方案（Mood 编译器）</h3>
-              <p class="muted">基于本 case 的 report.json / measurements.json / judgment_rules.json 生成</p>
+              <h3>Mood 编译器</h3>
+              <p class="muted" id="compiler-subtitle">Codex 内核 · 基于本 case 的 report.json / measurements.json / judgment_rules.json</p>
             </div>
             <div class="plan-gen-actions">
-              <button id="generate-plan" class="primary">生成方案</button>
-              <button id="stop-plan" class="ghost" hidden>停止</button>
+              <button id="compiler-plan-btn" class="primary" disabled title="打开 case 后可用">生成方案</button>
+              <button id="compiler-stop" class="ghost" hidden>停止</button>
+              <button id="compiler-save" class="ghost" hidden title="把最后一条方案存为 plan.md">保存方案</button>
             </div>
           </div>
-          <pre id="plan-output" class="plan-output" hidden></pre>
-          <p class="muted caption" id="plan-saved" hidden></p>
+
+          <!-- 首次使用：内核与模型提供方设置（安装时可选，随时可改） -->
+          <div id="compiler-setup" class="compiler-setup" hidden>
+            <div class="setup-row">
+              <label>模型提供方</label>
+              <select id="setup-kind">
+                <option value="glm">GLM（智谱）</option>
+                <option value="openai">OpenAI</option>
+                <option value="custom">自定义（OpenAI 兼容）</option>
+              </select>
+              <label>模型</label>
+              <input id="setup-model" type="text" placeholder="glm-4.7">
+              <input id="setup-baseurl" type="text" placeholder="https://…/v1/" hidden>
+            </div>
+            <div class="setup-row">
+              <label>API Key</label>
+              <input id="setup-key" type="password" placeholder="粘贴密钥（仅存本机 ~/.moodify/codex）">
+              <button id="setup-save" class="primary">保存并启动</button>
+            </div>
+            <p class="muted caption" id="setup-status"></p>
+          </div>
+
+          <div id="compiler-stream" class="compiler-stream"></div>
+
+          <div class="compiler-input-row">
+            <textarea id="compiler-input" rows="2" placeholder="向 Mood 编译器描述你的诉求（⏎ 发送，Shift+⏎ 换行）"></textarea>
+            <button id="compiler-send" class="primary" disabled>发送</button>
+          </div>
+          <p class="muted caption" id="compiler-note" hidden></p>
         </div>
         <h3 class="draft-head">规则草案（保守，DRAFT_PLAN_NOT_EXECUTED）</h3>
         <div id="plan-body"></div>
@@ -100,7 +128,7 @@
     <div id="drawer-bar" title="拖拽调高度，双击收起/展开">
       <span class="muted" id="term-cwd"></span>
       <span class="drawer-actions">
-        <button id="launch-claude" class="ghost">在此目录打开 Claude Code</button>
+        <button id="launch-codex" class="ghost">在此目录打开 Codex</button>
         <button id="drawer-toggle" class="ghost" title="收起/展开终端">▾</button>
       </span>
     </div>

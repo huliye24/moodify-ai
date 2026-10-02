@@ -77,3 +77,21 @@
 ## 8. 明确不做（v0.1）
 
 直连大模型 API / 多 provider 抽象（W2+ 评估）；连 MOOD 网络或任何链上操作；编译器执行算子（执行永远走显式作业）；移动端；多语言界面（沿用现有中文）。
+
+## 9. 修正案（2026-10-02 当日）：Mood 编译器内核改为 Codex
+
+人类指令："https://github.com/openai/codex 我希望采用 codex 的源代码，去嵌入 moodify"。三项新裁决（AskUserQuestion）：
+
+| # | 裁决点 | 裁决 |
+|---|---|---|
+| 5 | 嵌入路径 | **B：协议嵌入一步到位**（codex app-server，JSON-RPC over stdio，编译器面板原生实现；不 fork 源码——上游日更，fork 漂移不可维护；源码仅作审计参考） |
+| 6 | 模型提供方 | **安装时可选**（GLM / OpenAI / 自定义 OpenAI 兼容 base_url，首次使用设置卡录入，仅存本机 `~/.moodify/codex`，随时可改） |
+| 7 | claude CLI 去留 | **完全替换**（claude 通道从壳代码移除，不再作为回退内核） |
+
+取代 §6 裁决 1（"先用 claude CLI 过渡"）；§6 裁决 2-4 不变。
+
+**实现事实（2026-10-02 验证）：**
+- 内核来源：`@openai/codex` npm 0.160.0（Apache-2.0，平台子包 `codex-win32-x64`），`codex.exe app-server` 原生跑通 Windows 10.0.19045；协议形状取自二进制自带的 `generate-json-schema`（权威）。
+- 边界执行：thread/start 请求 `sandbox=workspace-write` + `approvalPolicy=untrusted`；审批请求（命令/文件修改）原生进 UI（批准 / 本次会话批准 / 拒绝）。**诚实发现：本机 `windowsSandbox/readiness` = notConfigured，生效沙箱降级为 read-only，UI 如实显示生效边界而非请求值；沙箱配置向导（`windowsSandbox/setupStart`）暂不自动触发，列为残余项。**
+- 隔离：`CODEX_HOME=~/.moodify/codex`（config.toml + providers.json），不碰用户自己的 `~/.codex`。
+- 方案产物：编译器"保存方案"按钮把最后一条助手消息写为 `case_dir/plan.md`（取代 plan_claude.md）。

@@ -25,17 +25,6 @@ const AUDIO_FILTERS = [
   { name: '所有文件', extensions: ['*'] },
 ];
 
-/** The plan-generation prompt: Claude Code reads the case, writes the plan. */
-const PLAN_PROMPT = [
-  '你是 Moodify 的后处理方案工程师。请读取当前目录下的 report.json、',
-  'measurements.json、judgment_rules.json（如存在），基于 L1 技术测量给出',
-  '【修音与混音方案】，包含：1) 目标（可测量）；2) 逐步算子建议（算子/参数/',
-  '理由，映射到标准算子 gain/eq/limiter/compressor/stereo 等）；',
-  '3) 验收指标（使用 report.json 中同 id 指标）；4) 风险与边界',
-  '（阈值 0/16 calibrated，全部 DEFAULT_UNCALIBRATED；L3/L4/L5 判断不承诺）。',
-  '只输出方案正文（Markdown），不要客套。',
-].join('');
-
 function pythonEnv() {
   return { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' };
 }
@@ -98,7 +87,7 @@ function registerTerminalIpc() {
     const term = pty.spawn(process.env.ComSpec || 'powershell.exe', [], {
       name: 'xterm-256color',
       cwd: fs.existsSync(cwd) ? cwd : CASES_ROOT,
-      env: { ...process.env, PYTHONUTF8: '1' },
+      env: { ...codexEnv(), PYTHONUTF8: '1' },
     });
     const win = BrowserWindow.fromWebContents(event.sender);
     terms.set(termId, { pty, win });
@@ -147,61 +136,257 @@ function killAllTerminals() {
   terms.clear();
 }
 
-// ——— Claude Code plan generation: one-shot, streamed, saved into the case ———
+// ——— Mood 编译器 kernel: Codex app-server (JSON-RPC over stdio) ———
+//
+// Human adjudication 2026-10-02: embed openai/codex (Apache-2.0) as the
+// compiler kernel via its app-server protocol; provider selectable at setup
+// (GLM / OpenAI / custom); the claude CLI channel is fully replaced.
+// Config lives in an isolated CODEX_HOME so the user's own codex is untouched.
 
-let claudeChild = null;
+const CODEX_HOME = process.env.MOODIFY_CODEX_HOME
+  || path.join(os.homedir(), '.moodify', 'codex');
 
-function registerClaudeIpc() {
-  ipcMain.handle('claude:generate', async (event, caseDir) => {
-    const win = BrowserWindow.fromWebContents(event.sender);
-    if (claudeChild) return { started: false, reason: '已有一次生成在进行' };
-    const claudeCmd = process.env.MOODIFY_CLAUDE || 'claude';
-    const child = spawn(claudeCmd, [
-      '-p', PLAN_PROMPT, '--allowedTools', 'Read,Glob,Grep', '--output-format', 'text',
-    ], { cwd: fs.existsSync(caseDir) ? caseDir : CASES_ROOT, env: process.env, shell: true });
-    claudeChild = child;
-    let planText = '';
-    let errText = '';
-    child.stdout.on('data', (d) => {
-      const text = d.toString('utf8');
-      planText += text;
-      if (!win.isDestroyed()) win.webContents.send('claude:chunk', text);
-    });
-    // stderr is CLI noise (e.g. model warnings) — only surface it on failure
-    child.stderr.on('data', (d) => { errText += d.toString('utf8'); });
-    child.on('error', (err) => {
-      if (!win.isDestroyed()) win.webContents.send('claude:chunk', `\r\n[claude 启动失败] ${err.message}\r\n`);
-      claudeChild = null;
-    });
-    child.on('close', (code) => {
-      if (code !== 0 && errText.trim() && !win.isDestroyed()) {
-        win.webContents.send('claude:chunk', `\r\n[claude stderr]\r\n${errText.trim().slice(-800)}\r\n`);
-      }
-      let savedPath = null;
-      if (code === 0 && planText.trim() && fs.existsSync(caseDir)) {
-        try {
-          savedPath = path.join(caseDir, 'plan_claude.md');
-          fs.writeFileSync(savedPath, planText, 'utf8');
-        } catch { /* archive dir may be read-only; the text is still in the pane */ }
-      }
-      if (!win.isDestroyed()) win.webContents.send('claude:done', code, savedPath);
-      claudeChild = null;
-    });
-    return { started: true };
-  });
-  ipcMain.handle('claude:stop', async () => {
-    if (claudeChild) {
-      try { claudeChild.kill(); } catch { /* already gone */ }
-      claudeChild = null;
-      return true;
+const COMPILER_INSTRUCTIONS = [
+  '你是 Moodify Studio 的 Mood 编译器：后处理方案工程师。你工作在一个音频检测 case 目录里，',
+  '只读 case 导出物（report.json / measurements.json / judgment_rules.json / scan 图表），',
+  '给出【修音与混音方案】：目标（可测量）、逐步算子建议（gain/eq/limiter/compressor/stereo 等，',
+  '含参数与理由）、验收指标（使用 report.json 中同 id 指标）、风险与边界（阈值 0/16 calibrated，',
+  '全部 DEFAULT_UNCALIBRATED；L3/L4/L5 判断不承诺）。方案不等于执行：你不修改 Moodify 核心、',
+  '不改动阈值、不执行任何音频处理。用中文回复。',
+].join('');
+
+function resolveCodexExe() {
+  const nm = path.join(__dirname, '..', 'node_modules', '@openai');
+  let dirs = [];
+  try { dirs = fs.readdirSync(nm).filter((d) => d.startsWith('codex-') && d !== 'codex'); } catch { return null; }
+  const binName = process.platform === 'win32' ? 'codex.exe' : 'codex';
+  for (const dir of dirs) {
+    const vendor = path.join(nm, dir, 'vendor');
+    let triples = [];
+    try { triples = fs.readdirSync(vendor); } catch { continue; }
+    for (const triple of triples) {
+      const bin = path.join(vendor, triple, 'bin', binName);
+      if (fs.existsSync(bin)) return bin;
     }
-    return false;
+  }
+  return null;
+}
+
+function codexEnv() {
+  // the active provider's key lives in CODEX_HOME/providers.json; inject at
+  // spawn time so config.toml's env_key resolves
+  const env = { ...process.env, CODEX_HOME };
+  try {
+    const providers = JSON.parse(fs.readFileSync(path.join(CODEX_HOME, 'providers.json'), 'utf8'));
+    if (providers.active && providers.active.apiKeyEnv && providers.active.apiKey) {
+      env[providers.active.apiKeyEnv] = providers.active.apiKey;
+    }
+  } catch { /* first run: no provider configured yet */ }
+  return env;
+}
+
+class CodexClient {
+  constructor() {
+    this.proc = null;
+    this.nextId = 1;
+    this.pending = new Map(); // request id -> {resolve, reject}
+    this.ready = false;
+    this.buffer = '';
+    this.onEvent = null;      // (notification) => void
+    this.onServerRequest = null; // (request) => void
+  }
+
+  start() {
+    if (this.proc) return true;
+    const exe = resolveCodexExe();
+    if (!exe) return false;
+    fs.mkdirSync(CODEX_HOME, { recursive: true });
+    this.proc = spawn(exe, ['app-server'], { env: codexEnv() });
+    this.proc.stdout.on('data', (d) => this.#consume(d.toString('utf8')));
+    this.proc.stderr.on('data', () => { /* diagnostics only; protocol is on stdout */ });
+    this.proc.on('exit', () => { this.proc = null; this.ready = false; this.pending.clear(); });
+    return true;
+  }
+
+  #consume(chunk) {
+    this.buffer += chunk;
+    let idx;
+    while ((idx = this.buffer.indexOf('\n')) >= 0) {
+      const line = this.buffer.slice(0, idx).trim();
+      this.buffer = this.buffer.slice(idx + 1);
+      if (!line) continue;
+      let msg;
+      try { msg = JSON.parse(line); } catch { continue; }
+      if (msg.id !== undefined && msg.method === undefined) {
+        const entry = this.pending.get(msg.id);
+        if (entry) {
+          this.pending.delete(msg.id);
+          if (msg.error) entry.reject(new Error(msg.error.message || JSON.stringify(msg.error)));
+          else entry.resolve(msg.result);
+        }
+      } else if (msg.id !== undefined && msg.method) {
+        if (this.onServerRequest) this.onServerRequest(msg);
+      } else if (msg.method) {
+        if (this.onEvent) this.onEvent(msg);
+      }
+    }
+  }
+
+  request(method, params) {
+    return new Promise((resolve, reject) => {
+      if (!this.proc && !this.start()) { reject(new Error('Codex 内核不可用（未找到 codex 二进制）')); return; }
+      const id = this.nextId++;
+      this.pending.set(id, { resolve, reject });
+      this.proc.stdin.write(JSON.stringify({ jsonrpc: '2.0', id, method, params }) + '\n');
+      setTimeout(() => {
+        if (this.pending.has(id)) {
+          this.pending.delete(id);
+          reject(new Error(`Codex 请求超时：${method}`));
+        }
+      }, 120 * 1000);
+    });
+  }
+
+  respond(requestId, result) {
+    if (this.proc) {
+      this.proc.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: requestId, result }) + '\n');
+    }
+  }
+
+  stop() {
+    if (this.proc) {
+      try { this.proc.kill(); } catch { /* already gone */ }
+      this.proc = null;
+      this.ready = false;
+    }
+  }
+}
+
+const codex = new CodexClient();
+
+function readProviderState() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(CODEX_HOME, 'providers.json'), 'utf8'));
+  } catch {
+    return { active: null };
+  }
+}
+
+function writeProviderConfig(state) {
+  fs.mkdirSync(CODEX_HOME, { recursive: true });
+  const p = state.active;
+  const lines = [];
+  if (p.kind === 'openai') {
+    lines.push(`model = ${JSON.stringify(p.model || 'gpt-5.1-codex')}`);
+    lines.push('preferred_auth_method = "apikey"');
+  } else {
+    lines.push(`model = ${JSON.stringify(p.model)}`);
+    lines.push(`model_provider = ${JSON.stringify(p.kind === 'glm' ? 'glm' : 'custom')}`);
+    lines.push('');
+    const baseUrl = p.kind === 'glm'
+      ? 'https://open.bigmodel.cn/api/paas/v4/'
+      : p.baseUrl.replace(/\/?$/, '/');
+    const providerId = p.kind === 'glm' ? 'glm' : 'custom';
+    lines.push(`[model_providers.${providerId}]`);
+    lines.push(`name = ${JSON.stringify(p.kind === 'glm' ? 'GLM' : 'Custom (Moodify)')}`);
+    lines.push(`base_url = ${JSON.stringify(baseUrl)}`);
+    lines.push('wire_api = "chat"');
+    lines.push(`env_key = ${JSON.stringify(p.apiKeyEnv)}`);
+  }
+  fs.writeFileSync(path.join(CODEX_HOME, 'config.toml'), lines.join('\n') + '\n', 'utf8');
+  // providers.json keeps the key locally per machine; config.toml only references it
+  fs.writeFileSync(path.join(CODEX_HOME, 'providers.json'), JSON.stringify(state, null, 2), 'utf8');
+}
+
+function registerCodexIpc() {
+  ipcMain.handle('codex:ensure', async () => {
+    if (!codex.ready) {
+      if (!codex.start()) return { ok: false, reason: '未找到 codex 内核（npm install 后重试）' };
+      try {
+        const info = await codex.request('initialize', {
+          clientInfo: { name: 'moodify-studio', title: 'Moodify Studio', version: '1.0.0' },
+        });
+        codex.ready = true;
+        let windowsSandbox = null;
+        try { windowsSandbox = await codex.request('windowsSandbox/readiness', {}); } catch { /* optional */ }
+        return { ok: true, info, windowsSandbox, provider: (readProviderState().active || null) };
+      } catch (err) {
+        codex.stop();
+        return { ok: false, reason: err.message };
+      }
+    }
+    return { ok: true, provider: (readProviderState().active || null) };
+  });
+
+  ipcMain.handle('codex:provider:get', async () => {
+    const state = readProviderState();
+    return { active: state.active ? { ...state.active, apiKey: undefined } : null };
+  });
+
+  ipcMain.handle('codex:provider:set', async (_e, provider) => {
+    const kind = provider.kind;
+    const apiKeyEnv = kind === 'openai' ? 'OPENAI_API_KEY'
+      : kind === 'glm' ? 'GLM_API_KEY' : 'MOODIFY_CUSTOM_API_KEY';
+    const active = { kind, model: provider.model, apiKeyEnv, apiKey: provider.apiKey };
+    if (kind === 'custom') active.baseUrl = provider.baseUrl;
+    writeProviderConfig({ active });
+    // restart the server so it picks up the new CODEX_HOME config; the
+    // renderer re-invokes codex:ensure afterwards
+    codex.stop();
+    return { ok: true };
+  });
+
+  ipcMain.handle('codex:thread-open', async (_e, caseDir) => {
+    if (!codex.ready) return { ok: false, reason: '内核未初始化' };
+    const result = await codex.request('thread/start', {
+      cwd: fs.existsSync(caseDir) ? caseDir : CASES_ROOT,
+      baseInstructions: COMPILER_INSTRUCTIONS,
+      sandbox: 'workspace-write',
+      approvalPolicy: 'untrusted',
+    });
+    return { ok: true, thread: result };
+  });
+
+  ipcMain.handle('codex:send', async (_e, threadId, text) => {
+    if (!codex.ready) return { ok: false, reason: '内核未初始化' };
+    const result = await codex.request('turn/start', {
+      threadId,
+      input: [{ type: 'text', text }],
+    });
+    return { ok: true, result };
+  });
+
+  ipcMain.handle('codex:interrupt', async (_e, threadId) => {
+    try { await codex.request('turn/interrupt', { threadId }); return { ok: true }; }
+    catch (err) { return { ok: false, reason: err.message }; }
+  });
+
+  ipcMain.handle('codex:respond', async (_e, requestId, result) => {
+    codex.respond(requestId, result);
+    return true;
+  });
+
+  ipcMain.handle('codex:save-plan', async (_e, caseDir, text) => {
+    const target = path.join(caseDir, 'plan.md');
+    fs.writeFileSync(target, text, 'utf8');
+    return target;
   });
 }
 
+codex.onEvent = (notification) => {
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) win.webContents.send('codex:event', notification);
+  }
+};
+codex.onServerRequest = (request) => {
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) win.webContents.send('codex:server-request', request);
+  }
+};
+
 function registerIpc() {
   registerTerminalIpc();
-  registerClaudeIpc();
+  registerCodexIpc();
   ipcMain.handle('env', async () => {
     const probe = await runPython(['-c', 'import moodify'], 60 * 1000).catch(() => null);
     return {
