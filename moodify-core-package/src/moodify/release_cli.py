@@ -17,6 +17,8 @@ def main(argv: list[str] | None = None) -> int:
     analyze = commands.add_parser("analyze")
     analyze.add_argument("audio")
     analyze.add_argument("--cases-root", default="outputs/moodify_cases")
+    analyze.add_argument("--format", choices=("json", "summary"), default="json",
+                         help="summary prints a short human-readable digest")
     show = commands.add_parser("show")
     show.add_argument("case_id")
     show.add_argument("--cases-root", default="outputs/moodify_cases")
@@ -28,9 +30,14 @@ def main(argv: list[str] | None = None) -> int:
     cache.add_argument("action", choices=("size", "clear-all", "clear-source"))
     cache.add_argument("--cache-root", default=".moodify/cache")
     cache.add_argument("--source-sha256")
-    protocol = commands.add_parser("protocol", help="validate or execute an MSP/0.1 sound job")
+    protocol = commands.add_parser(
+        "protocol", help="validate or execute an MSP sound job (0.1 process / 0.2 analyze)")
     protocol.add_argument("action", choices=("validate", "process"))
     protocol.add_argument("job", help="JSON job file; relative paths resolve beside it")
+    report_cmd = commands.add_parser(
+        "report", help="re-render report.md/report.html from a persisted 0.2 report.json")
+    report_cmd.add_argument("target", help="case_id (resolved under --cases-root) or path to report.json")
+    report_cmd.add_argument("--cases-root", default="outputs/moodify_cases")
     finishing = commands.add_parser(
         "finishing", help="mix graph finishing sessions (moodify.mix_graph/0.1, EXPERIMENTAL)")
     finishing_sub = finishing.add_subparsers(dest="finishing_action", required=True)
@@ -57,6 +64,29 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "analyze":
         result = analyze_to_case(Path(args.audio), Path(args.cases_root))
+        if args.format == "summary":
+            print(_summarize_analysis(result))
+            return 0
+    elif args.command == "report":
+        from moodify.auditory.protocol_report import write_report_bundle
+
+        target = Path(args.target)
+        if target.suffix == ".json" and target.is_file():
+            case_root = target.resolve().parent
+        else:
+            case_root = Path(args.cases_root).resolve() / args.target
+        if not (case_root / "report.json").is_file():
+            print(json.dumps({"status": "error",
+                              "error": f"no report.json under {case_root}"},
+                             ensure_ascii=False), file=sys.stderr)
+            return 2
+        write_report_bundle(case_root, rewrite_json=False)
+        result = {
+            "status": "rendered",
+            "case_root": str(case_root),
+            "reports": {"markdown": str(case_root / "report.md"),
+                        "html": str(case_root / "report.html")},
+        }
     elif args.command == "show":
         result = reopen_case(Path(args.cases_root), args.case_id)
     elif args.command == "local-analyze":
@@ -143,6 +173,30 @@ def main(argv: list[str] | None = None) -> int:
             result = {"cleared_source": args.source_sha256}
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     return 0
+
+
+def _summarize_analysis(result: dict) -> str:
+    """Short human-readable digest for `moodify analyze --format summary`."""
+    case = result.get("case", {})
+    report = result.get("report", {})
+    sections = report.get("sections", {})
+    lines = [
+        f"Moodify 听觉分析 — {report.get('source_name', '?')}",
+        f"case: {case.get('case_id', '?')}  状态: {report.get('overall_status', '?')}",
+    ]
+    if sections:
+        lines.append("分区: " + "  ".join(f"{name}={status}" for name, status in sections.items()))
+    findings = report.get("findings", [])
+    if findings:
+        lines.append("发现:")
+        for finding in findings:
+            lines.append(f"  [{finding.get('severity', '?')}] {finding.get('code', '?')} — "
+                         f"{finding.get('message', '')}")
+    else:
+        lines.append("发现: 无（未触发阈值）")
+    lines.append(f"说明: {report.get('summary', '')}")
+    lines.append("边界: 本结果只覆盖 L1 技术测量；不含听感、音乐或商业判断。")
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":

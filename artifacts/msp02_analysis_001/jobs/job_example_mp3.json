@@ -1,0 +1,6 @@
+{
+  "protocol": "moodify.sound/0.2",
+  "type": "analyze",
+  "source": "../../../demo/input/example.mp3",
+  "output_dir": "../cases"
+}

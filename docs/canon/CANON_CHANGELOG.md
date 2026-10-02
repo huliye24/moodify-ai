@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — MSP/0.2 analyze 作业与报告三件套（Layer A，CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 本条是在 v2.1 Sound Protocol 边界内的协议能力新增，不改产品身份、不改 authority order、不改 One Core 规则；记录于此是因为它新增了对外的协议文档与 CLI 表面（R7 可见性）。
+- **Why / evidence：** 2026-10-02 人类指令「把 moodify 核心做出来」并批准设计提案 D1–D5（`docs/plan/2026-10-02_MSP02_ANALYSIS_JOB_AND_DISPLAY_DESIGN.md`）；仓库已有 `release.analyze_to_case`、BS.1770 指标链与判定阈值表，0.2 只是把已有 Core 能力协议化，不新增 DSP。
+- **Boundary：** analyze 作业为纯读取分析；报告永远不含单一总分；`judgment_boundary` 机器可读（L1 EXECUTED，L2–L5 NOT_PROMISED）；`plan.status` 恒为 `DRAFT_PLAN_NOT_EXECUTED`，只映射保守可逆算子（true-peak 余量不足 → limiter 草案节点），clipping 明确不可自动修复、只出 note。`analyzed_review_required` 不得当作 `verified`。协议/报告 schema 停留在 EXPERIMENTAL，冻结门 = 三首试点曲金色证据包 + 确定性重放证明。
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`；新增 `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_2.md`。代码面：`sound_protocol.py`（0.2 分发）、`auditory/protocol_report.py`、`auditory/report_render.py`、`release_cli.py`（`protocol process` 0.2 / `report` / `analyze --format summary`）。
+- **Migration：** v0.1 作业行为逐字节不变；0.2 新增 `type` 字段（analyze/process），未知键 fail-closed。运行时新增 ffmpeg 依赖声明（解码路径，已在 0.2 协议文档与能力表声明）。
+- **Rollback：** 回退 `sound_protocol.py` 0.2 分发与 `release_cli.py` report/analyze-format 支面，删除 `auditory/protocol_report.py`、`auditory/report_render.py`、0.2 协议文档与本条；v0.1 链路与既有 case bundle 不受影响。
+
 ## 2026-09-23 — Sound Protocol（v2.1）
 
 - **CANON_CHANGE = YES。** 用户明确要求项目改为声音协议，让 AI / Agent 通过 CLI 调用并处理声音。

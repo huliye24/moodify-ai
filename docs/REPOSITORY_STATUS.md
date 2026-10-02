@@ -66,7 +66,7 @@ date: 2026-08-08
 | Cloud runtime（Ear 生产流量） | UNRESOLVED | 云端 API 壳运行，无生产流量（W01-P00） |
 | App integration | CANONICAL（对外面） | apps/music-android 3.1 + deliverables/releases |
 | MAMSE-001..012 | EXPERIMENTAL_ACCEPTED | artifacts/mamse_001..012 |
-| Mix Graph / Professional Finishing Session | ABSENT（目标态已入 Canon v2.0，未实现） | [docs/MOODIFY_PROFESSIONAL_FINISHING_V1.md](MOODIFY_PROFESSIONAL_FINISHING_V1.md)（TARGET） |
+| MSP/0.2 analyze 作业 + 0.2 报告三件套 | EXPERIMENTAL（本地 CLI 已实现，report schema 未冻结；运行时依赖 ffmpeg） | `sound_protocol.py`、`auditory/protocol_report.py`、`auditory/report_render.py`；`moodify protocol process`（0.2 analyze 作业）与 `moodify report` |
 
 Allowed status values: `CANONICAL`, `EXPERIMENTAL`, `LEGACY`, `HISTORICAL`, `ABSENT`, `UNRESOLVED`, plus W01-P00 task states (`IMPLEMENTED_NOT_MERGED` 等) for unmerged work.
 
@@ -74,7 +74,8 @@ Never promote a capability to CANONICAL based only on documentation or an unmerg
 
 ## History
 
-- 2026-09-20 (Canon v2.0): 身份升级为 Professional Finishing（Generated is not finished）；Player 重新定位为消费端接口 + Preview/A-B/Review/Delivery；Mix Graph v0.1 为下一工程包（当前 ABSENT）。
+- 2026-10-02 (MSP/0.2 Layer A): 协议新增 `analyze` 作业（纯读取分析）与 0.2 报告三件套（report.json/md/html，含指标可见性声明与判断边界）；同时清理双 CLI 入口点冲突（setup.py 不再声明 console_scripts）与 cli_v2/cli_daw 残骸。设计提案见 `docs/plan/2026-10-02_MSP02_ANALYSIS_JOB_AND_DISPLAY_DESIGN.md`。
+- 2026-09-20 (Canon v2.0): 身份升级为 Professional Finishing（Generated is not finished）；Player 重新定位为消费端接口 + Preview/A-B/Review/Delivery；Mix Graph v0.1 为下一工程包（当前 ABSENT）。〔2026-10-02 注：该行 status 已过时——Mix Graph v0.1 已实现，见上方能力表 EXPERIMENTAL 行〕
 - 2026-08-17 (W01-P01): 从历史静态快照转为 Canon 入口；身份收敛为 Moodify Music / Player。
 - 2026-08-14: Brand/Core Identity vs Public Product 记录（已并入上方历史身份说明）。
 - 2026-08-08: 原 Ear of AI 身份基线（保留为历史）。
