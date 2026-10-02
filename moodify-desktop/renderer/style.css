@@ -139,16 +139,11 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 #bench-head {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
 }
-#bench-tabs {
-  display: flex;
-  gap: 2px;
-}
-#bench-zoom { padding-bottom: 6px; }
 #bench-zoom button { padding: 2px 10px; font-size: 12px; }
-.fix-tracks { display: flex; flex-direction: column; gap: 8px; }
+.bench-tracks { display: flex; flex-direction: column; gap: 8px; }
 .track {
   display: grid;
   grid-template-columns: 128px 1fr;

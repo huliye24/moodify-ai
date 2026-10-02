@@ -17,7 +17,6 @@ const state = {
   termId: null,
   termCwd: undefined, // undefined = terminal never created
   drawerVisible: false, // engineering terminal stays hidden until asked for
-  bench: 'fix',         // 修音工作台当前分页：'fix' | 'mix'
   streamH: 200,         // 编译器对话抽屉高度（可拖动）
 };
 
@@ -146,7 +145,6 @@ async function openReport(reportPath) {
   state.reportPath = reportPath;
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
   destroyBench(); // 换世界：旧工作台实例销毁
-  selectBench('fix'); // 工作台回到修音分页
 
   $('source-name').textContent = (report.source || {}).name || '?';
   $('case-title').hidden = false;
@@ -236,11 +234,12 @@ function imageExists(src) {
   });
 }
 
-// ——— 修音/混音工作台波形：wavesurfer.js v6（BSD-3，vendor 内嵌）———
+// ——— 修音工作台波形：wavesurfer.js v6（BSD-3，vendor 内嵌）———
 // 缩放 / 滚动 / 播放头 / 点击定位 / 精细时间标尺；L/R 分声道渲染。
+// 统一轨道区：源轨 + W5 起叠加的版本轨，不再按修音/混音预分家。
 
-const bench = { fix: null, mix: null }; // WaveSurfer 实例，每个工作台一份
-let zoomPx = null; // 每秒像素；null = 适配全曲
+let sourceWS = null;  // 源轨 WaveSurfer 实例
+let zoomPx = null;    // 每秒像素；null = 适配全曲
 
 async function renderWaveform(entryDir) {
   const src = await window.moodify.resolveSource(entryDir);
@@ -253,24 +252,20 @@ async function renderWaveform(entryDir) {
     const audio = await ctx.decodeAudioData(ab);
     await ctx.close();
     if (state.caseDir !== entryDir) return; // world switched mid-decode
-    const meta =
+    $('source-meta').textContent =
       `${src.split(/[\\/]/).pop()} · ${audio.numberOfChannels}ch @ ${audio.sampleRate}Hz`
       + ` · ${audio.duration.toFixed(1)}s`;
-    $('fix-meta').textContent = meta;
-    $('mix-meta').textContent = meta;
-    $('fix-source-track').hidden = false;
-    $('mix-source-track').hidden = false;
-    mountTrackWave('fix', audio);
-    mountTrackWave('mix', audio);
+    $('source-track').hidden = false;
+    mountSourceWave(audio);
   } catch {
     // 轨道波形是增益，解码失败静默降级（数据/频谱/图表不受影响）
   }
 }
 
-function mountTrackWave(which, audioBuffer) {
-  if (bench[which]) { try { bench[which].destroy(); } catch { /* already gone */ } }
-  bench[which] = WaveSurfer.create({
-    container: $(`wave-${which}`),
+function mountSourceWave(audioBuffer) {
+  if (sourceWS) { try { sourceWS.destroy(); } catch { /* already gone */ } }
+  sourceWS = WaveSurfer.create({
+    container: $('wave-source'),
     backend: 'WebAudio',
     height: 60,
     splitChannels: true,
@@ -281,7 +276,7 @@ function mountTrackWave(which, audioBuffer) {
     cursorColor: '#16181d',
     cursorWidth: 1,
     plugins: [WaveSurfer.timeline.create({
-      container: $(`ruler-${which}`),
+      container: $('ruler-source'),
       fontSize: 10,
       primaryColor: '#d1d5db',
       secondaryColor: '#f3f4f6',
@@ -289,51 +284,36 @@ function mountTrackWave(which, audioBuffer) {
       secondaryFontColor: '#c7cbd1',
     })],
   });
-  bench[which].loadDecodedBuffer(audioBuffer);
+  sourceWS.loadDecodedBuffer(audioBuffer);
 }
 
 function destroyBench() {
-  for (const which of ['fix', 'mix']) {
-    if (bench[which]) { try { bench[which].destroy(); } catch { /* already gone */ } }
-    bench[which] = null;
-    $(`${which}-source-track`).hidden = true;
-  }
+  if (sourceWS) { try { sourceWS.destroy(); } catch { /* already gone */ } }
+  sourceWS = null;
+  $('source-track').hidden = true;
   zoomPx = null;
 }
 
 function applyZoom() {
-  for (const which of ['fix', 'mix']) {
-    const ws = bench[which];
-    const el = $(`wave-${which}`);
-    if (!ws || !el || el.clientWidth < 10) continue; // 隐藏页宽度为 0，跳过
-    const fitPx = el.clientWidth / (ws.getDuration() || 1);
-    ws.zoom(Math.max(zoomPx || fitPx, fitPx));
-  }
+  const el = $('wave-source');
+  if (!sourceWS || !el || el.clientWidth < 10) return; // 隐藏态宽度为 0
+  const fitPx = el.clientWidth / (sourceWS.getDuration() || 1);
+  sourceWS.zoom(Math.max(zoomPx || fitPx, fitPx));
 }
 
 function setZoom(factor) {
-  const el = $(`wave-${state.bench}`);
-  const ws = bench[state.bench];
-  if (!ws || !el || el.clientWidth < 10) return;
-  const fitPx = el.clientWidth / (ws.getDuration() || 1);
+  const el = $('wave-source');
+  if (!sourceWS || !el || el.clientWidth < 10) return;
+  const fitPx = el.clientWidth / (sourceWS.getDuration() || 1);
   zoomPx = Math.min(800, Math.max(fitPx, (zoomPx || fitPx) * factor));
   applyZoom();
 }
 
-/** 修音工作台（图标栏第 2 位）：观察三页之外的创造模式，内含 修音/混音 分页。 */
+/** 修音工作台（图标栏第 2 位）：观察三页之外的创造模式。 */
 function openBench() {
   if (!state.caseDir) return;
   selectView('bench');
   requestAnimationFrame(applyZoom); // 从隐藏态回来，宽度恢复后重画
-}
-
-function selectBench(which) {
-  state.bench = which;
-  $('bench-tab-fix').classList.toggle('active', which === 'fix');
-  $('bench-tab-mix').classList.toggle('active', which === 'mix');
-  $('bench-fix').hidden = which !== 'fix';
-  $('bench-mix').hidden = which !== 'mix';
-  requestAnimationFrame(applyZoom);
 }
 
 function renderPlan(report) {
@@ -744,8 +724,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('tab-spectrum').addEventListener('click', () => { if (state.caseDir) selectView('spectrum'); });
   $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
   $('rail-fix').addEventListener('click', openBench);
-  $('bench-tab-fix').addEventListener('click', () => selectBench('fix'));
-  $('bench-tab-mix').addEventListener('click', () => selectBench('mix'));
   $('zoom-in').addEventListener('click', () => setZoom(1.5));
   $('zoom-out').addEventListener('click', () => setZoom(1 / 1.5));
   $('zoom-fit').addEventListener('click', () => { zoomPx = null; applyZoom(); });
