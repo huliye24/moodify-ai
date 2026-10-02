@@ -18,16 +18,15 @@ const state = {
   termCwd: undefined, // undefined = terminal never created
   drawerVisible: false, // engineering terminal stays hidden until asked for
   wave: null,           // {lanes:[Float32Array(min,max)…], duration} peaks cache
+  bench: 'fix',         // 修音工作台当前分页：'fix' | 'mix'
 };
 
-const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'fix', 'mix'];
+const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'bench'];
 const VIEW_TAB = {
   data: 'tab-data',
   spectrum: 'tab-spectrum',
   charts: 'tab-charts',
-  fix: 'tab-fix',
-  mix: 'tab-mix',
-};
+}; // bench 无顶层标签：观察（三页）与创造（工作台）按模式分开
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -129,11 +128,11 @@ function showError(message) {
 
 function selectView(name) {
   for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
-  $('tabs').hidden = name === 'empty';
+  $('tabs').hidden = name === 'empty' || name === 'bench';
   for (const [view, tabId] of Object.entries(VIEW_TAB)) {
     $(tabId).classList.toggle('active', view === name);
   }
-  $('rail-fix').classList.toggle('active', name === 'fix');
+  $('rail-fix').classList.toggle('active', name === 'bench');
 }
 
 async function openReport(reportPath) {
@@ -147,6 +146,7 @@ async function openReport(reportPath) {
   state.reportPath = reportPath;
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
   state.wave = null;
+  selectBench('fix'); // 换世界：工作台回到修音分页
 
   const source = report.source || {};
   const technical = report.technical_state || {};
@@ -273,8 +273,8 @@ async function renderWaveform(entryDir) {
     $('mix-meta').textContent = meta;
     $('fix-source-track').hidden = false;
     $('mix-source-track').hidden = false;
-    drawTrackWave('fix-strip', 'view-fix');
-    drawTrackWave('mix-strip', 'view-mix');
+    drawTrackWave('fix-strip', 'bench-fix');
+    drawTrackWave('mix-strip', 'bench-mix');
   } catch {
     // 轨道波形是增益，解码失败静默降级（数据/频谱/图表不受影响）
   }
@@ -356,11 +356,21 @@ function drawTrackWave(canvasId, sectionId) {
   }
 }
 
-/** 修音/混音工作台入口：先切视图再补画（隐藏期间画不出来）。 */
-function openTrackView(name) {
+/** 修音工作台（图标栏第 2 位）：观察三页之外的创造模式，内含 修音/混音 分页。 */
+function openBench() {
   if (!state.caseDir) return;
-  selectView(name);
-  drawTrackWave(`${name}-strip`, `view-${name}`);
+  selectView('bench');
+  drawTrackWave('fix-strip', 'bench-fix');
+  drawTrackWave('mix-strip', 'bench-mix');
+}
+
+function selectBench(which) {
+  state.bench = which;
+  $('bench-tab-fix').classList.toggle('active', which === 'fix');
+  $('bench-tab-mix').classList.toggle('active', which === 'mix');
+  $('bench-fix').hidden = which !== 'fix';
+  $('bench-mix').hidden = which !== 'mix';
+  drawTrackWave(`${which}-strip`, `bench-${which}`);
 }
 
 function renderPlan(report) {
@@ -740,12 +750,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('tab-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
   $('tab-spectrum').addEventListener('click', () => { if (state.caseDir) selectView('spectrum'); });
   $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
-  $('tab-fix').addEventListener('click', () => openTrackView('fix'));
-  $('tab-mix').addEventListener('click', () => openTrackView('mix'));
-  $('rail-fix').addEventListener('click', () => openTrackView('fix'));
+  $('rail-fix').addEventListener('click', openBench);
+  $('bench-tab-fix').addEventListener('click', () => selectBench('fix'));
+  $('bench-tab-mix').addEventListener('click', () => selectBench('mix'));
   window.addEventListener('resize', () => {
-    drawTrackWave('fix-strip', 'view-fix');
-    drawTrackWave('mix-strip', 'view-mix');
+    drawTrackWave('fix-strip', 'bench-fix');
+    drawTrackWave('mix-strip', 'bench-mix');
   });
   const sendIntent = () => {
     const text = $('compiler-input').value;

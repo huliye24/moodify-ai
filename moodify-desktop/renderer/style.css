@@ -142,8 +142,14 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 }
 .workspace-view { position: relative; z-index: 1; }
 
-/* ——— 修音工作台：AU/Pr 式轨道条（源轨只读；版本轨 W5 起叠加）——— */
+/* ——— 修音工作台：AU/Pr 式轨道条（观察三页之外的模式；内含 修音/混音 分页）——— */
 
+#bench-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--hairline);
+}
 .fix-tracks { display: flex; flex-direction: column; gap: 8px; }
 .track {
   display: grid;

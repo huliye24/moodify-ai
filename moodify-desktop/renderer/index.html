@@ -56,8 +56,6 @@
         <button class="tab" id="tab-data">数据</button>
         <button class="tab" id="tab-spectrum">频谱</button>
         <button class="tab" id="tab-charts">图表</button>
-        <button class="tab" id="tab-fix">修音</button>
-        <button class="tab" id="tab-mix">混音</button>
       </nav>
       <div id="views">
         <!-- 产品水印：透明底纹，常驻工作区背景层；结果内容叠加其上，不占布局 -->
@@ -80,26 +78,31 @@
           <div id="charts-body" class="charts"></div>
         </section>
 
-        <section id="view-fix" class="workspace-view" hidden>
-          <div id="fix-tracks" class="fix-tracks">
-            <div class="track" id="fix-source-track" hidden>
-              <div class="track-head">
-                <span class="track-name">源</span>
-                <span class="muted track-meta" id="fix-meta"></span>
+        <section id="view-bench" class="workspace-view" hidden>
+          <nav id="bench-tabs">
+            <button class="tab active" id="bench-tab-fix">修音</button>
+            <button class="tab" id="bench-tab-mix">混音</button>
+          </nav>
+          <div id="bench-fix">
+            <div class="fix-tracks">
+              <div class="track" id="fix-source-track" hidden>
+                <div class="track-head">
+                  <span class="track-name">源</span>
+                  <span class="muted track-meta" id="fix-meta"></span>
+                </div>
+                <div class="track-strip"><canvas id="fix-strip" height="140"></canvas></div>
               </div>
-              <div class="track-strip"><canvas id="fix-strip" height="140"></canvas></div>
             </div>
           </div>
-        </section>
-
-        <section id="view-mix" class="workspace-view" hidden>
-          <div id="mix-tracks" class="fix-tracks">
-            <div class="track" id="mix-source-track" hidden>
-              <div class="track-head">
-                <span class="track-name">源</span>
-                <span class="muted track-meta" id="mix-meta"></span>
+          <div id="bench-mix" hidden>
+            <div class="fix-tracks">
+              <div class="track" id="mix-source-track" hidden>
+                <div class="track-head">
+                  <span class="track-name">源</span>
+                  <span class="muted track-meta" id="mix-meta"></span>
+                </div>
+                <div class="track-strip"><canvas id="mix-strip" height="140"></canvas></div>
               </div>
-              <div class="track-strip"><canvas id="mix-strip" height="140"></canvas></div>
             </div>
           </div>
         </section>
