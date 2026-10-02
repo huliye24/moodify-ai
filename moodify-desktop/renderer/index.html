@@ -41,10 +41,6 @@
 
     <!-- 世界面板：从左滑出，可收起；双击 = 进入该世界（不关闭当前） -->
     <aside id="history-panel" hidden>
-      <div class="list-head">
-        <span class="muted">世界（双击进入）</span>
-        <button id="refresh" class="ghost">刷新</button>
-      </div>
       <table class="data">
         <thead><tr>
           <th>源文件</th><th>分析时间</th><th>状态</th><th>判定</th>
@@ -57,23 +53,31 @@
     <!-- 中央工作区：顶部标签页按来源分——波谱=音乐本身，图表/数据=检测产物 -->
     <main id="workspace">
       <nav id="tabs" hidden>
-        <button class="tab" id="tab-wave">波谱</button>
-        <button class="tab" id="tab-fix">修音</button>
-        <button class="tab" id="tab-charts">图表</button>
         <button class="tab" id="tab-data">数据</button>
+        <button class="tab" id="tab-spectrum">频谱</button>
+        <button class="tab" id="tab-charts">图表</button>
+        <button class="tab" id="tab-fix">修音</button>
+        <button class="tab" id="tab-mix">混音</button>
       </nav>
       <div id="views">
         <!-- 产品水印：透明底纹，常驻工作区背景层；结果内容叠加其上，不占布局 -->
         <img id="wm" src="assets/moodify_watermark.png" alt="">
         <section id="view-empty" class="workspace-view"></section>
 
-        <section id="view-wave" class="workspace-view" hidden>
-          <div id="wave-wrap" hidden>
-            <canvas id="waveform" height="150"></canvas>
-            <p class="muted caption" id="wave-caption"></p>
-          </div>
+        <section id="view-data" class="workspace-view" hidden>
+          <table class="data">
+            <thead><tr><th>指标</th><th>值</th><th>单位</th><th>状态</th><th>组</th></tr></thead>
+            <tbody id="measure-body"></tbody>
+          </table>
+          <div id="plan-body"></div>
+        </section>
+
+        <section id="view-spectrum" class="workspace-view" hidden>
           <div id="spectrum-body" class="charts"></div>
-          <p class="muted caption">音乐的声谱（实测渲染）；不构成审美或平台适配判断。</p>
+        </section>
+
+        <section id="view-charts" class="workspace-view" hidden>
+          <div id="charts-body" class="charts"></div>
         </section>
 
         <section id="view-fix" class="workspace-view" hidden>
@@ -83,24 +87,21 @@
                 <span class="track-name">源</span>
                 <span class="muted track-meta" id="fix-meta"></span>
               </div>
-              <div class="track-strip"><canvas id="fix-strip" height="88"></canvas></div>
+              <div class="track-strip"><canvas id="fix-strip" height="140"></canvas></div>
             </div>
           </div>
-          <p class="muted caption">源轨（只读）；渲染出的版本以轨道条形式叠加于此。</p>
         </section>
 
-        <section id="view-charts" class="workspace-view" hidden>
-          <div id="charts-body" class="charts"></div>
-          <p class="muted caption">检测产物：指标实测图；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断。</p>
-        </section>
-
-        <section id="view-data" class="workspace-view" hidden>
-          <table class="data">
-            <thead><tr><th>指标</th><th>值</th><th>单位</th><th>状态</th><th>组</th></tr></thead>
-            <tbody id="measure-body"></tbody>
-          </table>
-          <h3 class="draft-head">规则草案（保守，DRAFT_PLAN_NOT_EXECUTED）</h3>
-          <div id="plan-body"></div>
+        <section id="view-mix" class="workspace-view" hidden>
+          <div id="mix-tracks" class="fix-tracks">
+            <div class="track" id="mix-source-track" hidden>
+              <div class="track-head">
+                <span class="track-name">源</span>
+                <span class="muted track-meta" id="mix-meta"></span>
+              </div>
+              <div class="track-strip"><canvas id="mix-strip" height="140"></canvas></div>
+            </div>
+          </div>
         </section>
       </div>
     </main>

@@ -20,8 +20,14 @@ const state = {
   wave: null,           // {lanes:[Float32Array(min,max)…], duration} peaks cache
 };
 
-const VIEWS = ['empty', 'wave', 'fix', 'charts', 'data'];
-const VIEW_TAB = { wave: 'tab-wave', fix: 'tab-fix', charts: 'tab-charts', data: 'tab-data' };
+const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'fix', 'mix'];
+const VIEW_TAB = {
+  data: 'tab-data',
+  spectrum: 'tab-spectrum',
+  charts: 'tab-charts',
+  fix: 'tab-fix',
+  mix: 'tab-mix',
+};
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -174,7 +180,7 @@ async function openReport(reportPath) {
   toggleHistoryPanel(false);
   renderMeasurements(report.measurements || []);
   renderPlan(report);
-  selectView('wave'); // 落在波谱：音乐本身先行
+  selectView('data'); // 落在第一个标签页：数据
   fitTerminalSoon();
   const entryDir = state.caseDir;
   await renderSpectrum(entryDir);        // 本地 PNG 即刻顶格可见
@@ -198,35 +204,34 @@ function renderMeasurements(measurements) {
   }
 }
 
-const CHART_TITLES = {
-  bands: ['频段能量占比（实测）', 'ratio（log 轴）'],
-  levels_db: ['电平与响度（实测）', 'dB 域（LUFS/dBFS/dB/LU）'],
-  stereo_ratios: ['立体声分布（实测）', 'ratio'],
-};
+const CHART_KEYS = ['bands', 'levels_db', 'stereo_ratios'];
 
-/** 波谱页：音乐本身的声谱（扫描频谱渲染；波形 canvas 另由 renderWaveform 负责）。 */
+/** 频谱页：只放各种频谱图（log + linear）。 */
 async function renderSpectrum(caseDir) {
   const box = $('spectrum-body');
   box.textContent = '';
-  const spectrum = ['spectrum_log.png', 'spectrum_linear.png']
-    .map((name) => `${caseDir}/scan/${name}`);
-  for (const src of spectrum) {
+  for (const name of ['spectrum_log.png', 'spectrum_linear.png']) {
+    const src = `${caseDir}/scan/${name}`;
     if (await imageExists(src)) {
-      box.appendChild(figure(src, '实测频谱渲染；不构成审美或平台适配判断'));
-      break;
+      const img = document.createElement('img');
+      img.src = fileUrl(src);
+      box.appendChild(img);
     }
   }
 }
 
-/** 图表页：检测产物（指标实测图）。 */
+/** 图表页：检测产物图。 */
 async function renderCharts(reportPath) {
   const box = $('charts-body');
   box.textContent = '';
   try {
     const payload = await window.moodify.renderCharts(reportPath);
-    for (const [name, title] of Object.entries(CHART_TITLES)) {
-      const png = payload.charts[name];
-      if (png) box.appendChild(figure(png, title.join(' · ')));
+    for (const key of CHART_KEYS) {
+      const png = payload.charts[key];
+      if (!png) continue;
+      const img = document.createElement('img');
+      img.src = fileUrl(png);
+      box.appendChild(img);
     }
   } catch (err) {
     const p = document.createElement('p');
@@ -245,23 +250,11 @@ function imageExists(src) {
   });
 }
 
-function figure(pngPath, caption) {
-  const fig = document.createElement('figure');
-  const img = document.createElement('img');
-  img.src = fileUrl(pngPath);
-  const cap = document.createElement('figcaption');
-  cap.textContent = caption;
-  fig.appendChild(img);
-  fig.appendChild(cap);
-  return fig;
-}
-
 // ——— 波形（Audacity 式）：Web Audio 解码源音频 → 峰值包络 → canvas ———
 
 const WAVE_PEAK_COLS = 2000;
 
 async function renderWaveform(entryDir) {
-  const wrap = $('wave-wrap');
   const src = await window.moodify.resolveSource(entryDir);
   if (!src || state.caseDir !== entryDir) return;
   try {
@@ -276,14 +269,14 @@ async function renderWaveform(entryDir) {
     const meta =
       `${src.split(/[\\/]/).pop()} · ${audio.numberOfChannels}ch @ ${audio.sampleRate}Hz`
       + ` · ${audio.duration.toFixed(1)}s`;
-    $('wave-caption').textContent = meta;
     $('fix-meta').textContent = meta;
-    wrap.hidden = false; // 画好再现身：解码期间频谱先顶格，不留空白块
+    $('mix-meta').textContent = meta;
     $('fix-source-track').hidden = false;
-    drawWaveform();
-    drawFixStrip();
+    $('mix-source-track').hidden = false;
+    drawTrackWave('fix-strip', 'view-fix');
+    drawTrackWave('mix-strip', 'view-mix');
   } catch {
-    if (state.caseDir === entryDir) wrap.hidden = true; // 波形是增益，失败静默降级
+    // 轨道波形是增益，解码失败静默降级（数据/频谱/图表不受影响）
   }
 }
 
@@ -310,14 +303,16 @@ function buildWavePeaks(audio) {
   return { lanes, duration: audio.duration };
 }
 
-function drawWaveform() {
-  const canvas = $('waveform');
-  const wrap = $('wave-wrap');
-  if (!state.wave || wrap.hidden) return;
+/** 轨道条渲染（AU 式 L/R 泳道 + 诚实时间标尺）；修音/混音两个工作台共用。 */
+function drawTrackWave(canvasId, sectionId) {
+  if (!state.wave) return;
+  const section = $(sectionId);
+  if (section.hidden) return; // 隐藏期间宽度为 0，切回时由入口重画
+  const canvas = $(canvasId);
   const { lanes, duration } = state.wave;
   const dpr = window.devicePixelRatio || 1;
-  const cssW = Math.max(400, wrap.clientWidth);
-  const laneH = 64, gap = 6, rulerH = 18;
+  const cssW = Math.max(400, canvas.parentElement.clientWidth);
+  const laneH = 56, gap = 5, rulerH = 16;
   const cssH = laneH * lanes.length + gap * (lanes.length - 1) + rulerH;
   canvas.style.width = '100%';
   canvas.style.height = `${cssH}px`;
@@ -347,7 +342,6 @@ function drawWaveform() {
     g.font = '10px "Segoe UI", sans-serif';
     g.fillText(ch === 0 ? 'L' : 'R', 4, y0 + 11);
   });
-  // time ruler（诚实时间轴）
   const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300];
   const stepSize = steps.find((s) => duration / s <= 10) || 600;
   g.font = '10px "Segoe UI", sans-serif';
@@ -358,59 +352,15 @@ function drawWaveform() {
     g.fillStyle = '#9ca3af';
     const m = Math.floor(t / 60);
     const s = Math.round(t % 60);
-    g.fillText(`${m}:${String(s).padStart(2, '0')}`, x + 2, cssH - 5);
+    g.fillText(`${m}:${String(s).padStart(2, '0')}`, x + 2, cssH - 4);
   }
 }
 
-/** 修音工作台：AU/Pr 式源轨条（声道取包络并集的概览；与波谱页共用峰值缓存）。 */
-function drawFixStrip() {
-  const section = $('view-fix');
-  const track = $('fix-source-track');
-  if (!state.wave || section.hidden || track.hidden) return;
-  const { lanes, duration } = state.wave;
-  const canvas = $('fix-strip');
-  const dpr = window.devicePixelRatio || 1;
-  const cssW = Math.max(400, canvas.parentElement.clientWidth);
-  const laneH = 72, rulerH = 16;
-  const cssH = laneH + rulerH;
-  canvas.style.width = '100%';
-  canvas.style.height = `${cssH}px`;
-  canvas.width = Math.round(cssW * dpr);
-  canvas.height = Math.round(cssH * dpr);
-  const g = canvas.getContext('2d');
-  g.scale(dpr, dpr);
-  const cols = lanes[0].length / 2;
-  const mid = laneH / 2, half = laneH / 2 - 2;
-  g.fillStyle = '#f6f7ff';
-  g.fillRect(0, 0, cssW, laneH);
-  g.strokeStyle = '#e5e7eb';
-  g.strokeRect(0.5, 0.5, cssW - 1, laneH - 1);
-  g.strokeStyle = '#d1d5db';
-  g.beginPath(); g.moveTo(0, mid); g.lineTo(cssW, mid); g.stroke();
-  g.fillStyle = 'rgba(79, 70, 229, 0.78)';
-  for (let x = 0; x < cssW; x++) {
-    const c = Math.min(cols - 1, Math.floor((x / cssW) * cols));
-    let mn = 1.0, mx = -1.0;
-    for (const lane of lanes) {
-      if (lane[c * 2] < mn) mn = lane[c * 2];
-      if (lane[c * 2 + 1] > mx) mx = lane[c * 2 + 1];
-    }
-    const yMax = mid + mx * half;
-    const yMin = mid + mn * half;
-    g.fillRect(x, yMax, 1, Math.max(1, yMin - yMax));
-  }
-  const steps = [1, 2, 5, 10, 15, 30, 60, 120, 300];
-  const stepSize = steps.find((s) => duration / s <= 10) || 600;
-  g.font = '10px "Segoe UI", sans-serif';
-  for (let t = 0; t <= duration; t += stepSize) {
-    const x = (t / duration) * cssW;
-    g.strokeStyle = '#f3f4f6';
-    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, laneH); g.stroke();
-    g.fillStyle = '#9ca3af';
-    const m = Math.floor(t / 60);
-    const s = Math.round(t % 60);
-    g.fillText(`${m}:${String(s).padStart(2, '0')}`, x + 2, cssH - 4);
-  }
+/** 修音/混音工作台入口：先切视图再补画（隐藏期间画不出来）。 */
+function openTrackView(name) {
+  if (!state.caseDir) return;
+  selectView(name);
+  drawTrackWave(`${name}-strip`, `view-${name}`);
 }
 
 function renderPlan(report) {
@@ -418,10 +368,6 @@ function renderPlan(report) {
   const findings = report.findings || [];
   const body = $('plan-body');
   body.textContent = '';
-
-  const status = document.createElement('h3');
-  status.textContent = `状态：${plan.status || '?'}`;
-  body.appendChild(status);
 
   if (findings.length) {
     const head = document.createElement('h3');
@@ -451,12 +397,6 @@ function renderPlan(report) {
     div.appendChild(reason);
     body.appendChild(div);
   }
-  if (!(plan.nodes || []).length) {
-    const none = document.createElement('p');
-    none.className = 'muted';
-    none.textContent = '无自动算子建议（未发现可安全映射到标准算子的发现）。';
-    body.appendChild(none);
-  }
 
   const notes = plan.notes || [];
   if (notes.length) {
@@ -471,13 +411,6 @@ function renderPlan(report) {
     }
     body.appendChild(ul);
   }
-}
-
-/** 修音视图入口（tab 与 rail 共用）：先切视图再补画，画时宽度才有效。 */
-function openFixView() {
-  if (!state.caseDir) return;
-  selectView('fix');
-  drawFixStrip();
 }
 
 // ——— terminal drawer (xterm.js + node-pty, cwd = case dir) ———
@@ -804,17 +737,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   $('rail-open').addEventListener('click', pickAndAnalyze);
   $('rail-history').addEventListener('click', () => toggleHistoryPanel());
-  $('tab-wave').addEventListener('click', () => {
-    if (!state.caseDir) return;
-    selectView('wave');
-    drawWaveform(); // 隐藏期间 clientWidth 归零过，重画一次
-  });
-  $('tab-fix').addEventListener('click', openFixView);
-  $('rail-fix').addEventListener('click', openFixView);
-  $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
   $('tab-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
-  window.addEventListener('resize', () => { drawWaveform(); drawFixStrip(); });
-  $('refresh').addEventListener('click', refreshArchive);
+  $('tab-spectrum').addEventListener('click', () => { if (state.caseDir) selectView('spectrum'); });
+  $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
+  $('tab-fix').addEventListener('click', () => openTrackView('fix'));
+  $('tab-mix').addEventListener('click', () => openTrackView('mix'));
+  $('rail-fix').addEventListener('click', () => openTrackView('fix'));
+  window.addEventListener('resize', () => {
+    drawTrackWave('fix-strip', 'view-fix');
+    drawTrackWave('mix-strip', 'view-mix');
+  });
   const sendIntent = () => {
     const text = $('compiler-input').value;
     $('compiler-input').value = '';

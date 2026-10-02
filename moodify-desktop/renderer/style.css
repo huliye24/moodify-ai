@@ -108,18 +108,12 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 @keyframes slide-in {
   from { transform: translateX(-16px); opacity: 0.4; }
 }
-.list-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 0 6px;
-}
 .archive-path { margin: 10px 0 0; font-size: 11.5px; word-break: break-all; }
 
 #workspace { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
 #workspace.drop-target { outline: 2px dashed var(--accent); outline-offset: -6px; border-radius: 8px; }
 
-/* ——— 顶部标签页：数据 / 图表·波谱 / 后处理 ——— */
+/* ——— 顶部标签页：数据 / 频谱 / 图表 / 修音 / 混音 ——— */
 
 #tabs { flex: none; display: flex; gap: 2px; padding: 4px 16px 0; border-bottom: 1px solid var(--hairline); }
 .tab {
@@ -133,8 +127,6 @@ button.ghost:hover { color: var(--fg); background: var(--accent-soft); }
 .tab.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
 
 #views { flex: 1; overflow: auto; padding: 10px 16px; position: relative; }
-#wave-wrap { margin-bottom: 8px; }
-#waveform { display: block; }
 
 /* 产品水印：工作区背景层的透明底纹，不占布局；结果内容（z=1）叠加覆盖其上 */
 #wm {
@@ -193,14 +185,12 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 /* ——— 图表 ——— */
 
 .charts { display: flex; flex-direction: column; gap: 14px; }
-.charts figure { margin: 0; }
 .charts img {
   max-width: 100%;
   border: 1px solid var(--hairline);
   border-radius: 8px;
   background: #fff;
 }
-.charts figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; }
 .caption { margin-top: 14px; font-size: 12px; }
 
 /* ——— Mood 编译器（住在底部意图命令条里）——— */
@@ -294,9 +284,8 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 #intent-dock #compiler-send { flex: none; }
 #intent-dock #drawer-toggle2 { flex: none; padding: 7px 10px; font-family: Consolas, monospace; }
 
-.draft-head { font-size: 14px; margin: 4px 0 6px; }
-
 #plan-body h3 { font-size: 14px; margin: 14px 0 6px; }
+
 #plan-body .node { margin: 0 0 10px; }
 #plan-body .node .op { font-weight: 600; }
 #plan-body .node .reason { color: var(--muted); margin: 2px 0 0 16px; }
