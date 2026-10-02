@@ -2,6 +2,15 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-02 — Moodify 实验台：科研 GUI 优先，GUI-first 开发教义（CANON_CHANGE = NO）
+
+- **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因开发教义与人机界面优先级翻转是产品级决策（R7 可见性）。人类指令原话要点：先要有科研一样的 GUI，然后才可以有 CLI——要知道在发生什么、可以发生什么、怎么优化迭代。
+- **Why / evidence：** 2026-10-02 人类对实验台三项裁决（AskUserQuestion）：升级现有 app（一个壳两个心智）/ 观测区优先 / 只观测不写入（改阈值=改判定语义，属 L3 决策，显式后置）。
+- **Boundary：** 新增 `moodify.ui.lab`（观测/目录/实验三区）：观测区从档案事实（evidence.json、scan_manifest、judgment_rules、report.representation）装配阶段级过程视图，**引擎零改动**；目录区为诚实能力地图（状态取值与 REPOSITORY_STATUS 同族；只有本窗口可达的 analyze/compare 可标"本实验台"入口）；实验区走 0.2 compare 作业同一条 validate/execute 路径，delta 只描述不评级。**开发教义（人类裁决）：新能力默认先进实验台（可观测可迭代），稳定后凝结为 CLI 命令；CLI 仍是 AI 调用面，不删。**
+- **Affected authority files：** `docs/REPOSITORY_STATUS.md`、本文件。代码面：`moodify/ui/lab.py`（新）、`moodify/ui/app.py`（实验台入口）、`tests/ui/test_lab.py`（新）。
+- **Migration：** 无破坏性变更；CLI 命令面不变。
+- **Rollback：** 删除 `moodify/ui/lab.py`、`tests/ui/test_lab.py`、回退 app.py 实验台入口与本条即可；协议链路与档案不受影响。
+
 ## 2026-10-02 — Moodify 桌面应用中枢：打开文件 + 历史档案 + 界面内完成分析（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 产品身份、authority order、One Core 规则不变；记录于此因产品显示面再次扩展（R7 可见性）。人类指令原话要点：增加打开文件让用户选歌，要有历史记录与保存档案，不用每次重复打开处理——需要一点 GUI 操作。

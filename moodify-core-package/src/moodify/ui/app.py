@@ -116,6 +116,7 @@ class MoodifyApp:
         top.pack(fill="x")
         self.open_button = ttk.Button(top, text="打开音频文件…", command=self._open_audio)
         self.open_button.pack(side="left")
+        ttk.Button(top, text="实验台", command=self._show_lab).pack(side="right")
         self.status_var = tk.StringVar(value="空闲 — 选择一首歌开始分析")
         ttk.Label(top, textvariable=self.status_var, foreground="#555").pack(
             side="left", padx=12)
@@ -146,6 +147,12 @@ class MoodifyApp:
     def _clear(self) -> None:
         for child in self.root.winfo_children():
             child.destroy()
+
+    def _show_lab(self) -> None:
+        from moodify.ui.lab import build_lab_frame
+
+        self._clear()
+        build_lab_frame(self.root, self.cases_root, on_back=self._show_hub)
 
     def _refresh(self) -> None:
         rows = scan_case_archive(self.cases_root)
