@@ -11,6 +11,9 @@
 
 * { box-sizing: border-box; }
 
+/* hidden 属性必须绝对生效：display:flex 等作者样式会压过 UA 的 [hidden]{display:none} */
+[hidden] { display: none !important; }
+
 html, body { height: 100%; }
 
 body {

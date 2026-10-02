@@ -554,14 +554,17 @@ function setCompilerBusy(busy) {
   compiler.busy = busy;
   $('compiler-stop').hidden = !busy;
   updateStreamDot();
-  const worldOpen = Boolean(state.caseDir);
-  $('compiler-send').disabled = busy || !worldOpen;
-  $('compiler-input').disabled = busy || !worldOpen;
+  $('compiler-send').disabled = busy;
+  $('compiler-input').disabled = busy;
 }
 
 /** 意图命令条入口：惰性开线程，回答与操作都发生在 dock 里。首次发送弹出对话抽屉。 */
 async function intentSend(text) {
-  if (!text.trim() || !state.caseDir || compiler.busy) return;
+  if (!text.trim() || compiler.busy) return;
+  if (!state.caseDir) {
+    compilerNote('先打开一个音频文件（左上角打开或拖入），创建世界后再对话。');
+    return;
+  }
   if (!state.convStarted) {
     state.convStarted = true;
     openStream(); // 开始 AI 对话：抽屉对话区从此出现
