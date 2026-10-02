@@ -163,7 +163,7 @@ async function openReport(reportPath) {
   }
 
   $('tabs').hidden = false;
-  setCompilerBusy(compiler.busy); // intent bar unlocks with the world
+  setCompilerBusy(compiler.busy); // 同步禁用态（输入行从不因无世界而锁）
   toggleHistoryPanel(false);
   renderMeasurements(report.measurements || []);
   renderPlan(report);
@@ -558,13 +558,10 @@ function setCompilerBusy(busy) {
   $('compiler-input').disabled = busy;
 }
 
-/** 意图命令条入口：惰性开线程，回答与操作都发生在 dock 里。首次发送弹出对话抽屉。 */
+/** 意图命令条入口：惰性开线程，回答与操作都发生在 dock 里。首次发送弹出对话抽屉。
+ *  无世界也可对话（纯聊）；打开世界后线程自动切到 case 目录。 */
 async function intentSend(text) {
   if (!text.trim() || compiler.busy) return;
-  if (!state.caseDir) {
-    compilerNote('先打开一个音频文件（左上角打开或拖入），创建世界后再对话。');
-    return;
-  }
   if (!state.convStarted) {
     state.convStarted = true;
     openStream(); // 开始 AI 对话：抽屉对话区从此出现
@@ -598,7 +595,7 @@ async function ensureCompiler() {
 }
 
 async function openCompilerThread() {
-  if (!compiler.ready || !state.caseDir) return;
+  if (!compiler.ready) return; // cwd 兜底：无世界时主进程落到 CASES_ROOT
   const res = await window.moodify.codexThreadOpen(state.caseDir);
   if (res.ok) {
     compiler.threadId = res.thread.thread.id;
@@ -610,7 +607,8 @@ async function openCompilerThread() {
     compilerNote('');
     setCompilerBusy(false);
     const effective = res.thread.sandbox && res.thread.sandbox.type ? res.thread.sandbox.type : 'unknown';
-    compilerLine('sys', `线程就绪（cwd = ${state.caseDir}）· 生效沙箱：${effective}`);
+    const cwdLabel = state.caseDir || '自由对话（未打开世界）';
+    compilerLine('sys', `线程就绪（${cwdLabel}）· 生效沙箱：${effective}`);
   } else {
     compilerNote(`线程打开失败：${res.reason}`);
   }
