@@ -177,30 +177,13 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 .charts figcaption { color: var(--muted); font-size: 12px; margin-top: 4px; }
 .caption { margin-top: 14px; font-size: 12px; }
 
-/* ——— Mood 编译器 ——— */
-
-.plan-gen {
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 16px;
-}
-.plan-gen-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-.plan-gen-head h3 { margin: 0; font-size: 15px; }
-.plan-gen-head p { margin: 4px 0 0; font-size: 12px; }
-.plan-gen-actions { display: flex; gap: 8px; flex-shrink: 0; }
+/* ——— Mood 编译器（住在底部意图命令条里）——— */
 
 .compiler-setup {
   border: 1px solid var(--hairline);
   border-radius: 8px;
   background: #f9fafb;
   padding: 12px 14px;
-  margin: 12px 0 0;
 }
 .setup-row {
   display: flex;
@@ -221,13 +204,20 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 .setup-row input#setup-baseurl { flex: 1; min-width: 200px; }
 
 .compiler-stream {
-  max-height: 420px;
+  max-height: 200px;
   overflow: auto;
-  margin: 12px 0 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+#dock-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+#dock-bar .drawer-actions button { padding: 2px 8px; font-size: 12px; }
+#dock-bar .muted { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cmsg { border-radius: 8px; padding: 8px 12px; max-width: 92%; }
 .cmsg.user { background: var(--accent-soft); align-self: flex-end; }
 .cmsg.assistant { background: #f9fafb; border: 1px solid var(--hairline); align-self: flex-start; }
@@ -251,11 +241,16 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
 #intent-dock {
   flex: none;
   display: flex;
-  gap: 8px;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 6px;
   padding: 8px 12px 10px;
   border-top: 1px solid var(--hairline);
   background: var(--bg);
+}
+#intent-dock .dock-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
 }
 #intent-dock textarea {
   flex: 1;

@@ -51,16 +51,30 @@
       <p class="muted archive-path" id="archive-path"></p>
     </aside>
 
-    <!-- 中央工作区：顶部标签页（数据 / 图表·波谱 / 后处理）+ 内容直接可见 -->
+    <!-- 中央工作区：顶部标签页按来源分——波谱=音乐本身，图表/数据=检测产物 -->
     <main id="workspace">
       <nav id="tabs" hidden>
+        <button class="tab" id="tab-wave">波谱</button>
+        <button class="tab" id="tab-charts">图表</button>
         <button class="tab" id="tab-data">数据</button>
-        <button class="tab" id="tab-charts">图表 · 波谱</button>
-        <button class="tab" id="tab-plan">后处理</button>
       </nav>
       <div id="views">
         <section id="view-empty" class="workspace-view">
           <img class="watermark" src="assets/moodify_logo.png" alt="">
+        </section>
+
+        <section id="view-wave" class="workspace-view" hidden>
+          <div id="wave-wrap" hidden>
+            <canvas id="waveform" height="150"></canvas>
+            <p class="muted caption" id="wave-caption"></p>
+          </div>
+          <div id="spectrum-body" class="charts"></div>
+          <p class="muted caption">音乐的声谱（实测渲染）；不构成审美或平台适配判断。</p>
+        </section>
+
+        <section id="view-charts" class="workspace-view" hidden>
+          <div id="charts-body" class="charts"></div>
+          <p class="muted caption">检测产物：指标实测图；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断。</p>
         </section>
 
         <section id="view-data" class="workspace-view" hidden>
@@ -68,59 +82,9 @@
             <thead><tr><th>指标</th><th>值</th><th>单位</th><th>状态</th><th>组</th></tr></thead>
             <tbody id="measure-body"></tbody>
           </table>
+          <h3 class="draft-head">规则草案（保守，DRAFT_PLAN_NOT_EXECUTED）</h3>
+          <div id="plan-body"></div>
         </section>
-
-        <section id="view-charts" class="workspace-view" hidden>
-          <div id="wave-wrap" hidden>
-            <canvas id="waveform" height="150"></canvas>
-            <p class="muted caption" id="wave-caption"></p>
-          </div>
-          <div id="charts-body" class="charts"></div>
-          <p class="muted caption">实测值展示；阈值 0/16 已校准（全部 DEFAULT_UNCALIBRATED）——本图不做好坏判断。</p>
-        </section>
-
-      <section id="view-plan" class="workspace-view" hidden>
-        <div class="plan-gen">
-          <div class="plan-gen-head">
-            <div>
-              <h3>Mood 编译器</h3>
-              <p class="muted" id="compiler-subtitle">Codex 内核 · 基于本世界的 report.json / measurements.json / judgment_rules.json</p>
-            </div>
-            <div class="plan-gen-actions">
-              <button id="compiler-plan-btn" class="primary" disabled title="打开世界后可用">生成方案</button>
-              <button id="compiler-stop" class="ghost" hidden>停止</button>
-              <button id="compiler-save" class="ghost" hidden title="把最后一条方案存为 plan.md">保存方案</button>
-            </div>
-          </div>
-
-          <!-- 首次使用：内核与模型提供方设置（安装时可选，随时可改） -->
-          <div id="compiler-setup" class="compiler-setup" hidden>
-            <div class="setup-row">
-              <label>模型提供方</label>
-              <select id="setup-kind">
-                <option value="deepseek">DeepSeek</option>
-                <option value="openai">OpenAI</option>
-                <option value="custom">自定义（OpenAI 兼容）</option>
-              </select>
-              <label>模型</label>
-              <input id="setup-model" type="text" placeholder="deepseek-v4-pro">
-              <input id="setup-baseurl" type="text" placeholder="https://…/v1/" hidden>
-            </div>
-            <div class="setup-row">
-              <label>API Key</label>
-              <input id="setup-key" type="password" placeholder="粘贴密钥（仅存本机 ~/.moodify/codex）">
-              <button id="setup-save" class="primary">保存并启动</button>
-            </div>
-            <p class="muted caption" id="setup-status"></p>
-          </div>
-
-          <div id="compiler-stream" class="compiler-stream"></div>
-          <p class="muted caption" id="compiler-note" hidden></p>
-        </div>
-        <h3 class="draft-head">规则草案（保守，DRAFT_PLAN_NOT_EXECUTED）</h3>
-        <div id="plan-body"></div>
-        <p class="muted caption">本页只呈现 L1 技术测量与保守草案；不含听感、音乐或商业判断。渲染是显式动作（W5 接入）。</p>
-      </section>
       </div>
     </main>
   </div>
@@ -136,11 +100,43 @@
     <div id="terminal"></div>
   </div>
 
-  <!-- 意图命令条：写文字，编译器回答与操作（MC 聊天栏位，唯一 AI 门） -->
+  <!-- 意图命令条 = Mood 编译器之家：写文字 → DeepSeek 回答与操作；唯一 AI 门 -->
   <div id="intent-dock">
-    <textarea id="compiler-input" rows="1" title="直接输入，⏎ 发送" disabled></textarea>
-    <button id="compiler-send" class="primary" disabled>发送</button>
-    <button id="drawer-toggle2" class="ghost" title="工程终端（ffmpeg / python / CLI）">⌘_</button>
+    <div id="compiler-stream" class="compiler-stream" hidden></div>
+    <div id="dock-bar" hidden>
+      <span class="muted" id="compiler-subtitle">Mood 编译器 · Codex 内核</span>
+      <span class="drawer-actions">
+        <button id="compiler-plan-btn" class="ghost" disabled title="打开世界后可用">生成方案</button>
+        <button id="compiler-stop" class="ghost" hidden>停止</button>
+        <button id="compiler-save" class="ghost" hidden title="把最后一条方案存为 plan.md">保存方案</button>
+      </span>
+    </div>
+    <!-- 首次使用：内核与模型提供方设置（安装时可选，随时可改） -->
+    <div id="compiler-setup" class="compiler-setup" hidden>
+      <div class="setup-row">
+        <label>模型提供方</label>
+        <select id="setup-kind">
+          <option value="deepseek">DeepSeek</option>
+          <option value="openai">OpenAI</option>
+          <option value="custom">自定义（OpenAI 兼容）</option>
+        </select>
+        <label>模型</label>
+        <input id="setup-model" type="text" placeholder="deepseek-v4-pro">
+        <input id="setup-baseurl" type="text" placeholder="https://…/v1/" hidden>
+      </div>
+      <div class="setup-row">
+        <label>API Key</label>
+        <input id="setup-key" type="password" placeholder="粘贴密钥（仅存本机 ~/.moodify/codex）">
+        <button id="setup-save" class="primary">保存并启动</button>
+      </div>
+      <p class="muted caption" id="setup-status"></p>
+    </div>
+    <p class="muted caption" id="compiler-note" hidden></p>
+    <div class="dock-input-row">
+      <textarea id="compiler-input" rows="1" title="直接输入，⏎ 发送" disabled></textarea>
+      <button id="compiler-send" class="primary" disabled>发送</button>
+      <button id="drawer-toggle2" class="ghost" title="工程终端（ffmpeg / python / CLI）">⌘_</button>
+    </div>
   </div>
 
   <script src="vendor/xterm.js"></script>

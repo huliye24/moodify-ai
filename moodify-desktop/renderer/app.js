@@ -20,8 +20,8 @@ const state = {
   wave: null,           // {lanes:[Float32Array(min,max)…], duration} peaks cache
 };
 
-const VIEWS = ['empty', 'data', 'charts', 'plan'];
-const VIEW_TAB = { data: 'tab-data', charts: 'tab-charts', plan: 'tab-plan' };
+const VIEWS = ['empty', 'wave', 'charts', 'data'];
+const VIEW_TAB = { wave: 'tab-wave', charts: 'tab-charts', data: 'tab-data' };
 
 function fileUrl(p) {
   return 'file:///' + encodeURI(String(p).replace(/\\/g, '/'));
@@ -173,12 +173,13 @@ async function openReport(reportPath) {
   toggleHistoryPanel(false);
   renderMeasurements(report.measurements || []);
   renderPlan(report);
-  selectView('charts'); // 图表优先：进入世界先看观察
+  selectView('wave'); // 落在波谱：音乐本身先行
   fitTerminalSoon();
   const entryDir = state.caseDir;
   const wave = renderWaveform(entryDir);   // 波形先行：解码完即有内容可看
-  await renderCharts(reportPath, report);
+  await renderSpectrum(entryDir);
   await wave;
+  await renderCharts(reportPath); // 检测图表后台补齐（图表页）
   await ensureTerminal();
 }
 
@@ -202,10 +203,10 @@ const CHART_TITLES = {
   stereo_ratios: ['立体声分布（实测）', 'ratio'],
 };
 
-async function renderCharts(reportPath, report) {
-  const box = $('charts-body');
+/** 波谱页：音乐本身的声谱（扫描频谱渲染；波形 canvas 另由 renderWaveform 负责）。 */
+async function renderSpectrum(caseDir) {
+  const box = $('spectrum-body');
   box.textContent = '';
-  const caseDir = reportPath.replace(/[\\/]report\.json$/, '');
   const spectrum = ['spectrum_log.png', 'spectrum_linear.png']
     .map((name) => `${caseDir}/scan/${name}`);
   for (const src of spectrum) {
@@ -214,6 +215,12 @@ async function renderCharts(reportPath, report) {
       break;
     }
   }
+}
+
+/** 图表页：检测产物（指标实测图）。 */
+async function renderCharts(reportPath) {
+  const box = $('charts-body');
+  box.textContent = '';
   try {
     const payload = await window.moodify.renderCharts(reportPath);
     for (const [name, title] of Object.entries(CHART_TITLES)) {
@@ -504,7 +511,13 @@ const compiler = {
   lastAssistantText: '',
 };
 
+function showDockStream() {
+  $('compiler-stream').hidden = false;
+  $('dock-bar').hidden = false;
+}
+
 function compilerBubble(role, text) {
+  showDockStream();
   const stream = $('compiler-stream');
   const div = document.createElement('div');
   div.className = `cmsg ${role}`;
@@ -518,6 +531,7 @@ function compilerBubble(role, text) {
 }
 
 function compilerLine(kind, text) {
+  showDockStream();
   const stream = $('compiler-stream');
   const div = document.createElement('div');
   div.className = `cline ${kind}`;
@@ -542,10 +556,9 @@ function setCompilerBusy(busy) {
   $('compiler-input').disabled = busy || !worldOpen;
 }
 
-/** 意图命令条入口：惰性开线程，发送即切到编译器视图。 */
+/** 意图命令条入口：惰性开线程，回答与操作都发生在 dock 里。 */
 async function intentSend(text) {
   if (!text.trim() || !state.caseDir || compiler.busy) return;
-  selectView('plan');
   if (!compiler.ready) {
     const ok = await ensureCompiler();
     if (!ok) return;
@@ -742,13 +755,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   $('rail-open').addEventListener('click', pickAndAnalyze);
   $('rail-history').addEventListener('click', () => toggleHistoryPanel());
-  $('tab-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
-  $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
-  $('tab-plan').addEventListener('click', () => {
+  $('tab-wave').addEventListener('click', () => {
     if (!state.caseDir) return;
-    selectView('plan');
-    if (!compiler.threadId || compiler.threadCwd !== state.caseDir) openCompilerThread();
+    selectView('wave');
+    drawWaveform(); // 隐藏期间 clientWidth 归零过，重画一次
   });
+  $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
+  $('tab-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
   window.addEventListener('resize', drawWaveform);
   $('refresh').addEventListener('click', refreshArchive);
   const sendIntent = () => {
