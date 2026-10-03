@@ -53,10 +53,11 @@ Studio → Publish to My Library → Phone → Play
 
 ## Studio 生产流程 v3 — 2026-10-03（DEFINED，已实现流程层）
 
-> **Understand first. Decompose second. Process last.**（先理解，再分解，最后处理。）
+> **Understand first. Decompose second. Plan third. Process last.**（先理解，再分解，再规划，最后处理。）
 
 Creator 侧流程固定为 **检测 → 问题 → 分轨 → 结构 → 方案 → 成品**。
 早期「分析完立刻选预设处理立体声母带」被移除——对母带来说太早。
+**分解先于规划**：⑤ 方案 需要 分轨 + MIDI，⑥ 成品还需要一份真实写出的方案产物。
 
 | 项 | 状态 | 依据 |
 |---|---|---|

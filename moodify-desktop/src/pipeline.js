@@ -2,7 +2,7 @@
  * Studio production pipeline — stages, gating, diagnosis and context.
  *
  * PRODUCT PRINCIPLE (TASK 002A):
- *     Understand first. Decompose second. Process last.
+ *     Understand first. Decompose second. Plan third. Process last.
  *
  * Why this file exists
  *   The first Studio flow let the user pick a preset and process immediately after
@@ -14,6 +14,18 @@
  *
  *   The three presets still exist and still work — they moved to the LAST stage. They are
  *   tools, not the workflow.
+ *
+ * PLANNING REQUIRES DECOMPOSITION (TASK 002A final gate patch)
+ *   An earlier revision gated planning on `analyzed && diagnosed` alone, which still allowed
+ *   Understand → Plan → (decomposition optional). That is the same mistake one level up:
+ *   an AI plan written before the song has been decomposed reasons about a stereo master it
+ *   has never separated or structured. So the plan gate now requires the full preparation:
+ *
+ *     ANALYZED + DIAGNOSED + SEPARATED + MIDI = READY_FOR_DEEP_PLAN
+ *
+ *   MIDI is the minimum machine-readable structure; MusicXML/score is an optional derived
+ *   interpretation and never substitutes for it. Quick Finish remains available, but only as
+ *   an explicit human choice that bypasses decomposition — never as the route into planning.
  *
  * STAGE IS DERIVED, NOT HAND-ADVANCED
  *   Nothing here records "the user clicked next". Every stage is derived from the artifacts
@@ -44,8 +56,9 @@ const path = require('path');
 // ── stages ──────────────────────────────────────────────────────────────────────
 
 /**
- * Ordered stages. READY_FOR_PLAN is a derivable state (analysis + diagnosis done), not a
- * separate artifact; it exists so the UI can say "ready to plan" without inventing a file.
+ * Ordered stages. READY_FOR_PLAN is a derivable state (analysis + diagnosis + separation +
+ * MIDI — the full deep prerequisite set), not a separate artifact; it exists so the UI can
+ * say "ready to plan" without inventing a file.
  */
 const STAGES = Object.freeze([
   'IMPORTED',
@@ -127,6 +140,10 @@ function inspect(caseDir) {
 
     midiFiles,
     scoreFiles,
+    // MIDI is the required machine-readable structure for Deep Finish. Score/MusicXML is an
+    // optional derived interpretation: worth discovering and citing, but it never substitutes
+    // for MIDI when deciding whether the song has been decomposed.
+    hasMidi: midiFiles.length > 0,
     hasStructure: midiFiles.length > 0 || scoreFiles.length > 0,
 
     plansDir,
@@ -153,14 +170,19 @@ function inspect(caseDir) {
 function factsOf(info) {
   const analyzed = info.hasReport;
   const diagnosed = info.hasDiagnosis;
+  const separated = info.hasStems;
+  const structured = info.hasMidi; // MIDI specifically — score alone is not decomposition
   return {
     imported: Boolean(info.caseDir) && fs.existsSync(info.caseDir),
     analyzed,
     diagnosed,
-    separated: info.hasStems,
-    structured: info.hasStructure,
-    // ready to plan = the hard gate for reaching the AI planning/finishing stages
-    readyForPlan: analyzed && diagnosed,
+    separated,
+    structured,
+    // The two readiness facts. `baseReady` is all Quick Finish ever needs; `deepReady` is the
+    // hard gate for the canonical route — an AI plan written before decomposition would be
+    // reasoning about a song nobody has taken apart yet.
+    baseReady: analyzed && diagnosed,
+    deepReady: analyzed && diagnosed && separated && structured,
     planned: info.hasPlan,
     rendered: info.hasRender,
     verified: info.hasVerification,
@@ -177,10 +199,10 @@ function factsOf(info) {
  * record. Skipping an optional does NOT stop the walk; missing a required one does.
  *
  * READY_FOR_PLAN is deliberately NOT in this table, even though it is a valid state name.
- * It is derived from `analyzed && diagnosed`, i.e. it is a *readiness* fact rather than
- * something the user did. Including it made every case that had analysed and diagnosed
- * report itself as READY_FOR_PLAN, jumping past 分轨 and 结构 — so the indicator claimed
- * progress the user had not made. Readiness is reported through `gates().canPlan` instead.
+ * It is derived from `deepReady`, i.e. it is a *readiness* fact rather than something the
+ * user did. Including it once made every case that had analysed and diagnosed report itself
+ * as READY_FOR_PLAN, jumping past 分轨 and 结构 — so the indicator claimed progress the user
+ * had not made. Readiness is reported through `gates().canPlan` instead.
  */
 const STAGE_TABLE = Object.freeze([
   { stage: 'IMPORTED', fact: 'imported' },
@@ -208,11 +230,19 @@ function stageOf(facts) {
 /**
  * What the UI may enter.
  *
- * THE FINISH STAGE IS NOT AUTOMATICALLY AVAILABLE.
+ * PLANNING REQUIRES DECOMPOSITION.
  *
- * Deep Finish is the canonical path and REQUIRES the full preparation:
+ *     ⑤ 方案  ANALYZED + DIAGNOSED + SEPARATED + MIDI = deepReady
+ *     ⑥ 成品  deepReady + a persisted plan artifact (studio/plans/*.json)
  *
- *     ANALYZED + DIAGNOSED + SEPARATED + STRUCTURED
+ * An earlier revision gated ⑤ on `analyzed && diagnosed`, which still permitted
+ * Understand → Plan → Decompose optional. That processes a stereo master the system has
+ * never heard apart. The rule is now literal: no plan before decomposition.
+ *
+ * THE FINISH STAGE IS NOT AUTOMATICALLY AVAILABLE EITHER.
+ *
+ * Canonical Deep Finish needs the full preparation AND a plan that actually exists on disk —
+ * entering ⑥ without one would mean executing a plan nobody wrote.
  *
  * A stereo-only finish is a legitimate fallback for a song that should not be forced
  * through an expensive decomposition — but it is a *concession*, not a default. It must be
@@ -227,24 +257,32 @@ function stageOf(facts) {
  * separating or extracting structure, and the canonical deep path would quietly become the
  * exception. A labelled shortcut is still a shortcut. Now the shortcut requires a decision.
  *
+ * Quick Finish never unlocks ⑤. It is a bypass around decomposition, not a planning route.
+ *
  * Deep always wins: if the user opts into Quick and later separates and structures the song,
  * `deepReady` takes precedence and the mode returns to DEEP without needing to undo anything.
  */
 function gates(info) {
   const f = factsOf(info);
-  const deepReady = f.readyForPlan && f.separated && f.structured;
+  const deepReady = f.deepReady;
   const optIn = readFinishMode(info.caseDir).mode === 'QUICK_STEREO_ONLY';
-  const quickFinish = f.readyForPlan && !deepReady && optIn;
+  const quickFinish = f.baseReady && !deepReady && optIn;
+  const canFinishDeep = deepReady && f.planned;
   return {
     canDiagnose: f.analyzed,
     canSeparate: f.analyzed,
     canStructure: f.analyzed,
-    canPlan: f.readyForPlan,
-    // canonical finish: separation + structure are required, not optional
-    canFinish: deepReady,
+    baseReady: f.baseReady,
+    deepReady,
+    // ⑤ only after decomposition: separation and MIDI are prerequisites, not options
+    canPlan: deepReady,
+    // canonical finish: the full preparation AND a real persisted plan
+    canFinish: canFinishDeep,
+    canFinishDeep,
     canFinishQuick: quickFinish,
-    canRequestQuick: f.readyForPlan && !deepReady && !optIn,
+    canRequestQuick: f.baseReady && !deepReady && !optIn,
     quickOptIn: optIn,
+    planned: f.planned,
     mode: deepReady ? 'DEEP' : (quickFinish ? 'FAST_STEREO_ONLY' : null),
     modeLabel: deepReady ? '深度完成' : (quickFinish ? '快速（仅立体声）' : null),
     facts: f,
@@ -282,7 +320,7 @@ function recordFinishMode(caseDir, mode, note) {
     mode,
     note: note || null,
     chosen_at: new Date().toISOString(),
-    reason: '用户显式选择跳过分轨与结构；深度完成需 SEPARATED + STRUCTURED。',
+    reason: '用户显式选择跳过分轨与结构；深度完成需 分轨 + MIDI 齐备，且已写出方案产物。',
   };
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(payload, null, 2), 'utf8');
@@ -551,8 +589,12 @@ function buildContext(caseDir) {
   ctx.midi = info.midiFiles.map((p) => fromCase(p));
   ctx.score = info.scoreFiles.map((p) => fromCase(p));
 
-  if (!info.hasStructure) {
-    ctx.notes.push('尚无 MIDI/曲谱产物；结构信息缺失。');
+  // MIDI is what a Deep Plan requires; score/MusicXML is optional and never substitutes
+  // for it (section 4). Say which of the two is actually missing instead of one vague note.
+  if (!info.hasMidi) {
+    ctx.notes.push(info.hasStructure
+      ? '仅有曲谱（MusicXML），缺少 MIDI；深度方案需要 MIDI 作为机器可读结构。'
+      : '尚无 MIDI/曲谱产物；结构信息缺失。深度方案需要 MIDI 作为机器可读结构。');
   }
 
   const { gates } = snapshot(caseDir);
@@ -604,11 +646,23 @@ function writeContextPlan(caseDir, ctx) {
   return { file, plan: payload };
 }
 
-/** The real PLAN action used by the UI: context and plan are committed together. */
+/**
+ * The real PLAN action used by the UI: context and plan are committed together.
+ *
+ * REFUSES BEFORE DECOMPOSITION. A missing analysis, diagnosis, stems or MIDI means no plan is
+ * written at all — not a partial one, and not a "context-only" consolation prize. A Deep Plan
+ * that does not know what the song is made of is exactly the thing this gate exists to stop,
+ * and a half-written plan on disk would be the kind of artifact that later reads as a real
+ * plan. So: all four facts, or nothing.
+ */
 function preparePlan(caseDir) {
   const snap = snapshot(caseDir);
   if (!snap.gates.canPlan) return null;
   const context = buildContext(caseDir);
+  // The planner's context must actually carry what a Deep Plan needs. `inspect()` and
+  // `buildContext()` read the same directory, so this should always hold — but if it ever
+  // does not, writing nothing is the honest outcome.
+  if (!context.stems || context.midi.length === 0) return null;
   const contextFile = writeContext(caseDir, context);
   const written = writeContextPlan(caseDir, context);
   if (!written) return null;

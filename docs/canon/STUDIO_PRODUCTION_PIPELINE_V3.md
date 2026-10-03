@@ -10,8 +10,8 @@
 
 ## 0. 核心原则
 
-> **Understand first. Decompose second. Process last.**
-> 先理解，再分解，最后处理。
+> **Understand first. Decompose second. Plan third. Process last.**
+> 先理解，再分解，再规划，最后处理。
 
 早期 Studio 允许「分析完立刻选一个预设处理立体声母带」。**那对母带来说太早了。**
 一首歌应当先被听懂、被分解、结构被恢复，然后才进入 AI 辅助的完成阶段。
@@ -57,8 +57,8 @@ AI 出现在**规划与执行**阶段，不早于系统拥有足够上下文之�
 ```text
 ANALYZED    ← report.json 存在
 DIAGNOSED   ← studio/diagnosis.json 存在
-SEPARATED   ← stems/*.wav 存在            （可选）
-STRUCTURED  ← midi/ 或 score/ 非空         （可选）
+SEPARATED   ← stems/*.wav 存在            （可选：快速完成可跳过）
+STRUCTURED  ← midi/*.mid 非空             （可选：快速完成可跳过；曲谱不顶替 MIDI）
 PLANNED     ← studio/plans/*.json 存在
 RENDERED    ← studio/versions/ai_* 存在
 VERIFIED    ← studio/verification/ 有记录  （可选）
@@ -69,18 +69,39 @@ EXPORTED    ← studio/export/ 有记录
 **为什么推导而不是推进**：删掉 stems 目录后状态必须自动退回。
 一个写着「已分轨」而文件已不在的状态，正是本仓库反复清理的那类谎报。
 
-`READY_FOR_PLAN` 是**就绪度**（= analyzed ∧ diagnosed），不是用户做过的动作，
-因此它**不出现在阶段游标里**，只作为门禁事实 —— 否则每个分析+诊断过的 case 都会
+`READY_FOR_PLAN` 是**就绪度**（= `deepReady` = analyzed ∧ diagnosed ∧ separated ∧ MIDI），
+不是用户做过的动作，因此它**不出现在阶段游标里**，只作为门禁事实 —— 否则每个分析+诊断过的 case 都会
 自称「可以出方案」，跳过 ③④，宣称用户没做过的进度。
 
 ---
 
 ## 4. 门禁
 
+**分解先于规划。** 让 AI 在歌曲被拆开之前写方案，与「分析完立刻处理立体声母带」是同一个错误
+抬高一层：方案会对着一个没人听清内部构成的立体声母带去推理。
+
 ```text
-⑤ 方案：需要 ANALYZED + DIAGNOSED
-⑥ 成品：需要 ANALYZED + DIAGNOSED + SEPARATED + STRUCTURED
+⑤ 方案：需要 ANALYZED + DIAGNOSED + SEPARATED + MIDI
+        —— 四者齐备 = deepReady = READY_FOR_DEEP_PLAN
+⑥ 成品：需要 deepReady + 已写出真实方案产物（<case>/studio/plans/*.json）
         —— 这是「深度完成」，也是规范路径
+```
+
+**MIDI 是机器可读结构的最低要求**；曲谱 / MusicXML 是有价值的**派生解读**，
+仍会被发现并写入 context，但**不能顶替 MIDI**（`structured = midi/*.mid 非空`）。
+
+`preparePlan()` 在前置不全时**拒绝**，并且**不写任何产物** —— 既不写 `context.json`，
+也不写 `context_plan.json`。半成品方案留在磁盘上，日后会被读成一份真方案，那比没有方案更糟。
+
+拒绝矩阵（有测试逐条断言）：
+
+```text
+仅 analysis                          → 拒绝
+analysis + diagnosis                 → 拒绝
+analysis + diagnosis + stems         → 拒绝
+analysis + diagnosis + MIDI          → 拒绝
+analysis + diagnosis + stems + score → 拒绝（缺 MIDI）
+四者齐备                             → 写出 context.json + plans/context_plan.json
 ```
 
 ### 快速完成必须由人**显式选择**
@@ -92,6 +113,9 @@ canRequestQuick   深度前置不足、且尚未选择 → UI 提供「改用快
 canFinishQuick    人点了那个入口之后，⑥ 才以 FAST 模式解锁
 ```
 
+**快速完成不解锁 ⑤ 方案。** 它是绕开分解的旁路，不是规划路线：
+`canPlan` 只由 `deepReady` 决定，选了快速也不会变成 true。
+
 选择的动作会写成可追溯产物 `<case>/studio/finish_mode.json`（含 `chosen_at`）——
 「人选了捷径」和「人保留了哪一版」一样，是值得日后能指出来的决定。
 
@@ -101,8 +125,8 @@ canFinishQuick    人点了那个入口之后，⑥ 才以 FAST 模式解锁
 
 ### 深度优先
 
-若用户先选了快速，之后又完成了分轨与结构，`deepReady` 自动接管，模式回到深度完成，
-不需要撤销任何东西。
+若用户先选了快速，之后又完成了分轨与 MIDI，`deepReady` 自动接管，模式回到深度完成，
+⑤ 方案随之解锁，不需要撤销任何东西。
 
 ### 徽章必须显示
 
@@ -153,6 +177,7 @@ canFinishQuick    人点了那个入口之后，⑥ 才以 FAST 模式解锁
 ✓ 把既有 ③ 分轨 / ④ 结构 接进主流程
 ✓ 新增 ⑤ 方案（context.json + Core 草稿方案）
 ✓ 阶段推导 + 门禁 + 完成模式标注
+✓ 分解先于规划（⑤ 门禁 = deepReady；⑥ 还需已写出方案产物）—— final gate patch
 ✗ 任意 AI 计划的完整执行（留待 TASK 002C）
 ✗ 精细分离引擎
 ✗ 移动端同步 / 网络

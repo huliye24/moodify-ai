@@ -2705,9 +2705,11 @@ async function refreshPipeline() {
 /**
  * Which stages the current case may enter. Mirrors src/pipeline.js gates().
  *
- * The finish stage opens on the canonical path (DEEP prereqs met) OR after the user has
- * explicitly opted into a Quick Finish. It is never unlocked just because analysis and
- * diagnosis are done — that is what made the shortcut the default path.
+ * ⑤ 方案 opens only after decomposition — 检测 + 问题 + 分轨 + MIDI — because an AI plan
+ * written before the song has been taken apart is the mistake this ordering exists to stop.
+ * ⑥ 成品 opens on the canonical path only once a real plan artifact exists
+ * (studio/plans/*.json), OR after the user has explicitly opted into a Quick Finish.
+ * Quick Finish never unlocks ⑤: it is a bypass around decomposition, not a planning route.
  */
 function stageUnlocked(id, gates) {
   if (!gates) return false;
@@ -2719,6 +2721,29 @@ function stageUnlocked(id, gates) {
     case 'plan': return gates.canPlan;
     case 'finish': return gates.canFinish || gates.canFinishQuick;
     default: return false;
+  }
+}
+
+/** 差什么就说差什么——「需要先完成前面的阶段」等于没说。 */
+function stageLockReason(id, gates) {
+  const f = (gates && gates.facts) || {};
+  switch (id) {
+    case 'diagnose':
+    case 'separate':
+    case 'structure':
+      return '需要先完成 ① 检测。';
+    case 'plan': {
+      const missing = [];
+      if (!f.analyzed) missing.push('① 检测');
+      if (!f.diagnosed) missing.push('② 问题');
+      if (!f.separated) missing.push('③ 分轨');
+      if (!f.structured) missing.push('④ 结构（MIDI）');
+      return `深度方案需要先完成：${missing.join('、')}。`;
+    }
+    case 'finish':
+      return '需要先在 ⑤ 方案生成处理方案，或显式选择「快速完成（仅立体声）」。';
+    default:
+      return '尚未满足前置条件。';
   }
 }
 
@@ -2737,7 +2762,7 @@ function renderPipelineBar() {
     btn.disabled = !unlocked;
     if (!unlocked) {
       btn.classList.add('locked');
-      btn.title = '尚未满足前置：需要先完成前面的阶段';
+      btn.title = stageLockReason(s.id, gates);
     }
     btn.addEventListener('click', () => {
       if (btn.disabled) return;
@@ -2953,15 +2978,20 @@ async function openPlan() {
   if (state.caseDir !== caseDir) return;
 
   const gates = (snap && snap.gates) || {};
+  const f = gates.facts || {};
   if (gates.modeLabel) {
+    // 已经有路径了：深度（前置齐备）或人显式选的快速。深度还要说清方案产物写没写。
     $('plan-readiness').textContent = `当前路径：${gates.modeLabel}`
-      + (gates.mode === 'FAST_STEREO_ONLY' ? '（未分轨 / 未提取结构）' : '');
-  } else if (gates.canPlan) {
-    // 能出方案，但还不是深度完成——把差什么说清楚，而不是含糊地说「未满足前置」
-    $('plan-readiness').textContent =
-      '尚未分轨与提取结构。深度完成需要两者；如需跳过，请显式选择「改用快速完成」。';
+      + (gates.mode === 'FAST_STEREO_ONLY' ? '（未分轨 / 未提取结构）' : '')
+      + (gates.mode === 'DEEP' && !gates.planned ? ' · 尚未生成方案产物' : '');
   } else {
-    $('plan-readiness').textContent = '尚未满足前置：需要先完成检测与问题。';
+    // 说清楚差什么：⑤ 需要 检测 + 问题 + 分轨 + MIDI 四件事，缺一不可
+    const missing = [];
+    if (!f.analyzed) missing.push('① 检测');
+    if (!f.diagnosed) missing.push('② 问题');
+    if (!f.separated) missing.push('③ 分轨');
+    if (!f.structured) missing.push('④ 结构（MIDI）');
+    $('plan-readiness').textContent = `深度方案未解锁：还差 ${missing.join('、')}。`;
   }
 
   let res;
@@ -3004,7 +3034,11 @@ async function buildPlanContext() {
   try { res = await window.moodify.pipelineContext(caseDir); } catch (err) { res = { ok: false, reason: err.message }; }
   if (state.caseDir !== caseDir) return;
   if (!res || !res.ok) {
-    $('plan-readiness').textContent = '构建失败：' + ((res && res.reason) || '');
+    const reason = (res && res.reason) || '';
+    // 拒绝是预期行为（分解未完成），不是故障——别把机器码当成错误信息丢给用户
+    $('plan-readiness').textContent = reason === 'NEED_DEEP_PREREQUISITES'
+      ? '还不能生成方案：深度方案需要先完成 ① 检测 → ② 问题 → ③ 分轨 → ④ 结构（MIDI）。'
+      : `构建失败：${reason}`;
     return;
   }
   await refreshPipeline();

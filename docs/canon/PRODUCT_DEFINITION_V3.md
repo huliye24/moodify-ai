@@ -69,7 +69,7 @@ Studio        App
 
 ### Studio 的规范生产流程（v3.0 补充，2026-10-03）
 
-> **Understand first. Decompose second. Process last.**（先理解，再分解，最后处理。）
+> **Understand first. Decompose second. Plan third. Process last.**（先理解，再分解，再规划，最后处理。）
 
 ```text
 ①  检测  →  ②  问题  →  ③  分轨  →  ④  结构  →  ⑤  方案  →  ⑥  成品
@@ -77,6 +77,8 @@ Studio        App
 
 **三个处理预设（`clean_master` / `warm_vocal` / `wide_space`）属于 ⑥ 成品阶段，是工具而非流程起点。**
 「分析完立刻处理立体声母带」已从流程中移除——那对母带来说太早了。
+**分解先于规划**：⑤ 方案 在 分轨 + MIDI 齐备前保持锁定；⑥ 成品还需要一份真实写出的方案产物。
+细则见 [`STUDIO_PRODUCTION_PIPELINE_V3.md`](STUDIO_PRODUCTION_PIPELINE_V3.md) §4。
 
 完整定义见 [STUDIO_PRODUCTION_PIPELINE_V3.md](STUDIO_PRODUCTION_PIPELINE_V3.md)；
 产物契约见 [../protocol/MOODIFY_STUDIO_CONTEXT_0_1.md](../protocol/MOODIFY_STUDIO_CONTEXT_0_1.md)。

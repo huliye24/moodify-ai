@@ -14,6 +14,9 @@
 现在流程是 **检测 → 问题 → 分轨 → 结构 → 方案 → 成品**，
 预设从第一步下移到**最后一步**，实现保留未删。
 
+**分解先于规划**：⑤ 方案 在 分轨 + MIDI 齐备前保持锁定，⑥ 成品还需要一份真实写出的方案产物
+（§3.4，final gate patch）。
+
 ---
 
 ## 1. 已实现（§11 A–F）
@@ -87,6 +90,8 @@ TRUE_PEAK_MARGIN_EXCEEDED   (WARNING)
 快速完成：需要人点「改用快速完成（仅立体声）」→ 记录 <case>/studio/finish_mode.json
 ```
 
+（§3.4 进一步收紧：深度完成还需 **MIDI**——曲谱不能顶替——以及一份真实写出的方案产物。）
+
 深度优先：若先选了快速、之后又完成分轨与结构，`deepReady` 自动接管，无需撤销选择。
 
 对应测试从「analysis + diagnosis may finish」改为十条新断言，覆盖：
@@ -102,6 +107,44 @@ TRUE_PEAK_MARGIN_EXCEEDED   (WARNING)
 测试当场抓到（`stage is derived, so deleting artifacts moves it backwards` 期望 SEPARATED 得到 READY_FOR_PLAN）。
 已修正：它是**就绪度**不是阶段，只通过 `gates().canPlan` 表达。
 
+### 3.4 分解先于规划（final gate patch）
+
+**残留的洞。** 上一轮的 `canPlan = analyzed && diagnosed` 与产品方向仍不一致：
+
+```text
+ANALYZED + DIAGNOSED → ⑤ 方案     ← 这是 Understand → Plan → Decompose optional
+```
+
+这和初版「分析完立刻处理」是**同一个错误抬高一层**：方案会对着一个没人拆开过的
+立体声母带去推理。规范路线是 **Understand → Decompose → Plan → Process**。
+
+**现在的规则（字面实现）：**
+
+```text
+deepReady = analyzed ∧ diagnosed ∧ separated ∧ structured(MIDI)
+⑤ 方案    = deepReady
+⑥ 成品    = deepReady ∧ planned（studio/plans/*.json 真实存在）
+```
+
+- **MIDI 是机器可读结构的最低要求**（`structured = midi/*.mid 非空`）。
+  曲谱 / MusicXML 仍被发现并写入 context，但**不能顶替 MIDI**，也不阻塞深度方案。
+- **`preparePlan()` 在前置不全时拒绝，且不写任何产物** —— 既不写 `context.json`，
+  也不写 `context_plan.json`。半成品方案留在磁盘上，日后会被读成一份真方案。
+  拒绝矩阵：仅 analysis / +diagnosis / +stems / +MIDI / stems+score → 全部拒绝；
+  四者齐备才写出 `context.json` + `plans/context_plan.json`。
+- **⑥ 成品不再只因「深度前置齐备」就解锁**：必须存在真实方案产物，
+  否则等于执行一份没人写过的方案。
+- **快速完成语义不变**：仍是显式人类选择（`finish_mode.json`），
+  仍然只在 分析与诊断 完成后可申请，仍标注 `FAST_STEREO_ONLY`。
+  它**不解锁 ⑤**——`canPlan` 只由 `deepReady` 决定。深度前置齐备后 `deepReady` 自动接管。
+
+**门禁输出**（`gates()`；属性名随现有约定，行为如上）：
+
+```json
+{ "baseReady": true, "deepReady": false, "canPlan": false,
+  "canFinishDeep": false, "canRequestQuick": true, "canFinishQuick": false, "mode": null }
+```
+
 ---
 
 ## 4. 验证
@@ -114,13 +157,30 @@ cd moodify-desktop && npm test
 
 | 套件 | 结果 |
 |---|---|
-| `check-contracts.js` | 通过 — DOM id 109→125、桥接 47→53、IPC 45→51 |
-| `test-pipeline.js` | **22 passed, 0 failed** |
+| `check-contracts.js` | 通过 — DOM id 126、桥接 54、IPC 52、事件 5 |
+| `test-pipeline.js` | **33 passed, 0 failed** |
 | `test-studio.js` | **21 passed, 0 failed**（无回归） |
 
 §20 七条逐条覆盖：产物可发现 · diagnosis 每条证据指针可解析回真实 finding ·
 stems manifest 可发现 · MIDI/曲谱可发现 · context.json 只含真实存在路径 ·
 前置未满足不得进深度成品 · 预设处理在成品阶段仍可用。
+
+§3.4 的分解门禁由 §6 的十二条断言逐条覆盖（全部调用真实门禁函数，不只查 DOM）：
+
+```text
+1  仅 analysis                 canPlan=false, canFinishDeep=false
+2  + diagnosis                 canPlan=false；提供 Quick 入口但不发放
+3  + stems                     canPlan=false
+4  + MIDI                      canPlan=false
+5  + stems + score（无 MIDI）  canPlan=false（MIDI 不可替代）+ 缺口写进 context.notes
+6  四者齐备                    canPlan=true, mode=DEEP, canFinish=false
+7  preparePlan 前置不全        拒绝，且 context.json / plans 均未写出
+8  preparePlan 前置齐备        写出 context.json + plans/context_plan.json，stage=PLANNED
+9  前置齐备但无方案            规范 ⑥ 保持锁定
+10 前置齐备 + 方案             规范 ⑥ 解锁
+11 显式快速选择                无分轨无 MIDI 仍可用，标注 FAST_STEREO_ONLY，且不解锁 ⑤
+12 深度接管                    先选快速、后完成分解 → mode=DEEP
+```
 
 测试用**合成 fixture**（不是真实 case），断言确定、不依赖 `~/.moodify/cases` 里恰好有什么。
 测试工具沿用上一轮教训：`check()` 是 async 且每处调用都 await——
@@ -145,7 +205,7 @@ cd moodify-desktop && npm start
 **新建**
 ```text
 moodify-desktop/src/pipeline.js                     阶段推导 / 门禁 / diagnosis / context
-moodify-desktop/scripts/test-pipeline.js            22 项无头测试
+moodify-desktop/scripts/test-pipeline.js            33 项无头测试（含 §6 十二条门禁断言）
 docs/canon/STUDIO_PRODUCTION_PIPELINE_V3.md         §19
 docs/protocol/MOODIFY_STUDIO_CONTEXT_0_1.md         §19（含 diagnosis.json 契约）
 docs/reports/STUDIO_PIPELINE_REALIGNMENT_2026-10-03.md  本文件

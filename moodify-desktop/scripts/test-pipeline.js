@@ -4,9 +4,9 @@
  *
  * Covers the seven things section 20 requires:
  *   1 analysis artifacts can be located        5 context.json contains only existing paths
- *   2 diagnosis references real evidence       6 pipeline cannot jump to deep finishing early
- *   3 stems manifest can be discovered         7 preset processing still works (see test-studio.js)
- *   4 MIDI / score artifacts can be discovered
+ *   2 diagnosis references real evidence       6 no planning before decomposition,
+ *   3 stems manifest can be discovered            no finishing before a real plan
+ *   4 MIDI / score artifacts can be discovered 7 preset processing still works (see test-studio.js)
  *
  * Fixtures are SYNTHESISED, not taken from a real case, so the assertions are deterministic
  * and do not depend on whatever happens to be in ~/.moodify/cases. The one test that needs
@@ -261,47 +261,132 @@ function makeCase(opts = {}) {
       assert.ok(c.core_command, `${c.id} must name the real command behind it`);
     }
   });
-  await check('the real plan action writes context and an authoritative plan artifact', () => {
-    const dir = makeCase({ diagnosis: true, stems: true, midi: true });
-    const prepared = pipeline.preparePlan(dir);
-    assert.ok(prepared, 'plan action should succeed after analysis and diagnosis');
-    assert.ok(fs.existsSync(prepared.contextFile));
-    assert.ok(fs.existsSync(prepared.planFile));
-    assert.strictEqual(prepared.plan.status, 'DRAFT_PLAN_NOT_EXECUTED');
-    assert.strictEqual(pipeline.snapshot(dir).stage, 'PLANNED');
-  });
-  await check('the plan action refuses to invent a plan before diagnosis', () => {
-    const dir = makeCase({});
-    assert.strictEqual(pipeline.preparePlan(dir), null);
-    assert.strictEqual(pipeline.inspect(dir).hasPlan, false);
-  });
+  // The plan action itself is covered in §6, where its gate (decomposition) is the point.
 
-  // ── 6. gating ─────────────────────────────────────────────────────────────────
-  console.log('\n6. the pipeline cannot jump to deep finishing early');
-  await check('analysis alone cannot reach planning or finishing', () => {
+  // ── 6. gating: ⑤ needs decomposition, ⑥ needs a real plan ──────────────────────
+  //
+  // The product rule is literal: Understand → Decompose → Plan → Process.
+  //   ⑤ 方案  analyzed + diagnosed + separated + MIDI
+  //   ⑥ 成品  the above AND a persisted plan artifact
+  // Quick Finish is a separate, explicitly-chosen stereo-only route around decomposition.
+  // It never unlocks ⑤.
+  console.log('\n6. no planning before decomposition, no finishing before a plan');
+
+  await check('1. analysis only: neither planning nor deep finishing', () => {
     const dir = makeCase({});
     const g = pipeline.gates(pipeline.inspect(dir));
-    assert.strictEqual(g.canPlan, false, 'planning needs diagnosis');
-    assert.strictEqual(g.canFinish, false, 'finishing needs diagnosis');
+    assert.strictEqual(g.canPlan, false);
+    assert.strictEqual(g.canFinish, false);
+    assert.strictEqual(g.canFinishDeep, false);
+    assert.strictEqual(g.deepReady, false);
     assert.strictEqual(g.mode, null);
   });
 
-  // DEEP FINISH REQUIRES THE FULL PREPARATION
-  await check('analysis + diagnosis does NOT unlock the finish stage', () => {
+  await check('2. analysis + diagnosis: still no plan; Quick Finish is offered', () => {
     const dir = makeCase({ diagnosis: true });
     const g = pipeline.gates(pipeline.inspect(dir));
-    assert.strictEqual(g.canFinish, false,
-      'stereo-only must not be auto-unlocked as the main flow');
-    assert.strictEqual(g.mode, null, 'no mode before the user has chosen one');
-  });
-  await check('a stereo-only fallback is OFFERED, not granted', () => {
-    const dir = makeCase({ diagnosis: true });
-    const g = pipeline.gates(pipeline.inspect(dir));
-    assert.strictEqual(g.canRequestQuick, true, 'the affordance must be reachable');
+    assert.strictEqual(g.baseReady, true, 'understanding is done');
+    assert.strictEqual(g.canPlan, false, 'but planning needs decomposition, not just understanding');
+    assert.strictEqual(g.canFinish, false, 'stereo-only must not be auto-unlocked');
+    assert.strictEqual(g.canRequestQuick, true, 'the affordance is reachable');
     assert.strictEqual(g.canFinishQuick, false, 'but not applied until chosen');
     assert.strictEqual(g.quickOptIn, false);
+    assert.strictEqual(g.mode, null, 'no mode before the user has chosen one');
   });
-  await check('the finish stage opens as FAST only after an explicit opt-in', () => {
+
+  await check('3. analysis + diagnosis + separation: still no plan', () => {
+    const dir = makeCase({ diagnosis: true, stems: true });
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.canPlan, false, 'stems without structure are not decomposition');
+    assert.strictEqual(g.deepReady, false);
+    assert.strictEqual(g.canFinish, false);
+  });
+
+  await check('4. analysis + diagnosis + MIDI: still no plan', () => {
+    const dir = makeCase({ diagnosis: true, midi: true });
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.canPlan, false, 'MIDI without stems is not decomposition');
+    assert.strictEqual(g.deepReady, false);
+  });
+
+  await check('5. separation + score but no MIDI: still no plan (MIDI is required)', () => {
+    const dir = makeCase({ diagnosis: true, stems: true, score: true });
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.facts.structured, false, 'MusicXML must not count as structure');
+    assert.strictEqual(g.canPlan, false);
+    // the score is still discovered and cited — it just cannot substitute for MIDI
+    const ctx = pipeline.buildContext(dir);
+    assert.strictEqual(ctx.score.length, 1);
+    assert.ok(ctx.notes.some((n) => /缺少 MIDI/.test(n)), 'the gap must be stated, not silent');
+  });
+
+  await check('6. analysis + diagnosis + separation + MIDI: planning unlocks', () => {
+    const dir = makeCase({ diagnosis: true, stems: true, midi: true });
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.deepReady, true);
+    assert.strictEqual(g.canPlan, true);
+    assert.strictEqual(g.mode, 'DEEP');
+    assert.strictEqual(g.canRequestQuick, false, 'no shortcut offered on the canonical path');
+    assert.strictEqual(g.canFinish, false, 'finishing still needs a real plan artifact');
+  });
+
+  await check('7. preparePlan refuses before deep prerequisites and writes nothing', () => {
+    for (const opts of [
+      {},                                             // analysis only
+      { diagnosis: true },                            // + diagnosis
+      { diagnosis: true, stems: true },               // + separation
+      { diagnosis: true, midi: true },                // + MIDI
+      { diagnosis: true, stems: true, score: true },  // score instead of MIDI
+    ]) {
+      const dir = makeCase(opts);
+      assert.strictEqual(pipeline.preparePlan(dir), null,
+        `must refuse: ${JSON.stringify(opts)}`);
+      assert.strictEqual(pipeline.inspect(dir).hasPlan, false, 'no plan artifact may appear');
+      assert.strictEqual(fs.existsSync(path.join(dir, 'studio', 'context.json')), false,
+        'no partial context pack may appear either');
+      // the invariant that matters: the cursor must never advance to PLANNED
+      const snap = pipeline.snapshot(dir);
+      assert.strictEqual(snap.facts.planned, false);
+      assert.ok(pipeline.STAGE_INDEX[snap.stage] < pipeline.STAGE_INDEX.PLANNED,
+        `stage must stay before PLANNED, got ${snap.stage}`);
+    }
+  });
+
+  await check('8. preparePlan after deep prerequisites writes context + plan', () => {
+    const dir = makeCase({ diagnosis: true, stems: true, midi: true });
+    const prepared = pipeline.preparePlan(dir);
+    assert.ok(prepared, 'the plan action must succeed once the song is decomposed');
+    assert.ok(fs.existsSync(prepared.contextFile));
+    assert.ok(fs.existsSync(prepared.planFile));
+    assert.strictEqual(path.basename(prepared.planFile), 'context_plan.json');
+    assert.strictEqual(prepared.plan.status, 'DRAFT_PLAN_NOT_EXECUTED');
+    // §9: a Deep Plan's context must actually carry stems and MIDI
+    const ctx = JSON.parse(fs.readFileSync(prepared.contextFile, 'utf8'));
+    assert.ok(ctx.stems !== null, 'context.stems must not be null for a Deep Plan');
+    assert.ok(ctx.midi.length > 0, 'context.midi must not be empty for a Deep Plan');
+    assert.strictEqual(pipeline.snapshot(dir).stage, 'PLANNED');
+  });
+
+  await check('9. deep prerequisites WITHOUT a plan leave the canonical finish locked', () => {
+    const dir = makeCase({ diagnosis: true, stems: true, midi: true });
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.deepReady, true);
+    assert.strictEqual(g.planned, false);
+    assert.strictEqual(g.canFinish, false, 'executing a plan nobody wrote is not allowed');
+    assert.strictEqual(g.canFinishDeep, false);
+  });
+
+  await check('10. deep prerequisites + plan unlock the canonical finish', () => {
+    const dir = makeCase({ diagnosis: true, stems: true, midi: true });
+    assert.ok(pipeline.preparePlan(dir));
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.planned, true);
+    assert.strictEqual(g.canFinish, true);
+    assert.strictEqual(g.canFinishDeep, true);
+    assert.strictEqual(g.mode, 'DEEP');
+  });
+
+  await check('11. an explicit Quick opt-in still works without stems or MIDI', () => {
     const dir = makeCase({ diagnosis: true });
     assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).canFinish, false);
     pipeline.recordFinishMode(dir, 'QUICK_STEREO_ONLY');
@@ -310,33 +395,13 @@ function makeCase(opts = {}) {
     assert.strictEqual(g.mode, 'FAST_STEREO_ONLY');
     assert.match(g.modeLabel, /仅立体声/);
     assert.strictEqual(g.canRequestQuick, false, 'no longer offered once taken');
+    assert.strictEqual(g.canPlan, false, 'Quick Finish is not a route into ⑤');
+    assert.strictEqual(g.canFinishDeep, false, 'and it is not deep finishing');
+    // and it still refuses to write a Deep Plan
+    assert.strictEqual(pipeline.preparePlan(dir), null);
   });
-  await check('the opt-in is recorded as an attributable artifact', () => {
-    const dir = makeCase({ diagnosis: true });
-    pipeline.recordFinishMode(dir, 'QUICK_STEREO_ONLY');
-    const rec = JSON.parse(fs.readFileSync(pipeline.finishModePath(dir), 'utf8'));
-    assert.strictEqual(rec.mode, 'QUICK_STEREO_ONLY');
-    assert.ok(rec.chosen_at, 'a human choice must carry a timestamp');
-    assert.strictEqual(rec.schema, 'moodify.studio.finish-mode/0.1');
-  });
-  await check('separated + structured unlocks DEEP with no opt-in needed', () => {
-    const dir = makeCase({ diagnosis: true, stems: true, midi: true });
-    const g = pipeline.gates(pipeline.inspect(dir));
-    assert.strictEqual(g.canFinish, true);
-    assert.strictEqual(g.mode, 'DEEP');
-    assert.strictEqual(g.canRequestQuick, false, 'no shortcut offered on the canonical path');
-  });
-  await check('separated WITHOUT structure still does not reach DEEP', () => {
-    const dir = makeCase({ diagnosis: true, stems: true });
-    const g = pipeline.gates(pipeline.inspect(dir));
-    assert.strictEqual(g.canFinish, false, 'DEEP needs both separation and structure');
-    assert.strictEqual(g.canRequestQuick, true);
-  });
-  await check('structure without separation still does not reach DEEP', () => {
-    const dir = makeCase({ diagnosis: true, midi: true });
-    assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).canFinish, false);
-  });
-  await check('DEEP wins over an earlier quick opt-in once prereqs are met', () => {
+
+  await check('12. deep readiness overrides an earlier Quick opt-in', () => {
     const dir = makeCase({ diagnosis: true });
     pipeline.recordFinishMode(dir, 'QUICK_STEREO_ONLY');
     assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).mode, 'FAST_STEREO_ONLY');
@@ -345,7 +410,19 @@ function makeCase(opts = {}) {
     fs.writeFileSync(path.join(dir, 'stems', 'song__vocals.wav'), 'RIFF');
     fs.mkdirSync(path.join(dir, 'midi'), { recursive: true });
     fs.writeFileSync(path.join(dir, 'midi', 'song_basic_pitch.mid'), 'MThd');
-    assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).mode, 'DEEP');
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.mode, 'DEEP');
+    assert.strictEqual(g.canPlan, true, 'deep readiness reopens the canonical route');
+    assert.strictEqual(g.canFinishQuick, false, 'the quick route is no longer the active one');
+  });
+
+  await check('the opt-in is recorded as an attributable artifact', () => {
+    const dir = makeCase({ diagnosis: true });
+    pipeline.recordFinishMode(dir, 'QUICK_STEREO_ONLY');
+    const rec = JSON.parse(fs.readFileSync(pipeline.finishModePath(dir), 'utf8'));
+    assert.strictEqual(rec.mode, 'QUICK_STEREO_ONLY');
+    assert.ok(rec.chosen_at, 'a human choice must carry a timestamp');
+    assert.strictEqual(rec.schema, 'moodify.studio.finish-mode/0.1');
   });
   await check('a fresh case has no finish-mode artifact at all', () => {
     const dir = makeCase({ diagnosis: true });

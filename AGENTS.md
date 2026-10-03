@@ -90,12 +90,15 @@ Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop �
 3. **Network 功能必须从真实用户循环生长**，不得先建网络再找用途。V1 的「网络」只有两个节点：Desktop ↔ 个人手机。
 4. **优先稳定、通用的技术**：`existing > standard library > mature OSS > commodity service > custom > experimental`。举证责任在 custom 与 experimental。（产品战略：可商用 > 技术先进。）
 5. **AI 不得自行扩大范围。** 未获人类批准，不得新增 server / login / social / account / cloud storage / P2P / 新框架；不得删除遗留 Android 项目；不得重写 Core 或 desktop。范围扩张需人类批准或走 MIP。
-6. **生产流程：先理解，再分解，最后处理。**（`Understand first. Decompose second. Process last.`）
+6. **生产流程：先理解，再分解，再规划，最后处理。**（`Understand first. Decompose second. Plan third. Process last.`）
    Creator 侧流程固定为 **检测 → 问题 → 分轨 → 结构 → 方案 → 成品**。
    **三个预设（`clean_master`/`warm_vocal`/`wide_space`）是成品阶段的工具，不是流程的起点**——
    不得把它们放回「分析完立刻处理」的位置。阶段由磁盘产物推导（`moodify-desktop/src/pipeline.js`），
-   未满足前置的阶段不得进入。**「深度完成」需要分轨 + 结构；跳过它们的「快速完成（仅立体声）」必须由人显式选择**
-   （记为 `<case>/studio/finish_mode.json`），**绝不自动解锁**——否则捷径会变成默认路径。
+   未满足前置的阶段不得进入。**分解先于规划：⑤ 方案在 分轨 + MIDI 齐备前保持锁定**（曲谱/MusicXML 不能替代 MIDI），
+   **⑥ 成品还需要已写出方案产物（`<case>/studio/plans/*.json`）**。
+   **跳过分解的「快速完成（仅立体声）」必须由人显式选择**
+   （记为 `<case>/studio/finish_mode.json`），**绝不自动解锁**——否则捷径会变成默认路径；
+   快速完成也**不得**解锁 ⑤ 方案。
    模式徽章必须显示 `深度完成` / `快速（仅立体声）`。
    诊断严格是 Core `report.json` 的投影：**不得发明测量事实**；
    `issues: []` 只能说「当前规则未发现技术问题」，**不得**说「这首歌没问题」。

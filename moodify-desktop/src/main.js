@@ -1144,7 +1144,8 @@ function registerStudioV02Ipc() {
 
 // ——— 生产流程（TASK 002A）：检测 → 问题 → 分轨 → 结构 → 方案 → 成品 ———
 //
-// 产品原则：**先理解，再分解，最后处理**。分析后立刻处理立体声母带是错的。
+// 产品原则：**先理解，再分解，再规划，最后处理**。分析后立刻处理立体声母带是错的，
+// 分解之前就让 AI 出方案同样是错的——⑤ 方案在 分轨 + MIDI 齐备前保持锁定。
 // 本节只暴露「流程状态 + 诊断产物 + context 包」，不含任何音频算法：
 //   阶段由磁盘产物**推导**（见 src/pipeline.js），不是人手推进，也不会谎报。
 //   诊断严格是 Core report.json 的投影，每条 issue 带 evidence 指针指回原 finding。
@@ -1201,8 +1202,9 @@ function registerPipelineIpc() {
   ipcMain.handle('pipeline:context', async (_e, caseDir) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    // 方案必须晚于分解：缺 检测/问题/分轨/MIDI 中任何一项都拒绝，且不写任何产物。
     const prepared = pipeline.preparePlan(dir);
-    if (!prepared) return { ok: false, reason: 'NEED_ANALYZE_AND_DIAGNOSE' };
+    if (!prepared) return { ok: false, reason: 'NEED_DEEP_PREREQUISITES' };
     return {
       ok: true,
       context: prepared.context,
@@ -1231,7 +1233,7 @@ function registerPipelineIpc() {
       return { ok: false, reason: 'BAD_MODE' };
     }
     const snap = pipeline.snapshot(dir);
-    if (mode === 'QUICK_STEREO_ONLY' && !snap.gates.facts.readyForPlan) {
+    if (mode === 'QUICK_STEREO_ONLY' && !snap.gates.baseReady) {
       // 连分析与诊断都没完成时，连「快速」都谈不上
       return { ok: false, reason: 'NEED_ANALYZE_AND_DIAGNOSE' };
     }

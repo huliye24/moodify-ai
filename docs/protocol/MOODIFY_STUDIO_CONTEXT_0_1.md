@@ -60,6 +60,19 @@
 所以 `../report.json` 就是 `<case>/report.json`。
 有测试断言每一条被引用的路径都真实存在。
 
+**深度方案的写入前置（分解先于规划）：** `context.json` 与 `plans/context_plan.json`
+**只在 `deepReady`（`ANALYZED + DIAGNOSED + SEPARATED + MIDI`）时一并写出**。
+任何一项缺失时 `preparePlan()` **拒绝，且不写任何文件**——半成品方案留在磁盘上，
+日后会被读成一份真方案。因此一份真实的深度方案上下文必然满足：
+
+```text
+context.stems != null
+context.midi.length > 0
+```
+
+`score`（MusicXML）可以是 `[]`：它是**可选的派生解读**，被发现就写入，但**不阻塞**深度方案，
+也**不能顶替 MIDI**。
+
 **`stems.grade` 恒定 `PREVIEW_NOT_MASTERING_GRADE`**：
 下游消费者不得把预览级分轨误当母带级。`engine_note` **原样搬运**分离器对自己局限的陈述。
 
@@ -148,17 +161,19 @@
   "mode": "QUICK_STEREO_ONLY",
   "note": "用户显式选择",
   "chosen_at": "2026-10-03T…Z",
-  "reason": "用户显式选择跳过分轨与结构；深度完成需 SEPARATED + STRUCTURED。" }
+  "reason": "用户显式选择跳过分轨与结构；深度完成需 分轨 + MIDI 齐备，且已写出方案产物。" }
 ```
 
 **它记录的是一个决定，不是一个开关。** 深度完成（⑥ 成品）需要
-`ANALYZED + DIAGNOSED + SEPARATED + STRUCTURED`；跳过分离与结构必须由人**主动选择**，
-且该选择可追溯。
+`deepReady`（`ANALYZED + DIAGNOSED + SEPARATED + MIDI`）**且已写出方案产物**
+`<case>/studio/plans/*.json`；跳过分解必须由人**主动选择**，且该选择可追溯。
 
 **文件存在** = `canFinishQuick` 为真 → ⑥ 以 FAST 解锁。
 **文件不存在** = 不提供快速完成（若深度前置不足，则仅提供 `canRequestQuick` 入口）。
 
-**深度优先：** 若用户先选了快速、之后又完成分轨与结构，`deepReady` 自动接管为 DEEP，
+**快速完成不解锁 ⑤ 方案。** `canPlan` 只由 `deepReady` 决定；选择快速不会让它变真。
+
+**深度优先：** 若用户先选了快速、之后又完成分轨与 MIDI，`deepReady` 自动接管为 DEEP，
 无需撤销此文件。清除方式：`mode` 传 `null` 即删除该文件。
 
 ---
