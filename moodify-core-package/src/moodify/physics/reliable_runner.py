@@ -87,7 +87,6 @@ def preflight_check() -> dict:
         PROJECT_ROOT / "tests" / "baseline" / "test_audio" / "piano.wav",
         _SRC_DIR.parent / "tests" / "baseline" / "test_audio" / "piano.wav",
         _SRC_DIR / "moodify" / "moodify-core-package" / "tests" / "baseline" / "test_audio" / "piano.wav",
-        Path("/home/ubuntu/phys-lab/test_audio/piano.wav"),
         Path("/home/ubuntu/moodify/test_audio/piano.wav"),
         Path("/home/ubuntu/moodify/moodify-core-package/tests/baseline/test_audio/piano.wav"),
     ]

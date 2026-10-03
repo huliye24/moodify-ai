@@ -19,7 +19,7 @@ DOMAIN_RULES = [
     ("LEARNING", r"^moodify-core-package/src/moodify/learning/"),
     ("PPE_RUNTIME", r"^moodify_runtime/"),
     ("CLOUD", r"^(workers|night|deploy)/"),
-    ("RESEARCH_EXPERIMENTAL", r"^(science|phys-lab|docs/experiments)/"),
+    ("RESEARCH_EXPERIMENTAL", r"^(science|docs/experiments)/"),
     ("GENERATED_ARTIFACT", r"^(outputs|reports|artifacts)/"),
     ("TOOLING", r"^(scripts|tools)/"),
     ("TESTS", r"(^tests/|/tests/)"),

@@ -7,7 +7,7 @@
 1. **Current explicit human instruction**（方向、产品边界、授权）
 2. **Root `AGENTS.md`**（仓库级最高认知入口）
 3. **`docs/canon/*`**（本目录：身份、边界、内部系统、权威顺序、当前架构）
-4. **Verified runtime evidence**（真实存在什么；见 W01-P00 Evidence Index）
+4. **Verified runtime evidence**（真实存在什么；见 [docs/evidence/](../evidence/README.md) W01-P00 Evidence Index）
 5. **Canonical main behavior + tests**（已验证主链行为与测试）
 6. **Current subsystem documentation**
 7. **Experimental documentation**

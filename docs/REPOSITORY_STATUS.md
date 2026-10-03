@@ -1,15 +1,55 @@
 # Repository Status
 
-**Status:** 当前 Canon 与事实状态入口（Canon v2.1 / Sound Protocol，2026-09-23 更新）。
+**Status:** 当前 Canon 与事实状态入口（Canon v3.0 / Personal Music Node，2026-10-03 更新）。
 **Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](canon/AUTHORITY_ORDER.md)）。
 
-## Canonical Identity（Canon v2.0，2026-09-20）
+## Canonical Identity（Canon v2.2，2026-10-03）
 
-> **Moodify — AI-native Professional Audio Finishing System**（Generated is not finished）；Listener Side 核心动作 **PLAY**，Creator Side 核心动作 **PROCESS**（专业完成流）。
+> **Moodify — an open protocol and reference implementation for evolving audio intelligence**（Generated is not finished）；Listener Side 核心动作 **PLAY**，Creator Side 核心动作 **PROCESS**（专业完成流）。
 
-- **对外产品面：** Moodify：Listener Side = App/Player（Music Android 3.1 APK、music-web PWA、云端 music-platform/BFF），兼 Preview / A-B / Review / Delivery；Creator Side = CLI（生产端完成流）。
+- **公共项目原则：** **Fork the code. Join the process.**（代码可以复制，过程需要参与。）Moodify 采用开源 + 免费 + 公共协作路线；`Moodify Moat = Process × History × Network`，不是 Code。三层叙事：**Protocol（规则层）/ Core（能力层）/ Network（过程）**——见 `GOVERNANCE.md`、`docs/governance/NETWORK.md`、`protocol/`。
+- **对外产品面：** Listener Side = App/Player，兼 Preview / A-B / Review / Delivery；Creator Side = CLI（生产端完成流）+ Studio（`moodify-desktop/` 人类工作台）。
 - **内部系统：** Moodify Ear / Auditory Intelligence（听觉、判断、验证与研究）、Cloud Production System（Intake→…→Render→Delivery）、Classic Reconstruction（内部生产哲学，宪法 v1.0）。
+- **治理与证据层（2026-10-03 新增）：** `GOVERNANCE.md`、`MAINTAINERS.md`、`docs/governance/NETWORK.md`、`docs/governance/constraints/`（ME-001…ME-003）、`protocol/mips/`（MIP 流程）、`docs/evidence/`（W01-P00 Evidence Index 等）、`docs/ARCHIVE_INDEX.md`。**NO TOKEN / NO DAO / NO AIRDROP / NO TREASURY GOVERNANCE。**
 - **历史身份说明：** 旧表述「The Ear of AI — an Auditory Intelligence System」作为**公开产品身份已失效**（被 W01-P01 Canon 覆盖）；Ear 保留为内部系统资产。完整裁决见 W01-P01 Decision Register CD-001/CD-002。
+- **已移出主线的项目线（2026-10-03）：** MOOD Protocol Web3 线（EVM/BSC 主网 BEP-20 代币，已部署合约）**移出主线但磁盘保留**：`mood-web3-protocol/`（原 `protocol/`）、`apps/web`、`e2e/staging`、`web 3.0/`。该线与 Moodify Network 是两件事；历史记录见 `docs/ARCHIVE_INDEX.md`，不静默改写。
+
+## 已退场的旧产品身份（2026-10-03 清理）
+
+`moodify-qa`、`moodify-qa-desktop`、`moodify-pulse`、`products/{qa,master,rating,supply}`、`shared/`、`sdk/`、`plugins/`、`phys-lab/`、`windows版本开发/`、`审查包/`、`engine/`、`demo/` 已从主线移除。QA / Master / Rating / Supply 从来不是四个平级产品身份，最多只能是 Core 内部 capability。逐路径依赖检查与裁决见 [`docs/restructure/CLEANUP_MANIFEST.md`](restructure/CLEANUP_MANIFEST.md)。结构守卫 `scripts/check_repo_structure.py` 防止其重建。
+
+## Product Canon v3 — 2026-10-03（DEFINED / TARGET）
+
+**产品定义：** `Moodify = Core + Protocol + Studio + App + Network`（一个产品的五层，不是五个产品）。完整定义见 [`docs/canon/PRODUCT_DEFINITION_V3.md`](canon/PRODUCT_DEFINITION_V3.md)；技术选型规则见 [`docs/canon/TECHNOLOGY_PRINCIPLES.md`](canon/TECHNOLOGY_PRINCIPLES.md)。
+
+**第一产品循环：**
+
+```text
+Studio → Publish to My Library → Phone → Play
+（在电脑上完成一首歌 → 歌出现在手机 → 立刻能听）
+```
+
+**战略：** `stability > novelty`、`completion > ambition`、`working loop > architecture purity`。
+
+> ⚠️ **下列 TARGET 部分尚未实现。本文不得被读作已实现。**
+
+| 能力 | 状态 | 依据 |
+|---|---|---|
+| Moodify Core | **IMPLEMENTED** | `moodify-core-package/`（679 文件，v1.0.0-rc.1） |
+| Moodify Protocol 0.1 / 0.2 | **IMPLEMENTED**（预设作业 + 报告；可编辑 Mix Graph 仍为目标态） | `moodify protocol validate\|process`；`docs/protocol/` |
+| Moodify Studio（Electron 壳） | **IMPLEMENTED（壳）** — 只编排 Core，自身无 DSP；启动脚本仅 `electron .` | `moodify-desktop/`（v1.0.0-rc.1，Electron ^33） |
+| Android 客户端 | **IMPLEMENTED（两条并存线，未裁决）** | `apps/android`（com.moodify.app v2.0.0）、`apps/music-android`（com.moodify.music v2.0.1） |
+| **Studio → My Library 发布动作** | **TARGET — 不存在** | 全仓库无实现 |
+| **Track package / `manifest.json`** | **TARGET — 不存在** | 全仓库无实现 |
+| **局域网传输 / 配对 / token** | **TARGET — 不存在** | 全仓库无实现 |
+| **Android 接收与本地音乐库** | **TARGET — 不存在** | 全仓库无实现 |
+| **App 身份 / 账号 / 设备注册** | **TARGET — 不存在** | 未实现 |
+| **Moodify Network（节点互联）** | **TARGET — 不存在** | V1 仅指 Desktop ↔ 个人手机 |
+| **远程分享 / relay / 对象存储** | **TARGET — 不存在** | 未实现 |
+
+经仓库检索确认：没有任何 `publish to my library` / `lan sync` / `pairing token` / `local transfer` 实现代码。
+
+**未裁决：** ①`apps/android` vs `apps/music-android` 谁是 canonical App；②Creator 侧首要产品面是 CLI（现行 `CURRENT_CANON.md`）还是 Studio（v3）。两者均为 `HUMAN_DECISION_REQUIRED`，见 [`docs/reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md`](reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md)。
 
 ## Current Verified Mainline（仓库侧）
 
@@ -29,7 +69,7 @@ SOURCE -> LISTEN -> REPRESENT -> JUDGE -> ABC INTERVENTION -> VERIFY
 ## Reality Snapshot Pointer（2026-08-17，W01-P00）
 
 - 云端现状：2 VPS（LA 核心 + 杭州数据工厂）+ PolarDB（核验 BLOCKED）+ 无对象存储 + 无云端 AI 推理 + 队列近空；完整 Ear 链路仅仓库代码。
-- 详见 W01-P00 报告（审查包/W01-P00_REPORTS_2026-08-17）与 [docs/canon/CURRENT_ARCHITECTURE.md](canon/CURRENT_ARCHITECTURE.md)。
+- 详见 [docs/evidence/](evidence/README.md)（W01-P00 Evidence Index，E01–E27；E13/E14 为 LA/杭州节点原始扫描）与 [docs/canon/CURRENT_ARCHITECTURE.md](canon/CURRENT_ARCHITECTURE.md)。
 - **事实规则：** 本文件与 Canon 不得虚构云端/生产能力；未验证能力不写成已运行。
 
 ## Verification Baseline（历史记录，2026-08-08）
@@ -75,6 +115,7 @@ Never promote a capability to CANONICAL based only on documentation or an unmerg
 
 ## History
 
+- 2026-10-03 (MOODIFY_NETWORK_RESTRUCTURE_001，**CANON_CHANGE = YES**): 对外定位扩为**开放声音协议与持续演化网络**（Protocol / Core / Network 三层叙事 + `Fork the code. Join the process.`），并完成仓库结构收敛。**全量 `pytest` 前 1197 passed / 5 skipped / 0 failed，后 1197 passed / 5 skipped（零回归）**；`ruff` 前后皆 clean。基线 `c11bc7f5`（2760 tracked files）→ tag `pre-network-restructure-2026-10-03`。移除：`windows版本开发/`(330) `审查包/`(373，9 份权威证据先迁 `docs/evidence/`) `products/`(32) `shared/`(7) `sdk/`(9) `plugins/`(9) `moodify-qa/`(26) `moodify-qa-desktop/`(8) `moodify-pulse/`(18) `engine/`(19) `demo/`(12) `phys-lab/`(1) `apps/ear-workbench/android/`(24)。移出主线但磁盘保留：MOOD Web3 线（`protocol/`→`mood-web3-protocol/`、`apps/web`、`e2e/staging`、`web 3.0/`）。收敛结果：**仓库内只剩一个 `moodify` console entry point**（`moodify.release_cli:main`，`demo` 的冲突声明随 `demo/` 移除而消失）。新增：`GOVERNANCE.md`、`MAINTAINERS.md`、`docs/governance/NETWORK.md`、`protocol/`（specs/schemas/conformance/mips）、`docs/evidence/`、`docs/ARCHIVE_INDEX.md`、`docs/restructure/**`、结构守卫。详见 [`docs/restructure/RESTRUCTURE_REPORT.md`](restructure/RESTRUCTURE_REPORT.md)。
 - 2026-10-02 (W2 修正 wire_api+DeepSeek): codex ≥0.160 硬移除 chat wire API → 全部 provider 改 `wire_api="responses"`；人类指令改用 DeepSeek（原生 Responses API，假路径 404 对照验证），设置卡三选一定为 DeepSeek/OpenAI/自定义，GLM（仅 chat）选项移除；**真轮次打通**（deepseek-v4-pro 经 app-server 流式应答，生效沙箱 readOnly 如实显示）。残余：用户全局 ~/.agents/skills 会被 codex 探测（待隔离）、GLM 转译桥未建、windowsSandbox/setupStart 未接。
 - 2026-10-02 (Moodify Studio W2 Mood 编译器): 内核按人类三项裁决换 Codex——**协议嵌入一步到位**（`@openai/codex` 0.160.0 `app-server`，JSON-RPC over stdio，schema 取自二进制自证）/ **模型安装时可选**（GLM/OpenAI/自定义，设置卡录入，仅存本机 `~/.moodify/codex`）/ **claude CLI 完全替换**（claude 通道移除）。流式对话 + 原生审批卡（批准/本次会话批准/拒绝）+ 保存方案为 `case_dir/plan.md`。诚实显示生效沙箱：请求 workspace-write、本机 windowsSandbox notConfigured → 生效 read-only。定义文档 §9 修正案。核心零改动；真模型轮次待 API Key 录入；W3 贡献值账本未开工。
 - 2026-10-02 (Moodify Studio W1 布局骨架): 产品定义定稿 `docs/plan/2026-10-02_MOODIFY_STUDIO_PRODUCT_DEFINITION.md`（四裁决：claude CLI 过渡 / 贡献值本地账本 MVP / 一次到位+左侧 dock / 终端共存）并实施 W1——IDE 骨架：44px 图标栏（打开/历史/编译器）+ 历史档案左滑出面板（PS 式）+ 中央工作区四视图（空态仅 logo 水印，无占位文字）+ 底部终端抽屉（拖拽调高度、可收起、cwd 跟随 case）；拖拽音频入工作区即检测。核心零改动；固定流程不变；W2 编译器对话 / W3 贡献值账本未开工。

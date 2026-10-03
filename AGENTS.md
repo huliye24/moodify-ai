@@ -8,6 +8,8 @@ This file defines the canonical context for AI coding agents working in this rep
 
 **产品命题（Product thesis）：Generated is not finished.（生成 ≠ 完成。）**
 
+**公共项目原则（Public project principle）：Fork the code. Join the process.（代码可以复制，过程需要参与。）** Moodify 采用开源 + 免费 + 公共协作路线，不把「别人看不到我们的代码」当作壁垒。代码可以被复制，产品可以被逆向；真正需要保护的是 continuity、standards、review quality、release trust、history、network density。目标不是「只有我们能更新 Moodify」，而是「任何人都可以改进 Moodify，且改进能够重新进入公共演化过程」。
+
 ```text
              Moodify
           Shared Core
@@ -45,6 +47,63 @@ Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress t
 Public brand language and public-site roles then resolve through `docs/brand/public/README.md` and its authority set. The highest topic-specific Public Brand authority is `docs/brand/public/PUBLIC_BRAND_CONSTITUTION.md`.
 
 内部系统权威与既有政策见 `docs/canon/INTERNAL_SYSTEMS.md`、`docs/LEGACY_AND_EXPERIMENTAL_POLICY.md`。
+
+## Network, Governance and Proposals
+
+Moodify 的长期资产不是代码（任何人都可以 fork），而是持续产生下一版的过程：
+
+```text
+Moodify Moat ≠ Code
+Moodify Moat = Process × History × Network
+```
+
+- `GOVERNANCE.md` — Network 定义、角色与权限（Stewards / Maintainers / Working Groups / Contributors / Review Network / AI Agents）、MIP 流程、发布权限、安全流程、冲突解决。
+- `MAINTAINERS.md` — 当前角色持有者。多数为 vacant，如实记录，不虚构社区。
+- `docs/governance/NETWORK.md` — 过程循环：Problem → Proposal → Experiment → Evidence → Human Review → Merge → Release → Feedback。
+- `protocol/mips/` — MIP 模板与流程。改变 protocol / schema / core behavior contract / governance / evidence format / public compatibility 需要 MIP；普通 bug fix 不需要。
+- `docs/governance/constraints/` — 工程约束 ME-001…ME-003（起源先于功能 / 证据门控发展 / 整体一致性）。
+
+**NO TOKEN / NO DAO / NO AIRDROP / NO TREASURY GOVERNANCE。** 先建立有效的 contribution、review、evidence、release、governance，再讨论其他经济机制。
+
+历史说明：本仓库曾承载一条**独立的** MOOD Protocol Web3 线（EVM/BSC 主网 BEP-20 代币，已部署合约并有 DEX 交易）。2026-10-03 该线被移出主线，磁盘保留、不再跟踪，见 `docs/ARCHIVE_INDEX.md`。它不是 Moodify Network，两者的历史都不得被静默改写。
+
+## Product Direction（Product Canon v3，2026-10-03）
+
+**Moodify 是一个产品的五层**，不是五个独立产品：
+
+```text
+Moodify = Core + Protocol + Studio + App + Network
+
+Core     声音能力        →  moodify-core-package/
+Protocol 契约层          →  protocol/ + docs/protocol/
+Studio   Creator 工作台  →  moodify-desktop/
+App      个人音乐节点     →  见 §6 现状（未实现的部分不得写成已实现）
+Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop ↔ 个人手机
+```
+
+完整定义见 `docs/canon/PRODUCT_DEFINITION_V3.md`；技术选型规则见 `docs/canon/TECHNOLOGY_PRINCIPLES.md`。
+
+**Agent 必须理解以下五条：**
+
+1. **第一个产品目标是 `Studio → My Phone → Play`。** 即：在桌面完成一首歌 → Publish to My Library → 歌出现在手机 → 立刻能听。这个循环可靠工作，Moodify 就已经是有效产品。完整循环见 `PRODUCT_DEFINITION_V3.md` §3。
+2. **Moodify App 是 Personal Music Node（个人音乐节点）**，初期不是另一个流媒体平台。四项职责 My Library / Playback / My Identity / Connections；**最早版本只做前两项**。
+3. **Network 功能必须从真实用户循环生长**，不得先建网络再找用途。V1 的「网络」只有两个节点：Desktop ↔ 个人手机。
+4. **优先稳定、通用的技术**：`existing > standard library > mature OSS > commodity service > custom > experimental`。举证责任在 custom 与 experimental。（产品战略：可商用 > 技术先进。）
+5. **AI 不得自行扩大范围。** 未获人类批准，不得新增 server / login / social / account / cloud storage / P2P / 新框架；不得删除遗留 Android 项目；不得重写 Core 或 desktop。范围扩张需人类批准或走 MIP。
+
+**仍未裁决（不得当作已定论）：** `apps/android` 与 `apps/music-android` 哪一个是 canonical App；Creator 侧首要产品面是 CLI 还是 Studio。两者均记录为 `HUMAN_DECISION_REQUIRED`。
+
+## Repository Structure Guard
+
+`scripts/check_repo_structure.py` 在 CI 中执行，防止历史问题复发。它禁止：
+
+- 重建 `web 3.0/`、`moodify-qa/`、`moodify-pulse/`、`windows版本开发/`、`审查包/`、`products/`、`shared/`、`sdk/`、`engine/`、`demo/`；
+- 顶层中文临时任务目录；
+- generated artifacts 进入 Git；
+- 第二个 `moodify` console entry point；
+- 第二套 Core。
+
+**新增任何非 `.py` 文件前先执行 `git check-ignore -v <path>`** —— 本仓库的 `.gitignore` 含大量宽泛模式（`*.png`、`*.html`、`*.wav` 等）与 `!` 白名单例外，已四次静默吞掉新文件。
 
 ## Important Distinction
 
@@ -98,7 +157,7 @@ When instructions conflict, prefer:
 1. current explicit human instruction;
 2. root `AGENTS.md`;
 3. `docs/canon/*`（CURRENT_CANON / PRODUCT_BOUNDARY / INTERNAL_SYSTEMS / AUTHORITY_ORDER / CURRENT_ARCHITECTURE）;
-4. verified runtime evidence（W01-P00 Evidence Index 等）;
+4. verified runtime evidence（[docs/evidence/](docs/evidence/README.md) W01-P00 Evidence Index 等）;
 5. canonical main behavior and tests;
 6. current subsystem documentation;
 7. experimental documentation;
