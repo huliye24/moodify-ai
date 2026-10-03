@@ -1,9 +1,0 @@
-# Demo runtime artifacts — regenerate with `moodify analyze`
-output/*
-!output/example/
-!output/example/report.json
-!output/example/report.md
-
-__pycache__/
-*.pyc
-.pytest_cache/
