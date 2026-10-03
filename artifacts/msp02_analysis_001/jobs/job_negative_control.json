@@ -1,6 +1,0 @@
-{
-  "protocol": "moodify.sound/0.2",
-  "type": "analyze",
-  "source": "../negative_control_clipped.wav",
-  "output_dir": "../cases"
-}

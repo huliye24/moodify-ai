@@ -1,7 +1,0 @@
-{
-  "required_outputs": [
-    "planning/execution_dag.json",
-    "planning/execution_dag.md"
-  ],
-  "non_empty": true
-}

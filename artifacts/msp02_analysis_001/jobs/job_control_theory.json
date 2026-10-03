@@ -1,6 +1,0 @@
-{
-  "protocol": "moodify.sound/0.2",
-  "type": "analyze",
-  "source": "../../../07Music/albums/Control Theory.mp3",
-  "output_dir": "../cases"
-}

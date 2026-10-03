@@ -257,3 +257,6 @@ docs/experiments/**/*.zip
 
 # Studio shell markup (whitelisted against *.html above)
 !moodify-desktop/renderer/index.html
+# Generated analysis, rendering, evidence, and experiment outputs.
+# Canonical schemas and small source fixtures belong outside this directory.
+/artifacts/
