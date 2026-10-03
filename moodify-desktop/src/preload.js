@@ -91,4 +91,6 @@ contextBridge.exposeInMainWorld('moodify', {
   pipelineNote: (caseDir, note, preserve) => ipcRenderer.invoke('pipeline:note', caseDir, note, preserve),
   pipelineContext: (caseDir) => ipcRenderer.invoke('pipeline:context', caseDir),
   pipelineReadContext: (caseDir) => ipcRenderer.invoke('pipeline:readContext', caseDir),
+  // 显式选择快速完成（仅立体声）。深度完成需要分轨 + 结构，跳过必须由人主动选。
+  pipelineSetFinishMode: (caseDir, mode) => ipcRenderer.invoke('pipeline:setFinishMode', caseDir, mode),
 });

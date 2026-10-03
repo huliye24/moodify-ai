@@ -141,6 +141,28 @@
 
 ---
 
+## 3.1 `moodify.studio.finish-mode/0.1`（人类决定记录）
+
+```json
+{ "schema": "moodify.studio.finish-mode/0.1",
+  "mode": "QUICK_STEREO_ONLY",
+  "note": "用户显式选择",
+  "chosen_at": "2026-10-03T…Z",
+  "reason": "用户显式选择跳过分轨与结构；深度完成需 SEPARATED + STRUCTURED。" }
+```
+
+**它记录的是一个决定，不是一个开关。** 深度完成（⑥ 成品）需要
+`ANALYZED + DIAGNOSED + SEPARATED + STRUCTURED`；跳过分离与结构必须由人**主动选择**，
+且该选择可追溯。
+
+**文件存在** = `canFinishQuick` 为真 → ⑥ 以 FAST 解锁。
+**文件不存在** = 不提供快速完成（若深度前置不足，则仅提供 `canRequestQuick` 入口）。
+
+**深度优先：** 若用户先选了快速、之后又完成分轨与结构，`deepReady` 自动接管为 DEEP，
+无需撤销此文件。清除方式：`mode` 传 `null` 即删除该文件。
+
+---
+
 ## 4. 版本与兼容
 
 版本字符串精确匹配，不兼容的产物必须失败而不是被猜测成新格式

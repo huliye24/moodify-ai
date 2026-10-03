@@ -720,3 +720,14 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   padding: 4px 0;
 }
 .preserve-item.note { color: var(--muted); font-size: 12px; }
+
+/* 「改用快速完成」入口。只在前置不足且尚未选择时出现。
+   刻意做成低调的 ghost 按钮而不是主按钮：它是让步，不是推荐路径。 */
+.pipeline-quick {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px dashed var(--hairline) !important;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.pipeline-quick:hover { color: var(--fg); border-color: var(--accent) !important; }

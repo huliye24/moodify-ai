@@ -1212,6 +1212,25 @@ function registerPipelineIpc() {
     const ctx = pipeline.readJsonSafe(path.join(dir, 'studio', 'context.json'));
     return ctx ? { ok: true, context: ctx } : { ok: false, reason: 'NO_CONTEXT' };
   });
+
+  // 显式选择「快速完成（仅立体声）」。
+  // 这是**人类决定**，不是一个 UI 开关：深度完成需要 SEPARATED + STRUCTURED；
+  // 跳过它必须由人主动选择，并留下可追溯的记录（finish_mode.json）。
+  // 绝不自动解锁——否则快捷路径会变成默认路径。
+  ipcMain.handle('pipeline:setFinishMode', async (_e, caseDir, mode) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    if (mode !== null && mode !== 'QUICK_STEREO_ONLY') {
+      return { ok: false, reason: 'BAD_MODE' };
+    }
+    const snap = pipeline.snapshot(dir);
+    if (mode === 'QUICK_STEREO_ONLY' && !snap.gates.facts.readyForPlan) {
+      // 连分析与诊断都没完成时，连「快速」都谈不上
+      return { ok: false, reason: 'NEED_ANALYZE_AND_DIAGNOSE' };
+    }
+    const record = pipeline.recordFinishMode(dir, mode, '用户显式选择');
+    return { ok: true, finishMode: record, gates: pipeline.snapshot(dir).gates };
+  });
 }
 
 function registerResearchIpc() {

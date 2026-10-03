@@ -208,25 +208,85 @@ function stageOf(facts) {
 /**
  * What the UI may enter.
  *
- * Hard gate  (section 13): planning and finishing require ANALYZED + DIAGNOSED.
- * Soft gate: the canonical DEEP finish also expects SEPARATED + STRUCTURED, but not every
- * song should be forced through an expensive decomposition — so a stereo-only FAST finish
- * is allowed and MUST be labelled as such. An unlabelled silent downgrade would be a lie.
+ * THE FINISH STAGE IS NOT AUTOMATICALLY AVAILABLE.
+ *
+ * Deep Finish is the canonical path and REQUIRES the full preparation:
+ *
+ *     ANALYZED + DIAGNOSED + SEPARATED + STRUCTURED
+ *
+ * A stereo-only finish is a legitimate fallback for a song that should not be forced
+ * through an expensive decomposition — but it is a *concession*, not a default. It must be
+ * a Quick Finish the user **explicitly opts into**, recorded as a human decision:
+ *
+ *     canRequestQuick  the affordance is offered (deep prereqs missing, no opt-in yet)
+ *     canFinishQuick   the user opted in, so the finish stage opens in FAST mode
+ *
+ * What this replaced, and why it mattered: the first version unlocked the finish stage as
+ * soon as analysis + diagnosis were done, and merely *labelled* the result FAST. That made
+ * stereo-only the path of least resistance — the user would reach 成品 by default, never
+ * separating or extracting structure, and the canonical deep path would quietly become the
+ * exception. A labelled shortcut is still a shortcut. Now the shortcut requires a decision.
+ *
+ * Deep always wins: if the user opts into Quick and later separates and structures the song,
+ * `deepReady` takes precedence and the mode returns to DEEP without needing to undo anything.
  */
 function gates(info) {
   const f = factsOf(info);
   const deepReady = f.readyForPlan && f.separated && f.structured;
-  const fastReady = f.readyForPlan;
+  const optIn = readFinishMode(info.caseDir).mode === 'QUICK_STEREO_ONLY';
+  const quickFinish = f.readyForPlan && !deepReady && optIn;
   return {
     canDiagnose: f.analyzed,
     canSeparate: f.analyzed,
     canStructure: f.analyzed,
     canPlan: f.readyForPlan,
-    canFinish: fastReady,
-    mode: deepReady ? 'DEEP' : (fastReady ? 'FAST_STEREO_ONLY' : null),
-    modeLabel: deepReady ? '深度完成' : (fastReady ? '快速（仅立体声）' : null),
+    // canonical finish: separation + structure are required, not optional
+    canFinish: deepReady,
+    canFinishQuick: quickFinish,
+    canRequestQuick: f.readyForPlan && !deepReady && !optIn,
+    quickOptIn: optIn,
+    mode: deepReady ? 'DEEP' : (quickFinish ? 'FAST_STEREO_ONLY' : null),
+    modeLabel: deepReady ? '深度完成' : (quickFinish ? '快速（仅立体声）' : null),
     facts: f,
   };
+}
+
+// ── explicit Quick Finish opt-in ────────────────────────────────────────────────
+
+function finishModePath(caseDir) {
+  return path.join(caseDir, 'studio', 'finish_mode.json');
+}
+
+/**
+ * The recorded human choice to skip separation and structure for this case.
+ *
+ * This is deliberately a persisted artifact rather than a checkbox in the UI: "the user
+ * chose the shortcut" is a decision worth being able to point at later, the same way
+ * selection.json records which version was kept.
+ */
+function readFinishMode(caseDir) {
+  return readJsonSafe(finishModePath(caseDir)) || {};
+}
+
+/**
+ * @param {'QUICK_STEREO_ONLY'|null} mode  null clears the opt-in (file removed)
+ */
+function recordFinishMode(caseDir, mode, note) {
+  const file = finishModePath(caseDir);
+  if (!mode) {
+    try { fs.rmSync(file, { force: true }); } catch { /* already gone */ }
+    return {};
+  }
+  const payload = {
+    schema: 'moodify.studio.finish-mode/0.1',
+    mode,
+    note: note || null,
+    chosen_at: new Date().toISOString(),
+    reason: '用户显式选择跳过分轨与结构；深度完成需 SEPARATED + STRUCTURED。',
+  };
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(payload, null, 2), 'utf8');
+  return payload;
 }
 
 function snapshot(caseDir) {
@@ -510,6 +570,9 @@ module.exports = {
   snapshot,
   pipelinePath,
   recordStage,
+  finishModePath,
+  readFinishMode,
+  recordFinishMode,
   buildDiagnosis,
   writeDiagnosis,
   readDiagnosis,

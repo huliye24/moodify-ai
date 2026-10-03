@@ -2667,6 +2667,7 @@ const pipe = { caseDir: null, snap: null };
 
 function initPipeline() {
   $('rail-studio').addEventListener('click', enterPipeline);
+  $('pipeline-quick').addEventListener('click', chooseQuickFinish);
   $('diagnosis-generate').addEventListener('click', runDiagnosis);
   $('diagnosis-note-save').addEventListener('click', saveDiagnosisNote);
   $('plan-build').addEventListener('click', buildPlanContext);
@@ -2677,6 +2678,7 @@ function resetPipeline() {
   pipe.snap = null;
   $('pipeline-stages').textContent = '';
   $('pipeline-mode').hidden = true;
+  $('pipeline-quick').hidden = true;
   $('diagnosis-summary').textContent = '';
   $('diagnosis-issues').textContent = '';
   $('diagnosis-draft').textContent = '';
@@ -2700,7 +2702,13 @@ async function refreshPipeline() {
   return res;
 }
 
-/** Which stages the current case may enter. Mirrors src/pipeline.js gates(). */
+/**
+ * Which stages the current case may enter. Mirrors src/pipeline.js gates().
+ *
+ * The finish stage opens on the canonical path (DEEP prereqs met) OR after the user has
+ * explicitly opted into a Quick Finish. It is never unlocked just because analysis and
+ * diagnosis are done — that is what made the shortcut the default path.
+ */
 function stageUnlocked(id, gates) {
   if (!gates) return false;
   switch (id) {
@@ -2709,7 +2717,7 @@ function stageUnlocked(id, gates) {
     case 'separate': return gates.canSeparate;
     case 'structure': return gates.canStructure;
     case 'plan': return gates.canPlan;
-    case 'finish': return gates.canFinish;
+    case 'finish': return gates.canFinish || gates.canFinishQuick;
     default: return false;
   }
 }
@@ -2738,6 +2746,11 @@ function renderPipelineBar() {
     box.appendChild(btn);
   }
 
+  // 显式选择「快速完成」的入口。只在前置不足且尚未选择时出现。
+  // 它不是一个开关：点它 = 记录一次人类决定（finish_mode.json）。
+  const quick = $('pipeline-quick');
+  quick.hidden = !gates.canRequestQuick;
+
   // 完成模式徽章：深度 or 快速（仅立体声）。
   // 不标注就是骗人——跳过分离与结构仍然是合法路径，但必须让人知道自己在哪条路上。
   const badge = $('pipeline-mode');
@@ -2748,6 +2761,18 @@ function renderPipelineBar() {
   } else {
     badge.hidden = true;
   }
+}
+
+/** 人类显式选择快速完成。记录后 ⑥ 才解锁（FAST 模式）。 */
+async function chooseQuickFinish() {
+  const caseDir = state.caseDir;
+  if (!caseDir) return;
+  let res;
+  try { res = await window.moodify.pipelineSetFinishMode(caseDir, 'QUICK_STEREO_ONLY'); }
+  catch (err) { res = { ok: false, reason: err.message }; }
+  if (!res || !res.ok) return;
+  await refreshPipeline();
+  openPipelineStage('finish');
 }
 
 function openPipelineStage(id) {
@@ -2928,9 +2953,16 @@ async function openPlan() {
   if (state.caseDir !== caseDir) return;
 
   const gates = (snap && snap.gates) || {};
-  $('plan-readiness').textContent = gates.modeLabel
-    ? `当前路径：${gates.modeLabel}` + (gates.mode === 'FAST_STEREO_ONLY' ? '（未分轨/未提取结构）' : '')
-    : '尚未满足前置。';
+  if (gates.modeLabel) {
+    $('plan-readiness').textContent = `当前路径：${gates.modeLabel}`
+      + (gates.mode === 'FAST_STEREO_ONLY' ? '（未分轨 / 未提取结构）' : '');
+  } else if (gates.canPlan) {
+    // 能出方案，但还不是深度完成——把差什么说清楚，而不是含糊地说「未满足前置」
+    $('plan-readiness').textContent =
+      '尚未分轨与提取结构。深度完成需要两者；如需跳过，请显式选择「改用快速完成」。';
+  } else {
+    $('plan-readiness').textContent = '尚未满足前置：需要先完成检测与问题。';
+  }
 
   let res;
   try { res = await window.moodify.pipelineReadContext(caseDir); } catch { res = null; }

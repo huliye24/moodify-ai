@@ -119,6 +119,10 @@
            所以这里没有静态 id——避免与合约检查漂移。 -->
       <nav id="pipeline-bar" hidden>
         <div id="pipeline-stages"></div>
+        <!-- 仅在前置不足时出现：深度完成需要分轨 + 结构，跳过必须由人**显式选择**，
+             绝不自动解锁——否则快捷路径会变成默认路径。 -->
+        <button id="pipeline-quick" class="ghost pipeline-quick" hidden
+                title="跳过分轨与结构，仅对立体声做处理">改用快速完成（仅立体声）</button>
         <span id="pipeline-mode" class="pipeline-mode" hidden></span>
       </nav>
 

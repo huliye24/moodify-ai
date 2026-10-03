@@ -258,21 +258,71 @@ function makeCase(opts = {}) {
     assert.strictEqual(g.canFinish, false, 'finishing needs diagnosis');
     assert.strictEqual(g.mode, null);
   });
-  await check('analysis + diagnosis may finish, but only as FAST / stereo-only', () => {
+
+  // DEEP FINISH REQUIRES THE FULL PREPARATION
+  await check('analysis + diagnosis does NOT unlock the finish stage', () => {
     const dir = makeCase({ diagnosis: true });
     const g = pipeline.gates(pipeline.inspect(dir));
-    assert.strictEqual(g.canFinish, true);
+    assert.strictEqual(g.canFinish, false,
+      'stereo-only must not be auto-unlocked as the main flow');
+    assert.strictEqual(g.mode, null, 'no mode before the user has chosen one');
+  });
+  await check('a stereo-only fallback is OFFERED, not granted', () => {
+    const dir = makeCase({ diagnosis: true });
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.canRequestQuick, true, 'the affordance must be reachable');
+    assert.strictEqual(g.canFinishQuick, false, 'but not applied until chosen');
+    assert.strictEqual(g.quickOptIn, false);
+  });
+  await check('the finish stage opens as FAST only after an explicit opt-in', () => {
+    const dir = makeCase({ diagnosis: true });
+    assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).canFinish, false);
+    pipeline.recordFinishMode(dir, 'QUICK_STEREO_ONLY');
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.canFinishQuick, true, 'explicit choice unlocks quick finish');
     assert.strictEqual(g.mode, 'FAST_STEREO_ONLY');
     assert.match(g.modeLabel, /仅立体声/);
+    assert.strictEqual(g.canRequestQuick, false, 'no longer offered once taken');
   });
-  await check('separated + structured upgrades to DEEP', () => {
+  await check('the opt-in is recorded as an attributable artifact', () => {
+    const dir = makeCase({ diagnosis: true });
+    pipeline.recordFinishMode(dir, 'QUICK_STEREO_ONLY');
+    const rec = JSON.parse(fs.readFileSync(pipeline.finishModePath(dir), 'utf8'));
+    assert.strictEqual(rec.mode, 'QUICK_STEREO_ONLY');
+    assert.ok(rec.chosen_at, 'a human choice must carry a timestamp');
+    assert.strictEqual(rec.schema, 'moodify.studio.finish-mode/0.1');
+  });
+  await check('separated + structured unlocks DEEP with no opt-in needed', () => {
     const dir = makeCase({ diagnosis: true, stems: true, midi: true });
     const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.canFinish, true);
     assert.strictEqual(g.mode, 'DEEP');
+    assert.strictEqual(g.canRequestQuick, false, 'no shortcut offered on the canonical path');
   });
-  await check('separated without structure is still only FAST', () => {
+  await check('separated WITHOUT structure still does not reach DEEP', () => {
     const dir = makeCase({ diagnosis: true, stems: true });
+    const g = pipeline.gates(pipeline.inspect(dir));
+    assert.strictEqual(g.canFinish, false, 'DEEP needs both separation and structure');
+    assert.strictEqual(g.canRequestQuick, true);
+  });
+  await check('structure without separation still does not reach DEEP', () => {
+    const dir = makeCase({ diagnosis: true, midi: true });
+    assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).canFinish, false);
+  });
+  await check('DEEP wins over an earlier quick opt-in once prereqs are met', () => {
+    const dir = makeCase({ diagnosis: true });
+    pipeline.recordFinishMode(dir, 'QUICK_STEREO_ONLY');
     assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).mode, 'FAST_STEREO_ONLY');
+    // user then does the real work — no need to undo the earlier choice
+    fs.mkdirSync(path.join(dir, 'stems'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'stems', 'song__vocals.wav'), 'RIFF');
+    fs.mkdirSync(path.join(dir, 'midi'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'midi', 'song_basic_pitch.mid'), 'MThd');
+    assert.strictEqual(pipeline.gates(pipeline.inspect(dir)).mode, 'DEEP');
+  });
+  await check('a fresh case has no finish-mode artifact at all', () => {
+    const dir = makeCase({ diagnosis: true });
+    assert.strictEqual(fs.existsSync(pipeline.finishModePath(dir)), false);
   });
   await check('a full case walks all the way to EXPORTED', () => {
     const dir = makeCase({
