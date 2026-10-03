@@ -23,7 +23,16 @@ const state = {
   convStarted: false,   // 本会话是否已开始 AI 对话（决定抽屉把手是否出现）
 };
 
-const VIEWS = ['empty', 'studio', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
+const VIEWS = ['empty', 'studio', 'diagnosis', 'plan', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
+/** Which pipeline stage each view belongs to (① 检测 spans the three observation tabs). */
+const VIEW_STAGE = {
+  data: 'analyze', spectrum: 'analyze', charts: 'analyze',
+  diagnosis: 'diagnose',
+  stems: 'separate',
+  score: 'structure',
+  plan: 'plan',
+  studio: 'finish',
+};
 const VIEW_TAB = {
   data: 'tab-data',
   spectrum: 'tab-spectrum',
@@ -130,7 +139,9 @@ function showError(message) {
 
 function selectView(name) {
   for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
-  $('tabs').hidden = name === 'empty' || name === 'bench' || name === 'stems' || name === 'score';
+  $('tabs').hidden = name === 'empty' || name === 'bench' || name === 'stems' || name === 'score'
+    || name === 'diagnosis' || name === 'plan' || name === 'studio';
+  $('pipeline-bar').hidden = name === 'empty';
   for (const [view, tabId] of Object.entries(VIEW_TAB)) {
     $(tabId).classList.toggle('active', view === name);
   }
@@ -138,6 +149,12 @@ function selectView(name) {
   $('rail-fix').classList.toggle('active', name === 'bench');
   $('rail-stems').classList.toggle('active', name === 'stems');
   $('rail-score').classList.toggle('active', name === 'score');
+
+  // 流程条高亮当前阶段。同一阶段可以有多个视图（① 检测 = 数据/频谱/图表）。
+  const stage = VIEW_STAGE[name];
+  for (const btn of $('pipeline-stages').querySelectorAll('.pipe-stage')) {
+    btn.classList.toggle('active', btn.dataset.stage === stage);
+  }
 }
 
 async function openReport(reportPath) {
@@ -153,6 +170,7 @@ async function openReport(reportPath) {
   destroyBench(); // 换世界：旧工作台实例销毁
   resetStudioTools(); // 换世界：分离/曲谱工作台复位（产物留在旧世界目录）
   resetStudioWorld(); // 换世界：后处理视图复位（版本产物留在旧世界目录）
+  resetPipeline();    // 换世界：流程状态复位（阶段由新 case 的产物重新推导）
 
   $('source-name').textContent = (report.source || {}).name || '?';
   $('case-title').hidden = false;
@@ -180,6 +198,7 @@ async function openReport(reportPath) {
   const wave = renderWaveform(entryDir); // 波形解码好后就地现身
   await wave;
   await renderCharts(reportPath); // 检测图表后台补齐（图表页）
+  await refreshPipeline(); // 流程条按本 case 的真实产物点亮/锁定
   await ensureTerminal();
 }
 
@@ -2300,6 +2319,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   initDrawer();
   initDrop();
   initStudio();
+  initPipeline();
   await ensureCompiler();
   await refreshArchive();
 });
@@ -2348,7 +2368,9 @@ const studio = {
 };
 
 function initStudio() {
-  $('rail-studio').addEventListener('click', openStudio);
+  // NOTE: rail-studio is wired by initPipeline() to enterPipeline(), not straight here.
+  // The rail entry must land on the first unfinished stage, not jump to 成品 — jumping
+  // straight to processing is the behaviour TASK 002A exists to remove.
   $('studio-run').addEventListener('click', runStudioProcess);
   $('studio-play').addEventListener('click', () => {
     if (studio.ws) studio.ws.playPause();
@@ -2621,4 +2643,338 @@ async function exportStudioVersion() {
     return;
   }
   $('studio-note').textContent = `已导出：${res.path}`;
+}
+
+// ——— 生产流程（TASK 002A）：检测 → 问题 → 分轨 → 结构 → 方案 → 成品 ———
+//
+// 产品原则：先把歌听懂，再分解，最后才处理。
+// 早期版本允许「分析完立刻选预设处理立体声母带」——那对母带来说太早了。
+// 预设没有消失，只是下移到最后一步：它们是工具，不是流程。
+//
+// 阶段状态由 main 侧从磁盘产物**推导**（src/pipeline.js），渲染层不自己记进度，
+// 也不允许把「未满足前置」的阶段显示成可用。
+
+const PIPELINE_STAGES = [
+  { id: 'analyze', label: '① 检测', view: 'data' },
+  { id: 'diagnose', label: '② 问题', view: 'diagnosis' },
+  { id: 'separate', label: '③ 分轨', view: 'stems' },
+  { id: 'structure', label: '④ 结构', view: 'score' },
+  { id: 'plan', label: '⑤ 方案', view: 'plan' },
+  { id: 'finish', label: '⑥ 成品', view: 'studio' },
+];
+
+const pipe = { caseDir: null, snap: null };
+
+function initPipeline() {
+  $('rail-studio').addEventListener('click', enterPipeline);
+  $('diagnosis-generate').addEventListener('click', runDiagnosis);
+  $('diagnosis-note-save').addEventListener('click', saveDiagnosisNote);
+  $('plan-build').addEventListener('click', buildPlanContext);
+}
+
+function resetPipeline() {
+  pipe.caseDir = null;
+  pipe.snap = null;
+  $('pipeline-stages').textContent = '';
+  $('pipeline-mode').hidden = true;
+  $('diagnosis-summary').textContent = '';
+  $('diagnosis-issues').textContent = '';
+  $('diagnosis-draft').textContent = '';
+  $('diagnosis-preserve').textContent = '';
+  $('diagnosis-state').textContent = '';
+  $('diagnosis-empty').hidden = true;
+  $('plan-context').textContent = '';
+  $('plan-draft').textContent = '';
+  $('plan-readiness').textContent = '';
+}
+
+async function refreshPipeline() {
+  const caseDir = state.caseDir;
+  if (!caseDir) return null;
+  let res;
+  try { res = await window.moodify.pipelineSnapshot(caseDir); } catch { return null; }
+  if (!res || !res.ok || state.caseDir !== caseDir) return null; // world-switch guard
+  pipe.caseDir = caseDir;
+  pipe.snap = res;
+  renderPipelineBar();
+  return res;
+}
+
+/** Which stages the current case may enter. Mirrors src/pipeline.js gates(). */
+function stageUnlocked(id, gates) {
+  if (!gates) return false;
+  switch (id) {
+    case 'analyze': return true;
+    case 'diagnose': return gates.canDiagnose;
+    case 'separate': return gates.canSeparate;
+    case 'structure': return gates.canStructure;
+    case 'plan': return gates.canPlan;
+    case 'finish': return gates.canFinish;
+    default: return false;
+  }
+}
+
+function renderPipelineBar() {
+  const box = $('pipeline-stages');
+  box.textContent = '';
+  if (!pipe.snap) return;
+  const { gates } = pipe.snap;
+
+  for (const s of PIPELINE_STAGES) {
+    const unlocked = stageUnlocked(s.id, gates);
+    const btn = document.createElement('button');
+    btn.className = 'pipe-stage';
+    btn.dataset.stage = s.id;
+    btn.textContent = s.label;
+    btn.disabled = !unlocked;
+    if (!unlocked) {
+      btn.classList.add('locked');
+      btn.title = '尚未满足前置：需要先完成前面的阶段';
+    }
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      openPipelineStage(s.id);
+    });
+    box.appendChild(btn);
+  }
+
+  // 完成模式徽章：深度 or 快速（仅立体声）。
+  // 不标注就是骗人——跳过分离与结构仍然是合法路径，但必须让人知道自己在哪条路上。
+  const badge = $('pipeline-mode');
+  if (gates.modeLabel) {
+    badge.textContent = gates.modeLabel;
+    badge.hidden = false;
+    badge.classList.toggle('deep', gates.mode === 'DEEP');
+  } else {
+    badge.hidden = true;
+  }
+}
+
+function openPipelineStage(id) {
+  const s = PIPELINE_STAGES.find((x) => x.id === id);
+  if (!s) return;
+  switch (id) {
+    case 'analyze': selectView('data'); break;
+    case 'diagnose': openDiagnosis(); break;
+    case 'separate': openStems(); break;
+    case 'structure': openScore(); break;
+    case 'plan': openPlan(); break;
+    case 'finish': openStudio(); break;
+    default: selectView(s.view);
+  }
+}
+
+/** 进入流程：落在第一个「已解锁但还没做」的阶段，而不是直接跳到成品。 */
+async function enterPipeline() {
+  if (!state.caseDir) return;
+  const snap = await refreshPipeline();
+  if (!snap) return;
+  const f = snap.facts || {};
+  const done = {
+    analyze: f.analyzed, diagnose: f.diagnosed, separate: f.separated,
+    structure: f.structured, plan: f.planned, finish: f.rendered || f.chosen,
+  };
+  const next = PIPELINE_STAGES.find((s) => stageUnlocked(s.id, snap.gates) && !done[s.id])
+    || PIPELINE_STAGES[PIPELINE_STAGES.length - 1];
+  openPipelineStage(next.id);
+}
+
+// ——— ② 问题 ———
+
+async function openDiagnosis() {
+  if (!state.caseDir) return;
+  selectView('diagnosis');
+  const caseDir = state.caseDir;
+  await refreshPipeline();
+  let res;
+  try { res = await window.moodify.pipelineDiagnosis(caseDir); } catch { res = null; }
+  if (state.caseDir !== caseDir) return;
+  if (res && res.ok) renderDiagnosis(res.diagnosis);
+  else {
+    $('diagnosis-state').textContent = '还没有诊断产物。点「生成诊断」从本次检测结果生成。';
+    $('diagnosis-summary').textContent = '';
+    $('diagnosis-issues').textContent = '';
+    $('diagnosis-draft').textContent = '';
+    $('diagnosis-empty').hidden = true;
+  }
+}
+
+function block(title, rows) {
+  const wrap = document.createElement('div');
+  const h = document.createElement('div');
+  h.className = 'diag-title';
+  h.textContent = title;
+  wrap.appendChild(h);
+  for (const r of rows) {
+    const p = document.createElement('div');
+    p.className = 'diag-row';
+    if (r.label) {
+      const l = document.createElement('span');
+      l.className = 'diag-label';
+      l.textContent = r.label;
+      p.appendChild(l);
+    }
+    const v = document.createElement('span');
+    v.className = r.cls || 'diag-value';
+    v.textContent = r.value;
+    p.appendChild(v);
+    wrap.appendChild(p);
+  }
+  return wrap;
+}
+
+function renderDiagnosis(d) {
+  const s = $('diagnosis-summary');
+  s.textContent = '';
+  const ts = d.technical_state || {};
+  s.appendChild(block('本次检测状态（原样来自 Core）', [
+    { label: '总体', value: ts.overall || '—' },
+    { label: '处置建议', value: ts.workflow_decision || '—' },
+    { label: '原因', value: (ts.reasons && ts.reasons.length) ? ts.reasons.join('、') : '无' },
+  ]));
+
+  const ib = $('diagnosis-issues');
+  ib.textContent = '';
+  if (!d.issues || !d.issues.length) {
+    // 关键诚实点：没有 finding ≠ 音频没问题，只代表当前规则没发现。
+    ib.appendChild(block('检测到的问题', [
+      { value: '当前规则未发现技术问题。', cls: 'diag-value' },
+      { value: (d.finding_rule_coverage && d.finding_rule_coverage.note) || '', cls: 'diag-note' },
+    ]));
+  } else {
+    const rows = [];
+    for (const it of d.issues) {
+      rows.push({ label: it.severity || '—', value: it.description || it.type || '' });
+      rows.push({
+        label: '证据',
+        value: `${(it.evidence || []).join(' ')}`
+          + (it.metric ? ` · ${it.metric}=${it.observed_value}${it.unit || ''}` : '')
+          + (it.calibration_status ? ` · ${it.calibration_status}` : ''),
+        cls: 'diag-note',
+      });
+    }
+    ib.appendChild(block('检测到的问题（每条都指回 Core 证据）', rows));
+  }
+
+  const db = $('diagnosis-draft');
+  db.textContent = '';
+  const dp = d.draft_plan || {};
+  const nodes = dp.nodes || [];
+  db.appendChild(block('Core 的草稿方案（状态：' + (dp.status || '—') + '）', nodes.length
+    ? nodes.map((n) => ({
+      label: n.op || '—',
+      value: `${JSON.stringify(n.params || {})} — ${n.reason || ''}`,
+      cls: 'diag-note',
+    }))
+    : [{ value: '本次没有草稿节点。', cls: 'diag-note' }]));
+
+  const pb = $('diagnosis-preserve');
+  pb.textContent = '';
+  const preserve = d.preserve || [];
+  const notes = d.human_notes || [];
+  if (!preserve.length && !notes.length) {
+    pb.textContent = '还没有记录。';
+  } else {
+    for (const p of preserve) {
+      const el = document.createElement('div');
+      el.className = 'preserve-item';
+      el.textContent = p;
+      pb.appendChild(el);
+    }
+    for (const n of notes) {
+      const el = document.createElement('div');
+      el.className = 'preserve-item note';
+      el.textContent = n.text;
+      pb.appendChild(el);
+    }
+  }
+  $('diagnosis-empty').hidden = (d.issues || []).length > 0;
+  $('diagnosis-state').textContent = d.generated_at ? `生成于 ${d.generated_at}` : '';
+}
+
+async function runDiagnosis() {
+  const caseDir = state.caseDir;
+  if (!caseDir) return;
+  $('diagnosis-state').textContent = '正在从本次检测结果生成诊断…';
+  let res;
+  try { res = await window.moodify.pipelineDiagnose(caseDir); } catch (err) { res = { ok: false, reason: err.message }; }
+  if (state.caseDir !== caseDir) return;
+  if (!res || !res.ok) {
+    $('diagnosis-state').textContent = '生成失败：' + ((res && res.reason) || '未知原因');
+    return;
+  }
+  renderDiagnosis(res.diagnosis);
+  await refreshPipeline();
+}
+
+async function saveDiagnosisNote() {
+  const caseDir = state.caseDir;
+  const note = $('diagnosis-note').value.trim();
+  if (!caseDir || !note) return;
+  let res;
+  try { res = await window.moodify.pipelineNote(caseDir, note, null); } catch { res = null; }
+  if (!res || !res.ok) return;
+  $('diagnosis-note').value = '';
+  renderDiagnosis(res.diagnosis);
+}
+
+// ——— ⑤ 方案 ———
+
+async function openPlan() {
+  if (!state.caseDir) return;
+  selectView('plan');
+  const caseDir = state.caseDir;
+  const snap = await refreshPipeline();
+  if (state.caseDir !== caseDir) return;
+
+  const gates = (snap && snap.gates) || {};
+  $('plan-readiness').textContent = gates.modeLabel
+    ? `当前路径：${gates.modeLabel}` + (gates.mode === 'FAST_STEREO_ONLY' ? '（未分轨/未提取结构）' : '')
+    : '尚未满足前置。';
+
+  let res;
+  try { res = await window.moodify.pipelineReadContext(caseDir); } catch { res = null; }
+  if (state.caseDir !== caseDir) return;
+  const box = $('plan-context');
+  box.textContent = '';
+  if (res && res.ok) {
+    box.appendChild(block('上下文包 context.json（只引用已存在的产物）', [
+      { label: '分析', value: JSON.stringify(res.context.analysis || {}) },
+      { label: '诊断', value: res.context.diagnosis || '（无）' },
+      { label: '分轨', value: res.context.stems ? `${res.context.stems.grade} · ${res.context.stems.engine || ''}` : '（无）' },
+      { label: 'MIDI', value: `${(res.context.midi || []).length} 个` },
+      { label: '曲谱', value: `${(res.context.score || []).length} 个` },
+      { label: '可用能力', value: (res.context.available_capabilities || []).map((c) => c.id).join('、'), cls: 'diag-note' },
+    ]));
+  } else {
+    box.appendChild(block('上下文包', [{ value: '还没构建。点「构建上下文」。', cls: 'diag-note' }]));
+  }
+
+  const db = $('plan-draft');
+  db.textContent = '';
+  let dres;
+  try { dres = await window.moodify.pipelineDiagnosis(caseDir); } catch { dres = null; }
+  if (state.caseDir !== caseDir) return;
+  if (dres && dres.ok) {
+    const dp = dres.diagnosis.draft_plan || {};
+    const nodes = dp.nodes || [];
+    db.appendChild(block('草稿方案（Core 产出）', nodes.length
+      ? nodes.map((n) => ({ label: n.op || '—', value: `${JSON.stringify(n.params || {})}`, cls: 'diag-note' }))
+      : [{ value: '没有草稿节点。', cls: 'diag-note' }]));
+  }
+}
+
+async function buildPlanContext() {
+  const caseDir = state.caseDir;
+  if (!caseDir) return;
+  $('plan-readiness').textContent = '正在构建上下文…';
+  let res;
+  try { res = await window.moodify.pipelineContext(caseDir); } catch (err) { res = { ok: false, reason: err.message }; }
+  if (state.caseDir !== caseDir) return;
+  if (!res || !res.ok) {
+    $('plan-readiness').textContent = '构建失败：' + ((res && res.reason) || '');
+    return;
+  }
+  await refreshPipeline();
+  await openPlan();
 }

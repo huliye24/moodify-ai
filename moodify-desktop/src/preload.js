@@ -82,4 +82,13 @@ contextBridge.exposeInMainWorld('moodify', {
   studioSelect: (caseDir, versionId, note) => ipcRenderer.invoke('studio:select', caseDir, versionId, note),
   studioAudio: (caseDir, versionId) => ipcRenderer.invoke('studio:audio', caseDir, versionId),
   studioExport: (caseDir, versionId) => ipcRenderer.invoke('studio:export', caseDir, versionId),
+
+  // 生产流程（TASK 002A）：检测 → 问题 → 分轨 → 结构 → 方案 → 成品。
+  // 阶段由产物推导；诊断是 Core report.json 的投影；context 只引用已存在的产物。
+  pipelineSnapshot: (caseDir) => ipcRenderer.invoke('pipeline:snapshot', caseDir),
+  pipelineDiagnose: (caseDir) => ipcRenderer.invoke('pipeline:diagnose', caseDir),
+  pipelineDiagnosis: (caseDir) => ipcRenderer.invoke('pipeline:diagnosis', caseDir),
+  pipelineNote: (caseDir, note, preserve) => ipcRenderer.invoke('pipeline:note', caseDir, note, preserve),
+  pipelineContext: (caseDir) => ipcRenderer.invoke('pipeline:context', caseDir),
+  pipelineReadContext: (caseDir) => ipcRenderer.invoke('pipeline:readContext', caseDir),
 });

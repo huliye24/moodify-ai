@@ -629,3 +629,94 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   margin-top: 10px;
 }
 .studio-spacer { flex: 1; }
+
+/* ——— 生产流程条（TASK 002A）———
+   先理解 → 再分解 → 最后处理。未满足前置的阶段锁定并灰显：
+   阶段能不能进，由 src/pipeline.js 从磁盘产物推导，渲染层不自己记进度。 */
+
+#pipeline-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px 10px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 10px;
+}
+
+#pipeline-stages { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.pipe-stage {
+  padding: 5px 12px;
+  font-size: 13px;
+  border-radius: 999px;
+}
+.pipe-stage.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.pipe-stage.locked,
+.pipe-stage:disabled {
+  color: #c7cbd1;
+  border-color: var(--hairline);
+  background: var(--bg);
+  cursor: not-allowed;
+}
+
+/* 完成模式徽章：深度 or 快速（仅立体声）。
+   跳过分离与结构是合法路径，但必须让人看见自己在哪条路上。 */
+.pipeline-mode {
+  margin-left: auto;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.pipeline-mode.deep { color: var(--accent); border-color: #c7d2fe; background: var(--accent-soft); }
+
+/* ——— ② 问题 / ⑤ 方案：证据块 ——— */
+
+#diagnosis-head, #plan-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.diagnosis-block { margin-bottom: 16px; }
+
+.diag-title {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.diag-row {
+  display: flex;
+  gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 13px;
+  align-items: baseline;
+}
+.diag-label {
+  flex: none;
+  min-width: 84px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.diag-value { flex: 1; min-width: 0; }
+.diag-note { flex: 1; min-width: 0; color: var(--muted); font-size: 12px; }
+
+#diagnosis-human { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+.note-row { display: flex; gap: 8px; margin-top: 6px; }
+.note-row input { flex: 1; }
+
+.preserve-list { margin-top: 8px; }
+.preserve-item {
+  font-size: 13px;
+  padding: 4px 0;
+}
+.preserve-item.note { color: var(--muted); font-size: 12px; }
