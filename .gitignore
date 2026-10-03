@@ -63,6 +63,19 @@ _github_moodify_ai/
 /web 3.0/
 /docs/mood/
 
+# ── MOOD Protocol line (Web3) — moved out of the mainline 2026-10-03 ──
+# The MOOD token line is live infrastructure, not residue: an EVM/BSC mainnet
+# BEP-20 token (MOOD, 0x1BB3115D43E397f7bb586F090831B02cA639e73E, 33,000,000
+# supply) with a deployed contract and DEX trading. MOODIFY_NETWORK_RESTRUCTURE_001
+# moved it out of the mainline WITHOUT deleting it from disk — the untracked part
+# of web 3.0/ is the contract authority for shipped code in
+# moodify-core-package/src/moodify/contribution/ (ruling of 2026-09-29).
+# DO NOT DELETE THESE FROM DISK. Recover tracking with:
+#   git checkout pre-network-restructure-2026-10-03 -- protocol/ apps/web e2e/staging
+/mood-web3-protocol/
+/apps/web/
+/e2e/
+
 # Machine-local asset workspaces
 local_audio_assets/
 models/
