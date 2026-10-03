@@ -15,7 +15,7 @@ exclude_dirs = [
   # 1.0 authoritative surface = moodify-core-package/src+moodify-core-package/tests
   #                            + apps/android + scripts + asset-registry + .github
   "_github_moodify_ai", "moodify-bridge", "moodify_runtime", "experiments",
-  "phys-lab", "docs", "data", "outputs", "tools/studio_session_prep"
+  "docs", "data", "outputs", "tools/studio_session_prep"
 ]
 exclude_globs = [
   "**/*.min.js",
