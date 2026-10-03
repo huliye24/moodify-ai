@@ -90,6 +90,15 @@ Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop �
 3. **Network 功能必须从真实用户循环生长**，不得先建网络再找用途。V1 的「网络」只有两个节点：Desktop ↔ 个人手机。
 4. **优先稳定、通用的技术**：`existing > standard library > mature OSS > commodity service > custom > experimental`。举证责任在 custom 与 experimental。（产品战略：可商用 > 技术先进。）
 5. **AI 不得自行扩大范围。** 未获人类批准，不得新增 server / login / social / account / cloud storage / P2P / 新框架；不得删除遗留 Android 项目；不得重写 Core 或 desktop。范围扩张需人类批准或走 MIP。
+6. **生产流程：先理解，再分解，最后处理。**（`Understand first. Decompose second. Process last.`）
+   Creator 侧流程固定为 **检测 → 问题 → 分轨 → 结构 → 方案 → 成品**。
+   **三个预设（`clean_master`/`warm_vocal`/`wide_space`）是成品阶段的工具，不是流程的起点**——
+   不得把它们放回「分析完立刻处理」的位置。阶段由磁盘产物推导（`moodify-desktop/src/pipeline.js`），
+   未满足前置的阶段不得进入。跳过分离/结构的快速路径必须显式标注 `快速（仅立体声）`。
+   诊断严格是 Core `report.json` 的投影：**不得发明测量事实**；
+   `issues: []` 只能说「当前规则未发现技术问题」，**不得**说「这首歌没问题」。
+   `preserve`（该保护什么）是听觉判断，默认留空由人填。
+   参见 `docs/canon/STUDIO_PRODUCTION_PIPELINE_V3.md`。
 
 **仍未裁决（不得当作已定论）：** `apps/android` 与 `apps/music-android` 哪一个是 canonical App；Creator 侧首要产品面是 CLI 还是 Studio。两者均记录为 `HUMAN_DECISION_REQUIRED`。
 
