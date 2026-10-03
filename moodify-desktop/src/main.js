@@ -1032,10 +1032,13 @@ function registerResearchIpc() {
       pair: { a: 'source', b: 'rendered' },
       versions: { a: record.versionA || 'source', b: (record.versionB || 'rendered') + (record.preset ? `(${record.preset})` : '') },
       preset: record.preset || null,
+      // 本次判断实际用的匹配状态（来自 Core 产物），不是界面勾选，也不是偏好值
       loudness_matched: record.loudnessMatched === true,
       choice: record.choice, // 'A' = 留源，'B' = 留修音产物
       kept: record.choice === 'A' ? 'source' : 'rendered',
-      judge_role: RESEARCH_ROLES.includes(prefs.role) ? prefs.role : 'listener',
+      // 角色以本次判断携带的为准，偏好只作兜底：两份账本不会记成不同角色
+      judge_role: RESEARCH_ROLES.includes(record.role) ? record.role
+        : (RESEARCH_ROLES.includes(prefs.role) ? prefs.role : 'listener'),
       notes: typeof record.notes === 'string' ? record.notes.slice(0, 500) : '',
       evidence_status: 'M3_candidate',
       research_mode: prefs.researchMode === true,

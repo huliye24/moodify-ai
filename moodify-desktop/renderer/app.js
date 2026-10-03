@@ -1407,7 +1407,7 @@ async function loadResearchCase() {
   ab.artifact = read.artifact;
   ab.freshness = read.freshness;
   renderAbArtifact();
-  await syncResearchPrefs();
+  try { await syncResearchPrefs(); } catch { /* 偏好读不到不阻塞产物展示 */ }
   updateRecordBtn();
 }
 
@@ -1581,7 +1581,9 @@ async function recordJudgment() {
         versionA: 'source',
         versionB: ((ab.artifact.b) || {}).name || 'rendered',
         preset: (((ab.artifact.b) || {}).mix_graph || {}).preset || null,
-        loudnessMatched: false, // 测出来的事实：v0.1 无匹配代理
+        // 读产物的事实，不由界面声明：v0.1 没有匹配代理 → NOT_MATCHED → false
+        loudnessMatched: (((ab.artifact || {}).loudness || {}).matching_status) === 'MATCHED',
+        role,
         choice: keep,
         comparisonRef: (ab.freshness || {}).artifact_sha256 || null,
       });
@@ -1595,6 +1597,9 @@ async function recordJudgment() {
     await loadResearchCase();
     $('rp-status').textContent = `已记录：保留 ${payload.keep}（${payload.kept}）`
       + `· 角色 ${payload.role} · 第 ${payload.count} 条${ledger}`;
+  } catch (err) {
+    // IPC 层失败也必须留下明确状态，不能停在「记录中…」冒充成功
+    $('rp-status').textContent = `记录失败：${err.message || err}`;
   } finally {
     ab.busy = false;
     updateRecordBtn();
@@ -1724,10 +1729,14 @@ async function abToggle(side) {
   }
   if (ab.caseDir !== caseDir) return;
   abHalt();
-  abStart(side, switchFrom);
-  $('rp-ab-state').textContent = ab.side === 'A'
-    ? '正在听 A（源）——点「▶ B」从同一位置切到修音产物。'
-    : '正在听 B（修音产物）——点「▶ A」从同一位置切回源。';
+  try {
+    abStart(side, switchFrom);
+    $('rp-ab-state').textContent = ab.side === 'A'
+      ? '正在听 A（源）——点「▶ B」从同一位置切到修音产物。'
+      : '正在听 B（修音产物）——点「▶ A」从同一位置切回源。';
+  } catch (err) {
+    $('rp-ab-state').textContent = `播放失败：${err.message || err}`;
+  }
 }
 
 
