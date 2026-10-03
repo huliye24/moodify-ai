@@ -16,6 +16,10 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
+// Studio v0.2: the processing backend contract + the version layer. Both are plain
+// Node modules with no Electron import, so they can be exercised headlessly.
+const studioBackends = require('./backends');
+const studio = require('./studio');
 
 const CASES_ROOT = process.env.MOODIFY_CASES_ROOT
   || path.join(os.homedir(), '.moodify', 'cases');
@@ -420,6 +424,7 @@ function registerIpc() {
   registerCodexIpc();
   registerResearchIpc();
   registerCompareIpc();
+  registerStudioV02Ipc();
   ipcMain.handle('env', async () => {
     const probe = await runPython(['-c', 'import moodify'], 60 * 1000).catch(() => null);
     return {
@@ -953,6 +958,186 @@ function recordFinishingEvidence(caseDir, preset, evidenceJsonPath) {
   fs.appendFileSync(RESEARCH_EVIDENCE, JSON.stringify(entry) + '\n');
   const count = fs.readFileSync(RESEARCH_EVIDENCE, 'utf8').trim().split('\n').filter(Boolean).length;
   return { ok: true, evidenceId: entry.evidence_id, stage: 'render', preset, operator_count: enabledNodes.length, count };
+}
+
+// ——— Studio v0.2：选目标 → 一键让 AI 处理 → 试听选择 → 导出 ———
+//
+// 产品定义（人类 2026-10-03，APPROVED）：把歌丢进去，AI 自动试后处理，人只负责听和选。
+// 本节只做「接线」，不复制任何能力：
+//   后处理 = Core 的 `protocol process` 作业（内部是 v01_pipeline.process_audio）
+//   导出   = Core 的 `finishing export`（内部是 export_delivery）
+//   壳不实现 DSP、不算响度、不写音频字节，也不替用户做选择。
+// 所有 caseDir 先经 resolveGuardedCase：必须落在 CASES_ROOT 内且确实是 case。
+
+function registerStudioV02Ipc() {
+  const localBackend = studioBackends.getBackend('local');
+
+  // 目标清单由后端层提供，前端不硬编码 —— 新增预设时不会两边漂移。
+  ipcMain.handle('studio:targets', async () => ({
+    ok: true,
+    defaultTarget: localBackend.DEFAULT_TARGET,
+    defaultMode: studioBackends.DEFAULT_MODE,
+    backends: studioBackends.describeBackends(),
+    targets: localBackend.TARGETS.map((id) => ({
+      id, label: studio.targetLabel(id), available: true,
+    })),
+    // 产品书写了、但 Core 做不到的目标：显式列出并标记不可用。
+    // 不映射到别的预设 —— 按钮承诺什么就必须做什么。
+    planned: studio.PLANNED_TARGETS.map((p) => ({
+      id: p.id, label: studio.targetLabel(p.id), available: false, reason: p.reason,
+    })),
+  }));
+
+  // 版本清单 = 原版（指向 case 源，不复制）+ 每次 AI 尝试。附上人类已做的选择。
+  ipcMain.handle('studio:versions', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    return {
+      ok: true,
+      source: resolveCaseSource(dir),
+      versions: studio.listVersions(dir, resolveCaseSource(dir)),
+      selection: studio.readSelection(dir),
+      meta: studio.readMeta(dir),
+    };
+  });
+
+  // 「让 AI 处理」。每次调用落在**新的** attempt 目录：既满足 Core 的
+  // 「拒绝覆盖已存在输出」守卫，也满足产品书 2.2「再试一次不得静默覆盖已确认版本」。
+  ipcMain.handle('studio:process', async (_e, caseDir, target, mode) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const src = resolveCaseSource(dir);
+    if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+
+    let backend;
+    try { backend = studioBackends.getBackend(mode || studioBackends.DEFAULT_MODE); }
+    catch (err) { return { ok: false, reason: err.message }; }
+
+    studio.ensureDirs(dir);
+    const attemptId = studio.newAttemptId();
+    const versionDir = studio.createAttemptDir(dir, attemptId);
+
+    const result = await backend.process(
+      { sourcePath: src, target, versionDir, attemptId },
+      { runPython, lastJsonLine },
+    );
+    // 失败时清掉空壳目录，避免版本列表里冒出没有音频的条目
+    if (!result.ok) {
+      try { fs.rmSync(versionDir, { recursive: true, force: true }); } catch { /* best effort */ }
+      return result;
+    }
+    studio.writeMeta(dir, { last_target: target, last_mode: backend.kind });
+    return {
+      ok: true,
+      attemptId,
+      output: result.output,
+      // 产品书 1.3：导出前状态一律为「待人确认」。这里原样回传 Core 的状态，
+      // 前端不得把它显示成「已验证」。
+      status: result.evidence.status,
+      reviewRequired: result.evidence.review_required === true,
+      evidence: result.evidence,
+      versions: studio.listVersions(dir, src),
+    };
+  });
+
+  ipcMain.handle('studio:evidence', async (_e, caseDir, versionId) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const evidence = studio.readEvidence(dir, versionId);
+    return evidence ? { ok: true, evidence } : { ok: false, reason: 'NO_EVIDENCE' };
+  });
+
+  // 人类的选择：只有显式动作才会写入，永不自动。
+  ipcMain.handle('studio:select', async (_e, caseDir, versionId, note) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    if (!versionId) return { ok: false, reason: 'NO_VERSION' };
+    return { ok: true, selection: studio.writeSelection(dir, { versionId, note }) };
+  });
+
+  // 试听某个版本。沿用 compare:audio 的守卫思路：音频必须落在本 case 内
+  // （原版是例外——它是 case 自己记录的源文件）。
+  ipcMain.handle('studio:audio', async (_e, caseDir, versionId) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) throw new Error('INVALID_CASE_DIR');
+    let file;
+    if (versionId === 'original') {
+      file = resolveCaseSource(dir);
+    } else {
+      const v = studio.listVersions(dir, null).find((x) => x.id === versionId);
+      file = v && v.audioPath;
+    }
+    if (!file || !fs.existsSync(file)) throw new Error('AUDIO_NOT_AVAILABLE');
+    const real = fs.realpathSync(file);
+    if (versionId !== 'original' && !insideDir(fs.realpathSync(dir), real)) {
+      throw new Error('AUDIO_OUTSIDE_CASE');
+    }
+    return fs.promises.readFile(real);
+  });
+
+  // 导出：复用 Core 的 delivery 编码（export_delivery），再把结果复制到用户选定路径。
+  // 导出是**显式动作**：这里是唯一把音频写出 case 之外的地方。
+  ipcMain.handle('studio:export', async (event, caseDir, versionId) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+
+    let audioPath;
+    if (versionId === 'original') {
+      audioPath = resolveCaseSource(dir);
+    } else {
+      const v = studio.listVersions(dir, null).find((x) => x.id === versionId);
+      audioPath = v && v.audioPath;
+    }
+    if (!audioPath || !fs.existsSync(audioPath)) return { ok: false, reason: 'AUDIO_NOT_AVAILABLE' };
+
+    const outDir = studio.exportDir(dir);
+    fs.mkdirSync(outDir, { recursive: true });
+    const res = await runPython([
+      '-m', 'moodify.release_cli', 'finishing', 'export',
+      '--audio', audioPath, '--output-dir', outDir,
+    ]);
+    if (res.code !== 0) {
+      return { ok: false, code: res.code, reason: res.stderr.trim().slice(-300) || '导出失败' };
+    }
+    const exported = lastJsonLine(res.stdout);
+    if (!exported || !exported.output || !fs.existsSync(exported.output)) {
+      return { ok: false, reason: '导出命令成功但未找到产物' };
+    }
+
+    const suggested = path.basename(exported.output);
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const picked = await dialog.showSaveDialog(win, {
+      title: '导出音频',
+      defaultPath: suggested,
+      filters: [{ name: 'WAV 音频', extensions: ['wav'] }],
+    });
+    if (picked.canceled || !picked.filePath) {
+      // 用户取消：case 内的导出产物保留（它是记录），但不写到用户路径
+      return { ok: false, canceled: true, reason: '已取消导出' };
+    }
+    try {
+      fs.copyFileSync(exported.output, picked.filePath);
+    } catch (err) {
+      return { ok: false, reason: '写入目标路径失败：' + err.message };
+    }
+
+    // 导出记录：写进 case，供日后回答「导出的是哪一版」
+    const record = {
+      schema: 'moodify.studio.export/0.1',
+      version_id: versionId,
+      source_audio: audioPath,
+      case_output: exported.output,
+      user_path: picked.filePath,
+      output_sha256: exported.output_sha256 || null,
+      applied_peak_trim_db: exported.applied_peak_trim_db,
+      exported_at: new Date().toISOString(),
+    };
+    try {
+      fs.writeFileSync(path.join(outDir, 'export_record.json'), JSON.stringify(record, null, 2), 'utf8');
+    } catch { /* record is best-effort; the audio is already written */ }
+
+    return { ok: true, path: picked.filePath, sha256: exported.output_sha256 || null, record };
+  });
 }
 
 function registerResearchIpc() {

@@ -553,3 +553,79 @@ table.data tbody tr.static:hover { background: transparent; cursor: default; }
   padding: 10px 14px;
   margin-top: 12px;
 }
+
+/* ——— 后处理（Studio v0.2 主流程）———
+   试听与选择是第一优先级：版本列表在最上，波形紧接其下，导出在最后。
+   数据/图表仍是次要页（顶部标签页），不在此视图里重复。 */
+
+#studio-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.studio-targets { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.studio-target {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 999px;
+}
+.studio-target.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* 产品书列了、Core 还没有的目标：显示但不可点，不假装可用 */
+.studio-target.planned {
+  color: var(--muted);
+  border-style: dashed;
+  cursor: default;
+}
+.studio-target.planned:hover { background: var(--bg); }
+
+.studio-backend { margin-left: auto; font-size: 12px; }
+
+.studio-versions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0;
+}
+
+.studio-version {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.studio-version.active { border-color: var(--accent); background: var(--accent-soft); }
+.studio-version .sv-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.sv-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.sv-badge.sv-original { color: var(--fg); }
+/* 「已处理，待人确认」= Core 的 processed_review_required。
+   刻意不用绿色/成功色：处理跑完不等于音频通过了审听。 */
+.sv-badge.sv-review { color: #92400e; border-color: #fcd34d; background: #fffbeb; }
+
+.sv-chosen { font-size: 11px; color: var(--accent); white-space: nowrap; }
+
+#studio-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.studio-spacer { flex: 1; }

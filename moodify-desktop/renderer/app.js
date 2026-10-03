@@ -23,7 +23,7 @@ const state = {
   convStarted: false,   // 本会话是否已开始 AI 对话（决定抽屉把手是否出现）
 };
 
-const VIEWS = ['empty', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
+const VIEWS = ['empty', 'studio', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
 const VIEW_TAB = {
   data: 'tab-data',
   spectrum: 'tab-spectrum',
@@ -134,6 +134,7 @@ function selectView(name) {
   for (const [view, tabId] of Object.entries(VIEW_TAB)) {
     $(tabId).classList.toggle('active', view === name);
   }
+  $('rail-studio').classList.toggle('active', name === 'studio');
   $('rail-fix').classList.toggle('active', name === 'bench');
   $('rail-stems').classList.toggle('active', name === 'stems');
   $('rail-score').classList.toggle('active', name === 'score');
@@ -151,6 +152,7 @@ async function openReport(reportPath) {
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
   destroyBench(); // 换世界：旧工作台实例销毁
   resetStudioTools(); // 换世界：分离/曲谱工作台复位（产物留在旧世界目录）
+  resetStudioWorld(); // 换世界：后处理视图复位（版本产物留在旧世界目录）
 
   $('source-name').textContent = (report.source || {}).name || '?';
   $('case-title').hidden = false;
@@ -2297,6 +2299,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   initPermToggle();
   initDrawer();
   initDrop();
+  initStudio();
   await ensureCompiler();
   await refreshArchive();
 });
@@ -2318,4 +2321,304 @@ function initDrop() {
     const p = await window.moodify.pathForFile(file);
     if (p) await runAnalysisPath(p);
   });
+}
+
+// ——— 后处理（Studio v0.2 主流程）———
+//
+// 产品定义（人类 2026-10-03，APPROVED）：把歌丢进去，AI 自动试后处理，人只负责听和选。
+//
+// 本段只做「发起」与「呈现」：
+//   后处理 = Core 的 protocol process 作业（内部 v01_pipeline.process_audio）
+//   导出   = Core 的 finishing export（内部 export_delivery）
+// 渲染层不实现 DSP、不算响度、不替用户做选择，也不把 Core 的
+// 「processed_review_required」显示成「已验证」。
+//
+// 版本落在 <case>/studio/versions/；为何复用现有 case 而不另起一套，见 src/studio.js。
+
+const studio = {
+  caseDir: null,
+  targets: [],
+  planned: [],
+  versions: [],
+  selection: null,
+  selectedId: null,
+  ws: null,
+  running: false,
+  targetsLoaded: false,
+};
+
+function initStudio() {
+  $('rail-studio').addEventListener('click', openStudio);
+  $('studio-run').addEventListener('click', runStudioProcess);
+  $('studio-play').addEventListener('click', () => {
+    if (studio.ws) studio.ws.playPause();
+  });
+  $('studio-use').addEventListener('click', useStudioVersion);
+  $('studio-export').addEventListener('click', exportStudioVersion);
+}
+
+function resetStudioWorld() {
+  destroyStudioWave();
+  studio.caseDir = null;
+  studio.versions = [];
+  studio.selection = null;
+  studio.selectedId = null;
+  $('studio-versions').textContent = '';
+  $('studio-track').hidden = true;
+  $('studio-status').textContent = '';
+  $('studio-note').textContent = '';
+  setStudioActionsEnabled(false);
+}
+
+function destroyStudioWave() {
+  if (studio.ws) { try { studio.ws.destroy(); } catch { /* already gone */ } }
+  studio.ws = null;
+}
+
+function setStudioActionsEnabled(on) {
+  $('studio-use').disabled = !on;
+  $('studio-export').disabled = !on;
+}
+
+// 目标清单来自后端层（studio:targets），前端不硬编码预设名——
+// 这样新增一个 Core 预设时，UI 不会和 Core 漂移。
+async function loadStudioTargets() {
+  if (studio.targetsLoaded) return;
+  let res;
+  try { res = await window.moodify.studioTargets(); } catch { return; }
+  if (!res || !res.ok) return;
+  studio.targets = res.targets || [];
+  studio.planned = res.planned || [];
+  studio.defaultTarget = res.defaultTarget;
+  studio.targetsLoaded = true;
+
+  const box = $('studio-targets');
+  box.textContent = '';
+  for (const t of studio.targets) {
+    const btn = document.createElement('button');
+    btn.className = 'studio-target';
+    btn.dataset.target = t.id;
+    btn.textContent = t.label;
+    btn.title = t.id;
+    btn.addEventListener('click', () => {
+      for (const b of box.querySelectorAll('.studio-target')) b.classList.remove('active');
+      btn.classList.add('active');
+      $('studio-run').dataset.target = t.id;
+    });
+    box.appendChild(btn);
+    if (t.id === studio.defaultTarget) btn.classList.add('active');
+  }
+  $('studio-run').dataset.target = studio.defaultTarget;
+
+  // 产品书列了、Core 做不到的目标：显示出来并禁用，绝不静默映射到别的预设
+  for (const p of studio.planned) {
+    const btn = document.createElement('button');
+    btn.className = 'studio-target planned';
+    btn.textContent = p.label + '（即将推出）';
+    btn.title = p.reason || '';
+    btn.disabled = true;
+    box.appendChild(btn);
+  }
+
+  const backend = (res.backends || []).find((b) => b.mode === res.defaultMode);
+  $('studio-backend').textContent = backend ? `处理位置：${backend.label}` : '';
+}
+
+async function openStudio() {
+  if (!state.caseDir) return;
+  selectView('studio');
+  studio.caseDir = state.caseDir;
+  await loadStudioTargets();
+  await refreshStudioVersions();
+}
+
+async function refreshStudioVersions() {
+  const caseDir = studio.caseDir;
+  if (!caseDir) return;
+  let res;
+  try { res = await window.moodify.studioVersions(caseDir); } catch { return; }
+  if (!res || !res.ok || studio.caseDir !== caseDir) return; // world-switch guard
+  studio.versions = res.versions || [];
+  studio.selection = res.selection || null;
+  renderStudioVersions();
+  // 默认选中：人类选过的那一版，否则原版
+  const preferred = (studio.selection && studio.selection.version_id)
+    || (studio.versions[0] && studio.versions[0].id);
+  if (preferred) await selectStudioVersion(preferred);
+}
+
+function renderStudioVersions() {
+  const box = $('studio-versions');
+  box.textContent = '';
+  for (const v of studio.versions) {
+    const row = document.createElement('button');
+    row.className = 'studio-version';
+    row.dataset.versionId = v.id;
+    if (v.id === studio.selectedId) row.classList.add('active');
+    if (studio.selection && studio.selection.version_id === v.id) row.classList.add('chosen');
+
+    const name = document.createElement('span');
+    name.className = 'sv-name';
+    name.textContent = v.label + (v.kind === 'ai' ? ` · ${v.target || ''}` : '');
+    row.appendChild(name);
+
+    const badge = document.createElement('span');
+    badge.className = 'sv-badge';
+    if (v.kind === 'original') {
+      badge.textContent = '原始';
+      badge.classList.add('sv-original');
+    } else if (v.status === 'processed_review_required') {
+      // Core 的语义：处理跑完了，但没人听过。绝不显示成「已验证」。
+      badge.textContent = '已处理，待人确认';
+      badge.classList.add('sv-review');
+    } else {
+      badge.textContent = v.status || '—';
+    }
+    row.appendChild(badge);
+
+    if (studio.selection && studio.selection.version_id === v.id) {
+      const tick = document.createElement('span');
+      tick.className = 'sv-chosen';
+      tick.textContent = '✓ 你的选择';
+      row.appendChild(tick);
+    }
+
+    row.addEventListener('click', () => selectStudioVersion(v.id));
+    box.appendChild(row);
+  }
+}
+
+async function selectStudioVersion(versionId) {
+  const caseDir = studio.caseDir;
+  if (!caseDir) return;
+  studio.selectedId = versionId;
+  renderStudioVersions();
+  $('studio-note').textContent = '';
+  showStudioEvidence(caseDir, versionId);
+
+  let bytes;
+  try { bytes = await window.moodify.studioAudio(caseDir, versionId); }
+  catch { $('studio-note').textContent = '这一版暂时无法试听。'; return; }
+  if (studio.caseDir !== caseDir) return; // world switched mid-read
+
+  try {
+    const ab = bytes instanceof ArrayBuffer ? bytes
+      : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    const ctx = new AudioContext();
+    const audio = await ctx.decodeAudioData(ab);
+    await ctx.close();
+    if (studio.caseDir !== caseDir) return;
+    mountStudioWave(audio);
+    setStudioActionsEnabled(true);
+  } catch {
+    $('studio-note').textContent = '这一版解码失败，无法试听。';
+    setStudioActionsEnabled(false);
+  }
+}
+
+function mountStudioWave(audioBuffer) {
+  destroyStudioWave();
+  $('studio-track').hidden = false;
+  studio.ws = WaveSurfer.create({
+    container: $('studio-wave'),
+    backend: 'WebAudio',
+    height: 96,
+    splitChannels: true,
+    responsive: true,
+    scroll: true,
+    waveColor: 'rgba(79, 70, 229, 0.38)',
+    progressColor: 'rgba(79, 70, 229, 0.82)',
+    cursorColor: '#16181d',
+    cursorWidth: 1,
+    plugins: [WaveSurfer.timeline.create({
+      container: $('studio-ruler'),
+      fontSize: 10,
+      primaryColor: '#d1d5db',
+      secondaryColor: '#f3f4f6',
+      primaryFontColor: '#9ca3af',
+      secondaryFontColor: '#c7cbd1',
+    })],
+  });
+  $('studio-time').textContent = `0:00.0 / ${fmtTime(audioBuffer.duration)}`;
+  studio.ws.on('timeupdate', (t) => {
+    if (studio.ws) {
+      $('studio-time').textContent = `${fmtTime(t)} / ${fmtTime(studio.ws.getDuration() || 0)}`;
+    }
+  });
+  studio.ws.on('play', () => { $('studio-play').textContent = '⏸'; });
+  studio.ws.on('pause', () => { $('studio-play').textContent = '▶'; });
+  studio.ws.on('finish', () => { $('studio-play').textContent = '▶'; });
+  studio.ws.loadDecodedBuffer(audioBuffer);
+}
+
+async function runStudioProcess() {
+  const caseDir = studio.caseDir;
+  if (!caseDir || studio.running) return;
+  const target = $('studio-run').dataset.target;
+  if (!target) return;
+
+  studio.running = true;
+  $('studio-run').disabled = true;
+  $('studio-status').textContent = 'AI 正在处理…（本机）';
+  const t0 = Date.now();
+  let res;
+  try { res = await window.moodify.studioProcess(caseDir, target, 'local'); }
+  catch (err) { res = { ok: false, reason: (err && err.message) || String(err) }; }
+  studio.running = false;
+  $('studio-run').disabled = false;
+  if (studio.caseDir !== caseDir) return; // world-switch guard
+
+  if (!res || !res.ok) {
+    $('studio-status').textContent = '处理失败：' + ((res && res.reason) || '未知原因');
+    return;
+  }
+  const secs = ((Date.now() - t0) / 1000).toFixed(1);
+  // 产品书 1.3：导出前一律「待人确认」。这里显示的是 Core 的真实状态，不是我们自己编的结论。
+  $('studio-status').textContent =
+    `已生成一版（${secs}s）· 已处理，待人确认 —— 请听，然后决定用不用它。`;
+  studio.versions = res.versions || studio.versions;
+  await refreshStudioVersions();
+  if (res.attemptId) await selectStudioVersion(res.attemptId);
+}
+
+// 产品书 1.3「证据优先」：每次 AI 尝试都留有可复现记录。
+// 这里只把它**显示出来**——原始文件在版本目录的 evidence.json，
+// 内容是 Core 自己写的，本壳不做任何转述或美化。
+async function showStudioEvidence(caseDir, versionId) {
+  if (versionId === 'original') return; // 原版没有处理证据
+  let res;
+  try { res = await window.moodify.studioEvidence(caseDir, versionId); } catch { return; }
+  if (!res || !res.ok || studio.caseDir !== caseDir) return;
+  const ev = res.evidence || {};
+  const short = (h) => (h ? String(h).slice(0, 12) + '…' : '—');
+  $('studio-note').textContent =
+    `证据：输入 ${short(ev.source_sha256)} → 输出 ${short(ev.output_sha256)}`
+    + ` · 预设 ${ev.preset || '—'} · ${ev.created_at || ''}`;
+}
+
+async function useStudioVersion() {
+  const caseDir = studio.caseDir;
+  if (!caseDir || !studio.selectedId) return;
+  let res;
+  try { res = await window.moodify.studioSelect(caseDir, studio.selectedId); }
+  catch (err) { $('studio-note').textContent = '记录失败：' + (err.message || err); return; }
+  if (!res || !res.ok) { $('studio-note').textContent = '记录失败：' + ((res && res.reason) || ''); return; }
+  studio.selection = res.selection;
+  renderStudioVersions();
+  const v = studio.versions.find((x) => x.id === studio.selectedId);
+  $('studio-note').textContent = `已选：${v ? v.label : studio.selectedId}。可继续「再试一次」或导出。`;
+}
+
+async function exportStudioVersion() {
+  const caseDir = studio.caseDir;
+  if (!caseDir || !studio.selectedId) return;
+  $('studio-note').textContent = '正在导出…';
+  let res;
+  try { res = await window.moodify.studioExport(caseDir, studio.selectedId); }
+  catch (err) { $('studio-note').textContent = '导出失败：' + (err.message || err); return; }
+  if (!res || !res.ok) {
+    $('studio-note').textContent = res && res.canceled ? '已取消导出。' : ('导出失败：' + ((res && res.reason) || ''));
+    return;
+  }
+  $('studio-note').textContent = `已导出：${res.path}`;
 }

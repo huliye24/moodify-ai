@@ -4,7 +4,9 @@
   "description": "Moodify — company desktop shell: pick a song, detect, read data & charts, get the repair/mixing plan. The core stays in moodify-core-package (pip); this shell orchestrates it.",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "check:contracts": "node scripts/check-contracts.js",
+    "test": "node scripts/check-contracts.js && node scripts/test-studio.js"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {
