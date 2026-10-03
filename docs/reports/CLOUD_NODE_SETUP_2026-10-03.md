@@ -87,20 +87,9 @@ moodify-integration.timer     enabled, every 6h (OnBootSec=15min + OnUnitActiveS
 
 ## 5. Integration result
 
-```json
-{
-  "schema": "moodify.cloud.integration/0.1",
-  "commit_sha": "37234485815c0313e211a8b38f75248fb9d43666",
-  "started_at": "2026-10-03T13:34:41Z",
-  "ended_at":   "2026-10-03T13:39:04Z",
-  "duration_s": 263,
-  "status": "PASS",
-  "failed_step": null,
-  "host": "moodify-global-engine"
-}
-```
+Two runs are recorded, because the first was against a commit that predated a merge.
 
-Steps:
+### First run — `3723448` (PR #35 still unmerged)
 
 ```text
 PASS  01-structure-guard        PASS  04-studio-contracts      PASS  07-protocol-tests
@@ -108,11 +97,49 @@ PASS  02-ruff                   SKIP  05-studio-pipeline       PASS  08-pipeline
 PASS  03-core-tests             PASS  06-v02-studio-chain
 ```
 
-`05-studio-pipeline` skips because that file is in an **unmerged PR**; its absence on this
-commit is not a failure of this commit.
+`05-studio-pipeline` skipped because that file existed only in an unmerged PR. **A check whose
+file has not merged is a `SKIP`, never a `FAIL`** — inventing alarms CI cannot see is how a
+verifier loses credibility.
 
-Health report confirms: `commit 3723448 (in sync with origin/main)`, `last FAIL: none`,
+### Second run — `01edc902` (current `origin/main`, PR #35 merged)
+
+```json
+{
+  "schema": "moodify.cloud.integration/0.1",
+  "commit_sha": "01edc902d72c15010dd86390dc0511fc03fb6323",
+  "started_at": "2026-10-03T13:53:47Z",
+  "ended_at":   "2026-10-03T13:58:09Z",
+  "duration_s": 262,
+  "status": "PASS",
+  "failed_step": null,
+  "host": "moodify-global-engine"
+}
+```
+
+**All eight steps passed — no skips:**
+
+```text
+PASS 01-structure-guard    PASS 04-studio-contracts    PASS 07-protocol-tests
+PASS 02-ruff               PASS 05-studio-pipeline     PASS 08-pipeline-smoke
+PASS 03-core-tests         PASS 06-v02-studio-chain
+```
+
+Underlying counts from that run:
+
+```text
+03-core-tests       1196 passed, 6 skipped   (242.5s)
+05-studio-pipeline    33 passed, 0 failed
+```
+
+`05` became a real assertion run the moment its file reached `main`, which is the behaviour
+the SKIP rule was designed to produce.
+
+Health report confirms: `commit 01edc902 (in sync with origin/main)`, `last FAIL: none`,
 `consecutive failures: 0`, `nginx: active`, `timer: active`, `WARNINGS: none`.
+
+> The node's `moodify-api`, `moodify-worker`, `moodify-music`, `moodify-music-bff`,
+> `cloudflared-moodify` and `nginx` services were checked at every step of both runs and
+> stayed `active` throughout.
 
 ---
 

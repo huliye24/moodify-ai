@@ -268,7 +268,216 @@ and a note; no code, no ports, no configuration.
 
 ---
 
-## 12. Related documents
+## 12. Reference card — copy these, do not guess
+
+Everything in this section was read off the running node, not written from memory.
+
+### 12.1 Last verified commit
+
+```text
+commit   : 01edc902d72c15010dd86390dc0511fc03fb6323   (= origin/main at the time)
+status   : PASS          duration: 262s          failed: none
+ran      : 2026-10-03T13:53:47Z → 13:58:09Z
+artifacts: /opt/moodify/artifacts/integration/01edc902d72c15010dd86390dc0511fc03fb6323
+```
+
+All eight steps passed, including `05-studio-pipeline` — which reads `SKIP` on any commit
+that does not yet contain that file, and becomes a real result once it is merged.
+
+```text
+PASS 01-structure-guard    PASS 04-studio-contracts    PASS 07-protocol-tests
+PASS 02-ruff               PASS 05-studio-pipeline     PASS 08-pipeline-smoke
+PASS 03-core-tests         PASS 06-v02-studio-chain
+```
+
+Underlying numbers from that run: `03-core-tests` = **1196 passed, 6 skipped**;
+`05-studio-pipeline` = **33 passed, 0 failed**.
+
+### 12.2 systemd units
+
+```text
+/etc/systemd/system/moodify-integration.service     Type=oneshot, User=moodify
+/etc/systemd/system/moodify-integration.timer       enabled
+```
+
+### 12.3 Scripts
+
+```text
+/opt/moodify/scripts/update_repo.sh          fetch + reset --hard origin/main
+/opt/moodify/scripts/run_integration.sh      8 checks; writes PASS/FAIL + summary
+/opt/moodify/scripts/smoke_pipeline.sh       audio smoke chain
+/opt/moodify/scripts/cleanup_artifacts.sh    retention (the ONLY deleter)
+/opt/moodify/scripts/health_report.sh        writes artifacts/health/latest.txt
+```
+
+### 12.4 Commands
+
+```bash
+# THE one command to trigger a full verification (pulls latest main first)
+sudo systemctl start moodify-integration.service
+
+# latest result
+cat /opt/moodify/artifacts/integration/$(sudo -u moodify git -C /opt/moodify/repo rev-parse HEAD)/summary.txt
+
+# latest logs (live, or the last N lines)
+journalctl -u moodify-integration.service -f
+journalctl -u moodify-integration.service -n 200
+
+# one step's log
+D=/opt/moodify/artifacts/integration/$(sudo -u moodify git -C /opt/moodify/repo rev-parse HEAD)
+cat $D/logs/03-core-tests.log
+
+# health report
+cat /opt/moodify/artifacts/health/latest.txt
+
+# re-run after a failure (otherwise status shows the stale failure)
+sudo systemctl reset-failed moodify-integration.service
+```
+
+### 12.5 Paths, and what may be deleted
+
+```text
+MAY be deleted by cleanup_artifacts.sh (and nothing else):
+  /opt/moodify/artifacts/**      (integration runs, health reports)
+  /opt/moodify/logs/**           (*.log)
+
+Written but never auto-deleted:
+  /opt/moodify/artifacts/health/latest.txt    (overwritten each run)
+
+Reserved, empty, no code:
+  /opt/moodify/staging/          /opt/moodify/staging/relay/
+  /opt/moodify/cache/            /opt/moodify/backups/
+
+The verifier's own working area:
+  /opt/moodify/repo/             git clone, hard-reset every run
+  /opt/moodify/runtime/venv/     engineering venv
+```
+
+`cleanup_artifacts.sh` **refuses** any base path other than `/opt/moodify/artifacts` and
+`/opt/moodify/logs` — a mis-set variable fails loudly instead of deleting somewhere else.
+
+Current footprint: artifacts 33 MB · logs 4 KB · repo 407 MB · runtime 646 MB (~1.1 GB).
+
+### 12.6 Git update policy
+
+```text
+branch      : main only
+update      : git fetch origin --prune
+              git checkout main
+              git reset --hard origin/main
+clean       : ONLY paths listed in CLEAN_PATHS in update_repo.sh
+              NEVER `git clean -fdx` over the whole tree
+```
+
+**The cloud worktree is not a development tree.** Manual edits to `/opt/moodify/repo` are
+forbidden — they are destroyed by the next `reset --hard`, and if they somehow survive they
+make every subsequent verification a statement about modified code rather than about `main`.
+
+### 12.7 GitHub permission boundary — read-only, enforced
+
+```text
+fetch       : allowed
+push        : DISABLED BY CONFIGURATION
+```
+
+```text
+origin  https://github.com/huliye24/moodify-ai.git (fetch)
+origin  DISABLED_BY_POLICY_read_only_verifier      (push)
+```
+
+There are no stored credentials for the `moodify` user (no `.git-credentials`, no `.netrc`,
+no credential helper), so the node could not authenticate even before this. The push URL is
+disabled anyway, so an accidental `git push` **fails immediately with a clear message**
+instead of depending on a credential being absent:
+
+```text
+fatal: 'DISABLED_BY_POLICY_read_only_verifier' does not appear to be a git repository
+```
+
+The node **verifies**. It never publishes, merges, tags, or writes to GitHub.
+
+### 12.8 Pinned baseline
+
+Machine differences, not code differences, are the usual cause of "CI passes but the node
+fails". Compare against this table first:
+
+| Tool | Version | Notes |
+|---|---|---|
+| Python | **3.10.12** | both system and venv |
+| ruff | **0.15.15** | **pinned to match `.github/workflows/*.yml`** |
+| pytest | 9.1.1 | |
+| Node | **v20.19.4** | `/usr/local/bin/node`; a second `/opt/node22` exists (not this node's) |
+| npm | 10.8.2 | |
+| FFmpeg | **4.4.2** | `4.4.2-0ubuntu0.22.04.1` |
+| git | 2.34.1 | |
+| moodify | 1.0.0-rc.1 | editable, from `/opt/moodify/repo/moodify-core-package` |
+
+The ruff pin is load-bearing: unpinned, the venv resolved 0.16.10 and reported **857 errors**
+on a tree CI passes with 0.15.15.
+
+### 12.9 Resource envelope
+
+```text
+systemd      Nice=10   CPUWeight=20   IOWeight=20   TimeoutStartSec=5400 (90 min)
+schedule     OnBootSec=15min + OnUnitActiveSec=6h + RandomizedDelaySec=120 + Persistent
+retention    successful runs 7 days · failed runs 14 days
+             latest PASS and latest FAIL always kept
+concurrency  1 (systemd runs one instance; a second start is queued, not parallel)
+logs         14 days
+```
+
+Thresholds that raise a warning in `logs/health.log`: disk > 80%, RAM > 90%, three
+consecutive integration failures. **No alerting service** — by design.
+
+A hung check is bounded by `TimeoutStartSec=5400`, so it cannot block the next scheduled run.
+
+### 12.10 Production forbidden zones — never modify
+
+The Cloud Verification Agent must **never** write to, restart, reconfigure, or delete:
+
+```text
+SERVICES (production, Moodify)
+  moodify-api.service          moodify-worker.service
+  moodify-music.service        moodify-music-bff.service
+  cloudflared-moodify.service   nginx.service
+
+SERVICES (other project — not ours at all)
+  duoweilai.service  duoweilai-webhook.service
+
+DIRECTORIES (production, root-owned)
+  /opt/moodify/releases/       /opt/moodify/current -> releases/…
+  /opt/moodify/venv/           /opt/moodify/music/     /opt/moodify/music-bff/
+  /opt/moodify/music-media/    /opt/moodify/music-build-*/
+  /opt/moodify/capabilities/   /opt/moodify/moodify-core-package/
+  /opt/duoweilai/   /opt/crestwave/   /opt/mood-research/   /opt/mood-node/
+
+CONFIG
+  /etc/nginx/**  (six production vhosts + default_server + Certbot SSL)
+  /etc/moodify/*.env  (production secrets)
+  ufw rules
+  SSH configuration
+```
+
+**Never run a recursive `chown` over `/opt/moodify`.** Production assets are root-owned;
+the verifier's own directories are `moodify`-owned. The split is deliberate — a
+`chown -R moodify:moodify /opt/moodify` would break the running deployment.
+
+**Never add a `default_server` directive to nginx** and never edit
+`sites-available/default`. A new endpoint, if one is ever needed, is a name-based vhost.
+
+### 12.11 One-line summary for task documents
+
+> Cloud node `moodify-global-engine` (103.144.246.242) verifies `origin/main` read-only.
+> Trigger: `sudo systemctl start moodify-integration.service`. Units:
+> `moodify-integration.{service,timer}`. Scripts: `/opt/moodify/scripts/*.sh`.
+> Artifacts: `/opt/moodify/artifacts/integration/<sha>/`. Health:
+> `/opt/moodify/artifacts/health/latest.txt`. Retention 7/14 days via
+> `cleanup_artifacts.sh` only. **Never touch `/opt/moodify/{releases,current,venv,music*}`,
+> nginx, ufw, or the production services.** No push access, by configuration.
+
+---
+
+## 13. Related documents
 
 - [`MOODIFY_CLOUD_NODE_OPERATIONS.md`](MOODIFY_CLOUD_NODE_OPERATIONS.md) — day-to-day commands
 - [`../reports/CLOUD_NODE_SETUP_2026-10-03.md`](../reports/CLOUD_NODE_SETUP_2026-10-03.md) — setup record, including where the task document and the server disagreed
