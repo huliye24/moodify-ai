@@ -72,4 +72,14 @@ contextBridge.exposeInMainWorld('moodify', {
   // 研究侧账本（T2 证据回流）：检测自动落账；渲染(W5)显式调用复用同一入口
   evidenceRecord: (caseDir, stage, sourceStatus) => ipcRenderer.invoke('evidence:record', caseDir, stage, sourceStatus),
   evidenceCount: () => ipcRenderer.invoke('evidence:count'),
+
+  // Studio v0.2（产品书 2026-10-03）：选目标 → 一键让 AI 处理 → 试听选择 → 导出。
+  // 后处理与导出都走 Core；渲染层只负责发起与呈现，不复制任何音频逻辑。
+  studioTargets: () => ipcRenderer.invoke('studio:targets'),
+  studioVersions: (caseDir) => ipcRenderer.invoke('studio:versions', caseDir),
+  studioProcess: (caseDir, target, mode) => ipcRenderer.invoke('studio:process', caseDir, target, mode),
+  studioEvidence: (caseDir, versionId) => ipcRenderer.invoke('studio:evidence', caseDir, versionId),
+  studioSelect: (caseDir, versionId, note) => ipcRenderer.invoke('studio:select', caseDir, versionId, note),
+  studioAudio: (caseDir, versionId) => ipcRenderer.invoke('studio:audio', caseDir, versionId),
+  studioExport: (caseDir, versionId) => ipcRenderer.invoke('studio:export', caseDir, versionId),
 });

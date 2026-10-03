@@ -27,6 +27,9 @@
       <button id="rail-open" title="打开音频文件（创建/进入世界）" aria-label="打开音频文件">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
       </button>
+      <button id="rail-studio" title="后处理（选目标 → AI 处理 → 听和选 → 导出）" aria-label="后处理">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v3M12 17v3M4 12h3M17 12h3M6.3 6.3l2.1 2.1M15.6 15.6l2.1 2.1M17.7 6.3l-2.1 2.1M8.4 15.6l-2.1 2.1"/><circle cx="12" cy="12" r="2.6"/></svg>
+      </button>
       <button id="rail-fix" title="修音工作台" aria-label="修音工作台">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4v16M12 4v16M19 4v16"/><circle cx="5" cy="9" r="2.2"/><circle cx="12" cy="15" r="2.2"/><circle cx="19" cy="7" r="2.2"/></svg>
       </button>
@@ -135,6 +138,38 @@
 
         <section id="view-charts" class="workspace-view" hidden>
           <div id="charts-body" class="charts"></div>
+        </section>
+
+        <!-- 后处理（Studio v0.2 主流程）：把歌丢进去 → 选目标 → 一键让 AI 处理 →
+             听原版与 AI 版 → 选一版 → 导出。试听与选择是第一优先级，数据/图表是次要页。
+             后处理与导出都走 Core；本壳不实现 DSP、不算响度、不替用户做选择。 -->
+        <section id="view-studio" class="workspace-view" hidden>
+          <div id="studio-head">
+            <div class="studio-targets" id="studio-targets"></div>
+            <button id="studio-run" class="primary">让 AI 处理</button>
+            <span class="muted studio-backend" id="studio-backend"></span>
+          </div>
+          <p class="muted caption" id="studio-status"></p>
+
+          <div class="studio-versions" id="studio-versions"></div>
+
+          <div class="bench-tracks">
+            <div class="track" id="studio-track" hidden>
+              <div class="track-strip">
+                <div id="studio-ruler" class="ws-ruler"></div>
+                <div id="studio-wave" class="ws-wave"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="studio-actions">
+            <button id="studio-play" class="ghost" title="播放 / 暂停">▶</button>
+            <span id="studio-time" class="bench-time">0:00.0</span>
+            <span class="studio-spacer"></span>
+            <button id="studio-use" class="primary" disabled>用这个版本</button>
+            <button id="studio-export" class="ghost" disabled>导出</button>
+          </div>
+          <p class="muted caption" id="studio-note"></p>
         </section>
 
         <section id="view-bench" class="workspace-view" hidden>

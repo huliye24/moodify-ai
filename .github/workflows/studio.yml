@@ -1,0 +1,58 @@
+name: Studio
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# The desktop shell had no automated check at all before this workflow — the static
+# contract check existed but only ever ran by hand, so a renderer that referenced a
+# missing DOM id or IPC channel could merge silently.
+#
+# Two layers, deliberately separate:
+#   check-contracts.js  static: every DOM id / bridge / IPC channel the renderer uses exists
+#   test-studio.js      behavioural: the real Core chain (validate -> process -> evidence)
+#                       driven headlessly, exactly as main.js drives it
+#
+# test-studio.js SKIPS (exit 0) when Core is not importable, so a checkout without the
+# Python environment is not reported as broken. Python is set up here so the behavioural
+# half actually runs rather than silently skipping.
+jobs:
+  studio:
+    name: Studio contracts and processing chain
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Core
+        working-directory: moodify-core-package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Static contract check
+        working-directory: moodify-desktop
+        run: node scripts/check-contracts.js
+
+      - name: Headless processing chain
+        working-directory: moodify-desktop
+        run: node scripts/test-studio.js
