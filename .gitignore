@@ -49,6 +49,20 @@ _github_moodify_ai/
 *.pptx
 *.docx
 
+# Local virtualenvs and scratch state (never committed; regenerate locally)
+/.venv-core/
+/.venv-score/
+/.tmp/
+
+# Moodify Studio private media library (user recordings — never committed)
+/07Music/
+
+# Other project lines living in this workspace are not part of the Moodify
+# mainline. They keep their own branches and worktrees; their working copies
+# stay on disk but never enter this repository.
+/web 3.0/
+/docs/mood/
+
 # Machine-local asset workspaces
 local_audio_assets/
 models/
