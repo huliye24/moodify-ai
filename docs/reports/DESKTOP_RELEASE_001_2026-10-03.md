@@ -28,7 +28,7 @@ This change adds release engineering for the existing Moodify Studio Electron sh
 
 Dependency rebuilding is disabled for packaging because `node-pty` 1.1.0 ships its supported Windows x64 prebuild in the npm package. That prebuild was loaded and exercised under Electron 33 (`ELECTRON_RUN_AS_NODE=1`) by spawning `cmd.exe`; forcing electron-builder to run `node-gyp` would add an unnecessary Visual Studio Build Tools dependency and replace the vendor prebuild.
 
-The tracked `moodify-desktop/build/icon.ico` is a deterministic multi-resolution conversion of `brand/assets/moodify-symbol.png`. Tracking it removes image-tool variability from Windows CI and gives electron-builder a stable Windows icon source; it is not a redesign.
+The tracked `moodify-desktop/renderer/assets/moodify_icon.ico` is a deterministic multi-resolution conversion of `brand/assets/moodify-symbol.png`. Tracking it removes image-tool variability from Windows CI and gives electron-builder a stable Windows icon source; it is not a redesign. It lives in the authoritative desktop asset tree rather than a generated `build/` directory, in accordance with the repository structure guard.
 
 The existing Android workflow remains separate. Its `v*` tag pattern does not match the desktop namespace `desktop-v*`.
 
@@ -45,8 +45,8 @@ Local verification at base commit produced:
 
 | Artifact | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `Moodify_Studio_1.0.0-rc.1_Setup_x64.exe` | 189,760,033 | `38c2518aba758b623acaa3ce11f826e1123d57cd0362df751ffff2dc2f877c0f` |
-| `Moodify_Studio_1.0.0-rc.1_Portable_x64.exe` | 189,528,453 | `9254a2b56bd097c90379e3eb864c02acb83509249867189eb22c829fdd6abcf6` |
+| `Moodify_Studio_1.0.0-rc.1_Setup_x64.exe` | 189,784,303 | `833a2bf95c383748e9f7a97e6e898a556ec454eb0ed6b99ad759e2abce2a0aa9` |
+| `Moodify_Studio_1.0.0-rc.1_Portable_x64.exe` | 189,552,727 | `5b179726e257959c933d470d5f04a9fa711800eeb15771ec9ce8d6dd743d8a3b` |
 
 CI regenerates sizes and hashes from its own exact build and commit. The local values are evidence for this verification run, not promised byte-for-byte CI output.
 
@@ -62,7 +62,7 @@ Local verification completed:
 - PE header and non-zero-size checks: pass for both EXEs
 - release manifest and checksum generation: pass
 - Authenticode boundary: confirmed `NotSigned` for both EXEs
-- `python scripts/check_repo_structure.py`: pass — 1,554 tracked files, 5 checks
+- `python scripts/check_repo_structure.py`: pass — 1,558 tracked files, 5 checks
 - `git diff --check`: pass
 
 ## Packaged runtime inspection

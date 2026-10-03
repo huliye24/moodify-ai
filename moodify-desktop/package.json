@@ -28,7 +28,7 @@
     "npmRebuild": false,
     "directories": {
       "output": "dist-electron",
-      "buildResources": "build"
+      "buildResources": "renderer/assets"
     },
     "files": [
       "src/**/*",
@@ -38,7 +38,7 @@
       "package.json"
     ],
     "win": {
-      "icon": "build/icon.ico",
+      "icon": "moodify_icon.ico",
       "target": [
         {
           "target": "nsis",
