@@ -54,4 +54,22 @@ contextBridge.exposeInMainWorld('moodify', {
   scoreRun: (caseDir, midiPath) => ipcRenderer.invoke('score:run', caseDir, midiPath),
   readText: (caseDir, filePath) => ipcRenderer.invoke('text:read', caseDir, filePath),
   onToolProgress: (cb) => ipcRenderer.on('tool:progress', (_e, kind, line) => cb(kind, line)),
+
+  // 研究侧账本（T1 感知通道）：人类判断显式落账；默认关，不自动抓行为
+  researchCase: (caseDir) => ipcRenderer.invoke('research:case', caseDir),
+  researchPrefs: (patch) => ipcRenderer.invoke('research:prefs', patch),
+  researchJudgment: (record) => ipcRenderer.invoke('research:judgment', record),
+
+  // A/B 比较（Core CLI 权威）：读产物 / 准备 / 记录选择 / 取 A|B 试听音频。
+  // prepare 与 choose 都走 `moodify compare`——GUI 与 AI 是同一条 CLI 路径。
+  compareRead: (caseDir) => ipcRenderer.invoke('compare:read', caseDir),
+  comparePrepare: (caseDir) => ipcRenderer.invoke('compare:prepare', caseDir),
+  compareChoose: (caseDir, keep, role, requestId) =>
+    ipcRenderer.invoke('compare:choose', caseDir, keep, role, requestId),
+  compareAudio: (caseDir, side) => ipcRenderer.invoke('compare:audio', caseDir, side),
+  // 修音渲染（后处理，接 core finishing）：产 B（源 vs 修音产物 中的 B），成功后自动落带 delta 的研究证据
+  finishingRun: (caseDir, preset) => ipcRenderer.invoke('finishing:run', caseDir, preset),
+  // 研究侧账本（T2 证据回流）：检测自动落账；渲染(W5)显式调用复用同一入口
+  evidenceRecord: (caseDir, stage, sourceStatus) => ipcRenderer.invoke('evidence:record', caseDir, stage, sourceStatus),
+  evidenceCount: () => ipcRenderer.invoke('evidence:count'),
 });

@@ -78,6 +78,39 @@ def main(argv: list[str] | None = None) -> int:
                                   help="optional peak gate applied to the output measurement")
     finishing_export = finishing_sub.add_parser(
         "export", help="delivery encode: 16-bit PCM with a -1 dBFS ceiling")
+    compare = commands.add_parser(
+        "compare",
+        help="A/B listening comparison: prepare source-vs-render, record the human choice")
+    compare_sub = compare.add_subparsers(dest="compare_action", required=True)
+    compare_prepare = compare_sub.add_parser(
+        "prepare",
+        help="build/refresh the case's A/B comparison artifact (measured facts, no verdict)")
+    compare_prepare.add_argument("case_dir", help="case directory (contains case.json)")
+    compare_prepare.add_argument("--cases-root", default=None,
+                                 help="require the case to live inside this root")
+    compare_prepare.add_argument("--a", default=None,
+                                 help="source audio (A) when the case has no recorded source path")
+    compare_prepare.add_argument("--b", default=None,
+                                 help="render (B) inside <case>/finishing; default = newest render")
+    compare_prepare.add_argument("--json", action="store_true",
+                                 help="machine output (stdout is one JSON object either way)")
+    compare_choose = compare_sub.add_parser(
+        "choose", help="append one human keep-A / keep-B decision to the case ledger")
+    compare_choose.add_argument("case_dir")
+    compare_choose.add_argument("--keep", required=True, choices=("A", "B"),
+                                help="A = keep the source, B = keep the rendered artifact")
+    compare_choose.add_argument("--role", required=True, choices=("creator", "listener", "pro"))
+    compare_choose.add_argument("--notes", default=None)
+    compare_choose.add_argument("--request-id", default=None,
+                                help="idempotency key: re-sending the same request is refused, "
+                                     "so an agent retry cannot record one decision twice")
+    compare_choose.add_argument("--cases-root", default=None)
+    compare_choose.add_argument("--json", action="store_true")
+    compare_show = compare_sub.add_parser(
+        "show", help="read the prepared comparison artifact and its freshness")
+    compare_show.add_argument("case_dir")
+    compare_show.add_argument("--cases-root", default=None)
+    compare_show.add_argument("--json", action="store_true")
     finishing_export.add_argument("--audio", required=True)
     finishing_export.add_argument("--output-dir", default="outputs")
     args = parser.parse_args(argv)
@@ -176,6 +209,41 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False),
                   file=sys.stderr)
             return 2
+    elif args.command == "compare":
+        from moodify.ab_compare import (
+            STATUS_EXIT,
+            CompareError,
+            NotReadyError,
+            load_comparison,
+            prepare_comparison,
+            record_choice,
+        )
+
+        try:
+            if args.compare_action == "prepare":
+                result = prepare_comparison(
+                    args.case_dir, cases_root=args.cases_root,
+                    a_path=args.a, b_path=args.b)
+                exit_code = STATUS_EXIT.get(result["status"], 2)
+            elif args.compare_action == "choose":
+                result = record_choice(
+                    args.case_dir, keep=args.keep, role=args.role,
+                    notes=args.notes, request_id=args.request_id,
+                    cases_root=args.cases_root)
+                exit_code = 0
+            else:  # show
+                result = load_comparison(args.case_dir, cases_root=args.cases_root)
+                exit_code = STATUS_EXIT.get(result["status"], 2)
+        except NotReadyError as exc:
+            print(json.dumps(exc.payload(), ensure_ascii=False), file=sys.stderr)
+            return exc.exit_code
+        except CompareError as exc:
+            print(json.dumps(exc.payload(), ensure_ascii=False), file=sys.stderr)
+            return 2
+        if not args.json:
+            print(_summarize_compare(args.compare_action, result), file=sys.stderr)
+        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+        return exit_code
     elif args.command == "doctor":
         result = _doctor_report()
     elif args.command == "demo":
@@ -331,6 +399,42 @@ def _doctor_report() -> dict:
         **({} if ready else {"hint": "install ffmpeg and ensure it is on PATH; "
                                      "re-run `moodify doctor` to verify"}),
     }
+
+
+def _summarize_compare(action: str, result: dict) -> str:
+    """Short human digest (stderr only) for `moodify compare …`.
+
+    stdout stays exactly one JSON object whether or not ``--json`` is given;
+    this line is the human convenience the flag suppresses.
+    """
+    if action == "choose":
+        return (f"已记录：保留 {result['keep']}（{result['kept']}）· 角色 {result['role']}"
+                f" · 第 {result['count']} 条 · {result['choices_path']}")
+    lines = [f"compare {action} — 状态 {result.get('status')}"]
+    if action == "show":
+        artifact = result.get("artifact") or {}
+        freshness = result.get("freshness") or {}
+        lines.append(f"case: {artifact.get('case_id', '?')}")
+        lines.append(f"账本条数: {freshness.get('choice_count', 0)}"
+                     f" · A 未变: {freshness.get('a_matches_artifact')}"
+                     f" · B 未变: {freshness.get('b_matches_artifact')}")
+        for reason in artifact.get("reasons", []):
+            lines.append(f"  [{reason.get('code')}] {reason.get('message')}")
+        return "\n".join(lines)
+    a_block = result.get("a") or {}
+    b_block = result.get("b") or {}
+    loudness = result.get("loudness") or {}
+    lines.append(f"A: {a_block.get('name', '（未定位）')}")
+    lines.append(f"B: {b_block.get('name', '（未渲染）')}")
+    lines.append(f"响度: A={loudness.get('a_integrated_lufs')} LUFS"
+                 f" B={loudness.get('b_integrated_lufs')} LUFS"
+                 f" Δ={loudness.get('delta_lu')} LU"
+                 f" → {loudness.get('matching_status')}（无匹配代理）")
+    for reason in result.get("reasons", []):
+        lines.append(f"  [{reason.get('code')}] {reason.get('message')}")
+    if result.get("status") == "READY":
+        lines.append("下一步: moodify compare choose <case-dir> --keep A|B --role creator|listener|pro")
+    return "\n".join(lines)
 
 
 def _summarize_analysis(result: dict) -> str:

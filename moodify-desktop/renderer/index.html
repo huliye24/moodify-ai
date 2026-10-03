@@ -39,6 +39,9 @@
       <button id="rail-history" title="世界（双击进入；时钟=世界历史）" aria-label="世界">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
       </button>
+      <button id="rail-research" title="研究账本（记录人类判断；感知通道）" aria-label="研究账本">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5A3.5 3.5 0 1 1 12.5 8M9 11.5 5 15.5M15 9a4 4 0 1 1-1.5 7.5L11 20.5M15 9l4-4"/></svg>
+      </button>
     </nav>
 
     <!-- 世界面板：从左滑出，可收起；双击 = 进入该世界（不关闭当前） -->
@@ -50,6 +53,60 @@
         <tbody id="archive-body"></tbody>
       </table>
       <p class="muted archive-path" id="archive-path"></p>
+    </aside>
+
+    <!-- A/B 审听（薄 GUI）：读取 Core CLI 产出的比较产物，只听不判。
+         A = 源音频；B = 修音产物（Mix Graph 渲染）。同位置切换试听；
+         保留 A 或 B 由人决定，经 `moodify compare choose` 记录（本壳不写判断）。 -->
+    <aside id="research-panel" hidden>
+      <div class="rp-head">
+        <span class="rp-title">A/B 审听</span>
+        <label class="rp-toggle">
+          <input type="checkbox" id="rp-mode"> <span>研究模式</span>
+        </label>
+      </div>
+      <p class="muted rp-caption">A = 源音频；B = 修音产物。事实来自 Core 比较产物（moodify compare prepare）；选择由同一条 CLI 记录，入账后不可修改。</p>
+
+      <div class="rp-sec">
+        <div class="rp-ver"><span class="rp-tag">A</span><span id="rp-a-name" class="muted">—</span></div>
+        <div class="rp-ver"><span class="rp-tag">B</span><span id="rp-b-name" class="muted">—</span></div>
+        <div class="rp-ver"><span class="rp-tag">响度</span><span id="rp-loud-status" class="pill">—</span></div>
+      </div>
+
+      <div class="rp-sec">
+        <div class="rp-scale">
+          <button id="rp-play-a" disabled>▶ A</button>
+          <button id="rp-play-b" disabled>▶ B</button>
+        </div>
+        <p class="muted rp-status" id="rp-time">0:00.0 / 0:00.0</p>
+        <p class="muted rp-status" id="rp-ab-state">同位置切换：播放中再点另一版即从当前位置切过去。</p>
+      </div>
+
+      <div class="rp-sec">
+        <div class="rp-row">
+          <label>修音</label>
+          <select id="rp-preset"></select>
+          <button id="rp-render" class="ghost">渲染 B</button>
+        </div>
+        <button id="rp-prepare" class="ghost rp-record-btn">准备比较（compare prepare）</button>
+        <p class="muted rp-status" id="rp-render-note"></p>
+      </div>
+
+      <div class="rp-sec">
+        <span class="rp-q">保留哪个版本？</span>
+        <div class="rp-scale" id="rp-choice"></div>
+        <button id="rp-record" class="primary rp-record-btn" disabled>记录选择</button>
+        <p class="muted rp-status" id="rp-status"></p>
+      </div>
+
+      <div class="rp-sec rp-meta">
+        <span class="muted">评判角色</span>
+        <select id="rp-role">
+          <option value="creator">创作者</option>
+          <option value="listener">听众</option>
+          <option value="pro">专业</option>
+        </select>
+      </div>
     </aside>
 
     <!-- 中央工作区：顶部标签页按来源分——波谱=音乐本身，图表/数据=检测产物 -->
@@ -112,16 +169,44 @@
           <div class="bench-tracks" id="stems-tracks"></div>
         </section>
 
-        <!-- 曲谱工作台：音频 → MIDI（basic-pitch）→ MusicXML（music21）→ 壳内渲染（OSMD） -->
+        <!-- 曲谱工作台：音频 → MIDI（basic-pitch）→ MusicXML（music21）→ 壳内渲染（OSMD）。
+             世界里已有的产物进入即直接打开；转换一键成链，重转按需。 -->
         <section id="view-score" class="workspace-view" hidden>
-          <div class="score-actions">
-            <select id="score-audio" title="选择音频（源或分离轨）"></select>
-            <button id="score-to-midi" class="primary">转 MIDI</button>
-            <select id="score-midi" title="选择 MIDI"></select>
-            <button id="score-render" class="primary">生成曲谱</button>
+          <div class="score-toolbar">
+            <select id="score-audio" title="选择转换源（源音频或分离轨）"></select>
+            <button id="score-convert" class="primary" title="音频 → MIDI → 曲谱 一键完成">音频转曲谱</button>
+            <span id="score-products" class="score-products"></span>
+            <select id="score-product" hidden title="切换已生成的产物"></select>
+            <span class="score-spacer"></span>
+            <button id="roll-play" class="ghost" title="播放 / 暂停 MIDI（空格）">▶</button>
+            <span id="roll-time" class="bench-time">0:00.0</span>
           </div>
           <div id="score-progress" class="tool-progress" hidden></div>
-          <div id="score-sheet"></div>
+          <div id="score-split">
+            <div id="score-pane" class="score-pane">
+              <div class="pane-tag">曲谱</div>
+              <div class="pane-zoom">
+                <button id="score-zoom-out" class="ghost" title="缩小">－</button>
+                <button id="score-zoom-in" class="ghost" title="放大">＋</button>
+                <button id="score-zoom-fit" class="ghost" title="默认大小">适配</button>
+              </div>
+              <div id="score-sheet" class="pane-body"></div>
+            </div>
+            <div id="score-divider" title="拖动调整上下比例"></div>
+            <div id="roll-pane" class="score-pane">
+              <div class="pane-tag">MIDI 钢琴卷帘</div>
+              <div class="pane-zoom">
+                <button id="roll-zoom-out" class="ghost" title="缩小">－</button>
+                <button id="roll-zoom-in" class="ghost" title="放大">＋</button>
+                <button id="roll-zoom-fit" class="ghost" title="适配全曲">适配</button>
+              </div>
+              <div id="roll-body" class="pane-body"><canvas id="roll-canvas"></canvas></div>
+            </div>
+          </div>
+          <div id="score-empty" class="score-empty" hidden>
+            <p>这个世界还没有曲谱产物。</p>
+            <p class="muted">选择上方音频（源或分离轨）→「音频转曲谱」，MIDI 与曲谱一次生成；<br>之后进入本工作台即直接打开，无需重转。</p>
+          </div>
         </section>
       </div>
     </main>
