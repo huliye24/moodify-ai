@@ -196,6 +196,19 @@ function makeCase(opts = {}) {
     const dir = makeCase({ diagnosis: true });
     assert.deepStrictEqual(pipeline.readDiagnosis(dir).preserve, []);
   });
+  await check('refreshing diagnosis preserves human judgement and refreshes Core facts', () => {
+    const dir = makeCase({ diagnosis: true, withFinding: false });
+    pipeline.addHumanNote(dir, { note: '主歌呼吸感不能丢', preserve: '保留主唱呼吸与动态' });
+    const report = makeReport({ withFinding: true });
+    fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify(report));
+    const refreshed = pipeline.buildDiagnosis(dir);
+    pipeline.writeDiagnosis(dir, refreshed);
+    const saved = pipeline.readDiagnosis(dir);
+    assert.deepStrictEqual(saved.preserve, ['保留主唱呼吸与动态']);
+    assert.strictEqual(saved.human_notes.length, 1);
+    assert.strictEqual(saved.human_notes[0].text, '主歌呼吸感不能丢');
+    assert.strictEqual(saved.issues.length, 1, 'Core projection must still refresh');
+  });
 
   // ── 3 / 4. stems and structure discovery ──────────────────────────────────────
   console.log('\n3-4. stems and structure artifacts can be discovered');
@@ -247,6 +260,20 @@ function makeCase(opts = {}) {
     for (const c of ctx.available_capabilities) {
       assert.ok(c.core_command, `${c.id} must name the real command behind it`);
     }
+  });
+  await check('the real plan action writes context and an authoritative plan artifact', () => {
+    const dir = makeCase({ diagnosis: true, stems: true, midi: true });
+    const prepared = pipeline.preparePlan(dir);
+    assert.ok(prepared, 'plan action should succeed after analysis and diagnosis');
+    assert.ok(fs.existsSync(prepared.contextFile));
+    assert.ok(fs.existsSync(prepared.planFile));
+    assert.strictEqual(prepared.plan.status, 'DRAFT_PLAN_NOT_EXECUTED');
+    assert.strictEqual(pipeline.snapshot(dir).stage, 'PLANNED');
+  });
+  await check('the plan action refuses to invent a plan before diagnosis', () => {
+    const dir = makeCase({});
+    assert.strictEqual(pipeline.preparePlan(dir), null);
+    assert.strictEqual(pipeline.inspect(dir).hasPlan, false);
   });
 
   // ── 6. gating ─────────────────────────────────────────────────────────────────

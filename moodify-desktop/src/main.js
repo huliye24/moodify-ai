@@ -1201,9 +1201,16 @@ function registerPipelineIpc() {
   ipcMain.handle('pipeline:context', async (_e, caseDir) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    const ctx = pipeline.buildContext(dir);
-    const file = pipeline.writeContext(dir, ctx);
-    return { ok: true, context: ctx, path: file };
+    const prepared = pipeline.preparePlan(dir);
+    if (!prepared) return { ok: false, reason: 'NEED_ANALYZE_AND_DIAGNOSE' };
+    return {
+      ok: true,
+      context: prepared.context,
+      path: prepared.contextFile,
+      plan: prepared.plan,
+      planPath: prepared.planFile,
+      stage: pipeline.snapshot(dir).stage,
+    };
   });
 
   ipcMain.handle('pipeline:readContext', async (_e, caseDir) => {

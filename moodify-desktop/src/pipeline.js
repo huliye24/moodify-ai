@@ -352,6 +352,20 @@ function buildDiagnosis(caseDir) {
   const info = inspect(caseDir);
   if (!info.hasReport) return null;
   const report = info.report;
+  const previous = readDiagnosis(caseDir);
+
+  // Refreshing Core's projection must never erase human judgement.  Only carry these
+  // fields from a diagnosis written for the same case/schema; every measured field below
+  // is rebuilt from report.json so stale machine facts cannot leak through.
+  const sameDiagnosis = previous
+    && previous.schema === 'moodify.studio.diagnosis/0.1'
+    && previous.case_id === info.caseId;
+  const preserve = sameDiagnosis && Array.isArray(previous.preserve)
+    ? previous.preserve
+    : [];
+  const humanNotes = sameDiagnosis && Array.isArray(previous.human_notes)
+    ? previous.human_notes
+    : [];
 
   const findings = Array.isArray(report.findings) ? report.findings : [];
   const issues = findings.map((f, i) => ({
@@ -390,10 +404,10 @@ function buildDiagnosis(caseDir) {
       notes: Array.isArray(plan.notes) ? plan.notes : [],
       next_actions: Array.isArray(plan.next_actions) ? plan.next_actions : [],
     },
-    // Deliberately empty by default. "What must be preserved" is a listening judgement,
-    // which AGENTS.md reserves to humans — we do not seed it with guesses.
-    preserve: [],
-    human_notes: [],
+    // Empty on first generation. On refresh these human-authored fields survive while all
+    // machine-authored fields above are projected again from the latest Core report.
+    preserve,
+    human_notes: humanNotes,
     finding_rule_coverage: {
       // stated plainly so nobody reads an empty issue list as "the audio is fine"
       note: 'Core 当前只能产出 CLIPPING_PRESENT / TRUE_PEAK_MARGIN_EXCEEDED 两类 finding；'
@@ -559,6 +573,48 @@ function writeContext(caseDir, ctx) {
   return file;
 }
 
+/**
+ * Persist the concrete draft which makes the PLAN stage real.
+ *
+ * The context pack is the planner's input; this artifact records the Core draft that the
+ * current Studio can actually execute.  It remains explicitly DRAFT_PLAN_NOT_EXECUTED and
+ * references its evidence rather than copying analysis data.
+ */
+function writeContextPlan(caseDir, ctx) {
+  const diagnosis = readDiagnosis(caseDir);
+  if (!diagnosis) return null;
+  const file = path.join(caseDir, 'studio', 'plans', 'context_plan.json');
+  const payload = {
+    schema: 'moodify.studio.plan/0.1',
+    case_id: ctx.case_id,
+    generated_at: new Date().toISOString(),
+    status: (diagnosis.draft_plan && diagnosis.draft_plan.status)
+      || 'DRAFT_PLAN_NOT_EXECUTED',
+    context: '../context.json',
+    diagnosis: '../diagnosis.json',
+    finish_mode: ctx.readiness ? ctx.readiness.finish_mode : null,
+    finish_mode_label: ctx.readiness ? ctx.readiness.finish_mode_label : null,
+    draft_plan: diagnosis.draft_plan || {
+      status: 'DRAFT_PLAN_NOT_EXECUTED', nodes: [], notes: [], next_actions: [],
+    },
+    note: '方案未执行；处理、校验与 A/B 选择仍需后续显式动作。',
+  };
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(payload, null, 2), 'utf8');
+  return { file, plan: payload };
+}
+
+/** The real PLAN action used by the UI: context and plan are committed together. */
+function preparePlan(caseDir) {
+  const snap = snapshot(caseDir);
+  if (!snap.gates.canPlan) return null;
+  const context = buildContext(caseDir);
+  const contextFile = writeContext(caseDir, context);
+  const written = writeContextPlan(caseDir, context);
+  if (!written) return null;
+  return { context, contextFile, plan: written.plan, planFile: written.file };
+}
+
 module.exports = {
   STAGES,
   STAGE_INDEX,
@@ -580,6 +636,8 @@ module.exports = {
   resolvePointer,
   buildContext,
   writeContext,
+  writeContextPlan,
+  preparePlan,
   readJsonSafe,
   listFiles,
 };
