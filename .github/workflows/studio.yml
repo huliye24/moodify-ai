@@ -53,6 +53,10 @@ jobs:
         working-directory: moodify-desktop
         run: node scripts/check-contracts.js
 
+      - name: Production pipeline (stages, diagnosis, context)
+        working-directory: moodify-desktop
+        run: node scripts/test-pipeline.js
+
       - name: Headless processing chain
         working-directory: moodify-desktop
         run: node scripts/test-studio.js

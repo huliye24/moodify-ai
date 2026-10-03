@@ -20,6 +20,7 @@ const { spawn } = require('child_process');
 // Node modules with no Electron import, so they can be exercised headlessly.
 const studioBackends = require('./backends');
 const studio = require('./studio');
+const pipeline = require('./pipeline');
 
 const CASES_ROOT = process.env.MOODIFY_CASES_ROOT
   || path.join(os.homedir(), '.moodify', 'cases');
@@ -425,6 +426,7 @@ function registerIpc() {
   registerResearchIpc();
   registerCompareIpc();
   registerStudioV02Ipc();
+  registerPipelineIpc();
   ipcMain.handle('env', async () => {
     const probe = await runPython(['-c', 'import moodify'], 60 * 1000).catch(() => null);
     return {
@@ -1137,6 +1139,106 @@ function registerStudioV02Ipc() {
     } catch { /* record is best-effort; the audio is already written */ }
 
     return { ok: true, path: picked.filePath, sha256: exported.output_sha256 || null, record };
+  });
+}
+
+// ——— 生产流程（TASK 002A）：检测 → 问题 → 分轨 → 结构 → 方案 → 成品 ———
+//
+// 产品原则：**先理解，再分解，再规划，最后处理**。分析后立刻处理立体声母带是错的，
+// 分解之前就让 AI 出方案同样是错的——⑤ 方案在 分轨 + MIDI 齐备前保持锁定。
+// 本节只暴露「流程状态 + 诊断产物 + context 包」，不含任何音频算法：
+//   阶段由磁盘产物**推导**（见 src/pipeline.js），不是人手推进，也不会谎报。
+//   诊断严格是 Core report.json 的投影，每条 issue 带 evidence 指针指回原 finding。
+
+function registerPipelineIpc() {
+  // 流程快照：当前阶段 + 各阶段事实 + 门禁。UI 靠它决定哪些阶段可进入。
+  ipcMain.handle('pipeline:snapshot', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const snap = pipeline.snapshot(dir);
+    // 顺手记一笔（记录用，不是权威；读的时候永远重新推导）
+    let record = null;
+    try { record = pipeline.recordStage(dir); } catch { /* best effort */ }
+    return {
+      ok: true,
+      stage: snap.stage,
+      gates: snap.gates,
+      facts: snap.facts,
+      record,
+      stages: pipeline.STAGES,
+    };
+  });
+
+  // 生成/刷新诊断产物。纯投影，不新增判断。
+  ipcMain.handle('pipeline:diagnose', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const diagnosis = pipeline.buildDiagnosis(dir);
+    if (!diagnosis) return { ok: false, reason: 'NO_REPORT' };
+    pipeline.writeDiagnosis(dir, diagnosis);
+    return {
+      ok: true,
+      diagnosis,
+      stage: pipeline.snapshot(dir).stage,
+    };
+  });
+
+  ipcMain.handle('pipeline:diagnosis', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const d = pipeline.readDiagnosis(dir);
+    return d ? { ok: true, diagnosis: d } : { ok: false, reason: 'NO_DIAGNOSIS' };
+  });
+
+  // 人类批注 / 声明该保护什么。「该保护什么」是听觉判断，只能由人写。
+  ipcMain.handle('pipeline:note', async (_e, caseDir, note, preserve) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const next = pipeline.addHumanNote(dir, { note, preserve });
+    return next ? { ok: true, diagnosis: next } : { ok: false, reason: 'NO_DIAGNOSIS' };
+  });
+
+  // 构建 context 包（§9）：只引用不复制，且只写真实存在的路径。
+  ipcMain.handle('pipeline:context', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    // 方案必须晚于分解：缺 检测/问题/分轨/MIDI 中任何一项都拒绝，且不写任何产物。
+    const prepared = pipeline.preparePlan(dir);
+    if (!prepared) return { ok: false, reason: 'NEED_DEEP_PREREQUISITES' };
+    return {
+      ok: true,
+      context: prepared.context,
+      path: prepared.contextFile,
+      plan: prepared.plan,
+      planPath: prepared.planFile,
+      stage: pipeline.snapshot(dir).stage,
+    };
+  });
+
+  ipcMain.handle('pipeline:readContext', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const ctx = pipeline.readJsonSafe(path.join(dir, 'studio', 'context.json'));
+    return ctx ? { ok: true, context: ctx } : { ok: false, reason: 'NO_CONTEXT' };
+  });
+
+  // 显式选择「快速完成（仅立体声）」。
+  // 这是**人类决定**，不是一个 UI 开关：深度完成需要 SEPARATED + STRUCTURED；
+  // 跳过它必须由人主动选择，并留下可追溯的记录（finish_mode.json）。
+  // 绝不自动解锁——否则快捷路径会变成默认路径。
+  ipcMain.handle('pipeline:setFinishMode', async (_e, caseDir, mode) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    if (mode !== null && mode !== 'QUICK_STEREO_ONLY') {
+      return { ok: false, reason: 'BAD_MODE' };
+    }
+    const snap = pipeline.snapshot(dir);
+    if (mode === 'QUICK_STEREO_ONLY' && !snap.gates.baseReady) {
+      // 连分析与诊断都没完成时，连「快速」都谈不上
+      return { ok: false, reason: 'NEED_ANALYZE_AND_DIAGNOSE' };
+    }
+    const record = pipeline.recordFinishMode(dir, mode, '用户显式选择');
+    return { ok: true, finishMode: record, gates: pipeline.snapshot(dir).gates };
   });
 }
 

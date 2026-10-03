@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "check:contracts": "node scripts/check-contracts.js",
-    "test": "node scripts/check-contracts.js && node scripts/test-studio.js"
+    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-studio.js"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {

@@ -114,6 +114,18 @@
 
     <!-- 中央工作区：顶部标签页按来源分——波谱=音乐本身，图表/数据=检测产物 -->
     <main id="workspace">
+      <!-- 生产流程条（TASK 002A）：先理解 → 再分解 → 最后处理。
+           阶段按钮由 app.js 按真实状态生成（未满足前置的锁定并灰显），
+           所以这里没有静态 id——避免与合约检查漂移。 -->
+      <nav id="pipeline-bar" hidden>
+        <div id="pipeline-stages"></div>
+        <!-- 仅在前置不足时出现：深度完成需要分轨 + 结构，跳过必须由人**显式选择**，
+             绝不自动解锁——否则快捷路径会变成默认路径。 -->
+        <button id="pipeline-quick" class="ghost pipeline-quick" hidden
+                title="跳过分轨与结构，仅对立体声做处理">改用快速完成（仅立体声）</button>
+        <span id="pipeline-mode" class="pipeline-mode" hidden></span>
+      </nav>
+
       <nav id="tabs" hidden>
         <button class="tab" id="tab-data">数据</button>
         <button class="tab" id="tab-spectrum">频谱</button>
@@ -143,6 +155,41 @@
         <!-- 后处理（Studio v0.2 主流程）：把歌丢进去 → 选目标 → 一键让 AI 处理 →
              听原版与 AI 版 → 选一版 → 导出。试听与选择是第一优先级，数据/图表是次要页。
              后处理与导出都走 Core；本壳不实现 DSP、不算响度、不替用户做选择。 -->
+        <!-- ② 问题：Core 实际发现了什么 + 该保护什么。
+             严格是 report.json 的投影——不发明测量事实，没有就明说「当前规则未发现技术问题」。 -->
+        <section id="view-diagnosis" class="workspace-view" hidden>
+          <div id="diagnosis-head">
+            <button id="diagnosis-generate" class="primary">生成诊断</button>
+            <span id="diagnosis-state" class="muted caption"></span>
+          </div>
+          <div id="diagnosis-summary" class="diagnosis-block"></div>
+          <div id="diagnosis-issues" class="diagnosis-block"></div>
+          <div id="diagnosis-draft" class="diagnosis-block"></div>
+          <div id="diagnosis-empty" class="muted caption" hidden></div>
+          <div id="diagnosis-human">
+            <label class="muted caption" for="diagnosis-note">该保护什么（你来写——这是听觉判断，AI 不替你决定）</label>
+            <div class="note-row">
+              <input id="diagnosis-note" type="text" placeholder="例如：人声的亲密感、动态起伏">
+              <button id="diagnosis-note-save" class="ghost">记录</button>
+            </div>
+            <div id="diagnosis-preserve" class="preserve-list"></div>
+          </div>
+        </section>
+
+        <!-- ⑤ 方案：context 包 + Core 的草稿方案。
+             本阶段建立流程与产物契约；不实现任意 AI 计划的完整执行。 -->
+        <section id="view-plan" class="workspace-view" hidden>
+          <div id="plan-head">
+            <button id="plan-build" class="primary">构建上下文</button>
+            <span id="plan-readiness" class="muted caption"></span>
+          </div>
+          <div id="plan-context" class="diagnosis-block"></div>
+          <div id="plan-draft" class="diagnosis-block"></div>
+          <p class="muted caption" id="plan-caption">
+            方案是草案：Core 的 plan.status 恒为 DRAFT_PLAN_NOT_EXECUTED，执行需显式动作。
+          </p>
+        </section>
+
         <section id="view-studio" class="workspace-view" hidden>
           <div id="studio-head">
             <div class="studio-targets" id="studio-targets"></div>

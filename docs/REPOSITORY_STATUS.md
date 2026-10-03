@@ -51,6 +51,32 @@ Studio → Publish to My Library → Phone → Play
 
 **未裁决：** ①`apps/android` vs `apps/music-android` 谁是 canonical App；②Creator 侧首要产品面是 CLI（现行 `CURRENT_CANON.md`）还是 Studio（v3）。两者均为 `HUMAN_DECISION_REQUIRED`，见 [`docs/reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md`](reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md)。
 
+## Studio 生产流程 v3 — 2026-10-03（DEFINED，已实现流程层）
+
+> **Understand first. Decompose second. Plan third. Process last.**（先理解，再分解，再规划，最后处理。）
+
+Creator 侧流程固定为 **检测 → 问题 → 分轨 → 结构 → 方案 → 成品**。
+早期「分析完立刻选预设处理立体声母带」被移除——对母带来说太早。
+**分解先于规划**：⑤ 方案 需要 分轨 + MIDI，⑥ 成品还需要一份真实写出的方案产物。
+
+| 项 | 状态 | 依据 |
+|---|---|---|
+| 流程条 + 阶段推导 + 门禁 | **IMPLEMENTED** | `moodify-desktop/src/pipeline.js`；阶段由磁盘产物推导，未满足前置的阶段锁定 |
+| ② 问题（`studio/diagnosis.json`） | **IMPLEMENTED** | 严格投影自 `report.json`，每条 issue 带可解析的 evidence 指针 |
+| ⑤ 方案（`studio/context.json`） | **IMPLEMENTED** | 只引用不复制，且只写真实存在的路径 |
+| ③ 分轨 / ④ 结构 接入主流程 | **IMPLEMENTED** | 复用既有工作台；分轨 `grade=PREVIEW_NOT_MASTERING_GRADE` |
+| 三个预设 | **保留**，已下移到 ⑥ 成品阶段 | 工具不是流程 |
+| 诊断丰度 | **受限** — Core 只有 2 种 finding 规则，18 个真实 case 中 17 个为空 | 见下 |
+| AI 方案的结构化规划 + 执行（002B/002C） | **TARGET — 未实现** | — |
+| 精细分离引擎 | **TARGET — 未实现** | — |
+
+**诊断诚实边界：** `issues: []` 只表示**当前规则未发现问题**，不代表音频被判定为无问题。
+UI 与产物均须如此表述。Core 另有 18 参数诊断引擎但桌面够不到，且接入会引入第二诊断权威 → `HUMAN_DECISION_REQUIRED`。
+
+文档：[`docs/canon/STUDIO_PRODUCTION_PIPELINE_V3.md`](canon/STUDIO_PRODUCTION_PIPELINE_V3.md) ·
+[`docs/protocol/MOODIFY_STUDIO_CONTEXT_0_1.md`](protocol/MOODIFY_STUDIO_CONTEXT_0_1.md) ·
+[`docs/reports/STUDIO_PIPELINE_REALIGNMENT_2026-10-03.md`](reports/STUDIO_PIPELINE_REALIGNMENT_2026-10-03.md)
+
 ## Current Verified Mainline（仓库侧）
 
 MSP/0.1 仓库侧实现：`moodify protocol validate|process`；JSON 作业 → 既有 Core 预设处理 → WAV、诊断与哈希清单。仅证明执行路径，不证明自动听感验证或云端部署。协议详情见 [`docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`](protocol/MOODIFY_SOUND_PROTOCOL_0_1.md)。
