@@ -1,6 +1,6 @@
 # Repository Status
 
-**Status:** 当前 Canon 与事实状态入口（Canon v2.2 / Open Sound Protocol & Network，2026-10-03 更新）。
+**Status:** 当前 Canon 与事实状态入口（Canon v3.0 / Personal Music Node，2026-10-03 更新）。
 **Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](canon/AUTHORITY_ORDER.md)）。
 
 ## Canonical Identity（Canon v2.2，2026-10-03）
@@ -17,6 +17,39 @@
 ## 已退场的旧产品身份（2026-10-03 清理）
 
 `moodify-qa`、`moodify-qa-desktop`、`moodify-pulse`、`products/{qa,master,rating,supply}`、`shared/`、`sdk/`、`plugins/`、`phys-lab/`、`windows版本开发/`、`审查包/`、`engine/`、`demo/` 已从主线移除。QA / Master / Rating / Supply 从来不是四个平级产品身份，最多只能是 Core 内部 capability。逐路径依赖检查与裁决见 [`docs/restructure/CLEANUP_MANIFEST.md`](restructure/CLEANUP_MANIFEST.md)。结构守卫 `scripts/check_repo_structure.py` 防止其重建。
+
+## Product Canon v3 — 2026-10-03（DEFINED / TARGET）
+
+**产品定义：** `Moodify = Core + Protocol + Studio + App + Network`（一个产品的五层，不是五个产品）。完整定义见 [`docs/canon/PRODUCT_DEFINITION_V3.md`](canon/PRODUCT_DEFINITION_V3.md)；技术选型规则见 [`docs/canon/TECHNOLOGY_PRINCIPLES.md`](canon/TECHNOLOGY_PRINCIPLES.md)。
+
+**第一产品循环：**
+
+```text
+Studio → Publish to My Library → Phone → Play
+（在电脑上完成一首歌 → 歌出现在手机 → 立刻能听）
+```
+
+**战略：** `stability > novelty`、`completion > ambition`、`working loop > architecture purity`。
+
+> ⚠️ **下列 TARGET 部分尚未实现。本文不得被读作已实现。**
+
+| 能力 | 状态 | 依据 |
+|---|---|---|
+| Moodify Core | **IMPLEMENTED** | `moodify-core-package/`（679 文件，v1.0.0-rc.1） |
+| Moodify Protocol 0.1 / 0.2 | **IMPLEMENTED**（预设作业 + 报告；可编辑 Mix Graph 仍为目标态） | `moodify protocol validate\|process`；`docs/protocol/` |
+| Moodify Studio（Electron 壳） | **IMPLEMENTED（壳）** — 只编排 Core，自身无 DSP；启动脚本仅 `electron .` | `moodify-desktop/`（v1.0.0-rc.1，Electron ^33） |
+| Android 客户端 | **IMPLEMENTED（两条并存线，未裁决）** | `apps/android`（com.moodify.app v2.0.0）、`apps/music-android`（com.moodify.music v2.0.1） |
+| **Studio → My Library 发布动作** | **TARGET — 不存在** | 全仓库无实现 |
+| **Track package / `manifest.json`** | **TARGET — 不存在** | 全仓库无实现 |
+| **局域网传输 / 配对 / token** | **TARGET — 不存在** | 全仓库无实现 |
+| **Android 接收与本地音乐库** | **TARGET — 不存在** | 全仓库无实现 |
+| **App 身份 / 账号 / 设备注册** | **TARGET — 不存在** | 未实现 |
+| **Moodify Network（节点互联）** | **TARGET — 不存在** | V1 仅指 Desktop ↔ 个人手机 |
+| **远程分享 / relay / 对象存储** | **TARGET — 不存在** | 未实现 |
+
+经仓库检索确认：没有任何 `publish to my library` / `lan sync` / `pairing token` / `local transfer` 实现代码。
+
+**未裁决：** ①`apps/android` vs `apps/music-android` 谁是 canonical App；②Creator 侧首要产品面是 CLI（现行 `CURRENT_CANON.md`）还是 Studio（v3）。两者均为 `HUMAN_DECISION_REQUIRED`，见 [`docs/reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md`](reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md)。
 
 ## Current Verified Mainline（仓库侧）
 

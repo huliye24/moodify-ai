@@ -67,6 +67,32 @@ Moodify Moat = Process × History × Network
 
 历史说明：本仓库曾承载一条**独立的** MOOD Protocol Web3 线（EVM/BSC 主网 BEP-20 代币，已部署合约并有 DEX 交易）。2026-10-03 该线被移出主线，磁盘保留、不再跟踪，见 `docs/ARCHIVE_INDEX.md`。它不是 Moodify Network，两者的历史都不得被静默改写。
 
+## Product Direction（Product Canon v3，2026-10-03）
+
+**Moodify 是一个产品的五层**，不是五个独立产品：
+
+```text
+Moodify = Core + Protocol + Studio + App + Network
+
+Core     声音能力        →  moodify-core-package/
+Protocol 契约层          →  protocol/ + docs/protocol/
+Studio   Creator 工作台  →  moodify-desktop/
+App      个人音乐节点     →  见 §6 现状（未实现的部分不得写成已实现）
+Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop ↔ 个人手机
+```
+
+完整定义见 `docs/canon/PRODUCT_DEFINITION_V3.md`；技术选型规则见 `docs/canon/TECHNOLOGY_PRINCIPLES.md`。
+
+**Agent 必须理解以下五条：**
+
+1. **第一个产品目标是 `Studio → My Phone → Play`。** 即：在桌面完成一首歌 → Publish to My Library → 歌出现在手机 → 立刻能听。这个循环可靠工作，Moodify 就已经是有效产品。完整循环见 `PRODUCT_DEFINITION_V3.md` §3。
+2. **Moodify App 是 Personal Music Node（个人音乐节点）**，初期不是另一个流媒体平台。四项职责 My Library / Playback / My Identity / Connections；**最早版本只做前两项**。
+3. **Network 功能必须从真实用户循环生长**，不得先建网络再找用途。V1 的「网络」只有两个节点：Desktop ↔ 个人手机。
+4. **优先稳定、通用的技术**：`existing > standard library > mature OSS > commodity service > custom > experimental`。举证责任在 custom 与 experimental。（产品战略：可商用 > 技术先进。）
+5. **AI 不得自行扩大范围。** 未获人类批准，不得新增 server / login / social / account / cloud storage / P2P / 新框架；不得删除遗留 Android 项目；不得重写 Core 或 desktop。范围扩张需人类批准或走 MIP。
+
+**仍未裁决（不得当作已定论）：** `apps/android` 与 `apps/music-android` 哪一个是 canonical App；Creator 侧首要产品面是 CLI 还是 Studio。两者均记录为 `HUMAN_DECISION_REQUIRED`。
+
 ## Repository Structure Guard
 
 `scripts/check_repo_structure.py` 在 CI 中执行，防止历史问题复发。它禁止：

@@ -16,39 +16,58 @@
 
 ---
 
-## Three things, one system
-
-### Protocol — the rules
-
-A declarative **sound job**: a JSON document naming a source, a preset, and an output
-location. AI systems, agents, CLIs, apps, and third-party software all submit the same job
-to the same Core and get back a machine-readable record of what happened.
-
-→ [`docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`](docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md) ·
-[`protocol/`](protocol/README.md) · [proposals](protocol/mips/)
-
-### Core — the capability
-
-The single home of the audio intelligence: analysis, DSP, processing, playback,
-verification, contracts. **One Core, many interfaces.** An interface must never keep its own
-copy of a sound algorithm — and no capability has two owners.
-
-→ [`moodify-core-package/`](moodify-core-package) · contracts in
-[`schemas/canonical/`](schemas)
-
-### Network — the process
-
-The open collaboration around the Protocol, Core, and Evidence. Forking is an entry point,
-not an exit: run an experiment, produce evidence, open a MIP, and the result can re-enter
-the canonical project.
+## Five layers, one product
 
 ```text
-Problem → Proposal → Experiment → Process → A/B → Evidence
-       → Human Review → Merge → Release → Real-world use → Feedback → ↻
+Moodify = Core + Protocol + Studio + App + Network
 ```
 
-→ [`GOVERNANCE.md`](GOVERNANCE.md) · [`docs/governance/NETWORK.md`](docs/governance/NETWORK.md) ·
-[`CONTRIBUTING.md`](CONTRIBUTING.md)
+Not five products — five layers of one product, each with a single responsibility.
+
+| Layer | Responsibility | Lives in |
+|---|---|---|
+| **Core** | Audio analysis, processing, verification, playback capability | [`moodify-core-package/`](moodify-core-package) |
+| **Protocol** | Stable contracts between Core, Studio, App, agents and future integrations | [`protocol/`](protocol/README.md) + [`docs/protocol/`](docs/protocol/) |
+| **Studio** | Creator-side desktop workspace: create, process, review, finish, publish | [`moodify-desktop/`](moodify-desktop) |
+| **App** | **Personal music node**: receive, store, play — sharing comes later | Listener-side clients |
+| **Network** | Connect personal music nodes and creators | **not implemented** — see below |
+
+**One Core, many interfaces.** An interface must never keep its own copy of a sound
+algorithm, and no capability has two owners.
+
+### The first product loop
+
+```text
+Studio → Publish to My Library → Phone → Play
+```
+
+> *I finish a song on my computer, press Publish to My Library, and the song appears on my
+> phone so I can immediately listen to it.*
+
+That single loop, working reliably, is already a valid product. Social features grow from it
+later — not the other way around. **None of it is built yet**; see the status table below.
+
+### Two different things called "Network"
+
+This is a real term collision, so it is stated plainly:
+
+- **Moodify Network (product layer)** — connecting personal music nodes. **Not implemented.**
+  In V1 it means exactly two nodes: your desktop and your own phone.
+- **Moodify Network (collaboration)** — the open process around the Protocol, Core and
+  Evidence: fork, experiment, produce evidence, open a MIP, and the result can re-enter the
+  canonical project. This one is real and documented in [`GOVERNANCE.md`](GOVERNANCE.md).
+
+### Product strategy
+
+```text
+stability > novelty · completion > ambition
+working loop > architecture purity · maintainability > technical fashion
+```
+
+Mature, public, common technology first: `existing > standard library > mature OSS >
+commodity service > custom > experimental`. The burden of proof is on custom and
+experimental. See [`docs/canon/TECHNOLOGY_PRINCIPLES.md`](docs/canon/TECHNOLOGY_PRINCIPLES.md)
+and [`docs/canon/PRODUCT_DEFINITION_V3.md`](docs/canon/PRODUCT_DEFINITION_V3.md).
 
 ---
 
@@ -101,6 +120,12 @@ capabilities are implemented and tested in Core. Private deployment works from `
 **Not demonstrated.** Automated perceptual validation. A complete
 Import → Analyze → Diagnose → Plan → Process → Verify → Export finishing session. An
 editable Mix Graph. Cloud production carrying real listening traffic.
+
+**Not built at all** — the entire first product loop above. There is no publish action, no
+track package, no LAN transfer or pairing, no Android receive, and no local library. A
+repository-wide search finds no `publish to my library`, `lan sync`, `pairing token`, or
+`local transfer` implementation. The same applies to identity, accounts, device
+registration, and every Network feature.
 
 **Unresolved.** Cloud runtime state is unverified — the database check was blocked and the
 record says so rather than guessing. See

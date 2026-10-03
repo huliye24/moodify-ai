@@ -2,6 +2,22 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-03 — PRODUCT CANON v3：产品定义五层 + 个人音乐节点 + 技术原则（CANON_CHANGE = YES）
+
+- **CANON_CHANGE = YES。** 触发的 Canon 控制项：**对外产品身份**与**内部/外部能力边界**。依据人类任务书 `MOODIFY_PRODUCT_DEFINITION_AND_EXECUTION_001`（2026-10-03）§2/§17，按 `AGENTS.md` L125 记录 why / evidence / affected authority files / migration / rollback。
+- **Why：** 人类方向（§0）：Moodify **不以技术最先进作为竞争方式**，产品战略为 `stability > novelty`、`completion > ambition`、`working loop > architecture purity`、`maintainability > technical fashion`——用成熟、公开、通用的技术快速做出稳定产品；先进技术仅在已证明的产品瓶颈要求时引入。
+- **产品定义（新增）：** `Moodify = Core + Protocol + Studio + App + Network`，**一个产品的五层，不是五个独立产品**。第一产品循环 = `Studio → Publish to My Library → Phone → Play`（「我在电脑上完成一首歌，按下发布，歌出现在手机上，我能立刻听」）。**App = Personal Music Node（个人音乐节点）**，四项职责 My Library / Playback / My Identity / Connections，**最早版本只做前两项**。
+- **新增权威文件：** `docs/canon/PRODUCT_DEFINITION_V3.md`、`docs/canon/TECHNOLOGY_PRINCIPLES.md`（技术优先级 `existing > standard library > mature OSS > commodity service > custom > experimental`；举证责任在 custom/experimental；V1 排除 blockchain/token/DAO/DID/CRDT/P2P/WebRTC/自定义密码学/自定义数据库/microservice mesh/Kubernetes/实时协作 DAW/自定义流协议）。
+- **Evidence（关键诚实边界）：** 经全仓库检索确认，**第一产品循环完全不存在实现**——无 `publish to my library`、无 track package / `manifest.json`、无 LAN 传输 / 配对 / token、无 Android 接收入口、无本地音乐库、无身份 / 账号 / 设备注册、无 Network。本文档定义方向，**不授权一次性实现 V1–V2**；TARGET 部分不得被写成已实现（R6/R10）。
+- **Affected authority files：** `docs/canon/PRODUCT_DEFINITION_V3.md`（新）、`docs/canon/TECHNOLOGY_PRINCIPLES.md`（新）、`AGENTS.md`（新增 Product Direction 段，五条 Agent 必读）、`docs/REPOSITORY_STATUS.md`（新增 Product Canon v3 段 + DEFINED/TARGET vs IMPLEMENTED 表）、`README.md`（五层架构 + 第一循环 + 「Network」术语消歧）、本文件。
+- **Known conflicts（如实记录，不静默改写）：**
+  1. **Creator 侧首要产品面：CLI 还是 Studio？** `CURRENT_CANON.md` §1（v2.1）称 Creator Side = **Moodify CLI** 且「CLI 是首要执行接口」；v3 称 Creator Side = **Moodify Studio**。当前**非裁决式**处理为「CLI 与 Studio 同在 Creator 侧，CLI 是自动化/Agent 接口，Studio 是人类工作台，同调一个 Core」，但**「哪一个是首要对外产品面」尚未由人类裁决** → `HUMAN_DECISION_REQUIRED`。
+  2. **「Network」一词语义冲突。** 2026-10-03 重构把 `Moodify Network` 定义为**开放协作网络**（`GOVERNANCE.md`、`docs/governance/NETWORK.md`）；v3 §1 把 Network 定义为**产品层：个人音乐节点之间的连接**。两者都在用同一个词。已在 `README.md` 与 `PRODUCT_DEFINITION_V3.md` 显式消歧，但**术语是否需要改名尚未裁决** → `HUMAN_DECISION_REQUIRED`。
+  3. v3 §8.2（App：Listening Interface → Personal Music Node）经判定为**扩展而非冲突**：`PLAY` 仍是核心动作，V1 的 App 行为与 v2.1 描述一致。
+- **未裁决前置问题：** `apps/android`（com.moodify.app v2.0.0）与 `apps/music-android`（com.moodify.music v2.0.1）**两条并存的 Android 线**，证据互相矛盾，v3 **不指定**哪一个是 canonical App，两者均不删除 → 归 Task 002 审计 + 人类确认（`AGENTS.md` L71）。
+- **Migration：** 无破坏性变更。本次为纯文档任务，**未新增任何网络 / Android / 云代码**，未删除任何遗留 Android 项目，未改动 Core、desktop、音频算法。既有 CLI 命令面与 0.1/0.2 协议不变。
+- **Rollback：** 回退本 commit 即可；不涉及代码，无数据迁移。
+
 ## 2026-10-03 — MOODIFY_NETWORK_RESTRUCTURE_001：对外定位扩为开放声音协议与持续演化网络（CANON_CHANGE = YES）
 
 - **CANON_CHANGE = YES。** 触发的 Canon 控制项：**对外产品身份**与**内部/外部能力边界**。依据为人类任务书 `MOODIFY_NETWORK_RESTRUCTURE_001`（2026-10-03），并按 AGENTS.md L125 记录 why / evidence / affected authority files / migration / rollback。
