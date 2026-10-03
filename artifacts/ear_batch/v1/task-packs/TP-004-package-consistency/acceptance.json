@@ -1,7 +1,0 @@
-{
-  "required_outputs": [
-    "quality/package_consistency.json",
-    "quality/package_consistency.md"
-  ],
-  "non_empty": true
-}

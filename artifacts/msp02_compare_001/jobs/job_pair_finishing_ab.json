@@ -1,7 +1,0 @@
-{
-  "protocol": "moodify.sound/0.2",
-  "type": "compare",
-  "source": "../../mix_graph_v01/golden/example_mixgraph_8eec7960.wav",
-  "reference": "../../../demo/input/example.mp3",
-  "output_dir": "../cases"
-}
