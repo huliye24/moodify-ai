@@ -29,7 +29,7 @@ SOURCE -> LISTEN -> REPRESENT -> JUDGE -> ABC INTERVENTION -> VERIFY
 ## Reality Snapshot Pointer（2026-08-17，W01-P00）
 
 - 云端现状：2 VPS（LA 核心 + 杭州数据工厂）+ PolarDB（核验 BLOCKED）+ 无对象存储 + 无云端 AI 推理 + 队列近空；完整 Ear 链路仅仓库代码。
-- 详见 W01-P00 报告（审查包/W01-P00_REPORTS_2026-08-17）与 [docs/canon/CURRENT_ARCHITECTURE.md](canon/CURRENT_ARCHITECTURE.md)。
+- 详见 [docs/evidence/](evidence/README.md)（W01-P00 Evidence Index，E01–E27；E13/E14 为 LA/杭州节点原始扫描）与 [docs/canon/CURRENT_ARCHITECTURE.md](canon/CURRENT_ARCHITECTURE.md)。
 - **事实规则：** 本文件与 Canon 不得虚构云端/生产能力；未验证能力不写成已运行。
 
 ## Verification Baseline（历史记录，2026-08-08）

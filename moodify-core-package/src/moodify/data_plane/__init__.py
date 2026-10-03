@@ -1,7 +1,7 @@
 """Moodify Data Plane (W01-P03) — Data Identity Backbone.
 
 Track / Job / Object / Hash / Version / Evidence 的唯一关系。
-见 docs/canon 与审查包 W01-P03 报告。
+见 docs/canon 与 docs/evidence（W01-P00 Evidence Index / W01-P03 报告）。
 """
 
 from moodify.data_plane.adapter import LocalFileAdapter, ObjectStoreAdapter, OSSAdapter

@@ -98,7 +98,7 @@ When instructions conflict, prefer:
 1. current explicit human instruction;
 2. root `AGENTS.md`;
 3. `docs/canon/*`（CURRENT_CANON / PRODUCT_BOUNDARY / INTERNAL_SYSTEMS / AUTHORITY_ORDER / CURRENT_ARCHITECTURE）;
-4. verified runtime evidence（W01-P00 Evidence Index 等）;
+4. verified runtime evidence（[docs/evidence/](docs/evidence/README.md) W01-P00 Evidence Index 等）;
 5. canonical main behavior and tests;
 6. current subsystem documentation;
 7. experimental documentation;

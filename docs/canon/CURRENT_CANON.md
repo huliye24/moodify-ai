@@ -96,4 +96,4 @@ Moodify Ear / Auditory Intelligence 是**内部听觉、判断、验证与研究
 
 - 云端现状：2 台 VPS（LA 核心 + 杭州数据工厂）+ PolarDB（BLOCKED 核验）+ 无对象存储 + 无 AI 推理 + 队列近空。
 - 完整 Listen→Judge→Intervene→Verify 链路存在于仓库代码，云端尚无生产流量。
-- 详见 [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md) 与 W01-P00 报告。
+- 详见 [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md) 与 [docs/evidence/](../evidence/README.md)（W01-P00 报告）。
