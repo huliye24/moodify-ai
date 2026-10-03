@@ -33,7 +33,6 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-import numpy as np
 import soundfile as sf
 
 from moodify.processing.pedalboard_chain import MoodifyDSPChain
@@ -159,7 +158,7 @@ def main() -> int:
             return 2
         expected_keys = set(profile.keys())
         print("OK --check-syntax")
-        print(f"  profile name          : listen-demo-profile-v1")
+        print("  profile name          : listen-demo-profile-v1")
         print(f"  profile params count  : {len(expected_keys)}")
         print(f"  manifest schemaVersion: {m.get('schemaVersion')}")
         print(f"  track count           : {len(tracks)}")
