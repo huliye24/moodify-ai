@@ -21,7 +21,7 @@
 | E15 | ssh-la-deep | LA service 定义/timers/部署非 git | `systemctl cat` / `git rev-parse`（NOGIT） | 2026-08-17 19:56 | HIGH |
 | E16 | ssh-hz-deep | 杭州 service 定义/env 名/API health | `systemctl cat` / curl /health | 2026-08-17 19:57 | HIGH |
 | E17 | polardb-access-denied | PolarDB 直接核验 BLOCKED | mysql SHOW DATABASES → Access denied | 2026-08-17 19:59 | HIGH |
-| E18 | cloud-state-json | 黑箱调查（同日 11:00 扫描）：PolarDB 3 实例/moodify_dev 19 表/OSS 无/无 AI 推理 | MOODIFY_CLOUD_CURRENT_STATE_2026-08-17.json/.md | 2026-08-17 11:00 | MEDIUM |
+| E18 | cloud-state-json | 黑箱调查（同日 11:00 扫描）：PolarDB 3 实例/moodify_dev 19 表/OSS 无/无 AI 推理 | `docs/evidence/cloud/MOODIFY_CLOUD_CURRENT_STATE_2026-08-17.json` / `.md` | 2026-08-17 11:00 | MEDIUM |
 | E19 | fs-audio-count | 音频资产统计（~790 文件 ~17GB） | `find`/`du` 各目录 | 2026-08-17 20:05 | HIGH |
 | E20 | fs-premusic | 真实曲目 ~7 首 + lalalai split | pre-music/ 目录 | 2026-08-17 20:06 | HIGH |
 | E21 | fs-outputs | data_factory 4 case + pairwise + CAD/calib | outputs/ 目录 | 2026-08-17 20:07 | HIGH |

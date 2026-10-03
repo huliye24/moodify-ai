@@ -76,6 +76,32 @@ different project line that keeps its own branches.
 | `moodify-pulse/` | 18 | retired product | `moodify-desktop/` |
 | `工程经验层/` | 5 | governance | moved to [`docs/governance/constraints/`](governance/constraints/CONSTRAINT_REGISTRY.md) |
 | `.codex_tmp/`, `scan_err.txt` | 2 | scratch | — |
+| `dashboard.html`, `cloud_status.py` | 2 | 3.0-era cloud experiment dashboard + the HTTP status API serving it | nowhere — superseded; no references outside the temporal-texture baseline snapshot |
+
+## Root-level work products moved to `docs/archive/`
+
+The task spec (§33) requires the repository root to carry only real entry points. These five
+were superseded work products sitting at the top level. They are kept, not deleted, because
+they document **why** this restructure happened — including the fact that three prior
+reduction plans were written and never executed, which is itself the argument for the
+structural guard in `scripts/check_repo_structure.py`.
+
+| File | What it was |
+|---|---|
+| `CURRENT_STATE_AUDIT.md` | 2026-09-17 point-in-time self-described "STEP 1 deliverable" |
+| `MOODIFY_PRODUCT_AUDIT.md` | 2026-08-30 product/duplication audit at Canon v1.1 (two versions behind) |
+| `REDUCTION_PLAN.md` | 2026-08-30 reduction plan marked "待人类批准；本次未执行任何修改" — **never executed** |
+| `AI_CONTEXT_OPTIMIZATION.md` | 2026-08-24 advisory; named `docs/ARCHIVE_INDEX.md` as a missing prerequisite, which this restructure finally created |
+| `CODE_FREEZE_MANIFEST.json` | 2026-08-11 freeze manifest for a different branch (`codex/mfy-data-factory-001` @ `b225c30`) |
+
+Root now holds 13 files: `README.md`, `AGENTS.md`, `GOVERNANCE.md`, `MAINTAINERS.md`,
+`CONTRIBUTING.md`, `DEVELOPMENT.md`, `CHANGELOG.md`, `CITATION.cff`, `LICENSE`,
+`Dockerfile`, `docker-compose.yml`, `.gitignore`, `.env.example`.
+
+> Note: inbound links from the (themselves stale) planning docs under `docs/reduction/`,
+> `docs/plan/`, and `docs/reports/` still name the old root paths. Those documents are
+> historical records of a superseded state and were left as-is rather than rewritten,
+> consistent with `docs/canon/AUTHORITY_ORDER.md` level 8.
 
 ## Moved, not archived
 
@@ -88,6 +114,7 @@ different project line that keeps its own branches.
 | `审查包/W01-P00_*/03_CLOUD_INFRASTRUCTURE_REALITY.md` | `docs/evidence/cloud/` |
 | `审查包/审查包 8.18完成/W01-P01_*/01_CANONICAL_DECISION_REGISTER.md` | `docs/evidence/decisions/` |
 | `工程经验层/*` | `docs/governance/constraints/` |
+| `MOODIFY_CLOUD_CURRENT_STATE_2026-08-17.{md,json}` (E18) | `docs/evidence/cloud/` — registered evidence, not a work product |
 
 `git log --follow <new-path>` traces each file through the move.
 

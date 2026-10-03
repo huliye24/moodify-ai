@@ -8,6 +8,8 @@ This file defines the canonical context for AI coding agents working in this rep
 
 **产品命题（Product thesis）：Generated is not finished.（生成 ≠ 完成。）**
 
+**公共项目原则（Public project principle）：Fork the code. Join the process.（代码可以复制，过程需要参与。）** Moodify 采用开源 + 免费 + 公共协作路线，不把「别人看不到我们的代码」当作壁垒。代码可以被复制，产品可以被逆向；真正需要保护的是 continuity、standards、review quality、release trust、history、network density。目标不是「只有我们能更新 Moodify」，而是「任何人都可以改进 Moodify，且改进能够重新进入公共演化过程」。
+
 ```text
              Moodify
           Shared Core
@@ -45,6 +47,37 @@ Ear 是 Moodify 的内部听觉智力，不是对外产品面。Do not regress t
 Public brand language and public-site roles then resolve through `docs/brand/public/README.md` and its authority set. The highest topic-specific Public Brand authority is `docs/brand/public/PUBLIC_BRAND_CONSTITUTION.md`.
 
 内部系统权威与既有政策见 `docs/canon/INTERNAL_SYSTEMS.md`、`docs/LEGACY_AND_EXPERIMENTAL_POLICY.md`。
+
+## Network, Governance and Proposals
+
+Moodify 的长期资产不是代码（任何人都可以 fork），而是持续产生下一版的过程：
+
+```text
+Moodify Moat ≠ Code
+Moodify Moat = Process × History × Network
+```
+
+- `GOVERNANCE.md` — Network 定义、角色与权限（Stewards / Maintainers / Working Groups / Contributors / Review Network / AI Agents）、MIP 流程、发布权限、安全流程、冲突解决。
+- `MAINTAINERS.md` — 当前角色持有者。多数为 vacant，如实记录，不虚构社区。
+- `docs/governance/NETWORK.md` — 过程循环：Problem → Proposal → Experiment → Evidence → Human Review → Merge → Release → Feedback。
+- `protocol/mips/` — MIP 模板与流程。改变 protocol / schema / core behavior contract / governance / evidence format / public compatibility 需要 MIP；普通 bug fix 不需要。
+- `docs/governance/constraints/` — 工程约束 ME-001…ME-003（起源先于功能 / 证据门控发展 / 整体一致性）。
+
+**NO TOKEN / NO DAO / NO AIRDROP / NO TREASURY GOVERNANCE。** 先建立有效的 contribution、review、evidence、release、governance，再讨论其他经济机制。
+
+历史说明：本仓库曾承载一条**独立的** MOOD Protocol Web3 线（EVM/BSC 主网 BEP-20 代币，已部署合约并有 DEX 交易）。2026-10-03 该线被移出主线，磁盘保留、不再跟踪，见 `docs/ARCHIVE_INDEX.md`。它不是 Moodify Network，两者的历史都不得被静默改写。
+
+## Repository Structure Guard
+
+`scripts/check_repo_structure.py` 在 CI 中执行，防止历史问题复发。它禁止：
+
+- 重建 `web 3.0/`、`moodify-qa/`、`moodify-pulse/`、`windows版本开发/`、`审查包/`、`products/`、`shared/`、`sdk/`、`engine/`、`demo/`；
+- 顶层中文临时任务目录；
+- generated artifacts 进入 Git；
+- 第二个 `moodify` console entry point；
+- 第二套 Core。
+
+**新增任何非 `.py` 文件前先执行 `git check-ignore -v <path>`** —— 本仓库的 `.gitignore` 含大量宽泛模式（`*.png`、`*.html`、`*.wav` 等）与 `!` 白名单例外，已四次静默吞掉新文件。
 
 ## Important Distinction
 

@@ -2,6 +2,19 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-03 — MOODIFY_NETWORK_RESTRUCTURE_001：对外定位扩为开放声音协议与持续演化网络（CANON_CHANGE = YES）
+
+- **CANON_CHANGE = YES。** 触发的 Canon 控制项：**对外产品身份**与**内部/外部能力边界**。依据为人类任务书 `MOODIFY_NETWORK_RESTRUCTURE_001`（2026-10-03），并按 AGENTS.md L125 记录 why / evidence / affected authority files / migration / rollback。
+- **Why：** Moodify 采用**开源 + 免费 + 公共协作**路线，不再把「别人无法看到我们的代码」当作壁垒。长期资产定义为 `Moodify Moat = Process × History × Network`（不是 Code）。产品命题 `Generated is not finished.` 不变；新增公共项目原则 `Fork the code. Join the process.`。目标从「只有我们能更新 Moodify」转为「任何人都可以改进 Moodify，且改进能够重新进入公共演化过程」。
+- **身份变化（对外）：** 从「Moodify Sound Protocol — 一个共享 Core + CLI/App」**扩展**为「**An open protocol and reference implementation for evolving audio intelligence**」+ 三层叙事 **Protocol / Core / Network**。**不变**：一个对外产品身份、One Core / Multiple Interfaces、CLI=PROCESS、App=PLAY、`Generated is not finished.`。**未复活**（§27 明确禁止）：Web3 / token economy / 四产品并列平台 / QA 公司 / 自动母带 SaaS / The Ear of AI 公开身份 / 音乐资产交易 / crypto protocol。
+- **边界变化（内部/外部）：** ① 新增**治理层**——`GOVERNANCE.md`、`MAINTAINERS.md`、`docs/governance/NETWORK.md`、`protocol/mips/`（MIP 流程）、`docs/governance/constraints/`（ME-001…ME-003，自 `工程经验层/` 迁入）；② 新增**证据层**规范化——`docs/evidence/`（W01-P00 Evidence Index 等迁入）+ `docs/ARCHIVE_INDEX.md`；③ 明确 **NO TOKEN / NO DAO / NO AIRDROP / NO TREASURY GOVERNANCE**；④ 明确 **AI Agent 有执行权、无最终产品主权**（与既有裁决一致，此处正式写入治理文件）。
+- **MOOD Protocol Web3 线移出主线（本次最大的边界变更）：** 该线（`protocol/` 113 文件、`apps/web` 201 文件、`e2e/staging` 6 文件、`web 3.0/` 37 文件、以及 `docs/protocol/` 中 5 份 Web3 文档）**移出主线但不删除**。判定依据：这不是历史残留而是**活体基础设施**——`protocol/mainnet.json` 声明 EVM/BSC 主网 BEP-20 代币 MOOD（`0x1BB3115D43E397f7bb586F090831B02cA639e73E`，33,000,000 供应，PancakeSwap 在交易）。人类裁决（2026-10-03）：磁盘保留、取消跟踪。**历史不得被静默改写**，故在此记录该线的存在及其与 Moodify Network 的区别。
+- **Evidence：** 基线 `c11bc7f5`（2760 tracked files），安全 tag `pre-network-restructure-2026-10-03`；全量 `pytest` 前 **1197 passed / 5 skipped / 0 failed**，重构后 **1197 passed / 5 skipped**（零回归）；`ruff` 前后皆 clean。逐路径依赖检查与裁决见 `docs/restructure/CLEANUP_MANIFEST.md`；前后树见 `BEFORE_TREE.txt` / `AFTER_TREE.txt`。
+- **Affected authority files：** `README.md`、`AGENTS.md`、`CONTRIBUTING.md`、`docs/REPOSITORY_STATUS.md`、`docs/canon/AUTHORITY_ORDER.md`、`docs/canon/CURRENT_ARCHITECTURE.md`、`docs/canon/CURRENT_CANON.md`、`GOVERNANCE.md`、`MAINTAINERS.md`、`docs/governance/NETWORK.md`、`protocol/**`、`docs/evidence/**`、`docs/ARCHIVE_INDEX.md`、`docs/restructure/**`、`.github/workflows/release.yml`。
+- **Migration：** 无协议破坏性变更；0.1/0.2 协议、CLI 命令面、`moodify-core-package` 公共 API 未变。新增 CI 结构守卫 `scripts/check_repo_structure.py`。`demo` 与 `engine` 移除后，仓库内**只剩一个 `moodify` console entry point**（`moodify.release_cli:main`）。
+- **Rollback：** `git checkout pre-network-restructure-2026-10-03 -- <path>` 可恢复任一被移除路径；完整回退为 revert 本系列 commit。磁盘保留的 MOOD 线亦可通过 `git checkout pre-network-restructure-2026-10-03 -- protocol/ apps/web e2e/staging "web 3.0/"` 重新纳入跟踪。
+- **HUMAN_DECISION_REQUIRED（本次未裁决，不猜测）：** ① `apps/android` vs `apps/music-android` 谁是当前版（两者本次均未动）；② `apps/web` 移出后线上站点 `play.rongjingmusic.com` 的部署路径与 `deploy.yml` 处置；③ Core 内 `moodify.contribution`（MOOD 层，14 文件）去留——牵涉 2026-09-29 契约权威裁决；④ `moodify_runtime/`（约 1550 行唯一 commerce 代码）迁入 Core 还是放弃；⑤ `.git` 4.0 GB 历史是否做 history diet（本次按 §3.1 不重写历史）；⑥ `moodify-desktop` 的 Windows 打包能力（electron-builder）由谁补。
+
 ## 2026-10-02 — Moodify Studio W2 修正：wire_api=responses + 提供方定稿 DeepSeek（真轮次已验证）（CANON_CHANGE = NO）
 
 - **CANON_CHANGE = NO。** 仍属 W2 编译器实现事实的修正（R7 可见性），产品身份与边界不变。

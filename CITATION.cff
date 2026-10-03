@@ -1,12 +1,13 @@
 cff-version: 1.2.0
 message: "If you use Moodify in research, please cite it as follows."
-title: "Moodify — The Ear of AI"
+title: "Moodify — An open protocol and reference implementation for evolving audio intelligence"
 abstract: >-
-  Evidence-first auditory intelligence for AI-generated audio: a frozen
-  data-production framework that converts real songs into reproducible,
-  inspectable, versioned Auditory Production Cases with standards-backed
-  measurement, diagnosis-derived ABC interventions, deterministic algorithmic
-  review, and pairwise training data.
+  An open protocol and reference implementation for evolving audio intelligence,
+  built on an evidence-first auditory framework: real songs become reproducible,
+  inspectable, versioned auditory production cases with standards-backed
+  measurement, diagnosis-derived bounded interventions, deterministic
+  algorithmic review, and pairwise evaluation data. Generated is not finished —
+  human listening and release authority are retained, never delegated.
 authors:
   - family-names: 荣景文川
     given-names: ""
