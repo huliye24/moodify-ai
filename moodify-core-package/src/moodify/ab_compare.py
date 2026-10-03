@@ -533,6 +533,7 @@ def prepare_comparison(case_dir: str | Path, *, cases_root: str | Path | None = 
         "loudness": loudness,
         "geometry": geometry,
         "reasons": reasons,
+        "next_actions": _next_actions(status, reasons),
         "human_required": status == "HUMAN_REQUIRED",
         "review_required": True,
         "decision_authority": "human",
@@ -549,6 +550,51 @@ def prepare_comparison(case_dir: str | Path, *, cases_root: str | Path | None = 
             pass
     _write_json(previous, artifact)
     return artifact
+
+
+# What an agent should do next, per reason code. These are *routing* hints —
+# they never carry a verdict about which version is better.
+_NEXT_BY_REASON = {
+    "A_SOURCE_UNRESOLVED": (
+        "PROVIDE_SOURCE",
+        "提供源音频（--a，或在 case 内保留 source_path.json / finishing 图）后重新 prepare"),
+    "B_RENDER_MISSING": (
+        "RENDER_B",
+        "先产出修音产物：moodify finishing new/render（或界面「渲染 B」），再 prepare"),
+    "B_EVIDENCE_MISSING": (
+        "REVIEW_B_PROVENANCE",
+        "B 缺少渲染证据：本对仍可试听，但预设/Mix Graph 溯源不可得"),
+    "B_GRAPH_UNMATCHED": (
+        "REVIEW_B_PROVENANCE",
+        "B 的 Mix Graph 未在 case 内匹配到：无法确认产物出自哪张图"),
+    "PAIR_GEOMETRY_MISMATCH": (
+        "REGENERATE_RENDER",
+        "A/B 长度或采样率不同：同位置切换不可靠，请重渲染后再比较"),
+    "LOUDNESS_UNAVAILABLE": (
+        "INVESTIGATE_LOUDNESS",
+        "响度未能在两侧同时测量：本对 A/B 不能用于响度受控的听感判断"),
+}
+
+_READY_NEXT = (
+    ("HUMAN_LISTEN", "需要人工听感判断（机器只准备事实，不判断哪个版本更好）"),
+    ("RECORD_CHOICE", "听完后用 `moodify compare choose <case-dir> --keep A|B "
+                      "--role creator|listener|pro` 记录选择"),
+)
+
+
+def _next_actions(status: str, reasons: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Ordered next steps for an agent, derived from the recorded reasons."""
+    if status == "READY":
+        return [{"action": action, "reason": reason} for action, reason in _READY_NEXT]
+    actions: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for reason in reasons:
+        mapped = _NEXT_BY_REASON.get(reason.get("code", ""))
+        if mapped is None or mapped[0] in seen:
+            continue
+        seen.add(mapped[0])
+        actions.append({"action": mapped[0], "reason": mapped[1]})
+    return actions
 
 
 def _status_for(a_block: dict | None, b_facts: dict | None,
