@@ -38,9 +38,12 @@ Before any path was removed, all four checks were run and recorded:
 
 | Path | Class | Reason | Replacement | Dependency check | Action | Commit |
 |---|---|---|---|---|---|---|
-| `pre-network-restructure-2026-10-03` (tag) | `CANONICAL` | Recovery point for the entire pre-restructure tree | — | n/a | created | _pending_ |
-| `docs/restructure/BEFORE_TREE.txt` | `CANONICAL` | 2841-line baseline listing of all 2760 tracked files | — | n/a | created | _pending_ |
-| `docs/restructure/CLEANUP_MANIFEST.md` | `CANONICAL` | This file | — | n/a | created | _pending_ |
+| `pre-network-restructure-2026-10-03` (tag) | `CANONICAL` | Recovery point for the entire pre-restructure tree | — | n/a | created | `1ee9dd13` |
+| `docs/restructure/BEFORE_TREE.txt` | `CANONICAL` | 2841-line baseline listing of all 2760 tracked files | — | n/a | created | `1ee9dd13` |
+| `docs/restructure/CLEANUP_MANIFEST.md` | `CANONICAL` | This file | — | n/a | created | `1ee9dd13` |
+
+**Baseline test result before any removal:** `ruff` clean; `pytest -q tests ../tests` → **1197 passed, 5 skipped, 0 failed** (7:18).
+**After Phase 1:** `ruff` clean; `pytest -m v01` → **265 passed, 5 skipped**. Tracked files: 2762 → 2283.
 
 ---
 
@@ -48,28 +51,46 @@ Before any path was removed, all four checks were run and recorded:
 
 | Path | Class | Reason | Replacement | Dependency check | Action | Commit |
 |---|---|---|---|---|---|---|
-| `products/` (32) | `REMOVE` | Four empty product scaffolds (`master` `qa` `rating` `supply`). All 23 `__init__.py` are **0 bytes**; only other content is 4 `config.yaml` ending `migration: status: "PHASE_A_STRUCTURE_CREATED"`. Directly contradicts `AGENTS.md` "no second public product identity". | Capabilities already live in `moodify-core-package/src/moodify/`; the `config.yaml` files cite it as their own `source` | Zero hits in all 5 workflows, root `Dockerfile`, `docker-compose.yml`, `ops/`, `deployment/`. `products/supply/config.yaml:20` points at `shared/contracts` — itself a 0-byte shell. Core imports none of it. | _pending_ | _pending_ |
-| `shared/` (7) | `REMOVE` | Migration map only. **Every `.py` is 0 bytes**; `README.md` declares each future module will be copied from `moodify-core-package/src/moodify/` | Already exists in Core (`contracts/`, `authority/`, `safety/`, `node/`, `api/`) | Referenced only by `products/supply/config.yaml:20` (also removed). No import anywhere. | _pending_ | _pending_ |
-| `sdk/` (9) | `REMOVE` | Placeholder SDK. `client.py:88` returns `id="placeholder-id"`, 5× `# Future: Actual API call`, 3× `raise NotImplementedError` | Core's real surfaces (`moodify.api`, `moodify.release_cli`) | Zero hits in workflows, Dockerfile, `ops/`, `deployment/`. `plugins/vst` CMake default `MOODIFY_SDK_DIR` resolves to `plugins/sdk`, not this path. **Caveat:** external downloader usage is not provable from the repo. | _pending_ | _pending_ |
-| `plugins/` (9) | `REMOVE` | Unbuilt plugin surface. `plugins/github-action/plugin-ci.yml` sits **outside** `.github/workflows/`, so GitHub never executes it; zero references to `plugin-ci`. VST template needs un-vendored JUCE. | — | No workflow, no `ops/`, no `deployment/`, no import. | _pending_ | _pending_ |
-| `phys-lab/` (1) | `REMOVE` | Single `run_suite.sh` launcher hardcoding `cd /home/ubuntu/moodify`. Zero audio/DSP logic. | Science lives in Core's `moodify.physics` | Dependency runs the other way: `moodify-core-package/src/moodify/physics/reliable_runner.py:90` hardcodes `/home/ubuntu/phys-lab/test_audio/piano.wav` → dangling constant fixed in the same change | _pending_ | _pending_ |
-| `moodify-qa/` (26) | `REMOVE` | Standalone "Moodify QA API" — a second public product identity. `core/metrics.py` is a **verbatim copy** of `moodify.auditory.loudness` (diff shows comment-only differences). Ships a committed 45 KB `qa_storage.db`. Its 0–100 score model was explicitly rejected (`docs/plan/2026-10-02_MSP02…:114`). | `moodify-core-package/src/moodify/auditory/` | Zero hits in all 5 workflows, root Dockerfile/compose, `ops/`, `deployment/`, `scripts/`. Sole consumer is `moodify-qa-desktop` (removed together). | _pending_ | _pending_ |
-| `moodify-qa-desktop/` (8) | `REMOVE` | Third Electron desktop shell (of three), and it sits downstream of the already-dead QA service — `package.json` `build.extraResources` bundles `../moodify-qa`. No audio logic at all. | `moodify-desktop/` is the surviving shell | Zero hits in workflows, `ops/`, `scripts/`, `deployment/`. Prior reduction plans assumed it was untracked; it **is** tracked (`4e2c1e28`), so `git rm -r` is required. | _pending_ | _pending_ |
-| `windows版本开发/` (330) | `REMOVE` | Historical MFD-001..010 Windows work packages. **Zero source code** — 255 `.md`, 36 `.json`, 24 `.txt`, 15 `.csv`; count of `.js/.ts/.tsx/.py/.sh/.ps1/.bat/.html/.css` = 0. | Superseded by the direct Electron build in `moodify-desktop/` (`docs/REPOSITORY_STATUS.md`, 2026-10-02) | No canonical doc cites it; no code cites it; the single `MFD-0` hit outside the dir is an inventory row in the recovery report. `moodify-desktop/` has zero `MFD`/`W01`/`W02` references. | _pending_ | _pending_ |
-| `apps/ear-workbench/android/` (17) | `REMOVE` | Kotlin sources with **no `build.gradle.kts`, no `settings.gradle.kts`, no wrapper** — not a buildable project. Its own README calls it an archive of `apps/android` that is "不公开、不构建、不进入任何公开发布产物". | `apps/android` | Not referenced by any workflow. The 8 HTML workbench pages are **kept** (`.gitignore` un-ignores them as canonical app source). | _pending_ | _pending_ |
-| `scan_err.txt` (1) | `REMOVE` | 0-byte tracked file | — | No references | _pending_ | _pending_ |
-| `.codex_tmp/` (1) | `REMOVE` | `read_roadmap.mjs` agent scratch.  Already gitignored (`.gitignore:23`) but 1 file remained tracked. | — | No references | _pending_ | _pending_ |
-| `engine/` (19) → 4 files `MIGRATE` to Core | `MIGRATE` | A facade that **reverses the dependency direction**: `engine/_compat.py` + `engine/adapters/_bootstrap.py` do `sys.path.insert(0, "moodify-core-package/src")`. Core never imports `engine`. This is the "second Core" `AGENTS.md` forbids. | Core, after lifting `acoustic_analysis/issue_detection.py`, `scoring_engine/recommendations.py`, `music_understanding/commercial_insight.py`, `report_schema/schema.py` + `moodify_intelligence_report.schema.json` | Only `demo/` imports `engine`. Both removed together. | _pending_ | _pending_ |
-| `demo/` (12) | `REMOVE` | Independent re-implementation with **no analysis logic of its own** (its README says so). Critically: `demo/pyproject.toml:17` declares `moodify = "demo.cli:main"`, **colliding with Core's `moodify = "moodify.release_cli:main"`** — installing both makes the `moodify` command resolve differently by install order. | Core CLI | Its only dependency was `engine/`. Zero CI/ops references. | _pending_ | _pending_ |
+| `products/` (32) | `REMOVE` | Four empty product scaffolds (`master` `qa` `rating` `supply`). All 23 `__init__.py` are **0 bytes**; only other content is 4 `config.yaml` ending `migration: status: "PHASE_A_STRUCTURE_CREATED"`. Directly contradicts `AGENTS.md` "no second public product identity". | Capabilities already live in `moodify-core-package/src/moodify/`; the `config.yaml` files cite it as their own `source` | Zero hits in all 5 workflows, root `Dockerfile`, `docker-compose.yml`, `ops/`, `deployment/`. `products/supply/config.yaml:20` points at `shared/contracts` — itself a 0-byte shell. Core imports none of it. | removed | `ea6608ee` |
+| `shared/` (7) | `REMOVE` | Migration map only. **Every `.py` is 0 bytes**; `README.md` declares each future module will be copied from `moodify-core-package/src/moodify/` | Already exists in Core (`contracts/`, `authority/`, `safety/`, `node/`, `api/`) | Referenced only by `products/supply/config.yaml:20` (also removed). No import anywhere. | removed | `ea6608ee` |
+| `sdk/` (9) | `REMOVE` | Placeholder SDK. `client.py:88` returns `id="placeholder-id"`, 5× `# Future: Actual API call`, 3× `raise NotImplementedError` | Core's real surfaces (`moodify.api`, `moodify.release_cli`) | Zero hits in workflows, Dockerfile, `ops/`, `deployment/`. `plugins/vst` CMake default `MOODIFY_SDK_DIR` resolves to `plugins/sdk`, not this path. **Caveat:** external downloader usage is not provable from the repo. | removed | `ea6608ee` |
+| `plugins/` (9) | `REMOVE` | Unbuilt plugin surface. `plugins/github-action/plugin-ci.yml` sits **outside** `.github/workflows/`, so GitHub never executes it; zero references to `plugin-ci`. VST template needs un-vendored JUCE. | — | No workflow, no `ops/`, no `deployment/`, no import. | removed | `8c3f2cff` |
+| `phys-lab/` (1) | `REMOVE` | Single `run_suite.sh` launcher hardcoding `cd /home/ubuntu/moodify`. Zero audio/DSP logic. | Science lives in Core's `moodify.physics` | Dependency runs the other way: `moodify-core-package/src/moodify/physics/reliable_runner.py:90` hardcodes `/home/ubuntu/phys-lab/test_audio/piano.wav` → dangling constant fixed in the same change | removed | `8c3f2cff` |
+| `moodify-qa/` (26) | `REMOVE` | Standalone "Moodify QA API" — a second public product identity. `core/metrics.py` is a **verbatim copy** of `moodify.auditory.loudness` (diff shows comment-only differences). Ships a committed 45 KB `qa_storage.db`. Its 0–100 score model was explicitly rejected (`docs/plan/2026-10-02_MSP02…:114`). | `moodify-core-package/src/moodify/auditory/` | Zero hits in all 5 workflows, root Dockerfile/compose, `ops/`, `deployment/`, `scripts/`. Sole consumer is `moodify-qa-desktop` (removed together). | removed | `8c3f2cff` |
+| `moodify-qa-desktop/` (8) | `REMOVE` | Third Electron desktop shell (of three), and it sits downstream of the already-dead QA service — `package.json` `build.extraResources` bundles `../moodify-qa`. No audio logic at all. | `moodify-desktop/` is the surviving shell | Zero hits in workflows, `ops/`, `scripts/`, `deployment/`. Prior reduction plans assumed it was untracked; it **is** tracked (`4e2c1e28`), so `git rm -r` is required. | removed | `8c3f2cff` |
+| `windows版本开发/` (330) | `REMOVE` | Historical MFD-001..010 Windows work packages. **Zero source code** — 255 `.md`, 36 `.json`, 24 `.txt`, 15 `.csv`; count of `.js/.ts/.tsx/.py/.sh/.ps1/.bat/.html/.css` = 0. | Superseded by the direct Electron build in `moodify-desktop/` (`docs/REPOSITORY_STATUS.md`, 2026-10-02) | No canonical doc cites it; no code cites it; the single `MFD-0` hit outside the dir is an inventory row in the recovery report. `moodify-desktop/` has zero `MFD`/`W01`/`W02` references. | removed | `3000f845` |
+| `apps/ear-workbench/android/` (24) | `REMOVE` | Kotlin sources with **no `build.gradle.kts`, no `settings.gradle.kts`, no wrapper** — not a buildable project. Its own README calls it an archive of `apps/android` that is "不公开、不构建、不进入任何公开发布产物". `apps/android` is retained, so no unique source is lost. | `apps/android` | Not referenced by any workflow. The 8 HTML workbench pages + `assets/`, `dev_proxy.py`, `check_workbench.mjs` are **kept** (`.gitignore` un-ignores them as canonical app source; 12 files remain). | removed | `bf5dd023` |
+| `scan_err.txt` (1) | `REMOVE` | 0-byte tracked file | — | No references | removed | `bf5dd023` |
+| `.codex_tmp/` (1) | `REMOVE` | `read_roadmap.mjs` agent scratch. Already gitignored (`.gitignore:23`) but 1 file remained tracked. The ignore rule is kept so the directory cannot be re-tracked. | — | No references | removed | `bf5dd023` |
+| `engine/` (19) | `REMOVE` | **Deviation from the approved plan, evidence-led.** The plan said to lift 4 files into Core; inspection shows each is the *weaker* duplicate of something Core already owns, so migrating would have created a second authority inside Core — the thing `AGENTS.md` L112-114 forbids. Also a facade that **reverses the dependency direction** (`_compat.py`/`adapters/_bootstrap.py` do `sys.path.insert("moodify-core-package/src")`); Core never imported it. | Nothing — Core already owns these capabilities. See the comparison below. | Only `demo/` imported `engine/`. Both removed together. | removed | `9617c9b0` |
+| `demo/` (12) | `REMOVE` | Independent re-implementation with **no analysis logic of its own**. Critically: `demo/pyproject.toml:17` declared `moodify = "demo.cli:main"`, **colliding with Core's `moodify = "moodify.release_cli:main"`** — installing both made the `moodify` command resolve by install order. | Core CLI — canonical `moodify analyze` verified working | Its only dependency was `engine/`. Zero CI/ops references. Post-removal, exactly **one** `moodify` console entry point remains repo-wide. | removed | `9617c9b0` |
+
+### Why `engine/` was not migrated into Core (deviation record)
+
+The approved plan called for lifting four `engine/` files into Core. Comparing each
+against what Core already ships reversed that decision:
+
+| `engine/` file | Core already owns | Verdict |
+|---|---|---|
+| `acoustic_analysis/issue_detection.py` — 7 hardcoded threshold rules | `diagnosis/defect_classifier.py` — 18 parameters, 3 severity levels, 4 priority classes | engine was the weaker duplicate |
+| `scoring_engine/recommendations.py` — 7-entry issue→action map | `knowledge/craft_chains.py` — 8 emotions × 15 DSP params, with risk warnings and contraindications | engine was the weaker duplicate |
+| `music_understanding/commercial_insight.py` — release-readiness verdict | `knowledge/risk_model.py` | overlapping |
+| `report_schema/schema.py` + `moodify_intelligence_report.schema.json` — `moodify.intelligence-report.v1` | `auditory/reports.py`, `auditory/report_render.py`, `auditory/protocol_report.py`, `schemas/canonical/` | **zero** references to `moodify.intelligence-report.v1` anywhere in Core src; its own docstring says it is the contract "shared by every Moodify product (QA, Master, Rating, Supply)" — the four-product identity `AGENTS.md` prohibits |
+
+Losing `demo`'s `moodify analyze` costs nothing: Core's canonical `moodify analyze`
+already exists and was verified working (`--cases-root`, `--format json|summary`).
+
 
 ### Dangling references repaired in Phase 1
 
 | Path | Fix | Commit |
 |---|---|---|
-| `moodify-core-package/src/moodify/physics/reliable_runner.py:90` | Remove hardcoded `/home/ubuntu/phys-lab/test_audio/piano.wav` | _pending_ |
-| `.gitignore` — `!moodify_runtime/operator_console.html` | File does not exist | _pending_ |
-| `.gitignore` — `!apps/music-web/public/moodify-logo.png` | `apps/music-web` was renamed to `apps/web` | _pending_ |
-| `.gitignore` — `工程经验层/*` block (L77-84) | Repointed at the new governance home | _pending_ |
+| `moodify-core-package/src/moodify/physics/reliable_runner.py:90` | Removed the dangling `/home/ubuntu/phys-lab/test_audio/piano.wav` baseline-audio candidate; remaining candidates cover the env override and repo-relative paths. Verified: module imports, 0 `phys-lab` references remain. | `8c3f2cff` |
+| `.moodify/temporal_texture.toml:18` | Removed the now-empty `"phys-lab"` exclude entry | `8c3f2cff` |
+| `scripts/pr15_asset_inventory.py:22` | Removed `phys-lab` from the `RESEARCH_EXPERIMENTAL` classification regex | `8c3f2cff` |
+| `.gitignore` — `!moodify_runtime/operator_console.html` | Removed. Neither the file nor a `moodify_runtime.operator_api` module exists. | _pending_ |
+| `.gitignore` — `!apps/music-web/public/moodify-logo.png` | Removed. `apps/music-web` was renamed to `apps/web`. **Pre-existing latent bug found:** `apps/web/public/moodify-logo.png` *is* tracked but matches the blanket `*.png` rule at `.gitignore:108` with no surviving exception — so it is tracked today only because it was added before the rename, and would be silently dropped if ever re-added. Resolved when `apps/web` leaves the mainline in Phase 3. | _pending_ |
+| `.gitignore` — `工程经验层/*` block | Repointed at the new governance home | _pending_ (Phase 2) |
 
 ---
 
