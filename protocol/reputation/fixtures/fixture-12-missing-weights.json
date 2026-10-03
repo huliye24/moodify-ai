@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 12: Missing Aggregate Weights",
+  "description": "Profile with contributions but no approved aggregate weights",
+  "fixtureId": "f12-missing-weights",
+  "policy": {
+    "policyVersion": "003-draft-1",
+    "status": "draft",
+    "weights": null,
+    "aggregateEnabled": false,
+    "notes": [
+      "Weights not yet approved by governance",
+      "Dimension scores calculated but aggregate must remain null"
+    ]
+  },
+  "profile": {
+    "protocolId": "mood:contributor:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "verifiedContributionCount": 5
+  },
+  "contributions": [
+    {
+      "contributionId": "mood-contrib-weight-001",
+      "scores": { "contribution": 80, "impact": 75, "quality": 85, "persistence": null, "early": 70 }
+    },
+    {
+      "contributionId": "mood-contrib-weight-002",
+      "scores": { "contribution": 75, "impact": 80, "quality": 78, "persistence": null, "early": 65 }
+    },
+    {
+      "contributionId": "mood-contrib-weight-003",
+      "scores": { "contribution": 82, "impact": 72, "quality": 88, "persistence": null, "early": 75 }
+    }
+  ],
+  "snapshot": {
+    "snapshotId": "mood-reputation-2026-08-29-012",
+    "dimensions": {
+      "contribution": 79,
+      "impact": 75.67,
+      "quality": 83.67,
+      "persistence": null,
+      "early": 70
+    },
+    "aggregate": null,
+    "confidence": "low"
+  },
+  "expectedBehavior": {
+    "dimensionsCalculated": true,
+    "aggregateNull": true,
+    "noInventedScore": true,
+    "reason": "Aggregate must be null when weights are not approved"
+  }
+}

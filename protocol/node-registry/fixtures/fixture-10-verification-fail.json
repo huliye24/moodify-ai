@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 10: Failed Challenge",
+  "description": "Node that failed HTTP challenge verification",
+  "fixtureId": "f10-verification-fail",
+  "challenge": {
+    "challengeId": "challenge-002",
+    "nonce": "xyz789",
+    "expectedPath": "/.well-known/mood-node-challenge"
+  },
+  "nodeResponse": "wrong-nonce",
+  "verificationResult": {
+    "verified": false,
+    "method": "http_challenge",
+    "error": "Challenge response does not match expected nonce"
+  },
+  "expectedBehavior": {
+    "verificationPassed": false,
+    "nodeStatus": "pending_verification"
+  }
+}

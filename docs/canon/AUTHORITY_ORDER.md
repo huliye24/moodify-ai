@@ -1,6 +1,6 @@
 # AUTHORITY ORDER — Moodify
 
-**Canon v1.1（Public Form Package 01, 2026-08-19）**
+**Canon v2.0（Professional Finishing, 2026-09-20；v1.2 One Core / Two Interfaces 技术宪法延续）**
 
 当指令冲突时，按以下顺序判断。低级来源可以说明「意图」，不能覆盖高级来源证明的「现实」。
 
@@ -12,6 +12,10 @@
 6. **Current subsystem documentation**
 7. **Experimental documentation**
 8. **Historical / legacy documentation**
+
+## 技术宪法约束（非协商，独立于上述 8 级）
+
+- **One Core, Multiple Interfaces**：一切声音能力来自 Moodify Core，interface 不得私藏第二套声音逻辑（见 `AGENTS.md` Technical Constitution）。该约束不属于「意图 vs 现实」的 8 级判断，而是一条工程不变量。
 
 主题细化：Public Brand 问题在第 3 级 Canon 之后进入 `docs/brand/public/`；其中 `PUBLIC_BRAND_CONSTITUTION.md` 是最高主题权威。部署是否真实存在仍由第 4 级 verified runtime evidence 判断。
 

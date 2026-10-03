@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 3: Valid Data Node",
+  "description": "Data node without endpoint, with provenance capabilities",
+  "fixtureId": "f3-valid-data-node",
+  "node": {
+    "nodeId": "mood:node:7777777777777777777777777777777777777777777777777777777777777777",
+    "operatorProtocolId": "mood:contributor:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "nodeType": "data",
+    "displayName": "Audio Dataset Provider",
+    "region": { "countryCode": "DE", "regionCode": null, "city": null, "precision": "country" },
+    "endpoint": null,
+    "capabilityManifestId": "mood:capability:7777777777777777777777777777777777777777777777777777777777777777",
+    "verification": { "status": "pending", "method": null, "verifiedAt": null, "evidenceIds": [] },
+    "health": { "status": "unknown", "observedAt": null },
+    "lifecycleStatus": "registered",
+    "registeredAt": "2026-08-17T10:00:00Z",
+    "updatedAt": "2026-08-17T10:00:00Z",
+    "recordFingerprint": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+    "lifecycleHistory": []
+  },
+  "capabilityManifest": {
+    "manifestId": "mood:capability:7777777777777777777777777777777777777777777777777777777777777777",
+    "nodeId": "mood:node:7777777777777777777777777777777777777777777777777777777777777777",
+    "nodeType": "data",
+    "protocolVersions": ["0.1"],
+    "capabilities": [
+      { "key": "data.category", "value": "audio", "visibility": "public", "verificationStatus": "declared", "evidenceIds": [] },
+      { "key": "data.provenance", "value": "verified", "visibility": "restricted", "verificationStatus": "declared", "evidenceIds": [] }
+    ],
+    "createdAt": "2026-08-17T10:00:00Z",
+    "fingerprint": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+  }
+}

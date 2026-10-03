@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 11: Insufficient Persistence History",
+  "description": "Single contribution cannot produce valid persistence score",
+  "fixtureId": "f11-persistence-insufficient",
+  "profile": {
+    "protocolId": "mood:contributor:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "verifiedContributionCount": 1,
+    "firstVerifiedContributionAt": "2026-08-29T10:00:00Z",
+    "lastVerifiedContributionAt": "2026-08-29T10:00:00Z"
+  },
+  "contributions": [
+    {
+      "contributionId": "mood-contrib-persist-001",
+      "status": "finalized",
+      "submittedAt": "2026-08-29T10:00:00Z",
+      "scores": {
+        "contribution": 80,
+        "impact": 75,
+        "quality": 85,
+        "persistence": null,
+        "early": 100
+      }
+    }
+  ],
+  "persistenceCalculation": {
+    "contributionCount": 1,
+    "epochCount": 1,
+    "timeSpanDays": 0,
+    "status": "INSUFFICIENT_HISTORY",
+    "persistenceScore": null,
+    "reason": "Persistence requires multiple time-separated contributions across epochs"
+  },
+  "snapshot": {
+    "snapshotId": "mood-reputation-2026-08-29-011",
+    "dimensions": {
+      "persistence": null
+    },
+    "confidence": "insufficient"
+  },
+  "expectedBehavior": {
+    "persistenceNull": true,
+    "noFalsePositive": true,
+    "reason": "One-time contribution should not produce persistence score"
+  }
+}

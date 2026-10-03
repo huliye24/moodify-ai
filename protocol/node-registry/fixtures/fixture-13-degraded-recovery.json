@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 13: Degraded to Active Recovery",
+  "description": "Healthy heartbeat recovers degraded node to active",
+  "fixtureId": "f13-degraded-active-recovery",
+  "previousState": "degraded",
+  "previousHealth": "degraded",
+  "newHeartbeat": {
+    "status": "healthy",
+    "observedAt": "2026-08-29T10:00:00Z"
+  },
+  "recoveryEvaluation": {
+    "canRecover": true,
+    "newLifecycleState": "active"
+  },
+  "expectedBehavior": {
+    "recoveryAllowed": true,
+    "heartbeatCanAffectState": true
+  }
+}

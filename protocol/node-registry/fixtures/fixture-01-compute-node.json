@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 1: Valid Compute Node",
+  "description": "Compute node with endpoint and capabilities",
+  "fixtureId": "f1-valid-compute-node",
+  "node": {
+    "schemaVersion": "1.0.0",
+    "nodeId": "mood:node:1111111111111111111111111111111111111111111111111111111111111111",
+    "operatorProtocolId": "mood:contributor:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "nodeType": "compute",
+    "displayName": "Singapore Compute Node Alpha",
+    "region": {
+      "countryCode": "SG",
+      "regionCode": null,
+      "city": null,
+      "precision": "country"
+    },
+    "endpoint": {
+      "type": "https",
+      "uri": "https://compute-sg.mood.invalid"
+    },
+    "capabilityManifestId": "mood:capability:1111111111111111111111111111111111111111111111111111111111111111",
+    "verification": {
+      "status": "pending",
+      "method": null,
+      "verifiedAt": null,
+      "evidenceIds": []
+    },
+    "health": {
+      "status": "unknown",
+      "observedAt": null
+    },
+    "lifecycleStatus": "registered",
+    "registeredAt": "2026-08-15T10:00:00Z",
+    "updatedAt": "2026-08-15T10:00:00Z",
+    "recordFingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "lifecycleHistory": []
+  },
+  "capabilityManifest": {
+    "schemaVersion": "1.0.0",
+    "manifestId": "mood:capability:1111111111111111111111111111111111111111111111111111111111111111",
+    "nodeId": "mood:node:1111111111111111111111111111111111111111111111111111111111111111",
+    "nodeType": "compute",
+    "protocolVersions": ["0.1"],
+    "capabilities": [
+      {
+        "key": "compute.cpu.arch",
+        "value": "x86_64",
+        "visibility": "public",
+        "verificationStatus": "declared",
+        "evidenceIds": []
+      },
+      {
+        "key": "compute.memory.capacity_class",
+        "value": "16-32GB",
+        "visibility": "public",
+        "verificationStatus": "declared",
+        "evidenceIds": []
+      }
+    ],
+    "createdAt": "2026-08-15T10:00:00Z",
+    "fingerprint": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "expectedBehavior": {
+    "valid": true,
+    "hasEndpoint": true,
+    "hasCapabilities": true
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 1: API Health Response",
+  "description": "Sample health endpoint response",
+  "fixtureId": "f1-health",
+  "request": {
+    "method": "GET",
+    "url": "/api/protocol/v1/health"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "data": {
+      "status": "ok",
+      "apiVersion": "v1",
+      "components": {
+        "protocolFacts": "ok",
+        "contributions": "ok",
+        "reputation": "ok",
+        "nodeRegistry": "ok"
+      }
+    },
+    "meta": {
+      "requestId": "req_example_001",
+      "generatedAt": "2026-08-29T10:00:00Z"
+    }
+  }
+}

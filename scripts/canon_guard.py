@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Moodify Canon drift guard — W01-P01.
+"""Moodify Canon drift guard — W01-P01, updated for Canon v2.0.
 
 低成本权威守卫：防止高权威文件再次把 Ear 定义为对外一级产品，
 或出现相互冲突的对外产品身份。只读检查，不修改任何文件。
+身份标记支持 Canon v2.0（Professional Finishing，延续 v1.2 One Core / Two Interfaces）；
+禁止把对外身份回退为「Player 唯一中心」（v1.1 复辟）。
 
 用法:
     python scripts/canon_guard.py            # 检查仓库根（自动定位）
@@ -37,10 +39,31 @@ REQUIRED_CANON_FILES = [
 
 # 对外一级产品身份允许的表述（首身份位置附近可接受的产品行）
 ALLOWED_PRODUCT_LINES = [
+    # Canon v1.1（Public Form）
     "Moodify Music",
     "Moodify Player",
     "Moodify Music / Player",
     "Moodify Music / Moodify Player",
+    # Canon v1.2（One Core / Two Interfaces）
+    "One Core, Two Interfaces",
+    "一个 Core，两个接口",
+    "Moodify CLI",
+    "Moodify App",
+    # Canon v2.0（Professional Finishing）
+    "AI-native Professional Audio Finishing System",
+    "Generated is not finished",
+]
+
+# Canon v2.0 要求出现的身份/命题标记（README/AGENTS 首部至少其一）
+REQUIRED_IDENTITY_V2 = [
+    "Professional Finishing",
+    "Generated is not finished",
+]
+
+# Canon v2.0：禁止把对外身份回退到「Player 唯一中心」（v1.1 旧身份复辟）
+FORBIDDEN_PLAYER_ONLY_PATTERNS = [
+    "Moodify Music / Moodify Player",
+    "Core user action: PLAY",
 ]
 
 # 高权威文件内禁止的"Ear 作为对外一级产品"表述模式
@@ -65,14 +88,19 @@ def check_files(files: dict[str, str]) -> list[str]:
     """纯文本检查（便于测试注入）: files 为相对路径 -> 内容。"""
     errors: list[str] = []
 
-    # 2. README / AGENTS 顶部（前 60 行）必须出现对外产品身份，且禁止 Ear-as-product 模式
+    # 2. README / AGENTS 顶部（前 60 行）必须出现对外产品身份，且禁止 Ear-as-product / Player-only 复辟模式
     for rel in ("README.md", "AGENTS.md"):
         head = "\n".join(files.get(rel, "").splitlines()[:60])
         if not any(pat in head for pat in ALLOWED_PRODUCT_LINES):
-            errors.append(f"{rel}: no external product identity (Moodify Music/Player) in first 60 lines")
+            errors.append(f"{rel}: no external product identity marker in first 60 lines")
+        if not any(pat in head for pat in REQUIRED_IDENTITY_V2):
+            errors.append(f"{rel}: missing Canon v2.0 Professional Finishing identity marker in first 60 lines")
         for pat in FORBIDDEN_EAR_PRODUCT_PATTERNS:
             if pat in head:
                 errors.append(f"{rel}: forbidden Ear-as-product pattern: {pat!r}")
+        for pat in FORBIDDEN_PLAYER_ONLY_PATTERNS:
+            if pat in head:
+                errors.append(f"{rel}: forbidden Player-only regression pattern: {pat!r}")
 
     # 3. 高权威文件内不允许并列对外一级身份（README/AGENTS 首身份行）
     #    允许 "INTERNAL" 语境下的 Ear 表述；禁止把 Ear 放在"对外产品身份"位置。
@@ -83,8 +111,10 @@ def check_files(files: dict[str, str]) -> list[str]:
 
     # 4. CURRENT_CANON 必须声明唯一对外身份与 Canon change rule
     cc = files.get("docs/canon/CURRENT_CANON.md", "")
-    if "Moodify Music" not in cc:
-        errors.append("docs/canon/CURRENT_CANON.md: missing external identity Moodify Music")
+    if not any(pat in cc for pat in ALLOWED_PRODUCT_LINES):
+        errors.append("docs/canon/CURRENT_CANON.md: no external product identity marker")
+    if "Generated is not finished" not in cc:
+        errors.append("docs/canon/CURRENT_CANON.md: missing Canon v2.0 thesis 'Generated is not finished'")
     if "CANON_CHANGE = YES" not in cc:
         errors.append("docs/canon/CURRENT_CANON.md: missing CANON_CHANGE rule")
 

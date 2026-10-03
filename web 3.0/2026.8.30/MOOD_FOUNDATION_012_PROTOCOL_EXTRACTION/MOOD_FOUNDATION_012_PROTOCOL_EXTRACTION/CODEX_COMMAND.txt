@@ -1,0 +1,34 @@
+执行任务包：
+
+MOOD-FOUNDATION-012 — Protocol Foundation Extraction
+
+目标仓库：
+huliye24/moodify-ai
+
+第一步不是写代码，而是检查 011 是否已经执行并被接受。
+
+如果以下文件不存在：
+docs/mood/CURRENT_CANON.md
+docs/mood/SYSTEM_ARCHITECTURE.md
+docs/mood/ASSET_CLASSIFICATION.md
+docs/mood/TOKEN_LAUNCH_GATE.md
+
+立即停止并返回：
+BLOCKED_BY_MOOD_FOUNDATION_011
+
+如果 011 已完成，则：
+
+1. 基于被接受的 011 commit 创建独立 worktree / branch。
+2. 审计 codex/mood-mainnet-integration-009，但禁止整条 merge。
+3. 选择性提取 Wallet、Identity、Contribution、Reputation、Transparency、通用只读 Chain 能力。
+4. 把 Token / Genesis / Airdrop / Distributor / DEX / Claim 与 foundation 解耦。
+5. 默认 Launch State = foundation。
+6. Foundation 必须在没有新 MOOD Token CA 的情况下可运行。
+7. Pending reward 只做 accounting，不产生链上资产债权或自动转账。
+8. 建立 012 extraction manifest、dependency map、legacy token seams。
+9. 写并运行相关测试，结果必须真实。
+10. 不部署合约、不发币、不移动资金、不创建 Flap Token。
+11. 完成后严格按 OUTPUT_TEMPLATE.md 输出，并给 013 稳定 handoff。
+
+并发安全：
+严禁 reset --hard、git clean、force push、覆盖未知工作。

@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MOOD Protocol Reputation Evidence",
+  "description": "Evidence record supporting reputation claims",
+  "type": "object",
+  "required": [
+    "evidenceVersion",
+    "evidenceId",
+    "protocolId",
+    "dimension",
+    "contributionId",
+    "evidenceType",
+    "source",
+    "collectedAt",
+    "status",
+    "content"
+  ],
+  "properties": {
+    "evidenceVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Evidence schema version"
+    },
+    "evidenceId": {
+      "type": "string",
+      "pattern": "^EV-[0-9]{6}$",
+      "description": "Unique evidence identifier"
+    },
+    "protocolId": {
+      "type": "string",
+      "pattern": "^mood:contributor:[a-f0-9]{64}$",
+      "description": "Participant identity"
+    },
+    "dimension": {
+      "type": "string",
+      "enum": ["contribution", "impact", "quality", "persistence", "early"],
+      "description": "Reputation dimension"
+    },
+    "contributionId": {
+      "type": "string",
+      "pattern": "^mood-contrib-[a-z0-9-]+$",
+      "description": "Related contribution ID"
+    },
+    "evidenceType": {
+      "type": "string",
+      "enum": ["documentary", "observational", "computational", "testimonial"],
+      "description": "Type of evidence"
+    },
+    "source": {
+      "$ref": "#/definitions/EvidenceSource",
+      "description": "Evidence source information"
+    },
+    "collectedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When evidence was collected"
+    },
+    "status": {
+      "$ref": "#/definitions/EvidenceStatus",
+      "description": "Evidence status"
+    },
+    "content": {
+      "$ref": "#/definitions/EvidenceContent",
+      "description": "Evidence content"
+    },
+    "integrity": {
+      "$ref": "#/definitions/EvidenceIntegrity",
+      "description": "Evidence integrity metadata"
+    },
+    "metadata": {
+      "$ref": "#/definitions/EvidenceMetadata",
+      "description": "Additional evidence metadata"
+    }
+  },
+  "definitions": {
+    "EvidenceSource": {
+      "type": "object",
+      "required": [
+        "sourceType",
+        "sourceId",
+        "collectorId"
+      ],
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "enum": ["on-chain", "off-chain", "manual", "automated"],
+          "description": "Type of source"
+        },
+        "sourceId": {
+          "type": "string",
+          "description": "Source identifier (e.g., transaction hash, URL)"
+        },
+        "collectorId": {
+          "type": "string",
+          "pattern": "^mood:collector:[a-f0-9]{64}$",
+          "description": "Evidence collector identity"
+        },
+        "collectorTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When evidence was collected by collector"
+        }
+      }
+    },
+    "EvidenceStatus": {
+      "type": "string",
+      "enum": ["PENDING", "VERIFIED", "REJECTED", "CHALLENGED", "REVIEW"],
+      "description": "Evidence status"
+    },
+    "EvidenceContent": {
+      "type": "object",
+      "required": ["format", "data", "hash"],
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["json", "text", "binary", "link"],
+          "description": "Content format"
+        },
+        "data": {
+          "type": ["string", "object"],
+          "description": "Content data (JSON object or string/URL)"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA-256 hash of content"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Content size in bytes"
+        }
+      }
+    },
+    "EvidenceIntegrity": {
+      "type": "object",
+      "properties": {
+        "checksum": {
+          "type": "string",
+          "pattern":^[a-f0-9]{64}$",
+          "description": "Evidence checksum"
+        },
+        "provenance": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProvenanceEvent"
+          },
+          "description": "Provenance chain"
+        },
+        "tamperProof": {
+          "type": "boolean",
+          "description": "Whether evidence is tamper-proof"
+        }
+      }
+    },
+    "EvidenceMetadata": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Evidence tags"
+        },
+        "confidence": {
+          "$ref": "#/definitions/ConfidenceLevel",
+          "description": "Confidence in evidence"
+        },
+        "relevance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Relevance score"
+        },
+        "context": {
+          "type": "object",
+          "description": "Context information"
+        }
+      }
+    },
+    "ProvenanceEvent": {
+      "type": "object",
+      "required": [
+        "eventId",
+        "timestamp",
+        "actor",
+        "action",
+        "data"
+      ],
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^PR-[0-9]{8}-[0-9]{6}$",
+          "description": "Provenance event ID"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Event timestamp"
+        },
+        "actor": {
+          "type": "string",
+          "pattern": "^mood:[a-z]+:[a-f0-9]{64}$",
+          "description": "Actor identity"
+        },
+        "action": {
+          "type": "string",
+          "enum": ["create", "modify", "verify", "reject", "appeal"],
+          "description": "Action performed"
+        },
+        "data": {
+          "type": "object",
+          "description": "Action data"
+        }
+      }
+    },
+    "ConfidenceLevel": {
+      "type": "string",
+      "enum": ["insufficient", "low", "medium", "high", "certainty"],
+      "description": "Confidence level"
+    }
+  }
+}

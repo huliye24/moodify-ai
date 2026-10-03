@@ -3,6 +3,8 @@
 **Canon v1.0（W01-P01, 2026-08-17）**
 **规则 R6/R10：** 本文件只记录已由运行时证据支持的现状；理想架构不得写入。完整事实见 W01-P00 报告（审查包）。
 
+> **注（2026-09-20, Canon v2.0）：** 生产端**目标**架构（Professional Finishing / Mix Graph v0.1）见 [MOODIFY_PROFESSIONAL_FINISHING_V1.md](../MOODIFY_PROFESSIONAL_FINISHING_V1.md)（TARGET，非现状）。本文件仍只记录运行时证据支持的现状。
+
 ## 1. 云端现状（P00 扫描 2026-08-17，与同日黑箱调查一致）
 
 ```text

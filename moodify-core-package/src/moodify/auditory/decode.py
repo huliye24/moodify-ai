@@ -64,7 +64,8 @@ def ffmpeg_version() -> str:
     try:
         out = subprocess.run(
             [_which_ffmpeg(), "-version"],
-            capture_output=True, text=True, timeout=15,
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=15,
         ).stdout
         return out.splitlines()[0] if out else "unknown"
     except Exception:
@@ -83,7 +84,8 @@ def probe(path: Path) -> FileProbe:
             "-of", "json",
             str(path),
         ],
-        capture_output=True, text=True, timeout=60,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        timeout=60,
     )
     if proc.returncode != 0:
         raise AudioDecodeFailed(f"ffprobe failed: {proc.stderr[:300]}")
@@ -142,7 +144,8 @@ def decode(path: Path, analysis_sample_rate: int, timeout_s: int = 300) -> Decod
         "-ar", str(analysis_sample_rate),
         "-f", "f32le", str(out_path),
     ]
-    proc = subprocess.run(args, capture_output=True, text=True, timeout=timeout_s)
+    proc = subprocess.run(args, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", timeout=timeout_s)
     if proc.returncode != 0:
         _best_effort_cleanup(out_path)
         raise AudioDecodeFailed(f"ffmpeg decode failed: {proc.stderr[:300]}")

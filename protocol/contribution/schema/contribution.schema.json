@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mood://protocol/contribution/1.0.0",
+  "title": "MOOD Protocol Contribution Record",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "contributionId",
+    "contributor",
+    "category",
+    "title",
+    "description",
+    "submittedAt",
+    "evidence",
+    "status",
+    "policyVersion",
+    "contentFingerprint"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "contributionId": {
+      "type": "string",
+      "minLength": 8
+    },
+    "contributor": {
+      "type": "object",
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["wallet", "github", "protocol_id"]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "code",
+        "documentation",
+        "data",
+        "compute",
+        "research",
+        "design",
+        "community",
+        "infrastructure",
+        "security",
+        "other"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "submittedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "mood://protocol/evidence/1.0.0" }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted",
+        "under_review",
+        "needs_more_evidence",
+        "rejected",
+        "verified",
+        "scored",
+        "finalized"
+      ]
+    },
+    "policyVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contentFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "review": {
+      "type": ["object", "null"]
+    },
+    "scores": {
+      "type": ["object", "null"]
+    },
+    "reputationEvidence": {
+      "type": ["object", "null"]
+    },
+    "supersedes": {
+      "type": ["string", "null"]
+    }
+  },
+  "additionalProperties": false
+}

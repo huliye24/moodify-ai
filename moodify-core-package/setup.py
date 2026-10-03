@@ -27,11 +27,10 @@ setup(
         "api": ["fastapi>=0.100.0", "uvicorn", "python-multipart"],
         "dev": ["pytest>=7.0", "httpx>=0.24.0"],
     },
-    entry_points={
-        "console_scripts": [
-            "moodify=moodify.cli:main",
-        ],
-    },
+    # Console entry points are declared ONLY in pyproject.toml [project.scripts]
+    # (moodify -> moodify.release_cli:main). A second conflicting entry point
+    # here caused the same `moodify` command to resolve differently depending
+    # on which config the installer read.
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

@@ -1,0 +1,20 @@
+{
+  "description": "This contribution has no evidence and should fail verification.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-no-evidence",
+  "contributor": {
+    "type": "wallet",
+    "id": "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+  },
+  "category": "code",
+  "title": "Contribution with no evidence",
+  "submittedAt": "2026-08-29T13:00:00Z",
+  "evidence": [],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:6588ceffb6f519cf6296a1944b6e12b30453ab5b05ca061b81c544fecfcf1979",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

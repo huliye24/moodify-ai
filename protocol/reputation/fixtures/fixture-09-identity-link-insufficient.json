@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 9: Insufficient Identity Link Evidence",
+  "description": "Attempted identity link without sufficient verification",
+  "fixtureId": "f9-identity-link-insufficient",
+  "primaryIdentity": {
+    "type": "wallet",
+    "id": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "attemptedLink": {
+    "type": "github",
+    "id": "similar_username"
+  },
+  "verification": {
+    "status": "inconclusive",
+    "reason": "Weak similarity - display names look similar but no verifiable proof",
+    "evidence": {
+      "displayNameMatch": false,
+      "emailMatch": false,
+      "signedMessage": null,
+      "commitVerification": null
+    },
+    "confidence": "insufficient"
+  },
+  "identityLink": {
+    "linkId": "mood-identity-link-002",
+    "status": "inconclusive",
+    "message": "Identity link requires explicit verifiable evidence. Similarity alone is insufficient."
+  },
+  "expectedBehavior": {
+    "linkCreated": false,
+    "status": "inconclusive",
+    "autoMergePrevented": true,
+    "reason": "Weak evidence should not create verified identity link"
+  }
+}

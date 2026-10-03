@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 4: Rejected Contribution Mixed In",
+  "description": "Contributor history with both finalized and rejected contributions",
+  "fixtureId": "f4-rejected-mixed",
+  "profile": {
+    "profileVersion": "1.0.0",
+    "protocolId": "mood:contributor:4444444444444444444444444444444444444444444444444444444444444444",
+    "createdAt": "2026-08-10T10:00:00Z",
+    "status": "active",
+    "verifiedContributionCount": 2,
+    "currentSnapshotId": "mood-reputation-2026-08-29-004"
+  },
+  "contributions": [
+    {
+      "contributionId": "mood-contrib-rej-001",
+      "status": "finalized",
+      "category": "code",
+      "scores": { "contribution": 80, "impact": 75, "quality": 85, "persistence": null, "early": 80 }
+    },
+    {
+      "contributionId": "mood-contrib-rej-002",
+      "status": "rejected",
+      "category": "documentation",
+      "rejectionReason": "Insufficient detail, duplicate of existing docs",
+      "scores": null
+    },
+    {
+      "contributionId": "mood-contrib-rej-003",
+      "status": "finalized",
+      "category": "testing",
+      "scores": { "contribution": 70, "impact": 68, "quality": 78, "persistence": null, "early": 70 }
+    },
+    {
+      "contributionId": "mood-contrib-rej-004",
+      "status": "needs_more_evidence",
+      "category": "research",
+      "scores": null
+    }
+  ],
+  "snapshot": {
+    "snapshotId": "mood-reputation-2026-08-29-004",
+    "protocolId": "mood:contributor:4444444444444444444444444444444444444444444444444444444444444444",
+    "epochId": "GENESIS_2026",
+    "policyVersion": "003-draft-1",
+    "inputContributionIds": ["mood-contrib-rej-001", "mood-contrib-rej-003"],
+    "rejectedContributionIds": ["mood-contrib-rej-002", "mood-contrib-rej-004"],
+    "verifiedContributionCount": 2,
+    "categoryDiversity": ["code", "testing"]
+  },
+  "expectedBehavior": {
+    "rejectedExcluded": true,
+    "onlyFinalizedCount": 2,
+    "rejectedCount": 2,
+    "reason": "Only finalized contributions should count toward reputation"
+  }
+}

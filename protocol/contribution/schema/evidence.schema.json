@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mood://protocol/evidence/1.0.0",
+  "title": "MOOD Protocol Evidence",
+  "type": "object",
+  "required": [
+    "evidenceId",
+    "type",
+    "observedAt",
+    "verification"
+  ],
+  "properties": {
+    "evidenceId": {
+      "type": "string",
+      "minLength": 4
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "git_commit",
+        "pull_request",
+        "issue",
+        "review",
+        "file_hash",
+        "dataset_hash",
+        "compute_receipt",
+        "benchmark_report",
+        "document_url",
+        "transaction_hash",
+        "signed_public_message",
+        "manual_review_note"
+      ]
+    },
+    "uri": {
+      "type": ["string", "null"]
+    },
+    "digest": {
+      "type": ["string", "null"],
+      "pattern": "^(sha256:[0-9a-f]{64})?$"
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "verification": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unverified", "verified", "rejected", "inconclusive"]
+        },
+        "method": {
+          "type": ["string", "null"]
+        },
+        "verifiedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "verifiedBy": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

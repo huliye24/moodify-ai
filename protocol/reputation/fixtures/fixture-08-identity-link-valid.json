@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 8: Valid Identity Link Evidence",
+  "description": "Identity link with complete verifiable evidence",
+  "fixtureId": "f8-identity-link-valid",
+  "primaryIdentity": {
+    "type": "wallet",
+    "namespace": "eip155:1",
+    "id": "0x8888888888888888888888888888888888888888"
+  },
+  "linkedIdentity": {
+    "type": "github",
+    "id": "verified-contributor"
+  },
+  "verification": {
+    "status": "verified",
+    "method": "signed_public_message",
+    "evidence": {
+      "signature": "0xabc123...def456",
+      "publicKey": "0x8888888888888888888888888888888888888888",
+      "message": "Linking GitHub account to wallet for MOOD Protocol",
+      "signedAt": "2026-08-20T10:00:00Z",
+      "githubCommitVerification": {
+        "commitAuthor": "verified-contributor",
+        "commitVerifier": "0x8888888888888888888888888888888888888888",
+        "commitHash": "abc123def456",
+        "verified": true
+      }
+    },
+    "verifiedAt": "2026-08-20T10:30:00Z"
+  },
+  "identityLink": {
+    "linkId": "mood-identity-link-001",
+    "primaryProtocolId": "mood:contributor:8888888888888888888888888888888888888888888888888888888888888888",
+    "linkedProtocolIds": ["mood:contributor:9999999999999999999999999999999999999999999999999999999999999999"],
+    "status": "verified",
+    "createdAt": "2026-08-20T10:30:00Z"
+  },
+  "expectedBehavior": {
+    "linkCreated": true,
+    "verificationComplete": true,
+    "status": "verified",
+    "reason": "Valid evidence should create verified identity link"
+  }
+}

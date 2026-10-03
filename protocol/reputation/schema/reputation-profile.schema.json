@@ -1,0 +1,373 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MOOD Protocol Reputation Profile",
+  "description": "A participant's reputation profile with aggregated contributions",
+  "type": "object",
+  "required": [
+    "profileVersion",
+    "protocolId",
+    "identityFingerprint",
+    "createdAt",
+    "lastUpdated",
+    "epochs",
+    "totalContributions",
+    "dimensionSummary",
+    "identityHistory"
+  ],
+  "properties": {
+    "profileVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Profile schema version"
+    },
+    "protocolId": {
+      "type": "string",
+      "pattern": "^mood:contributor:[a-f0-9]{64}$",
+      "description": "Canonical participant identity"
+    },
+    "identityFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of identity proof"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Profile creation timestamp"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "epochs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/EpochSummary"
+      },
+      "description": "Epoch participation history"
+    },
+    "totalContributions": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of contributions"
+    },
+    "dimensionSummary": {
+      "$ref": "#/definitions/DimensionSummary",
+      "description": "Summary across all dimensions"
+    },
+    "identityHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/IdentityEvent"
+      },
+      "description": "Identity proof history"
+    },
+    "metadata": {
+      "$ref": "#/definitions/ProfileMetadata",
+      "description": "Additional profile metadata"
+    }
+  },
+  "definitions": {
+    "EpochSummary": {
+      "type": "object",
+      "required": [
+        "epochId",
+        "participated",
+        "contributionCount",
+        "dimensions",
+        "aggregateScore",
+        "confidence"
+      ],
+      "properties": {
+        "epochId": {
+          "type": "string",
+          "pattern": "^EPOCH-[0-9]{4}$",
+          "description": "Epoch identifier"
+        },
+        "participated": {
+          "type": "boolean",
+          "description": "Whether participant contributed in this epoch"
+        },
+        "contributionCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of contributions in this epoch"
+        },
+        "dimensions": {
+          "$ref": "#/definitions/DimensionScores",
+          "description": "Dimension scores for this epoch"
+        },
+        "aggregateScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Aggregate reputation score"
+        },
+        "confidence": {
+          "$ref": "#/definitions/ConfidenceLevel",
+          "description": "Confidence level in the aggregation"
+        },
+        "firstContributionAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of first contribution in epoch"
+        },
+        "lastContributionAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last contribution in epoch"
+        }
+      }
+    },
+    "DimensionScores": {
+      "type": "object",
+      "required": [
+        "contribution",
+        "impact",
+        "quality",
+        "persistence",
+        "early"
+      ],
+      "properties": {
+        "contribution": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Contribution dimension score"
+        },
+        "impact": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Impact dimension score"
+        },
+        "quality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Quality dimension score"
+        },
+        "persistence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Persistence dimension score"
+        },
+        "early": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Early participation dimension score"
+        }
+      }
+    },
+    "DimensionSummary": {
+      "type": "object",
+      "required": [
+        "contribution",
+        "impact",
+        "quality",
+        "persistence",
+        "early",
+        "participationRate"
+      ],
+      "properties": {
+        "contribution": {
+          "$ref": "#/definitions/DimensionStats",
+          "description": "Contribution dimension statistics"
+        },
+        "impact": {
+          "$ref": "#/definitions/DimensionStats",
+          "description": "Impact dimension statistics"
+        },
+        "quality": {
+          "$ref": "#/definitions/DimensionStats",
+          "description": "Quality dimension statistics"
+        },
+        "persistence": {
+          "$ref": "#/definitions/DimensionStats",
+          "description": "Persistence dimension statistics"
+        },
+        "early": {
+          "$ref": "#/definitions/DimensionStats",
+          "description": "Early participation dimension statistics"
+        },
+        "participationRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Rate of participation across epochs"
+        }
+      }
+    },
+    "DimensionStats": {
+      "type": "object",
+      "required": [
+        "mean",
+        "median",
+        "min",
+        "max",
+        "stdDev",
+        "count"
+      ],
+      "properties": {
+        "mean": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Mean score"
+        },
+        "median": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Median score"
+        },
+        "min": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Minimum score"
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Maximum score"
+        },
+        "stdDev": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Standard deviation"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of data points"
+        }
+      }
+    },
+    "IdentityEvent": {
+      "type": "object",
+      "required": [
+        "eventId",
+        "timestamp",
+        "eventType",
+        "identityProof",
+        "fingerprint",
+        "contributionsAffected"
+      ],
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "pattern": "^IDENTITY-[0-9]{8}-[0-9]{6}$",
+          "description": "Unique identity event ID"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Event timestamp"
+        },
+        "eventType": {
+          "type": "string",
+          "enum": ["CREATED", "UPDATED", "LINKED", "SPLIT"],
+          "description": "Type of identity event"
+        },
+        "identityProof": {
+          "type": "string",
+          "description": "Identity proof data"
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Fingerprint of identity proof"
+        },
+        "contributionsAffected": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of contributions affected by this event"
+        },
+        "previousIdentity": {
+          "type": "string",
+          "pattern": "^mood:contributor:[a-f0-9]{64}$",
+          "description": "Previous identity (for link/split events)"
+        }
+      }
+    },
+    "ProfileMetadata": {
+      "type": "object",
+      "properties": {
+        "categoryTags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Participant category tags"
+        },
+        "achievements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Achievement"
+          },
+          "description": "Earned achievements"
+        },
+        "preferences": {
+          "type": "object",
+          "description": "Participant preferences"
+        },
+        "verificationStatus": {
+          "type": "string",
+          "enum": ["PENDING", "VERIFIED", "FLAGGED"],
+          "description": "Profile verification status"
+        }
+      }
+    },
+    "Achievement": {
+      "type": "object",
+      "required": [
+        "achievementId",
+        "earnedAt",
+        "title",
+        "description",
+        "dimension"
+      ],
+      "properties": {
+        "achievementId": {
+          "type": "string",
+          "pattern": "^ACH-[0-9]{4}$",
+          "description": "Achievement identifier"
+        },
+        "earnedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When achievement was earned"
+        },
+        "title": {
+          "type": "string",
+          "description": "Achievement title"
+        },
+        "description": {
+          "type": "string",
+          "description": "Achievement description"
+        },
+        "dimension": {
+          "type": "string",
+          "enum": ["contribution", "impact", "quality", "persistence", "early"],
+          "description": "Related dimension"
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Achievement level"
+        }
+      }
+    },
+    "ConfidenceLevel": {
+      "type": "string",
+      "enum": ["insufficient", "low", "medium", "high", "certainty"],
+      "description": "Confidence level in the data"
+    }
+  }
+}

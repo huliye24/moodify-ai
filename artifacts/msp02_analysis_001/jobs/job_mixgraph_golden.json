@@ -1,0 +1,6 @@
+{
+  "protocol": "moodify.sound/0.2",
+  "type": "analyze",
+  "source": "../../mix_graph_v01/golden/example_mixgraph_8eec7960.wav",
+  "output_dir": "../cases"
+}

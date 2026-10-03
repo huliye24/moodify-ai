@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mood://protocol/reputation-evidence/1.0.0",
+  "title": "MOOD Protocol Reputation Evidence",
+  "type": "object",
+  "required": [
+    "contributionId",
+    "policyVersion",
+    "dimensions",
+    "aggregate",
+    "status",
+    "inputFingerprint",
+    "artifactFingerprint"
+  ],
+  "properties": {
+    "contributionId": {
+      "type": "string"
+    },
+    "policyVersion": {
+      "type": "string"
+    },
+    "dimensions": {
+      "type": "object",
+      "required": ["contribution", "impact", "quality", "persistence", "early"],
+      "properties": {
+        "contribution": {
+          "type": ["object", "null"],
+          "properties": {
+            "value": { "type": "number", "minimum": 0, "maximum": 100 },
+            "scale": { "const": "0-100" },
+            "ruleId": { "type": "string" },
+            "evidenceIds": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "source": { "type": "object" }
+          },
+          "required": ["value", "scale", "ruleId", "evidenceIds", "source"],
+          "additionalProperties": false
+        },
+        "impact": {
+          "type": ["object", "null"],
+          "properties": {
+            "value": { "type": "number", "minimum": 0, "maximum": 100 },
+            "scale": { "const": "0-100" },
+            "ruleId": { "type": "string" },
+            "evidenceIds": { "type": "array", "items": { "type": "string" } },
+            "source": { "type": "object" }
+          },
+          "required": ["value", "scale", "ruleId", "evidenceIds", "source"],
+          "additionalProperties": false
+        },
+        "quality": {
+          "type": ["object", "null"],
+          "properties": {
+            "value": { "type": "number", "minimum": 0, "maximum": 100 },
+            "scale": { "const": "0-100" },
+            "ruleId": { "type": "string" },
+            "evidenceIds": { "type": "array", "items": { "type": "string" } },
+            "source": { "type": "object" }
+          },
+          "required": ["value", "scale", "ruleId", "evidenceIds", "source"],
+          "additionalProperties": false
+        },
+        "persistence": {
+          "type": ["object", "null"],
+          "properties": {
+            "value": { "type": "number", "minimum": 0, "maximum": 100 },
+            "scale": { "const": "0-100" },
+            "ruleId": { "type": "string" },
+            "evidenceIds": { "type": "array", "items": { "type": "string" } },
+            "source": { "type": "object" }
+          },
+          "required": ["value", "scale", "ruleId", "evidenceIds", "source"],
+          "additionalProperties": false
+        },
+        "early": {
+          "type": ["object", "null"],
+          "properties": {
+            "value": { "type": "number", "minimum": 0, "maximum": 100 },
+            "scale": { "const": "0-100" },
+            "ruleId": { "type": "string" },
+            "evidenceIds": { "type": "array", "items": { "type": "string" } },
+            "source": { "type": "object" }
+          },
+          "required": ["value", "scale", "ruleId", "evidenceIds", "source"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "aggregate": {
+      "type": ["number", "null"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["scored", "finalized"]
+    },
+    "inputFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "artifactFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

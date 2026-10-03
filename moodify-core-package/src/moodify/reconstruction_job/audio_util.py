@@ -70,7 +70,8 @@ def transcode_to_wav(src: Path, dst: Path, timeout_s: int = 300) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
         [exe, "-y", "-i", str(src), "-vn", "-acodec", "pcm_s16le", "-f", "wav", str(dst)],
-        capture_output=True, timeout=timeout_s, check=False,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        timeout=timeout_s, check=False,
     )
     if proc.returncode != 0:
         dst.unlink(missing_ok=True)

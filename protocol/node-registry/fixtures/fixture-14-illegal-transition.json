@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 14: Illegal Lifecycle Transition",
+  "description": "Attempted illegal transition from draft to active",
+  "fixtureId": "f14-illegal-transition",
+  "fromState": "draft",
+  "toState": "active",
+  "transitionResult": {
+    "valid": false,
+    "error": "Illegal transition: draft -> active"
+  },
+  "expectedBehavior": {
+    "transitionRejected": true,
+    "reason": "Must go through verification path"
+  }
+}

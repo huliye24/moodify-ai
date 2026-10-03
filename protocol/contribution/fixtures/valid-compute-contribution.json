@@ -1,0 +1,39 @@
+{
+  "description": "Completed a batch of 500 audio analysis jobs for the moodify pipeline.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-compute-001",
+  "contributor": {
+    "type": "protocol_id",
+    "id": "compute-node-001"
+  },
+  "category": "compute",
+  "title": "Audio analysis compute batch",
+  "submittedAt": "2026-08-29T12:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-compute-001",
+      "type": "compute_receipt",
+      "uri": "https://moodify.internal/jobs/2026-08-29/compute-batch-xyz",
+      "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "observedAt": "2026-08-29T11:55:00Z",
+      "metadata": {
+        "jobCount": 500,
+        "batchId": "compute-batch-xyz",
+        "fixture": true
+      },
+      "verification": {
+        "status": "verified",
+        "method": "receipt_verify",
+        "verifiedAt": "2026-08-29T12:01:00Z",
+        "verifiedBy": "reviewer-fixture-003"
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:7a758a784849ad1781175643bfedd2a860f958334e5c00a2472cca28e28a90fb",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

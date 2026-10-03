@@ -1,0 +1,37 @@
+{
+  "description": "This contribution is in 'submitted' status. Attempting to score must fail.",
+  "schemaVersion": "1.0.0",
+  "contributionId": "mood-contrib-fixture-score-before-verify",
+  "contributor": {
+    "type": "wallet",
+    "id": "0x9999999999999999999999999999999999999999"
+  },
+  "category": "code",
+  "title": "Score before verification fixture",
+  "submittedAt": "2026-08-29T16:00:00Z",
+  "evidence": [
+    {
+      "evidenceId": "evidence-fixture-sbv-001",
+      "type": "git_commit",
+      "uri": null,
+      "digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "observedAt": "2026-08-29T15:55:00Z",
+      "metadata": {
+        "fixture": true
+      },
+      "verification": {
+        "status": "verified",
+        "method": "git_verify",
+        "verifiedAt": "2026-08-29T16:01:00Z",
+        "verifiedBy": "reviewer-fixture-sbv"
+      }
+    }
+  ],
+  "status": "submitted",
+  "policyVersion": "002-draft-1",
+  "contentFingerprint": "sha256:ad602f96783f48be08982f536d8436191d938ef33d032b633f29262225a262d0",
+  "review": null,
+  "scores": null,
+  "reputationEvidence": null,
+  "supersedes": null
+}

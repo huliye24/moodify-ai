@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 4: Reputation Snapshot Response with Aggregate Null",
+  "description": "Reputation snapshot with aggregate = null per MPF-003",
+  "fixtureId": "f4-reputation-null-aggregate",
+  "request": {
+    "method": "GET",
+    "url": "/api/protocol/v1/contributors/mood:contributor:aaa/reputation"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "data": {
+      "snapshotId": "mood-rep-001",
+      "snapshotVersion": "1.0.0",
+      "protocolId": "mood:contributor:aaa",
+      "epochId": "GENESIS_2026",
+      "policyVersion": "003-draft-1",
+      "epochPolicyVersion": "003-draft-1",
+      "dimensions": {
+        "contribution": 75,
+        "impact": 80,
+        "quality": 85,
+        "persistence": null,
+        "early": 100
+      },
+      "aggregate": null,
+      "verifiedContributionCount": 1,
+      "categoryDiversity": ["code"],
+      "confidence": "insufficient",
+      "generatedAt": "2026-08-29T10:00:00Z",
+      "snapshotFingerprint": "sha256:abc"
+    },
+    "meta": {
+      "requestId": "req_example_004",
+      "generatedAt": "2026-08-29T10:00:00Z"
+    }
+  },
+  "expectedBehavior": {
+    "aggregatePreserved": true,
+    "aggregateValueIsNull": true
+  }
+}

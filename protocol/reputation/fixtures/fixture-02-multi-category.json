@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 2: Multiple Categories",
+  "description": "Contributor with contributions across multiple categories",
+  "fixtureId": "f2-multi-category",
+  "profile": {
+    "profileVersion": "1.0.0",
+    "protocolId": "mood:contributor:2222222222222222222222222222222222222222222222222222222222222222",
+    "primaryIdentity": {
+      "type": "wallet",
+      "namespace": "eip155:1",
+      "id": "0x2222222222222222222222222222222222222222"
+    },
+    "linkedPublicIdentities": [],
+    "createdAt": "2026-08-20T10:00:00Z",
+    "status": "active",
+    "firstVerifiedContributionAt": "2026-08-01T09:00:00Z",
+    "lastVerifiedContributionAt": "2026-08-20T16:00:00Z",
+    "verifiedContributionCount": 5,
+    "currentSnapshotId": "mood-reputation-2026-08-29-002"
+  },
+  "contributions": [
+    {
+      "contributionId": "mood-contrib-multi-001",
+      "status": "finalized",
+      "category": "code",
+      "title": "Core reputation module implementation",
+      "scores": { "contribution": 80, "impact": 75, "quality": 85, "persistence": null, "early": 80 }
+    },
+    {
+      "contributionId": "mood-contrib-multi-002",
+      "status": "finalized",
+      "category": "documentation",
+      "title": "Reputation system documentation",
+      "scores": { "contribution": 70, "impact": 65, "quality": 75, "persistence": null, "early": 70 }
+    },
+    {
+      "contributionId": "mood-contrib-multi-003",
+      "status": "finalized",
+      "category": "testing",
+      "title": "Comprehensive test suite",
+      "scores": { "contribution": 75, "impact": 70, "quality": 90, "persistence": null, "early": 75 }
+    },
+    {
+      "contributionId": "mood-contrib-multi-004",
+      "status": "finalized",
+      "category": "research",
+      "title": "Reputation model analysis",
+      "scores": { "contribution": 65, "impact": 80, "quality": 70, "persistence": null, "early": 65 }
+    },
+    {
+      "contributionId": "mood-contrib-multi-005",
+      "status": "finalized",
+      "category": "infrastructure",
+      "title": "CI/CD pipeline setup",
+      "scores": { "contribution": 70, "impact": 60, "quality": 75, "persistence": null, "early": 70 }
+    }
+  ],
+  "snapshot": {
+    "snapshotId": "mood-reputation-2026-08-29-002",
+    "protocolId": "mood:contributor:2222222222222222222222222222222222222222222222222222222222222222",
+    "epochId": "GENESIS_2026",
+    "policyVersion": "003-draft-1",
+    "verifiedContributionCount": 5,
+    "categoryDiversity": ["code", "documentation", "testing", "research", "infrastructure"],
+    "confidence": "low"
+  },
+  "expectedBehavior": {
+    "categoryDiversity": 5,
+    "dimensionsAggregated": true,
+    "reason": "Multi-category contributions should track diversity"
+  }
+}

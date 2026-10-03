@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 10: Internal Error (Sanitized)",
+  "description": "Sample INTERNAL_ERROR with sanitized details",
+  "fixtureId": "f10-internal-error",
+  "rawError": {
+    "message": "Database connection failed at /internal/path/secret.db with password=hunter2",
+    "stack": "Error: at /internal/path/handler.js:123"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "error": {
+      "code": "INTERNAL_ERROR",
+      "message": "Internal server error",
+      "details": null
+    },
+    "meta": {
+      "requestId": "req_example_010",
+      "generatedAt": "2026-08-29T10:00:00Z"
+    }
+  },
+  "expectedBehavior": {
+    "httpStatus": 500,
+    "stackTraceHidden": true,
+    "internalPathHidden": true,
+    "credentialsHidden": true
+  }
+}

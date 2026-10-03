@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  "name": "moodify-web3-staging",
+
+  "main": "./worker/index.ts",
+
+  "compatibility_date": "2026-05-22",
+
+  "compatibility_flags": ["nodejs_compat"],
+
+  "workers_dev": true,
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "moodify-web3-staging",
+      "database_id": "dff53f3a-b783-4d0b-afe9-973e2e22d585"
+    }
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "moodify-web3-staging-media"
+    }
+  ]
+}

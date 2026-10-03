@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 3: Multi-Epoch Contributor",
+  "description": "Contributor with contributions spanning multiple epochs",
+  "fixtureId": "f3-multi-epoch",
+  "profile": {
+    "profileVersion": "1.0.0",
+    "protocolId": "mood:contributor:3333333333333333333333333333333333333333333333333333333333333333",
+    "primaryIdentity": {
+      "type": "github",
+      "id": "contributor-multi-epoch"
+    },
+    "createdAt": "2026-07-01T00:00:00Z",
+    "status": "active",
+    "firstVerifiedContributionAt": "2026-07-15T10:00:00Z",
+    "lastVerifiedContributionAt": "2026-11-30T18:00:00Z",
+    "verifiedContributionCount": 15,
+    "currentSnapshotId": "mood-reputation-2026-11-003"
+  },
+  "contributions": [
+    {
+      "contributionId": "mood-contrib-epoch-001",
+      "status": "finalized",
+      "category": "code",
+      "epoch": "GENESIS_2026",
+      "scores": { "contribution": 85, "impact": 80, "quality": 88, "persistence": null, "early": 100 }
+    },
+    {
+      "contributionId": "mood-contrib-epoch-002",
+      "status": "finalized",
+      "category": "code",
+      "epoch": "GENESIS_2026",
+      "scores": { "contribution": 75, "impact": 70, "quality": 82, "persistence": null, "early": 100 }
+    },
+    {
+      "contributionId": "mood-contrib-epoch-003",
+      "status": "finalized",
+      "category": "documentation",
+      "epoch": "2026-09",
+      "scores": { "contribution": 70, "impact": 75, "quality": 80, "persistence": null, "early": null }
+    },
+    {
+      "contributionId": "mood-contrib-epoch-004",
+      "status": "finalized",
+      "category": "testing",
+      "epoch": "2026-09",
+      "scores": { "contribution": 78, "impact": 72, "quality": 85, "persistence": null, "early": null }
+    },
+    {
+      "contributionId": "mood-contrib-epoch-005",
+      "status": "finalized",
+      "category": "infrastructure",
+      "epoch": "2026-Q4",
+      "scores": { "contribution": 82, "impact": 78, "quality": 80, "persistence": null, "early": null }
+    }
+  ],
+  "epochHistory": ["GENESIS_2026", "2026-09", "2026-Q4"],
+  "snapshot": {
+    "snapshotId": "mood-reputation-2026-11-003",
+    "epochId": "2026-Q4",
+    "policyVersion": "003-draft-1",
+    "verifiedContributionCount": 15,
+    "categoryDiversity": ["code", "documentation", "testing", "infrastructure"],
+    "confidence": "medium"
+  },
+  "expectedBehavior": {
+    "persistenceCalculated": true,
+    "epochCount": 3,
+    "reason": "Multiple epochs should calculate persistence"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "protocol": "moodify.sound/0.2",
+  "type": "compare",
+  "source": "../clipped.wav",
+  "reference": "../../../demo/input/example.mp3",
+  "output_dir": "../cases"
+}

@@ -40,3 +40,49 @@ def test_guard_catches_ear_as_product_regression():
     }
     errors = canon_guard.check_files(fake)
     assert any("forbidden Ear-as-product" in e for e in errors)
+
+
+def test_guard_accepts_professional_finishing_identity():
+    """Canon v2.0 身份（Professional Finishing / Generated is not finished）必须通过守卫。"""
+    fake = {
+        "README.md": (
+            "# Moodify\n\n"
+            "**AI-native Professional Audio Finishing System — One Core, Two Interfaces**\n\n"
+            "> **Generated is not finished.**\n" + "\n" * 50
+        ),
+        "AGENTS.md": (
+            "**External product:** Moodify — AI-native Professional Audio Finishing System。\n\n"
+            "**产品命题：Generated is not finished.**\n" + "\n" * 50
+        ),
+        "docs/canon/CURRENT_CANON.md": (
+            "AI-native Professional Audio Finishing System\nGenerated is not finished\nCANON_CHANGE = YES\n"
+        ),
+        "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
+    }
+    assert canon_guard.check_files(fake) == []
+
+
+def test_guard_catches_player_only_identity_regression():
+    """Canon v2.0：把对外身份回退为 Moodify Music / Player 唯一中心必须报错。"""
+    fake = {
+        "README.md": (
+            "# Moodify\n\n**External product:** Moodify Music / Moodify Player\n\nCore user action: PLAY\n" + "\n" * 50
+        ),
+        "AGENTS.md": "# AGENTS\n\nCore user action: PLAY\n" + "\n" * 50,
+        "docs/canon/CURRENT_CANON.md": "AI-native Professional Audio Finishing System\nGenerated is not finished\nCANON_CHANGE = YES\n",
+        "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
+    }
+    errors = canon_guard.check_files(fake)
+    assert any("forbidden Player-only regression" in e for e in errors)
+
+
+def test_guard_fails_without_identity_marker():
+    """高权威文件完全不含对外身份标记时必须报错。"""
+    fake = {
+        "README.md": "# Something else entirely\n" + "\n" * 50,
+        "AGENTS.md": "# AGENTS\n" + "\n" * 50,
+        "docs/canon/CURRENT_CANON.md": "CANON_CHANGE = YES\n",
+        "docs/canon/AUTHORITY_ORDER.md": "docs/canon\n",
+    }
+    errors = canon_guard.check_files(fake)
+    assert any("no external product identity" in e for e in errors)

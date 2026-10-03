@@ -56,7 +56,8 @@ def _ffmpeg_version() -> str:
     try:
         out = subprocess.run(
             [shutil.which("ffmpeg") or "ffmpeg", "-version"],
-            capture_output=True, text=True, timeout=15,
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=15,
         ).stdout
         return out.splitlines()[0] if out else "unknown"
     except Exception:
@@ -112,7 +113,8 @@ def generate_spectrogram(
         str(output_path),
     ]
     started_at = datetime.now(timezone.utc).isoformat()
-    proc = subprocess.run(command, capture_output=True, text=True, timeout=timeout_s)
+    proc = subprocess.run(command, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", timeout=timeout_s)
     # Ubuntu 22.04 ships FFmpeg 4.4, whose showspectrumpic filter predates
     # drange/limit. Preserve the profile values on capable runtimes, but use
     # the older filter's fixed range when it explicitly rejects those options.
@@ -122,7 +124,8 @@ def generate_spectrogram(
             _ffmpeg(), "-v", "error", "-y", "-i", str(input_path),
             "-lavfi", filter_expr, str(output_path),
         ]
-        proc = subprocess.run(command, capture_output=True, text=True, timeout=timeout_s)
+        proc = subprocess.run(command, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", timeout=timeout_s)
     completed_at = datetime.now(timezone.utc).isoformat()
 
     run = SpectrogramRun(

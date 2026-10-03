@@ -1,0 +1,19 @@
+[Unit]
+Description=Crestwave Web3 official site
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=moodify
+Group=moodify
+WorkingDirectory=/opt/crestwave/current
+Environment=NODE_ENV=production
+Environment=PATH=/opt/node22/bin:/usr/bin:/bin
+ExecStart=/opt/node22/bin/node node_modules/vinext/dist/cli.js start --hostname 127.0.0.1 --port 3200
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 7: Policy Version Mismatch",
+  "description": "Snapshot references a different policy version than current",
+  "fixtureId": "f7-policy-mismatch",
+  "currentPolicy": {
+    "policyVersion": "003-draft-2",
+    "dimensions": ["contribution", "impact", "quality", "persistence", "early"],
+    "weights": null,
+    "aggregateEnabled": false
+  },
+  "historicalSnapshot": {
+    "snapshotId": "mood-reputation-2026-08-15-001",
+    "protocolId": "mood:contributor:7777777777777777777777777777777777777777777777777777777777777777",
+    "epochId": "GENESIS_2026",
+    "policyVersion": "003-draft-1",
+    "epochPolicyVersion": "003-draft-1",
+    "dimensions": {
+      "contribution": 75,
+      "impact": 70,
+      "quality": 80,
+      "persistence": null,
+      "early": 100
+    },
+    "generatedAt": "2026-08-15T10:00:00Z",
+    "snapshotFingerprint": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+  },
+  "newPolicySnapshot": {
+    "snapshotId": "mood-reputation-2026-08-29-001",
+    "protocolId": "mood:contributor:7777777777777777777777777777777777777777777777777777777777777777",
+    "epochId": "GENESIS_2026",
+    "policyVersion": "003-draft-2",
+    "epochPolicyVersion": "003-draft-2",
+    "supersedes": "mood-reputation-2026-08-15-001"
+  },
+  "expectedBehavior": {
+    "historicalSnapshotPreserved": true,
+    "policyVersionPinned": true,
+    "newSnapshotCreated": true,
+    "reason": "Historical snapshots must retain original policy version"
+  }
+}

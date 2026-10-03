@@ -1,0 +1,69 @@
+{
+  "judgment_rules_version": "1.0",
+  "universal_thresholds": {
+    "true_peak_margin_reduced": {
+      "metric": "true_peak_dbfs",
+      "min_margin_db": 0.5
+    },
+    "excessive_loudness_increase": {
+      "metric": "integrated_lufs",
+      "max_increase_db": 4.0
+    },
+    "excessive_dynamic_compression": {
+      "metric": "crest_factor_db",
+      "max_reduction_db": 4.0
+    },
+    "crest_factor_collapse": {
+      "metric": "crest_factor_db",
+      "min_crest_db": 4.0
+    },
+    "new_clipping": {
+      "metric": "clipping_sample_count",
+      "max_count": 0
+    },
+    "low_frequency_overaccumulation": {
+      "metric": "bass_60_120_hz",
+      "max_increase_ratio": 0.03
+    },
+    "high_frequency_overaccumulation": {
+      "metric": "brilliance_5000_10000_hz",
+      "max_increase_ratio": 0.05
+    },
+    "new_high_frequency_cutoff": {
+      "metric": "estimated_high_frequency_cutoff_hz",
+      "max_reduction_hz": 3000.0
+    },
+    "stereo_phase_risk_increased": {
+      "metric": "phase_risk_ratio",
+      "max_increase": 0.02
+    },
+    "negative_correlation_increased": {
+      "metric": "negative_correlation_ratio",
+      "max_increase": 0.02
+    },
+    "duration_changed": {
+      "metric": "duration",
+      "max_abs_delta_s": 0.05
+    },
+    "channel_layout_changed": {
+      "metric": "channels",
+      "max_delta": 0
+    },
+    "sample_rate_changed": {
+      "metric": "sample_rate",
+      "max_delta": 0
+    },
+    "silence_structure_changed": {
+      "metric": "silence_ratio",
+      "max_abs_delta": 0.05
+    },
+    "invalid_audio_samples": {
+      "metric": "invalid_sample_count",
+      "max_count": 0
+    },
+    "analysis_confidence_low": {
+      "metric": "finite_sample_ratio",
+      "min_ratio": 0.999
+    }
+  }
+}

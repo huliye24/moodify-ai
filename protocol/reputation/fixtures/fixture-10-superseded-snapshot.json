@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 10: Superseded Snapshot",
+  "description": "Historical snapshot superseded by new policy-compliant snapshot",
+  "fixtureId": "f10-superseded-snapshot",
+  "historicalSnapshot": {
+    "snapshotVersion": "1.0.0",
+    "snapshotId": "mood-reputation-2026-08-15-010",
+    "protocolId": "mood:contributor:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "epochId": "GENESIS_2026",
+    "policyVersion": "003-draft-1",
+    "epochPolicyVersion": "003-draft-1",
+    "inputContributionIds": ["mood-contrib-001"],
+    "dimensions": {
+      "contribution": 75,
+      "impact": 70,
+      "quality": 80,
+      "persistence": null,
+      "early": 100
+    },
+    "aggregate": null,
+    "verifiedContributionCount": 1,
+    "categoryDiversity": ["code"],
+    "confidence": "insufficient",
+    "generatedAt": "2026-08-15T10:00:00Z",
+    "snapshotFingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "supersedes": null,
+    "supersededBy": "mood-reputation-2026-08-29-010"
+  },
+  "currentSnapshot": {
+    "snapshotVersion": "1.0.0",
+    "snapshotId": "mood-reputation-2026-08-29-010",
+    "protocolId": "mood:contributor:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "epochId": "GENESIS_2026",
+    "policyVersion": "003-draft-2",
+    "epochPolicyVersion": "003-draft-2",
+    "inputContributionIds": ["mood-contrib-001", "mood-contrib-002", "mood-contrib-003"],
+    "dimensions": {
+      "contribution": 78,
+      "impact": 75,
+      "quality": 82,
+      "persistence": 60,
+      "early": 100
+    },
+    "aggregate": null,
+    "verifiedContributionCount": 3,
+    "categoryDiversity": ["code", "documentation", "testing"],
+    "confidence": "low",
+    "generatedAt": "2026-08-29T10:00:00Z",
+    "snapshotFingerprint": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "supersedes": "mood-reputation-2026-08-15-010"
+  },
+  "expectedBehavior": {
+    "historicalPreserved": true,
+    "newSnapshotCreated": true,
+    "supersessionRecorded": true,
+    "historyNotDeleted": true,
+    "reason": "New snapshot supersedes old without deleting history"
+  }
+}

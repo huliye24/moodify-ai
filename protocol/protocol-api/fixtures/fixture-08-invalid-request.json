@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Fixture 8: Invalid Request Error",
+  "description": "Sample INVALID_REQUEST error response",
+  "fixtureId": "f8-invalid-request",
+  "request": {
+    "method": "GET",
+    "url": "/api/protocol/v1/contributions?limit=invalid"
+  },
+  "response": {
+    "apiVersion": "v1",
+    "error": {
+      "code": "INVALID_REQUEST",
+      "message": "Invalid request",
+      "details": {
+        "parameter": "limit",
+        "reason": "Must be positive integer"
+      }
+    },
+    "meta": {
+      "requestId": "req_example_008",
+      "generatedAt": "2026-08-29T10:00:00Z"
+    }
+  },
+  "expectedBehavior": {
+    "httpStatus": 400,
+    "detailsProvided": true
+  }
+}
