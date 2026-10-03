@@ -1,3 +1,5 @@
+<p align="center"><img src="brand/assets/moodify-horizontal.png" alt="Moodify — Every voice deserves to be heard" width="100%"></p>
+
 # Moodify
 
 **Moodify Sound Protocol — sound processing through one shared Core**
