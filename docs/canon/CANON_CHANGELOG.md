@@ -2,6 +2,16 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-04 — Android App authority 收敛（CANON_CHANGE = YES）
+
+- **CANON_CHANGE = YES。** 本次改变 App 的公开实现边界并解除一个 `HUMAN_DECISION_REQUIRED`。
+- **Why：** 人类产品权威确认 Moodify 只有一个生态 App，即用于听歌、已经由 GitHub Release 发布的播放器；第二套 Android 工程必须删除清理。
+- **Evidence：** `apps/music-android/README.md` 将自身定义为 public Android player，核心动作为 `PLAY`；`.github/workflows/release.yml` 的 Android build/sign 路径均唯一指向 `apps/music-android`；其实现包含 Media3 ExoPlayer、MediaSession、云端曲库、本地文件和外部音频 intent。旧 `apps/android` README 仍将真实接入描述为后续阶段。
+- **Decision：** `apps/music-android`（`com.moodify.music`）是唯一 canonical Moodify App。`apps/android`（`com.moodify.app`）退役删除，不再构成第二 App authority。
+- **Affected authority files：** `AGENTS.md`、`docs/canon/PRODUCT_DEFINITION_V3.md`、`docs/REPOSITORY_STATUS.md`、本文件；结构守卫 `scripts/check_repo_structure.py` 禁止旧路径重新进入 Git。
+- **Migration：** 删除 `apps/android` 的 70 个 tracked 文件；发布工作流无需迁移，因为它原本已唯一构建 `apps/music-android`。本次不声称旧候选中的功能已迁入正式 App。
+- **Rollback：** revert 本次提交，或从删除前基线 `1dd5b2e14cdc67e673c26a2aa62e556c12066b20` 恢复 `apps/android/`。回滚会重新引入双 App authority，只能由新的明确人类裁决执行。
+
 ## 2026-10-03 — PRODUCT CANON v3：产品定义五层 + 个人音乐节点 + 技术原则（CANON_CHANGE = YES）
 
 - **CANON_CHANGE = YES。** 触发的 Canon 控制项：**对外产品身份**与**内部/外部能力边界**。依据人类任务书 `MOODIFY_PRODUCT_DEFINITION_AND_EXECUTION_001`（2026-10-03）§2/§17，按 `AGENTS.md` L125 记录 why / evidence / affected authority files / migration / rollback。

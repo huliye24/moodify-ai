@@ -1,0 +1,131 @@
+name: Desktop Release
+
+on:
+  pull_request:
+    paths:
+      - "moodify-desktop/**"
+      - ".github/workflows/desktop-release.yml"
+      - "docs/releases/**"
+  workflow_dispatch:
+  push:
+    tags:
+      - "desktop-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows-x64:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: moodify-desktop
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: moodify-desktop/package-lock.json
+
+      - name: Verify tag matches package version
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $tagVersion = $env:RELEASE_TAG -replace '^desktop-v', ''
+          if ($tagVersion -ne $packageVersion) {
+            throw "Desktop tag version '$tagVersion' does not match package version '$packageVersion'."
+          }
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run desktop tests
+        run: npm test
+
+      - name: Build Windows installer and portable executable
+        run: npm run dist:win
+
+      - name: Generate release manifest and checksums
+        env:
+          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $setupName = "Moodify_Studio_${version}_Setup_x64.exe"
+          $portableName = "Moodify_Studio_${version}_Portable_x64.exe"
+          $releaseDir = Join-Path $PWD "dist-electron"
+          $setupPath = Join-Path $releaseDir $setupName
+          $portablePath = Join-Path $releaseDir $portableName
+
+          foreach ($path in @($setupPath, $portablePath)) {
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+              throw "Expected release artifact is missing: $path"
+            }
+            if ((Get-Item -LiteralPath $path).Length -le 0) {
+              throw "Release artifact is empty: $path"
+            }
+          }
+
+          $artifacts = @($setupPath, $portablePath) | ForEach-Object {
+            $item = Get-Item -LiteralPath $_
+            [ordered]@{
+              name = $item.Name
+              bytes = $item.Length
+              sha256 = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant()
+            }
+          }
+
+          $manifest = [ordered]@{
+            product = "Moodify Studio"
+            version = $version
+            tag = $env:RELEASE_TAG
+            commit = $env:RELEASE_COMMIT
+            platform = "windows"
+            arch = "x64"
+            channel = "rc"
+            code_signed = $false
+            runtime_mode = "external"
+            artifacts = $artifacts
+          }
+          $manifestPath = Join-Path $releaseDir "RELEASE_MANIFEST.json"
+          $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $manifestPath -Encoding utf8
+
+          $checksumPaths = @($setupPath, $portablePath, $manifestPath)
+          $checksumLines = $checksumPaths | ForEach-Object {
+            $item = Get-Item -LiteralPath $_
+            $hash = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $($item.Name)"
+          }
+          $checksumLines | Set-Content -LiteralPath (Join-Path $releaseDir "SHA256SUMS.txt") -Encoding ascii
+
+      - name: Upload Windows release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: moodify-studio-${{ github.sha }}-windows-x64
+          if-no-files-found: error
+          path: |
+            moodify-desktop/dist-electron/Moodify_Studio_*_Setup_x64.exe
+            moodify-desktop/dist-electron/Moodify_Studio_*_Portable_x64.exe
+            moodify-desktop/dist-electron/SHA256SUMS.txt
+            moodify-desktop/dist-electron/RELEASE_MANIFEST.json
+
+      - name: Publish GitHub prerelease
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Moodify Studio 1.0.0-rc.1
+          prerelease: true
+          body_path: docs/releases/MOODIFY_STUDIO_1_0_RC1.md
+          files: |
+            moodify-desktop/dist-electron/Moodify_Studio_*_Setup_x64.exe
+            moodify-desktop/dist-electron/Moodify_Studio_*_Portable_x64.exe
+            moodify-desktop/dist-electron/SHA256SUMS.txt
+            moodify-desktop/dist-electron/RELEASE_MANIFEST.json
