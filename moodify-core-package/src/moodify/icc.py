@@ -56,7 +56,9 @@ def compute_icc(
                 "method": "pingouin",
             }
     except ImportError:
-        pass
+        # pingouin (or pandas) not installed: fall through to the hand-written
+        # ANOVA below, which is the documented fallback.
+        ...
 
     # 手写 ANOVA 兜底
     return _icc_anova_fallback(ratings)

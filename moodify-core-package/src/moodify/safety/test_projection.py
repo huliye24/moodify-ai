@@ -120,5 +120,10 @@ def test_partial_params_pass_through():
         full = get_recommended_params("GA")
         result2, log2 = project(full, "GA")
         assert log2 == []
-    except Exception:
-        pass
+    except (ImportError, KeyError, ValueError, TypeError):
+        # craft_chains unavailable: this deeper assertion is skipped.
+        #
+        # NOTE: AssertionError is deliberately NOT caught. The previous
+        # `except Exception` swallowed a failed `assert log2 == []`, which made
+        # this check unable to fail.
+        ...

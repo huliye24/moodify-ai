@@ -12,8 +12,15 @@ def load_audio(path: str, always_2d: bool = True) -> tuple[np.ndarray, int]:
     try:
         data, sr = sf.read(str(path), always_2d=always_2d)
         return data.astype(np.float32), sr
-    except Exception:
-        pass
+    except sf.SoundFileError:
+        # soundfile cannot decode this container/codec (M4A, and any format this
+        # libsndfile build lacks) -- fall through to librosa below.
+        #
+        # SoundFileError is soundfile's own base class: it covers format,
+        # corruption and read failures. Catching it rather than Exception means a
+        # genuine programming error surfaces instead of silently becoming
+        # "librosa also failed".
+        ...
 
     import librosa
     data, sr = librosa.load(str(path), sr=None, mono=False)

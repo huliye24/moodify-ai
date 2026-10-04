@@ -77,8 +77,9 @@ def _load_d_history() -> list[dict]:
         for line in f:
             try:
                 records.append(json.loads(line))
-            except Exception:
-                pass
+            except (ValueError, TypeError):
+                # Malformed historical line: skip it and keep reading the file.
+                ...
     return records
 
 

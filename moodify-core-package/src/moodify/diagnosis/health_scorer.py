@@ -146,8 +146,10 @@ class HealthScorer:
         try:
             from moodify.knowledge.emotion_targets import get_ideal_process_vector
             return get_ideal_process_vector(emotion)
-        except Exception:
-            pass
+        except (ImportError, KeyError, ValueError):
+            # No exact vector for this emotion: fall through to substring matching.
+            ...
+
         # 回退: 中文子串匹配
         for key in EMOTION_IDEAL_VECTORS:
             if key in emotion:

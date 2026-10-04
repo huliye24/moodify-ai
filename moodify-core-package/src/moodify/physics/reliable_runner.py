@@ -150,7 +150,9 @@ class CheckpointManager:
                     try:
                         data.append(json.loads(line))
                     except json.JSONDecodeError:
-                        pass
+                        # Truncated final line from an interrupted run: keep the
+                        # records that did parse.
+                        ...
 
         return step, data
 

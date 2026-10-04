@@ -664,7 +664,8 @@ def resolve_emotion_from_nl(nl_text: str) -> dict:
             "source": "preset",
         }
     except KeyError:
-        pass
+        # No preset match: fall through to the DeepSeek step below.
+        ...
 
     # Step 2: 调 DeepSeek
     try:
@@ -682,8 +683,11 @@ def resolve_emotion_from_nl(nl_text: str) -> dict:
                     "vector_bias": result["vector_bias"],
                     "source": "deepseek",
                 }
-    except Exception:
-        pass
+    except (ImportError, KeyError, ValueError, TypeError, OSError):
+        # DeepSeek unavailable or returned something unusable: fall through to the
+        # documented step-3 default. This is the function's stated contract --
+        # callers always receive a usable dict, never an exception.
+        ...
 
     # Step 3: 回退
     return {

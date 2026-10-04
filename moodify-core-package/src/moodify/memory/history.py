@@ -86,8 +86,11 @@ class ProcessingHistory:
             for line in f:
                 try:
                     records.append(ProcessingRecord(**json.loads(line)))
-                except Exception:
-                    pass
+                except (ValueError, TypeError):
+                    # Malformed or schema-invalid historical line: skip it and keep
+                    # reading. ValueError also covers json.JSONDecodeError and
+                    # pydantic ValidationError.
+                    ...
         return records
 
     def find_similar(

@@ -63,8 +63,9 @@ def stage_live_read() -> None:
     if code == 200:
         try:
             tracks = json.loads(body).get("tracks", [])
-        except ValueError:
-            pass
+        except (ValueError, AttributeError):
+            # Non-JSON or non-object body: the check below reports 0 tracks.
+            ...
     check("Music catalogue（匿名发现）", code == 200 and len(tracks) >= 1, f"{len(tracks)} tracks")
     if tracks:
         track_id = tracks[0]["id"]

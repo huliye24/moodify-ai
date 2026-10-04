@@ -78,7 +78,13 @@ def set_app_icon(root) -> None:
         return
     try:
         import tkinter as tk
-
+    except ImportError:
+        # Headless / Tk not installed: there is no window to decorate.
+        return
+    try:
         root.iconphoto(True, tk.PhotoImage(file=str(ICON_PATH)))
-    except Exception:
-        pass
+    except (tk.TclError, OSError):
+        # Cosmetic only: an unreadable or unsupported image must not stop the
+        # window from opening. Named TclError rather than Exception so the
+        # tkinter reference in the handler is always bound.
+        ...

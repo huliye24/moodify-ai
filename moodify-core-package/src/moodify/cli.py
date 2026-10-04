@@ -270,8 +270,10 @@ def cmd_batch(args):
     try:
         state = CalibrationState.load(output_dir)
         print(f"  calibration D: {state.d_value():.3f}  (n={state.total_n})")
-    except Exception:
-        pass
+    except (OSError, ValueError, KeyError, TypeError):
+        # Purely informational line: absent or unreadable calibration state is
+        # not an error for a batch summary.
+        ...
 
     return 0 if fail == 0 else 1
 

@@ -142,7 +142,8 @@ class DiagnosisEngine:
             import soxr
             return soxr.resample(signal.astype(np.float64), orig_sr, target_sr).astype(np.float32)
         except ImportError:
-            pass
+            # soxr is optional: fall through to scipy resample_poly
+            ...
         try:
             from scipy.signal import resample_poly
             from math import gcd
@@ -150,8 +151,10 @@ class DiagnosisEngine:
             up = target_sr // g
             down = orig_sr // g
             return resample_poly(signal.astype(np.float64), up=up, down=down).astype(np.float32)
-        except Exception:
-            pass
+        except (ImportError, ValueError, TypeError):
+            # scipy unavailable, or it rejected this signal/rate pair: fall through
+            # to librosa. Anything else propagates rather than vanishing.
+            ...
         import librosa
         return librosa.resample(signal, orig_sr=orig_sr, target_sr=target_sr)
 

@@ -88,8 +88,10 @@ def generate_versions(audio_path: str, emotion_code: str, output_dir: str):
             result = llm.recommend_params(prompt)
             if result and "parameters" in result:
                 v4_params = {p["param_name"]: p["value"] for p in result["parameters"]}
-    except Exception:
-        pass
+    except (ImportError, KeyError, ValueError, TypeError, OSError):
+        # LLM path unavailable or returned nothing usable: v4_params stays None
+        # and the search_top2 fallback below is used instead.
+        ...
 
     if v4_params is None and len(results) >= 3:
         v4_params = results[1][1]  # search_top2 as fallback

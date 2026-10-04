@@ -92,8 +92,9 @@ def test_fallback_search():
     try:
         key = resolve_emotion("GA")
         code = KEY_TO_CODE.get(key, "GA")
-    except Exception:
-        pass
+    except (ImportError, KeyError, ValueError, TypeError):
+        # Emotion could not be resolved: fall back to the "GA" default set above.
+        ...
 
     params = get_recommended_params(code)
     return {"status": "pass" if len(params) == 15 else "fail",

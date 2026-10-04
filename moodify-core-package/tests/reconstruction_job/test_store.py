@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from uuid import uuid4
 
+import pytest
+
 from moodify.reconstruction_job.contract import (
     FailureInfo,
     JobStatus,
@@ -68,11 +70,8 @@ def test_unique_idempotency_constraint(tmp_path):
     store = JobStore(tmp_path / "jobs.db")
     store.insert_job(_job(key="key-1"))
     import sqlite3
-    try:
+    with pytest.raises(sqlite3.IntegrityError):
         store.insert_job(_job(key="key-1"))
-        assert False, "expected IntegrityError"
-    except sqlite3.IntegrityError:
-        pass
 
 
 def test_null_idempotency_keys_do_not_conflict(tmp_path):

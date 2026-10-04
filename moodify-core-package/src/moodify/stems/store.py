@@ -299,7 +299,9 @@ class StemStore:
             if path.is_file():
                 path.unlink()
         except OSError:
-            pass
+            # Best-effort cleanup: a locked or already-removed source must not
+            # fail the submission that already succeeded upstream.
+            ...
 
     def prune_old_sources(self, age_days: int = SOURCE_RETENTION_DAYS) -> int:
         """Delete stale source files still on disk and clear their paths."""
@@ -316,6 +318,7 @@ class StemStore:
                         path.unlink()
                         removed += 1
                 except OSError:
-                    pass
+                    # Unremovable file is not counted; the DB row is still cleared.
+                    ...
                 con.execute("UPDATE stem_jobs SET source_path='' WHERE job_id=?", (row["job_id"],))
         return removed

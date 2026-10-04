@@ -103,7 +103,9 @@ class MoodifyApp:
         try:
             style.theme_use("clam")
         except tk.TclError:
-            pass
+            # "clam" unavailable in this Tk build: keep the default theme, the
+            # white theme below is applied regardless.
+            ...
         apply_white_theme(self.root, style)
         set_app_icon(self.root)
 
@@ -222,7 +224,8 @@ class MoodifyApp:
                     self.status_var.set("分析失败")
                     messagebox.showerror("分析失败", str(payload), parent=self.root)
         except queue.Empty:
-            pass
+            # Expected control flow: the worker queue is simply empty this tick.
+            ...
         self.root.after(150, self._poll)
 
 

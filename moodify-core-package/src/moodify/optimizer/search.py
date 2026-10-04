@@ -347,8 +347,9 @@ def _proxy_te_base(
             error_5d = state.get_error_5d(emotion_code)
             ws_te = ws_te - confidence * error_5d
             ws_te = np.clip(ws_te, 0.0, 1.0)
-    except Exception:
-        pass
+    except (ImportError, KeyError, ValueError, IndexError, TypeError):
+        # No calibration state for this emotion: use the uncorrected vector.
+        ...
 
     sigma_inv = get_static_sigma_inv()
     dist_after = float(_mahalanobis_distance(ws_te, target, sigma_inv))
@@ -523,8 +524,10 @@ def search_optimal_strengths(
             ws_raw_arr = cal["ws_raw"]
             target_arr = cal["target"]
             dist_before = float(_mahalanobis_distance(ws_raw_arr, target_arr, get_static_sigma_inv()))
-        except Exception:
-            pass
+        except (ImportError, KeyError, ValueError, TypeError, ArithmeticError):
+            # Calibration probes are best-effort: on failure ws_raw_arr/dist_before
+            # stay None and the T_EFFECTS fallback path below takes over.
+            ...
 
     # T_EFFECTS 回退路径
     if ws_raw_arr is None:

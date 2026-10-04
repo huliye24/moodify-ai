@@ -547,7 +547,9 @@ def prepare_comparison(case_dir: str | Path, *, cases_root: str | Path | None = 
             artifact["previous_prepared_at"] = json.loads(
                 previous.read_text(encoding="utf-8")).get("prepared_at")
         except (OSError, UnicodeError, json.JSONDecodeError):
-            pass
+            # Previous artifact missing or corrupt: previous_prepared_at stays
+            # unset. The new artifact is written either way.
+            ...
     _write_json(previous, artifact)
     return artifact
 

@@ -81,8 +81,10 @@ class CalibrationState:
                     ec.proxy_real_pairs = edata.get("proxy_real_pairs", [])
                     ec.last_updated = edata.get("last_updated", "")
                     state.emotions[code] = ec
-            except Exception:
-                pass
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                # Calibration state unreadable or malformed: carry on with the
+                # default (uncalibrated) state rather than failing the caller.
+                logger.warning("calibration state at %s could not be loaded: %s", state._path, exc)
         return state
 
     def save(self) -> None:

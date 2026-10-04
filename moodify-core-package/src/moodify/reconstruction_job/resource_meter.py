@@ -25,8 +25,10 @@ class ResourceMeter:
             if tracemalloc.is_tracing():
                 current, peak = tracemalloc.get_traced_memory()
                 self._peak_memory_mb = max(self._peak_memory_mb, peak / (1024 * 1024))
-        except Exception:
-            pass
+        except (ImportError, RuntimeError):
+            # tracemalloc unavailable or not started: peak memory stays at its
+            # previous value. Resource metering must never fail the caller.
+            ...
 
     def snapshot(self, **extra: object) -> ResourceUsage:
         wall = time.perf_counter() - self._wall_start

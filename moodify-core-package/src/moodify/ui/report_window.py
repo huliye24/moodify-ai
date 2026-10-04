@@ -347,7 +347,8 @@ def launch(report_path: Path) -> int:
     try:
         style.theme_use("clam")
     except tk.TclError:
-        pass
+        # "clam" unavailable in this Tk build: keep the default theme.
+        ...
     from moodify.ui.theme import apply_white_theme, set_app_icon
 
     apply_white_theme(root, style)

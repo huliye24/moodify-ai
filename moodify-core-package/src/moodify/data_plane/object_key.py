@@ -95,11 +95,14 @@ def parse_object_key(full: str) -> ObjectKey:
     try:
         return _parse_key("moodify", full)
     except ValueError:
-        pass
+        # Not a default-bucket key: try to read it as an explicit 'bucket/key'.
+        ...
     parts = full.split("/", 1)
     if len(parts) == 2:
         try:
             return _parse_key(parts[0], parts[1])
         except ValueError:
-            pass
+            # Also unparseable: fall through to the explicit rejection below,
+            # which is the only exit that may report failure.
+            ...
     raise ValueError(f"unrecognized object key: {full!r}")

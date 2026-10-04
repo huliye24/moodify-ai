@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 
 import numpy as np
+import pytest
 
 from moodify.auditory.evidence import (
     EPISTEMIC_STATES,
@@ -75,11 +76,8 @@ def test_epistemic_states_bounded():
 
 
 def test_epistemic_rejects_unknown_state():
-    try:
+    with pytest.raises(ValueError):
         EpistemicState("GUESSED")
-        assert False, "unknown epistemic state must raise"
-    except ValueError:
-        pass
 
 
 def test_evidence_node_validates_epistemic_and_scale():
@@ -88,11 +86,8 @@ def test_evidence_node_validates_epistemic_and_scale():
     assert node.scale == "WHOLE_TRACK"
     assert node.epistemic_state == "OBSERVED"
     for kwargs in ({"epistemic_state": "BAD"}, {"scale": "BAD"}):
-        try:
+        with pytest.raises(ValueError):
             EvidenceNode(node_id="n", kind="MEASUREMENT", ref="r", **kwargs)
-            assert False, "invalid scale/epistemic must raise"
-        except ValueError:
-            pass
 
 
 def test_judgment_evidence_epistemic_default_inferred():
@@ -129,11 +124,8 @@ def test_scale_taxonomy_bounded():
         "SHORT_TERM", "MUSICAL_UNIT", "LONG_FORM", "WHOLE_TRACK",
     }
     assert EvidenceScale("SHORT_TERM").to_dict() == {"scale": "SHORT_TERM"}
-    try:
+    with pytest.raises(ValueError):
         EvidenceScale("HALF_SECOND")
-        assert False, "unknown scale must raise"
-    except ValueError:
-        pass
 
 
 def test_scale_for_duration_boundaries():
@@ -181,27 +173,18 @@ def test_correlation_events_are_associated_not_inferred():
 # ---------------------------------------------------------------------------
 
 def test_section_validation():
-    try:
+    with pytest.raises(ValueError):
         Section("BAD", 5.0, 2.0)
-        assert False, "end before start must raise"
-    except ValueError:
-        pass
-    try:
+    with pytest.raises(ValueError):
         Section("BAD", 0.0, 2.0, confidence=1.5)
-        assert False, "confidence out of range must raise"
-    except ValueError:
-        pass
 
 
 def test_structure_context_rejects_overlaps():
-    try:
+    with pytest.raises(ValueError):
         StructureContext(
             source="events-v1",
             sections=(Section("A", 0.0, 4.0), Section("B", 3.0, 6.0)),
         )
-        assert False, "overlapping sections must raise"
-    except ValueError:
-        pass
 
 
 def test_structure_context_queries():

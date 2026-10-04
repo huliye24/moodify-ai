@@ -98,7 +98,8 @@ class Preprocessor:
                 return np.stack(chs, axis=1).astype(np.float32)
             return soxr.resample(y.astype(np.float64), orig_sr, target).astype(np.float32)
         except ImportError:
-            pass
+            # soxr is optional: fall through to scipy resample_poly
+            ...
 
         # scipy resample_poly
         try:
@@ -112,8 +113,10 @@ class Preprocessor:
                        for c in range(y.shape[1])]
                 return np.stack(chs, axis=1).astype(np.float32)
             return resample_poly(y.astype(np.float64), up=up, down=down).astype(np.float32)
-        except Exception:
-            pass
+        except (ImportError, ValueError, TypeError):
+            # scipy unavailable, or it rejected this signal/rate pair: fall through
+            # to librosa. Anything else propagates rather than vanishing.
+            ...
 
         # librosa fallback
         import librosa

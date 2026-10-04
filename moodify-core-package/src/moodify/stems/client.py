@@ -115,5 +115,6 @@ def _extract_detail(response: httpx.Response) -> str:
         if isinstance(payload, dict) and "detail" in payload:
             return str(payload["detail"])[:500]
     except (ValueError, TypeError):
-        pass
+        # Body was not JSON (or not an object): fall through to the raw-text form.
+        ...
     return response.text[:500]

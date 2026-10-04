@@ -481,8 +481,11 @@ class WorkflowOrchestrator:
         if ctx.best_output and os.path.exists(ctx.best_output):
             try:
                 ws_after_obj = self._diagnose_audio(ctx.best_output)
-            except Exception:
-                pass  # re-diagnose best_output failed — ws_after_obj stays None
+            except Exception as e:
+                # Optional enrichment: ws_after_obj stays None. Logged rather than
+                # silent so a degraded result is visible. Matches the sibling
+                # re-diagnose site above (line ~396).
+                logger.warning(f"[result] re-diagnose of best_output failed: {e}")
 
         total_elapsed = (time.perf_counter() - ctx.total_start) * 1000
         success = all(
@@ -544,8 +547,9 @@ class WorkflowOrchestrator:
             matcher = CraftChainMatch()
             matches = matcher.match(defects, emotion_target, ws, cards, top_k=1)
             best_card = matches[0].craft_card if matches else None
-        except Exception:
-            pass
+        except (ImportError, KeyError, ValueError, IndexError, TypeError) as e:
+            # Craft-card matching is advisory; diagnosis proceeds without it.
+            logger.debug(f"[diagnosis] craft-card match unavailable: {e}")
 
         return PhaseResult(
             phase=1, name="诊断",
@@ -626,8 +630,9 @@ class WorkflowOrchestrator:
             try:
                 params = craft_card.get_recommended_params()
                 width = params.get("P12_reverb_width", 1.0)
-            except Exception:
-                pass
+            except (KeyError, ValueError, TypeError, AttributeError) as e:
+                # Keep width=1.0 (no spatial widening) rather than failing the render.
+                logger.debug(f"[spatial] craft-card width unavailable: {e}")
         else:
             try:
                 from moodify.knowledge.craft_chains import get_recommended_params
@@ -636,8 +641,9 @@ class WorkflowOrchestrator:
                 resolved_code = KEY_TO_CODE.get(resolved_key, "GA")
                 params = get_recommended_params(resolved_code)
                 width = params.get("P12_reverb_width", 1.0)
-            except Exception:
-                pass
+            except (ImportError, KeyError, ValueError, TypeError) as e:
+                # Keep width=1.0 (no spatial widening) rather than failing the render.
+                logger.debug(f"[spatial] preset width unavailable for {emotion_target!r}: {e}")
 
         mid = (audio[:, 0] + audio[:, 1]) / 2.0
         side = (audio[:, 0] - audio[:, 1]) / 2.0
