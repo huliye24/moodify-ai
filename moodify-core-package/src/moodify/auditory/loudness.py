@@ -71,7 +71,11 @@ def integrated_loudness_lufs(samples: np.ndarray, sr: int) -> float:
         if loudness.size == 0:
             return _ABS_GATE_LUFS
         energies.append(weight * 10 ** (loudness / 10))
-    combined = np.sum(energies, axis=0) / sum(weights)
+    # BS.1770 aggregates channel contributions by *summing* the
+    # channel-weighted powers (L_K = -0.691 + 10*log10(sum_i G_i * z_i)).
+    # Dividing by sum(weights) here would be a "mean over channels" and bias
+    # every stereo measurement by -10*log10(2) = -3.0103 dB.
+    combined = np.sum(energies, axis=0)
     # loudness already carries _LOUDNESS_OFFSET; re-adding it here double-counts
     # the 130 dB reference (measured -0.65 to -1.28 LUFS bias vs pyloudnorm).
     block_loudness = 10 * np.log10(combined + 1e-12)
