@@ -31,7 +31,7 @@ apps/music-android/
 - Mobile listening surface
 - CI release: `moodify-music-*-release.yml`
 - Contract shared with Web Player via Music BFF
-- No second Android (`apps/android/` is frozen)
+- No second Android (`apps/android/` was retired on 2026-10-04)
 
 ### 3. Music BFF
 

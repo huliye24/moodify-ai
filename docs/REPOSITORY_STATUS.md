@@ -38,7 +38,7 @@ Studio → Publish to My Library → Phone → Play
 | Moodify Core | **IMPLEMENTED** | `moodify-core-package/`（679 文件，v1.0.0-rc.1） |
 | Moodify Protocol 0.1 / 0.2 | **IMPLEMENTED**（预设作业 + 报告；可编辑 Mix Graph 仍为目标态） | `moodify protocol validate\|process`；`docs/protocol/` |
 | Moodify Studio（Electron 壳） | **IMPLEMENTED（壳）** — 只编排 Core，自身无 DSP；启动脚本仅 `electron .` | `moodify-desktop/`（v1.0.0-rc.1，Electron ^33） |
-| Android 客户端 | **IMPLEMENTED（两条并存线，未裁决）** | `apps/android`（com.moodify.app v2.0.0）、`apps/music-android`（com.moodify.music v2.0.1） |
+| Moodify App / Android Player | **IMPLEMENTED（唯一正式移动端）** | `apps/music-android`（com.moodify.music v2.0.1）；GitHub Release 工作流从该目录构建与签名 |
 | **Studio → My Library 发布动作** | **TARGET — 不存在** | 全仓库无实现 |
 | **Track package / `manifest.json`** | **TARGET — 不存在** | 全仓库无实现 |
 | **局域网传输 / 配对 / token** | **TARGET — 不存在** | 全仓库无实现 |
@@ -49,7 +49,7 @@ Studio → Publish to My Library → Phone → Play
 
 经仓库检索确认：没有任何 `publish to my library` / `lan sync` / `pairing token` / `local transfer` 实现代码。
 
-**未裁决：** ①`apps/android` vs `apps/music-android` 谁是 canonical App；②Creator 侧首要产品面是 CLI（现行 `CURRENT_CANON.md`）还是 Studio（v3）。两者均为 `HUMAN_DECISION_REQUIRED`，见 [`docs/reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md`](reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md)。
+**已裁决：** `apps/music-android` 是唯一 canonical App；旧候选 `apps/android` 已于 2026-10-04 按人类指令退役删除。**仍未裁决：** Creator 侧首要产品面是 CLI（现行 `CURRENT_CANON.md`）还是 Studio（v3），继续标记为 `HUMAN_DECISION_REQUIRED`。此前的双线状态与证据保留在 [`docs/reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md`](reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md) 作为历史记录。
 
 ## Studio 生产流程 v3 — 2026-10-03（DEFINED，已实现流程层）
 

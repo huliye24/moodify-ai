@@ -7,7 +7,7 @@
 **North star:** docs/design/MOODIFY_AESTHETIC_SYSTEM.md（六层审美系统）
 **Scope:** 官网、Moodify Ear、Moodify Music 三入口共享设计语言；不共享业务权威。
 
-这是**唯一 token 来源**。Web（`apps/music-web/app/tokens.css`）与 Android（`apps/android/.../ui/theme/Color.kt`）实现都从此表映射；三端不得出现三套漂移色值。
+这是**唯一 token 来源**。Web 与 canonical Android App（`apps/music-android/`）应从此表映射；各端不得出现彼此漂移的 token 权威。旧 Android 映射实现已随 `apps/android/` 于 2026-10-04 退役，不能再作为当前实现依据。
 
 ## 1. 色板（深色优先，默认主题为深色）
 
@@ -101,4 +101,4 @@
 | blocking | `--blocking` | `Blocking`（替代 MoodifyCritical + ConnectionCard `#E05B5B` 双红） |
 | 字号/间距/圆角 | CSS 变量 + spacing 阶梯 | Type.kt / Dp 常量 |
 
-Android 实现文件：`apps/android/app/src/main/java/com/moodify/app/ui/theme/Color.kt`、`Theme.kt`（dark scheme 接线）。
+Android 状态：`apps/music-android/` 尚未提供独立的 token 映射文件。后续实现必须在 canonical App 内完成，并以本表为设计语义来源；不得恢复旧 `apps/android` 路径。
