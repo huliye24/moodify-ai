@@ -178,8 +178,8 @@ Moodify Core                 moodify-core-package/  （679 文件，v1.0.0-rc.1�
 Moodify Protocol 0.1/0.2     moodify protocol validate|process；docs/protocol/
 Moodify Studio（壳）          moodify-desktop/  （Electron ^33，v1.0.0-rc.1）
   └ 它只编排 Core；自身无 DSP。启动脚本仅 `electron .`
-Android 客户端（两条线）       apps/android（com.moodify.app, v2.0.0/code 20）
-                             apps/music-android（com.moodify.music, v2.0.1/code 3）
+Moodify App（唯一正式移动端）  apps/music-android（com.moodify.music, v2.0.1/code 3）
+  └ GitHub Release 工作流实际构建、签名和发布的 Android Player
 ```
 
 ### 还没有（DEFINED / TARGET — 尚未实现）
@@ -199,11 +199,11 @@ Moodify Network（节点互联）             不存在
 
 > **不得把 §6 的 TARGET 部分写成已实现。** 违反此条等同于 Canon 不虚构现实（R6/R10）的违反。
 
-### 一个尚未裁决的前置问题
+### Android App 裁决（2026-10-04）
 
-`apps/android` 与 `apps/music-android` 是**两个并存的 Android 客户端**，且证据互相矛盾（详见 [../reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md](../reports/PRODUCT_CANON_V3_ALIGNMENT_2026-10-03.md)）。
+人类产品权威已确认：**`apps/music-android` 是唯一 canonical Moodify App**。依据是它的产品职责为 public Android player / `PLAY`，并且 `.github/workflows/release.yml` 实际从该目录构建、签名和发布 APK。旧候选 `apps/android` 已退役删除。
 
-**本文不指定哪一个是 canonical App。** 该判定属于 Task 002（Android 审计），且必须由人类确认（`AGENTS.md` L71 产品边界属人类主权）。在那之前，两条线都不删除、不被当作已定论。
+这项裁决只收敛 App authority，不表示 `apps/music-android` 已实现本文件列出的所有 TARGET 能力；功能状态仍以可运行代码、测试和发布证据为准。
 
 ---
 

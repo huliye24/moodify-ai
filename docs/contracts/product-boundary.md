@@ -2,6 +2,8 @@
 
 Status: FROZEN — MFY_PRODUCT_BOUNDARY_AND_SHARED_CONTRACTS_001
 
+> **2026-10-04 authority update:** `apps/music-android` is the sole canonical Moodify App. The former internal Android candidate `apps/android` has been retired. Historical Ear/Music contract distinctions below remain context, but deleted paths are not implementation targets.
+
 > **CLASSIFICATION UPDATE (2026-08-14) — Per Constitution v2.0 and Release Topology v1.0: Moodify Music is the only PUBLIC_PRODUCT; Moodify Ear is INTERNAL_CANONICAL (internal research and production authority, not a public consumer product). Contract rules below are unchanged; only the public/internal classification labels are updated.**
 
 ## 产品组合
@@ -17,9 +19,8 @@ Status: FROZEN — MFY_PRODUCT_BOUNDARY_AND_SHARED_CONTRACTS_001
 | 目录 | 分类 | 说明 |
 |---|---|---|
 | moodify-core-package | **INTERNAL_CANONICAL** | Ear 权威后端（job queue/cases/measurements/evidence） |
-| apps/android | **INTERNAL_CANONICAL** | Ear 原生客户端（pairing/jobs/results；CreatorCenter 等 UI = EXPERIMENTAL 标注） |
 | apps/music-web | **PUBLIC_PRODUCT** | Music Web/PWA |
-| apps/music-android | **PUBLIC_PRODUCT CANDIDATE** | Music 最小移动壳（33D） |
+| apps/music-android | **PUBLIC_PRODUCT / CANONICAL APP** | 唯一 Android Player；核心动作 `PLAY` |
 | apps/tools | SHARED / EXPERIMENTAL | 工具脚本 |
 | ops/ | SHARED | 部署/运维（web_origin、ear_batch、data_node） |
 | docs/contracts/music | SHARED | Music 契约（身份/所有权/发布/公开 API/生命周期/共享客户端） |
@@ -63,7 +64,7 @@ requested -> processing -> evidence_ready -> human_reviewed -> optionally_attach
 |---|---|---|
 | 域名 | rongjingmusic.com（工作台）、rongjingwenchuan.com（产品站） | rongjinwenchuan.xyz（聆听站） |
 | API namespace | /api/v1（Ear）、/internal/v1（内部） | /api/v1/music（BFF）、/internal/v1/music（内部） |
-| Android applicationId | com.moodify.app | com.moodify.music |
+| Android applicationId | —（旧 `com.moodify.app` 已退役） | com.moodify.music |
 | 存储 | SQLite + case 目录 | PolarDB moodify_dev + LA 媒体根 |
 | 部署 | LA nginx/FastAPI、杭州 8000 | LA BFF :8100、杭州 8000、PolarDB |
 
@@ -71,5 +72,4 @@ requested -> processing -> evidence_ready -> human_reviewed -> optionally_attach
 
 - Music 不得退化为 Ear 指标展示壳或音频处理工具。
 - Ear 不得退化为自动母带/preset 产品。
-- 旧处理 App（apps/android 的 Music UI 实验）评估迁移到 Ear 客户端或 Lab 工具，
-  不直接改名发布为 Music App。
+- 旧处理 App（原 `apps/android`）已退役，不得恢复为第二 Android 产品面。
