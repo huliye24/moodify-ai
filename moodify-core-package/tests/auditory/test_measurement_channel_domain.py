@@ -32,15 +32,17 @@ pyln = pytest.importorskip("pyloudnorm")
 #: A mean-over-channels aggregation under-reports stereo by exactly this much.
 CHANNEL_MEAN_BIAS_DB = 10 * np.log10(2)  # 3.0103 dB
 
-#: Loudness tolerance where the implementation uses the standard's exact
-#: 48 kHz K-weighting coefficients.
+#: 48 kHz uses the standard's exact K-weighting coefficients.
+#: Current oracle validation on these probes: <= 0.05 LU vs both pyloudnorm
+#: and ffmpeg ebur128. Tolerance is set at 0.1 LU.
 LUFS_TOLERANCE_STANDARD_SR = 0.1
 
-#: 44.1 kHz reuses the 48 kHz coefficients (a documented approximation in
-#: loudness.py, uncorrected by this hotfix). Measured deviation on these
-#: probes is up to ~0.15 LU, so the tolerance is wider *at that rate only*
-#: and for that documented reason — not to accommodate the aggregation bug,
-#: which is 3 dB.
+#: 44.1 kHz reuses the 48 kHz coefficients (a documented, pre-existing
+#: approximation in loudness.py -- unrelated to the channel-aggregation
+#: defect, which was 3.01 dB).
+#: Observed on these deterministic probes: up to ~0.15 LU.
+#: Tolerance is set at 0.2 LU, wider *at that rate only* and for that
+#: documented reason.
 LUFS_TOLERANCE_APPROX_SR = 0.2
 
 

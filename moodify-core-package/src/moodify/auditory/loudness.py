@@ -2,7 +2,8 @@
 
 Integrated loudness follows ITU-R BS.1770-5 / EBU Tech 3341: per-channel
 K-weighting with standard 48 kHz coefficients (44.1 kHz uses the same
-coefficients, an accepted approximation), channel-weighted energy
+coefficients -- a documented approximation, see _k_weighted for the
+measured error), channel-weighted energy
 aggregation, 400 ms blocks, -70 LUFS absolute gate and -10 LU relative
 gate. Other sample rates are resampled to 48 kHz before weighting.
 Loudness Range follows EBU Tech 3342 (3 s short-term loudness
@@ -15,7 +16,8 @@ import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 from scipy.signal import lfilter, resample_poly
 
-# BS.1770 K-weighting coefficients (48 kHz; accepted for 44.1 kHz).
+# BS.1770 K-weighting coefficients (48 kHz). 44.1 kHz reuses these; see
+# _k_weighted for the measured error (~0.15 LU worst observed).
 _RLB_B = [1.53512485958697, -2.69169618940638, 1.19839281085285]
 _RLB_A = [1.0, -1.69065929318241, 0.73248077421585]
 _HS_B = [1.0, -2.0, 1.0]
@@ -31,9 +33,20 @@ _LOUDNESS_OFFSET = -0.691  # 130 dB reference
 def _k_weighted(x: np.ndarray, sr: int) -> np.ndarray:
     """K-weighting (RLB high-pass + high-shelf).
 
-    Standard coefficients are defined at 48 kHz. 44.1 kHz uses the same
-    coefficients (accepted, error < 0.1 LU). Other rates are resampled
-    to 48 kHz first, per BS.1770 guidance.
+    Standard coefficients are defined at 48 kHz. 44.1 kHz reuses the same
+    coefficients. Other rates are resampled to 48 kHz first, per BS.1770
+    guidance.
+
+    Measured error of the 44.1 kHz approximation (HOTFIX 000, against
+    pyloudnorm and ffmpeg ebur128 on the deterministic channel-domain
+    probes in tests/auditory/test_measurement_channel_domain.py):
+
+        48 kHz   <= 0.05 LU   (exact coefficients)
+        44.1 kHz ~  0.15 LU   (worst observed on those probes)
+
+    The regression tolerance at 44.1 kHz is therefore 0.2 LU. This
+    approximation is pre-existing and unrelated to the channel-aggregation
+    fix, which was 3.01 dB.
     """
     if sr not in (44100, 48000):
         x = resample_poly(x, 48000, sr)

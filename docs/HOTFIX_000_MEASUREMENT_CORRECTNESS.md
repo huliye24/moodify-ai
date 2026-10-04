@@ -119,9 +119,15 @@ Probe B: Mine  -9.712 | pyloudnorm  -9.754 | ffmpeg ebur128  -9.7 LUFS
 ```
 
 At 44.1 kHz the implementation reuses the 48 kHz coefficients — a
-**pre-existing, documented approximation** unrelated to this hotfix. Measured
-deviation on these probes reaches ~0.15 LU, so the 44.1 kHz test tolerance is
-0.2 LU *for that documented reason*. The aggregation defect was 3 dB.
+**pre-existing, documented approximation** unrelated to this hotfix:
+
+| Sample rate | K-weighting coefficients | Current oracle validation | Test tolerance |
+| --- | --- | --- | --- |
+| 48 kHz | standard exact | **≤ 0.05 LU** (vs pyloudnorm and ffmpeg ebur128) | 0.1 LU |
+| 44.1 kHz | reuses the 48 kHz set | **up to ~0.15 LU** on the deterministic probes | **0.2 LU** |
+
+The 44.1 kHz tolerance is wider *at that rate only*, and for that documented
+reason. The aggregation defect was 3 dB, far outside either tolerance.
 
 ---
 
