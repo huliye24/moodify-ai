@@ -113,14 +113,33 @@ def test_silence_ratio_exact():
 # Loudness semantics (G4, G6)
 # ---------------------------------------------------------------------------
 
-def test_loudness_stereo_identity_matches_mono_energy():
+def test_loudness_stereo_duplicate_channel_adds_3db():
+    """Two identical channels carry twice the power of one -> +3.01 dB.
+
+    BS.1770 aggregates channels by *summing* weighted powers, so duplicating a
+    channel into L and R adds 10*log10(2) = 3.0103 dB. This test previously
+    asserted stereo == mono, which is the signature of a mean-over-channels
+    aggregation bug (HOTFIX 000 / F1); it encoded the defect as an identity.
+    """
     sr = 48000
     mono = _sine(3.0, 0.5, 440.0, sr)
     stereo_same = np.stack([mono, mono], axis=1)
-    # Two identical channels: per-channel weighting sums to the same energy
-    # as the mono single-channel value (weights L=R=1).
-    assert integrated_loudness_lufs(stereo_same, sr) == pytest.approx(
-        integrated_loudness_lufs(mono, sr), abs=0.05)
+    delta = integrated_loudness_lufs(stereo_same, sr) - integrated_loudness_lufs(mono, sr)
+    assert delta == pytest.approx(10 * np.log10(2), abs=0.05)
+
+
+def test_loudness_antiphase_stereo_is_not_cancelled():
+    """L = -R must not be treated as silence or as a mono downmix of zero.
+
+    Summing powers (not samples) makes anti-phase stereo as loud as in-phase
+    stereo. A sample-domain downmix would wrongly cancel it.
+    """
+    sr = 48000
+    mono = _sine(3.0, 0.5, 440.0, sr)
+    in_phase = np.stack([mono, mono], axis=1)
+    anti_phase = np.stack([mono, -mono], axis=1)
+    assert integrated_loudness_lufs(anti_phase, sr) == pytest.approx(
+        integrated_loudness_lufs(in_phase, sr), abs=0.05)
 
 
 def test_loudness_short_content_returns_gated_floor():
