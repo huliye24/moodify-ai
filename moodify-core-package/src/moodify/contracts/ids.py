@@ -6,12 +6,13 @@ import re
 from typing import Literal
 from uuid import uuid4
 
-IdKind = Literal["case", "meas", "evid", "rule", "finding"]
+#: Every canonical ID kind. New kinds are appended so that already-persisted
+#: identifiers keep validating byte-for-byte unchanged.
+ID_KINDS = ("case", "meas", "evid", "rule", "finding", "project", "asset")
 
-_PATTERNS = {
-    kind: re.compile(rf"^{kind}_[0-9a-f]{{32}}$")
-    for kind in ("case", "meas", "evid", "rule", "finding")
-}
+IdKind = Literal["case", "meas", "evid", "rule", "finding", "project", "asset"]
+
+_PATTERNS = {kind: re.compile(rf"^{kind}_[0-9a-f]{{32}}$") for kind in ID_KINDS}
 
 
 def new_id(kind: IdKind) -> str:
