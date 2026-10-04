@@ -77,6 +77,7 @@ RETIRED_PATHS: dict[str, str] = {
     "phys-lab/": "launcher for Core's moodify.physics",
     "工程经验层/": "engineering constraints moved to docs/governance/constraints/",
     "moodify-app/": "untracked workspace copy",
+    "apps/android/": "retired duplicate Android client; apps/music-android is the canonical Moodify App",
 }
 
 # Generated subtrees whose contents are known runtime / experiment output rather
