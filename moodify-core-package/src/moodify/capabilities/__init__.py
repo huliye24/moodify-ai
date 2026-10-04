@@ -17,6 +17,7 @@ is discovered by scanning the filesystem, because a module with a promising
 name is not a capability.
 """
 
+from . import router as _router
 from .builtin import builtin_registry
 from .failures import (
     RETRYABLE_FAILURE_CODES,
@@ -41,6 +42,12 @@ from .models import (
     validate_capability_id,
     validate_provider_id,
 )
+from .policy import (
+    DeterminismPolicy,
+    LocalityPreference,
+    PrivacyPolicy,
+    ProviderPolicy,
+)
 from .registry import (
     CapabilityNotFound,
     CapabilityRegistry,
@@ -48,6 +55,7 @@ from .registry import (
     RegistryError,
     RegistryValidationError,
 )
+from .router import ProviderSelection, RejectedProvider, RoutingReason
 
 __all__ = [
     "CAPABILITY_SCHEMA",
@@ -58,20 +66,28 @@ __all__ = [
     "CapabilityStatus",
     "CommercialUse",
     "Determinism",
+    "DeterminismPolicy",
     "ExecutionMode",
     "Failure",
     "FailureCode",
     "IOType",
     "Locality",
+    "LocalityPreference",
+    "PrivacyPolicy",
     "Provider",
     "ProviderNotFound",
+    "ProviderPolicy",
+    "ProviderSelection",
     "ProviderStatus",
     "ProviderType",
     "Redistribution",
     "RegistryError",
     "RegistryValidationError",
+    "RejectedProvider",
+    "RoutingReason",
     "StrategicPosture",
     "builtin_registry",
+    "eligible_providers",
     "get_capability",
     "get_provider",
     "has_capability",
@@ -79,8 +95,10 @@ __all__ = [
     "list_capabilities",
     "list_providers",
     "providers_for",
+    "rank_providers",
     "registry_snapshot",
     "registry_snapshot_json",
+    "select_provider",
     "validate_capability_id",
     "validate_provider_id",
 ]
@@ -131,3 +149,43 @@ def registry_snapshot() -> dict:
 def registry_snapshot_json() -> str:
     """Canonical JSON form of :func:`registry_snapshot`."""
     return builtin_registry().snapshot_json()
+
+
+# ── provider selection against the canonical built-in registry ────────────
+#
+# Convenience wrappers. The decision logic lives in ``router`` and is pure:
+# these add nothing but the default registry.
+
+
+def eligible_providers(
+    capability_id: str,
+    policy: ProviderPolicy | None = None,
+    *,
+    registry: CapabilityRegistry | None = None,
+):
+    """Providers satisfying every hard constraint, in declared-ID order."""
+    return _router.eligible_providers(capability_id, policy, registry=registry)
+
+
+def rank_providers(
+    capability_id: str,
+    policy: ProviderPolicy | None = None,
+    *,
+    registry: CapabilityRegistry | None = None,
+):
+    """Eligible providers in deterministic preference order, best first."""
+    return _router.rank_providers(capability_id, policy, registry=registry)
+
+
+def select_provider(
+    capability_id: str,
+    policy: ProviderPolicy | None = None,
+    *,
+    registry: CapabilityRegistry | None = None,
+) -> ProviderSelection:
+    """Select one provider, or explain why none could be selected.
+
+    Never raises for "nothing eligible"; check ``result.selected``. Pass
+    *registry* to route over something other than the built-in declarations.
+    """
+    return _router.select_provider(capability_id, policy, registry=registry)
