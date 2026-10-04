@@ -99,6 +99,46 @@ def fingerprint(rule: str, path: str, symbol: str, message_key: str) -> str:
     return hashlib.sha256(payload).hexdigest()[:20]
 
 
+def content_key(content: str, seen: dict[str, int]) -> str:
+    """A stable, collision-free discriminator derived from the finding's content.
+
+    Positional discriminators (line numbers) are unstable: any edit above a
+    finding re-keys it, so the guard reported churn where nothing had changed.
+    The finding's *content* is what actually identifies it. Identical content
+    appearing twice in one scope is disambiguated by an occurrence ordinal, so
+    the key stays unique — ``finding_map`` is a plain dict and silently drops
+    any colliding finding.
+    """
+    digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
+    occurrence = seen.get(digest, 0)
+    seen[digest] = occurrence + 1
+    return digest if occurrence == 0 else f"{digest}:{occurrence}"
+
+
+def qualified_symbols(tree: ast.AST) -> dict[ast.AST, str]:
+    """Map each function to a scope-qualified name.
+
+    A bare function name is not unique: repeated definitions — e.g. one
+    ``evaluate`` method per judge class — all produced the symbol ``evaluate``,
+    so their findings shared a fingerprint and every one but the last was
+    silently dropped by the guard.
+    """
+    names: dict[ast.AST, str] = {}
+
+    def walk(node: ast.AST, prefix: str) -> None:
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                name = f"{prefix}.{child.name}" if prefix else child.name
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    names[child] = name
+                walk(child, name)
+            else:
+                walk(child, prefix)
+
+    walk(tree, "")
+    return names
+
+
 def make_finding(
     *,
     rule: str,
@@ -228,6 +268,7 @@ def scan_python(path: Path, relative: str, text: str, config: dict[str, Any]) ->
 
     thresholds = config["thresholds"]
     policy = config["policy"]
+    symbols = qualified_symbols(tree)
 
     for node in ast.walk(tree):
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -237,7 +278,7 @@ def scan_python(path: Path, relative: str, text: str, config: dict[str, Any]) ->
         visitor = PythonFunctionVisitor()
         for statement in node.body:
             visitor.visit(statement)
-        symbol = node.name
+        symbol = symbols.get(node, node.name)
 
         sev = severity_for(lines, thresholds["function_warning_lines"], thresholds["function_error_lines"])
         if sev:
@@ -297,6 +338,7 @@ def scan_python(path: Path, relative: str, text: str, config: dict[str, Any]) ->
             ))
 
         if policy["review_broad_exception_handlers"]:
+            seen_broad: dict[str, int] = {}
             for handler in visitor.broad_handlers:
                 findings.append(make_finding(
                     rule="TT-BROAD-EXCEPTION",
@@ -306,10 +348,11 @@ def scan_python(path: Path, relative: str, text: str, config: dict[str, Any]) ->
                     column=handler.col_offset,
                     symbol=symbol,
                     message="Broad exception handler requires contextual logging, rethrowing, or a documented boundary.",
-                    message_key=f"broad-exception:{handler.lineno}",
+                    message_key=f"broad-exception:{content_key(ast.unparse(handler), seen_broad)}",
                 ))
 
         if policy["forbid_empty_exception_handlers"]:
+            seen_empty: dict[str, int] = {}
             for handler in visitor.empty_handlers:
                 findings.append(make_finding(
                     rule="TT-EMPTY-EXCEPTION",
@@ -319,7 +362,7 @@ def scan_python(path: Path, relative: str, text: str, config: dict[str, Any]) ->
                     column=handler.col_offset,
                     symbol=symbol,
                     message="Empty exception handler hides failure evidence.",
-                    message_key=f"empty-exception:{handler.lineno}",
+                    message_key=f"empty-exception:{content_key(ast.unparse(handler), seen_empty)}",
                 ))
 
     return findings
@@ -330,6 +373,9 @@ def scan_textual(path: Path, relative: str, text: str, config: dict[str, Any]) -
     threshold = config["thresholds"]["max_line_length"]
     policy = config["policy"]
     markers = [marker.upper() for marker in policy["debt_markers"]]
+    seen_length: dict[str, int] = {}
+    seen_debt: dict[str, int] = {}
+    seen_catch: dict[str, int] = {}
 
     for number, line in enumerate(text.splitlines(), start=1):
         if len(line) > threshold:
@@ -339,7 +385,7 @@ def scan_textual(path: Path, relative: str, text: str, config: dict[str, Any]) -
                 path=relative,
                 line=number,
                 message=f"Line length is {len(line)} characters; expression may be compressed.",
-                message_key=f"line-length:{number}",
+                message_key=f"line-length:{content_key(line.strip(), seen_length)}",
                 evidence={"length": len(line)},
             ))
         if policy["track_debt_markers"]:
@@ -352,7 +398,7 @@ def scan_textual(path: Path, relative: str, text: str, config: dict[str, Any]) -
                         path=relative,
                         line=number,
                         message=f"Debt marker {marker} requires a reason and exit condition.",
-                        message_key=f"debt:{marker}:{number}",
+                        message_key=f"debt:{marker}:{content_key(line.strip(), seen_debt)}",
                         evidence={"marker": marker, "excerpt": line.strip()[:240]},
                     ))
                     break
@@ -368,7 +414,7 @@ def scan_textual(path: Path, relative: str, text: str, config: dict[str, Any]) -
                         path=relative,
                         line=number,
                         message="Empty catch block hides failure evidence.",
-                        message_key=f"empty-catch:{number}",
+                        message_key=f"empty-catch:{content_key(stripped, seen_catch)}",
                     ))
     return findings
 
