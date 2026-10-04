@@ -77,6 +77,15 @@ RETIRED_PATHS: dict[str, str] = {
     "phys-lab/": "launcher for Core's moodify.physics",
     "工程经验层/": "engineering constraints moved to docs/governance/constraints/",
     "moodify-app/": "untracked workspace copy",
+    "apps/android/": "retired duplicate Android client; apps/music-android is the canonical Moodify App",
+}
+
+# Generated subtrees whose contents are known runtime / experiment output rather
+# than source fixtures. Keep this list narrow: bounded test evidence elsewhere in
+# the repository may intentionally live below a directory named `outputs`.
+FORBIDDEN_GENERATED_PREFIXES: dict[str, str] = {
+    "moodify-core-package/outputs/":
+        "Core runtime / experiment output must never be tracked",
 }
 
 # Top-level directories whose names are Chinese task-package labels. The
@@ -215,6 +224,19 @@ def check_generated_artifacts(files: list[str]) -> list[str]:
     return problems
 
 
+def check_forbidden_generated_prefixes(files: list[str]) -> list[str]:
+    problems = []
+    for prefix, reason in FORBIDDEN_GENERATED_PREFIXES.items():
+        hits = [path for path in files if path.startswith(prefix)]
+        if hits:
+            problems.append(
+                f"generated output subtree is tracked: '{prefix}' ({len(hits)} file(s)) — {reason}\n"
+                f"    first: {hits[0]}\n"
+                "    Keep local outputs ignored; commit source fixtures under their bounded test paths."
+            )
+    return problems
+
+
 def check_moodify_command(files: list[str]) -> list[str]:
     """Exactly one *tracked* package may declare the `moodify` console command.
 
@@ -278,6 +300,7 @@ def main() -> int:
     checks = (
         ("retired paths", check_retired_paths(files)),
         ("top-level naming", check_cjk_top_level(files)),
+        ("forbidden generated prefixes", check_forbidden_generated_prefixes(files)),
         ("generated artifacts", check_generated_artifacts(files)),
         ("console entry points", check_moodify_command(files)),
         ("single Core", check_second_core(files)),

@@ -6,16 +6,64 @@
   "scripts": {
     "start": "electron .",
     "check:contracts": "node scripts/check-contracts.js",
-    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-studio.js"
+    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-studio.js && node scripts/test-runtime.js",
+    "pack:win": "electron-builder --win --x64 --dir",
+    "dist:win": "electron-builder --win nsis portable --x64"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "26.15.3"
   },
   "dependencies": {
     "@openai/codex": "^0.160.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
     "node-pty": "^1.1.0"
+  },
+  "build": {
+    "appId": "com.moodify.studio",
+    "productName": "Moodify Studio",
+    "asar": false,
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "renderer/assets"
+    },
+    "files": [
+      "src/**/*",
+      "renderer/**/*",
+      "scripts/dsp_separate.py",
+      "scripts/midi_to_musicxml.py",
+      "package.json"
+    ],
+    "win": {
+      "icon": "moodify_icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "artifactName": "Moodify_Studio_${version}_Setup_${arch}.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Moodify Studio"
+    },
+    "portable": {
+      "artifactName": "Moodify_Studio_${version}_Portable_${arch}.${ext}"
+    }
   }
 }
