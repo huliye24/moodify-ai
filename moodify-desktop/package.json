@@ -8,7 +8,7 @@
   "scripts": {
     "start": "electron .",
     "check:contracts": "node scripts/check-contracts.js",
-    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-studio.js",
+    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-studio.js && node scripts/test-runtime.js",
     "pack:win": "electron-builder --win --x64 --dir",
     "dist:win": "electron-builder --win nsis portable --x64",
     "icon:linux": "node scripts/derive-linux-icon.js",

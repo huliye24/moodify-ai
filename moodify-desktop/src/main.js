@@ -21,6 +21,8 @@ const { spawn } = require('child_process');
 const studioBackends = require('./backends');
 const studio = require('./studio');
 const pipeline = require('./pipeline');
+// 外部专用运行时解析（HOTFIX 000 / F4）。缺运行时必须显式失败，不静默回退。
+const { RuntimeMissingError, resolveRuntime, resolveRuntimeTool } = require('./runtime');
 
 const CASES_ROOT = process.env.MOODIFY_CASES_ROOT
   || path.join(os.homedir(), '.moodify', 'cases');
@@ -514,20 +516,21 @@ function registerIpc() {
 // 所有 python 子进程强制 PYTHONUTF8=1；长任务单飞锁，进度行实时转发渲染层。
 
 const TOOLS_ROOT = path.join(__dirname, '..', 'scripts');
-const VENVS = {
-  'basic-pitch': path.join(__dirname, '..', '..', '.venv-basic-pitch'),
-  score: path.join(__dirname, '..', '..', '.venv-score'),
-};
 
-function pyExe(venvName) {
-  // A venv's executable layout is platform-specific: Windows keeps them in
-  // Scripts\ with an .exe suffix, POSIX in bin/ without one. Looking only in
-  // Scripts\ meant the helper venv was never found on Linux and every call
-  // silently fell through to the generic PYTHON.
-  const exe = process.platform === 'win32'
-    ? path.join(VENVS[venvName], 'Scripts', 'python.exe')
-    : path.join(VENVS[venvName], 'bin', 'python');
-  return fs.existsSync(exe) ? exe : PYTHON;
+// 需要专用 venv 的能力必须先解析运行时：解析失败就返回 DEPENDENCY_MISSING，
+// 不 spawn 任何子进程，也不用系统 python 顶替（那只会把缺依赖伪装成 ABI 崩溃）。
+//
+// 平台布局差异（Windows `Scripts\*.exe` / POSIX `bin/*`）不在这里判断，而是由
+// runtime.js 按 process.platform 解析。两件事必须同时成立：POSIX 上要去
+// bin/ 找专用解释器，且找不到时**不能**回退到系统 python3——"跨平台"与
+// "显式失败"是不同的问题，混在一起就会得到"在 Linux 上静默回退"。
+function requireRuntimeExe(resolve) {
+  try {
+    return { ok: true, exe: resolve() };
+  } catch (err) {
+    if (err instanceof RuntimeMissingError) return err.toResult();
+    throw err;
+  }
 }
 
 function insideDir(dir, p) {
@@ -610,9 +613,11 @@ function registerStudioToolIpc() {
   ipcMain.handle('stems:run', async (_e, caseDir) => {
     const src = resolveCaseSource(caseDir);
     if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+    const runtime = requireRuntimeExe(() => resolveRuntime('basic-pitch').python);
+    if (!runtime.ok) return runtime;
     const outdir = path.join(caseDir, 'stems');
     fs.mkdirSync(outdir, { recursive: true });
-    return runLong('stems', pyExe('basic-pitch'), [
+    return runLong('stems', runtime.exe, [
       path.join(TOOLS_ROOT, 'dsp_separate.py'), src, '--outdir', outdir,
     ]);
   });
@@ -624,14 +629,11 @@ function registerStudioToolIpc() {
       || insideDir(caseDir, path.resolve(audioPath));
     if (!allowed) return { ok: false, reason: '输入音频必须是世界源或 case 内分离轨' };
     if (!fs.existsSync(audioPath)) return { ok: false, reason: '输入音频不存在' };
-    // Same platform split as pyExe(): POSIX venvs expose bin/basic-pitch.
-    const bpExe = process.platform === 'win32'
-      ? path.join(VENVS['basic-pitch'], 'Scripts', 'basic-pitch.exe')
-      : path.join(VENVS['basic-pitch'], 'bin', 'basic-pitch');
-    if (!fs.existsSync(bpExe)) return { ok: false, reason: '未找到 basic-pitch（.venv-basic-pitch）' };
+    const runtime = requireRuntimeExe(() => resolveRuntimeTool('basic-pitch', 'basic-pitch'));
+    if (!runtime.ok) return runtime;
     const outdir = path.join(caseDir, 'midi');
     fs.mkdirSync(outdir, { recursive: true });
-    const res = await runLong('midi', bpExe, [
+    const res = await runLong('midi', runtime.exe, [
       '--save-midi', '--model-serialization', 'onnx', outdir, audioPath,
     ]);
     if (res.ok) {
@@ -654,7 +656,9 @@ function registerStudioToolIpc() {
     fs.mkdirSync(outdir, { recursive: true });
     const base = path.basename(midiPath).replace(/\.(mid|midi)$/i, '');
     const out = path.join(outdir, `${base}.musicxml`);
-    const res = await runLong('score', pyExe('score'), [
+    const runtime = requireRuntimeExe(() => resolveRuntime('score').python);
+    if (!runtime.ok) return runtime;
+    const res = await runLong('score', runtime.exe, [
       path.join(TOOLS_ROOT, 'midi_to_musicxml.py'), midiPath, out,
     ]);
     return res.ok ? { ...res, musicxml: out } : res;
