@@ -2,13 +2,18 @@
   "name": "moodify-desktop",
   "version": "1.0.0-rc.1",
   "description": "Moodify — company desktop shell: pick a song, detect, read data & charts, get the repair/mixing plan. The core stays in moodify-core-package (pip); this shell orchestrates it.",
+  "author": "文川院 / Moodify 声音实验室",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "check:contracts": "node scripts/check-contracts.js",
     "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-studio.js",
     "pack:win": "electron-builder --win --x64 --dir",
-    "dist:win": "electron-builder --win nsis portable --x64"
+    "dist:win": "electron-builder --win nsis portable --x64",
+    "icon:linux": "node scripts/derive-linux-icon.js",
+    "rebuild:electron": "electron-builder install-app-deps",
+    "pack:linux": "npm run icon:linux && npm run rebuild:electron && electron-builder --linux --x64 --dir",
+    "dist:linux": "npm run icon:linux && npm run rebuild:electron && electron-builder --linux AppImage deb --x64"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {
@@ -64,6 +69,32 @@
     },
     "portable": {
       "artifactName": "Moodify_Studio_${version}_Portable_${arch}.${ext}"
+    },
+    "linux": {
+      "icon": "icon.png",
+      "category": "AudioVideo",
+      "synopsis": "Moodify Studio — listening and production review for the Moodify Sound Protocol",
+      "description": "Moodify Studio is the Linux listening and production-review interface for the Moodify Sound Protocol. It orchestrates the pip-installed Moodify Core; it does not embed a second audio engine. The full pipeline expects an existing local Moodify runtime (Python 3.10-3.12 with Moodify Core 1.0.0-rc.1 importable, plus FFmpeg/FFprobe). This package does not install Python, Core, FFmpeg or model weights.",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Moodify_Studio_${version}_Linux_${arch}.${ext}"
+    },
+    "deb": {
+      "artifactName": "Moodify_Studio_${version}_Linux_amd64.${ext}",
+      "priority": "optional",
+      "maintainer": "文川院 / Moodify 声音实验室"
     }
   }
 }
