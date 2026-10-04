@@ -191,12 +191,26 @@ Studio must not own a second production state machine or private DSP implementat
 
 ### Moodify App
 
-App remains the Listener-side personal music node:
+**Decided 2026-10-04: `apps/music-android` is the only canonical App. `apps/android` is retired.**
+
+App is the Listener-side personal music node:
 
 - receive accepted versions;
 - maintain My Library;
 - play reliably;
 - later return feedback or revision requests.
+
+App must not own a second production state machine or private sound logic — the same constraint §5
+already places on Studio, for the same reason: the App is a client of Core contracts, not an author
+of them.
+
+> **Execution note (recorded with the decision).** The decision above is canonical. The physical
+> removal of the `apps/android/` directory is a separate repository step and had **not** landed on
+> `main` when this was written — the directory was still present. Until it lands, that directory is
+> a migration leftover, not a competing product claim: no new work may depend on it, and no
+> interface may be documented as living there. Stating this explicitly is deliberate; a canonical
+> document that silently describes a tree that does not exist is the failure mode this audit track
+> exists to remove.
 
 ### Moodify Core
 
@@ -210,6 +224,20 @@ Core owns:
 - audio analysis, DSP and processing;
 - verification and comparison facts;
 - evidence, provenance and version contracts.
+
+### Cloud and Core are not competing authorities
+
+The cloud is the **system core for the delivery and listening loop** — catalogue, delivery and
+device-adaptive playback — and it is authoritative *for that loop*.
+
+**Core and Protocol remain the cross-client shared authority.** Every interface consumes the same
+Project Model, capability and evidence contracts: CLI, Agent, Studio, App and cloud services alike.
+The two layers serve different loops, which is why they may legitimately have different internal
+sequences; what they may not have is two different definitions of the same fact.
+
+A client that needs a different contract must change the shared contract, not fork it. This is the
+same rule §5 applies to Studio and App, and the rule §3 of the Cloud track states as "there may be
+only one authority".
 
 ## 6. Canonical production loop
 
@@ -704,17 +732,22 @@ Machine evidence must not be converted into artistic approval.
 This product direction does not automatically decide:
 
 ```text
-1. apps/android or apps/music-android as canonical App
-2. exact Project Model schema freeze
-3. exact Production Graph protocol version
-4. which edit/repair capability is implemented first
-5. provider selection and licensing for mastering-grade separation
-6. default Quick versus Deep presentation in Studio
-7. when an accepted version becomes publishable
-8. public compatibility guarantees
+1. exact Project Model schema freeze
+2. exact Production Graph protocol version
+3. which edit/repair capability is implemented first
+4. provider selection and licensing for mastering-grade separation
+5. default Quick versus Deep presentation in Studio
+6. when an accepted version becomes publishable
+7. public compatibility guarantees
 ```
 
 Record each unresolved point as `HUMAN_DECISION_REQUIRED`; do not let an implementation PR decide it silently.
+
+**Decided 2026-10-04 — the canonical App question is resolved and removed from the list above.**
+`apps/music-android` is the only canonical App; `apps/android` is retired. See §5 for the decision
+and for the execution note on the directory itself. It was taken off the list rather than left in
+place because an item that stays on a "still required" list after being decided is precisely how
+the ambiguity would return.
 
 ## 21. Forbidden implementation pattern
 
