@@ -34,7 +34,11 @@ const REPO_ROOT = path.join(ROOT, '..');
 const studio = require(path.join(ROOT, 'src', 'studio'));
 const { getBackend, describeBackends } = require(path.join(ROOT, 'src', 'backends'));
 
-const PYTHON = process.env.MOODIFY_PYTHON || 'python';
+// On POSIX the interpreter is normally `python3`; Windows ships `python`.
+// MOODIFY_PYTHON still wins on every platform. Defaulting to `python` meant the
+// harness died with ENOENT on a stock Linux box before any test could run.
+const PYTHON = process.env.MOODIFY_PYTHON
+  || (process.platform === 'win32' ? 'python' : 'python3');
 const pythonEnv = () => ({ ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' });
 
 const runPython = (args, timeoutMs = 10 * 60 * 1000) => new Promise((resolve, reject) => {

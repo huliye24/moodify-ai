@@ -41,12 +41,20 @@ function check(name, fn) {
   }
 }
 
+// The venv layout is a property of the host OS, restated here as a literal
+// expectation rather than imported from runtime.js. Importing it would make the
+// fixture agree with whatever the resolver believes, so a resolver that looked
+// only in Scripts\ would pass its own test on Linux while finding nothing real.
+const IS_WINDOWS = process.platform === 'win32';
+const BIN_DIR = IS_WINDOWS ? 'Scripts' : 'bin';
+const exeName = (name) => (IS_WINDOWS ? `${name}.exe` : name);
+
 function tempVenv({ python = false, tool = false } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'moodify-runtime-'));
   created.push(dir);
-  if (python || tool) fs.mkdirSync(path.join(dir, 'Scripts'), { recursive: true });
-  if (python) fs.writeFileSync(path.join(dir, 'Scripts', 'python.exe'), '');
-  if (tool) fs.writeFileSync(path.join(dir, 'Scripts', 'basic-pitch.exe'), '');
+  if (python || tool) fs.mkdirSync(path.join(dir, BIN_DIR), { recursive: true });
+  if (python) fs.writeFileSync(path.join(dir, BIN_DIR, exeName('python')), '');
+  if (tool) fs.writeFileSync(path.join(dir, BIN_DIR, exeName('basic-pitch')), '');
   return dir;
 }
 
@@ -56,14 +64,31 @@ console.log('moodify-desktop runtime resolver (HOTFIX 000 / F4)');
 check('A. dedicated runtime present resolves to that interpreter', () => {
   const dir = tempVenv({ python: true });
   const resolved = rt.resolveRuntime('basic-pitch', { candidates: [dir] });
-  assert.strictEqual(resolved.python, path.join(dir, 'Scripts', 'python.exe'));
+  assert.strictEqual(resolved.python, path.join(dir, BIN_DIR, exeName('python')));
   assert.strictEqual(resolved.dir, dir);
 });
 
 check('A. dedicated runtime present resolves a declared tool', () => {
   const dir = tempVenv({ python: true, tool: true });
   const exe = rt.resolveRuntimeTool('basic-pitch', 'basic-pitch', { candidates: [dir] });
-  assert.strictEqual(exe, path.join(dir, 'Scripts', 'basic-pitch.exe'));
+  assert.strictEqual(exe, path.join(dir, BIN_DIR, exeName('basic-pitch')));
+});
+
+check('A. declared layout matches this OS, not the other one', () => {
+  // Guards the defect this reconciliation exists for: a runtime table that
+  // hardcoded Scripts\python.exe made every Linux venv look absent.
+  assert.strictEqual(rt.venvExecutable('python'), path.join(BIN_DIR, exeName('python')));
+  assert.strictEqual(rt.venvExecutable('basic-pitch'), path.join(BIN_DIR, exeName('basic-pitch')));
+  for (const [name, spec] of Object.entries(rt.RUNTIMES)) {
+    assert.strictEqual(spec.python, rt.venvExecutable('python'), `${name} python path`);
+    for (const [tool, rel] of Object.entries(spec.tools)) {
+      assert.strictEqual(rel, rt.venvExecutable(tool), `${name} tool ${tool} path`);
+    }
+  }
+  const other = IS_WINDOWS ? 'bin' : 'Scripts';
+  for (const spec of Object.values(rt.RUNTIMES)) {
+    assert.ok(!spec.python.startsWith(other), `layout leaks the foreign OS: ${spec.python}`);
+  }
 });
 
 // --- B. dedicated runtime absent ------------------------------------------
@@ -89,6 +114,44 @@ check('B. missing runtime never returns a system interpreter', () => {
   // candidates are search *directories*; none of them is a runnable interpreter
   for (const candidate of result.candidates || []) {
     assert.ok(!/python(\.exe)?$/i.test(candidate), `failure names an interpreter: ${candidate}`);
+  }
+});
+
+check('B. absent runtime fails with DEPENDENCY_MISSING and no executable, deterministically', () => {
+  // A candidate that provably does not exist, so the outcome does not depend on
+  // whatever happens to be on the machine running the suite.
+  const absent = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'moodify-absent-')), 'no-such-venv');
+  created.push(path.dirname(absent));
+
+  const result = rt.tryResolve(() => rt.resolveRuntime('basic-pitch', { candidates: [absent] }));
+  assert.strictEqual(result.ok, false);
+  assert.strictEqual(result.code, rt.CODE_DEPENDENCY_MISSING);
+  assert.strictEqual(result.runtime, 'basic-pitch');
+  assert.strictEqual(result.exe, undefined, 'a failed resolution must not carry an executable');
+  assert.ok(typeof result.reason === 'string' && result.reason.length > 0);
+  // The failure must not name any interpreter anywhere — neither the generic
+  // `python` / `python3` nor a stray path a caller could spawn anyway.
+  assert.ok(!/python3?\b/i.test(JSON.stringify(result)),
+    `failure leaks an interpreter: ${JSON.stringify(result)}`);
+});
+
+check('B. default candidates never fall back to a system interpreter', () => {
+  const key = rt.RUNTIMES['basic-pitch'].envVar;
+  const previous = process.env[key];
+  delete process.env[key];
+  try {
+    const candidates = rt.runtimeCandidates('basic-pitch');
+    assert.ok(candidates.length > 0, 'expected at least the packaged default location');
+    for (const candidate of candidates) {
+      assert.ok(path.isAbsolute(candidate), `candidate is not absolute: ${candidate}`);
+      assert.ok(!/python3?\b/i.test(candidate), `candidate names an interpreter: ${candidate}`);
+    }
+    // The entry point is resolved *inside* a candidate, never as a bare command.
+    assert.ok(!path.isAbsolute(rt.RUNTIMES['basic-pitch'].python),
+      'runtime entry point must be venv-relative, not an absolute/system path');
+  } finally {
+    if (previous === undefined) delete process.env[key];
+    else process.env[key] = previous;
   }
 });
 

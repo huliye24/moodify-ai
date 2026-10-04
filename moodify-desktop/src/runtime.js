@@ -23,6 +23,20 @@ const path = require('path');
 
 const CODE_DEPENDENCY_MISSING = 'DEPENDENCY_MISSING';
 
+// venv 的可执行文件布局是**操作系统的属性**，不是运行时的属性：
+// Windows 放 Scripts\ 且带 .exe 后缀，POSIX 放 bin/ 且不带后缀。
+// 在这里解析一次，调用方就不必各自判断平台。
+//
+// 注意这与「缺运行时能不能回退到系统解释器」是**两个不同的问题**：
+// 前者是布局，后者是语义，后者永远是否。把两者混起来，得到的正是
+// 「在 Linux 上找不到 bin/python，于是静默用了系统 python3」这个缺陷。
+const IS_WINDOWS = process.platform === 'win32';
+const VENV_BIN_DIR = IS_WINDOWS ? 'Scripts' : 'bin';
+/** venv 内可执行文件的相对路径（'python' → Scripts\python.exe / bin/python）。 */
+function venvExecutable(name) {
+  return path.join(VENV_BIN_DIR, IS_WINDOWS ? `${name}.exe` : name);
+}
+
 // 专用运行时清单。dir 是打包/开发布局下的默认位置；envVar 允许显式覆盖。
 // 注意：envVar 指向的是**同一个专用 venv**，不是「随便一个 python」——
 // 覆盖是显式的、要校验的，与「静默回退」是两件事。
@@ -31,14 +45,14 @@ const RUNTIMES = {
     label: 'Basic Pitch（快速分离 / MIDI）',
     envVar: 'MOODIFY_VENV_BASIC_PITCH',
     dir: path.join(__dirname, '..', '..', '.venv-basic-pitch'),
-    python: path.join('Scripts', 'python.exe'),
-    tools: { 'basic-pitch': path.join('Scripts', 'basic-pitch.exe') },
+    python: venvExecutable('python'),
+    tools: { 'basic-pitch': venvExecutable('basic-pitch') },
   },
   score: {
     label: 'music21（MIDI → 曲谱）',
     envVar: 'MOODIFY_VENV_SCORE',
     dir: path.join(__dirname, '..', '..', '.venv-score'),
-    python: path.join('Scripts', 'python.exe'),
+    python: venvExecutable('python'),
     tools: {},
   },
 };
@@ -137,4 +151,5 @@ module.exports = {
   resolveRuntimeTool,
   runtimeCandidates,
   tryResolve,
+  venvExecutable,
 };

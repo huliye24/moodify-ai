@@ -33,7 +33,21 @@ const RESEARCH_JUDGMENTS = path.join(RESEARCH_ROOT, 'judgments.jsonl');
 const RESEARCH_EVIDENCE = path.join(RESEARCH_ROOT, 'evidence.jsonl');
 const RESEARCH_SCALES = ['明显更好', '略好', '听不出', '略差', '明显更差'];
 const RESEARCH_ROLES = ['creator', 'listener', 'pro'];
-const PYTHON = process.env.MOODIFY_PYTHON || 'python';
+// The external Moodify runtime. `python` is the Windows convention; stock Linux
+// distributions ship `python3` and usually have no `python` alias at all, so a
+// Linux Studio would fail every Core call before it started. MOODIFY_PYTHON
+// overrides both and stays the precise way to pin a specific interpreter.
+const PYTHON = process.env.MOODIFY_PYTHON
+  || (process.platform === 'win32' ? 'python' : 'python3');
+// The embedded terminal must start a *real* shell on every platform it is
+// packaged for. Windows keeps its historical behaviour exactly (%ComSpec%,
+// falling back to powershell.exe); POSIX takes $SHELL and falls back to the
+// bash every supported distribution ships. Hardcoding powershell.exe here made
+// the terminal fail to spawn on Linux (ENOENT), which reads as "the shell is
+// broken" rather than "this build assumed Windows".
+const DEFAULT_SHELL = process.platform === 'win32'
+  ? (process.env.ComSpec || 'powershell.exe')
+  : (process.env.SHELL || '/bin/bash');
 const AUDIO_FILTERS = [
   { name: '音频', extensions: ['flac', 'wav', 'mp3', 'm4a', 'aac', 'ogg', 'aiff', 'aif'] },
   { name: '所有文件', extensions: ['*'] },
@@ -105,7 +119,7 @@ function registerTerminalIpc() {
       try { fs.mkdirSync(CASES_ROOT, { recursive: true }); } catch { /* read-only home */ }
       dir = fs.existsSync(CASES_ROOT) ? CASES_ROOT : os.homedir();
     }
-    const term = pty.spawn(process.env.ComSpec || 'powershell.exe', [], {
+    const term = pty.spawn(DEFAULT_SHELL, [], {
       name: 'xterm-256color',
       cwd: dir,
       env: { ...codexEnv(), PYTHONUTF8: '1' },
@@ -505,6 +519,11 @@ const TOOLS_ROOT = path.join(__dirname, '..', 'scripts');
 
 // 需要专用 venv 的能力必须先解析运行时：解析失败就返回 DEPENDENCY_MISSING，
 // 不 spawn 任何子进程，也不用系统 python 顶替（那只会把缺依赖伪装成 ABI 崩溃）。
+//
+// 平台布局差异（Windows `Scripts\*.exe` / POSIX `bin/*`）不在这里判断，而是由
+// runtime.js 按 process.platform 解析。两件事必须同时成立：POSIX 上要去
+// bin/ 找专用解释器，且找不到时**不能**回退到系统 python3——"跨平台"与
+// "显式失败"是不同的问题，混在一起就会得到"在 Linux 上静默回退"。
 function requireRuntimeExe(resolve) {
   try {
     return { ok: true, exe: resolve() };
