@@ -32,6 +32,15 @@ const RESEARCH_EVIDENCE = path.join(RESEARCH_ROOT, 'evidence.jsonl');
 const RESEARCH_SCALES = ['明显更好', '略好', '听不出', '略差', '明显更差'];
 const RESEARCH_ROLES = ['creator', 'listener', 'pro'];
 const PYTHON = process.env.MOODIFY_PYTHON || 'python';
+// The embedded terminal must start a *real* shell on every platform it is
+// packaged for. Windows keeps its historical behaviour exactly (%ComSpec%,
+// falling back to powershell.exe); POSIX takes $SHELL and falls back to the
+// bash every supported distribution ships. Hardcoding powershell.exe here made
+// the terminal fail to spawn on Linux (ENOENT), which reads as "the shell is
+// broken" rather than "this build assumed Windows".
+const DEFAULT_SHELL = process.platform === 'win32'
+  ? (process.env.ComSpec || 'powershell.exe')
+  : (process.env.SHELL || '/bin/bash');
 const AUDIO_FILTERS = [
   { name: '音频', extensions: ['flac', 'wav', 'mp3', 'm4a', 'aac', 'ogg', 'aiff', 'aif'] },
   { name: '所有文件', extensions: ['*'] },
@@ -103,7 +112,7 @@ function registerTerminalIpc() {
       try { fs.mkdirSync(CASES_ROOT, { recursive: true }); } catch { /* read-only home */ }
       dir = fs.existsSync(CASES_ROOT) ? CASES_ROOT : os.homedir();
     }
-    const term = pty.spawn(process.env.ComSpec || 'powershell.exe', [], {
+    const term = pty.spawn(DEFAULT_SHELL, [], {
       name: 'xterm-256color',
       cwd: dir,
       env: { ...codexEnv(), PYTHONUTF8: '1' },
@@ -506,7 +515,13 @@ const VENVS = {
 };
 
 function pyExe(venvName) {
-  const exe = path.join(VENVS[venvName], 'Scripts', 'python.exe');
+  // A venv's executable layout is platform-specific: Windows keeps them in
+  // Scripts\ with an .exe suffix, POSIX in bin/ without one. Looking only in
+  // Scripts\ meant the helper venv was never found on Linux and every call
+  // silently fell through to the generic PYTHON.
+  const exe = process.platform === 'win32'
+    ? path.join(VENVS[venvName], 'Scripts', 'python.exe')
+    : path.join(VENVS[venvName], 'bin', 'python');
   return fs.existsSync(exe) ? exe : PYTHON;
 }
 
@@ -604,7 +619,10 @@ function registerStudioToolIpc() {
       || insideDir(caseDir, path.resolve(audioPath));
     if (!allowed) return { ok: false, reason: '输入音频必须是世界源或 case 内分离轨' };
     if (!fs.existsSync(audioPath)) return { ok: false, reason: '输入音频不存在' };
-    const bpExe = path.join(VENVS['basic-pitch'], 'Scripts', 'basic-pitch.exe');
+    // Same platform split as pyExe(): POSIX venvs expose bin/basic-pitch.
+    const bpExe = process.platform === 'win32'
+      ? path.join(VENVS['basic-pitch'], 'Scripts', 'basic-pitch.exe')
+      : path.join(VENVS['basic-pitch'], 'bin', 'basic-pitch');
     if (!fs.existsSync(bpExe)) return { ok: false, reason: '未找到 basic-pitch（.venv-basic-pitch）' };
     const outdir = path.join(caseDir, 'midi');
     fs.mkdirSync(outdir, { recursive: true });
