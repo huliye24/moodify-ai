@@ -61,6 +61,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         code_license=_MOODIFY_CODE_LICENSE,
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.ALLOWED,
+        determinism=Determinism.DETERMINISTIC,
         runtime_requirements=("python>=3.10", "numpy", "scipy", "librosa", "soundfile"),
         notes="auditory/metrics.py, loudness.py, true_peak.py, evidence/. Standards-backed; "
         "loudness and true peak are oracle-verified against pyloudnorm and ffmpeg ebur128.",
@@ -75,6 +76,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         code_license=_MOODIFY_CODE_LICENSE,
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.ALLOWED,
+        determinism=Determinism.DETERMINISTIC,
         runtime_requirements=("python>=3.10", "numpy"),
         notes="intervention/primitives.py. Primitives are pre-registered with scope, max "
         "strength and identity risk. Peak repair only — not true declipping.",
@@ -89,6 +91,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         code_license=_MOODIFY_CODE_LICENSE,
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.ALLOWED,
+        determinism=Determinism.DETERMINISTIC,
         runtime_requirements=("python>=3.10", "pedalboard", "numpy", "scipy"),
         notes="mix_graph/. Self-declared EXPERIMENTAL in its own serialization. Node types "
         "are rendered by exactly one provider and must be deterministic.",
@@ -103,6 +106,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         code_license=_MOODIFY_CODE_LICENSE,
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.ALLOWED,
+        determinism=Determinism.DETERMINISTIC,
         runtime_requirements=("python>=3.10", "soundfile"),
         notes="v01_exporter.py (16-bit PCM WAV, peak clamped) and data_plane/delivery.py "
         "(authorized delivery contract). Only WAV encoding exists.",
@@ -117,6 +121,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         code_license=_MOODIFY_CODE_LICENSE,
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.ALLOWED,
+        determinism=Determinism.DETERMINISTIC,
         runtime_requirements=("python>=3.10", "librosa", "soundfile", "external venv .venv-basic-pitch"),
         notes="moodify-desktop/scripts/dsp_separate.py — centre-channel estimate + HPSS, "
         "second-scale, NOT a neural separator. Its own docstring states it does not constitute "
@@ -133,6 +138,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         weights_license=None,
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.UNKNOWN,
+        determinism=Determinism.DETERMINISTIC,
         runtime_requirements=("ffmpeg", "ffprobe"),
         notes="Redistribution rights depend on how the user's ffmpeg build was configured; "
         "Moodify consumes the system binary and does not ship one, so this is recorded as "
@@ -149,6 +155,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         weights_license=None,
         commercial_use=CommercialUse.RESTRICTED,
         redistribution=Redistribution.RESTRICTED,
+        determinism=Determinism.UNKNOWN,
         runtime_requirements=("network", "LALAL.AI API key"),
         notes="stems/client.py exposes a 10-stem catalog and four splitters; Canon records it "
         "as CONNECTED_UNTESTED. Currently the only cloud separation provider — "
@@ -165,6 +172,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         weights_license="Apache-2.0",
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.UNKNOWN,
+        determinism=Determinism.CONDITIONALLY_DETERMINISTIC,
         runtime_requirements=("python>=3.10", "basic-pitch==0.4.0", "external venv .venv-basic-pitch"),
         notes="Invoked as a CLI from the desktop shell; Core contains no import. Canon records "
         "it as IMPLEMENTED_NOT_MERGED, and released builds do not ship the venv it needs.",
@@ -180,6 +188,7 @@ _PROVIDERS: tuple[Provider, ...] = (
         weights_license=None,
         commercial_use=CommercialUse.ALLOWED,
         redistribution=Redistribution.ALLOWED,
+        determinism=Determinism.DETERMINISTIC,
         runtime_requirements=("python>=3.10", "music21", "external venv .venv-score"),
         notes="Used only by moodify-desktop/scripts/midi_to_musicxml.py. Not declared in any "
         "pyproject — an undeclared runtime dependency.",

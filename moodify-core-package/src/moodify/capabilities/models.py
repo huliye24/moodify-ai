@@ -267,6 +267,16 @@ class Provider(BaseModel):
 
     commercial_use: CommercialUse = CommercialUse.UNKNOWN
     redistribution: Redistribution = Redistribution.UNKNOWN
+    determinism: Determinism = Determinism.UNKNOWN
+    """This *implementation's* determinism.
+
+    Distinct from ``Capability.determinism``, which describes the capability as
+    declared. A capability may be ``CONDITIONALLY_DETERMINISTIC`` overall while
+    one of its providers is fully deterministic and another is not — which is
+    exactly the distinction a policy needs in order to prefer one over the
+    other. Defaults to ``UNKNOWN``: an undeclared claim is not a claim.
+    """
+
     runtime_requirements: tuple[str, ...] = ()
     notes: str | None = None
 
