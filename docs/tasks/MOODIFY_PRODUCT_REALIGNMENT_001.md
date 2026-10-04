@@ -204,13 +204,10 @@ App must not own a second production state machine or private sound logic — th
 already places on Studio, for the same reason: the App is a client of Core contracts, not an author
 of them.
 
-> **Execution note (recorded with the decision).** The decision above is canonical. The physical
-> removal of the `apps/android/` directory is a separate repository step and had **not** landed on
-> `main` when this was written — the directory was still present. Until it lands, that directory is
-> a migration leftover, not a competing product claim: no new work may depend on it, and no
-> interface may be documented as living there. Stating this explicitly is deliberate; a canonical
-> document that silently describes a tree that does not exist is the failure mode this audit track
-> exists to remove.
+> **Execution update (2026-10-04).** The follow-up Android retirement change physically removes
+> `apps/android/`, updates current authority references, and adds a repository-structure guard that
+> prevents the duplicate path from silently returning. Historical audits keep their original tree
+> observations as evidence; they are not current implementation instructions.
 
 ### Moodify Core
 

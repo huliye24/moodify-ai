@@ -105,7 +105,7 @@ Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop �
    `preserve`（该保护什么）是听觉判断，默认留空由人填。
    参见 `docs/canon/STUDIO_PRODUCTION_PIPELINE_V3.md`。
 
-**仍未裁决（不得当作已定论）：** `apps/android` 与 `apps/music-android` 哪一个是 canonical App；Creator 侧首要产品面是 CLI 还是 Studio。两者均记录为 `HUMAN_DECISION_REQUIRED`。
+**已裁决（2026-10-04）：** `apps/music-android` 是唯一 canonical Moodify App，也是 GitHub Release 工作流实际构建的播放器。旧候选 `apps/android` 已按人类指令退役删除，不得重建为第二个 App。Creator 侧首要产品面是 CLI 还是 Studio 仍记录为 `HUMAN_DECISION_REQUIRED`。
 
 ## Repository Structure Guard
 
