@@ -1,0 +1,381 @@
+name: Desktop Sign & Attest
+
+# 桌面产物的**信任链**工作流。与 `desktop-release.yml` 的分工是刻意的：
+#
+#   desktop-release.yml   构建 + 测试 + 未签名产物 + 校验和（每个 PR 都跑，权限最小）
+#   desktop-sign.yml      代码签名 + 来源证明 + 验签（只在签名基础设施配好后跑）
+#
+# 为什么不合并成一个 workflow：
+#   签名与证明需要 `id-token: write` + `attestations: write`（可写入仓库的证明库），
+#   而这套流程会执行 `npm ci`（任意依赖的安装脚本）。把「执行代码」与「持有高权限」
+#   放在同一个 job 里，等于给每个依赖一个签发入口。这里拆开：
+#   构建 job 无高权限，签名 job 只处理**二进制字节**，不安装依赖、不执行项目脚本。
+#
+# ── 证书问题的现状（重要，不要读成已解决）─────────────────────────────────────
+#   本项目**目前没有任何代码签名证书**，所以：
+#     · 默认不签名，产物与今天一致（未签名 + 校验和 + 来源证明）
+#     · `code_signed` 由实测得出，不是手写常量
+#   三档方案与各自的真实代价见 `docs/releases/CODE_SIGNING_PLAN.md`。
+#
+# ── 各步骤何时生效 ────────────────────────────────────────────────────────────
+#   来源证明（attestation）  立即可用，不需要证书，不需要任何 Secret
+#   签名（SignPath）         需要仓库 Variable `SIGNPATH_ENABLED=true` 且配好 5 个 Secret
+#                            未配置时该步骤**显式跳过并说明原因**，不静默假装签名
+
+on:
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: "提交 SignPath 签名（需要已配置 SignPath secrets）"
+        type: boolean
+        default: false
+  # 供 desktop-release.yml 复用：整个构建→签名→证明链只有这一份实现。
+  # 两个 workflow 各建一次包，等于给了「未签名的那一份被发出去」一条真实路径。
+  workflow_call:
+    outputs:
+      artifact_name:
+        description: "签名/证明后的产物 artifact 名"
+        value: ${{ jobs.sign.outputs.artifact_name }}
+      code_signed:
+        description: "产物是否真的有有效签名（实测）"
+        value: ${{ jobs.sign.outputs.code_signed }}
+  push:
+    tags:
+      - "desktop-v*"
+
+# 为什么不把「执行代码」与「持有高权限」放进同一个 job（本题的真实约束）：
+#   签名与来源证明需要 `id-token: write` + `attestations: write`。本 workflow 内部
+#   已经在 build / sign 之间拆开了权限（build 只读，sign 才拿写入权限）。
+#   但**可复用 workflow 的权限不能超过调用方授予的上限**，所以当 desktop-release.yml
+#   以 `workflow_call` 调用本文件时，那两个权限会覆盖整条链，包括跑 `npm ci` 的 build。
+#   这是复用换来的真实让步，已记录在 desktop-release.yml 的注释里。
+#   直接触发本 workflow（tag / 手动）时，权限按下面的 job 级声明生效，隔离是完整的。
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. 构建：无高权限，跑完整测试 ─────────────────────────────────────────────
+  build:
+    name: Build (unsigned)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: moodify-desktop
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: moodify-desktop/package-lock.json
+
+      - name: Verify tag matches package version
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $tagVersion = $env:RELEASE_TAG -replace '^desktop-v', ''
+          if ($tagVersion -ne $packageVersion) {
+            throw "Desktop tag version '$tagVersion' does not match package version '$packageVersion'."
+          }
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install the audio runtime (deep chain)
+        # 让 `npm test` 里的 test-deep-chain 真的跑起来，而不是因为缺 .venv-audio 跳过。
+        # 只需 numpy+scipy+soundfile；打包出去的应用仍走 runtime.js 解析的专用运行时，
+        # 两者不冲突。注意本 job 的 working-directory 是 moodify-desktop，
+        # 所以这里是 `scripts/...` 而不是 `moodify-desktop/scripts/...`。
+        run: python -m pip install -r scripts/requirements-audio.txt
+
+      - name: Run desktop tests
+        run: npm test
+
+      - name: Build Windows installer and portable executable
+        run: npm run dist:win
+
+      - name: Assert the packaged app actually contains the deep-chain scripts
+        # 这条断言存在的理由：`build.files` 曾经只列了两个旧脚本，
+        # 新建的 model_separate.py / roundtrip.py / structure.py 不会被装进包——
+        # 开发机能跑、用户装完就没有模型分离。目录型断言能防住这类静默缺失。
+        run: |
+          $appDir = Get-ChildItem -Path dist-electron -Directory -Filter "win-unpacked" |
+            Select-Object -First 1
+          if (-not $appDir) { throw "win-unpacked not found; cannot verify packaged contents" }
+          $scripts = Join-Path $appDir.FullName "resources/app/scripts"
+          if (-not (Test-Path $scripts)) {
+            $scripts = Join-Path $appDir.FullName "resources/app/moodify-desktop/scripts"
+          }
+          if (-not (Test-Path $scripts)) { throw "packaged scripts directory not found under $($appDir.FullName)" }
+          $required = @('dsp_separate.py', 'model_separate.py', 'roundtrip.py',
+                        'structure.py', 'midi_to_musicxml.py')
+          $missing = @()
+          foreach ($f in $required) {
+            if (-not (Test-Path (Join-Path $scripts $f))) { $missing += $f }
+          }
+          if ($missing.Count -gt 0) {
+            throw "packaged app is missing deep-chain scripts: $($missing -join ', ')"
+          }
+          # 测试脚本不该被装进产品包
+          $leaked = Get-ChildItem -Path $scripts -Filter 'test-*.js' -ErrorAction SilentlyContinue
+          if ($leaked) { throw "test scripts leaked into the package: $($leaked.Name -join ', ')" }
+          Write-Host "packaged scripts verified: $($required -join ', ')"
+
+      - name: Upload unsigned artifacts for the signing stage
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-unsigned
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            moodify-desktop/dist-electron/Moodify_Studio_*_Setup_x64.exe
+            moodify-desktop/dist-electron/Moodify_Studio_*_Portable_x64.exe
+
+  # ── 2. 签名：只碰字节，不安装依赖、不执行项目脚本 ─────────────────────────────
+  sign:
+    name: Sign (SignPath, optional)
+    needs: [build]
+    runs-on: windows-latest
+    # 供 desktop-release.yml 读取：产物是否真的有效签名。
+    # 用 verification 的实测结果，而不是「signpath 步骤跑过了」这种代理事实。
+    outputs:
+      artifact_name: desktop-signed
+      code_signed: ${{ steps.facts.outputs.code_signed }}
+    # 进入条件：PR **不**跑这一段（PR 只需要构建与测试；签名与证明属于发布动作，
+    # 且证明步骤会额外拖慢每个 PR）。其余情况：手动勾选、tag 发布、或仓库变量打开。
+    if: |
+      github.event_name != 'pull_request' && (
+        github.event_name == 'push'
+        || inputs.sign == true
+        || vars.SIGNPATH_ENABLED == 'true'
+      )
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Assert helper scripts survived checkout intact
+        # `verify-signature.ps1` 含中文注释，**必须**带 UTF-8 BOM：
+        # Windows PowerShell 5.1（windows-latest 的默认 shell）在没有 BOM 时按 ANSI(GBK)
+        # 读取 .ps1，中文被解码成乱码后解析器会在很靠后的 `}` 上报
+        # "Unexpected token '}'" —— 报错位置与真因相距极远，实测排查成本很高。
+        # 放在最前面：这是 2 秒的检查，没理由让它在最后一步才失败。
+        shell: pwsh
+        run: |
+          $f = 'moodify-desktop/scripts/verify-signature.ps1'
+          $b = [System.IO.File]::ReadAllBytes((Resolve-Path $f).Path)
+          if (-not ($b[0] -eq 0xEF -and $b[1] -eq 0xBB -and $b[2] -eq 0xBF)) {
+            throw "$f lost its UTF-8 BOM in checkout; PowerShell 5.1 will fail to parse it."
+          }
+          Write-Host "$f has its UTF-8 BOM"
+
+      - name: Download unsigned artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: desktop-unsigned
+          path: unsigned
+
+      - name: Record unsigned digests (provenance chain)
+        id: pre
+        shell: pwsh
+        run: |
+          $lines = Get-ChildItem -Path unsigned -File | ForEach-Object {
+            "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)"
+          }
+          $lines | Set-Content -LiteralPath unsigned-digests.txt -Encoding ascii
+          $lines | ForEach-Object { Write-Host $_ }
+          if (-not $lines) { throw "no unsigned artifacts were downloaded" }
+
+      - name: SignPath signing submission
+        id: signpath
+        if: vars.SIGNPATH_ENABLED == 'true'
+        # 这一段是**唯一**无法在本仓库离线验证的部分：具体 action 的版本与输入名
+        # 必须以 SignPath 为你的项目生成的文档为准（申请通过后会给出）。
+        # 已按其公开用法写好；若输入名不同，只影响这一个步骤，其余步骤（验签、
+        # 清单、证明、校验和）与签名服务无关，照常工作。
+        #
+        # 两个输入名需要特别核对：
+        #   artifact-configuration-slug  决定哪些文件被签、签完如何重打包
+        #   github-artifact-id           SignPath 需要的是**其服务端的 artifact id**，
+        #                                不是 run id。若该输入不接受此写法，
+        #                                改用其提供的上传步骤（见其文档）。
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: desktop-unsigned
+          wait-for-completion: true
+          output-artifact-directory: signed
+
+      - name: Explain why signing was skipped
+        if: vars.SIGNPATH_ENABLED != 'true'
+        shell: pwsh
+        run: |
+          $msg = "SignPath is not configured (vars.SIGNPATH_ENABLED != 'true'), " +
+                 "so the artifacts stay unsigned. See docs/releases/CODE_SIGNING_PLAN.md. " +
+                 "Provenance attestation still runs below."
+          Write-Host "::notice title=Unsigned build::$msg"
+
+      - name: Stage the artifacts that will be attested
+        # ── 这一段是整条链的**发布守卫核心**，改动前请读完 ──────────────────────
+        #
+        # 它决定「最终被证明与发布的字节是哪一个」。规则只有一条：
+        #
+        #     签名已启用 ⇒ final **只能**来自 SignPath 的输出目录；
+        #                  拿不到签名产物就整个失败，绝不回退到未签名字节。
+        #
+        # 为什么必须这样：早先的写法是「signed 目录为空就 copy unsigned」——
+        # 那意味着 SignPath 挂掉、超时、或 artifact-configuration 配错时，
+        # 流水线会**静默地把未签名产物当成最终产物**继续走下去，
+        # 一路通过证明与校验和，最后被发出去。这正是
+        # 「Build A → Sign A → Publish B」那条被明令禁止的路径，
+        # 只不过它伪装成了「签名服务暂时不可用」。
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path final | Out-Null
+          $signingEnabled = "${{ vars.SIGNPATH_ENABLED }}" -eq "true"
+          $signed = @()
+          if (Test-Path signed) {
+            $signed = @(Get-ChildItem -Path signed -Recurse -File |
+              Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') })
+          }
+
+          if ($signingEnabled) {
+            if ($signed.Count -eq 0) {
+              throw ("SIGNING_ENABLED but no signed artifacts were produced. " +
+                     "Refusing to fall back to the unsigned build: publishing unsigned bytes " +
+                     "as the official release is exactly the failure this gate exists to prevent.")
+            }
+            $signed | Copy-Item -Destination final -Force
+            Write-Host "final = SIGNED artifacts from SignPath ($($signed.Count) file(s))"
+          } else {
+            Copy-Item -Path unsigned/* -Destination final -Force
+            Write-Host ("final = unsigned artifacts. VAR SIGNPATH_ENABLED is not 'true', " +
+                        "so NO signature exists and none is claimed. See " +
+                        "docs/releases/WINDOWS_CODE_SIGNING.md.")
+          }
+
+          # 无论走哪条路：final 里必须恰好是本次构建的那批可执行文件，一个不多一个不少。
+          # 数量对不上说明有东西被漏掉或多出来——两种都不该发布。
+          $unsignedExes = @(Get-ChildItem -Path unsigned -File |
+            Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') })
+          $finalExes = @(Get-ChildItem -Path final -File |
+            Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') })
+          if ($finalExes.Count -eq 0) { throw "no executable artifacts were staged" }
+          if ($finalExes.Count -ne $unsignedExes.Count) {
+            throw ("artifact set changed across the signing stage: built $($unsignedExes.Count) " +
+                   "executable(s), staged $($finalExes.Count). The released set must be exactly " +
+                   "the built set, signed or not.")
+          }
+          $finalExes | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Verify signatures and write signature facts
+        id: facts
+        shell: pwsh
+        run: |
+          # 签名尚未接线时，用 -AllowUnsigned 让这一步如实记录"未签名"而不是伪装通过。
+          # 一旦 SignPath 接通（SIGNPATH_ENABLED=true），未签名就变成硬失败——
+          # 那就是我们真正想要的严格性。
+          $extra = @()
+          if ("${{ vars.SIGNPATH_ENABLED }}" -ne "true") { $extra += '-AllowUnsigned' }
+          if ("${{ vars.SIGNATURE_EXPECTED_PUBLISHER }}") {
+            $extra += @('-ExpectedPublisher', "${{ vars.SIGNATURE_EXPECTED_PUBLISHER }}")
+          }
+          & ./moodify-desktop/scripts/verify-signature.ps1 `
+              -Path (Get-ChildItem final -File).FullName `
+              -ManifestOut final/SIGNATURE_FACTS.json @extra
+          if ($LASTEXITCODE -ne 0) { throw "signature verification failed" }
+          $facts = Get-Content final/SIGNATURE_FACTS.json -Raw | ConvertFrom-Json
+          $signed = if (($facts.all_signed -eq $true) -and ($facts.all_valid -eq $true)) { 'true' } else { 'false' }
+          "code_signed=$signed" | Add-Content -LiteralPath $env:GITHUB_OUTPUT
+          Write-Host "code_signed (measured) = $signed"
+
+      - name: Generate release manifest
+        shell: pwsh
+        run: |
+          $facts = Get-Content final/SIGNATURE_FACTS.json -Raw | ConvertFrom-Json
+          $artifacts = $facts.artifacts | ForEach-Object {
+            [ordered]@{
+              name = $_.name
+              bytes = $_.bytes
+              sha256 = $_.sha256
+              is_signed = $_.is_signed
+              signature_status = $_.signature_status
+              signer_subject = $_.signer_subject
+              timestamped = $_.timestamped
+            }
+          }
+          $manifest = [ordered]@{
+            product = "Moodify Studio"
+            version = ((Get-Content moodify-desktop/package.json -Raw | ConvertFrom-Json).version)
+            tag = "${{ github.ref_type == 'tag' && github.ref_name || '' }}"
+            commit = "${{ github.sha }}"
+            platform = "windows"
+            arch = "x64"
+            channel = "rc"
+            # 实测得出，不是手写常量
+            code_signed = [bool]$facts.all_signed
+            signature_valid = [bool]$facts.all_valid
+            signature_timestamped = [bool]$facts.all_timestamped
+            publisher_checked = [bool]$facts.publisher_checked
+            signer_subject = ($facts.artifacts | Select-Object -First 1).signer_subject
+            runtime_mode = "external"
+            artifacts = $artifacts
+          }
+          $manifest | ConvertTo-Json -Depth 6 |
+            Set-Content -LiteralPath final/RELEASE_MANIFEST.json -Encoding utf8
+
+      - name: Checksums (over the final bytes only)
+        # 校验和**只覆盖被发布的字节**（最终 exe/msix/msi）。
+        #
+        # 为什么不把 SIGNATURE_FACTS.json / RELEASE_MANIFEST.json 也算进去：
+        #   SHA256SUMS.txt 的语义是「这些二进制的指纹」。把描述性 JSON 混进来，
+        #   用户就得自己判断哪一行才是安装包；而 `sha256sum -c` 也会因为多出来的
+        #   条目而变得难以使用。事实与清单是**佐证**，不是被校验的对象。
+        #   而且这些执行文件此刻已经是签名后的字节——顺序是 Sign → SHA256，
+        #   不是 SHA256 → Sign。
+        shell: pwsh
+        run: |
+          $exes = @(Get-ChildItem -Path final -File |
+            Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') } |
+            Sort-Object Name)
+          if ($exes.Count -eq 0) { throw "nothing to checksum: no executables in final/" }
+          $lines = $exes | ForEach-Object {
+            "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)"
+          }
+          $lines | Set-Content -LiteralPath final/SHA256SUMS.txt -Encoding ascii
+          $lines | ForEach-Object { Write-Host $_ }
+          Write-Host "checksums cover $($exes.Count) final artifact(s)"
+
+      - name: Attest build provenance
+        # 来源证明证明「这个字节序列由这次 commit、这个 workflow 产出」。
+        # 关键边界：它**不**让 Windows 信任这个二进制——那是代码签名的事。
+        # 两者互补，不能互相替代。
+        id: attest
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: final/*.exe
+
+      - name: Upload signed + attested artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-signed
+          if-no-files-found: error
+          path: |
+            final/*.exe
+            final/RELEASE_MANIFEST.json
+            final/SIGNATURE_FACTS.json
+            final/SHA256SUMS.txt

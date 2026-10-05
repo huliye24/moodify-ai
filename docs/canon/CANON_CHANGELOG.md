@@ -2,6 +2,99 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-04 — Identity / Account / Personal History（Phase 3A，CANON_CHANGE = YES）
+
+- **CANON_CHANGE = YES。** 触发的 Canon 控制项：**内部/外部能力边界** + **data authority** +
+  **cloud control authority**。依据人类批准（2026-10-04，Phase 3A 任务包「0. 人类产品裁定」）。
+  影响文件：`PRODUCT_DEFINITION_V3.md`（§9.1 例外 + §11）、`PRODUCT_BOUNDARY.md`
+  （non-goals + 边界节）、`AUTHORITY_ORDER.md`（三种权威）、`REPOSITORY_STATUS.md`。
+  契约冻结于 `protocol/mips/MIP-0003-personal-identity-history.md`（`MIP_REQUIRED: YES`）。
+
+- **Why：** 个人作品历史需要跨安装持续存在。Desktop 已能形成 A/B 候选、人工选择、keepsake 与
+  完成时刻，但这些历史只存在于单机 case；换电脑、重装或将来换到手机即消失。账户是 continuity
+  的承载，**不是**社交增长工具。
+
+- **Evidence：** Phase 2 / 2.1 / 2.2 / 2.3 已在 Desktop 落地并测试通过（一次性完成会话、
+  A/B 审听工作台、完成层与 keepsake）；`<case>/studio/` 下已有真实的 decision 账本与留存记录，
+  它们构成可同步的白名单 metadata 来源。真实歌曲排练记录见
+  `docs/reports/2026-10-04_DESKTOP_PHASE2_3_FINISHING_POLISH.md`。
+
+- **New boundary：**
+  - **允许**：account / login / 受控云端 metadata / Desktop history sync；
+  - **仍然禁止**：公共主页、关注/粉丝、动态流、排行榜、评论、点赞、公开作品发布平台、广告画像、
+    **默认上传音频**；
+  - 云端只存白名单 metadata（标题、完成时间、最终选择、可选一句话、粗粒度历史事件）；
+    音频 / stems / MIDI / 曲谱 / report / 频谱图片 / Mix Graph 全量参数 / 本地路径 / 源 hash
+    默认不上传；
+  - 三种权威分离：本地声音生产事实（pipeline + decisions.jsonl）/ 账户身份（认证服务）/
+    个人历史同步（append-only events + server projection）；云端**不得**推进本地阶段或改写本地选择；
+  - 未登录、断网、服务停机不得阻断本地生产；无本地音频的历史项显示「音频仅在原设备」，无假播放。
+
+- **Migration：** 既有 case 不自动上传。用户登录后必须显式确认（逐项或批量）启用历史同步，
+  每个 case 写 `<case>/studio/account_link.json`，并可随时关闭后续同步。没有任何既有 case
+  因本变更被修改或上传。
+
+- **Rollback：** 关闭 account / sync 功能后，本地声音流程、case、选择、导出与 keepsake 继续完整工作；
+  `account_link.json` 与离线队列可整体删除而不影响任何声音产物。删除云端历史或账户不删除本地 case。
+
+- **状态：** 代码、迁移、RLS 策略与本地可验证部分在仓库内；**真实账户能力为 `DEPLOYMENT_BLOCKED`**
+  ——缺生产/测试 Supabase 凭据与可用数据库（本机无 `supabase` CLI / `psql`，Docker daemon 未运行），
+  因此 RLS 执行证据、真实登录与端到端验收尚不存在，不得写成已上线。
+
+## 2026-10-04 — Studio 模式门禁：深度受阻时提供显式快速完成（Phase 2.1，CANON_CHANGE = YES）
+
+- **CANON_CHANGE = YES。** 触发的 Canon 控制项：**内部能力边界**（Studio 的模式选择与门禁语义）。
+  依据人类批准（2026-10-04，Phase 2.1 任务包「0. 人类裁定」），按 `AGENTS.md` 记录
+  why / evidence / affected authority files / migration / rollback。Core 音频契约未变，故 `MIP_REQUIRED: NO`。
+- **旧语义（被取代）：** 快速完成的入口条件为 `baseReady ∧ ¬deepReady ∧ ¬optIn`
+  （`gates().canRequestQuick`），模式为 `deepReady ? DEEP : (quick ? FAST_STEREO_ONLY : null)`，
+  即「只要分轨 + MIDI 存在（`deepReady`）就隐藏快速入口，且深度优先覆盖」。
+- **死路证据（真实歌曲复现）：** `Je ne blesserai pas ta fragilité.wav` 在 Desktop 上
+  检测 → 自动分轨与 MIDI → 进入 DEEP；此时 `roundtrip.json` 缺失、且逐轨 Core 能力未实现，
+  于是 `canTune = false`、`canTuneQuick = false`、`canRequestQuick = false`——三处同时为假，
+  用户既不能深度完成，也不能选择快速完成。**这不是用户操作错误，是门禁组合产生的产品死路**，
+  违反「第一个产品目标必须形成可靠完成循环」「失败必须可见、可恢复」「AI 不得替人改变完成模式」。
+- **Why：** `deepReady`（资产存在）与「深度路径当前可执行」是两件事。Core 的逐轨能力尚未实现，
+  所以任何 `deepReady` 的 case 实际上都不可深度完成；用资产存在与否决定入口，就把用户关在门外。
+- **新语义（权威，见 `STUDIO_PRODUCTION_PIPELINE_V4.md` §3.4 / §4.2.0）：**
+
+  ```text
+  deepAssetsReady = analyzed ∧ separated ∧ structured
+  deepExecutable  = deepAssetsReady ∧ reversible ∧ 深度 Core 能力可用（当前不可用）
+  fastAvailable   = analyzed ∧ fast-stereo-pair 能力可用（当前可用）
+
+  deepExecutable 为真 → 默认 DEEP，不显示快速入口
+  deepExecutable 为假 → canRequestQuick = true（提供显式入口）
+  用户未选择          → 不生成任何快速候选
+  用户明确选择        → 记录 QUICK_STEREO_ONLY，mode = FAST_STEREO_ONLY，按快速路径继续
+  ```
+
+  要点：①入口依据改为 `!deepExecutable`；②**人的显式选择优先于 `deepAssetsReady`**，
+  不再被覆盖回 DEEP；③切换只写 `finish_mode.json`，**不生成音频**；
+  ④切换**不删除/移动/覆盖**任何深度资产（stems / MIDI / score / roundtrip / 失败证据），
+  已存在的产物在相位投影中仍显示为 `done`；⑤绝不自动降级，绝不因此解锁深度 ④修音。
+- **Evidence：** 死路状态由 `gates()` 三处布尔值同时为假复现；消除后
+  `moodify-desktop/scripts/test-pipeline.js` §5c、`test-session.js` §9、`test-orchestrator.js` §7、
+  `test-main-ipc.js` §7 逐条钉住（含「未选择不生成 pair」「确认前不写 finish_mode.json」
+  「切换不删资产」「有 stems/MIDI 也能切换」「显式选择后 mode 不再被 deepReady 覆盖」
+  「未来深度可执行时仍默认 DEEP」）。全部回归见
+  `docs/reports/2026-10-04_DESKTOP_ONE_CLICK_PHASE2_1_MODE_SWITCH.md`。
+- **Affected authority files：** `docs/canon/STUDIO_PRODUCTION_PIPELINE_V4.md`（新增 §3.4、
+  §4 门禁表、§4.2.0、§9、§10）、本文件、`docs/REPOSITORY_STATUS.md`（Studio v4 状态表）。
+  实现文件：`moodify-desktop/src/pipeline.js`（`modeDecision()` + `gates()`）、
+  `src/session.js`（阻断补救投影）、`src/main.js`（`pipeline:setFinishMode`）、
+  `renderer/{app.js,index.html,style.css}`（显式入口 + 确认 + 徽章）。
+- **Migration：** 无需迁移。既有 case 产物不动；`finish_mode.json` schema 不变
+  （仍是 `moodify.studio.finish-mode/0.1`）；阶段仍由磁盘产物推导。
+  既有已选 FAST 的 case 升级后行为不变（本来就该显示 FAST）。
+- **Rollback：** 恢复 `pipeline.gates()` 的 `canRequestQuick = baseReady ∧ ¬deepReady ∧ ¬optIn`
+  与 `mode = deepReady ? DEEP : …`，并隐藏 renderer 的切换入口即可；
+  Core、pair、decision、recheck 产物与账本完全兼容，无需任何数据迁移。
+  单一 commit revert 亦可（本轮改动集中在一个 commit 范围内的上述文件）。
+- **未裁决（不在本轮）：** 是否提供「从快速模式切回深度路径」的 UI 入口（当前只能清除
+  `finish_mode.json`）；快速完成是否需要一个「一键重跑检测」入口。两者均为后续工作，
+  本轮按现状如实记录，不自行扩大范围。
+
 ## 2026-10-04 — Android App authority 收敛（CANON_CHANGE = YES）
 
 - **CANON_CHANGE = YES。** 本次改变 App 的公开实现边界并解除一个 `HUMAN_DECISION_REQUIRED`。

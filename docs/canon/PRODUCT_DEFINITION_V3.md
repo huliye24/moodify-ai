@@ -277,6 +277,22 @@ Custom streaming protocol
 - 不重写 Core 或 desktop；不引入 Flutter / React Native；不修改音频算法
 - 不 mass-delete 历史目录
 
+### 9.1 例外：Identity / Account / Personal History（2026-10-04 人类批准，Phase 3A）
+
+上一节第 5 条曾是**全面禁止**。2026-10-04 人类明确批准一个**受控例外**，理由是「个人作品历史
+需要跨安装持续存在；账户是 continuity 的承载，不是社交增长工具」。本节记录该例外的确切边界；
+除此以外第 9 节其余各条继续有效。
+
+**批准（且仅批准）：** Identity / Account / Personal History / Desktop history sync。
+
+**仍然禁止：** 公共主页、关注/粉丝、动态流、排行榜、评论、点赞、公开作品发布平台、广告画像、
+**默认上传音频**。
+
+**边界：** 音频、stems、MIDI、曲谱、report/evidence、频谱图片、Mix Graph 全量参数与本地路径
+默认**不上传**；云端只保存白名单 metadata（标题、完成时间、最终选择、可选的一句话、粗粒度历史事件）。
+不登录时本地完整流程照常可用。云端状态**不得**成为声音生产权威。契约见
+[MIP-0003](../../protocol/mips/MIP-0003-personal-identity-history.md)。
+
 开发方法按 `AGENTS.md` 与任务包规则：**一次一个可验证的小步**，一步一 commit，合并后重新审计 `main` 再定义下一步。
 
 ---
@@ -296,3 +312,38 @@ rollback is possible
 ```
 
 音频相关行为：**human listening review remains required**（适用处）。`Generated is not finished.`
+
+---
+
+## 11. Identity / Account / Personal History（Phase 3A，2026-10-04 人类批准）
+
+**Why:** 个人作品历史需要跨安装持续存在。桌面已经能形成 A/B 候选、人工选择、keepsake 与完成时刻，
+但这些历史目前只存在于单机 case 里——换电脑、重装或将来换到手机就消失。账户是 continuity 的承载。
+
+**产品结果（本阶段只承诺这些）：**
+
+1. 不登录继续使用 Desktop 的完整本地完成流程；
+2. 用邮箱创建/登录个人账户；
+3. 把已完成作品的**轻量历史**同步到自己的账户；
+4. 重装或在另一台 Desktop 登录后看到个人作品历史；
+5. 打开历史项时看见标题、完成日期、最终选择与自己留下的话；
+6. 导出自己的账户数据；
+7. 删除云端个人历史或删除账户；
+8. 清楚知道哪些内容留在本地、哪些被同步。
+
+**三种权威，不得混为一体：**
+
+```text
+声音生产事实权威：本地 case 目录 + Core 产物（pipeline.js 仍是阶段权威）
+账户身份权威：认证服务（Supabase Auth）的 user identity
+个人历史同步权威：账户私有的 append-only history events + server projection
+```
+
+**硬规则：**
+
+- 云端 history 不能把本地 case 推进到 CHOSEN / EXPORTED；云端 `selected=A` 不替代本地 `decisions.jsonl`；
+- 用户未登录、登录失败、断网或服务停机均不得阻断分析、处理、试听、选择或导出；
+- 本地文件被删后，云端历史仍可作为记忆存在，但**不得冒充音频可用**（显示「音频仅在原设备」，
+  不出现不可播放的假播放按钮）；
+- account / sync 不进入 Core DSP；
+- 关闭 sync / account 功能后，本地声音流程、case、选择、导出与 keepsake 继续完整工作（rollback）。

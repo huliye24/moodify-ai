@@ -47,9 +47,19 @@ contextBridge.exposeInMainWorld('moodify', {
   permissionGet: () => ipcRenderer.invoke('codex:permission:get'),
   permissionSet: (value) => ipcRenderer.invoke('codex:permission:set', value),
 
-  // 分离 / MIDI / 曲谱：显式动作，产物落世界目录
+  // 逆向分解 / 结构 / 可逆性：显式动作，产物落世界目录
   listCaseFiles: (caseDir, subdir, exts) => ipcRenderer.invoke('casefiles:list', caseDir, subdir, exts),
-  stemsRun: (caseDir) => ipcRenderer.invoke('stems:run', caseDir),
+  // mode: 'auto'（默认，模型优先）| 'model'（Demucs 母带级）| 'dsp'（快速，秒级预览级）
+  stemsRun: (caseDir, mode) => ipcRenderer.invoke('stems:run', caseDir, mode),
+  // 可逆性验证：分轨相加回原版 → studio/roundtrip.json（④ 修音 的门禁）
+  stemsRoundtrip: (caseDir) => ipcRenderer.invoke('stems:roundtrip', caseDir),
+  // 分离引擎偏好；缺模型运行时时不会被替用户改选，只如实报缺
+  stemsEngineGet: () => ipcRenderer.invoke('stems:engine:get'),
+  stemsEngineSet: (engine) => ipcRenderer.invoke('stems:engine:set', engine),
+  // 结构事实：速度 / 拍点 / 段落边界 → studio/structure.json
+  structureAnalyze: (caseDir) => ipcRenderer.invoke('structure:analyze', caseDir),
+  // 能力体检：哪些外部运行时可用、缺哪个、怎么装。UI 据此说明「为什么这一步走不通」。
+  capabilitiesProbe: () => ipcRenderer.invoke('capabilities:probe'),
   midiRun: (caseDir, audioPath) => ipcRenderer.invoke('midi:run', caseDir, audioPath),
   scoreRun: (caseDir, midiPath) => ipcRenderer.invoke('score:run', caseDir, midiPath),
   readText: (caseDir, filePath) => ipcRenderer.invoke('text:read', caseDir, filePath),
@@ -67,30 +77,50 @@ contextBridge.exposeInMainWorld('moodify', {
   compareChoose: (caseDir, keep, role, requestId) =>
     ipcRenderer.invoke('compare:choose', caseDir, keep, role, requestId),
   compareAudio: (caseDir, side) => ipcRenderer.invoke('compare:audio', caseDir, side),
-  // 修音渲染（后处理，接 core finishing）：产 B（源 vs 修音产物 中的 B），成功后自动落带 delta 的研究证据
+  // 修音渲染（研究仪器，**非产品面**）：产「源(A) vs 修音产物(B)」中的 B，成功后自动落带 delta 的
+  // 研究证据。三预设作为产品面已于 2026-10-04 退场；此入口只服务研究侧 A/B 证据采集，
+  // 待 Core 的 tuning render 就绪后删除（见 MIP-0002）。
   finishingRun: (caseDir, preset) => ipcRenderer.invoke('finishing:run', caseDir, preset),
   // 研究侧账本（T2 证据回流）：检测自动落账；渲染(W5)显式调用复用同一入口
   evidenceRecord: (caseDir, stage, sourceStatus) => ipcRenderer.invoke('evidence:record', caseDir, stage, sourceStatus),
   evidenceCount: () => ipcRenderer.invoke('evidence:count'),
 
-  // Studio v0.2（产品书 2026-10-03）：选目标 → 一键让 AI 处理 → 试听选择 → 导出。
-  // 后处理与导出都走 Core；渲染层只负责发起与呈现，不复制任何音频逻辑。
-  studioTargets: () => ipcRenderer.invoke('studio:targets'),
-  studioVersions: (caseDir) => ipcRenderer.invoke('studio:versions', caseDir),
-  studioProcess: (caseDir, target, mode) => ipcRenderer.invoke('studio:process', caseDir, target, mode),
-  studioEvidence: (caseDir, versionId) => ipcRenderer.invoke('studio:evidence', caseDir, versionId),
-  studioSelect: (caseDir, versionId, note) => ipcRenderer.invoke('studio:select', caseDir, versionId, note),
-  studioAudio: (caseDir, versionId) => ipcRenderer.invoke('studio:audio', caseDir, versionId),
-  studioExport: (caseDir, versionId) => ipcRenderer.invoke('studio:export', caseDir, versionId),
+  // ④ 修音 / ⑤ 复合 / ⑦ 选定（V4）。
+  // 两档完整方案由系统产出；选定有**三个**出口 A / B / 保留原版。
+  // Core 能力未就绪时 tuningRender 显式拒绝（TUNABLE_CORE_NOT_AVAILABLE），绝不留假产物。
+  tuningPairs: (caseDir) => ipcRenderer.invoke('tuning:pairs', caseDir),
+  tuningRender: (caseDir) => ipcRenderer.invoke('tuning:render', caseDir),
+  tuningDecision: (caseDir, pairId, kept, role, requestId) =>
+    ipcRenderer.invoke('tuning:decision', caseDir, pairId, kept, role, requestId),
+  tuningAudio: (caseDir, pairId, side) => ipcRenderer.invoke('tuning:audio', caseDir, pairId, side),
+  tuningRecheck: (caseDir, pairId) => ipcRenderer.invoke('tuning:recheck', caseDir, pairId),
+  tuningRecheckRun: (caseDir, pairId) => ipcRenderer.invoke('tuning:recheckRun', caseDir, pairId),
+  tuningExport: (caseDir, pairId, kept) => ipcRenderer.invoke('tuning:export', caseDir, pairId, kept),
+  // A/B 审听工作台（Phase 2.2）：只读证据包 + 按侧生成的检测图表。
+  // 路径全部由 main 侧从 recheck / pair 产物推导并守卫；渲染层递不了任意绝对路径。
+  tuningEvidence: (caseDir, pairId) => ipcRenderer.invoke('tuning:evidence', caseDir, pairId),
+  tuningCharts: (caseDir, pairId, side) => ipcRenderer.invoke('tuning:charts', caseDir, pairId, side),
 
-  // 生产流程（TASK 002A）：检测 → 问题 → 分轨 → 结构 → 方案 → 成品。
-  // 阶段由产物推导；诊断是 Core report.json 的投影；context 只引用已存在的产物。
+  // 完成时刻的留存（Phase 2.3）。keepsake 是**表现层留存记录**，不是完成状态权威：
+  // 完成与否由 pipeline 产物 + ⑦ 准入推导；这里只读写「选了哪一版、一句话、波形印记」。
+  keepsakeState: (caseDir) => ipcRenderer.invoke('keepsake:state', caseDir),
+  keepsakeSync: (caseDir) => ipcRenderer.invoke('keepsake:sync', caseDir),
+  keepsakeInscription: (caseDir, text) => ipcRenderer.invoke('keepsake:inscription', caseDir, text),
+  keepsakeImprint: (caseDir, values) => ipcRenderer.invoke('keepsake:imprint', caseDir, values),
+  // 唯一把作品卡写出 case 之外的地方，且必须是显式动作（用户在保存对话框里确认）
+  keepsakeSaveCard: (caseDir, bytes) => ipcRenderer.invoke('keepsake:saveCard', caseDir, bytes),
+
+  // 完成会话（「一键完成机」）：放入一首歌 → 一次启动 → 内部自动执行 → 原版/A/B → 选定 → 导出。
+  // 「一键」只简化操作，不省略内部步骤；缺能力时停在真实阻断态，不生成假产物。
+  sessionView: (caseDir) => ipcRenderer.invoke('session:view', caseDir),
+  sessionStart: (caseDir) => ipcRenderer.invoke('session:start', caseDir),
+  onSessionProgress: (cb) => ipcRenderer.on('session:progress', (_e, payload) => cb(payload)),
+
+  // 生产流程（V4）：检测 → 逆向分解 → 结构 → 修音 → 复合 → 复检 → 选定 → 导出。
+  // 阶段由产物推导；context 只引用已存在的产物；preserve 由人填。
   pipelineSnapshot: (caseDir) => ipcRenderer.invoke('pipeline:snapshot', caseDir),
-  pipelineDiagnose: (caseDir) => ipcRenderer.invoke('pipeline:diagnose', caseDir),
-  pipelineDiagnosis: (caseDir) => ipcRenderer.invoke('pipeline:diagnosis', caseDir),
-  pipelineNote: (caseDir, note, preserve) => ipcRenderer.invoke('pipeline:note', caseDir, note, preserve),
   pipelineContext: (caseDir) => ipcRenderer.invoke('pipeline:context', caseDir),
   pipelineReadContext: (caseDir) => ipcRenderer.invoke('pipeline:readContext', caseDir),
-  // 显式选择快速完成（仅立体声）。深度完成需要分轨 + 结构，跳过必须由人主动选。
+  // 显式选择快速完成（仅立体声）。深度路径需要 分轨 + MIDI + 可逆性通过，跳过必须由人主动选。
   pipelineSetFinishMode: (caseDir, mode) => ipcRenderer.invoke('pipeline:setFinishMode', caseDir, mode),
 });

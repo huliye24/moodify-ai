@@ -1,4 +1,16 @@
 /**
+ * ⚠️ RETIRED 2026-10-04 — 三预设作为产品面已退场（人类裁定），本文件不再被 main.js 引用。
+ *
+ * 后处理后端注册表（local / cloud）曾服务「选目标 → 让 AI 处理」的产品面。
+ * V4 的处理对象是分轨，入口是 Core 的 tuning，不再是这里的 `protocol process` 预设作业。
+ *
+ * 未删除的原因：删除文件属不可逆动作，按仓库纪律留在磁盘上供审阅对比，
+ * 待人类确认后整体删除。**不要为它新增调用方。**
+ *
+ * ──────────────────────────────────────────────────────────────────────────────
+ */
+
+/**
  * Backend registry — Studio v0.2 section 3.
  *
  * "跑分析 / 跑后处理" must be abstracted behind a switchable interface, so the UI never

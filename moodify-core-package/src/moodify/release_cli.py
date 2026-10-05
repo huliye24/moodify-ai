@@ -111,6 +111,22 @@ def main(argv: list[str] | None = None) -> int:
     compare_show.add_argument("case_dir")
     compare_show.add_argument("--cases-root", default=None)
     compare_show.add_argument("--json", action="store_true")
+    tuning = commands.add_parser(
+        "tuning",
+        help="paired tier rendering for the Studio tuning stage "
+             "(MIP-0002 Addendum A, EXPERIMENTAL)")
+    tuning_sub = tuning.add_subparsers(dest="tuning_action", required=True)
+    tuning_pair = tuning_sub.add_parser(
+        "render-pair",
+        help="render one complete A/B pair (conservative / full) into a pair directory")
+    tuning_pair.add_argument("--mode", required=True, choices=("fast-stereo-only",),
+                             help="FAST_STEREO_ONLY: whole-track pair, no stems and no MIDI")
+    tuning_pair.add_argument("--source", required=True,
+                             help="the case's own stereo master (never written to)")
+    tuning_pair.add_argument("--output-dir", required=True,
+                             help="final pair directory; must not exist yet")
+    tuning_pair.add_argument("--pair-id", default=None,
+                             help="pair id recorded in pair.json (default: the output directory name)")
     finishing_export.add_argument("--audio", required=True)
     finishing_export.add_argument("--output-dir", default="outputs")
     args = parser.parse_args(argv)
@@ -206,6 +222,18 @@ def main(argv: list[str] | None = None) -> int:
             else:  # export
                 result = export_delivery(args.audio, args.output_dir)
         except MixGraphError as exc:
+            print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False),
+                  file=sys.stderr)
+            return 2
+    elif args.command == "tuning":
+        # MIP-0002 Addendum A: one call renders one complete pair, or nothing at all.
+        from moodify.mix_graph.schema import MixGraphError
+        from moodify.tuning import TuningError, render_pair
+
+        try:
+            result = render_pair(args.source, args.output_dir,
+                                 pair_id=args.pair_id, mode=args.mode)
+        except (TuningError, MixGraphError) as exc:
             print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False),
                   file=sys.stderr)
             return 2

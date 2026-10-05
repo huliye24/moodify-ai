@@ -1,0 +1,38 @@
+# Moodify Studio — 模型分离运行时（.venv-demucs）
+#
+# 用途：`model_separate.py`（母带级四轨分离，Demucs htdemucs）。
+#
+# 上游：https://github.com/adefossez/demucs  (MIT)
+#   代码与模型权重都来自上游；本仓库只维护**接口与诚实边界**，
+#   不 vendor 上游源码（AGENTS.md：不造第二套 Core、不自研模型）。
+#
+# 为什么需要独立运行时
+#   torch + demucs 是重量级依赖，且与 basic-pitch 的 onnxruntime 版本要求
+#   可能冲突。分开放，两个引擎互不牵连：任何一边装坏，另一边仍然可用。
+#
+# CPU 实测（2026-10-05，本机 20s 音频）：RTF ≈ 2.2–3.6×（即 4 分钟的歌约 9–14 分钟）。
+# GPU 可用时 model_separate.py --device auto 会自动选 cuda。
+#
+# 安装（两种都行）：
+#
+#   A. 复用本机已有的 torch 栈（省 ~2.5 GB 下载；本机已装 torch+demucs 时用这个）
+#      python -m venv --system-site-packages .venv-demucs
+#      .venv-demucs/Scripts/python -m pip install -r moodify-desktop/scripts/requirements-demucs.txt
+#
+#   B. 完全独立（干净机器、或要钉死 torch 版本时用这个）
+#      python -m venv .venv-demucs
+#      .venv-demucs/Scripts/python -m pip install -r moodify-desktop/scripts/requirements-demucs.txt
+#
+# 为什么 A 是可以接受的：模型分离是**可选引擎**，不是产品的必经之路。
+# `--system-site-packages` 让这个 venv 依赖全局 torch——所以它可能被全局环境变动弄坏。
+# 那没关系，因为坏掉时的行为是**明确的**：`resolveRuntime('demucs')` 仍然只能找到这个
+# venv 的 python，脚本会以 DEPENDENCY_MISSING 如实失败，自动模式退回 DSP 快速分离
+# 并在 UI 上标注「这是降级」。不存在「悄悄用坏解释器跑出一个错结果」的路径。
+#
+# 首次运行会从上游下载 htdemucs 权重（约 80 MB）到 ~/.cache/torch —— 权重不进 Git。
+
+torch>=2.2
+torchaudio>=2.2
+demucs>=4.0.1
+soundfile>=0.12,<1
+numpy>=1.26,<3

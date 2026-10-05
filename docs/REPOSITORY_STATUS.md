@@ -77,6 +77,29 @@ UI 与产物均须如此表述。Core 另有 18 参数诊断引擎但桌面够�
 [`docs/protocol/MOODIFY_STUDIO_CONTEXT_0_1.md`](protocol/MOODIFY_STUDIO_CONTEXT_0_1.md) ·
 [`docs/reports/STUDIO_PIPELINE_REALIGNMENT_2026-10-03.md`](reports/STUDIO_PIPELINE_REALIGNMENT_2026-10-03.md)
 
+### Studio 生产流程 v4 — 2026-10-04（DEFINED；流程层已实现，第一条真实 A/B 闭环已打通）
+
+V4 重塑了 v3 的后半程：`① 检测 → ② 逆向分解 → ③ 结构 → ④ 修音 → ⑤ 复合 → ⑥ 复检 → ⑦ 选定 → ⑧ 导出`；
+②问题 与 ⑤方案 退场（findings 留在 ① 的 report 里），三预设作为产品面退场。
+契约见 [`STUDIO_PRODUCTION_PIPELINE_V4.md`](canon/STUDIO_PRODUCTION_PIPELINE_V4.md)；
+Phase 2 实现报告见 [`reports/2026-10-04_DESKTOP_ONE_CLICK_PHASE2_IMPLEMENTATION.md`](reports/2026-10-04_DESKTOP_ONE_CLICK_PHASE2_IMPLEMENTATION.md)。
+
+| 项 | 状态 | 依据 |
+|---|---|---|
+| 一键完成会话（Phase 1） | **IMPLEMENTED** | `moodify-desktop/src/orchestrator.js` / `session.js`：步骤由产物推导、真实失败可见且可重试、⑦ 选定有严格准入 |
+| 快速完成（仅立体声）两档候选（Phase 2） | **IMPLEMENTED（EXPERIMENTAL）** | Core `moodify tuning render-pair`（`moodify/tuning.py`，MIP-0002 附录 A）+ Desktop 接线；A 保守 / B 充分，逐侧 evidence，原子发布，A/B 均完成才发布 |
+| 深度受阻时的显式切换（Phase 2.1） | **IMPLEMENTED**（`CANON_CHANGE = YES`） | 入口依据 `!deepExecutable`（不再是 `!deepAssetsReady`）；有 stems/MIDI 也能切换，切换只写 `finish_mode.json`、不生成音频、不删资产；见 [`CANON_CHANGELOG.md`](canon/CANON_CHANGELOG.md) 2026-10-04 条目与 [`reports/2026-10-04_DESKTOP_ONE_CLICK_PHASE2_1_MODE_SWITCH.md`](reports/2026-10-04_DESKTOP_ONE_CLICK_PHASE2_1_MODE_SWITCH.md) |
+| A/B 审听工作台（Phase 2.2） | **IMPLEMENTED**（`CANON_CHANGE = NO`） | REVIEW 重建为两个候选标签 + 单 transport（三音源同位置切换）+ 每页「原版 vs 候选」的频谱/指标/图表/处理链；全部数值来自候选自己那次复检的 report 与 Core 的 plan/evidence（只读 IPC `tuning:evidence` / `tuning:charts` 带路径守卫）；见 [`reports/2026-10-04_DESKTOP_PHASE2_2_AB_REVIEW_WORKBENCH.md`](reports/2026-10-04_DESKTOP_PHASE2_2_AB_REVIEW_WORKBENCH.md) |
+| 完成层与作品留存（Phase 2.3） | **IMPLEMENTED**（`CANON_CHANGE = NO`） | 选定后进入作品层（标题 / 版本 / 确定性波形印记 / 日期 / 从头听 / 导出 / 作品卡 / 查看制作详情 / 可选的一句话）+ 安静聆听；留存记录 `<case>/studio/keepsake.json` 是**非权威**表现层产物（完成状态仍由产物 + ⑦ 准入推导，keepsake 不能解锁 CHOSEN 或导出）；见 [`reports/2026-10-04_DESKTOP_PHASE2_3_FINISHING_POLISH.md`](reports/2026-10-04_DESKTOP_PHASE2_3_FINISHING_POLISH.md) |
+| Identity / Account / Personal History（Phase 3A） | **PARTIALLY IMPLEMENTED · DEPLOYMENT_BLOCKED**（`CANON_CHANGE = YES`） | 已实现并测试：Canon 三权威边界、`MIP-0003`（DRAFT）、Supabase 迁移 + RLS + 受控删除函数、两用户 RLS 套件（**未能执行**：本机无 `psql`/Supabase CLI、Docker daemon 未运行、无凭据 → runner 以 exit 2 显式跳过）、history 事件白名单与数据最小化、离线幂等队列、投影与冲突规则、`account_link.json`。**未实现**：`src/account/*`（登录回调/PKCE/session-store）、`history-sync/sync.js` 编排、main/preload IPC、个人空间 UI、`test-account.js`——**不得**接假登录 UI 充数。真实账户/RLS/端到端验收缺凭据，为 `DEPLOYMENT_BLOCKED`。见 [`reports/2026-10-04_DESKTOP_PHASE3A_IDENTITY_HISTORY.md`](reports/2026-10-04_DESKTOP_PHASE3A_IDENTITY_HISTORY.md) |
+| 深度路径：逐轨音准·节奏修正、多轨复合 | **TARGET — 未实现** | Core 无此能力；Desktop 显式拒绝 `TUNABLE_CORE_NOT_AVAILABLE` / `DEEP_NOT_EXECUTABLE` |
+| 可逆性验证（**壳侧**） | **IMPLEMENTED（EXPERIMENTAL）** | `moodify-desktop/scripts/roundtrip.py` → `<case>/studio/roundtrip.json`：按引擎声明的**划分**把分轨相加与原版比较（采样率先对齐），阈值分引擎（DSP 精确分解 −40 dB；Demucs 重建式 −25 dB）。实测：DSP null −74.1 dB / corr 1.0000；Demucs null −32.7 dB / corr 0.9997。**`passed` 只表示重建一致，不表示分轨质量**——产物自带平凡控制组（轨1=原版、轨2=静音同样通过）与 `interpretation` 说明。Core 侧同名能力仍为 TARGET，两者不得互相顶替 |
+| 逆向分解引擎（**壳侧**） | **IMPLEMENTED（EXPERIMENTAL）** | 两档真实引擎：模型 `model_separate.py`（Demucs htdemucs，MIT，四轨，实测 CPU RTF 2.2–3.6×）/ 快速 `dsp_separate.py`（scipy 中置估计 + HPSS，秒级，`engine_grade = PREVIEW_NOT_MASTERING_GRADE`）。引擎在 manifest 里声明身份与等级，下游不得降级或升级描述 |
+| 结构分析（速度 / 拍点 / 段落 / 能量） | **IMPLEMENTED（EXPERIMENTAL）** | `moodify-desktop/scripts/structure.py` → `<case>/studio/structure.json`。实测 387s 曲：BPM 127.84（倍频已消歧）、824 拍、8 段。**段落只有位置编号，无主歌/副歌标签**；`judgment_boundary` 随产物声明「这不是曲式判断」。取代先前的 `ABSENT`（见下方能力表） |
+| 音频 → MIDI / MIDI → 曲谱 | **IMPLEMENTED（运行时就绪）** | `.venv-basic-pitch`（basic-pitch 0.4.0 + music21 10.5.0 + onnxruntime）。实测 30s → MIDI 29.3s；MIDI → MusicXML 通过。运行时的**存在**由 `runtime.js` 校验，缺失即 `DEPENDENCY_MISSING` + 安装提示 |
+| ⑥ 复检（三方逐指标对齐） | **IMPLEMENTED** | `moodify-desktop/src/recheck.js`：对 A / B 各重跑一次完整检测 |
+| 两档参数 | **UNCALIBRATED_ENGINEERING_DEFAULT** | 人类尚未校准；B 只代表「变化更充分」，不代表「更好」 |
+
 ## Current Verified Mainline（仓库侧）
 
 MSP/0.1 仓库侧实现：`moodify protocol validate|process`；JSON 作业 → 既有 Core 预设处理 → WAV、诊断与哈希清单。仅证明执行路径，不证明自动听感验证或云端部署。协议详情见 [`docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`](protocol/MOODIFY_SOUND_PROTOCOL_0_1.md)。
@@ -128,7 +151,8 @@ date: 2026-08-08
 | Treatment records | EXPERIMENTAL | `treatment_records/` |
 | Human feedback | EXPERIMENTAL | Treatment record feedback fields |
 | Production-case state machine | LEGACY（orchestration）| `orchestration/workflow_engine.py`；统一方案 HUMAN_DECISION_REQUIRED |
-| MSE structural analysis | ABSENT | No canonical score/MIDI/lyrics structural subsystem |
+| MSE structural analysis | **EXPERIMENTAL（壳侧部分实现，2026-10-05）** | 原记 `ABSENT`。现有：`moodify-desktop/scripts/structure.py` 产出速度 / 拍点 / 段落边界 / 能量曲线（`<case>/studio/structure.json`）。**仍 ABSENT**：调性、和弦、逐轨 MIDI、MIDI 清理/量化/合并、歌词结构——即 canonical 的 score/MIDI 结构子系统仍不存在 |
+| 逆向分解（分轨）| **EXPERIMENTAL（壳侧，2026-10-05）** | 模型引擎 `model_separate.py`（Demucs htdemucs，MIT，四轨）+ 快速引擎 `dsp_separate.py`（scipy 中置估计 + HPSS）。Core 侧 `moodify/stems/` 是 lalal.ai 远程 API，与本地分解不是同一条路 |
 | Cloud runtime（Ear 生产流量） | UNRESOLVED | 云端 API 壳运行，无生产流量（W01-P00） |
 | App integration | CANONICAL（对外面） | apps/music-android 3.1 + deliverables/releases |
 | MAMSE-001..012 | EXPERIMENTAL_ACCEPTED | artifacts/mamse_001..012 |

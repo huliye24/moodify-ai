@@ -7,6 +7,10 @@
  * calls a missing id or a missing channel produces a silent UI break at
  * runtime; this turns those into a build-time failure.
  *
+ * Section 6 pins one more cross-file contract: every completion-session phase declared in
+ * src/session.js must have a real step function in main.js's SESSION_STEPS. A drift there does
+ * not crash — "开始完成" just stops at PHASE_HAS_NO_ACTION, which reads like a hang.
+ *
  * Run: node scripts/check-contracts.js      (exit 1 on any violation)
  */
 
@@ -103,6 +107,17 @@ if (nodeIntegration && nodeIntegration[1] !== 'false') {
   problems.push('main.js 必须保持 nodeIntegration: false');
 }
 
+// ——— 6) every session phase must have a real step in main ————————————————
+// 一键完成机的相位表在 src/session.js，真正干活的函数在 main.js 的 SESSION_STEPS。
+// 两边漂移的后果不是崩溃，而是「一键启动」在某个相位停在 PHASE_HAS_NO_ACTION ——
+// 用户看到的是流程莫名停住。所以这里把两边的键对上。
+const sessionJs = read(path.join('src', 'session.js'));
+const sessionRuns = collect(sessionJs, /run:\s*'([^']+)'/g);
+const stepsBlock = /SESSION_STEPS\s*=\s*Object\.freeze\(\{([\s\S]*?)\}\)/.exec(mainJs);
+const stepKeys = stepsBlock ? collect(stepsBlock[1], /(\w+)\s*:/g) : new Set();
+diff(sessionRuns, stepKeys, '会话相位步骤',
+     'src/session.js 的 PHASES[].run 必须在 main.js 的 SESSION_STEPS 里有真实实现');
+
 // ——— report —————————————————————————————————————————————————————————————
 if (problems.length) {
   console.error(`✗ Studio 合约检查失败（${problems.length} 项）`);
@@ -110,5 +125,6 @@ if (problems.length) {
   process.exit(1);
 }
 console.log('✓ Studio 合约检查通过'
-  + `（DOM id ${domRefs.size} · 桥接 ${bridgeCalls.size} · IPC ${invoked.size} · 事件 ${sent.size}）`
+  + `（DOM id ${domRefs.size} · 桥接 ${bridgeCalls.size} · IPC ${invoked.size} · 事件 ${sent.size}`
+  + ` · 会话相位 ${sessionRuns.size}）`
   + ` — ${NOTE}`);

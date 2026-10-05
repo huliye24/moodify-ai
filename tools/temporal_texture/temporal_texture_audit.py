@@ -124,9 +124,27 @@ def make_finding(
     )
 
 
+def is_virtualenv_dir(name: str) -> bool:
+    """任何以 `.venv` 开头的目录都是本地虚拟环境，不是 Moodify 代码。
+
+    为什么用前缀而不是继续往 exclude_dirs 里加名字：
+      这个仓库的虚拟环境命名是 `.venv-<用途>`（`.venv-core`、`.venv-score`、
+      `.venv-basic-pitch`，2026-10-05 又加了 `.venv-audio`、`.venv-demucs`）。
+      逐一列举的结果就是每加一个运行时都要记得改两处配置——而漏掉一次的后果不是
+      报错，是**整个 site-packages 被当成项目代码扫描**：实测本地会因此多出
+      13000+ 条 finding，把真实的债务信号淹没在第三方库的噪声里。
+      这与 `.gitignore` 那次（`.venv-audio` / `.venv-demucs` 不被任何规则匹配、
+      差点被 `git add -A` 提交 231 MB）是同一类故障：枚举跟不上新增。
+      前缀规则一次覆盖整个命名空间。
+    """
+    return name.startswith(".venv")
+
+
 def should_exclude(relative: Path, config: dict[str, Any]) -> bool:
     exclude_dirs = set(config["scan"]["exclude_dirs"])
     if any(part in exclude_dirs for part in relative.parts[:-1]):
+        return True
+    if any(is_virtualenv_dir(part) for part in relative.parts[:-1]):
         return True
     posix = relative.as_posix()
     return any(fnmatch.fnmatch(posix, pattern) for pattern in config["scan"]["exclude_globs"])
@@ -138,7 +156,7 @@ def iter_source_files(repo: Path, config: dict[str, Any]) -> Iterable[Path]:
         root_path = Path(root)
         relative_root = root_path.relative_to(repo)
         exclude_dirs = set(config["scan"]["exclude_dirs"])
-        dirs[:] = [d for d in dirs if d not in exclude_dirs]
+        dirs[:] = [d for d in dirs if d not in exclude_dirs and not is_virtualenv_dir(d)]
         for name in files:
             path = root_path / name
             relative = relative_root / name
