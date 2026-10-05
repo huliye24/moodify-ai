@@ -39,7 +39,7 @@ The Listening Environment may be responsible for:
 
 In P02 only the following are defined — nothing below is implemented in this phase:
 
-- playback and device/output adaptation remain the Android/Listening Environment client's domain (`apps/music-android`, `apps/android`);
+- playback and device/output adaptation remain the canonical Android/Listening Environment client's domain (`apps/music-android`);
 - song-specific rendering is a stated future direction;
 - device-specific EQ, HRTF, headphone profiles and adaptive room correction are recorded but **not authorized**:
 

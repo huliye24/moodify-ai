@@ -83,7 +83,7 @@ User Play
 | Billing / Credit ledger | 当前无收入模型 |
 | MAMSE / Physics / LLM / Lyric / Transcription research | 研究资产；不进入主线 CI |
 | Reconstruction Job（billing 未完成） | 真实生产 case 出现前不扩状态 |
-| Second Android (`apps/android/`) | 与 `apps/music-android` 双 authority |
+| Second Android (`apps/android/`) | **RETIRED 2026-10-04**；不得恢复为第二 App authority |
 | Second Desktop | v1.0 不发布 Desktop |
 | Multi-model research dashboard | 当前无生产流量 |
 | Public Evidence dashboard | Evidence 属内部系统 |

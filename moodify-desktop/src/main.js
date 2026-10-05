@@ -28,6 +28,10 @@ const pipeline = require('./pipeline');
 const session = require('./session');
 // 调度循环本体（与 Electron 无关，步骤函数由本文件注入）—— 这样它能被 headless 测到。
 const { createOrchestrator } = require('./orchestrator');
+// 外部专用运行时解析（HOTFIX 000 / F4）。缺运行时必须显式失败，不静默回退。
+// V4 合并时这里曾残留对 VENVS / pyExe 的引用，两者在本文件里都没有定义——外部运行时
+// 的唯一解析入口就是本模块（见 resolveRuntime / resolveRuntimeTool）。
+const { RuntimeMissingError, resolveRuntime, resolveRuntimeTool } = require('./runtime');
 
 const CASES_ROOT = process.env.MOODIFY_CASES_ROOT
   || path.join(os.homedir(), '.moodify', 'cases');
@@ -500,14 +504,16 @@ function registerIpc() {
 // 所有 python 子进程强制 PYTHONUTF8=1；长任务单飞锁，进度行实时转发渲染层。
 
 const TOOLS_ROOT = path.join(__dirname, '..', 'scripts');
-const VENVS = {
-  'basic-pitch': path.join(__dirname, '..', '..', '.venv-basic-pitch'),
-  score: path.join(__dirname, '..', '..', '.venv-score'),
-};
 
-function pyExe(venvName) {
-  const exe = path.join(VENVS[venvName], 'Scripts', 'python.exe');
-  return fs.existsSync(exe) ? exe : PYTHON;
+// 需要专用 venv 的能力必须先解析运行时：解析失败就返回 DEPENDENCY_MISSING，
+// 不 spawn 任何子进程，也不用系统 python 顶替（那只会把缺依赖伪装成 ABI 崩溃）。
+function requireRuntimeExe(resolve) {
+  try {
+    return { ok: true, exe: resolve() };
+  } catch (err) {
+    if (err instanceof RuntimeMissingError) return err.toResult();
+    throw err;
+  }
 }
 
 function insideDir(dir, p) {
@@ -595,7 +601,7 @@ function registerStudioToolIpc() {
   ipcMain.handle('casefiles:list', (_e, caseDir, subdir, exts) =>
     listCaseFiles(caseDir, subdir, exts));
 
-  // 快速分离（引擎 A）→ 实现在 separateStems()（完成会话编排器复用同一条路径）
+  // 逆向分解：快速分离（引擎 A）→ 实现在 separateStems()（完成会话编排器复用同一条路径）
   ipcMain.handle('stems:run', async (_e, caseDir) => separateStems(caseDir));
 
   // 音频 → MIDI → 实现在 transcribeMidi()（完成会话编排器复用同一条路径）
@@ -966,9 +972,13 @@ async function analyzeAudio(audioPath) {
 async function separateStems(caseDir) {
   const src = resolveCaseSource(caseDir);
   if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+  // 外部运行时的唯一解析入口是 runtime.js：缺失即 DEPENDENCY_MISSING，
+  // 绝不用系统 python 顶替（那会把缺依赖伪装成 ABI 崩溃——本仓库已经踩过一次）。
+  const runtime = requireRuntimeExe(() => resolveRuntime('basic-pitch').python);
+  if (!runtime.ok) return runtime;
   const outdir = path.join(caseDir, 'stems');
   fs.mkdirSync(outdir, { recursive: true });
-  return runLong('stems', pyExe('basic-pitch'), [
+  return runLong('stems', runtime.exe, [
     path.join(TOOLS_ROOT, 'dsp_separate.py'), src, '--outdir', outdir,
   ]);
 }
@@ -986,11 +996,11 @@ async function transcribeMidi(caseDir, audioPath) {
     || insideDir(caseDir, path.resolve(audioPath));
   if (!allowed) return { ok: false, reason: '输入音频必须是世界源或 case 内分离轨' };
   if (!fs.existsSync(audioPath)) return { ok: false, reason: '输入音频不存在' };
-  const bpExe = path.join(VENVS['basic-pitch'], 'Scripts', 'basic-pitch.exe');
-  if (!fs.existsSync(bpExe)) return { ok: false, reason: '未找到 basic-pitch（.venv-basic-pitch）' };
+  const runtime = requireRuntimeExe(() => resolveRuntimeTool('basic-pitch', 'basic-pitch'));
+  if (!runtime.ok) return runtime;
   const outdir = path.join(caseDir, 'midi');
   fs.mkdirSync(outdir, { recursive: true });
-  const res = await runLong('midi', bpExe, [
+  const res = await runLong('midi', runtime.exe, [
     '--save-midi', '--model-serialization', 'onnx', outdir, audioPath,
   ]);
   if (res.ok) {
@@ -1013,7 +1023,9 @@ async function convertScore(caseDir, midiPath) {
   fs.mkdirSync(outdir, { recursive: true });
   const base = path.basename(midiPath).replace(/\.(mid|midi)$/i, '');
   const out = path.join(outdir, `${base}.musicxml`);
-  const res = await runLong('score', pyExe('score'), [
+  const runtime = requireRuntimeExe(() => resolveRuntime('score').python);
+  if (!runtime.ok) return runtime;
+  const res = await runLong('score', runtime.exe, [
     path.join(TOOLS_ROOT, 'midi_to_musicxml.py'), midiPath, out,
   ]);
   return res.ok ? { ...res, musicxml: out } : res;

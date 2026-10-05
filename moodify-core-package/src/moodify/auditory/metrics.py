@@ -89,9 +89,14 @@ def compute_metrics(
         m["loudness_range_lu"] = MetricValue(round(lra, 2), "LU", "EBU3342").to_dict()
     tp = true_peak_db(samples, sr)
     m["true_peak_dbfs"] = MetricValue(round(tp, 2), "dBFS", "4x-oversample").to_dict()
-    pk = _peak_db(mono)
+    # Peak and RMS describe the *source signal*, so they span every channel.
+    # Measuring them on the mono downmix would under-report the true peak of an
+    # asymmetric mix and disagree with true_peak_dbfs, which is per-channel.
+    # RMS is total energy over total sample count (same definition as
+    # chunked_peak_rms), not the RMS of a downmix.
+    pk = _peak_db(samples)
     m["sample_peak_dbfs"] = MetricValue(round(pk, 2), "dBFS", "direct").to_dict()
-    rms = _rms_db(mono)
+    rms = _rms_db(samples)
     m["rms_dbfs"] = MetricValue(round(rms, 2), "dBFS", "direct").to_dict()
     crest = pk - rms
     m["crest_factor_db"] = MetricValue(round(crest, 2), "dB", "derived").to_dict()
