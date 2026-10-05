@@ -5,18 +5,58 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
+    "runtime:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-windows-runtime.ps1",
+    "dist:win": "npm run runtime:win && electron-builder --win nsis",
     "check:contracts": "node scripts/check-contracts.js",
     "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-recheck.js && node scripts/test-session.js && node scripts/test-keepsake.js && node scripts/test-sync.js && node scripts/test-orchestrator.js && node scripts/test-main-ipc.js && node scripts/test-studio.js",
     "test:rls": "node ../deployment/supabase/tests/run_rls_tests.js"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "@openai/codex": "^0.160.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
     "node-pty": "^1.1.0"
+  },
+  "build": {
+    "appId": "com.rongjingwenchuan.moodify.studio",
+    "productName": "Moodify Studio",
+    "asar": false,
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "renderer/**/*",
+      "scripts/dsp_separate.py",
+      "scripts/midi_to_musicxml.py",
+      "scripts/vendor-xterm.js",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "build/runtime",
+        "to": "runtime"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "renderer/assets/moodify_watermark.png",
+      "artifactName": "Moodify-Studio-${version}-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Moodify Studio",
+      "license": "../LICENSE"
+    }
   }
 }

@@ -38,14 +38,21 @@ const RESEARCH_JUDGMENTS = path.join(RESEARCH_ROOT, 'judgments.jsonl');
 const RESEARCH_EVIDENCE = path.join(RESEARCH_ROOT, 'evidence.jsonl');
 const RESEARCH_SCALES = ['明显更好', '略好', '听不出', '略差', '明显更差'];
 const RESEARCH_ROLES = ['creator', 'listener', 'pro'];
-const PYTHON = process.env.MOODIFY_PYTHON || 'python';
+const BUNDLED_RUNTIME = app.isPackaged ? path.join(process.resourcesPath, 'runtime') : null;
+const PYTHON = process.env.MOODIFY_PYTHON
+  || (BUNDLED_RUNTIME ? path.join(BUNDLED_RUNTIME, 'python', 'python.exe') : 'python');
 const AUDIO_FILTERS = [
   { name: '音频', extensions: ['flac', 'wav', 'mp3', 'm4a', 'aac', 'ogg', 'aiff', 'aif'] },
   { name: '所有文件', extensions: ['*'] },
 ];
 
 function pythonEnv() {
-  return { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' };
+  const env = { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' };
+  if (BUNDLED_RUNTIME) {
+    env.PATH = `${path.join(BUNDLED_RUNTIME, 'ffmpeg')};${env.PATH || ''}`;
+    env.MPLCONFIGDIR = path.join(os.homedir(), '.moodify', 'matplotlib');
+  }
+  return env;
 }
 
 function runPython(args, timeoutMs = 30 * 60 * 1000) {

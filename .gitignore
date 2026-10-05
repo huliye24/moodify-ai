@@ -1,6 +1,7 @@
 node_modules
 dist
 dist-electron
+moodify-desktop/build/
 release
 __pycache__
 *.pyc
