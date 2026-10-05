@@ -46,6 +46,137 @@ const AUDIO_FILTERS = [
   { name: '所有文件', extensions: ['*'] },
 ];
 
+// ——— Application updates: user chooses; Studio never replaces itself silently. ———
+
+let desktopUpdater = null;
+let updaterStarted = false;
+function currentAppVersion() {
+  try { return typeof app.getVersion === 'function' ? app.getVersion() : '1.0.1-rc.1'; } catch { return '1.0.1-rc.1'; }
+}
+let updateState = {
+  supported: false,
+  status: 'idle',
+  currentVersion: currentAppVersion(),
+  version: null,
+  percent: 0,
+  message: '',
+  // 生效的更新源。让「当前连的是哪个 feed」成为界面可读的事实——
+  // 差分升级测试时会指向本机 server，正常情况指向 https://rongjingmusic.com/...
+  feed: null,
+  feedOverridden: false,
+};
+
+function updatePreferencesPath() {
+  return path.join(app.getPath('userData'), 'update-preferences.json');
+}
+
+function readUpdatePreferences() {
+  try { return JSON.parse(fs.readFileSync(updatePreferencesPath(), 'utf8')); } catch { return {}; }
+}
+
+function writeUpdatePreferences(patch) {
+  const next = { ...readUpdatePreferences(), ...patch, updatedAt: new Date().toISOString() };
+  fs.mkdirSync(path.dirname(updatePreferencesPath()), { recursive: true });
+  fs.writeFileSync(updatePreferencesPath(), JSON.stringify(next, null, 2), 'utf8');
+  return next;
+}
+
+function publishUpdateState(patch = {}) {
+  updateState = { ...updateState, ...patch, currentVersion: currentAppVersion() };
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) win.webContents.send('update:status', updateState);
+  }
+  return updateState;
+}
+
+function setupAutoUpdater() {
+  if (updaterStarted) return desktopUpdater;
+  updaterStarted = true;
+  if (!app.isPackaged || process.platform !== 'win32') {
+    publishUpdateState({ supported: false, status: 'dev', message: '开发模式不检查更新。' });
+    return null;
+  }
+  try {
+    desktopUpdater = require('electron-updater').autoUpdater;
+    desktopUpdater.autoDownload = false;
+    desktopUpdater.autoInstallOnAppQuit = false;
+    desktopUpdater.allowPrerelease = true;
+
+    // 仅供本地差分升级测试使用的 feed 覆盖。
+    //
+    // 为什么需要它：验证「发现更新 → 下载 → 重启安装 → 版本真的变了」这条闭环，
+    // 必须在真实安装的旧版上跑。若为此把假版本推到生产 feed，等于让所有已安装客户端
+    // 都看到一个不存在的版本——不可接受。所以走环境变量，**默认严格使用生产 URL**。
+    //
+    // 边界：环境变量由本机启动者提供，远端 feed 无法改写它，因此不构成
+    // 「被投递的 feed 自称来自别处」这一类风险。仍然把生效的 URL 写进状态里，
+    // 让「我现在不是连生产」这件事在界面上可见，而不是只在日志里。
+    const feedOverride = (process.env.MOODIFY_UPDATE_URL || '').trim();
+    if (feedOverride) {
+      desktopUpdater.setFeedURL({ provider: 'generic', url: feedOverride, channel: 'latest' });
+    }
+    const effectiveFeed = feedOverride || 'https://rongjingmusic.com/downloads/studio/windows/';
+    updateState.feed = effectiveFeed;
+    updateState.feedOverridden = Boolean(feedOverride);
+
+    desktopUpdater.on('checking-for-update', () => publishUpdateState({ supported: true, status: 'checking', message: '正在检查更新…' }));
+    desktopUpdater.on('update-available', (info) => {
+      const skipped = readUpdatePreferences().skippedVersion;
+      publishUpdateState({
+        supported: true,
+        status: skipped === info.version ? 'skipped' : 'available',
+        version: info.version,
+        percent: 0,
+        message: skipped === info.version ? `已跳过 ${info.version}` : `发现新版本 ${info.version}`,
+      });
+    });
+    desktopUpdater.on('update-not-available', () => publishUpdateState({ supported: true, status: 'current', version: null, percent: 0, message: '已是最新版本。' }));
+    desktopUpdater.on('download-progress', (progress) => publishUpdateState({ supported: true, status: 'downloading', percent: Math.round(progress.percent || 0), message: `正在下载更新 ${Math.round(progress.percent || 0)}%` }));
+    desktopUpdater.on('update-downloaded', (info) => publishUpdateState({ supported: true, status: 'ready', version: info.version, percent: 100, message: `版本 ${info.version} 已准备好。` }));
+    desktopUpdater.on('error', (error) => publishUpdateState({ supported: true, status: 'error', message: `更新失败：${error && error.message ? error.message : String(error)}` }));
+    publishUpdateState({ supported: true, status: 'idle', message: '' });
+  } catch (error) {
+    publishUpdateState({ supported: false, status: 'error', message: `更新组件不可用：${error.message}` });
+  }
+  return desktopUpdater;
+}
+
+async function checkForDesktopUpdate(manual = false) {
+  const updater = setupAutoUpdater();
+  if (!updater) return publishUpdateState(manual ? { message: '当前环境不支持自动更新。' } : {});
+  try {
+    await updater.checkForUpdates();
+  } catch (error) {
+    publishUpdateState({ status: 'error', message: `检查更新失败：${error.message}` });
+  }
+  return updateState;
+}
+
+function registerUpdateIpc() {
+  ipcMain.handle('update:status', () => ({ ...updateState }));
+  ipcMain.handle('update:check', async () => checkForDesktopUpdate(true));
+  ipcMain.handle('update:action', async (_event, action) => {
+    const updater = setupAutoUpdater();
+    if (action === 'later') return publishUpdateState({ status: 'later', message: '已保留当前版本，稍后可再次更新。' });
+    if (action === 'skip') {
+      if (updateState.version) writeUpdatePreferences({ skippedVersion: updateState.version });
+      return publishUpdateState({ status: 'skipped', message: `已跳过 ${updateState.version || '此版本'}。` });
+    }
+    if (!updater) return publishUpdateState({ status: 'error', message: '当前环境不支持自动更新。' });
+    if (action === 'download') {
+      writeUpdatePreferences({ skippedVersion: null });
+      publishUpdateState({ status: 'downloading', percent: 0, message: '正在下载更新…' });
+      try { await updater.downloadUpdate(); } catch (error) { publishUpdateState({ status: 'error', message: `下载更新失败：${error.message}` }); }
+      return updateState;
+    }
+    if (action === 'install' && updateState.status === 'ready') {
+      setImmediate(() => updater.quitAndInstall(false, true));
+      return publishUpdateState({ status: 'installing', message: '正在重启并安装更新…' });
+    }
+    return publishUpdateState({ status: 'error', message: '无法执行这个更新操作。' });
+  });
+}
+
 function pythonEnv() {
   const env = { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' };
   if (BUNDLED_RUNTIME) {
@@ -449,6 +580,7 @@ codex.onServerRequest = (request) => {
 };
 
 function registerIpc() {
+  registerUpdateIpc();
   registerTerminalIpc();
   registerCodexIpc();
   registerResearchIpc();
@@ -2044,6 +2176,12 @@ function createWindow() {
     },
   });
   win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
+  if (win.webContents && typeof win.webContents.once === 'function') {
+    win.webContents.once('did-finish-load', () => {
+      setupAutoUpdater();
+      if (app.isPackaged) setTimeout(() => checkForDesktopUpdate(false), 5000);
+    });
+  }
   win.on('closed', killAllTerminals);
   return win;
 }

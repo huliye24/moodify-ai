@@ -52,6 +52,99 @@ function setStatus(text) {
   el.hidden = !text;
 }
 
+// ——— application updates: prompt only; the user chooses update / later / skip. ———
+
+let currentUpdateState = null;
+
+/**
+ * 更新对话框的状态投影。
+ *
+ * 三种人类选择（下载并安装 / 稍后提醒 / 跳过此版本）之外，还必须始终留一条
+ * 「手动检查」的路径。早先的实现把 primary 按钮在 `later` / `skipped` 下**整个隐藏**，
+ * 于是用户点了「稍后提醒」之后重新打开入口，卡片上只剩一个「关闭」——
+ * 想改主意也没有按钮可点。那是把「本次不再提示」实现成了「再也查不了」。
+ *
+ * 现在的规则：
+ *   - `available`  → primary = 下载更新；显示 稍后提醒 / 跳过此版本
+ *   - `ready`      → primary = 重启并安装（唯一允许安装的状态）
+ *   - `later` / `skipped` / `current` / `error` / `idle`
+ *                  → primary = 检查更新（可再次检查，用户可改主意）
+ *   - `downloading` / `installing` / `checking` → primary 隐藏，避免重复提交
+ *   - `dev`（未打包）→ 不提供检查：没有 feed 可查，给按钮就是骗人
+ */
+function renderUpdateStatus(next, forceOpen = false) {
+  if (!next) return;
+  currentUpdateState = next;
+  const dialog = $('update-dialog');
+  const open = $('update-open');
+  const primary = $('update-primary');
+  const later = $('update-later');
+  const skip = $('update-skip');
+  const progress = $('update-progress');
+  const status = next.status;
+
+  $('update-version').textContent = `当前版本 ${next.currentVersion || '—'}${next.version ? ` · 新版本 ${next.version}` : ''}`;
+  $('update-message').textContent = next.message || '检查是否有新版本。';
+
+  // 顶栏入口：让人一眼看出有没有待处理的新版本
+  open.classList.toggle('has-update', ['available', 'downloading', 'ready'].includes(status));
+  open.textContent = status === 'ready' ? '更新已就绪' : status === 'available' ? '有新版本' : '更新';
+
+  progress.hidden = status !== 'downloading';
+  progress.value = next.percent || 0;
+
+  // 「稍后」与「跳过」只对**当下这个可用版本**有意义
+  later.hidden = status !== 'available';
+  skip.hidden = status !== 'available';
+
+  // primary 的动作由状态决定；只有 ready 才可能是「安装」
+  let action = 'check';
+  let label = '检查更新';
+  if (status === 'available') { action = 'download'; label = '下载更新'; }
+  else if (status === 'ready') { action = 'install'; label = '重启并安装'; }
+
+  const busy = ['downloading', 'installing', 'checking'].includes(status);
+  const unsupported = status === 'dev' || next.supported === false;
+  primary.hidden = busy || unsupported;
+  primary.disabled = busy || unsupported;
+  primary.dataset.action = action;
+  primary.textContent = label;
+
+  // 自动弹窗只发生在**真的需要用户做决定**时（有可用版本 / 已下载完成）。
+  // 手动打开入口（forceOpen）则一律展示卡片——即使当前无动作可做（例如 dev
+  // 未打包模式，或正在下载），因为那时候用户需要的是**看到状态说明**，
+  // 而不是面对一个点了没反应的入口。
+  if (forceOpen || ['available', 'ready'].includes(status)) dialog.hidden = false;
+}
+
+async function initUpdater() {
+  $('update-open').addEventListener('click', async () => {
+    $('update-dialog').hidden = false;
+    const status = await window.moodify.updateStatus();
+    renderUpdateStatus(status, true);
+  });
+  $('update-close').addEventListener('click', () => { $('update-dialog').hidden = true; });
+  $('update-later').addEventListener('click', async () => {
+    renderUpdateStatus(await window.moodify.updateAction('later'));
+    $('update-dialog').hidden = true;
+  });
+  $('update-skip').addEventListener('click', async () => {
+    renderUpdateStatus(await window.moodify.updateAction('skip'));
+    $('update-dialog').hidden = true;
+  });
+  $('update-primary').addEventListener('click', async () => {
+    // 动作由 renderUpdateStatus 写在 dataset 上，这里不再二次推断：
+    // 两处各自推断同一个动作，迟早会分叉（按钮写着「下载更新」却发 check 请求）。
+    const action = $('update-primary').dataset.action || 'check';
+    const result = action === 'check'
+      ? await window.moodify.updateCheck()
+      : await window.moodify.updateAction(action);
+    renderUpdateStatus(result, true);
+  });
+  window.moodify.onUpdateStatus((status) => renderUpdateStatus(status));
+  renderUpdateStatus(await window.moodify.updateStatus());
+}
+
 // ——— history archive (left slide-out panel) ———
 
 async function refreshArchive() {
@@ -2229,6 +2322,7 @@ function initCompilerSetup() {
 // ——— boot ———
 
 window.addEventListener('DOMContentLoaded', async () => {
+  await initUpdater();
   const env = await window.moodify.env();
   $('archive-path').textContent = env.casesRoot;
   if (!env.coreReady) {

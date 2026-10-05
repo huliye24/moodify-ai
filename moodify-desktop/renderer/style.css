@@ -1029,3 +1029,28 @@ button:focus-visible, textarea:focus-visible, input:focus-visible {
 
 /* NOTE: 上面的 .diag-* / #diagnosis-human / .preserve-list 属于已退场的 ②问题 视图
    （2026-10-04 裁定）。当前无使用者，随退场文件一并待清理。 */
+
+/* 用户主权更新：发现版本只提示，下载与安装都要明确确认。 */
+.update-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 22, 27, 0.38);
+  backdrop-filter: blur(4px);
+}
+.update-dialog[hidden] { display: none; }
+.update-card {
+  width: min(520px, 100%);
+  padding: 30px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
+}
+.update-card h2 { margin: 4px 0 8px; font-size: 28px; }
+.update-card progress { width: 100%; height: 8px; margin: 10px 0 4px; }
+.update-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 10px; }
+#update-open.has-update { color: var(--accent); border-color: var(--accent); }

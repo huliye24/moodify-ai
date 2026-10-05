@@ -10,6 +10,10 @@ const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('moodify', {
   env: () => ipcRenderer.invoke('env'),
+  updateStatus: () => ipcRenderer.invoke('update:status'),
+  updateCheck: () => ipcRenderer.invoke('update:check'),
+  updateAction: (action) => ipcRenderer.invoke('update:action', action),
+  onUpdateStatus: (cb) => ipcRenderer.on('update:status', (_e, payload) => cb(payload)),
   pickAudio: () => ipcRenderer.invoke('pick-audio'),
   // drag-drop: Electron 32+ removed File.path — resolve via webUtils
   pathForFile: (file) => {

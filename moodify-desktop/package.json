@@ -1,6 +1,6 @@
 {
   "name": "moodify-desktop",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.1-rc.1",
   "description": "Moodify — company desktop shell: pick a song, detect, read data & charts, get the repair/mixing plan. The core stays in moodify-core-package (pip); this shell orchestrates it.",
   "main": "src/main.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "runtime:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-windows-runtime.ps1",
     "dist:win": "npm run runtime:win && electron-builder --win nsis",
     "check:contracts": "node scripts/check-contracts.js",
-    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-recheck.js && node scripts/test-session.js && node scripts/test-keepsake.js && node scripts/test-sync.js && node scripts/test-orchestrator.js && node scripts/test-main-ipc.js && node scripts/test-studio.js",
+    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-recheck.js && node scripts/test-session.js && node scripts/test-keepsake.js && node scripts/test-sync.js && node scripts/test-orchestrator.js && node scripts/test-main-ipc.js && node scripts/test-studio.js && node scripts/test-update.js && node scripts/test-update-flow.js && node scripts/test-update-feed.js",
     "test:rls": "node ../deployment/supabase/tests/run_rls_tests.js"
   },
   "license": "GPL-3.0-only",
@@ -20,6 +20,7 @@
     "@openai/codex": "^0.160.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
+    "electron-updater": "^6.6.2",
     "node-pty": "^1.1.0"
   },
   "build": {
@@ -43,6 +44,13 @@
       {
         "from": "build/runtime",
         "to": "runtime"
+      }
+    ],
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://rongjingmusic.com/downloads/studio/windows/",
+        "channel": "latest"
       }
     ],
     "win": {

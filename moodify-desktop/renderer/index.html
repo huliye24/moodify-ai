@@ -17,6 +17,7 @@
     </div>
     <div class="top-actions">
       <span id="status-line" class="muted" hidden></span>
+      <button id="update-open" class="ghost" title="检查 Moodify Studio 更新">更新</button>
       <button id="perm-toggle" class="ghost" title="AI 编译器权限模式">权限：标准</button>
     </div>
   </header>
@@ -429,6 +430,23 @@
         </section>
       </div>
     </main>
+  </div>
+
+  <div id="update-dialog" class="update-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="update-title">
+    <div class="update-card">
+      <p class="eyebrow">Moodify Studio</p>
+      <h2 id="update-title">软件更新</h2>
+      <p id="update-version" class="muted"></p>
+      <p id="update-message">检查是否有新版本。</p>
+      <progress id="update-progress" max="100" value="0" hidden></progress>
+      <div class="update-actions">
+        <button id="update-primary" class="primary">检查更新</button>
+        <button id="update-later" class="ghost" hidden>稍后提醒</button>
+        <button id="update-skip" class="ghost" hidden>跳过此版本</button>
+        <button id="update-close" class="ghost">关闭</button>
+      </div>
+      <p class="muted caption">更新只在你确认后下载和安装。选择稍后或跳过时，当前版本会保持不变。</p>
+    </div>
   </div>
 
   <!-- 工程终端：默认隐藏，纯工程面（ffmpeg/python/CLI）；无 AI 通道 -->
