@@ -103,18 +103,34 @@ def _format_value(value: Any) -> str:
 _DB_UNITS = {"LUFS", "dBFS", "dB", "LU"}
 
 
+def _numeric_value(measurement: dict[str, Any]) -> float | None:
+    """The measurement's value as a float, or None when it is not a real number.
+
+    A report may legitimately carry a metric whose value could not be computed (Core writes
+    ``null`` rather than inventing a number). Such a metric simply cannot be plotted — it is
+    skipped, never defaulted to zero and never guessed at.
+    """
+    value = measurement.get("value")
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return float(value)
+
+
 def select_chart_measurements(measurements: list[dict[str, Any]]) -> dict[str, list[tuple[str, float]]]:
     """Split raw measurements into chart-ready series (pure, unit-honest).
 
     Bands share one ratio axis; loudness/level values share one dB axis;
     stereo ratios share a 0..1 axis. Values with other units are never
-    mixed onto an axis they do not belong to.
+    mixed onto an axis they do not belong to. Measurements without a
+    numeric value are dropped (and the chart says so by being empty), because
+    plotting ``None`` would either crash or require inventing a number.
     """
-    bands = [(m["id"], float(m["value"])) for m in measurements
-             if m.get("group") == "bands"]
-    levels = [(m["id"], float(m["value"])) for m in measurements
+    numeric = [(m, _numeric_value(m)) for m in measurements]
+    numeric = [(m, v) for m, v in numeric if v is not None]
+    bands = [(m["id"], v) for m, v in numeric if m.get("group") == "bands"]
+    levels = [(m["id"], v) for m, v in numeric
               if m.get("group") == "loudness" and m.get("unit") in _DB_UNITS]
-    stereo = [(m["id"], float(m["value"])) for m in measurements
+    stereo = [(m["id"], v) for m, v in numeric
               if m.get("group") == "stereo" and m.get("unit") == "ratio"]
     return {"bands": bands, "levels_db": levels, "stereo_ratios": stereo}
 

@@ -16,11 +16,18 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
-// Studio v0.2: the processing backend contract + the version layer. Both are plain
-// Node modules with no Electron import, so they can be exercised headlessly.
-const studioBackends = require('./backends');
-const studio = require('./studio');
+// V4 流程层：阶段推导与门禁（pipeline）、修音对与三出口账本（tuning）、三方对齐表（recheck）。
+// 三者都是纯 Node 模块，无 Electron 依赖，可 headless 测试。
+//
+// RETIRED 2026-10-04：`./backends` 与 `./studio`（Studio v0.2 的预设版本层）不再被本文件引用。
+// 三预设作为产品面已退场；两个文件仍留在磁盘上供审阅，待人类确认后删除。
+const tuning = require('./tuning');
+const recheck = require('./recheck');
 const pipeline = require('./pipeline');
+// 完成会话编排器（纯投影 + 重入保护）。阶段权威仍在 pipeline.js，它只是把进度折叠给用户看。
+const session = require('./session');
+// 调度循环本体（与 Electron 无关，步骤函数由本文件注入）—— 这样它能被 headless 测到。
+const { createOrchestrator } = require('./orchestrator');
 
 const CASES_ROOT = process.env.MOODIFY_CASES_ROOT
   || path.join(os.homedir(), '.moodify', 'cases');
@@ -62,6 +69,20 @@ function lastJsonLine(text) {
     try { return JSON.parse(trimmed); } catch { /* keep scanning */ }
   }
   return null;
+}
+
+/**
+ * 子进程最后一行非空输出 —— 长任务失败时的原因。
+ *
+ * 工具脚本（dsp_separate.py / basic-pitch / midi_to_musicxml.py）失败时，唯一有用的话
+ * 就在输出的最后一行（`ModuleNotFoundError: No module named 'librosa'` 之类）。
+ * 没有它，失败只会剩下一个退出码，而「缺少 Basic Pitch」这种真实原因正是用户需要看到的。
+ */
+function lastOutputLine(text, max = 300) {
+  const lines = String(text || '').trimEnd().split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (!lines.length) return null;
+  const line = lines[lines.length - 1];
+  return line.length > max ? line.slice(-max) : line;
 }
 
 function scanArchive() {
@@ -425,7 +446,10 @@ function registerIpc() {
   registerCodexIpc();
   registerResearchIpc();
   registerCompareIpc();
-  registerStudioV02Ipc();
+  registerTuningIpc();
+  registerReviewIpc();
+  registerKeepsakeIpc();
+  registerSessionIpc();
   registerPipelineIpc();
   ipcMain.handle('env', async () => {
     const probe = await runPython(['-c', 'import moodify'], 60 * 1000).catch(() => null);
@@ -445,32 +469,8 @@ function registerIpc() {
   ipcMain.handle('archive:list', async () => scanArchive());
   ipcMain.handle('report:read', async (_event, reportPath) =>
     JSON.parse(fs.readFileSync(reportPath, 'utf8')));
-  ipcMain.handle('analysis:run', async (_event, audioPath) => {
-    const result = await runPython([
-      '-m', 'moodify.release_cli', 'demo', audioPath,
-      '--cases-root', CASES_ROOT, '--no-open',
-    ]);
-    if (result.code !== 0) {
-      const payload = lastJsonLine(result.stderr);
-      throw new Error((payload && payload.error) || result.stderr.trim().slice(-500)
-        || `python exited with code ${result.code}`);
-    }
-    const payload = lastJsonLine(result.stdout);
-    // remember where the audio lives so the shell can draw its waveform
-    // (report.json carries only name/sha256); optional, never fatal
-    try {
-      const reportPath = payload && payload.reports && payload.reports.json;
-      if (reportPath) {
-        fs.writeFileSync(path.join(path.dirname(reportPath), 'source_path.json'),
-          JSON.stringify({ path: audioPath }, null, 2), 'utf8');
-      }
-      // T2 证据回流：检测完成自动落一条研究侧证据记录（不阻塞、不致命）
-      try {
-        if (reportPath) recordCaseEvidence(path.dirname(reportPath), 'detect', payload.status);
-      } catch { /* evidence bookkeeping is best-effort; never blocks analysis */ }
-    } catch { /* waveform is optional */ }
-    return payload;
-  });
+  // 真正的实现在 analyzeAudio()（完成会话编排器复用同一条路径，不复制第二份）
+  ipcMain.handle('analysis:run', async (_event, audioPath) => analyzeAudio(audioPath));
   ipcMain.handle('source:resolve', (_event, caseDir) => {
     try {
       const p = JSON.parse(fs.readFileSync(path.join(caseDir, 'source_path.json'), 'utf8'));
@@ -537,8 +537,11 @@ function runLong(kind, exe, args) {
     }
     longRuns.set(kind, child);
     let tail = '';
+    let output = ''; // 尾部输出留一份：失败时要能说清**为什么**失败，而不是只给一个退出码
     const feed = (d) => {
-      tail += d.toString('utf8');
+      const text = d.toString('utf8');
+      output = (output + text).slice(-4000);
+      tail += text;
       const lines = tail.split(/\r?\n/);
       tail = lines.pop();
       for (const line of lines) {
@@ -554,7 +557,13 @@ function runLong(kind, exe, args) {
     child.on('close', (code) => {
       longRuns.delete(kind);
       if (tail.trim()) send(tail.trim());
-      resolve({ ok: code === 0, code });
+      if (code === 0) { resolve({ ok: true, code }); return; }
+      // 非零退出必须带原因：调用方（完成会话编排器）要把它当成真实阻断显示给用户。
+      // 只回一个 code 的话，「缺少 Basic Pitch / 依赖没装 / 脚本报错」全都会变成
+      // 一句没有信息的「失败」——那和编造成功一样没用。
+      const reason = lastOutputLine(output)
+        || `子进程退出码 ${code}（无输出；工具：${kind}）`;
+      resolve({ ok: false, code, reason });
     });
   });
 }
@@ -586,56 +595,14 @@ function registerStudioToolIpc() {
   ipcMain.handle('casefiles:list', (_e, caseDir, subdir, exts) =>
     listCaseFiles(caseDir, subdir, exts));
 
-  // 快速分离（引擎 A）：源音频 → case/stems/ 四轨 + manifest.json
-  ipcMain.handle('stems:run', async (_e, caseDir) => {
-    const src = resolveCaseSource(caseDir);
-    if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
-    const outdir = path.join(caseDir, 'stems');
-    fs.mkdirSync(outdir, { recursive: true });
-    return runLong('stems', pyExe('basic-pitch'), [
-      path.join(TOOLS_ROOT, 'dsp_separate.py'), src, '--outdir', outdir,
-    ]);
-  });
+  // 快速分离（引擎 A）→ 实现在 separateStems()（完成会话编排器复用同一条路径）
+  ipcMain.handle('stems:run', async (_e, caseDir) => separateStems(caseDir));
 
-  // 音频 → MIDI（basic-pitch onnx）：输入限源音频或 case 内分离轨 → case/midi/
-  ipcMain.handle('midi:run', async (_e, caseDir, audioPath) => {
-    const src = resolveCaseSource(caseDir);
-    const allowed = (src && path.resolve(audioPath) === path.resolve(src))
-      || insideDir(caseDir, path.resolve(audioPath));
-    if (!allowed) return { ok: false, reason: '输入音频必须是世界源或 case 内分离轨' };
-    if (!fs.existsSync(audioPath)) return { ok: false, reason: '输入音频不存在' };
-    const bpExe = path.join(VENVS['basic-pitch'], 'Scripts', 'basic-pitch.exe');
-    if (!fs.existsSync(bpExe)) return { ok: false, reason: '未找到 basic-pitch（.venv-basic-pitch）' };
-    const outdir = path.join(caseDir, 'midi');
-    fs.mkdirSync(outdir, { recursive: true });
-    const res = await runLong('midi', bpExe, [
-      '--save-midi', '--model-serialization', 'onnx', outdir, audioPath,
-    ]);
-    if (res.ok) {
-      // 回传刚生成的 MIDI，渲染层据此立即续跑曲谱转换（无需再扫目录猜）
-      const base = path.basename(audioPath).replace(/\.[^.]+$/, '').toLowerCase();
-      const mids = listCaseFiles(outdir, '', ['.mid', '.midi']);
-      const mine = mids.find((m) => m.name.toLowerCase().startsWith(base)) || mids[0];
-      return { ...res, midi: mine ? mine.path : null };
-    }
-    return res;
-  });
+  // 音频 → MIDI → 实现在 transcribeMidi()（完成会话编排器复用同一条路径）
+  ipcMain.handle('midi:run', async (_e, caseDir, audioPath) => transcribeMidi(caseDir, audioPath));
 
-  // MIDI → MusicXML（music21）→ case/score/；渲染由壳内 OSMD 完成
-  ipcMain.handle('score:run', async (_e, caseDir, midiPath) => {
-    if (!insideDir(caseDir, path.resolve(midiPath))) {
-      return { ok: false, reason: 'MIDI 必须在世界目录内（case/midi/）' };
-    }
-    if (!fs.existsSync(midiPath)) return { ok: false, reason: 'MIDI 文件不存在' };
-    const outdir = path.join(caseDir, 'score');
-    fs.mkdirSync(outdir, { recursive: true });
-    const base = path.basename(midiPath).replace(/\.(mid|midi)$/i, '');
-    const out = path.join(outdir, `${base}.musicxml`);
-    const res = await runLong('score', pyExe('score'), [
-      path.join(TOOLS_ROOT, 'midi_to_musicxml.py'), midiPath, out,
-    ]);
-    return res.ok ? { ...res, musicxml: out } : res;
-  });
+  // MIDI → MusicXML；渲染由壳内 OSMD 完成 → 实现在 convertScore()
+  ipcMain.handle('score:run', async (_e, caseDir, midiPath) => convertScore(caseDir, midiPath));
 
   // 壳内曲谱渲染需要读 MusicXML 文本；只放行世界目录内文件
   ipcMain.handle('text:read', (_e, caseDir, filePath) => {
@@ -962,137 +929,567 @@ function recordFinishingEvidence(caseDir, preset, evidenceJsonPath) {
   return { ok: true, evidenceId: entry.evidence_id, stage: 'render', preset, operator_count: enabledNodes.length, count };
 }
 
-// ——— Studio v0.2：选目标 → 一键让 AI 处理 → 试听选择 → 导出 ———
+// ——— 可复用的真实步骤（IPC 与完成会话编排器共用，绝不写第二条实现）———
 //
-// 产品定义（人类 2026-10-03，APPROVED）：把歌丢进去，AI 自动试后处理，人只负责听和选。
-// 本节只做「接线」，不复制任何能力：
-//   后处理 = Core 的 `protocol process` 作业（内部是 v01_pipeline.process_audio）
-//   导出   = Core 的 `finishing export`（内部是 export_delivery）
-//   壳不实现 DSP、不算响度、不写音频字节，也不替用户做选择。
+// 每个函数就是界面上某个按钮背后真正做的事。编排器调用**同一批函数**，
+// 所以「一键完成」不会走一条只有它自己知道的路径——用户手动做的与自动做的是同一件事。
+
+/** 检测：源音频 → 新 case（report.json / measurements.json）+ source_path.json + 研究证据。失败抛错。 */
+async function analyzeAudio(audioPath) {
+  const result = await runPython([
+    '-m', 'moodify.release_cli', 'demo', audioPath,
+    '--cases-root', CASES_ROOT, '--no-open',
+  ]);
+  if (result.code !== 0) {
+    const payload = lastJsonLine(result.stderr);
+    throw new Error((payload && payload.error) || result.stderr.trim().slice(-500)
+      || `python exited with code ${result.code}`);
+  }
+  const payload = lastJsonLine(result.stdout);
+  // remember where the audio lives so the shell can draw its waveform
+  // (report.json carries only name/sha256); optional, never fatal
+  try {
+    const reportPath = payload && payload.reports && payload.reports.json;
+    if (reportPath) {
+      fs.writeFileSync(path.join(path.dirname(reportPath), 'source_path.json'),
+        JSON.stringify({ path: audioPath }, null, 2), 'utf8');
+    }
+    // T2 证据回流：检测完成自动落一条研究侧证据记录（不阻塞、不致命）
+    try {
+      if (reportPath) recordCaseEvidence(path.dirname(reportPath), 'detect', payload.status);
+    } catch { /* evidence bookkeeping is best-effort; never blocks analysis */ }
+  } catch { /* waveform is optional */ }
+  return payload;
+}
+
+/** 逆向分解：源音频 → case/stems/ 四轨 + manifest.json（预览级，见 V4 §5.2） */
+async function separateStems(caseDir) {
+  const src = resolveCaseSource(caseDir);
+  if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+  const outdir = path.join(caseDir, 'stems');
+  fs.mkdirSync(outdir, { recursive: true });
+  return runLong('stems', pyExe('basic-pitch'), [
+    path.join(TOOLS_ROOT, 'dsp_separate.py'), src, '--outdir', outdir,
+  ]);
+}
+
+/**
+ * 结构 1/2：音频 → MIDI。
+ *
+ * 当前 Core 的能力是「一个音频文件 → 一份 MIDI」，所以编排器用**源音频**作为输入
+ * （midi:run 明确允许源或 case 内分离轨）。逐轨 MIDI 要等 Core 具备逐轨能力，
+ * 这一限制记在 V4 §5.4，不在这里假装已经做到。
+ */
+async function transcribeMidi(caseDir, audioPath) {
+  const src = resolveCaseSource(caseDir);
+  const allowed = (src && path.resolve(audioPath) === path.resolve(src))
+    || insideDir(caseDir, path.resolve(audioPath));
+  if (!allowed) return { ok: false, reason: '输入音频必须是世界源或 case 内分离轨' };
+  if (!fs.existsSync(audioPath)) return { ok: false, reason: '输入音频不存在' };
+  const bpExe = path.join(VENVS['basic-pitch'], 'Scripts', 'basic-pitch.exe');
+  if (!fs.existsSync(bpExe)) return { ok: false, reason: '未找到 basic-pitch（.venv-basic-pitch）' };
+  const outdir = path.join(caseDir, 'midi');
+  fs.mkdirSync(outdir, { recursive: true });
+  const res = await runLong('midi', bpExe, [
+    '--save-midi', '--model-serialization', 'onnx', outdir, audioPath,
+  ]);
+  if (res.ok) {
+    // 回传刚生成的 MIDI，供紧接着的曲谱转换使用（不必再扫目录猜）
+    const base = path.basename(audioPath).replace(/\.[^.]+$/, '').toLowerCase();
+    const mids = listCaseFiles(outdir, '', ['.mid', '.midi']);
+    const mine = mids.find((m) => m.name.toLowerCase().startsWith(base)) || mids[0];
+    return { ...res, midi: mine ? mine.path : null };
+  }
+  return res;
+}
+
+/** 结构 2/2：MIDI → MusicXML（music21）→ case/score/ */
+async function convertScore(caseDir, midiPath) {
+  if (!insideDir(caseDir, path.resolve(midiPath))) {
+    return { ok: false, reason: 'MIDI 必须在世界目录内（case/midi/）' };
+  }
+  if (!fs.existsSync(midiPath)) return { ok: false, reason: 'MIDI 文件不存在' };
+  const outdir = path.join(caseDir, 'score');
+  fs.mkdirSync(outdir, { recursive: true });
+  const base = path.basename(midiPath).replace(/\.(mid|midi)$/i, '');
+  const out = path.join(outdir, `${base}.musicxml`);
+  const res = await runLong('score', pyExe('score'), [
+    path.join(TOOLS_ROOT, 'midi_to_musicxml.py'), midiPath, out,
+  ]);
+  return res.ok ? { ...res, musicxml: out } : res;
+}
+
+/**
+ * ⑥ 复检：对 A、B 各重跑一次**完整**检测，再交 recheck.js 做三方对齐。
+ *
+ * 复用 Core 既有分析（与 analyzeAudio 同一条 `demo` 路径），不新增第二套测量权威。
+ * 缺任一侧就拒绝——不留一张看起来"已复检"的空表。
+ */
+async function recheckPair(caseDir, pairId) {
+  const p = tuning.pairState(caseDir, pairId);
+  if (!p.composed) {
+    return { ok: false, reason: 'NEED_BOTH_SIDES',
+             detail: 'A、B 两侧都需先有 mix.wav 才能复检。' };
+  }
+
+  const origPath = path.join(caseDir, 'report.json');
+  const paths = { original: origPath, A: p.A.report, B: p.B.report };
+  const reports = { original: recheck.readReport(origPath), A: null, B: null };
+
+  for (const side of ['A', 'B']) {
+    const mix = pairSideAudio(p, side);
+    if (!mix) return { ok: false, reason: 'NEED_BOTH_SIDES', side };
+    // 每次复检用独立的 cases-root，避免覆盖上一次的分析 case
+    const outRoot = path.join(tuning.sideDir(caseDir, pairId, side), 'recheck-cases');
+    fs.mkdirSync(outRoot, { recursive: true });
+    const res = await runPython([
+      '-m', 'moodify.release_cli', 'demo', mix,
+      '--cases-root', outRoot, '--no-open',
+    ]);
+    if (res.code !== 0) {
+      return { ok: false, code: res.code, side,
+               reason: res.stderr.trim().slice(-300) || '复检检测失败' };
+    }
+    const payload = lastJsonLine(res.stdout);
+    const reportPath = payload && payload.reports && payload.reports.json;
+    if (!reportPath || !fs.existsSync(reportPath)) {
+      return { ok: false, reason: 'RECHECK_REPORT_MISSING', side };
+    }
+    reports[side] = recheck.readReport(reportPath);
+    paths[side] = reportPath;
+  }
+
+  const built = recheck.buildRecheck({
+    pairId, paths, reports, mode: (p.pair && p.pair.mode) || null,
+  });
+  if (!built.ok) return built;
+  recheck.writeRecheck(caseDir, pairId, built.payload);
+  return { ok: true, recheck: built.payload, gates: pipeline.snapshot(caseDir).gates };
+}
+
+// ——— ④修音 / ⑤复合 / ⑦选定（V4）———
+//
+// 产品方向（人类 2026-10-04 采纳）：**逆向工程 · 多轨复合**。
+// 一次修音产出**两档完整方案**（保守 / 充分），由系统生成，人只负责听和选。
+// 选定有**三个**出口：A / B / **保留原版**。第三出口是「最小变换」的落地——
+// 若两档都不如原版，人必须有路可退，系统也应主动推荐回原版。
+//
+// 本段只做「接线」与「记账」，不复制任何声音能力：
+//   快速完成的两档整轨渲染 = Core `tuning render-pair`（已实现，MIP-0002 附录 A）
+//   深度路径的逐轨修音 / 复合 = Core **尚未实现** → 显式拒绝 TUNABLE_CORE_NOT_AVAILABLE
+//   ⑥ 复检        = 对 A、B 各跑一次 Core 既有分析，再交 src/recheck.js 做三方对齐
+//   ⑧ 导出        = Core 的 `finishing export`
+//   壳不算响度、不写音频字节、不替用户做选择，**绝不留看起来像修音产物的假文件**。
+//
 // 所有 caseDir 先经 resolveGuardedCase：必须落在 CASES_ROOT 内且确实是 case。
 
-function registerStudioV02Ipc() {
-  const localBackend = studioBackends.getBackend('local');
+/**
+ * 快速完成（仅立体声）：一次 Core 调用生成一对完整候选（A 保守 / B 充分）。
+ *
+ * 「一键编排」与「只生成两档」按钮**共用这一个实现**——不写第二份接线，也不新建第二个编排器。
+ * 壳只做三件事：调 Core、核对磁盘上真的是完整一对、把 **Core 自己写的**理由原样带回。
+ * 它不算响度、不写音频、不猜参数。
+ */
+async function renderFastPair(dir) {
+  const src = resolveCaseSource(dir);
+  if (!src) {
+    return { ok: false, reason: 'NO_SOURCE',
+             detail: '未找到源音频（source_path.json 缺失或文件不存在）' };
+  }
+  const pairId = tuning.newPairId();
+  const pairDir = path.join(tuning.tuningDir(dir), pairId);
+  fs.mkdirSync(tuning.tuningDir(dir), { recursive: true });
 
-  // 目标清单由后端层提供，前端不硬编码 —— 新增预设时不会两边漂移。
-  ipcMain.handle('studio:targets', async () => ({
-    ok: true,
-    defaultTarget: localBackend.DEFAULT_TARGET,
-    defaultMode: studioBackends.DEFAULT_MODE,
-    backends: studioBackends.describeBackends(),
-    targets: localBackend.TARGETS.map((id) => ({
-      id, label: studio.targetLabel(id), available: true,
-    })),
-    // 产品书写了、但 Core 做不到的目标：显式列出并标记不可用。
-    // 不映射到别的预设 —— 按钮承诺什么就必须做什么。
-    planned: studio.PLANNED_TARGETS.map((p) => ({
-      id: p.id, label: studio.targetLabel(p.id), available: false, reason: p.reason,
-    })),
-  }));
+  const res = await runPython([
+    '-m', 'moodify.release_cli', 'tuning', 'render-pair',
+    '--mode', 'fast-stereo-only',
+    '--source', src,
+    '--output-dir', pairDir,
+    '--pair-id', pairId,
+  ]);
+  const payload = lastJsonLine(res.stdout);
+  if (res.code !== 0 || !payload || payload.status !== 'rendered') {
+    const err = lastJsonLine(res.stderr);
+    const reason = (err && err.error) || res.stderr.trim().slice(-300) || 'Core 未能生成两档候选';
+    // 失败时 Core 不发布任何 pair；这里如实报告磁盘上还剩什么，而不是「已清理」了事。
+    return {
+      ok: false, code: res.code, reason: 'RENDER_PAIR_FAILED', detail: reason,
+      leftover: fs.existsSync(pairDir) ? pairDir : null,
+    };
+  }
 
-  // 版本清单 = 原版（指向 case 源，不复制）+ 每次 AI 尝试。附上人类已做的选择。
-  ipcMain.handle('studio:versions', async (_e, caseDir) => {
+  // Core 说成功 ≠ 磁盘上真的是完整一对。阶段由产物推导，所以这里必须自己核对一遍。
+  const missing = [];
+  if (!fs.existsSync(path.join(pairDir, 'pair.json'))) missing.push('pair.json');
+  for (const side of ['A', 'B']) {
+    for (const rel of ['plan.json', 'evidence.json', 'mix.wav', path.join('tuned', 'source.wav')]) {
+      if (!fs.existsSync(path.join(pairDir, side, rel))) missing.push(`${side}/${rel}`);
+    }
+  }
+  if (missing.length) {
+    return {
+      ok: false, reason: 'PAIR_INCOMPLETE_ON_DISK',
+      detail: 'Core 报告成功，但磁盘上这一对不完整：' + missing.join('、'),
+      leftover: pairDir,
+    };
+  }
+  return { ok: true, pairId, pairDir, tiers: payload.tiers, checks: payload.checks, sides: payload.sides };
+}
+
+/** 一侧的整曲合成产物；没有就是 null（单边不成阶段）。 */
+function pairSideAudio(pair, side) {
+  const s = pair && pair[side];
+  return (s && s.mix) || null;
+}
+
+// ——— A/B 审听工作台的数据面（Phase 2.2，只读）———
+//
+// 工作台要展示的每一张频谱、每一个指标都必须是**真实产物**里的东西：候选自己那次复检的
+// report / scan 图，以及 pair 里 Core 写的 plan / evidence。所以路径全部由 main 侧从
+// recheck 产物**推导并守卫**，渲染层只拿到「可以读的东西」，拿不到「任意路径」。
+//
+// 这一层不算测量、不跑分析、不改证据：它只做三件事——把 recheck 引用的报告读出来、
+// 把 Core 已经生成的图找出来、把 Core 的指标按固定顺序摊成卡片数据。
+
+/** 审听卡片偏好顺序。值一律取自 recheck，缺失就写「不可对齐」，绝不补算。 */
+const REVIEW_CARD_METRICS = Object.freeze([
+  { id: 'integrated_lufs', label: '整体响度', unit: 'LUFS', digits: 2 },
+  { id: 'true_peak_dbfs', label: '真峰值', unit: 'dBFS', digits: 2 },
+  { id: 'sample_peak_dbfs', label: '采样峰值', unit: 'dBFS', digits: 2 },
+  { id: 'rms_dbfs', label: 'RMS 电平', unit: 'dBFS', digits: 2 },
+  { id: 'crest_factor_db', label: '波峰因数', unit: 'dB', digits: 2 },
+  { id: 'plr_db', label: '峰均比 PLR', unit: 'dB', digits: 2 },
+  { id: 'core_mid_500_2000_hz', label: '核心中频占比', unit: 'ratio', digits: 3 },
+  { id: 'low_mid_120_250_hz', label: '低中频占比', unit: 'ratio', digits: 3 },
+  { id: 'stereo_width_proxy', label: '立体声宽度', unit: 'ratio', digits: 3 },
+  { id: 'stereo_correlation', label: '声道相关性', unit: 'ratio', digits: 3 },
+  { id: 'spectral_centroid_hz', label: '频谱质心', unit: 'Hz', digits: 1 },
+  { id: 'clipping_sample_ratio', label: '削波比例', unit: 'ratio', digits: 4 },
+]);
+
+/**
+ * 把三方对齐表摊成该侧的审听卡片。
+ *
+ * 只在 alignable / not_alignable 里出现过的指标才会成为卡片——没被复检覆盖的指标不出现，
+ * 也绝不替 Core 补算一个值。`digits` 写死在这里，A/B 两页因此天然同精度（§3.3）。
+ */
+function buildReviewCards(alignment, side) {
+  if (!alignment) return [];
+  const alignable = new Set(Array.isArray(alignment.alignable) ? alignment.alignable : []);
+  const notAlignable = new Map(
+    (Array.isArray(alignment.not_alignable) ? alignment.not_alignable : [])
+      .map((x) => [x.name, x.reason]));
+  const cards = [];
+  for (const metric of REVIEW_CARD_METRICS) {
+    const { id } = metric;
+    if (alignable.has(id)) {
+      const column = alignment[side] || {};
+      const original = (alignment.original && alignment.original.metrics
+        && alignment.original.metrics[id]) || null;
+      const candidate = (column.metrics && column.metrics[id]) || null;
+      if (!original || !candidate) continue;
+      cards.push({
+        ...metric,
+        status: 'alignable',
+        original: original.value,
+        value: candidate.value,
+        // 原版对原版的变化是 0，不是「未定义」——这样任何消费者都不会打印出 Δ null。
+        delta: side === 'original' ? 0 : ((column.delta_vs_original || {})[id] ?? null),
+      });
+    } else if (notAlignable.has(id)) {
+      cards.push({ ...metric, status: 'not_alignable', reason: notAlignable.get(id) });
+    }
+  }
+  return cards;
+}
+
+/** 报告目录下 Core 已经生成的频谱图；不存在的直接不列（缺图由 UI 说缺图）。 */
+function sideSpectra(reportPath) {
+  const dir = path.join(path.dirname(reportPath), 'scan');
+  return [
+    { key: 'spectrum_log', label: '频谱（log）', file: path.join(dir, 'spectrum_log.png') },
+    { key: 'spectrum_linear', label: '频谱（linear）', file: path.join(dir, 'spectrum_linear.png') },
+  ].filter((s) => fs.existsSync(s.file)).map((s) => ({ key: s.key, label: s.label, path: s.file }));
+}
+
+/** 已经导出过的图表（由 tuning:charts 生成，同样落在该报告的 charts/ 下）。
+    文件名由 Core 的导出器决定（`chart_<name>.png`），这里只按它的命名去找，不猜。 */
+function sideCharts(reportPath) {
+  const dir = path.join(path.dirname(reportPath), 'charts');
+  const keys = ['bands', 'levels_db', 'stereo_ratios'];
+  const labels = { bands: '频段能量', levels_db: '电平 / 响度', stereo_ratios: '立体声分布' };
+  return keys
+    .map((key) => ({ key, label: labels[key], file: path.join(dir, `chart_${key}.png`) }))
+    .filter((c) => fs.existsSync(c.file))
+    .map((c) => ({ key: c.key, label: c.label, path: c.file }));
+}
+
+/**
+ * 一侧的证据包：报告 + 频谱 + 图表 + 卡片 + Core 写的 plan / evidence。
+ *
+ * 守卫：报告路径必须落在**本 case 内**且确实由这份 recheck 引用；候选侧的 plan / evidence
+ * 必须落在本 case 内。任一条不成立就拒绝，不给渲染层任何越界读取面。
+ */
+function sideEvidence(dir, pairId, side, alignment) {
+  const rc = recheck.readRecheck(dir, pairId);
+  if (!rc) return { ok: false, reason: 'NO_RECHECK' };
+  const key = side === 'ORIGINAL' ? 'original' : side;
+  const reportPath = rc[key] && rc[key].report;
+  if (!reportPath || !fs.existsSync(reportPath)) return { ok: false, reason: 'NO_REPORT', side };
+  let real;
+  let realCase;
+  try {
+    real = fs.realpathSync(reportPath);
+    realCase = fs.realpathSync(dir);
+  } catch { return { ok: false, reason: 'NO_REPORT', side }; }
+  if (!insideDir(realCase, real)) return { ok: false, reason: 'EVIDENCE_OUTSIDE_CASE', side };
+
+  const bundle = {
+    side,
+    reportPath: real,
+    spectra: sideSpectra(real),
+    charts: sideCharts(real),
+    cards: buildReviewCards(alignment, key),
+    isCandidate: side !== 'ORIGINAL',
+  };
+  if (side === 'ORIGINAL') {
+    bundle.source = resolveCaseSource(dir);
+    bundle.audio = Boolean(bundle.source);
+    return { ok: true, bundle };
+  }
+
+  const sideDir = tuning.sideDir(dir, pairId, side);
+  const planPath = path.join(sideDir, 'plan.json');
+  const evidencePath = path.join(sideDir, 'evidence.json');
+  const mixPath = path.join(sideDir, 'mix.wav');
+  const plan = fs.existsSync(planPath) ? JSON.parse(fs.readFileSync(planPath, 'utf8')) : null;
+  const evidence = fs.existsSync(evidencePath)
+    ? JSON.parse(fs.readFileSync(evidencePath, 'utf8')) : null;
+  bundle.audio = fs.existsSync(mixPath);
+  bundle.mixPath = bundle.audio ? mixPath : null;
+  bundle.planPath = fs.existsSync(planPath) ? planPath : null;
+  bundle.evidencePath = fs.existsSync(evidencePath) ? evidencePath : null;
+  bundle.tier = plan && plan.tier ? plan.tier : null;
+  bundle.calibrationStatus = (plan && plan.calibration_status)
+    || (evidence && evidence.calibration_status) || null;
+  // 处理链与门禁：直接取 Core 写的那份，不转述、不重算（只读展示，不可编辑）。
+  bundle.chain = evidence ? {
+    nodes: (evidence.tier && evidence.tier.parameters && evidence.tier.parameters.nodes) || [],
+    graphDigest: evidence.graph_digest_sha256 || null,
+    checks: Array.isArray(evidence.checks) ? evidence.checks : [],
+    reviewRequired: evidence.review_required === true,
+    composite: (plan && plan.composite) || null,
+    engineVersion: evidence.engine_version || null,
+  } : null;
+  return { ok: true, bundle };
+}
+
+function registerReviewIpc() {
+  // 工作台的一次性数据面。所有路径都由这里推导并守卫，渲染层不参与路径拼接。
+  ipcMain.handle('tuning:evidence', async (_e, caseDir, pairId) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    if (!pairId || !fs.existsSync(tuning.pairDir(dir, pairId))) {
+      return { ok: false, reason: 'NO_SUCH_PAIR' };
+    }
+    const rc = recheck.readRecheck(dir, pairId);
+    if (!rc) return { ok: false, reason: 'NO_RECHECK' };
+    const sides = {};
+    for (const side of ['ORIGINAL', 'A', 'B']) {
+      const one = sideEvidence(dir, pairId, side, rc);
+      if (!one.ok) return { ...one, pair_id: pairId };
+      sides[side] = one.bundle;
+    }
+    return {
+      ok: true,
+      pair_id: rc.pair_id || pairId,
+      mode: rc.mode || null,
+      sides,
+      // 对齐表的三方报告路径：数据守恒测试与 UI 都据此核对「A 页只绑 A」。
+      reports: {
+        original: (rc.original && rc.original.report) || null,
+        A: (rc.A && rc.A.report) || null,
+        B: (rc.B && rc.B.report) || null,
+      },
+    };
+  });
+
+  // 单个侧的检测图表：Core 的导出器按**该侧自己那份 report** 生成，落在该报告目录下。
+  // 这不是新测量，也不是第二套绘图权威——就是把 Core 已有的图渲染出来。
+  ipcMain.handle('tuning:charts', async (_e, caseDir, pairId, side) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    if (!['ORIGINAL', 'A', 'B'].includes(side)) return { ok: false, reason: 'BAD_SIDE' };
+    const rc = recheck.readRecheck(dir, pairId);
+    if (!rc) return { ok: false, reason: 'NO_RECHECK' };
+    const key = side === 'ORIGINAL' ? 'original' : side;
+    const reportPath = rc[key] && rc[key].report;
+    if (!reportPath || !fs.existsSync(reportPath)) return { ok: false, reason: 'NO_REPORT', side };
+    let real;
+    try { real = fs.realpathSync(reportPath); } catch { return { ok: false, reason: 'NO_REPORT', side }; }
+    if (!insideDir(fs.realpathSync(dir), real)) {
+      return { ok: false, reason: 'EVIDENCE_OUTSIDE_CASE', side };
+    }
+    const res = await runPython([
+      '-m', 'moodify.ui.chart_export', real, '--out', path.join(path.dirname(real), 'charts'),
+    ]);
+    if (res.code !== 0) {
+      return { ok: false, reason: res.stderr.trim().slice(-300) || 'chart export failed', side };
+    }
+    return { ok: true, side, charts: sideCharts(real), payload: lastJsonLine(res.stdout) };
+  });
+}
+
+function registerTuningIpc() {
+  // 修音对清单 + 门禁 + 可逆性状态 + 已做的选择。UI 靠它决定哪些动作可点。
+  ipcMain.handle('tuning:pairs', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const snap = pipeline.snapshot(dir);
+    const currentPairId = snap.info.currentPair ? snap.info.currentPair.pair_id : null;
     return {
       ok: true,
       source: resolveCaseSource(dir),
-      versions: studio.listVersions(dir, resolveCaseSource(dir)),
-      selection: studio.readSelection(dir),
-      meta: studio.readMeta(dir),
+      pairs: snap.info.pairs,
+      currentPairId,
+      decisions: snap.info.decisions,
+      roundtrip: snap.info.roundtrip,
+      // ⑦ 选定 每一对到底能不能选；不能就给出原因（与 appendDecision 同一条规则）。
+      // UI 靠它决定三个出口按钮是否可点——按钮必须与真实准入一致，否则点了只会被拒。
+      decidable: currentPairId ? tuning.canDecide(dir, currentPairId) : false,
+      decisionBlockers: Object.fromEntries(
+        snap.info.pairs.map((p) => [p.pair_id, tuning.decisionBlockers(dir, p.pair_id)]),
+      ),
+      decisionBacked: snap.info.decisionValid,
+      stage: snap.stage,
+      gates: snap.gates,
+      exits: [...tuning.EXITS],
     };
   });
 
-  // 「让 AI 处理」。每次调用落在**新的** attempt 目录：既满足 Core 的
-  // 「拒绝覆盖已存在输出」守卫，也满足产品书 2.2「再试一次不得静默覆盖已确认版本」。
-  ipcMain.handle('studio:process', async (_e, caseDir, target, mode) => {
+  // 生成两档完整方案。
+  //
+  // 分支顺序 = 用户的真实处境，逐条说实话：
+  //   ① 人已显式选择快速完成 → **真的调 Core** 生成一对整轨候选；
+  //   ② 深度路径被声明为可执行（能力清单里已有逐轨能力）→ 本壳尚未接这条线，如实拒绝；
+  //   ③ 连检测都没有 → 说清缺什么；
+  //   ④ 其余（深度资产可能齐备，但深度跑不了）→ 说清深度为什么跑不了，并告诉人可以**显式切换**。
+  // 快速路径可用**不会**解锁深度路径：这里的分支就是那条纪律的落点。
+  ipcMain.handle('tuning:render', async (_e, caseDir) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    const src = resolveCaseSource(dir);
-    if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
-
-    let backend;
-    try { backend = studioBackends.getBackend(mode || studioBackends.DEFAULT_MODE); }
-    catch (err) { return { ok: false, reason: err.message }; }
-
-    studio.ensureDirs(dir);
-    const attemptId = studio.newAttemptId();
-    const versionDir = studio.createAttemptDir(dir, attemptId);
-
-    const result = await backend.process(
-      { sourcePath: src, target, versionDir, attemptId },
-      { runPython, lastJsonLine },
-    );
-    // 失败时清掉空壳目录，避免版本列表里冒出没有音频的条目
-    if (!result.ok) {
-      try { fs.rmSync(versionDir, { recursive: true, force: true }); } catch { /* best effort */ }
-      return result;
+    const snap = pipeline.snapshot(dir);
+    if (snap.gates.canTuneQuick) {
+      const r = await renderFastPair(dir);
+      if (!r.ok) return r;
+      return { ...r, gates: pipeline.snapshot(dir).gates };
     }
-    studio.writeMeta(dir, { last_target: target, last_mode: backend.kind });
+    if (snap.gates.canTune) {
+      return {
+        ok: false,
+        reason: 'TUNABLE_CORE_NOT_AVAILABLE',
+        detail: '深度路径的逐轨修音 / 复合尚未接入本壳，本壳不会生成任何逐轨修音产物。',
+        planned: pipeline.PLANNED_CAPABILITIES.map((c) => ({ ...c })),
+      };
+    }
+    if (!snap.gates.baseReady) {
+      return { ok: false, reason: 'TUNE_LOCKED', blockers: snap.gates.tuneBlockers,
+               detail: snap.gates.tuneBlockers[0] || '前置条件未满足' };
+    }
+    // 深度路径现在不可执行（可逆性未验证/未通过，或逐轨能力未就绪）。
+    // 这不是「缺前置」而是「产品能力尚未就绪」，所以不能只说 TUNE_LOCKED：
+    // 必须把真实原因与**由人确认**的补救一起给出。
     return {
-      ok: true,
-      attemptId,
-      output: result.output,
-      // 产品书 1.3：导出前状态一律为「待人确认」。这里原样回传 Core 的状态，
-      // 前端不得把它显示成「已验证」。
-      status: result.evidence.status,
-      reviewRequired: result.evidence.review_required === true,
-      evidence: result.evidence,
-      versions: studio.listVersions(dir, src),
+      ok: false,
+      reason: 'DEEP_NOT_EXECUTABLE',
+      blockers: snap.gates.deepTuneBlockers,
+      deepBlockers: snap.gates.deepBlockers,
+      canSwitchToFast: Boolean(snap.gates.canRequestQuick),
+      detail: '深度路径现在不可执行：' + (snap.gates.deepTuneBlockers[0] || '前置条件未满足')
+        + (snap.gates.canRequestQuick
+          ? '。你可以显式切换到「快速完成（仅立体声）」（需要你确认，系统不会自动切换）。'
+          : '。'),
     };
   });
 
-  ipcMain.handle('studio:evidence', async (_e, caseDir, versionId) => {
+  // ⑦ 选定：A / B / 保留原版。只追加、不可修改；同一 requestId 重试幂等。
+  ipcMain.handle('tuning:decision', async (_e, caseDir, pairId, kept, role, requestId) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    const evidence = studio.readEvidence(dir, versionId);
-    return evidence ? { ok: true, evidence } : { ok: false, reason: 'NO_EVIDENCE' };
+    const r = tuning.appendDecision(dir, { pairId, kept, role, requestId });
+    if (!r.ok) return r;
+    return { ...r, decision: tuning.decisionFor(dir, pairId), gates: pipeline.snapshot(dir).gates };
   });
 
-  // 人类的选择：只有显式动作才会写入，永不自动。
-  ipcMain.handle('studio:select', async (_e, caseDir, versionId, note) => {
-    const dir = resolveGuardedCase(caseDir);
-    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    if (!versionId) return { ok: false, reason: 'NO_VERSION' };
-    return { ok: true, selection: studio.writeSelection(dir, { versionId, note }) };
-  });
-
-  // 试听某个版本。沿用 compare:audio 的守卫思路：音频必须落在本 case 内
-  // （原版是例外——它是 case 自己记录的源文件）。
-  ipcMain.handle('studio:audio', async (_e, caseDir, versionId) => {
+  // 试听 A / B / 原版。A、B 必须落在本 case 内；ORIGINAL 是本 case 自己记录的源。
+  // 渲染层递什么路径都读不到别的音频。
+  ipcMain.handle('tuning:audio', async (_e, caseDir, pairId, side) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) throw new Error('INVALID_CASE_DIR');
+    if (!tuning.EXITS.includes(side)) throw new Error('BAD_SIDE');
     let file;
-    if (versionId === 'original') {
+    if (side === 'ORIGINAL') {
       file = resolveCaseSource(dir);
     } else {
-      const v = studio.listVersions(dir, null).find((x) => x.id === versionId);
-      file = v && v.audioPath;
+      file = pairSideAudio(tuning.pairState(dir, pairId), side);
     }
     if (!file || !fs.existsSync(file)) throw new Error('AUDIO_NOT_AVAILABLE');
     const real = fs.realpathSync(file);
-    if (versionId !== 'original' && !insideDir(fs.realpathSync(dir), real)) {
+    if (side !== 'ORIGINAL' && !insideDir(fs.realpathSync(dir), real)) {
       throw new Error('AUDIO_OUTSIDE_CASE');
     }
     return fs.promises.readFile(real);
   });
 
-  // 导出：复用 Core 的 delivery 编码（export_delivery），再把结果复制到用户选定路径。
-  // 导出是**显式动作**：这里是唯一把音频写出 case 之外的地方。
-  ipcMain.handle('studio:export', async (event, caseDir, versionId) => {
+  // 读已产出的对齐表（⑥ 的产物）。
+  ipcMain.handle('tuning:recheck', async (_e, caseDir, pairId) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const r = recheck.readRecheck(dir, pairId);
+    return r ? { ok: true, recheck: r } : { ok: false, reason: 'NO_RECHECK' };
+  });
 
-    let audioPath;
-    if (versionId === 'original') {
-      audioPath = resolveCaseSource(dir);
-    } else {
-      const v = studio.listVersions(dir, null).find((x) => x.id === versionId);
-      audioPath = v && v.audioPath;
+  // ⑥ 复检：对 A、B 各重跑一次**完整**检测，再与原版逐指标对齐。
+  //
+  // 实现在 recheckPair()（完成会话编排器复用同一条路径）。
+  // 注意：本处理器在 Core 能产出 mix.wav 之前**不会被走到**（composed 为 false）。
+  // 它是 ⑥ 的接口契约，属 P2/P3 的对接面。
+  ipcMain.handle('tuning:recheckRun', async (_e, caseDir, pairId) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    return recheckPair(dir, pairId);
+  });
+
+  // ⑧ 导出：把选定的一侧（或原版）交给 Core 的 delivery 编码，再复制到用户选定路径。
+  // 这是唯一把音频写出 case 之外的地方，且是**显式动作**。
+  ipcMain.handle('tuning:export', async (event, caseDir, pairId, kept) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    if (!tuning.EXITS.includes(kept)) return { ok: false, reason: 'BAD_KEPT' };
+
+    // 出口必须与账本一致：不允许导出「没选过的东西」。
+    const decided = tuning.decisionFor(dir, pairId);
+    if (!decided || decided.kept !== kept) {
+      return { ok: false, reason: 'NOT_CHOSEN', detail: '请先在 ⑦ 选定这一出口。' };
     }
+    // 而且**此刻**仍要有一对完整候选撑着它：候选被删掉之后，「保留原版」不该还能把原版交出去。
+    // 与 appendDecision 同一条规则（validateDecision），不另立标准。
+    const stillValid = tuning.validateDecision(dir, { pairId, kept });
+    if (!stillValid.ok) {
+      return {
+        ok: false,
+        reason: 'CANDIDATES_INCOMPLETE',
+        blockers: stillValid.blockers || [],
+        detail: stillValid.detail || 'A / B 候选或复检产物已不完整，导出被拒绝。',
+      };
+    }
+
+    const audioPath = kept === 'ORIGINAL'
+      ? resolveCaseSource(dir)
+      : pairSideAudio(tuning.pairState(dir, pairId), kept);
     if (!audioPath || !fs.existsSync(audioPath)) return { ok: false, reason: 'AUDIO_NOT_AVAILABLE' };
 
-    const outDir = studio.exportDir(dir);
+    const outDir = path.join(dir, 'studio', 'export');
     fs.mkdirSync(outDir, { recursive: true });
     const res = await runPython([
       '-m', 'moodify.release_cli', 'finishing', 'export',
@@ -1106,27 +1503,25 @@ function registerStudioV02Ipc() {
       return { ok: false, reason: '导出命令成功但未找到产物' };
     }
 
-    const suggested = path.basename(exported.output);
     const win = BrowserWindow.fromWebContents(event.sender);
     const picked = await dialog.showSaveDialog(win, {
       title: '导出音频',
-      defaultPath: suggested,
+      defaultPath: path.basename(exported.output),
       filters: [{ name: 'WAV 音频', extensions: ['wav'] }],
     });
     if (picked.canceled || !picked.filePath) {
       // 用户取消：case 内的导出产物保留（它是记录），但不写到用户路径
       return { ok: false, canceled: true, reason: '已取消导出' };
     }
-    try {
-      fs.copyFileSync(exported.output, picked.filePath);
-    } catch (err) {
-      return { ok: false, reason: '写入目标路径失败：' + err.message };
-    }
+    try { fs.copyFileSync(exported.output, picked.filePath); }
+    catch (err) { return { ok: false, reason: '写入目标路径失败：' + err.message }; }
 
-    // 导出记录：写进 case，供日后回答「导出的是哪一版」
+    // 导出记录写明「导出的是哪一对、哪一个出口」——选了 ORIGINAL 也要能日后指出来
     const record = {
-      schema: 'moodify.studio.export/0.1',
-      version_id: versionId,
+      schema: 'moodify.studio.export/0.2',
+      pair_id: pairId,
+      kept,
+      chosen_at: decided.at || null,
       source_audio: audioPath,
       case_output: exported.output,
       user_path: picked.filePath,
@@ -1142,13 +1537,310 @@ function registerStudioV02Ipc() {
   });
 }
 
-// ——— 生产流程（TASK 002A）：检测 → 问题 → 分轨 → 结构 → 方案 → 成品 ———
+// ——— 完成会话（「一键完成机」· Phase 1）———
 //
-// 产品原则：**先理解，再分解，再规划，最后处理**。分析后立刻处理立体声母带是错的，
-// 分解之前就让 AI 出方案同样是错的——⑤ 方案在 分轨 + MIDI 齐备前保持锁定。
-// 本节只暴露「流程状态 + 诊断产物 + context 包」，不含任何音频算法：
+// 产品形态：放入一首歌 → 一次启动 → 内部自动执行 → 原版 / A / B → 人选择 → 导出。
+//
+// 「一键」只简化**用户操作**：
+//   · 不省略内部步骤 —— 检测 → 逆向分解 → 结构 → 可逆性 → 修音/复合 → 复检，一步不少；
+//   · 不把未实现能力伪装成成功 —— 缺能力时停在真实阻断态，并说清「本次没有生成任何候选」；
+//   · 不维护第二套状态机 —— 每一轮都从磁盘重新推导（pipeline.snapshot），
+//     编排队列只是对唯一权威的投影（调度循环本身在 src/orchestrator.js）。
+//
+// 这里只提供两样东西：**真实步骤函数**（与手动按钮共用同一批，绝不写第二条实现），
+// 以及 IPC 接线。
+
+/**
+ * ① 检测 这一步在会话里的真实行为。
+ *
+ * 为什么不是「直接再检测一次」：Core 的检测（`moodify demo` → `analyze_to_case`）
+ * **总是新建一个 case 目录**（case_id 新生成，`mkdir(exist_ok=False)`），它无法把
+ * report.json 补写进一个已经存在的 case。所以对一个没有 report.json 的世界来说，
+ * 「再检测一次」并不会让这一步完成，只会造出一个同名的孤儿 case —— 反复重试就是反复造垃圾。
+ *
+ * 因此这里如实拒绝，并给出唯一真正可行的补救（重新导入，检测会建立新的世界）。
+ * 会话自己不修 case：把别人的产物搬进这个目录才是真正不许发生的事。
+ */
+async function sessionAnalyze(dir) {
+  if (pipeline.snapshot(dir).info.hasReport) return { ok: true, skipped: true };
+  const src = resolveCaseSource(dir);
+  return {
+    ok: false,
+    reason: 'CASE_WITHOUT_REPORT',
+    detail: '这个还没有检测产物（缺 report.json），而 Core 的检测总是新建一个世界，'
+      + '无法就地补写。请用「打开音频」重新导入'
+      + (src ? `这首歌（${path.basename(src)}）` : '这首歌')
+      + '，检测会建立一个新的世界。本壳不会把检测结果搬进别的目录，也不会重复新建世界。',
+  };
+}
+
+/** ③ 结构：音频 → MIDI（必需）→ 曲谱（派生解读，失败不阻断）。 */
+async function sessionStructure(dir) {
+  const src = resolveCaseSource(dir);
+  if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+  const midi = await transcribeMidi(dir, src);
+  if (!midi.ok) return midi;
+  if (!midi.midi) return { ok: false, reason: '未生成 MIDI 文件' };
+  // 曲谱是派生解读，转不出来不阻断主流程（MIDI 才是机器可读结构）
+  const score = await convertScore(dir, midi.midi);
+  return {
+    ok: true,
+    midi: midi.midi,
+    score: score.ok ? score.musicxml : null,
+    scoreSkipped: score.ok ? null : (score.reason || '曲谱转换失败'),
+  };
+}
+
+/**
+ * ④修音 / ⑤复合 这一步在会话里的真实行为。
+ *
+ * 快速完成（仅立体声）已经由 Core 实现：一次调用产出 A 保守 / B 充分两个完整整轨候选。
+ * 深度路径（逐轨音准与节奏修正）仍然是 Core 不具备的能力，继续如实拒绝——
+ * 快速路径可用**不是**深度路径的解锁理由。
+ */
+async function sessionTune(dir) {
+  const snap = pipeline.snapshot(dir);
+  if (snap.gates.canTuneQuick) {
+    const r = await renderFastPair(dir);
+    return r.ok ? { ok: true, ...r } : r;
+  }
+  if (snap.gates.canTune) {
+    return {
+      ok: false,
+      reason: 'TUNABLE_CORE_NOT_AVAILABLE',
+      detail: '深度路径的逐轨修音 / 复合尚未接入本壳；本壳不生成任何逐轨修音产物。',
+    };
+  }
+  return {
+    ok: false,
+    reason: 'DEEP_NOT_EXECUTABLE',
+    detail: '深度路径现在不可执行：' + (snap.gates.deepTuneBlockers[0] || '前置条件未满足')
+      + (snap.gates.canRequestQuick
+        ? '。可以显式切换到「快速完成（仅立体声）」（需要你确认）。'
+        : '。'),
+  };
+}
+
+/** ⑥ 复检：对当前修音对的两侧各重跑一次完整检测，再做三方对齐。 */
+async function sessionRecheck(dir) {
+  const pair = pipeline.snapshot(dir).info.currentPair;
+  if (!pair) return { ok: false, reason: 'NO_PAIR', detail: '还没有修音对，无从复检。' };
+  return recheckPair(dir, pair.pair_id);
+}
+
+// 相位 → 真实步骤。键与 session.PHASES[].run 一一对应（测试会钉住这一点）。
+const SESSION_STEPS = Object.freeze({
+  analyze: sessionAnalyze,
+  separate: separateStems,
+  structure: sessionStructure,
+  tune: sessionTune,
+  recheck: sessionRecheck,
+});
+
+const orchestrator = createOrchestrator({
+  snapshot: (dir) => pipeline.snapshot(dir),
+  resolveCaseSource,
+  steps: SESSION_STEPS,
+});
+
+const sessionView = orchestrator.sessionView;
+const runCompletionSession = orchestrator.runCompletionSession;
+
+// ——— 完成时刻的留存（Phase 2.3）———
+//
+// 「完成」不是一个新的状态权威：它由既有事实推导——有效 decision（tuning 的 ⑦ 准入：
+// pair 存在 + A/B 两侧候选 + 真实复检）+ 该 decision 指向的那一侧音频还在。
+// `keepsake.json` 只是**表现层留存记录**：它记录选的是哪一版、什么时候、人写的一句话和
+// 波形印记。它读不出完成状态，也不能让阶段前进或解锁导出（keepsake 永远在下游）。
+
+const keepsake = require('./keepsake');
+
+/** 源曲名（不含扩展名）。只用于标题与作品卡文件名。 */
+function caseTitle(dir) {
+  try {
+    const report = JSON.parse(fs.readFileSync(path.join(dir, 'report.json'), 'utf8'));
+    const name = report && report.source && report.source.name;
+    if (name) return path.basename(String(name), path.extname(String(name)));
+  } catch { /* fall through to the recorded source path */ }
+  const src = resolveCaseSource(dir);
+  if (src) return path.basename(src, path.extname(src));
+  return path.basename(dir);
+}
+
+/**
+ * 完成状态投影（只读）。
+ *
+ * complete 只可能来自 `tuning.decisionBacked()` —— 手写的假记录、被删掉候选之后的记录、
+ * 或者没有记录的 case 都得不到完成层。
+ */
+function completionState(dir) {
+  const snap = pipeline.snapshot(dir);
+  const backed = tuning.decisionBacked(dir);
+  const decision = backed.decision || null;
+  const complete = Boolean(backed.valid && decision);
+  const pairId = complete ? decision.pair_id : null;
+  const pair = complete
+    ? (snap.info.pairs.find((p) => p.pair_id === pairId) || null)
+    : null;
+  const selected = complete ? decision.kept : null;
+  const selectedAudio = !complete ? null
+    : (selected === 'ORIGINAL' ? resolveCaseSource(dir) : pairSideAudio(pair, selected));
+  const audioAvailable = Boolean(selectedAudio && fs.existsSync(selectedAudio));
+
+  const record = keepsake.readKeepsake(dir);
+  const stored = record.keepsake || {};
+  const tierLabel = pair && pair.mode === 'FAST_STEREO_ONLY'
+    ? '快速完成（仅立体声）'
+    : (pair && pair.mode === 'DEEP' ? '深度完成' : null);
+  const completedAt = complete ? (decision.at || null) : null;
+
+  return {
+    ok: true,
+    complete,
+    // 为什么还没有完成层：直接引用 ⑦ 的真实原因，不另编一套
+    reason: complete ? null : (backed.reason || 'NOT_COMPLETE'),
+    blockers: complete ? [] : (backed.blockers || []),
+    selected,
+    selectedLabel: selected ? session.exitLabel(selected) : null,
+    pairId,
+    title: caseTitle(dir),
+    tierLabel,
+    completedAt,
+    audioAvailable,
+    audioPath: audioAvailable ? selectedAudio : null,
+    decisionRequestId: complete ? (decision.request_id || null) : null,
+    // 留存内容（非权威）：读不出来就是空的，声音流程不受影响
+    inscription: typeof stored.inscription === 'string' ? stored.inscription : '',
+    imprint: Array.isArray(stored.imprint) ? stored.imprint : null,
+    imprintBuckets: keepsake.IMPRINT_BUCKETS,
+    inscriptionMax: keepsake.INSCRIPTION_MAX_CHARS,
+    inscriptionMaxLines: keepsake.INSCRIPTION_MAX_LINES,
+    storedSelection: stored.selected || null,
+    keepsakeError: record.error,
+    keepsakeAge: stored.updated_at || null,
+    // 作品卡能画的东西只有这些字段（不含 id / 路径 / hash）
+    card: keepsake.cardModel({
+      title: caseTitle(dir), selected, completedAt, inscription: stored.inscription, tierLabel,
+    }),
+  };
+}
+
+function registerKeepsakeIpc() {
+  const guard = (caseDir) => resolveGuardedCase(caseDir);
+
+  // 只读投影。渲染层据它决定「进完成层还是进 A/B 审听」。
+  ipcMain.handle('keepsake:state', async (_e, caseDir) => {
+    const dir = guard(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    return completionState(dir);
+  });
+
+  // 把当前有效 decision 投影进留存记录（selected / completed_at / request_id）。
+  // 文字与波形印记不动；没有有效 decision 时拒绝写入（完成层消失，但旧文字留着）。
+  ipcMain.handle('keepsake:sync', async (_e, caseDir) => {
+    const dir = guard(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const state = completionState(dir);
+    if (!state.complete) return { ok: false, reason: state.reason || 'NOT_COMPLETE' };
+    const res = keepsake.writeKeepsake(dir, {
+      case_id: path.basename(dir),
+      decision_request_id: state.decisionRequestId,
+      selected: state.selected,
+      completed_at: state.completedAt,
+    });
+    return res.ok ? { ok: true, keepsake: res.keepsake, state: completionState(dir) } : res;
+  });
+
+  // 一句私人文字：可选、本地、可编辑可清空。清空就是普通编辑（写空串），没有确认弹窗。
+  ipcMain.handle('keepsake:inscription', async (_e, caseDir, text) => {
+    const dir = guard(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const valid = keepsake.validateInscription(text);
+    if (!valid.ok) return valid;
+    const existing = keepsake.readKeepsake(dir).keepsake;
+    const state = completionState(dir);
+    if (!existing && !state.complete) {
+      // 还没有任何留存记录、也还没完成：没有东西可以附着，拒绝写入而不是凭空造一条
+      return { ok: false, reason: 'NOT_COMPLETED' };
+    }
+    const res = keepsake.writeKeepsake(dir, { inscription: valid.text });
+    return res.ok ? { ok: true, inscription: res.keepsake.inscription } : res;
+  });
+
+  // 波形印记：渲染层从**已解码的最终音频**算出峰值，这里只做定长/限幅/舍入后落盘。
+  ipcMain.handle('keepsake:imprint', async (_e, caseDir, values) => {
+    const dir = guard(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const state = completionState(dir);
+    if (!state.complete) return { ok: false, reason: state.reason || 'NOT_COMPLETE' };
+    const imprint = keepsake.normalizeImprint(values);
+    if (!imprint.length) return { ok: false, reason: 'EMPTY_IMPRINT' };
+    const res = keepsake.writeKeepsake(dir, { imprint });
+    return res.ok ? { ok: true, imprint: res.keepsake.imprint } : res;
+  });
+
+  // 作品卡：渲染层画好 PNG 字节，这里只负责系统保存对话框与落盘（唯一写出 case 的地方）。
+  ipcMain.handle('keepsake:saveCard', async (event, caseDir, bytes) => {
+    const dir = guard(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const state = completionState(dir);
+    if (!state.complete) return { ok: false, reason: state.reason || 'NOT_COMPLETE' };
+    const buffer = Buffer.isBuffer(bytes) ? bytes
+      : (bytes instanceof ArrayBuffer ? Buffer.from(new Uint8Array(bytes)) : Buffer.from(bytes || []));
+    if (!buffer.length) return { ok: false, reason: 'EMPTY_PNG' };
+
+    const win = BrowserWindow.fromWebContents(event.sender);
+    let defaultPath = keepsake.defaultCardFileName(state.title);
+    try { defaultPath = path.join(app.getPath('pictures'), defaultPath); } catch { /* 没有图片目录就退到纯文件名 */ }
+    const picked = await dialog.showSaveDialog(win, {
+      title: '保存作品卡',
+      defaultPath,
+      filters: [{ name: 'PNG 图片', extensions: ['png'] }],
+    });
+    if (picked.canceled || !picked.filePath) return { ok: false, canceled: true };
+    try {
+      fs.writeFileSync(picked.filePath, buffer);
+    } catch (err) {
+      return { ok: false, reason: 'CARD_WRITE_FAILED', detail: err && err.message };
+    }
+    return { ok: true, path: picked.filePath, bytes: buffer.length };
+  });
+}
+
+function registerSessionIpc() {
+  // 读会话状态（不执行任何步骤）。EMPTY 由渲染层处理：没有 case 就没有会话。
+  ipcMain.handle('session:view', async (_e, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    return { ok: true, view: sessionView(dir) };
+  });
+
+  // 一键启动。已完成的步骤跳过，所以重复启动是安全的（上一次真实失败也会在这次重新尝试，
+  // 因为失败记录只影响显示、不影响控制流）；**并发**启动被显式拒绝——
+  // 两次并发会在同一个 case 目录里交错写产物，那是最难排查的一类损坏。
+  ipcMain.handle('session:start', async (event, caseDir) => {
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    if (!session.acquire(dir)) {
+      return { ok: false, reason: 'ALREADY_RUNNING', view: sessionView(dir) };
+    }
+    try {
+      return await runCompletionSession(event, dir);
+    } finally {
+      session.release(dir);
+    }
+  });
+}
+
+// ——— 生产流程（V4）：检测 → 逆向分解 → 结构 → 修音 → 复合 → 复检 → 选定 → 导出 ———
+//
+// 产品原则：**先理解，再分解，再修音，再复合，最后复检**。
+// 本节只暴露「流程状态 + context 包」，不含任何音频算法：
 //   阶段由磁盘产物**推导**（见 src/pipeline.js），不是人手推进，也不会谎报。
-//   诊断严格是 Core report.json 的投影，每条 issue 带 evidence 指针指回原 finding。
+//   context 只引用已存在的产物；`preserve`（该保护什么）是听觉判断，由人填。
+//
+// ②问题 已退场（2026-10-04）：Core 的 findings 仍在 ①检测 的 report 里可见，
+// 但不再单设阶段与 IPC。诚实要求不变——「无 finding」只能说「当前规则未发现技术问题」。
 
 function registerPipelineIpc() {
   // 流程快照：当前阶段 + 各阶段事实 + 门禁。UI 靠它决定哪些阶段可进入。
@@ -1166,52 +1858,25 @@ function registerPipelineIpc() {
       facts: snap.facts,
       record,
       stages: pipeline.STAGES,
+      // 计划中的能力随快照一起给 UI，好让「未就绪」有出处而不是一句含糊的提示
+      plannedCapabilities: pipeline.PLANNED_CAPABILITIES.map((c) => ({ ...c })),
     };
   });
 
-  // 生成/刷新诊断产物。纯投影，不新增判断。
-  ipcMain.handle('pipeline:diagnose', async (_e, caseDir) => {
-    const dir = resolveGuardedCase(caseDir);
-    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    const diagnosis = pipeline.buildDiagnosis(dir);
-    if (!diagnosis) return { ok: false, reason: 'NO_REPORT' };
-    pipeline.writeDiagnosis(dir, diagnosis);
-    return {
-      ok: true,
-      diagnosis,
-      stage: pipeline.snapshot(dir).stage,
-    };
-  });
-
-  ipcMain.handle('pipeline:diagnosis', async (_e, caseDir) => {
-    const dir = resolveGuardedCase(caseDir);
-    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    const d = pipeline.readDiagnosis(dir);
-    return d ? { ok: true, diagnosis: d } : { ok: false, reason: 'NO_DIAGNOSIS' };
-  });
-
-  // 人类批注 / 声明该保护什么。「该保护什么」是听觉判断，只能由人写。
-  ipcMain.handle('pipeline:note', async (_e, caseDir, note, preserve) => {
-    const dir = resolveGuardedCase(caseDir);
-    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    const next = pipeline.addHumanNote(dir, { note, preserve });
-    return next ? { ok: true, diagnosis: next } : { ok: false, reason: 'NO_DIAGNOSIS' };
-  });
-
-  // 构建 context 包（§9）：只引用不复制，且只写真实存在的路径。
+  // 构建 context 包：只引用不复制，且只写真实存在的路径。
+  // 这是 ④修音 的输入（分轨 / MIDI / 可逆性状态 / 计划中能力），不再是「方案」产物——
+  // ⑤方案 已并入 ④，两档参数由 Core 的 tuning 产出。
   ipcMain.handle('pipeline:context', async (_e, caseDir) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
-    // 方案必须晚于分解：缺 检测/问题/分轨/MIDI 中任何一项都拒绝，且不写任何产物。
-    const prepared = pipeline.preparePlan(dir);
-    if (!prepared) return { ok: false, reason: 'NEED_DEEP_PREREQUISITES' };
+    const context = pipeline.buildContext(dir);
+    const file = pipeline.writeContext(dir, context);
     return {
       ok: true,
-      context: prepared.context,
-      path: prepared.contextFile,
-      plan: prepared.plan,
-      planPath: prepared.planFile,
+      context,
+      path: file,
       stage: pipeline.snapshot(dir).stage,
+      gates: pipeline.snapshot(dir).gates,
     };
   });
 
@@ -1223,9 +1888,14 @@ function registerPipelineIpc() {
   });
 
   // 显式选择「快速完成（仅立体声）」。
-  // 这是**人类决定**，不是一个 UI 开关：深度完成需要 SEPARATED + STRUCTURED；
+  // 这是**人类决定**，不是一个 UI 开关：深度路径需要 分轨 + MIDI + 可逆性通过 + 逐轨能力；
   // 跳过它必须由人主动选择，并留下可追溯的记录（finish_mode.json）。
   // 绝不自动解锁——否则快捷路径会变成默认路径。
+  // 注意：快速路径同样必须走 ⑤复合 → ⑥复检 → ⑦选定 才能导出（跳过的是分解，不是验证）。
+  //
+  // 2026-10-04 裁定（Phase 2.1）：**已经有分轨 / MIDI 的 case 也可以切换**。
+  // 旧的「深度资产齐备就不给快速入口」在逐轨能力未实现时是一条死路。切换只写这一份记录：
+  // 不生成音频、不删除/移动任何深度资产、不改动任何已有 pair 或账本。
   ipcMain.handle('pipeline:setFinishMode', async (_e, caseDir, mode) => {
     const dir = resolveGuardedCase(caseDir);
     if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
@@ -1233,9 +1903,11 @@ function registerPipelineIpc() {
       return { ok: false, reason: 'BAD_MODE' };
     }
     const snap = pipeline.snapshot(dir);
-    if (mode === 'QUICK_STEREO_ONLY' && !snap.gates.baseReady) {
-      // 连分析与诊断都没完成时，连「快速」都谈不上
-      return { ok: false, reason: 'NEED_ANALYZE_AND_DIAGNOSE' };
+    if (mode === 'QUICK_STEREO_ONLY') {
+      // 连检测都没完成时，连「快速」都谈不上
+      if (!snap.gates.baseReady) return { ok: false, reason: 'NEED_ANALYZE' };
+      // 快速路径本身不可用时不能记录成「已选择」——那会写下一个跑不通的模式
+      if (!snap.gates.fastAvailable) return { ok: false, reason: 'FAST_NOT_AVAILABLE' };
     }
     const record = pipeline.recordFinishMode(dir, mode, '用户显式选择');
     return { ok: true, finishMode: record, gates: pipeline.snapshot(dir).gates };

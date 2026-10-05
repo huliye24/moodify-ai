@@ -39,3 +39,22 @@
 | docs/AUDITORY_INTELLIGENCE_ARCHITECTURE.md | INTERNAL | 内部系统参考 |
 | docs/ASSET_MODEL.md | INTERNAL | 认知基础设施 |
 | 历史任务书 / 历史补丁包 | 第 8 级 | 不能反向覆盖当前 Canon |
+
+## 三种权威（Phase 3A，2026-10-04）
+
+Identity / Account / Personal History 引入两类**新的、彼此独立**的权威。它们不覆盖、不合并、
+也不降级既有的声音生产权威。三者不得混为一体：
+
+1. **声音生产事实权威** — 本地 case 目录 + Core 产物；`moodify-desktop/src/pipeline.js` 仍是阶段权威，
+   `<case>/studio/tuning/decisions.jsonl` 仍是选择权威。
+2. **账户身份权威** — 认证服务（Supabase Auth）签发的 user identity。它只回答「你是谁」，
+   不回答「你的歌处理到哪一步」。
+3. **个人历史同步权威** — 账户私有的 append-only history events + 服务端投影。它只回答
+   「你曾经完成过什么」，是**记忆**，不是声音状态。
+
+**冲突判定（不可协商）：** 云端 history 与本地 case 冲突时，本地胜出；云端不得把本地 case
+推进到 CHOSEN / EXPORTED，也不得自动改写 `decisions.jsonl`。本地 case 被删除后，云端历史仍可
+作为记忆存在，但必须显示「音频仅在原设备」，不得呈现为可播放。
+
+账户服务不可用（未配置 / 断网 / 停机 / 登录失败）时，第 1 条权威必须保持完整可用——
+这是本阶段的停止条件之一，不是体验优化。

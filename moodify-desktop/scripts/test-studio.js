@@ -1,5 +1,15 @@
 #!/usr/bin/env node
 /**
+ * ⚠️ 覆盖对象已退场 2026-10-04 — 本文件测的是 Studio v0.2 的**预设版本层**
+ * （src/studio.js + src/backends/），而那层作为产品面已随三预设一并退场，
+ * 不再被 main.js 引用。保留它的原因：这是对该冻结层的回归测试，
+ * 能在删除前证明「退场没有顺手改坏 Core 的处理链」。
+ *
+ * V4 的主流程（④修音 / ⑤复合 / ⑦选定）由 scripts/test-pipeline.js 覆盖；
+ * 真实 Core 的 tuning 链要等 MIP-0002 落地后另写（P4）。
+ *
+ * ────────────────────────────────────────────────────────────────────────────
+/**
  * Headless test for the Studio v0.2 post-processing path.
  *
  * WHY THIS EXISTS

@@ -48,6 +48,21 @@ Public Brand 的品牌信念、语言层级和三站职责以 [`docs/brand/publi
 - 强迫用户选择工程预设
 - 把 Ear 作为第二个公开产品
 - 用未验证的云端能力作为宣传点
+- 公共主页 / 关注 / 粉丝 / 动态流 / 排行榜 / 评论 / 点赞 / 公开作品发布平台 / 广告画像
+  （2026-10-04 人类批准 Identity / Account / Personal History，但明确不批准上述任何一项）
+
+## Identity / Account / Personal History boundary（2026-10-04 人类批准，Phase 3A）
+
+**允许：** account / login / 受控云端 metadata / Desktop history sync。
+**默认禁止上传：** 音频、stems、MIDI、曲谱、report/evidence、频谱图片、Mix Graph 全量参数、
+本地绝对路径、源音频 hash、终端日志、搜索历史、收听时长与细粒度行为。
+
+云端只有账户私有、白名单的轻量 metadata（标题、完成时间、最终选择、可选的一句话、粗粒度历史事件）。
+跨设备可见历史，**不等于**跨设备可听：没有本地音频必须显示「音频仅在原设备」，且不提供播放按钮。
+
+**Evidence boundary（延续）：** 不得把「账户服务已接入」写成「已上线」——真实账户能力以运行时证据
+（两个测试账户的真实登录、RLS 隔离、同步幂等与删除语义）为准；未取得凭据时状态为 `DEPLOYMENT_BLOCKED`。
+详细契约见 [MIP-0003](../../protocol/mips/MIP-0003-personal-identity-history.md)。
 
 ## Evidence boundary
 

@@ -133,6 +133,24 @@ def test_select_chart_measurements_keeps_units_on_their_own_axis():
     assert "format" not in {k: v for k, v in series.items() if v}
 
 
+def test_uncomputable_measurements_are_skipped_not_defaulted():
+    """A metric Core could not compute carries ``null``; it must not crash the chart."""
+    from moodify.ui.report_window import select_chart_measurements
+
+    measurements = _measurements() + [
+        {"id": "spectral_flux", "value": None, "unit": "mag/frame", "group": "bands"},
+        {"id": "loudness_range_lu", "value": None, "unit": "LU", "group": "loudness"},
+    ]
+    series = select_chart_measurements(measurements)
+    # the null band is dropped; the *other* loudness_range_lu row is still plotted as before
+    assert [name for name, _ in series["bands"]] == ["sub_20_60_hz", "air_10000_16000_hz"]
+    assert "loudness_range_lu" in [name for name, _ in series["levels_db"]]
+    # and a report made only of uncomputable values yields empty series, not zeros
+    only_null = select_chart_measurements(
+        [{"id": "x", "value": None, "unit": "ratio", "group": "bands"}])
+    assert only_null == {"bands": [], "levels_db": [], "stereo_ratios": []}
+
+
 def _save_png(fig) -> int:
     import io
 

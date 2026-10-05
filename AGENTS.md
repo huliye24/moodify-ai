@@ -90,20 +90,43 @@ Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop �
 3. **Network 功能必须从真实用户循环生长**，不得先建网络再找用途。V1 的「网络」只有两个节点：Desktop ↔ 个人手机。
 4. **优先稳定、通用的技术**：`existing > standard library > mature OSS > commodity service > custom > experimental`。举证责任在 custom 与 experimental。（产品战略：可商用 > 技术先进。）
 5. **AI 不得自行扩大范围。** 未获人类批准，不得新增 server / login / social / account / cloud storage / P2P / 新框架；不得删除遗留 Android 项目；不得重写 Core 或 desktop。范围扩张需人类批准或走 MIP。
-6. **生产流程：先理解，再分解，再规划，最后处理。**（`Understand first. Decompose second. Plan third. Process last.`）
-   Creator 侧流程固定为 **检测 → 问题 → 分轨 → 结构 → 方案 → 成品**。
-   **三个预设（`clean_master`/`warm_vocal`/`wide_space`）是成品阶段的工具，不是流程的起点**——
-   不得把它们放回「分析完立刻处理」的位置。阶段由磁盘产物推导（`moodify-desktop/src/pipeline.js`），
-   未满足前置的阶段不得进入。**分解先于规划：⑤ 方案在 分轨 + MIDI 齐备前保持锁定**（曲谱/MusicXML 不能替代 MIDI），
-   **⑥ 成品还需要已写出方案产物（`<case>/studio/plans/*.json`）**。
+6. **生产流程：先理解，再分解，再修音，再复合，最后复检。**（`Understand first. Decompose second. Tune third. Compose fourth. Verify fifth.`）
+   Creator 侧流程固定为 **检测 → 逆向分解 → 结构 → 修音 → 复合 → 复检 → 选定 → 导出**。
+   **产品方向（2026-10-04 采纳）：逆向工程 → 多轨复合。** AI 音乐是单轨直出，单轨直出不如多轨复合；
+   先逆向分解成多轨、逐轨修音、再复合——**多轨复合才是 AI 后处理的核心操作**。
+   该方向的前提（「多轨复合一定优于单轨直出」）**是假设而非事实**，因此由两道机制关住风险：
+   - **可逆性门禁**：分解 → 复合（不处理）必须回到原版（`<case>/studio/roundtrip.json`，仅
+     `passed === true` 才算通过）。**门禁不通过，④修音不开**，也不得自行推断一个通过。
+     这是分解质量的唯一可测代理——原分轨不可知（AI 音乐无原轨客体），"还原得对不对"无法回答。
+   - **第三出口**：选定为 `A / B / 保留原版`（`kept ∈ A|B|ORIGINAL`）。净增益为负时系统应主动
+     推荐保留原版；缺了这一出口，「最小变换」就是空话。
+   **②「问题」不是独立阶段**（2026-10-04 裁定）：Core `report.json` 的 `findings` 仍在 ①检测 里可见，
+   但不得单设阶段或页面；`issues: []` 只能说「当前规则未发现技术问题」，**不得**说「这首歌没问题」——
+   这条诚实要求由 ①检测 承接，不随 ② 的退场而消失。
+   **④修音与⑤复合必须分开**：修音改每根轨（音准·节奏·逐轨处理），复合决定它们如何叠在一起
+   （平衡·空间·响度）。合并就无法归因「这一步变差是哪一层造成的」，而可归因是硬要求。
+   **三个预设（`clean_master`/`warm_vocal`/`wide_space`）已退场**（2026-10-04 裁定），
+   不得作为产品面、流程起点或「成品」工具重新引入。
+   阶段由磁盘产物推导（`moodify-desktop/src/pipeline.js`），未满足前置的阶段不得进入；
+   成就判定**用聚合**（任一成对的修音对达到即可），开一对新实验不得让阶段倒退。
+   **分解先于修音：④ 修音在 分轨 + MIDI + 可逆性通过 齐备前保持锁定**（曲谱/MusicXML 不能替代 MIDI）。
+   **修音必须成对**：一次产出保守 / 激进两个**完整方案**（系统出两档参数，人只负责听与选）；
+   **A、B 必须成对**——只有一侧时 `TUNED` 不成立，⑤ ⑥ 一律锁定。
+   **⑥ 复检**：对 A、B 各重跑一次完整检测，与原版逐指标对齐；缺项只能进 `not_alignable`，**不得补算**，
+   **不得发明测量事实**。**绝不** `AI 处理 → 自动完成`；`Generated is not finished.` 不变。
+   **⑦ 选定**由人做，逐步落账 `<case>/studio/tuning/decisions.jsonl`
+   （只追加、不可修改、带 request_id 幂等）；任何一档都不得被自动称为「完成」。
    **跳过分解的「快速完成（仅立体声）」必须由人显式选择**
-   （记为 `<case>/studio/finish_mode.json`），**绝不自动解锁**——否则捷径会变成默认路径；
-   快速完成也**不得**解锁 ⑤ 方案。
-   模式徽章必须显示 `深度完成` / `快速（仅立体声）`。
-   诊断严格是 Core `report.json` 的投影：**不得发明测量事实**；
-   `issues: []` 只能说「当前规则未发现技术问题」，**不得**说「这首歌没问题」。
-   `preserve`（该保护什么）是听觉判断，默认留空由人填。
-   参见 `docs/canon/STUDIO_PRODUCTION_PIPELINE_V3.md`。
+   （记为 `<case>/studio/finish_mode.json`，带 `chosen_at`），**绝不自动解锁**——否则捷径会变成默认路径；
+   其处理引擎是**对整轨的两档处理**（无 MIDI → 只做混音处理，不做音准·节奏修正），
+   **不得**打开需要分轨的 ④ 修音；但它**仍然必须走 ⑤复合 → ⑥复检 → ⑦选定 才能导出**
+   （跳过的是分解，不是验证）。模式徽章必须显示 `深度完成` / `快速（仅立体声）`。
+   `preserve`（该保护什么）是听觉判断，挂在 ④ 修音 的输入侧，默认留空由人填。
+   **两档参数是人类听觉判断**：产物必须携带 `calibration_status`，未校准时为
+   `UNCALIBRATED_ENGINEERING_DEFAULT`，不得被读成「更好的设置」。
+   Core 的逐轨修音 / 复合 / 可逆性验证能力未就绪时，壳必须显式拒绝（`TUNABLE_CORE_NOT_AVAILABLE`），
+   **不得留假产物**。
+   参见 `docs/canon/STUDIO_PRODUCTION_PIPELINE_V4.md`。
 
 **仍未裁决（不得当作已定论）：** `apps/android` 与 `apps/music-android` 哪一个是 canonical App；Creator 侧首要产品面是 CLI 还是 Studio。两者均记录为 `HUMAN_DECISION_REQUIRED`。
 

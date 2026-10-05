@@ -1,4 +1,16 @@
 /**
+ * ⚠️ RETIRED 2026-10-04 — 三预设作为产品面已退场（人类裁定），本文件不再被 main.js 引用。
+ *
+ * 本地后处理后端：把 `clean_master` / `warm_vocal` / `wide_space` 三个预设映射到 Core 的
+ * `protocol process`。三预设已退场，这条预设路径不再是产品面。
+ *
+ * 未删除的原因：删除文件属不可逆动作，按仓库纪律留在磁盘上供审阅对比，
+ * 待人类确认后整体删除。**不要为它新增调用方。**
+ *
+ * ──────────────────────────────────────────────────────────────────────────────
+ */
+
+/**
  * LocalBackend — runs the Moodify Sound Protocol `process` job on this machine.
  *
  * Studio v0.2 section 3 requires the "run analysis / run post-processing" step to be a

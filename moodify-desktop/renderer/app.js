@@ -23,15 +23,13 @@ const state = {
   convStarted: false,   // 本会话是否已开始 AI 对话（决定抽屉把手是否出现）
 };
 
-const VIEWS = ['empty', 'studio', 'diagnosis', 'plan', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
+const VIEWS = ['empty', 'tuning', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
 /** Which pipeline stage each view belongs to (① 检测 spans the three observation tabs). */
 const VIEW_STAGE = {
   data: 'analyze', spectrum: 'analyze', charts: 'analyze',
-  diagnosis: 'diagnose',
   stems: 'separate',
   score: 'structure',
-  plan: 'plan',
-  studio: 'finish',
+  tuning: 'tune',
 };
 const VIEW_TAB = {
   data: 'tab-data',
@@ -137,18 +135,28 @@ function showError(message) {
 
 // ——— workspace views ———
 
+/** 当前视图名。用于「制作详情」展开时决定技术阶段条是否出现。 */
+let currentView = 'empty';
+
 function selectView(name) {
+  currentView = name;
   for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
   $('tabs').hidden = name === 'empty' || name === 'bench' || name === 'stems' || name === 'score'
-    || name === 'diagnosis' || name === 'plan' || name === 'studio';
-  $('pipeline-bar').hidden = name === 'empty';
+    || name === 'tuning';
+  // 技术阶段条（pipeline.js 的内部 8 阶段）不再裸露在主界面上——它属于「制作详情」层。
+  // 主界面的进度由完成会话的 6 相位条承担，而那一条是不可点的状态投影。
+  $('pipeline-bar').hidden = name === 'empty' || name === 'tuning';
   for (const [view, tabId] of Object.entries(VIEW_TAB)) {
     $(tabId).classList.toggle('active', view === name);
   }
-  $('rail-studio').classList.toggle('active', name === 'studio');
-  $('rail-fix').classList.toggle('active', name === 'bench');
+  $('rail-tuning').classList.toggle('active', name === 'tuning');
+  $('rail-bench').classList.toggle('active', name === 'bench');
   $('rail-stems').classList.toggle('active', name === 'stems');
   $('rail-score').classList.toggle('active', name === 'score');
+  // 波形在隐藏态宽度为 0：进入审听视图后重新应用缩放，别留一条画不出来的空轨。
+  if (name === 'tuning') {
+    requestAnimationFrame(() => { try { applyReviewZoom(); } catch { /* not mounted yet */ } });
+  }
 
   // 流程条高亮当前阶段。同一阶段可以有多个视图（① 检测 = 数据/频谱/图表）。
   const stage = VIEW_STAGE[name];
@@ -169,7 +177,8 @@ async function openReport(reportPath) {
   state.caseDir = reportPath.replace(/[\\/]report\.json$/, '');
   destroyBench(); // 换世界：旧工作台实例销毁
   resetStudioTools(); // 换世界：分离/曲谱工作台复位（产物留在旧世界目录）
-  resetStudioWorld(); // 换世界：后处理视图复位（版本产物留在旧世界目录）
+  resetTuningWorld(); // 换世界：修音/复合视图复位（修音对留在旧世界目录）
+  resetSession();     // 换世界：完成会话复位（一次启动的状态不跨世界）
   resetPipeline();    // 换世界：流程状态复位（阶段由新 case 的产物重新推导）
 
   $('source-name').textContent = (report.source || {}).name || '?';
@@ -190,7 +199,10 @@ async function openReport(reportPath) {
   toggleHistoryPanel(false);
   renderMeasurements(report.measurements || []);
   renderPlan(report);
-  selectView('data'); // 落在第一个标签页：数据
+  // 落地在「完成会话」而不是数据页：普通用户不需要先读指标表，
+  // 数据 / 频谱 / 图表仍在，但归入「制作详情」层。
+  await refreshPipeline(); // 流程条按本 case 的真实产物点亮/锁定
+  await openTuning();
   if (!$('research-panel').hidden) loadResearchCase(); // 研究面板开着则随世界刷新 A/B
   fitTerminalSoon();
   const entryDir = state.caseDir;
@@ -198,7 +210,6 @@ async function openReport(reportPath) {
   const wave = renderWaveform(entryDir); // 波形解码好后就地现身
   await wave;
   await renderCharts(reportPath); // 检测图表后台补齐（图表页）
-  await refreshPipeline(); // 流程条按本 case 的真实产物点亮/锁定
   await ensureTerminal();
 }
 
@@ -2225,11 +2236,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   $('rail-open').addEventListener('click', pickAndAnalyze);
+  $('empty-pick').addEventListener('click', pickAndAnalyze);
   $('rail-history').addEventListener('click', () => toggleHistoryPanel());
   $('tab-data').addEventListener('click', () => { if (state.caseDir) selectView('data'); });
   $('tab-spectrum').addEventListener('click', () => { if (state.caseDir) selectView('spectrum'); });
   $('tab-charts').addEventListener('click', () => { if (state.caseDir) selectView('charts'); });
-  $('rail-fix').addEventListener('click', openBench);
+  $('rail-bench').addEventListener('click', openBench);
   $('zoom-in').addEventListener('click', () => setZoom(1.5));
   $('zoom-out').addEventListener('click', () => setZoom(1 / 1.5));
   $('zoom-fit').addEventListener('click', () => { zoomPx = null; applyZoom(); });
@@ -2318,7 +2330,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   initPermToggle();
   initDrawer();
   initDrop();
-  initStudio();
+  initTuning();
+  initSession();
   initPipeline();
   await ensureCompiler();
   await refreshArchive();
@@ -2343,334 +2356,1707 @@ function initDrop() {
   });
 }
 
-// ——— 后处理（Studio v0.2 主流程）———
+// ——— 完成会话（「一键完成机」· Phase 1）———
 //
-// 产品定义（人类 2026-10-03，APPROVED）：把歌丢进去，AI 自动试后处理，人只负责听和选。
+// 产品形态：放入一首歌 → 一次启动 → 内部自动执行 → 原版 / A / B → 人选择 → 导出。
 //
-// 本段只做「发起」与「呈现」：
-//   后处理 = Core 的 protocol process 作业（内部 v01_pipeline.process_audio）
-//   导出   = Core 的 finishing export（内部 export_delivery）
-// 渲染层不实现 DSP、不算响度、不替用户做选择，也不把 Core 的
-// 「processed_review_required」显示成「已验证」。
-//
-// 版本落在 <case>/studio/versions/；为何复用现有 case 而不另起一套，见 src/studio.js。
+// 这里的代码只做**投影与发起**：
+//   · 相位与状态来自 main 侧的 session 投影，其权威仍是 pipeline.js 的产物推导；
+//   · 渲染层不自己算进度，也不自己判断能不能继续；
+//   · 阻断态照原样显示，绝不把「Core 还没实现」渲染成成功或进行中。
 
-const studio = {
-  caseDir: null,
-  targets: [],
-  planned: [],
-  versions: [],
-  selection: null,
-  selectedId: null,
-  ws: null,
-  running: false,
-  targetsLoaded: false,
+const STATUS_TITLE = {
+  done: '已完成',
+  next: '下一步',
+  blocked: '做不了：产品能力尚未就绪',
+  todo: '尚未开始',
+  skipped: '快速完成（仅立体声）不经过这一步',
 };
 
-function initStudio() {
-  // NOTE: rail-studio is wired by initPipeline() to enterPipeline(), not straight here.
-  // The rail entry must land on the first unfinished stage, not jump to 成品 — jumping
-  // straight to processing is the behaviour TASK 002A exists to remove.
-  $('studio-run').addEventListener('click', runStudioProcess);
-  $('studio-play').addEventListener('click', () => {
-    if (studio.ws) studio.ws.playPause();
+const sessionState = {
+  caseDir: null,
+  view: null,
+  busy: false,
+};
+
+function initSession() {
+  $('session-start').addEventListener('click', startCompletion);
+  $('session-detail-toggle').addEventListener('click', toggleSessionDetail);
+  // 显式切换到快速完成：两级动作。点「切换」只展开确认，**不写任何东西**；
+  // 只有点「确认切换」才记录人类决定（与「制作详情」里的按钮共用同一个处理器）。
+  $('session-remedy-switch').addEventListener('click', askQuickSwitch);
+  $('session-remedy-yes').addEventListener('click', () => {
+    hideQuickConfirm();
+    chooseQuickFinish();
   });
-  $('studio-use').addEventListener('click', useStudioVersion);
-  $('studio-export').addEventListener('click', exportStudioVersion);
+  $('session-remedy-no').addEventListener('click', hideQuickConfirm);
+  window.moodify.onSessionProgress((payload) => {
+    // 只接受当前世界的进度——换世界后旧会话的事件必须被丢掉
+    if (!payload || payload.caseDir !== sessionState.caseDir) return;
+    renderSession(payload);
+  });
 }
 
-function resetStudioWorld() {
-  destroyStudioWave();
-  studio.caseDir = null;
-  studio.versions = [];
-  studio.selection = null;
-  studio.selectedId = null;
-  $('studio-versions').textContent = '';
-  $('studio-track').hidden = true;
-  $('studio-status').textContent = '';
-  $('studio-note').textContent = '';
-  setStudioActionsEnabled(false);
+/** 展开确认区（不写 finish_mode.json）。 */
+function askQuickSwitch() {
+  const view = sessionState.view || {};
+  const note = (view.fastSwitch && view.fastSwitch.note)
+    || '快速完成不会使用分轨进行音准或节奏修正；仍会生成 A/B、复检并由你选择。';
+  $('session-remedy-note').textContent = note;
+  $('session-remedy-ask').hidden = true;
+  $('session-remedy-confirm').hidden = false;
 }
 
-function destroyStudioWave() {
-  if (studio.ws) { try { studio.ws.destroy(); } catch { /* already gone */ } }
-  studio.ws = null;
+function hideQuickConfirm() {
+  $('session-remedy-confirm').hidden = true;
+  $('session-remedy-ask').hidden = false;
 }
 
-function setStudioActionsEnabled(on) {
-  $('studio-use').disabled = !on;
-  $('studio-export').disabled = !on;
+function toggleSessionDetail(force) {
+  const box = $('session-detail');
+  box.hidden = typeof force === 'boolean' ? !force : !box.hidden;
+  $('session-detail-toggle').textContent = box.hidden ? '制作详情' : '收起详情';
+  // 技术阶段条只在「制作详情」展开时出现：主界面用它只会暴露内部步骤。
+  if (currentView === 'tuning') $('pipeline-bar').hidden = box.hidden;
 }
 
-// 目标清单来自后端层（studio:targets），前端不硬编码预设名——
-// 这样新增一个 Core 预设时，UI 不会和 Core 漂移。
-async function loadStudioTargets() {
-  if (studio.targetsLoaded) return;
+function resetSession() {
+  sessionState.caseDir = null;
+  sessionState.view = null;
+  sessionState.busy = false;
+  $('session-phases').textContent = '';
+  $('session-state').textContent = '';
+  $('session-stage').textContent = '';
+  $('session-mode').hidden = true;
+  $('session-remedy').hidden = true;
+  $('session-remedy-reason').textContent = '';
+  hideQuickConfirm();
+  $('session-start').disabled = false;
+  $('session-start').textContent = '开始完成';
+  toggleSessionDetail(false);
+}
+
+async function refreshSession() {
+  const caseDir = state.caseDir;
+  if (!caseDir) return null;
   let res;
-  try { res = await window.moodify.studioTargets(); } catch { return; }
-  if (!res || !res.ok) return;
-  studio.targets = res.targets || [];
-  studio.planned = res.planned || [];
-  studio.defaultTarget = res.defaultTarget;
-  studio.targetsLoaded = true;
-
-  const box = $('studio-targets');
-  box.textContent = '';
-  for (const t of studio.targets) {
-    const btn = document.createElement('button');
-    btn.className = 'studio-target';
-    btn.dataset.target = t.id;
-    btn.textContent = t.label;
-    btn.title = t.id;
-    btn.addEventListener('click', () => {
-      for (const b of box.querySelectorAll('.studio-target')) b.classList.remove('active');
-      btn.classList.add('active');
-      $('studio-run').dataset.target = t.id;
-    });
-    box.appendChild(btn);
-    if (t.id === studio.defaultTarget) btn.classList.add('active');
-  }
-  $('studio-run').dataset.target = studio.defaultTarget;
-
-  // 产品书列了、Core 做不到的目标：显示出来并禁用，绝不静默映射到别的预设
-  for (const p of studio.planned) {
-    const btn = document.createElement('button');
-    btn.className = 'studio-target planned';
-    btn.textContent = p.label + '（即将推出）';
-    btn.title = p.reason || '';
-    btn.disabled = true;
-    box.appendChild(btn);
-  }
-
-  const backend = (res.backends || []).find((b) => b.mode === res.defaultMode);
-  $('studio-backend').textContent = backend ? `处理位置：${backend.label}` : '';
+  try { res = await window.moodify.sessionView(caseDir); } catch { return null; }
+  if (!res || !res.ok || state.caseDir !== caseDir) return null; // 换世界守卫
+  sessionState.caseDir = caseDir;
+  renderSession(res.view);
+  return res.view;
 }
 
-async function openStudio() {
+function renderSession(view) {
+  if (!view) return;
+  sessionState.view = view;
+
+  const blockerKind = view.blocker && view.blocker.kind;
+  const stepFailed = blockerKind === 'STEP_FAILED';
+  const fast = view.fast === true;
+
+  const list = $('session-phases');
+  list.textContent = '';
+  for (const p of view.phases || []) {
+    const li = document.createElement('li');
+    li.className = 'session-phase ' + p.status;
+    li.textContent = p.label;
+    // 阻断有两种：产品缺能力（等 Core / 重试无用）与这一步真实失败（修好后可重试）。
+    // 用同一句话概括它们，用户就无法判断该等还是该修。
+    li.title = (p.status === 'blocked' && stepFailed)
+      ? '这一步真实失败：修好原因后可重试'
+      : (p.status === 'skipped' ? (p.reason || STATUS_TITLE.skipped) : (STATUS_TITLE[p.status] || ''));
+    list.appendChild(li);
+  }
+
+  $('session-state').textContent = view.message || '';
+  $('session-stage').textContent = view.running
+    ? '正在执行…'
+    : (view.state === 'BLOCKED'
+      ? (stepFailed ? '已停止 · 这一步真实失败' : '已停止 · 能力未就绪')
+      : '');
+
+  // 完成模式徽章：持续可见。跳过分解与结构仍然要导出、要复检，但人必须知道自己在哪条路上。
+  const mode = $('session-mode');
+  if (view.modeLabel) {
+    mode.textContent = view.modeLabel;
+    mode.hidden = false;
+    mode.classList.toggle('deep', view.mode === 'DEEP');
+  } else {
+    mode.hidden = true;
+  }
+
+  // 深度受阻 → 补救动作必须看得见（2026-10-04 裁定）。三点纪律：
+  //   ① 只有人能按（两级确认），系统绝不自动切换；
+  //   ② 文案说清这条路不做逐轨音准/节奏修正，也不删除已有分解结果；
+  //   ③ 已经在快速模式、或已经有候选/选定（流程走过去了）时不再提示切换。
+  const sw = view.fastSwitch || {};
+  const canSwitch = Boolean(sw.available) && !view.running;
+  const remedy = $('session-remedy');
+  remedy.hidden = !canSwitch;
+  if (canSwitch) {
+    $('session-remedy-title').textContent = view.state === 'BLOCKED'
+      ? '深度完成暂不可用' : '也可以改用快速完成（仅立体声）';
+    // 产品面只显示投影算好的白话一句（原因 + 可怎么办）；
+    // 工程细节（缺哪个文件、哪项能力）在「制作详情」层，不摆到主界面。
+    $('session-remedy-reason').textContent = sw.summary
+      || '可逆性验证或逐轨处理能力尚未就绪。你可以改用整轨两档完成（快速完成：仅立体声）。';
+    $('session-remedy-switch').textContent = sw.label || '切换到快速完成（仅立体声）';
+  } else {
+    hideQuickConfirm();
+  }
+
+  // 「开始完成」只在真能继续时开放。缺能力时它不该看起来还能点——一个点了没反应的按钮，
+  // 会让人以为是应用坏了。但**这一步真实失败**不同：原因可能是环境问题（依赖没装、
+  // 磁盘满），人修好之后必须能重试，否则只能重开应用。
+  const retryable = view.state === 'BLOCKED' && stepFailed && !view.running;
+  const canStart = (view.state === 'READY' || retryable) && !view.running && !sessionState.busy;
+  $('session-start').disabled = !canStart;
+  $('session-start').textContent = retryable
+    ? '重试（已完成的步骤会跳过）'
+    : ((view.state === 'REVIEW' || view.state === 'DONE')
+      ? '重新完成（已完成的步骤会跳过）' : '开始完成');
+
+  // 阻断时展开详情，让「哪一步、缺什么能力 / 失败原因」直接可见，而不是藏在一个折叠面板里
+  if (view.state === 'BLOCKED') toggleSessionDetail(true);
+  if (fast && view.running) toggleSessionDetail(false);
+}
+
+async function startCompletion() {
+  const caseDir = state.caseDir;
+  if (!caseDir || sessionState.busy) return;
+  if (sessionState.view && sessionState.view.running) return;
+  sessionState.busy = true;
+  $('session-start').disabled = true;
+  $('session-state').textContent = '正在执行…';
+
+  let res;
+  try { res = await window.moodify.sessionStart(caseDir); }
+  catch (err) { res = { ok: false, reason: (err && err.message) || String(err) }; }
+  sessionState.busy = false;
+  if (state.caseDir !== caseDir) return; // 换世界守卫
+
+  if (res && res.phases) {
+    renderSession(res);
+  } else {
+    // 连投影都没拿到：如实说，不编造进度
+    $('session-state').textContent = '启动失败：' + ((res && res.reason) || '未知原因');
+    $('session-start').disabled = false;
+  }
+  await refreshSession();
+  await refreshPipeline();
+  await refreshTuning();
+}
+
+// ——— ④修音 / ⑤复合 / ⑦选定（V4 主流程）———
+//
+// 产品方向（人类 2026-10-04 采纳）：**逆向工程 · 多轨复合**。
+// 一次修音产出**两档完整方案**（A 保守 conservative / B 充分 full），由系统生成，人只负责听和选。
+// 选定有**三个**出口：A / B / **保留原版**——两档都不如原版时，「回原版」是一条真路，
+// 也是「最小变换」从口号变成规则的地方。
+//
+// 本段只做「发起」与「呈现」：
+//   快速完成的两档整轨渲染 = Core `tuning render-pair`（**已实现**，MIP-0002 附录 A）
+//   深度路径的逐轨修音 / 复合 = Core（**尚未实现** → main 侧显式拒绝 TUNABLE_CORE_NOT_AVAILABLE）
+//   ⑥ 复检      = 对 A、B 各跑一次 Core 既有检测，再由 main 侧做三方对齐
+//   ⑧ 导出      = Core 的 finishing export
+// 渲染层不实现 DSP、不算响度、不替用户做选择，也绝不把「Core 未就绪」显示成「已处理」。
+
+const tuningState = {
+  caseDir: null,
+  pairs: [],
+  decisions: [],
+  gates: null,
+  // ⑦ 选定 的准入：按 pair_id 存「还差什么」。按钮的可点状态必须与 main 侧的
+  // validateDecision 完全一致——否则会出现「按钮能点，点了被拒」这种看起来很坏的行为。
+  decisionBlockers: {},
+  activePairId: null,
+  busy: false,
+  // 决定 id 的单调计数：每次**显式点击**生成新的 requestId，于是「改选」会真的追加一条记录；
+  // 同一个点击的重试仍然幂等（id 在这一次动作内不变）。
+  decisionSeq: 0,
+};
+
+/**
+ * A/B 审听工作台状态（Phase 2.2）。
+ *
+ * `tab` = 当前**页面**（在看哪个候选），`playing` = 当前**真正加载在播放器里的音源**。
+ * 两者必须分开记录：浏览 B 但正在听原版时，界面要同时说清这两件事，禁止拿页签冒充播放源。
+ */
+const review = {
+  pairId: null,
+  evidence: null,      // tuning:evidence 的结果（报告 / 频谱 / 图表 / 卡片 / 处理链）
+  alignment: null,     // tuning:recheck 的三方对齐表（完整表与卡片的数据源）
+  tab: 'A',            // 当前页面：A | B
+  playing: null,       // 当前播放源：ORIGINAL | A | B | null
+  ws: null,            // 唯一的 transport（一个播放器，三个音源）
+  loadToken: 0,        // 竞态守卫：只接受最后一次加载的结果
+  bufferCache: new Map(), // 最多缓存 2 个已解码 buffer，长曲不至于把内存吃光
+  zoomPx: null,
+  tableOpen: false,
+  tableFilter: 'changed',
+  busy: false,
+};
+
+function initTuning() {
+  // NOTE: rail-tuning 由 initPipeline() 接到 enterPipeline()，不直接进本视图——
+  // 入口必须落在第一个未完成的阶段，而不是直接跳到处理。
+  $('tuning-run').addEventListener('click', runTuningRender);
+  $('tuning-recheck').addEventListener('click', runTuningRecheck);
+  initReview();
+  initCompletion();
+}
+
+function resetTuningWorld() {
+  destroyReviewTransport();
+  tuningState.caseDir = null;
+  tuningState.pairs = [];
+  tuningState.decisions = [];
+  tuningState.gates = null;
+  tuningState.decisionBlockers = {};
+  tuningState.activePairId = null;
+  tuningState.decisionSeq = 0;
+  review.pairId = null;
+  review.evidence = null;
+  review.alignment = null;
+  review.tab = 'A';
+  review.playing = null;
+  review.tableOpen = false;
+  review.tableFilter = 'changed';
+  completion.state = null;
+  completion.quiet = false;
+  completion.detailsOpen = false;
+  completion.lastStatus = '';
+  document.body.classList.remove('cp-quiet');
+  $('completion').hidden = true;
+  $('session-detail').hidden = true;
+  $('tuning-pairs').textContent = '';
+  $('tuning-status').textContent = '';
+  $('tuning-note').textContent = '';
+  $('tuning-mode').textContent = '';
+  $('review').hidden = true;
+}
+
+function activePair() {
+  return tuningState.pairs.find((p) => p.pair_id === tuningState.activePairId) || null;
+}
+
+function decisionForPair(pairId) {
+  const rows = tuningState.decisions.filter((d) => d.pair_id === pairId);
+  return rows.length ? rows[rows.length - 1] : null;
+}
+
+async function openTuning() {
   if (!state.caseDir) return;
-  selectView('studio');
-  studio.caseDir = state.caseDir;
-  await loadStudioTargets();
-  await refreshStudioVersions();
+  selectView('tuning');
+  tuningState.caseDir = state.caseDir;
+  sessionState.caseDir = state.caseDir;
+  await refreshSession();
+  // 完成层优先：已完成的作品默认落在作品上，技术细节在「查看制作详情」后面。
+  completion.detailsOpen = false;
+  await refreshCompletion();
+  await refreshTuning();
 }
 
-async function refreshStudioVersions() {
-  const caseDir = studio.caseDir;
-  if (!caseDir) return;
+async function refreshTuning() {
+  const caseDir = tuningState.caseDir || state.caseDir;
+  if (!caseDir) return null;
   let res;
-  try { res = await window.moodify.studioVersions(caseDir); } catch { return; }
-  if (!res || !res.ok || studio.caseDir !== caseDir) return; // world-switch guard
-  studio.versions = res.versions || [];
-  studio.selection = res.selection || null;
-  renderStudioVersions();
-  // 默认选中：人类选过的那一版，否则原版
-  const preferred = (studio.selection && studio.selection.version_id)
-    || (studio.versions[0] && studio.versions[0].id);
-  if (preferred) await selectStudioVersion(preferred);
+  try { res = await window.moodify.tuningPairs(caseDir); } catch { return null; }
+  if (!res || !res.ok || state.caseDir !== caseDir) return null; // 换世界守卫
+  tuningState.pairs = res.pairs || [];
+  tuningState.decisions = res.decisions || [];
+  tuningState.gates = res.gates || null;
+  tuningState.decisionBlockers = res.decisionBlockers || {};
+  tuningState.activePairId = res.currentPairId || tuningState.activePairId;
+  renderTuning();
+  await refreshReview();
+  return res;
 }
 
-function renderStudioVersions() {
-  const box = $('studio-versions');
+function renderTuning() {
+  const g = tuningState.gates || {};
+
+  // 完成模式徽章：深度 / 快速（仅立体声）。不标注就是骗人。
+  $('tuning-mode').textContent = g.modeLabel || '';
+
+  renderTuningStatus(g);
+  renderTuningPairs();
+}
+
+/** 差什么就说差什么——「需要先完成前面的阶段」等于没说。 */
+function renderTuningStatus(g) {
+  const paint = (text) => { $('tuning-status').textContent = text; };
+  const first = (...arrs) => {
+    for (const a of arrs) if (Array.isArray(a) && a.length) return a[0];
+    return null;
+  };
+
+  if (!tuningState.pairs.length) {
+    const why = first(g.tuneBlockers, g.composeBlockers);
+    // 快速完成是另一条路：它不需要分轨与 MIDI，所以提示也不能拿「缺分轨」来解释。
+    if (g.mode === 'FAST_STEREO_ONLY') {
+      paint('快速完成（仅立体声）：尚无候选。点「开始完成」或上面的「只生成两档」，'
+        + 'Core 会一次产出 A 保守 / B 充分两个完整整轨候选。');
+    } else {
+      paint(why
+        ? `还不能生成修音：${why}`
+        : '尚无修音对。点「生成两档修音」让系统产出保守 / 充分两档完整方案。');
+    }
+    return;
+  }
+
+  const p = activePair();
+  if (!p) { paint(''); return; }
+  const parts = [];
+  parts.push(p.mode === 'FAST_STEREO_ONLY' ? '快速（仅立体声）' : '深度');
+  parts.push(`A/B 修音：${p.tuned ? '两侧齐备' : '未完成'}`);
+  parts.push(`合成：${p.composed ? '两侧齐备' : '未完成'}`);
+  parts.push(`复检：${p.has_recheck ? '已完成' : '未做'}`);
+  const d = decisionForPair(p.pair_id);
+  parts.push(`选定：${d ? exitLabel(d.kept) : '未选'}`);
+  // ⑦ 的准入附在后面：差什么就说差什么。「需要先完成前面的阶段」等于没说。
+  const blockers = tuningState.decisionBlockers[p.pair_id] || [];
+  paint(blockers.length
+    ? `${parts.join(' · ')} —— 还不能选定：${blockers.join('；')}`
+    : parts.join(' · '));
+}
+
+function exitLabel(kept) {
+  if (kept === 'A') return 'A（保守）';
+  if (kept === 'B') return 'B（充分）';
+  if (kept === 'ORIGINAL') return '保留原版';
+  return kept;
+}
+
+function renderTuningPairs() {
+  const box = $('tuning-pairs');
   box.textContent = '';
-  for (const v of studio.versions) {
+  for (const p of tuningState.pairs) {
     const row = document.createElement('button');
-    row.className = 'studio-version';
-    row.dataset.versionId = v.id;
-    if (v.id === studio.selectedId) row.classList.add('active');
-    if (studio.selection && studio.selection.version_id === v.id) row.classList.add('chosen');
+    row.className = 'pair-row';
+    if (p.pair_id === tuningState.activePairId) row.classList.add('active');
+    const d = decisionForPair(p.pair_id);
+    if (d) row.classList.add('chosen');
 
     const name = document.createElement('span');
     name.className = 'sv-name';
-    name.textContent = v.label + (v.kind === 'ai' ? ` · ${v.target || ''}` : '');
+    name.textContent = p.pair_id + (p.mode === 'FAST_STEREO_ONLY' ? ' · 快速' : ' · 深度');
     row.appendChild(name);
 
     const badge = document.createElement('span');
     badge.className = 'sv-badge';
-    if (v.kind === 'original') {
-      badge.textContent = '原始';
-      badge.classList.add('sv-original');
-    } else if (v.status === 'processed_review_required') {
-      // Core 的语义：处理跑完了，但没人听过。绝不显示成「已验证」。
-      badge.textContent = '已处理，待人确认';
-      badge.classList.add('sv-review');
-    } else {
-      badge.textContent = v.status || '—';
-    }
+    if (p.composed) { badge.textContent = 'A/B 可听'; }
+    else if (p.tuned) { badge.textContent = '已修音，待合成'; badge.classList.add('sv-review'); }
+    else { badge.textContent = '未完成'; badge.classList.add('sv-review'); }
     row.appendChild(badge);
 
-    if (studio.selection && studio.selection.version_id === v.id) {
+    if (d) {
       const tick = document.createElement('span');
       tick.className = 'sv-chosen';
-      tick.textContent = '✓ 你的选择';
+      tick.textContent = `✓ ${exitLabel(d.kept)}`;
       row.appendChild(tick);
     }
 
-    row.addEventListener('click', () => selectStudioVersion(v.id));
+    row.addEventListener('click', () => selectPair(p.pair_id));
     box.appendChild(row);
   }
 }
 
-async function selectStudioVersion(versionId) {
-  const caseDir = studio.caseDir;
-  if (!caseDir) return;
-  studio.selectedId = versionId;
-  renderStudioVersions();
-  $('studio-note').textContent = '';
-  showStudioEvidence(caseDir, versionId);
-
-  let bytes;
-  try { bytes = await window.moodify.studioAudio(caseDir, versionId); }
-  catch { $('studio-note').textContent = '这一版暂时无法试听。'; return; }
-  if (studio.caseDir !== caseDir) return; // world switched mid-read
-
-  try {
-    const ab = bytes instanceof ArrayBuffer ? bytes
-      : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    const ctx = new AudioContext();
-    const audio = await ctx.decodeAudioData(ab);
-    await ctx.close();
-    if (studio.caseDir !== caseDir) return;
-    mountStudioWave(audio);
-    setStudioActionsEnabled(true);
-  } catch {
-    $('studio-note').textContent = '这一版解码失败，无法试听。';
-    setStudioActionsEnabled(false);
-  }
+async function selectPair(pairId) {
+  tuningState.activePairId = pairId || null;
+  renderTuningPairs();
+  renderTuningStatus(tuningState.gates || {});
+  await refreshReview();
 }
 
-function mountStudioWave(audioBuffer) {
-  destroyStudioWave();
-  $('studio-track').hidden = false;
-  studio.ws = WaveSurfer.create({
-    container: $('studio-wave'),
-    backend: 'WebAudio',
-    height: 96,
-    splitChannels: true,
-    responsive: true,
-    scroll: true,
-    waveColor: 'rgba(79, 70, 229, 0.38)',
-    progressColor: 'rgba(79, 70, 229, 0.82)',
-    cursorColor: '#16181d',
-    cursorWidth: 1,
-    plugins: [WaveSurfer.timeline.create({
-      container: $('studio-ruler'),
-      fontSize: 10,
-      primaryColor: '#d1d5db',
-      secondaryColor: '#f3f4f6',
-      primaryFontColor: '#9ca3af',
-      secondaryFontColor: '#c7cbd1',
-    })],
-  });
-  $('studio-time').textContent = `0:00.0 / ${fmtTime(audioBuffer.duration)}`;
-  studio.ws.on('timeupdate', (t) => {
-    if (studio.ws) {
-      $('studio-time').textContent = `${fmtTime(t)} / ${fmtTime(studio.ws.getDuration() || 0)}`;
-    }
-  });
-  studio.ws.on('play', () => { $('studio-play').textContent = '⏸'; });
-  studio.ws.on('pause', () => { $('studio-play').textContent = '▶'; });
-  studio.ws.on('finish', () => { $('studio-play').textContent = '▶'; });
-  studio.ws.loadDecodedBuffer(audioBuffer);
-}
+// ——— 生成两档（Core 未就绪时显式拒绝）———
 
-async function runStudioProcess() {
-  const caseDir = studio.caseDir;
-  if (!caseDir || studio.running) return;
-  const target = $('studio-run').dataset.target;
-  if (!target) return;
-
-  studio.running = true;
-  $('studio-run').disabled = true;
-  $('studio-status').textContent = 'AI 正在处理…（本机）';
-  const t0 = Date.now();
+async function runTuningRender() {
+  const caseDir = tuningState.caseDir || state.caseDir;
+  if (!caseDir || tuningState.busy) return;
+  tuningState.busy = true;
+  $('tuning-run').disabled = true;
+  const fast = tuningState.gates && tuningState.gates.mode === 'FAST_STEREO_ONLY';
+  $('tuning-status').textContent = fast
+    ? '正在让 Core 生成两档整轨候选（A 保守 / B 充分）…'
+    : '正在请求 Core 生成两档修音…';
   let res;
-  try { res = await window.moodify.studioProcess(caseDir, target, 'local'); }
+  try { res = await window.moodify.tuningRender(caseDir); }
   catch (err) { res = { ok: false, reason: (err && err.message) || String(err) }; }
-  studio.running = false;
-  $('studio-run').disabled = false;
-  if (studio.caseDir !== caseDir) return; // world-switch guard
+  tuningState.busy = false;
+  $('tuning-run').disabled = false;
+  if (tuningState.caseDir !== caseDir && state.caseDir !== caseDir) return;
 
   if (!res || !res.ok) {
-    $('studio-status').textContent = '处理失败：' + ((res && res.reason) || '未知原因');
+    // 拒绝是预期行为，不是故障——把原因说清楚，别把机器码丢给用户
+    const why = (res && res.reason) || '';
+    if (why === 'TUNABLE_CORE_NOT_AVAILABLE') {
+      $('tuning-status').textContent = '深度路径的逐轨修音与复合能力尚未就绪（见 MIP-0002）。'
+        + '本壳不会生成任何逐轨修音产物；如果想先走通闭环，请显式选择「快速完成（仅立体声）」。';
+    } else if (why === 'TUNE_LOCKED') {
+      const b = (res.blockers && res.blockers[0]) || '前置条件未满足';
+      $('tuning-status').textContent = `还不能生成：${b}`;
+    } else if (why === 'RENDER_PAIR_FAILED') {
+      const leftover = res.leftover ? `（磁盘上留下了 ${res.leftover}，本次未发布为正式 pair）` : '（没有留下任何产物）';
+      $('tuning-status').textContent = `Core 未能生成两档候选：${(res.detail || '').trim()} ${leftover}`;
+    } else if (why === 'PAIR_INCOMPLETE_ON_DISK') {
+      $('tuning-status').textContent = `${res.detail} 这一对**不会**被当成完整候选。`;
+    } else if (why === 'NO_SOURCE') {
+      $('tuning-status').textContent = res.detail || '未找到源音频。';
+    } else {
+      $('tuning-status').textContent = '生成失败：' + why;
+    }
     return;
   }
-  const secs = ((Date.now() - t0) / 1000).toFixed(1);
-  // 产品书 1.3：导出前一律「待人确认」。这里显示的是 Core 的真实状态，不是我们自己编的结论。
-  $('studio-status').textContent =
-    `已生成一版（${secs}s）· 已处理，待人确认 —— 请听，然后决定用不用它。`;
-  studio.versions = res.versions || studio.versions;
-  await refreshStudioVersions();
-  if (res.attemptId) await selectStudioVersion(res.attemptId);
+
+  $('tuning-status').textContent = fast
+    ? `已生成两档整轨候选（A 保守 / B 充分）。请点「复检（重跑检测）」对 A、B 各跑一次完整检测，`
+      + '然后同位置试听并选定。'
+    : '已生成两档候选。';
+  await refreshTuning();
+  await refreshPipeline();
+  await refreshSession();
 }
 
-// 产品书 1.3「证据优先」：每次 AI 尝试都留有可复现记录。
-// 这里只把它**显示出来**——原始文件在版本目录的 evidence.json，
-// 内容是 Core 自己写的，本壳不做任何转述或美化。
-async function showStudioEvidence(caseDir, versionId) {
-  if (versionId === 'original') return; // 原版没有处理证据
-  let res;
-  try { res = await window.moodify.studioEvidence(caseDir, versionId); } catch { return; }
-  if (!res || !res.ok || studio.caseDir !== caseDir) return;
-  const ev = res.evidence || {};
-  const short = (h) => (h ? String(h).slice(0, 12) + '…' : '—');
-  $('studio-note').textContent =
-    `证据：输入 ${short(ev.source_sha256)} → 输出 ${short(ev.output_sha256)}`
-    + ` · 预设 ${ev.preset || '—'} · ${ev.created_at || ''}`;
-}
+// ——— ⑥ 复检 ———
 
-async function useStudioVersion() {
-  const caseDir = studio.caseDir;
-  if (!caseDir || !studio.selectedId) return;
+async function runTuningRecheck() {
+  const caseDir = tuningState.caseDir;
+  const pairId = tuningState.activePairId;
+  if (!caseDir || !pairId || tuningState.busy) return;
+  tuningState.busy = true;
+  $('tuning-recheck').disabled = true;
+  $('tuning-status').textContent = '正在对 A、B 各重跑一次完整检测…（可能耗时数分钟）';
   let res;
-  try { res = await window.moodify.studioSelect(caseDir, studio.selectedId); }
-  catch (err) { $('studio-note').textContent = '记录失败：' + (err.message || err); return; }
-  if (!res || !res.ok) { $('studio-note').textContent = '记录失败：' + ((res && res.reason) || ''); return; }
-  studio.selection = res.selection;
-  renderStudioVersions();
-  const v = studio.versions.find((x) => x.id === studio.selectedId);
-  $('studio-note').textContent = `已选：${v ? v.label : studio.selectedId}。可继续「再试一次」或导出。`;
-}
+  try { res = await window.moodify.tuningRecheckRun(caseDir, pairId); }
+  catch (err) { res = { ok: false, reason: (err && err.message) || String(err) }; }
+  tuningState.busy = false;
+  $('tuning-recheck').disabled = false;
+  if (tuningState.caseDir !== caseDir) return;
 
-async function exportStudioVersion() {
-  const caseDir = studio.caseDir;
-  if (!caseDir || !studio.selectedId) return;
-  $('studio-note').textContent = '正在导出…';
-  let res;
-  try { res = await window.moodify.studioExport(caseDir, studio.selectedId); }
-  catch (err) { $('studio-note').textContent = '导出失败：' + (err.message || err); return; }
   if (!res || !res.ok) {
-    $('studio-note').textContent = res && res.canceled ? '已取消导出。' : ('导出失败：' + ((res && res.reason) || ''));
+    const why = (res && res.reason) || '';
+    $('tuning-status').textContent = why === 'NEED_BOTH_SIDES'
+      ? '还不能复检：A、B 两侧都需先有合成结果。'
+      : `复检失败：${why}`;
     return;
   }
-  $('studio-note').textContent = `已导出：${res.path}`;
+  // 复检产物就是审听工作台的数据源：刷新它，让新对齐表/卡片立刻可见。
+  await refreshTuning();
 }
 
-// ——— 生产流程（TASK 002A）：检测 → 问题 → 分轨 → 结构 → 方案 → 成品 ———
+// ——— ⑦ 选定（三出口）与 ⑧ 导出 ———
 //
-// 产品原则：先把歌听懂，再分解，最后才处理。
-// 早期版本允许「分析完立刻选预设处理立体声母带」——那对母带来说太早了。
-// 预设没有消失，只是下移到最后一步：它们是工具，不是流程。
+// 选择永远只有一条权威通道：`tuning:decision`（main 侧的 validateDecision）。
+// 渲染层不维护私有选择状态，也不在本地「先选中再同步」——选定成功以账本回读为准。
+//
+// requestId 每次**显式点击**生成一次：同一次动作的重试仍然幂等，而「改选」会真的追加一条
+// 记录（否则 A→B→A 的第三次会被当成第一次的重复，账本留在 B 而界面显示 A）。
+
+function nextDecisionRequestId(pairId, kept) {
+  tuningState.decisionSeq += 1;
+  return `keep:${pairId}:${kept}:${tuningState.decisionSeq}`;
+}
+
+async function keepExit(kept) {
+  const caseDir = tuningState.caseDir;
+  const pairId = tuningState.activePairId;
+  if (!caseDir || !pairId || tuningState.busy) return;
+  tuningState.busy = true;
+  const requestId = nextDecisionRequestId(pairId, kept);
+  let res;
+  try { res = await window.moodify.tuningDecision(caseDir, pairId, kept, 'creator', requestId); }
+  catch (err) { res = { ok: false, reason: (err && err.message) || String(err) }; }
+  tuningState.busy = false;
+  if (tuningState.caseDir !== caseDir) return;
+
+  if (!res || !res.ok) {
+    // 拒绝是预期行为：把原因说清楚，别把机器码丢给用户
+    const why = (res && res.reason) || '';
+    if (why === 'PAIR_NOT_COMPLETE') {
+      const first = (res.blockers && res.blockers[0]) || '候选或复检还不完整';
+      $('tuning-note').textContent = `还不能选定：${first}。`
+        + '「保留原版」也是三个出口之一，同样要等 A / B 两个完整候选与复检齐备之后才可选。';
+    } else if (why === 'REQUEST_ID_CONFLICT') {
+      $('tuning-note').textContent = '记录失败：同一次选择被用于不同的出口或不同的修音对，已拒绝写入。';
+    } else {
+      $('tuning-note').textContent = '记录失败：' + why;
+    }
+    return;
+  }
+  $('tuning-note').textContent = `已记录：${exitLabel(kept)}。`
+    + (kept === 'ORIGINAL' ? '两档都不如原版时，这是正确的选择。' : '');
+  await refreshTuning();   // 账本回读 → 标签、按钮、导出目标一起更新
+  // 选定之后自然收束到完成层（没有庆祝弹层、没有提示音）：先同步留存记录，再显示作品。
+  await window.moodify.keepsakeSync(caseDir).catch(() => null);
+  completion.detailsOpen = false;
+  const entered = await refreshCompletion();
+  if (entered) {
+    completion.lastStatus = '';
+    $('cp-status').textContent = '';
+    // 焦点落到「从头听」，但不自动播放
+    if (typeof $('cp-listen').focus === 'function') $('cp-listen').focus();
+  }
+}
+
+async function exportChosen() {
+  const caseDir = tuningState.caseDir;
+  const pairId = tuningState.activePairId || (completion.state && completion.state.pairId);
+  if (!caseDir || !pairId) return;
+  const note = (text) => {
+    // 导出反馈同时写到「制作详情」与完成层，谁在前面都不会看不到
+    $('tuning-note').textContent = text;
+    if (completion.state && completion.state.complete) $('cp-status').textContent = text;
+  };
+  const d = decisionForPair(pairId);
+  if (!d) { note('请先选定一个出口再导出。'); return; }
+  note('正在导出…');
+  let res;
+  try { res = await window.moodify.tuningExport(caseDir, pairId, d.kept); }
+  catch (err) { note('导出失败：' + ((err && err.message) || err)); return; }
+  if (!res || !res.ok) {
+    if (res && res.canceled) { note('已取消导出。'); return; }
+    const why = (res && res.reason) || '';
+    if (why === 'CANDIDATES_INCOMPLETE') {
+      const first = (res.blockers && res.blockers[0]) || '候选或复检产物已不完整';
+      note(`导出被拒绝：${first}。选定必须仍然被两个完整候选与复检支撑——产物没了，这一步就退回未完成。`);
+      return;
+    }
+    note('导出失败：' + why);
+    return;
+  }
+  note(`已导出（${exitLabel(d.kept)}）：${res.path}`);
+}
+// ——— A/B 审听工作台（Phase 2.2）———
+//
+// 首屏先回答两件事：**我正在听谁**、**它相对原版变了什么**。每一条数据都来自真实产物：
+//   音频      pair/<side>/mix.wav（原版 = case 源）——经 tuning:audio 读字节
+//   对齐表    tuning:recheck（recheck.js 从三份 Core report 摊出来的对齐结果）
+//   卡片/频谱/图表/处理链  tuning:evidence（main 侧从候选自己那份 report + plan/evidence 推导）
+// 本层不做测量、不跑分析、不缩放波形去制造差异、不生成任何「谁更好」的结论。
+
+const REV_SIDE_LABEL = { ORIGINAL: '原版', A: 'A（保守）', B: 'B（充分）' };
+const REV_TAB_LABEL = { A: 'A · 保守', B: 'B · 充分' };
+
+function revSideLabel(side) { return REV_SIDE_LABEL[side] || side; }
+
+function initReview() {
+  $('rv-play').addEventListener('click', () => reviewTogglePlay());
+  $('rv-src-original').addEventListener('click', () => reviewLoadSide('ORIGINAL'));
+  $('rv-src-a').addEventListener('click', () => reviewLoadSide('A'));
+  $('rv-src-b').addEventListener('click', () => reviewLoadSide('B'));
+  $('rv-tab-a').addEventListener('click', () => reviewSelectTab('A'));
+  $('rv-tab-b').addEventListener('click', () => reviewSelectTab('B'));
+  $('rv-zoom-out').addEventListener('click', () => reviewSetZoom(1 / 1.6));
+  $('rv-zoom-in').addEventListener('click', () => reviewSetZoom(1.6));
+  $('rv-zoom-fit').addEventListener('click', () => { review.zoomPx = null; applyReviewZoom(); });
+  $('rv-table-toggle').addEventListener('click', () => {
+    review.tableOpen = !review.tableOpen;
+    renderReviewTable();
+  });
+  for (const input of document.querySelectorAll('input[name="rv-filter"]')) {
+    input.addEventListener('change', () => {
+      review.tableFilter = input.value;
+      renderReviewTable();
+    });
+  }
+  $('rv-choose').addEventListener('click', () => keepExit(review.tab));
+  $('rv-keep-original').addEventListener('click', () => keepExit('ORIGINAL'));
+  $('rv-export-run').addEventListener('click', exportChosen);
+}
+
+/** 工作台刷新：当前 pair 的证据包 + 三方对齐表。数据不全就整体隐藏，绝不用别的图占位。 */
+async function refreshReview() {
+  const caseDir = tuningState.caseDir || state.caseDir;
+  const pairId = tuningState.activePairId;
+  if (!caseDir || !pairId) { $('review').hidden = true; return; }
+  let evidence;
+  let alignment;
+  try { evidence = await window.moodify.tuningEvidence(caseDir, pairId); } catch { evidence = null; }
+  try { alignment = await window.moodify.tuningRecheck(caseDir, pairId); } catch { alignment = null; }
+  if (state.caseDir !== caseDir || tuningState.activePairId !== pairId) return; // 换世界/换 pair 守卫
+
+  if (!evidence || !evidence.ok || !alignment || !alignment.ok) {
+    // 没有复检就没有可审听的对齐证据：工作台不出现（选择本来也被门禁锁着）。
+    review.evidence = null;
+    review.alignment = null;
+    review.pairId = pairId;
+    applyWorkspaceMode();
+    return;
+  }
+  review.pairId = pairId;
+  review.evidence = evidence;
+  review.alignment = alignment.recheck;
+  // 播放器：如果当前播放源在这个 pair 里不可用（缺 mix.wav），退回原版，不留一个假状态。
+  const wanted = review.playing || review.tab;
+  const usable = (side) => Boolean(evidence.sides[side] && evidence.sides[side].audio);
+  if (!usable(wanted)) review.playing = null;
+
+  renderReviewChrome();
+  renderReviewPage();
+  applyWorkspaceMode();
+  if (review.playing === null) await reviewLoadSide(usable('A') ? 'A' : 'ORIGINAL');
+}
+
+/**
+ * 谁在前面：完成层是第一视图，A/B 审听是它的第二层（同一份数据、同一个播放器）。
+ * 两者永远只显示一个，避免出现「两套完成态」。
+ */
+function applyWorkspaceMode() {
+  const s = completion.state;
+  const complete = Boolean(s && s.complete);
+  const showDetails = completion.detailsOpen || !complete;
+  $('view-tuning').classList.toggle('cp-complete', complete && !showDetails);
+  $('completion').hidden = !(complete && !showDetails);
+  $('review').hidden = !(showDetails && review.evidence);
+}
+
+function renderReviewChrome() {
+  const ev = review.evidence;
+  // 当前页面（在看哪个候选）——与「正在试听」是两件事，永远同时显示。
+  $('rv-page').textContent = REV_TAB_LABEL[review.tab] || '—';
+  for (const [id, side] of [['rv-tab-a', 'A'], ['rv-tab-b', 'B']]) {
+    const btn = $(id);
+    const bundle = ev.sides[side];
+    btn.classList.toggle('active', review.tab === side);
+    btn.classList.toggle('playing', review.playing === side);
+    btn.classList.toggle('chosen', Boolean(decisionForPair(review.pairId)
+      && decisionForPair(review.pairId).kept === side));
+    btn.classList.toggle('unavailable', !(bundle && bundle.audio));
+    const badges = [];
+    if (!(bundle && bundle.audio)) badges.push('不可用');
+    if (review.playing === side) badges.push('当前试听');
+    if (decisionForPair(review.pairId) && decisionForPair(review.pairId).kept === side) badges.push('已选择');
+    btn.textContent = `${REV_TAB_LABEL[side]}${badges.length ? ` · ${badges.join(' · ')}` : ''}`;
+    btn.disabled = !(bundle && bundle.audio);
+  }
+  // 三个真实音源：填充色 + 文字 + 圆点三重表达，不靠颜色单独承载信息。
+  for (const [id, side] of [['rv-src-original', 'ORIGINAL'], ['rv-src-a', 'A'], ['rv-src-b', 'B']]) {
+    const btn = $(id);
+    const bundle = ev.sides[side];
+    const usable = Boolean(bundle && bundle.audio);
+    btn.classList.toggle('active', review.playing === side);
+    btn.disabled = !usable;
+    btn.title = usable ? `试听${revSideLabel(side)}` : `${revSideLabel(side)}暂不可试听`;
+    if (review.playing === side) btn.setAttribute('aria-current', 'true');
+    else btn.removeAttribute('aria-current');
+  }
+  const playing = $('rv-playing');
+  playing.textContent = review.playing ? revSideLabel(review.playing) : '—';
+  playing.className = 'rv-playing' + (review.playing ? ` rv-${review.playing.toLowerCase()}` : ' rv-none');
+  const d = decisionForPair(review.pairId);
+  $('rv-choice-state').textContent = d
+    ? `当前选择：${exitLabel(d.kept)}（已记入账本，可改选）`
+    : '当前选择：未选定 —— 选定之后才能导出。';
+}
+
+/** 一个候选页：身份 → 波形 → 频谱 → 指标 → 图表 → 处理链 → 完整表 → 动作。 */
+function renderReviewPage() {
+  const ev = review.evidence;
+  const side = review.tab;
+  const bundle = ev.sides[side];
+  const other = ev.sides[side === 'A' ? 'B' : 'A'];
+  $('rv-wave-title').textContent = `${REV_TAB_LABEL[side]} 候选波形`;
+
+  // ——— 身份卡（诚实说明永远在这里）———
+  const identity = $('rv-identity');
+  identity.textContent = '';
+  const h = document.createElement('h3');
+  h.className = 'rv-h';
+  h.textContent = revSideLabel(side);
+  identity.appendChild(h);
+  const facts = document.createElement('p');
+  facts.className = 'muted caption';
+  const mode = (ev.mode === 'FAST_STEREO_ONLY') ? '快速完成（仅立体声）' : (ev.mode || '—');
+  facts.textContent = `${mode} · ${bundle.calibrationStatus || '未标注校准状态'}`
+    + ' · 机器已处理并测量；是否更好由你试听决定。';
+  identity.appendChild(facts);
+  if (!bundle.audio) {
+    const warn = document.createElement('p');
+    warn.className = 'rv-missing';
+    warn.textContent = '这一侧的候选音频不可用（缺 mix.wav）：不可试听、也不可选定。';
+    identity.appendChild(warn);
+  }
+
+  renderReviewSpectra();
+  renderReviewMetrics();
+  renderReviewCharts();
+  renderReviewChain();
+  renderReviewTable();
+  renderReviewActions();
+  // 导出目标（与当前 pair 的账本一致）
+  const d = decisionForPair(review.pairId);
+  $('rv-export-target').textContent = d
+    ? `导出对象：${exitLabel(d.kept)}（pair ${review.pairId}）`
+    : '导出对象：尚未选定';
+  $('rv-export-run').disabled = !d;
+  void other;
+}
+
+function renderReviewMissing(box, text) {
+  box.textContent = '';
+  const p = document.createElement('p');
+  p.className = 'rv-missing';
+  p.textContent = text;
+  box.appendChild(p);
+}
+
+/** 频谱：原版 vs 当前候选，并排、同显示尺寸、图例常驻。图来自各自复检报告，缺就写缺。 */
+function renderReviewSpectra() {
+  const box = $('rv-spectra');
+  const ev = review.evidence;
+  const side = review.tab;
+  box.textContent = '';
+  const head = document.createElement('h3');
+  head.className = 'rv-h';
+  head.textContent = `频谱：原版 vs ${REV_TAB_LABEL[side]}`;
+  box.appendChild(head);
+  const note = document.createElement('p');
+  note.className = 'muted caption';
+  note.textContent = '两张图由 Core 的同一导出器分别从各自 report 生成（log 频谱）；本层不重绘、不缩放、不解释差异好坏。';
+  box.appendChild(note);
+
+  const columns = [
+    { key: 'original', label: '原版', bundle: ev.sides.ORIGINAL },
+    { key: 'candidate', label: REV_TAB_LABEL[side], bundle: ev.sides[side] },
+  ];
+  const grid = document.createElement('div');
+  grid.className = 'rv-grid-2';
+  for (const col of columns) {
+    const cell = document.createElement('div');
+    cell.className = 'rv-cell';
+    const cap = document.createElement('p');
+    cap.className = 'rv-cap';
+    const found = (col.bundle.spectra || []).find((s) => s.key === 'spectrum_log');
+    cap.textContent = found ? `${col.label} · 频谱（log）` : `${col.label} · 缺频谱`;
+    cell.appendChild(cap);
+    if (found) {
+      const img = document.createElement('img');
+      img.src = fileUrl(found.path);
+      img.alt = `${col.label} 频谱`;
+      cell.appendChild(img);
+    } else {
+      const miss = document.createElement('p');
+      miss.className = 'rv-missing';
+      miss.textContent = '该复检报告未提供频谱';
+      cell.appendChild(miss);
+    }
+    grid.appendChild(cell);
+  }
+  box.appendChild(grid);
+}
+
+/** 关键指标卡：值全部来自 recheck；缺就写「不可对齐」，不给颜色暗示、不给综合分。 */
+function renderReviewMetrics() {
+  const box = $('rv-metrics');
+  const cards = (review.evidence.sides[review.tab].cards) || [];
+  box.textContent = '';
+  const head = document.createElement('h3');
+  head.className = 'rv-h';
+  head.textContent = `关键指标：原版 → ${REV_TAB_LABEL[review.tab]}`;
+  box.appendChild(head);
+  if (!cards.length) { renderReviewMissing(box, '这份复检没有提供可用于审听的指标。'); return; }
+  const grid = document.createElement('div');
+  grid.className = 'rv-cards';
+  for (const c of cards) {
+    const card = document.createElement('div');
+    card.className = 'rv-card';
+    const name = document.createElement('div');
+    name.className = 'rv-card-name';
+    name.textContent = c.label;
+    card.appendChild(name);
+    if (c.status === 'alignable') {
+      const val = document.createElement('div');
+      val.className = 'rv-card-value';
+      val.textContent = `${revNum(c.original, c.digits)} → ${revNum(c.value, c.digits)}`;
+      card.appendChild(val);
+      const delta = document.createElement('div');
+      delta.className = 'rv-card-delta';
+      delta.textContent = `Δ ${c.delta > 0 ? '+' : ''}${revNum(c.delta, c.digits)} ${c.unit}`;
+      card.appendChild(delta);
+      const unit = document.createElement('div');
+      unit.className = 'muted caption';
+      unit.textContent = `单位：${c.unit} · 指标 id：${c.id}`;
+      card.appendChild(unit);
+    } else {
+      const na = document.createElement('div');
+      na.className = 'rv-card-na';
+      na.textContent = '不可对齐';
+      card.appendChild(na);
+      const why = document.createElement('div');
+      why.className = 'muted caption';
+      why.textContent = c.reason || '复检未说明原因';
+      card.appendChild(why);
+    }
+    grid.appendChild(card);
+  }
+  box.appendChild(grid);
+  const note = document.createElement('p');
+  note.className = 'muted caption';
+  note.textContent = 'Δ 只表示数学方向，不表示审美好坏；本表不出评分、不做推荐。';
+  box.appendChild(note);
+}
+
+function revNum(value, digits) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
+  return value.toFixed(digits === undefined ? 3 : digits);
+}
+
+/** 图表：原版 | 当前候选。候选图按需由 Core 导出器生成（同一份 report），缺就写缺。 */
+async function renderReviewCharts() {
+  const box = $('rv-charts');
+  const ev = review.evidence;
+  const side = review.tab;
+  const caseDir = tuningState.caseDir;
+  const pairId = review.pairId;
+  box.textContent = '';
+  const head = document.createElement('h3');
+  head.className = 'rv-h';
+  head.textContent = `检测图表：原版 | ${REV_TAB_LABEL[side]}`;
+  box.appendChild(head);
+
+  const candidate = ev.sides[side];
+  let charts = candidate.charts || [];
+  if (!charts.length && candidate.audio !== undefined) {
+    const note = document.createElement('p');
+    note.className = 'muted caption';
+    note.textContent = '正在生成这一侧的检测图表…';
+    box.appendChild(note);
+    let res;
+    try { res = await window.moodify.tuningCharts(caseDir, pairId, side); } catch { res = null; }
+    if (state.caseDir !== caseDir || review.pairId !== pairId || review.tab !== side) return;
+    if (res && res.ok) {
+      charts = res.charts || [];
+      // 只刷新这一侧的图表数据，不重跑整页
+      candidate.charts = charts;
+    } else {
+      renderReviewMissing(box, `这一侧的检测图表不可用：${(res && res.reason) || '生成失败'}（不会用原版图占位）`);
+      return;
+    }
+  }
+  box.textContent = '';
+  box.appendChild(head);
+
+  if (!charts.length) {
+    renderReviewMissing(box, '该复检报告未提供检测图表（不会用原版图占位）。');
+    return;
+  }
+  for (const chart of charts) {
+    const row = document.createElement('div');
+    row.className = 'rv-chart-row';
+    const cap = document.createElement('p');
+    cap.className = 'rv-cap';
+    cap.textContent = chart.label;
+    row.appendChild(cap);
+    const grid = document.createElement('div');
+    grid.className = 'rv-grid-2';
+    const originalChart = (ev.sides.ORIGINAL.charts || []).find((c) => c.key === chart.key);
+    for (const [label, found] of [['原版', originalChart], [REV_TAB_LABEL[side], chart]]) {
+      const cell = document.createElement('div');
+      cell.className = 'rv-cell';
+      const sub = document.createElement('p');
+      sub.className = 'rv-cap';
+      sub.textContent = found ? label : `${label} · 缺图`;
+      cell.appendChild(sub);
+      if (found) {
+        const img = document.createElement('img');
+        img.src = fileUrl(found.path);
+        img.alt = `${label} ${chart.label}`;
+        cell.appendChild(img);
+      } else {
+        const miss = document.createElement('p');
+        miss.className = 'rv-missing';
+        miss.textContent = '该报告未提供此图';
+        cell.appendChild(miss);
+      }
+      grid.appendChild(cell);
+    }
+    row.appendChild(grid);
+    box.appendChild(row);
+  }
+  // 原版图表同样按需生成（只用于对照，不替代候选图）
+  if (!(ev.sides.ORIGINAL.charts || []).length) {
+    try {
+      const res = await window.moodify.tuningCharts(caseDir, pairId, 'ORIGINAL');
+      if (res && res.ok) ev.sides.ORIGINAL.charts = res.charts || [];
+    } catch { /* 对照图缺失就保持缺失，绝不用候选图顶替 */ }
+  }
+}
+
+/** 处理链：只读展示 Core 写的算子与参数 + Mix Graph digest（解释「为什么不同」）。 */
+function renderReviewChain() {
+  const box = $('rv-chain');
+  const bundle = review.evidence.sides[review.tab];
+  box.textContent = '';
+  const head = document.createElement('h3');
+  head.className = 'rv-h';
+  head.textContent = '实际处理链（只读）';
+  box.appendChild(head);
+  if (!bundle.chain || !bundle.chain.nodes.length) {
+    renderReviewMissing(box, '这一侧没有可读的处理链产物（缺 plan/evidence）。');
+    return;
+  }
+  const chain = document.createElement('p');
+  chain.className = 'rv-chain';
+  chain.textContent = bundle.chain.nodes.map((n) => n.type).join(' → ');
+  box.appendChild(chain);
+  const meta = document.createElement('p');
+  meta.className = 'muted caption';
+  meta.textContent = `Mix Graph digest：${(bundle.chain.graphDigest || '—').slice(0, 16)}…`
+    + ` · 引擎：${bundle.chain.engineVersion || '—'}`
+    + ` · 复合：${bundle.chain.composite === 'identity_single_track' ? '单轨恒等（整轨两档）' : (bundle.chain.composite || '—')}`
+    + ` · 待人确认：${bundle.chain.reviewRequired ? '是' : '否'}`;
+  box.appendChild(meta);
+  const details = document.createElement('details');
+  const summary = document.createElement('summary');
+  summary.textContent = '展开实际参数';
+  details.appendChild(summary);
+  const pre = document.createElement('pre');
+  pre.className = 'rv-pre';
+  pre.textContent = JSON.stringify(bundle.chain.nodes, null, 2);
+  details.appendChild(pre);
+  box.appendChild(details);
+  const gates = document.createElement('p');
+  gates.className = 'muted caption';
+  const passed = (bundle.chain.checks || []).filter((g) => g.passed).length;
+  gates.textContent = `Core 硬门禁：${passed}/${(bundle.chain.checks || []).length} 通过`
+    + (bundle.chain.checks || []).map((g) => ` · ${g.gate}`).join('');
+  box.appendChild(gates);
+}
+
+/** 完整复检表（审计层）：默认折叠，只按当前候选过滤；不可对齐项保留真实原因。 */
+function renderReviewTable() {
+  const box = $('rv-table');
+  const filters = $('rv-table-filters');
+  const toggle = $('rv-table-toggle');
+  const r = review.alignment;
+  const side = review.tab;
+  if (!r) { box.textContent = ''; box.hidden = true; filters.hidden = true; return; }
+  const total = r.summary.alignable_count + r.summary.not_alignable_count;
+  toggle.textContent = review.tableOpen
+    ? `收起完整复检表（${total} 项）`
+    : `查看全部 ${total} 项复检指标`;
+  box.hidden = !review.tableOpen;
+  filters.hidden = !review.tableOpen;
+  if (!review.tableOpen) { box.textContent = ''; return; }
+
+  const head = document.createElement('p');
+  head.className = 'muted caption';
+  head.textContent = `可比 ${r.summary.alignable_count} 项 · 不可比 ${r.summary.not_alignable_count} 项`
+    + ` · 本页只列「原版 / ${REV_TAB_LABEL[side]}」两列（本表只报变了什么，不报更好）`;
+
+  const table = document.createElement('table');
+  table.className = 'data rv-data';
+  const thead = document.createElement('thead');
+  thead.innerHTML = `<tr><th>指标</th><th>原版</th><th>${side === 'A' ? 'A' : 'B'}</th><th>Δ</th><th>单位</th></tr>`;
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  const column = r[side] || {};
+  let rows = 0;
+  for (const id of r.alignable) {
+    const delta = (column.delta_vs_original || {})[id];
+    if (review.tableFilter === 'changed' && (delta === 0 || delta === null || delta === undefined)) continue;
+    if (review.tableFilter === 'not_alignable') continue;
+    const original = (r.original.metrics || {})[id] || {};
+    const candidate = (column.metrics || {})[id] || {};
+    const tr = document.createElement('tr');
+    for (const cell of [id, original.value, candidate.value, delta, original.unit || '']) {
+      const td = document.createElement('td');
+      td.textContent = cell === null || cell === undefined ? '—' : String(cell);
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+    rows += 1;
+  }
+  if (review.tableFilter !== 'changed') {
+    for (const na of r.not_alignable) {
+      const tr = document.createElement('tr');
+      tr.className = 'rv-na-row';
+      const td = document.createElement('td');
+      td.textContent = na.name;
+      const td2 = document.createElement('td');
+      td2.colSpan = 3;
+      td2.textContent = `不可对齐：${na.reason}`;
+      const td3 = document.createElement('td');
+      td3.textContent = '—';
+      tr.append(td, td2, td3);
+      tbody.appendChild(tr);
+      rows += 1;
+    }
+  }
+  table.appendChild(tbody);
+  box.textContent = '';
+  box.appendChild(head);
+  if (!rows) {
+    const none = document.createElement('p');
+    none.className = 'muted caption';
+    none.textContent = review.tableFilter === 'changed'
+      ? '这一侧没有与「仅看有变化」匹配的指标。'
+      : '没有匹配的指标。';
+    box.appendChild(none);
+  } else {
+    box.appendChild(table);
+  }
+}
+
+/** 动作区：每页的主动作与本页对象一致；「保留原版」是三出口里共同的第三选项。 */
+function renderReviewActions() {
+  const side = review.tab;
+  const bundle = review.evidence.sides[side];
+  const blockers = tuningState.decisionBlockers[review.pairId] || [];
+  const ready = blockers.length === 0 && Boolean(bundle.audio);
+  $('rv-choose').textContent = `选择 ${REV_TAB_LABEL[side]}`;
+  $('rv-choose').disabled = !ready;
+  $('rv-keep-original').disabled = !ready;
+  const note = $('tuning-note');
+  if (!ready && blockers.length) note.textContent = `还不能选定：${blockers.join('；')}`;
+}
+
+//
+// 产品方向（2026-10-04 采纳）：**逆向工程 · 多轨复合**。
+// 先把立体声逆向分解成多轨，逐轨修音，再复合——多轨复合才是 AI 后处理的核心操作。
+// 该方向的前提是**假设**，所以由两道机制关住风险：可逆性门禁（不过则 ④修音 不开）
+// 与第三出口「保留原版」。
 //
 // 阶段状态由 main 侧从磁盘产物**推导**（src/pipeline.js），渲染层不自己记进度，
 // 也不允许把「未满足前置」的阶段显示成可用。
 
+// ——— 传输控制：一个播放器、三个真实音源、同一时间位置 ———
+//
+// 同一时刻只加载一个源（没有三个 AudioContext、没有三个播放头）。切换源时记住当前时间与
+// 缩放，加载完成后回到同一位置；加载失败就**保持上一个可播放源**，绝不出现「按钮显示 B、
+// 实际在放 A」。位置绝不在切换时被偷偷归零。
+
+function reviewSelectTab(side) {
+  if (review.tab === side) return;
+  review.tab = side;
+  renderReviewChrome();
+  renderReviewPage();
+}
+
+function destroyReviewTransport() {
+  if (review.ws) { try { review.ws.destroy(); } catch { /* already gone */ } }
+  review.ws = null;
+  review.bufferCache.clear();
+  review.zoomPx = null;
+  review.loadToken += 1;
+}
+
+function reviewSetLoadNote(text) { $('rv-load').textContent = text || ''; }
+
+function reviewCurrentPosition() {
+  if (!review.ws) return 0;
+  try { return review.ws.getCurrentTime() || 0; } catch { return 0; }
+}
+
+function reviewIsPlaying() {
+  if (!review.ws) return false;
+  try { return review.ws.isPlaying(); } catch { return false; }
+}
+
+/** 把已解码的 buffer 放进一个最多两条的缓存（长曲不至于把内存吃光）。 */
+function reviewCacheBuffer(side, buffer) {
+  review.bufferCache.delete(side);
+  review.bufferCache.set(side, buffer);
+  while (review.bufferCache.size > 2) {
+    const oldest = review.bufferCache.keys().next().value;
+    review.bufferCache.delete(oldest);
+  }
+}
+
+async function reviewDecodeSide(side) {
+  const cached = review.bufferCache.get(side);
+  if (cached) return cached;
+  const bytes = await window.moodify.tuningAudio(tuningState.caseDir, review.pairId, side);
+  const ab = bytes instanceof ArrayBuffer ? bytes
+    : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+  const ctx = new AudioContext();
+  try {
+    const audio = await ctx.decodeAudioData(ab);
+    reviewCacheBuffer(side, audio);
+    return audio;
+  } finally {
+    await ctx.close();
+  }
+}
+
+function reviewMountTransport(buffer) {
+  if (!review.ws) {
+    review.ws = WaveSurfer.create({
+      container: $('rv-wave'),
+      backend: 'WebAudio',
+      height: 96,
+      splitChannels: true,
+      responsive: true,
+      scroll: true,
+      waveColor: 'rgba(79, 70, 229, 0.38)',
+      progressColor: 'rgba(79, 70, 229, 0.82)',
+      cursorColor: '#16181d',
+      cursorWidth: 1,
+      plugins: [WaveSurfer.timeline.create({
+        container: $('rv-ruler'),
+        fontSize: 10,
+        primaryColor: '#d1d5db',
+        secondaryColor: '#f3f4f6',
+        primaryFontColor: '#9ca3af',
+        secondaryFontColor: '#c7cbd1',
+      })],
+    });
+    review.ws.on('timeupdate', (t) => {
+      if (!review.ws) return;
+      const text = `${fmtTime(t)} / ${fmtTime(review.ws.getDuration() || 0)}`;
+      $('rv-time').textContent = text;
+      $('cp-time').textContent = text;
+    });
+    review.ws.on('play', () => { $('rv-play').textContent = '⏸'; $('cp-play').textContent = '⏸'; });
+    review.ws.on('pause', () => { $('rv-play').textContent = '▶'; $('cp-play').textContent = '▶'; });
+    review.ws.on('finish', () => {
+      // 曲终保持安静：停在这里，不自动跳下一首、不弹任何推荐
+      $('rv-play').textContent = '▶';
+      $('cp-play').textContent = '▶';
+    });
+  }
+  review.ws.loadDecodedBuffer(buffer);
+  $('rv-time').textContent = `0:00.0 / ${fmtTime(buffer.duration)}`;
+}
+
+/**
+ * 载入某个音源。切换时保留时间位置与缩放；失败时保持上一个可播放源。
+ *
+ * @param {'ORIGINAL'|'A'|'B'} side
+ * @param {{autoplay?:boolean}} [opts]
+ */
+async function reviewLoadSide(side, opts = {}) {
+  const caseDir = tuningState.caseDir;
+  const pairId = review.pairId;
+  if (!caseDir || !pairId) return;
+  const bundle = review.evidence && review.evidence.sides[side];
+  if (!bundle || !bundle.audio) {
+    reviewSetLoadNote(`${revSideLabel(side)}没有可用音频`);
+    return;
+  }
+  const token = ++review.loadToken;
+  const position = reviewCurrentPosition();
+  const wasPlaying = reviewIsPlaying();
+  const previous = review.playing;
+  reviewSetLoadNote(`正在加载${revSideLabel(side)}…`);
+  let buffer;
+  try {
+    buffer = await reviewDecodeSide(side);
+  } catch (err) {
+    if (token !== review.loadToken) return;
+    // 真实原因照说；播放器保持在原来那一侧（绝不把按钮状态切成 B 却仍在放 A）。
+    reviewSetLoadNote(`加载${revSideLabel(side)}失败：${(err && err.message) || err}`);
+    return;
+  }
+  if (token !== review.loadToken) return;             // 只接受最后一次切换
+  if (state.caseDir !== caseDir || review.pairId !== pairId) return; // 换世界/换 pair
+
+  if (!review.ws) reviewMountTransport(buffer);
+  else review.ws.loadDecodedBuffer(buffer);
+  if (position > 0) {
+    try { review.ws.seekTo(Math.min(position, buffer.duration)); } catch { /* keep 0 */ }
+  }
+  review.playing = side;
+  reviewSetLoadNote('');
+  renderReviewChrome();
+  requestAnimationFrame(applyReviewZoom); // 换 buffer 后重新应用同一缩放
+  const keepPlaying = opts.autoplay === undefined ? wasPlaying : opts.autoplay;
+  if (keepPlaying) { try { review.ws.play(); } catch { /* user gesture rules */ } }
+  void previous;
+}
+
+function reviewTogglePlay() {
+  if (!review.ws) return;
+  review.ws.playPause();
+}
+
+/**
+ * 波形缩放：默认适配全曲（长曲不会把页面横向撑破），缩小/放大只在显式点击时发生。
+ * 切换音源后重新应用同一缩放，于是「保留当前缩放范围」是真的。
+ */
+function applyReviewZoom() {
+  const el = $('rv-wave');
+  if (!review.ws || !el || el.clientWidth < 10) return; // 隐藏态宽度为 0
+  const duration = review.ws.getDuration() || 1;
+  const fitPx = el.clientWidth / duration;
+  review.ws.zoom(Math.max(review.zoomPx || fitPx, fitPx));
+}
+
+function reviewSetZoom(factor) {
+  const el = $('rv-wave');
+  if (!review.ws || !el || el.clientWidth < 10) return;
+  const duration = review.ws.getDuration() || 1;
+  const fitPx = el.clientWidth / duration;
+  review.zoomPx = Math.min(800, Math.max(fitPx, (review.zoomPx || fitPx) * factor));
+  applyReviewZoom();
+}
+
+// ——— 完成层（Phase 2.3）：作品留存 ———
+//
+// 「完成」不是这里判断的：能不能进入由 keepsake:state 投影（= pipeline 产物 + ⑦ 准入）决定。
+// 本层只做三件事：把作品安静地摆出来、把最终选择听一遍、把一句话与作品卡留下来。
+// 它复用 Phase 2.2 的同一个 transport（`review.ws`），不新建播放器、不复用第二份数据。
+
+const CP_COLORS = {
+  ORIGINAL: { line: '#64748b', soft: 'rgba(100, 116, 139, 0.18)' },
+  A: { line: '#4f46e5', soft: 'rgba(79, 70, 229, 0.18)' },
+  B: { line: '#c2410c', soft: 'rgba(194, 65, 12, 0.18)' },
+};
+
+const completion = {
+  state: null,
+  quiet: false,
+  detailsOpen: false,   // 「查看制作详情」= 把 A/B 审听这第二层打开
+  includeInscription: true,
+  lastStatus: '',
+  imprintDrawToken: 0,
+};
+
+function prefersReducedMotion() {
+  try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; }
+}
+
+function initCompletion() {
+  $('cp-listen').addEventListener('click', completionListenFromStart);
+  $('cp-play').addEventListener('click', () => reviewTogglePlay());
+  $('cp-exit-listen').addEventListener('click', () => completionExitQuiet());
+  $('cp-details').addEventListener('click', () => completionShowDetails());
+  $('cp-export').addEventListener('click', exportChosen);
+  $('cp-card').addEventListener('click', completionSaveCard);
+  $('cp-inscribe-toggle').addEventListener('click', () => {
+    $('cp-inscribe-box').hidden = !$('cp-inscribe-box').hidden;
+    if (!$('cp-inscribe-box').hidden) $('cp-inscription').focus();
+  });
+  $('cp-inscription-save').addEventListener('click', completionSaveInscription);
+  $('cp-inscription-clear').addEventListener('click', () => {
+    // 清空是普通编辑行为：不发确认弹窗、不报警，写完就安静地更新
+    $('cp-inscription').value = '';
+    completionSaveInscription();
+  });
+  $('cp-card-include').addEventListener('change', () => {
+    completion.includeInscription = $('cp-card-include').checked;
+  });
+  $('cp-volume').addEventListener('input', () => {
+    const value = Number($('cp-volume').value) / 100;
+    if (review.ws && typeof review.ws.setVolume === 'function') review.ws.setVolume(value);
+  });
+  window.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (completion.quiet) { completionExitQuiet(); return; }
+    if ($('completion').hidden) return;
+    if (!$('cp-inscribe-box').hidden) { $('cp-inscribe-box').hidden = true; return; }
+  });
+}
+
+/** 刷新完成状态；返回 true 表示当前 case 有完成层可进。 */
+async function refreshCompletion() {
+  const caseDir = tuningState.caseDir || state.caseDir;
+  if (!caseDir) { $('completion').hidden = true; return false; }
+  let res;
+  try { res = await window.moodify.keepsakeState(caseDir); } catch { res = null; }
+  if (state.caseDir !== caseDir) return false;
+  completion.state = res && res.ok ? res : null;
+  return renderCompletion();
+}
+
+/**
+ * 渲染完成层。返回是否显示。
+ *
+ * 只有真完成才显示：伪造的 decision、被删掉的候选、消失的复检，都会让 complete 为假，
+ * 于是这里**什么都不显示**（回到真实的 A/B/阻断状态），而不是摆一个假完成。
+ */
+function renderCompletion() {
+  const s = completion.state;
+  const complete = Boolean(s && s.complete);
+  const layer = $('completion');
+  if (!complete) {
+    layer.hidden = true;
+    completion.quiet = false;
+    completion.detailsOpen = false;
+    document.body.classList.remove('cp-quiet');
+    applyWorkspaceMode();
+    return false;
+  }
+  layer.hidden = false;
+  $('cp-title').textContent = s.title || '未命名作品';
+  $('cp-title').title = s.title || '';
+  // 「快速完成」只是小型事实标签；保留原版时就说保留原版，不伪装成处理版本。
+  const version = s.selected === 'ORIGINAL'
+    ? '保留原版'
+    : [s.selectedLabel, s.tierLabel].filter(Boolean).join(' · ');
+  $('cp-version').textContent = version;
+  const completed = s.completedAt ? new Date(s.completedAt) : null;
+  $('cp-date').textContent = completed && !Number.isNaN(completed.getTime())
+    ? `${completed.getFullYear()}.${String(completed.getMonth() + 1).padStart(2, '0')}.${String(completed.getDate()).padStart(2, '0')}`
+    : '';
+
+  // 文字：完成层显示的永远是本地留存里那一句（可编辑、可清空）
+  const text = typeof s.inscription === 'string' ? s.inscription : '';
+  $('cp-inscription-shown').textContent = text;
+  $('cp-inscription-shown').hidden = !text;
+  if ($('cp-inscription').value !== text) $('cp-inscription').value = text;
+
+  // 警告（音频不可用 / 留存文件读不出来）就地显示，不弹 toast
+  const warn = $('cp-warning');
+  if (!s.audioAvailable) {
+    warn.hidden = false;
+    warn.textContent = s.selected === 'ORIGINAL'
+      ? '原版音频不可用（文件可能被移动或删除）。'
+      : `${s.selectedLabel} 的音频不可用（文件可能被移动或删除）。`;
+  } else if (s.keepsakeError) {
+    warn.hidden = false;
+    warn.textContent = '留存记录读取失败，本次显示为空白状态（不影响声音与导出）。';
+  } else {
+    warn.hidden = true;
+    warn.textContent = '';
+  }
+
+  drawCompletionImprint();
+  $('cp-listen').disabled = !s.audioAvailable;
+  $('cp-export').disabled = !s.audioAvailable;
+  $('cp-card').disabled = false;
+  $('cp-status').textContent = completion.lastStatus;
+  applyWorkspaceMode();
+  return true;
+}
+
+/** 把留存里的波形印记画出来；没有印记时从已解码的最终音频算一次并存下来。 */
+function drawCompletionImprint() {
+  const canvas = $('cp-imprint');
+  const s = completion.state;
+  if (!canvas || !s) return;
+  if (Array.isArray(s.imprint) && s.imprint.length) {
+    paintImprint(canvas, s.imprint, s.selected);
+    return;
+  }
+  paintImprint(canvas, [], s.selected);
+  // 还没有印记：用最终选择的真实音频算一次（同一段音频永远得到同一个形状）
+  ensureSelectedAudioDecoded().then((buffer) => {
+    if (!buffer || !completion.state || completion.state.selected !== s.selected) return;
+    const peaks = imprintPeaksFromBuffer(buffer, completion.state.imprintBuckets || 600);
+    if (!peaks.length) return;
+    paintImprint(canvas, peaks, s.selected);
+    window.moodify.keepsakeImprint(tuningState.caseDir, peaks).then((res) => {
+      if (res && res.ok && completion.state) completion.state.imprint = res.imprint;
+    }).catch(() => { /* 印记存不下来不影响任何东西 */ });
+  }).catch(() => { /* 音频不可用时只是没有印记 */ });
+}
+
+/** 从**已解码的最终音频**取峰值包络（纯计算：无随机、无时钟、桶数固定）。 */
+function imprintPeaksFromBuffer(buffer, buckets) {
+  const count = Math.max(1, Number(buckets) || 600);
+  const channels = Math.max(1, buffer.numberOfChannels || 1);
+  const length = buffer.length || 0;
+  if (!length) return [];
+  const data = [];
+  for (let c = 0; c < channels; c += 1) data.push(buffer.getChannelData(c));
+  const peaks = new Array(count).fill(0);
+  for (let i = 0; i < count; i += 1) {
+    const start = Math.floor((i * length) / count);
+    const end = Math.max(start + 1, Math.floor(((i + 1) * length) / count));
+    let peak = 0;
+    for (let j = start; j < end && j < length; j += 1) {
+      let value = 0;
+      for (let c = 0; c < channels; c += 1) {
+        const sample = Math.abs(data[c][j]);
+        if (sample > value) value = sample;
+      }
+      if (value > peak) peak = value;
+    }
+    peaks[i] = Math.min(1, peak);
+  }
+  return peaks;
+}
+
+/**
+ * 画波形印记：只画形状，不画时间刻度、网格或工程游标。
+ * 它是作品的指纹，不是 DAW 截图，也不是分析证据。
+ */
+function paintImprint(canvas, imprint, selected) {
+  const ctx = canvas.getContext('2d');
+  const colors = CP_COLORS[selected] || CP_COLORS.ORIGINAL;
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = colors.soft;
+  ctx.fillRect(0, 0, width, height);
+
+  const mid = height / 2;
+  const top = 18;
+  const bottom = height - 18;
+  const usable = (bottom - top) / 2;
+  ctx.fillStyle = colors.line;
+  if (!imprint.length) {
+    // 还没有可画的形状：留一条极细的中线，不假装有波形
+    ctx.globalAlpha = 0.35;
+    ctx.fillRect(0, mid - 0.5, width, 1);
+    ctx.globalAlpha = 1;
+    return;
+  }
+  const step = width / imprint.length;
+  for (let i = 0; i < imprint.length; i += 1) {
+    const value = Math.max(0, Math.min(1, imprint[i] || 0));
+    const barHeight = Math.max(1, value * usable);
+    const x = i * step;
+    ctx.globalAlpha = 0.9;
+    ctx.fillRect(x, mid - barHeight, Math.max(0.8, step * 0.72), barHeight * 2);
+  }
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(22, 24, 29, 0.16)';
+  ctx.fillRect(0, mid, width, 1);
+}
+
+/** 取「最终选择」的已解码音频（复用 Phase 2.2 的同一解码路径与缓存）。 */
+async function ensureSelectedAudioDecoded() {
+  const s = completion.state;
+  if (!s || !s.complete || !s.audioAvailable) return null;
+  try {
+    return await reviewDecodeSide(s.selected);
+  } catch {
+    return null;
+  }
+}
+
+/** ▶ 从头听：载入最终选择、位置归零、进入安静聆听；绝不自动播放之外的任何东西。 */
+async function completionListenFromStart() {
+  const s = completion.state;
+  if (!s || !s.complete || !s.audioAvailable) return;
+  review.pairId = s.pairId;
+  review.tab = s.selected === 'A' ? 'A' : (s.selected === 'B' ? 'B' : review.tab);
+  await reviewLoadSide(s.selected, { autoplay: false });
+  if (review.ws) {
+    try { review.ws.seekTo(0); } catch { /* fresh buffer starts at 0 anyway */ }
+    try { review.ws.play(); } catch { /* user gesture rules may block; the button shows ▶ */ }
+  }
+  completionEnterQuiet();
+}
+
+function completionEnterQuiet() {
+  completion.quiet = true;
+  document.body.classList.add('cp-quiet');
+  $('cp-listen-bar').hidden = false;
+  $('cp-listen').hidden = true;
+  $('cp-listen').focus();
+  paintCompletionListening();
+}
+
+function completionExitQuiet() {
+  completion.quiet = false;
+  document.body.classList.remove('cp-quiet');
+  $('cp-listen-bar').hidden = true;
+  $('cp-listen').hidden = false;
+}
+
+/** 播放身份与时间：安静聆听时也要明确「现在放的是哪一版」。 */
+function paintCompletionListening() {
+  const s = completion.state;
+  if (!s) return;
+  const playing = review.playing || s.selected;
+  $('cp-listening').textContent = `正在播放：${playing === 'ORIGINAL' ? '保留原版' : revSideLabel(playing)}`;
+}
+
+/** 「查看制作详情」：回到 Phase 2.2 的 A/B 审听（证据都在那里，完成不删除证据）。 */
+async function completionShowDetails() {
+  completionExitQuiet();
+  completion.detailsOpen = true;
+  await refreshReview();
+  applyWorkspaceMode();
+  const target = $('session-head');
+  if (target && typeof target.scrollIntoView === 'function') {
+    // 减少动画时直接跳过去，不做平滑滚动
+    target.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  }
+}
+
+async function completionSaveInscription() {
+  const caseDir = tuningState.caseDir || state.caseDir;
+  if (!caseDir) return;
+  const text = $('cp-inscription').value;
+  let res;
+  try { res = await window.moodify.keepsakeInscription(caseDir, text); }
+  catch (err) { res = { ok: false, reason: (err && err.message) || String(err) }; }
+  if (!res || !res.ok) {
+    const why = res && res.reason === 'INSCRIPTION_TOO_LONG' ? '最多 280 个字'
+      : (res && res.reason === 'INSCRIPTION_TOO_MANY_LINES' ? '最多 4 行'
+        : '暂时存不下来');
+    $('cp-status').textContent = `文字${why}。`;
+    return;
+  }
+  if (completion.state) completion.state.inscription = res.inscription;
+  $('cp-inscription-shown').textContent = res.inscription;
+  $('cp-inscription-shown').hidden = !res.inscription;
+  $('cp-status').textContent = '已留下';
+  $('cp-inscribe-box').hidden = true;
+}
+
+/**
+ * 保存作品卡：本地画一张 PNG（1600×1000，确定性），再过系统保存对话框落盘。
+ * 卡片上只有：Moodify 标识、标题、最终选择、波形印记、完成日期、可选的一句话。
+ */
+async function completionSaveCard() {
+  const caseDir = tuningState.caseDir || state.caseDir;
+  const s = completion.state;
+  if (!caseDir || !s || !s.complete) return;
+  $('cp-status').textContent = '正在生成作品卡…';
+  let bytes;
+  try {
+    bytes = await drawKeepsakeCard(s, completion.includeInscription);
+  } catch (err) {
+    $('cp-status').textContent = '作品卡生成失败。';
+    return;
+  }
+  if (!bytes) { $('cp-status').textContent = '作品卡生成失败。'; return; }
+  let res;
+  try { res = await window.moodify.keepsakeSaveCard(caseDir, bytes); }
+  catch (err) { res = { ok: false, reason: (err && err.message) || String(err) }; }
+  if (!res) { $('cp-status').textContent = '作品卡保存失败。'; return; }
+  if (res.canceled) { $('cp-status').textContent = ''; return; }   // 用户取消不算失败
+  $('cp-status').textContent = res.ok ? '作品卡已保存' : '作品卡保存失败。';
+}
+
+function loadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+/** 文本换行（按像素宽度贪心断行），确定性、可预测。 */
+function wrapCanvasText(ctx, text, maxWidth, maxLines) {
+  const lines = [];
+  for (const paragraph of String(text).split('\n')) {
+    let current = '';
+    for (const char of paragraph) {
+      const next = current + char;
+      if (ctx.measureText(next).width > maxWidth && current) {
+        lines.push(current);
+        current = char;
+        if (lines.length >= maxLines) break;
+      } else {
+        current = next;
+      }
+    }
+    if (lines.length >= maxLines) break;
+    lines.push(current);
+  }
+  return lines.slice(0, maxLines);
+}
+
+async function drawKeepsakeCard(state, includeInscription) {
+  const width = 1600;
+  const height = 1000;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  const colors = CP_COLORS[state.selected] || CP_COLORS.ORIGINAL;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = colors.soft;
+  ctx.fillRect(0, 0, width, height);
+
+  // Moodify 小型标识（现有品牌资产；加载不出来就不画，绝不拿别的东西顶替）
+  const logo = await loadImage('assets/moodify_logo.png');
+  if (logo && logo.width) {
+    const markWidth = 180;
+    const markHeight = Math.round((logo.height / logo.width) * markWidth);
+    ctx.globalAlpha = 0.9;
+    ctx.drawImage(logo, 96, 84, markWidth, Math.min(markHeight, 64));
+    ctx.globalAlpha = 1;
+  }
+
+  // 标题（最多两行，超出用省略号；不换行也不能溢出）
+  ctx.fillStyle = '#16181d';
+  ctx.font = '600 58px "Microsoft YaHei", "Segoe UI", sans-serif';
+  const titleLines = wrapCanvasText(ctx, state.title || '未命名作品', width - 192, 2);
+  let y = 300;
+  for (const [index, line] of titleLines.entries()) {
+    const isLast = index === titleLines.length - 1;
+    const text = isLast && line.length < String(state.title || '').length ? `${line}…` : line;
+    ctx.fillText(text, 96, y);
+    y += 72;
+  }
+
+  // 版本
+  ctx.fillStyle = colors.line;
+  ctx.font = '500 30px "Microsoft YaHei", "Segoe UI", sans-serif';
+  const version = state.selected === 'ORIGINAL'
+    ? '保留原版'
+    : [state.card.selectionLabel, state.card.versionLabel].filter(Boolean).join(' · ');
+  ctx.fillText(version, 96, y + 6);
+
+  // 波形印记：同一份数据、同一算法（与完成层一致）
+  const imprintTop = 470;
+  const imprintHeight = 240;
+  const imprintWidth = width - 192;
+  const imprint = Array.isArray(state.imprint) ? state.imprint : [];
+  ctx.fillStyle = colors.line;
+  if (!imprint.length) {
+    ctx.globalAlpha = 0.35;
+    ctx.fillRect(96, imprintTop + imprintHeight / 2, imprintWidth, 2);
+    ctx.globalAlpha = 1;
+  } else {
+    const mid = imprintTop + imprintHeight / 2;
+    const usable = imprintHeight / 2;
+    const step = imprintWidth / imprint.length;
+    for (let i = 0; i < imprint.length; i += 1) {
+      const value = Math.max(0, Math.min(1, imprint[i] || 0));
+      const barHeight = Math.max(1, value * usable);
+      ctx.fillRect(96 + i * step, mid - barHeight, Math.max(1, step * 0.72), barHeight * 2);
+    }
+  }
+
+  // 完成日期
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '400 28px "Microsoft YaHei", "Segoe UI", sans-serif';
+  if (state.card.dateLabel) ctx.fillText(state.card.dateLabel, 96, imprintTop + imprintHeight + 72);
+
+  // 一句私人文字（可选包含）
+  if (includeInscription && state.card.inscription) {
+    ctx.fillStyle = '#16181d';
+    ctx.font = '400 30px "Microsoft YaHei", "Segoe UI", sans-serif';
+    const lines = wrapCanvasText(ctx, state.card.inscription, width - 192, 4);
+    let ty = imprintTop + imprintHeight + 150;
+    for (const line of lines) {
+      ctx.fillText(line, 96, ty);
+      ty += 42;
+    }
+  }
+
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+  if (!blob) return null;
+  return new Uint8Array(await blob.arrayBuffer());
+}
+
+// ——— 生产流程（V4）：检测 → 逆向分解 → 结构 → 修音 → 复合 → 复检 → 选定 → 导出 ———
+//
+// 产品方向（人类 2026-10-04 采纳）：**逆向工程 · 多轨复合**。
+// 先把立体声逆向分解成多轨，逐轨修音，再复合——多轨复合才是 AI 后处理的核心操作。
+// 该方向的前提是**假设**，所以由两道机制关住风险：可逆性门禁（不过则 ④修音 不开）
+// 与第三出口「保留原版」。
+
 const PIPELINE_STAGES = [
   { id: 'analyze', label: '① 检测', view: 'data' },
-  { id: 'diagnose', label: '② 问题', view: 'diagnosis' },
-  { id: 'separate', label: '③ 分轨', view: 'stems' },
-  { id: 'structure', label: '④ 结构', view: 'score' },
-  { id: 'plan', label: '⑤ 方案', view: 'plan' },
-  { id: 'finish', label: '⑥ 成品', view: 'studio' },
+  { id: 'separate', label: '② 逆向分解', view: 'stems' },
+  { id: 'structure', label: '③ 结构', view: 'score' },
+  { id: 'tune', label: '④ 修音', view: 'tuning' },
+  { id: 'compose', label: '⑤ 复合', view: 'tuning' },
+  { id: 'recheck', label: '⑥ 复检', view: 'tuning' },
+  { id: 'choose', label: '⑦ 选定', view: 'tuning' },
+  { id: 'export', label: '⑧ 导出', view: 'tuning' },
 ];
 
 const pipe = { caseDir: null, snap: null };
 
 function initPipeline() {
-  $('rail-studio').addEventListener('click', enterPipeline);
+  // rail-tuning 接到 enterPipeline：入口落在第一个未完成的阶段，不直接跳到处理。
+  $('rail-tuning').addEventListener('click', enterPipeline);
   $('pipeline-quick').addEventListener('click', chooseQuickFinish);
-  $('diagnosis-generate').addEventListener('click', runDiagnosis);
-  $('diagnosis-note-save').addEventListener('click', saveDiagnosisNote);
-  $('plan-build').addEventListener('click', buildPlanContext);
 }
 
 function resetPipeline() {
@@ -2679,15 +4065,6 @@ function resetPipeline() {
   $('pipeline-stages').textContent = '';
   $('pipeline-mode').hidden = true;
   $('pipeline-quick').hidden = true;
-  $('diagnosis-summary').textContent = '';
-  $('diagnosis-issues').textContent = '';
-  $('diagnosis-draft').textContent = '';
-  $('diagnosis-preserve').textContent = '';
-  $('diagnosis-state').textContent = '';
-  $('diagnosis-empty').hidden = true;
-  $('plan-context').textContent = '';
-  $('plan-draft').textContent = '';
-  $('plan-readiness').textContent = '';
 }
 
 async function refreshPipeline() {
@@ -2705,43 +4082,51 @@ async function refreshPipeline() {
 /**
  * Which stages the current case may enter. Mirrors src/pipeline.js gates().
  *
- * ⑤ 方案 opens only after decomposition — 检测 + 问题 + 分轨 + MIDI — because an AI plan
- * written before the song has been taken apart is the mistake this ordering exists to stop.
- * ⑥ 成品 opens on the canonical path only once a real plan artifact exists
- * (studio/plans/*.json), OR after the user has explicitly opted into a Quick Finish.
- * Quick Finish never unlocks ⑤: it is a bypass around decomposition, not a planning route.
+ * ④ 修音 requires 分轨 + MIDI **and 可逆性通过**：分解是信息有损的，原分轨不可知，
+ * 所以唯一可测的质量代理是「分解 → 复合（不处理）是否回到原版」。门禁不过，④ 不开。
+ * ⑤ 复合 opens on the paired tuned artifacts; ⑥ on the paired mixes; ⑦ on the recheck;
+ * ⑧ on a recorded choice (A / B / 保留原版 皆可).
+ * Quick Finish skips decomposition, not verification — it still walks ④→⑤→⑥→⑦.
  */
 function stageUnlocked(id, gates) {
   if (!gates) return false;
   switch (id) {
     case 'analyze': return true;
-    case 'diagnose': return gates.canDiagnose;
     case 'separate': return gates.canSeparate;
     case 'structure': return gates.canStructure;
-    case 'plan': return gates.canPlan;
-    case 'finish': return gates.canFinish || gates.canFinishQuick;
+    case 'tune': return gates.canTune || gates.canTuneQuick;
+    case 'compose': return gates.canCompose;
+    case 'recheck': return gates.canRecheck;
+    case 'choose': return gates.canChoose;
+    case 'export': return gates.canExport;
     default: return false;
   }
 }
 
-/** 差什么就说差什么——「需要先完成前面的阶段」等于没说。 */
+/**
+ * 差什么就说差什么——「需要先完成前面的阶段」等于没说。
+ *
+ * 每个被锁的阶段都从 gates 的 `*Blockers` 里取第一条真实原因：
+ * 「缺分轨」「缺 MIDI」「可逆性未通过」是三个不同的问题、三种不同的补救，
+ * 压成一句含糊的话会让门禁显得任意。
+ */
 function stageLockReason(id, gates) {
-  const f = (gates && gates.facts) || {};
+  const g = gates || {};
+  const first = (arr) => (Array.isArray(arr) && arr.length ? arr[0] : null);
   switch (id) {
-    case 'diagnose':
     case 'separate':
     case 'structure':
       return '需要先完成 ① 检测。';
-    case 'plan': {
-      const missing = [];
-      if (!f.analyzed) missing.push('① 检测');
-      if (!f.diagnosed) missing.push('② 问题');
-      if (!f.separated) missing.push('③ 分轨');
-      if (!f.structured) missing.push('④ 结构（MIDI）');
-      return `深度方案需要先完成：${missing.join('、')}。`;
-    }
-    case 'finish':
-      return '需要先在 ⑤ 方案生成处理方案，或显式选择「快速完成（仅立体声）」。';
+    case 'tune':
+      return first(g.tuneBlockers) || '尚未满足 ④ 修音的前置条件。';
+    case 'compose':
+      return first(g.composeBlockers) || '需要先完成 ④ 修音。';
+    case 'recheck':
+      return first(g.recheckBlockers) || '需要先完成 ⑤ 复合。';
+    case 'choose':
+      return first(g.chooseBlockers) || '需要先完成 ⑥ 复检。';
+    case 'export':
+      return first(g.exportBlockers) || '需要先在 ⑦ 选定一个出口（A / B / 保留原版）。';
     default:
       return '尚未满足前置条件。';
   }
@@ -2788,7 +4173,11 @@ function renderPipelineBar() {
   }
 }
 
-/** 人类显式选择快速完成。记录后 ⑥ 才解锁（FAST 模式）。 */
+/**
+ * 人类显式选择快速完成（仅立体声）。
+ * 记录后 ④ 才以 FAST 模式解锁；但快速路径仍然要走 ⑤复合 → ⑥复检 → ⑦选定 才能导出——
+ * 它跳过的是分解，不是验证。
+ */
 async function chooseQuickFinish() {
   const caseDir = state.caseDir;
   if (!caseDir) return;
@@ -2797,7 +4186,7 @@ async function chooseQuickFinish() {
   catch (err) { res = { ok: false, reason: err.message }; }
   if (!res || !res.ok) return;
   await refreshPipeline();
-  openPipelineStage('finish');
+  openPipelineStage('tune');
 }
 
 function openPipelineStage(id) {
@@ -2805,242 +4194,34 @@ function openPipelineStage(id) {
   if (!s) return;
   switch (id) {
     case 'analyze': selectView('data'); break;
-    case 'diagnose': openDiagnosis(); break;
     case 'separate': openStems(); break;
     case 'structure': openScore(); break;
-    case 'plan': openPlan(); break;
-    case 'finish': openStudio(); break;
+    case 'tune':
+    case 'compose':
+    case 'recheck':
+    case 'choose':
+    case 'export': openTuning(); break;
     default: selectView(s.view);
   }
 }
 
-/** 进入流程：落在第一个「已解锁但还没做」的阶段，而不是直接跳到成品。 */
+/** 进入流程：落在第一个「已解锁但还没做」的阶段，而不是直接跳到处理。 */
 async function enterPipeline() {
   if (!state.caseDir) return;
   const snap = await refreshPipeline();
   if (!snap) return;
   const f = snap.facts || {};
   const done = {
-    analyze: f.analyzed, diagnose: f.diagnosed, separate: f.separated,
-    structure: f.structured, plan: f.planned, finish: f.rendered || f.chosen,
+    analyze: f.analyzed,
+    separate: f.separated,
+    structure: f.structured,
+    tune: f.tuned,
+    compose: f.composed,
+    recheck: f.rechecked,
+    choose: f.chosen,
+    export: f.exported,
   };
   const next = PIPELINE_STAGES.find((s) => stageUnlocked(s.id, snap.gates) && !done[s.id])
     || PIPELINE_STAGES[PIPELINE_STAGES.length - 1];
   openPipelineStage(next.id);
-}
-
-// ——— ② 问题 ———
-
-async function openDiagnosis() {
-  if (!state.caseDir) return;
-  selectView('diagnosis');
-  const caseDir = state.caseDir;
-  await refreshPipeline();
-  let res;
-  try { res = await window.moodify.pipelineDiagnosis(caseDir); } catch { res = null; }
-  if (state.caseDir !== caseDir) return;
-  if (res && res.ok) renderDiagnosis(res.diagnosis);
-  else {
-    $('diagnosis-state').textContent = '还没有诊断产物。点「生成诊断」从本次检测结果生成。';
-    $('diagnosis-summary').textContent = '';
-    $('diagnosis-issues').textContent = '';
-    $('diagnosis-draft').textContent = '';
-    $('diagnosis-empty').hidden = true;
-  }
-}
-
-function block(title, rows) {
-  const wrap = document.createElement('div');
-  const h = document.createElement('div');
-  h.className = 'diag-title';
-  h.textContent = title;
-  wrap.appendChild(h);
-  for (const r of rows) {
-    const p = document.createElement('div');
-    p.className = 'diag-row';
-    if (r.label) {
-      const l = document.createElement('span');
-      l.className = 'diag-label';
-      l.textContent = r.label;
-      p.appendChild(l);
-    }
-    const v = document.createElement('span');
-    v.className = r.cls || 'diag-value';
-    v.textContent = r.value;
-    p.appendChild(v);
-    wrap.appendChild(p);
-  }
-  return wrap;
-}
-
-function renderDiagnosis(d) {
-  const s = $('diagnosis-summary');
-  s.textContent = '';
-  const ts = d.technical_state || {};
-  s.appendChild(block('本次检测状态（原样来自 Core）', [
-    { label: '总体', value: ts.overall || '—' },
-    { label: '处置建议', value: ts.workflow_decision || '—' },
-    { label: '原因', value: (ts.reasons && ts.reasons.length) ? ts.reasons.join('、') : '无' },
-  ]));
-
-  const ib = $('diagnosis-issues');
-  ib.textContent = '';
-  if (!d.issues || !d.issues.length) {
-    // 关键诚实点：没有 finding ≠ 音频没问题，只代表当前规则没发现。
-    ib.appendChild(block('检测到的问题', [
-      { value: '当前规则未发现技术问题。', cls: 'diag-value' },
-      { value: (d.finding_rule_coverage && d.finding_rule_coverage.note) || '', cls: 'diag-note' },
-    ]));
-  } else {
-    const rows = [];
-    for (const it of d.issues) {
-      rows.push({ label: it.severity || '—', value: it.description || it.type || '' });
-      rows.push({
-        label: '证据',
-        value: `${(it.evidence || []).join(' ')}`
-          + (it.metric ? ` · ${it.metric}=${it.observed_value}${it.unit || ''}` : '')
-          + (it.calibration_status ? ` · ${it.calibration_status}` : ''),
-        cls: 'diag-note',
-      });
-    }
-    ib.appendChild(block('检测到的问题（每条都指回 Core 证据）', rows));
-  }
-
-  const db = $('diagnosis-draft');
-  db.textContent = '';
-  const dp = d.draft_plan || {};
-  const nodes = dp.nodes || [];
-  db.appendChild(block('Core 的草稿方案（状态：' + (dp.status || '—') + '）', nodes.length
-    ? nodes.map((n) => ({
-      label: n.op || '—',
-      value: `${JSON.stringify(n.params || {})} — ${n.reason || ''}`,
-      cls: 'diag-note',
-    }))
-    : [{ value: '本次没有草稿节点。', cls: 'diag-note' }]));
-
-  const pb = $('diagnosis-preserve');
-  pb.textContent = '';
-  const preserve = d.preserve || [];
-  const notes = d.human_notes || [];
-  if (!preserve.length && !notes.length) {
-    pb.textContent = '还没有记录。';
-  } else {
-    for (const p of preserve) {
-      const el = document.createElement('div');
-      el.className = 'preserve-item';
-      el.textContent = p;
-      pb.appendChild(el);
-    }
-    for (const n of notes) {
-      const el = document.createElement('div');
-      el.className = 'preserve-item note';
-      el.textContent = n.text;
-      pb.appendChild(el);
-    }
-  }
-  $('diagnosis-empty').hidden = (d.issues || []).length > 0;
-  $('diagnosis-state').textContent = d.generated_at ? `生成于 ${d.generated_at}` : '';
-}
-
-async function runDiagnosis() {
-  const caseDir = state.caseDir;
-  if (!caseDir) return;
-  $('diagnosis-state').textContent = '正在从本次检测结果生成诊断…';
-  let res;
-  try { res = await window.moodify.pipelineDiagnose(caseDir); } catch (err) { res = { ok: false, reason: err.message }; }
-  if (state.caseDir !== caseDir) return;
-  if (!res || !res.ok) {
-    $('diagnosis-state').textContent = '生成失败：' + ((res && res.reason) || '未知原因');
-    return;
-  }
-  renderDiagnosis(res.diagnosis);
-  await refreshPipeline();
-}
-
-async function saveDiagnosisNote() {
-  const caseDir = state.caseDir;
-  const note = $('diagnosis-note').value.trim();
-  if (!caseDir || !note) return;
-  let res;
-  try { res = await window.moodify.pipelineNote(caseDir, note, null); } catch { res = null; }
-  if (!res || !res.ok) return;
-  $('diagnosis-note').value = '';
-  renderDiagnosis(res.diagnosis);
-}
-
-// ——— ⑤ 方案 ———
-
-async function openPlan() {
-  if (!state.caseDir) return;
-  selectView('plan');
-  const caseDir = state.caseDir;
-  const snap = await refreshPipeline();
-  if (state.caseDir !== caseDir) return;
-
-  const gates = (snap && snap.gates) || {};
-  const f = gates.facts || {};
-  if (gates.modeLabel) {
-    // 已经有路径了：深度（前置齐备）或人显式选的快速。深度还要说清方案产物写没写。
-    $('plan-readiness').textContent = `当前路径：${gates.modeLabel}`
-      + (gates.mode === 'FAST_STEREO_ONLY' ? '（未分轨 / 未提取结构）' : '')
-      + (gates.mode === 'DEEP' && !gates.planned ? ' · 尚未生成方案产物' : '');
-  } else {
-    // 说清楚差什么：⑤ 需要 检测 + 问题 + 分轨 + MIDI 四件事，缺一不可
-    const missing = [];
-    if (!f.analyzed) missing.push('① 检测');
-    if (!f.diagnosed) missing.push('② 问题');
-    if (!f.separated) missing.push('③ 分轨');
-    if (!f.structured) missing.push('④ 结构（MIDI）');
-    $('plan-readiness').textContent = `深度方案未解锁：还差 ${missing.join('、')}。`;
-  }
-
-  let res;
-  try { res = await window.moodify.pipelineReadContext(caseDir); } catch { res = null; }
-  if (state.caseDir !== caseDir) return;
-  const box = $('plan-context');
-  box.textContent = '';
-  if (res && res.ok) {
-    box.appendChild(block('上下文包 context.json（只引用已存在的产物）', [
-      { label: '分析', value: JSON.stringify(res.context.analysis || {}) },
-      { label: '诊断', value: res.context.diagnosis || '（无）' },
-      { label: '分轨', value: res.context.stems ? `${res.context.stems.grade} · ${res.context.stems.engine || ''}` : '（无）' },
-      { label: 'MIDI', value: `${(res.context.midi || []).length} 个` },
-      { label: '曲谱', value: `${(res.context.score || []).length} 个` },
-      { label: '可用能力', value: (res.context.available_capabilities || []).map((c) => c.id).join('、'), cls: 'diag-note' },
-    ]));
-  } else {
-    box.appendChild(block('上下文包', [{ value: '还没构建。点「构建上下文」。', cls: 'diag-note' }]));
-  }
-
-  const db = $('plan-draft');
-  db.textContent = '';
-  let dres;
-  try { dres = await window.moodify.pipelineDiagnosis(caseDir); } catch { dres = null; }
-  if (state.caseDir !== caseDir) return;
-  if (dres && dres.ok) {
-    const dp = dres.diagnosis.draft_plan || {};
-    const nodes = dp.nodes || [];
-    db.appendChild(block('草稿方案（Core 产出）', nodes.length
-      ? nodes.map((n) => ({ label: n.op || '—', value: `${JSON.stringify(n.params || {})}`, cls: 'diag-note' }))
-      : [{ value: '没有草稿节点。', cls: 'diag-note' }]));
-  }
-}
-
-async function buildPlanContext() {
-  const caseDir = state.caseDir;
-  if (!caseDir) return;
-  $('plan-readiness').textContent = '正在构建上下文…';
-  let res;
-  try { res = await window.moodify.pipelineContext(caseDir); } catch (err) { res = { ok: false, reason: err.message }; }
-  if (state.caseDir !== caseDir) return;
-  if (!res || !res.ok) {
-    const reason = (res && res.reason) || '';
-    // 拒绝是预期行为（分解未完成），不是故障——别把机器码当成错误信息丢给用户
-    $('plan-readiness').textContent = reason === 'NEED_DEEP_PREREQUISITES'
-      ? '还不能生成方案：深度方案需要先完成 ① 检测 → ② 问题 → ③ 分轨 → ④ 结构（MIDI）。'
-      : `构建失败：${reason}`;
-    return;
-  }
-  await refreshPipeline();
-  await openPlan();
 }

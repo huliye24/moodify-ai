@@ -22,21 +22,21 @@
   </header>
 
   <div id="main-row">
-    <!-- 左图标栏：1 打开 / 2 修音 / 3 世界（时钟=世界历史；视图主体走顶部标签页） -->
+    <!-- 左图标栏：打开 / 完成流（修音·复合·选定）/ 波形 / 逆向分解 / 结构 / 世界 / 研究账本 -->
     <nav id="rail">
       <button id="rail-open" title="打开音频文件（创建/进入世界）" aria-label="打开音频文件">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
       </button>
-      <button id="rail-studio" title="后处理（选目标 → AI 处理 → 听和选 → 导出）" aria-label="后处理">
+      <button id="rail-tuning" title="完成（④ 修音 · ⑤ 复合 · ⑦ 选定：A / B / 保留原版）" aria-label="修音复合与选定">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v3M12 17v3M4 12h3M17 12h3M6.3 6.3l2.1 2.1M15.6 15.6l2.1 2.1M17.7 6.3l-2.1 2.1M8.4 15.6l-2.1 2.1"/><circle cx="12" cy="12" r="2.6"/></svg>
       </button>
-      <button id="rail-fix" title="修音工作台" aria-label="修音工作台">
+      <button id="rail-bench" title="波形工作台（查看源音频）" aria-label="波形工作台">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4v16M12 4v16M19 4v16"/><circle cx="5" cy="9" r="2.2"/><circle cx="12" cy="15" r="2.2"/><circle cx="19" cy="7" r="2.2"/></svg>
       </button>
-      <button id="rail-stems" title="分离工作台（四轨分离）" aria-label="分离工作台">
+      <button id="rail-stems" title="逆向分解（立体声 → 多轨）" aria-label="逆向分解">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l9 5.5-9 5.5-9-5.5z"/><path d="M3.5 14.5l8.5 5.2 8.5-5.2"/></svg>
       </button>
-      <button id="rail-score" title="曲谱工作台（音频 → MIDI → 曲谱）" aria-label="曲谱工作台">
+      <button id="rail-score" title="结构工作台（音频 → MIDI → 曲谱；MIDI 是修音的参考）" aria-label="结构工作台">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18.5V6l10-2v11.5"/><circle cx="6.5" cy="18.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/></svg>
       </button>
       <button id="rail-history" title="世界（双击进入；时钟=世界历史）" aria-label="世界">
@@ -58,17 +58,18 @@
       <p class="muted archive-path" id="archive-path"></p>
     </aside>
 
-    <!-- A/B 审听（薄 GUI）：读取 Core CLI 产出的比较产物，只听不判。
-         A = 源音频；B = 修音产物（Mix Graph 渲染）。同位置切换试听；
-         保留 A 或 B 由人决定，经 `moodify compare choose` 记录（本壳不写判断）。 -->
+    <!-- 研究仪器（**不是产品主流程**）：A = 源音频，B = 预设渲染产物，
+         用于研究侧「净增益」证据采集。产品的 A/B 是**同一步的两个完整候选**
+         （A 保守 / B 充分），在完成视图里；这里不是它。
+         三预设作为产品面已于 2026-10-04 退场，此处只保留为研究通道。 -->
     <aside id="research-panel" hidden>
       <div class="rp-head">
-        <span class="rp-title">A/B 审听</span>
+        <span class="rp-title">研究仪器 · 净增益证据</span>
         <label class="rp-toggle">
           <input type="checkbox" id="rp-mode"> <span>研究模式</span>
         </label>
       </div>
-      <p class="muted rp-caption">A = 源音频；B = 修音产物。事实来自 Core 比较产物（moodify compare prepare）；选择由同一条 CLI 记录，入账后不可修改。</p>
+      <p class="muted rp-caption">研究用：A = 源音频，B = 预设渲染产物。<strong>这不是产品的 A/B</strong>——产品的 A/B 是两个完整候选（保守 / 充分），在「开始完成」的审听视图里。事实来自 Core 比较产物（moodify compare prepare）；选择由同一条 CLI 记录，入账后不可修改。</p>
 
       <div class="rp-sec">
         <div class="rp-ver"><span class="rp-tag">A</span><span id="rp-a-name" class="muted">—</span></div>
@@ -134,7 +135,19 @@
       <div id="views">
         <!-- 产品水印：透明底纹，常驻工作区背景层；结果内容叠加其上，不占布局 -->
         <img id="wm" src="assets/moodify_watermark.png" alt="">
-        <section id="view-empty" class="workspace-view"></section>
+        <section id="view-empty" class="workspace-view">
+          <!-- 空态：唯一清晰的入口。说清会发生什么（两个完整候选 + 原版出口），
+               而不是罗列分轨 / MIDI / DSP 这些内部步骤。 -->
+          <div id="empty-hero">
+            <h2 id="empty-title">放入一首歌</h2>
+            <p id="empty-sub">
+              拖到窗口里，或选择文件。Moodify 会一次跑完内部流程，产出
+              <strong>两个完整候选版本</strong>（A 保守 / B 充分）与一份客观复检对比，
+              由你听过之后选定——<strong>原版始终是第三个出口</strong>。
+            </p>
+            <button id="empty-pick" class="primary">选择音频文件</button>
+          </div>
+        </section>
 
         <section id="view-data" class="workspace-view" hidden>
           <table class="data">
@@ -152,71 +165,195 @@
           <div id="charts-body" class="charts"></div>
         </section>
 
-        <!-- 后处理（Studio v0.2 主流程）：把歌丢进去 → 选目标 → 一键让 AI 处理 →
-             听原版与 AI 版 → 选一版 → 导出。试听与选择是第一优先级，数据/图表是次要页。
-             后处理与导出都走 Core；本壳不实现 DSP、不算响度、不替用户做选择。 -->
-        <!-- ② 问题：Core 实际发现了什么 + 该保护什么。
-             严格是 report.json 的投影——不发明测量事实，没有就明说「当前规则未发现技术问题」。 -->
-        <section id="view-diagnosis" class="workspace-view" hidden>
-          <div id="diagnosis-head">
-            <button id="diagnosis-generate" class="primary">生成诊断</button>
-            <span id="diagnosis-state" class="muted caption"></span>
+        <!-- ④ 修音 / ⑤ 复合 / ⑦ 选定（V4 主流程）。
+             两档完整方案 A / B 由系统产出；人不编辑参数，只负责听和选。
+             选定有**三个**出口：A / B / 保留原版 —— 两档都不如原版时，「回原版」是一条真路。
+             Core 的逐轨修音与复合能力尚未就绪时，本视图显式拒绝，绝不留假产物。
+             ②问题 与 ⑤方案 已退场（2026-10-04）：findings 留在 ①检测 的 report 里，
+             两档参数由 ④ 修音阶段产出。 -->
+        <section id="view-tuning" class="workspace-view" hidden>
+          <!-- 一键完成机（Phase 1）：一个主动作 + 真实进度 + 真实阻断。
+               普通用户不需要理解分轨 / MIDI / DSP；技术阶段与手动步骤收进「制作详情」。 -->
+          <div id="session-head">
+            <button id="session-start" class="primary"
+                    title="内部依次执行：检测 → 逆向分解 → 结构 → 可逆性 → 修音/复合 → 复检">开始完成</button>
+            <span class="muted caption" id="session-stage"></span>
+            <!-- 完成模式徽章：持续可见。跳过分离与结构是合法路径，但必须让人知道自己在哪条路上。 -->
+            <span id="session-mode" class="session-mode" hidden></span>
+            <span class="studio-spacer"></span>
+            <button id="session-detail-toggle" class="ghost" title="展开技术阶段与手动步骤">制作详情</button>
           </div>
-          <div id="diagnosis-summary" class="diagnosis-block"></div>
-          <div id="diagnosis-issues" class="diagnosis-block"></div>
-          <div id="diagnosis-draft" class="diagnosis-block"></div>
-          <div id="diagnosis-empty" class="muted caption" hidden></div>
-          <div id="diagnosis-human">
-            <label class="muted caption" for="diagnosis-note">该保护什么（你来写——这是听觉判断，AI 不替你决定）</label>
-            <div class="note-row">
-              <input id="diagnosis-note" type="text" placeholder="例如：人声的亲密感、动态起伏">
-              <button id="diagnosis-note-save" class="ghost">记录</button>
+          <!-- 深度受阻时的补救动作（2026-10-04 人类裁定）：**人可以**显式切换到快速完成。
+               两级动作：先点「切换到快速完成」，再点「确认切换」——确认之前绝不写
+               finish_mode.json，也绝不自动降级。文案必须说清它不做逐轨音准/节奏修正。 -->
+          <div id="session-remedy" class="session-remedy" hidden>
+            <p class="session-remedy-title" id="session-remedy-title">深度完成暂不可用</p>
+            <p class="muted session-remedy-note" id="session-remedy-reason"></p>
+            <div class="session-remedy-actions" id="session-remedy-ask">
+              <button id="session-remedy-switch" class="ghost">切换到快速完成（仅立体声）</button>
             </div>
-            <div id="diagnosis-preserve" class="preserve-list"></div>
+            <div class="session-remedy-actions" id="session-remedy-confirm" hidden>
+              <p class="muted session-remedy-note" id="session-remedy-note"></p>
+              <button id="session-remedy-yes" class="primary">确认切换</button>
+              <button id="session-remedy-no" class="ghost">取消</button>
+            </div>
           </div>
-        </section>
+          <ol id="session-phases" class="session-phases"></ol>
+          <p class="muted caption" id="session-state"></p>
 
-        <!-- ⑤ 方案：context 包 + Core 的草稿方案。
-             本阶段建立流程与产物契约；不实现任意 AI 计划的完整执行。 -->
-        <section id="view-plan" class="workspace-view" hidden>
-          <div id="plan-head">
-            <button id="plan-build" class="primary">构建上下文</button>
-            <span id="plan-readiness" class="muted caption"></span>
+          <!-- 制作详情 / 高级：技术阶段（pipeline.js 的内部 8 阶段）与手动步骤。
+               手动步骤与一键走的是同一批真实函数，只是给需要单步控制的人。 -->
+          <div id="session-detail" hidden>
+            <div id="tuning-head">
+              <button id="tuning-run" class="ghost" title="只生成两档修音（高级：正常应点「开始完成」）">只生成两档</button>
+              <span class="muted caption" id="tuning-mode"></span>
+              <span class="studio-spacer"></span>
+              <button id="tuning-recheck" class="ghost" title="对 A、B 各重跑一次完整检测，与原版逐指标对齐">复检（重跑检测）</button>
+            </div>
           </div>
-          <div id="plan-context" class="diagnosis-block"></div>
-          <div id="plan-draft" class="diagnosis-block"></div>
-          <p class="muted caption" id="plan-caption">
-            方案是草案：Core 的 plan.status 恒为 DRAFT_PLAN_NOT_EXECUTED，执行需显式动作。
-          </p>
-        </section>
+          <p class="muted caption" id="tuning-status"></p>
 
-        <section id="view-studio" class="workspace-view" hidden>
-          <div id="studio-head">
-            <div class="studio-targets" id="studio-targets"></div>
-            <button id="studio-run" class="primary">让 AI 处理</button>
-            <span class="muted studio-backend" id="studio-backend"></span>
-          </div>
-          <p class="muted caption" id="studio-status"></p>
+          <div class="pair-list" id="tuning-pairs"></div>
 
-          <div class="studio-versions" id="studio-versions"></div>
+          <!-- ================= A/B 审听工作台（Phase 2.2）=================
+               一屏之内先回答两件事：**我正在听谁**、**它相对原版变了什么**。
+               A、B 是两个完整候选版本（pair/A|B/mix.wav），不是多轨 stems。
+               所有数值、频谱、图表都来自候选自己那次复检的 report 与 Core 写的 plan/evidence；
+               机器只报变化，不替人判断「更好」。 -->
+          <div id="review" class="review" hidden>
+            <!-- 试听身份（sticky）：当前页面 ≠ 当前播放源，两者必须同时看得见 -->
+            <div id="review-transport" class="rv-transport">
+              <div class="rv-who">
+                <span class="rv-who-label">正在试听</span>
+                <span id="rv-playing" class="rv-playing rv-none">—</span>
+                <span class="rv-page">当前页面：<b id="rv-page">—</b></span>
+              </div>
+              <div class="rv-sources" role="group" aria-label="试听源">
+                <button id="rv-src-original" class="rv-src" data-side="ORIGINAL">
+                  <span class="rv-src-dot"></span>原版
+                </button>
+                <button id="rv-src-a" class="rv-src" data-side="A">
+                  <span class="rv-src-dot"></span>A · 保守
+                </button>
+                <button id="rv-src-b" class="rv-src" data-side="B">
+                  <span class="rv-src-dot"></span>B · 充分
+                </button>
+              </div>
+              <div class="rv-play">
+                <button id="rv-play" class="ghost" title="播放 / 暂停（空格）">▶</button>
+                <span id="rv-time" class="bench-time">0:00.0 / 0:00.0</span>
+                <span id="rv-load" class="rv-load"></span>
+              </div>
+            </div>
 
-          <div class="bench-tracks">
-            <div class="track" id="studio-track" hidden>
-              <div class="track-strip">
-                <div id="studio-ruler" class="ws-ruler"></div>
-                <div id="studio-wave" class="ws-wave"></div>
+            <!-- 两个候选标签页：每个只回答「这个候选相对原版发生了什么」。
+                 刻意不做第三个「原版详情」页——原版是共同基准，通过顶部试听源与每页的对照列进入。 -->
+            <nav id="rv-tabs" class="rv-tabs" role="tablist">
+              <button id="rv-tab-a" class="rv-tab" data-side="A" role="tab">A · 保守</button>
+              <button id="rv-tab-b" class="rv-tab" data-side="B" role="tab">B · 充分</button>
+            </nav>
+
+            <div id="rv-body" class="rv-body">
+              <div class="rv-block" id="rv-identity"></div>
+
+              <div class="rv-block">
+                <h3 class="rv-h" id="rv-wave-title">候选波形</h3>
+                <div class="rv-zoom">
+                  <button id="rv-zoom-out" class="ghost" title="缩小">－</button>
+                  <button id="rv-zoom-in" class="ghost" title="放大">＋</button>
+                  <button id="rv-zoom-fit" class="ghost" title="适配全曲">适配</button>
+                </div>
+                <div class="rv-wave-wrap">
+                  <div id="rv-ruler" class="ws-ruler"></div>
+                  <div id="rv-wave" class="ws-wave"></div>
+                </div>
+              </div>
+
+              <div class="rv-block" id="rv-spectra"></div>
+              <div class="rv-block" id="rv-metrics"></div>
+              <div class="rv-block" id="rv-charts"></div>
+              <div class="rv-block" id="rv-chain"></div>
+
+              <div class="rv-block" id="rv-table-block">
+                <button id="rv-table-toggle" class="ghost">展开完整复检表</button>
+                <div id="rv-table-filters" class="rv-filters" hidden>
+                  <label><input type="radio" name="rv-filter" value="changed" checked> 仅看有变化</label>
+                  <label><input type="radio" name="rv-filter" value="all"> 全部</label>
+                  <label><input type="radio" name="rv-filter" value="not_alignable"> 不可对齐</label>
+                </div>
+                <div id="rv-table" class="rv-table" hidden></div>
+              </div>
+
+              <div class="rv-block rv-actions" id="rv-actions">
+                <button id="rv-choose" class="primary" disabled>选择</button>
+                <button id="rv-keep-original" class="ghost" disabled>保留原版</button>
+                <span id="rv-choice-state" class="muted caption"></span>
+              </div>
+
+              <div class="rv-block rv-export" id="rv-export">
+                <span id="rv-export-target" class="muted caption"></span>
+                <button id="rv-export-run" class="ghost" disabled>导出</button>
               </div>
             </div>
           </div>
+          <!-- ================= 完成层（Phase 2.3）=================
+               一首歌被选定之后待的地方。首屏只有作品本身：标题、版本、波形印记、日期、
+               一句可选的私人文字，以及几个尽可能少的动作。技术证据不在这里——它们在
+               「查看制作详情」后面的 A/B 审听工作台里（完成不删除证据）。
+               完成不是新的状态权威：能否进入由 pipeline 产物 + ⑦ 准入推导。 -->
+          <section id="completion" class="completion" hidden aria-label="作品">
+            <div class="cp-stage">
+              <h2 id="cp-title" class="cp-title">—</h2>
+              <p id="cp-version" class="cp-version"></p>
+              <div class="cp-imprint-wrap">
+                <canvas id="cp-imprint" class="cp-imprint" width="1200" height="240"
+                        aria-label="波形印记"></canvas>
+              </div>
+              <p id="cp-date" class="cp-date"></p>
 
-          <div id="studio-actions">
-            <button id="studio-play" class="ghost" title="播放 / 暂停">▶</button>
-            <span id="studio-time" class="bench-time">0:00.0</span>
-            <span class="studio-spacer"></span>
-            <button id="studio-use" class="primary" disabled>用这个版本</button>
-            <button id="studio-export" class="ghost" disabled>导出</button>
-          </div>
-          <p class="muted caption" id="studio-note"></p>
+              <div class="cp-listen-bar" id="cp-listen-bar" hidden>
+                <button id="cp-play" class="ghost" title="播放 / 暂停">▶</button>
+                <span id="cp-time" class="bench-time">0:00.0 / 0:00.0</span>
+                <label class="cp-volume" title="音量（只影响试听，不改文件）">
+                  <span class="muted caption">音量</span>
+                  <input id="cp-volume" type="range" min="0" max="100" value="100">
+                </label>
+                <span id="cp-listening" class="muted caption"></span>
+                <span class="studio-spacer"></span>
+                <button id="cp-exit-listen" class="ghost">返回作品</button>
+              </div>
+
+              <div class="cp-actions">
+                <button id="cp-listen" class="cp-primary">▶ 从头听</button>
+              </div>
+
+              <div class="cp-secondary">
+                <button id="cp-export" class="ghost">导出音频</button>
+                <button id="cp-card" class="ghost">保存作品卡</button>
+                <button id="cp-details" class="ghost">查看制作详情</button>
+              </div>
+
+              <div class="cp-inscription">
+                <button id="cp-inscribe-toggle" class="ghost">留一句话</button>
+                <p id="cp-inscription-shown" class="cp-inscription-text"></p>
+                <div id="cp-inscribe-box" hidden>
+                  <textarea id="cp-inscription" rows="2" maxlength="280" placeholder="写给这首歌"></textarea>
+                  <div class="cp-inscribe-actions">
+                    <label class="cp-include">
+                      <input type="checkbox" id="cp-card-include" checked> 作品卡包含这句话
+                    </label>
+                    <span class="studio-spacer"></span>
+                    <button id="cp-inscription-save" class="ghost">保存文字</button>
+                    <button id="cp-inscription-clear" class="ghost">清空</button>
+                  </div>
+                </div>
+              </div>
+
+              <p id="cp-status" class="cp-status" role="status" aria-live="polite"></p>
+              <p id="cp-warning" class="cp-warning" hidden></p>
+            </div>
+          </section>
+          <p class="muted caption" id="tuning-note"></p>
         </section>
 
         <section id="view-bench" class="workspace-view" hidden>

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron .",
     "check:contracts": "node scripts/check-contracts.js",
-    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-studio.js"
+    "test": "node scripts/check-contracts.js && node scripts/test-pipeline.js && node scripts/test-recheck.js && node scripts/test-session.js && node scripts/test-keepsake.js && node scripts/test-sync.js && node scripts/test-orchestrator.js && node scripts/test-main-ipc.js && node scripts/test-studio.js",
+    "test:rls": "node ../deployment/supabase/tests/run_rls_tests.js"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {
