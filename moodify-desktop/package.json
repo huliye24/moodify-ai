@@ -1,6 +1,6 @@
 {
   "name": "moodify-desktop",
-  "version": "1.0.1-rc.1",
+  "version": "1.0.1-rc.2",
   "description": "Moodify — company desktop shell: pick a song, detect, read data & charts, get the repair/mixing plan. The core stays in moodify-core-package (pip); this shell orchestrates it.",
   "main": "src/main.js",
   "scripts": {
@@ -51,12 +51,24 @@
     "win": {
       "icon": "moodify_icon.ico",
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "signtoolOptions": {
         "publisherName": "Moodify",
-        "signingHashAlgorithms": ["sha256"],
+        "signingHashAlgorithms": [
+          "sha256"
+        ],
         "rfc3161TimeStampServer": "http://timestamp.digicert.com"
       },
       "signAndEditExecutable": true
