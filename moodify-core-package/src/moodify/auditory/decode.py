@@ -10,6 +10,7 @@ import logging
 import shutil
 import subprocess
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -46,13 +47,20 @@ def _win_exe(name: str) -> str | None:
     return None
 
 
+@lru_cache(maxsize=1)
 def _which_ffmpeg() -> str:
+    """Resolved ffmpeg path. Memoized: one PATH/toolbox search per process.
+
+    Exceptions are not cached by lru_cache, so a missing binary still raises
+    on every call instead of failing once and staying failed.
+    """
     exe = shutil.which("ffmpeg") or _win_exe("ffmpeg")
     if exe is None:
         raise FfmpegNotFound("ffmpeg not found on PATH")
     return exe
 
 
+@lru_cache(maxsize=1)
 def _which_ffprobe() -> str:
     exe = shutil.which("ffprobe") or _win_exe("ffprobe")
     if exe is None:
@@ -60,7 +68,13 @@ def _which_ffprobe() -> str:
     return exe
 
 
+@lru_cache(maxsize=1)
 def ffmpeg_version() -> str:
+    """First line of `ffmpeg -version`. Memoized: one version probe per process.
+
+    The version of the resolved binary cannot change while this process runs,
+    so repeated probes only paid subprocess cost for identical metadata.
+    """
     try:
         out = subprocess.run(
             [_which_ffmpeg(), "-version"],
