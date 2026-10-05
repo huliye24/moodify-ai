@@ -289,14 +289,18 @@ jobs:
           # 签名尚未接线时，用 -AllowUnsigned 让这一步如实记录"未签名"而不是伪装通过。
           # 一旦 SignPath 接通（SIGNPATH_ENABLED=true），未签名就变成硬失败——
           # 那就是我们真正想要的严格性。
-          $extra = @()
-          if ("${{ vars.SIGNPATH_ENABLED }}" -ne "true") { $extra += '-AllowUnsigned' }
-          if ("${{ vars.SIGNATURE_EXPECTED_PUBLISHER }}") {
-            $extra += @('-ExpectedPublisher', "${{ vars.SIGNATURE_EXPECTED_PUBLISHER }}")
+          $verifyArgs = @{
+            Path = (Get-ChildItem final -File).FullName
+            ManifestOut = 'final/SIGNATURE_FACTS.json'
           }
-          & ./moodify-desktop/scripts/verify-signature.ps1 `
-              -Path (Get-ChildItem final -File).FullName `
-              -ManifestOut final/SIGNATURE_FACTS.json @extra
+          if ("${{ vars.SIGNATURE_EXPECTED_PUBLISHER }}") {
+            $verifyArgs.ExpectedPublisher = "${{ vars.SIGNATURE_EXPECTED_PUBLISHER }}"
+          }
+          if ("${{ vars.SIGNPATH_ENABLED }}" -ne "true") {
+            & ./moodify-desktop/scripts/verify-signature.ps1 @verifyArgs -AllowUnsigned
+          } else {
+            & ./moodify-desktop/scripts/verify-signature.ps1 @verifyArgs
+          }
           if ($LASTEXITCODE -ne 0) { throw "signature verification failed" }
           $facts = Get-Content final/SIGNATURE_FACTS.json -Raw | ConvertFrom-Json
           $signed = if (($facts.all_signed -eq $true) -and ($facts.all_valid -eq $true)) { 'true' } else { 'false' }
