@@ -723,11 +723,35 @@ const deepOpts = (extra = {}) => ({ stems: true, midi: true, roundtrip: true, ..
     }
   });
   await check('available capabilities name a real stage and the real command behind them', () => {
+    // 阶段名集合与 session.PHASES 的阶段保持一致；可逆性验证发生在 SEPARATE 之后、
+    // ④ 修音 之前，它属于 SEPARATE 阶段（V4 §4 门禁），所以不新增阶段名。
     const stages = new Set(['ANALYZE', 'SEPARATE', 'STRUCTURE', 'TUNE', 'EXPORT']);
     for (const c of pipeline.CAPABILITIES) {
       assert.ok(stages.has(c.stage), `${c.id} claims an unexpected stage ${c.stage}`);
       assert.ok(c.core_command && c.core_command.length > 10, `${c.id} must name the real command`);
     }
+  });
+  await check('壳侧可逆性验证与 Core 侧可逆性是两件事，都如实登记', () => {
+    // 2026-10-05：壳现在真的会跑可逆性验证（roundtrip.py），所以它进入 CAPABILITIES；
+    // 但 PLANNED 里的 `reversibility-check`（Core 自己产出证据）**必须留下**——
+    // 否则一个壳侧 null 测试会被读成 Core 已验证，那正是本仓库反复清理的「改名升级」。
+    const avail = pipeline.CAPABILITIES.find((c) => c.id === 'shell-reversibility-check');
+    assert.ok(avail, '壳侧可逆性验证必须作为真实能力登记');
+    assert.match(avail.core_command, /roundtrip\.py/);
+    assert.strictEqual(avail.stage, 'SEPARATE');
+    const planned = pipeline.PLANNED_CAPABILITIES.map((c) => c.id);
+    assert.ok(planned.includes('reversibility-check'), 'Core 侧可逆性仍须标为未实现');
+  });
+  await check('模型分离与结构分析与快速分离并列登记，且各自点明真实命令', () => {
+    for (const id of ['model-separation', 'structure-analysis']) {
+      const c = pipeline.CAPABILITIES.find((x) => x.id === id);
+      assert.ok(c, `${id} 必须登记为真实能力`);
+      assert.ok(c.core_command.length > 10, `${id} 必须点明真实命令`);
+    }
+    assert.match(pipeline.CAPABILITIES.find((c) => c.id === 'model-separation').core_command,
+      /model_separate\.py/);
+    assert.match(pipeline.CAPABILITIES.find((c) => c.id === 'structure-analysis').core_command,
+      /structure\.py/);
   });
   await check('the pair capability is the whole-track one; the per-stem path stays unavailable', () => {
     // 2026-10-04 Phase 2：Core 有了 FAST_STEREO_ONLY 的整轨两档渲染（MIP-0002 附录 A），

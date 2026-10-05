@@ -31,7 +31,8 @@ const { createOrchestrator } = require('./orchestrator');
 // 外部专用运行时解析（HOTFIX 000 / F4）。缺运行时必须显式失败，不静默回退。
 // V4 合并时这里曾残留对 VENVS / pyExe 的引用，两者在本文件里都没有定义——外部运行时
 // 的唯一解析入口就是本模块（见 resolveRuntime / resolveRuntimeTool）。
-const { RuntimeMissingError, resolveRuntime, resolveRuntimeTool } = require('./runtime');
+const { RuntimeMissingError, resolveRuntime, resolveRuntimeTool,
+        probeRuntime, probeAllRuntimes } = require('./runtime');
 
 const CASES_ROOT = process.env.MOODIFY_CASES_ROOT
   || path.join(os.homedir(), '.moodify', 'cases');
@@ -602,7 +603,32 @@ function registerStudioToolIpc() {
     listCaseFiles(caseDir, subdir, exts));
 
   // 逆向分解：快速分离（引擎 A）→ 实现在 separateStems()（完成会话编排器复用同一条路径）
-  ipcMain.handle('stems:run', async (_e, caseDir) => separateStems(caseDir));
+  // mode: 'auto'（默认，模型优先）| 'model'（Demucs）| 'dsp'（快速，秒级）
+  ipcMain.handle('stems:run', async (_e, caseDir, mode) => separateStems(caseDir, mode));
+
+  // 可逆性验证：分轨相加回原版 → studio/roundtrip.json（④ 修音的门禁）
+  ipcMain.handle('stems:roundtrip', async (_e, caseDir) => checkRoundtrip(caseDir));
+
+  // 引擎偏好（模型 / 快速 / 自动）——用户可显式选择，缺运行时不会被替他改选
+  ipcMain.handle('stems:engine:get', async () => ({
+    ok: true,
+    engine: readStemEnginePref(),
+    model: probeRuntime('demucs'),
+  }));
+  ipcMain.handle('stems:engine:set', async (_e, engine) => {
+    if (!['auto', 'model', 'dsp'].includes(engine)) return { ok: false, reason: 'BAD_ENGINE' };
+    return { ok: true, engine: writeStemEnginePref(engine) };
+  });
+
+  // 结构事实：速度 / 拍点 / 段落边界 → studio/structure.json
+  ipcMain.handle('structure:analyze', async (_e, caseDir) => structureAnalysis(caseDir));
+
+  // 能力体检：哪些外部运行时可用、缺哪个、怎么装。UI 据此说明「为什么这一步走不通」，
+  // 而不是让用户面对一个点了没反应的按钮。
+  ipcMain.handle('capabilities:probe', async () => ({
+    ok: true,
+    runtimes: probeAllRuntimes(),
+  }));
 
   // 音频 → MIDI → 实现在 transcribeMidi()（完成会话编排器复用同一条路径）
   ipcMain.handle('midi:run', async (_e, caseDir, audioPath) => transcribeMidi(caseDir, audioPath));
@@ -968,19 +994,158 @@ async function analyzeAudio(audioPath) {
   return payload;
 }
 
-/** 逆向分解：源音频 → case/stems/ 四轨 + manifest.json（预览级，见 V4 §5.2） */
-async function separateStems(caseDir) {
+/**
+ * 引擎偏好：模型优先，快速兜底。
+ *
+ * 为什么需要它：深度路径的目标是「逆向分解 → 多轨复合」，而复合只有在分轨真把
+ * 乐器拆开时才有意义——所以**模型分离是首选**。但模型分离需要 torch（重），
+ * 没装时不该让整个 ③ 逆向分解 卡死，而应退回快速引擎并**如实标注降级**。
+ *
+ * 关键纪律：降级绝不静默。manifest 里带着 engine / engine_grade，
+ * 下游（context.json、UI）据此说明用户拿到的是哪一档。
+ */
+function readStemEnginePref() {
+  try {
+    const p = path.join(CODEX_HOME, 'stems.json');
+    const v = JSON.parse(fs.readFileSync(p, 'utf8')).engine;
+    if (v === 'dsp' || v === 'model') return v;
+  } catch { /* 未设置 */ }
+  return 'auto';
+}
+
+function writeStemEnginePref(engine) {
+  fs.mkdirSync(CODEX_HOME, { recursive: true });
+  const file = path.join(CODEX_HOME, 'stems.json');
+  fs.writeFileSync(file, JSON.stringify({ engine, updated_at: new Date().toISOString() }, null, 2), 'utf8');
+  return engine;
+}
+
+/**
+ * ③ 逆向分解：源音频 → case/stems/ + manifest.json。
+ *
+ * 两条真实路径，都不是假装：
+ *   model（Demucs htdemucs，MIT）—— 神经网络四轨（drums/bass/other/vocals），母带级
+ *   dsp（scipy 中置估计 + HPSS）—— 秒级预览级，engine_grade 明写 PREVIEW_NOT_MASTERING_GRADE
+ *
+ * `mode` 语义：
+ *   'auto'（默认）模型可用就用模型，不可用则退回快速并注明降级
+ *   'model' / 'dsp' 用户显式指定，缺运行时即如实报缺，**不**替他改选
+ */
+async function separateStems(caseDir, mode) {
   const src = resolveCaseSource(caseDir);
   if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
-  // 外部运行时的唯一解析入口是 runtime.js：缺失即 DEPENDENCY_MISSING，
-  // 绝不用系统 python 顶替（那会把缺依赖伪装成 ABI 崩溃——本仓库已经踩过一次）。
-  const runtime = requireRuntimeExe(() => resolveRuntime('basic-pitch').python);
-  if (!runtime.ok) return runtime;
   const outdir = path.join(caseDir, 'stems');
   fs.mkdirSync(outdir, { recursive: true });
-  return runLong('stems', runtime.exe, [
+
+  const want = mode || 'auto';
+  const modelProbe = probeRuntime('demucs');
+  const engine = want === 'dsp' ? 'dsp'
+    : want === 'model' ? 'model'
+      : (modelProbe.available ? 'model' : 'dsp');
+
+  if (engine === 'model') {
+    const rt = requireRuntimeExe(() => resolveRuntime('demucs').python);
+    if (!rt.ok) return rt;
+    const res = await runLong('stems', rt.exe, [
+      path.join(TOOLS_ROOT, 'model_separate.py'), src, '--outdir', outdir,
+    ]);
+    return res.ok ? { ...res, engine: 'model' } : this_or(res, { engine: 'model' });
+  }
+
+  const rt = requireRuntimeExe(() => resolveRuntime('audio').python);
+  if (!rt.ok) return rt;
+  const res = await runLong('stems', rt.exe, [
     path.join(TOOLS_ROOT, 'dsp_separate.py'), src, '--outdir', outdir,
   ]);
+  if (!res.ok) return { ...res, engine: 'dsp' };
+  // 没安装模型引擎时要说清「这是降级」，否则用户会以为拿到的是母带级分轨
+  const downgraded = want === 'auto' && !modelProbe.available;
+  return {
+    ...res,
+    engine: 'dsp',
+    downgraded,
+    downgradeReason: downgraded
+      ? `模型分离运行时不可用（${modelProbe.reason}），已用快速分离。`
+      : null,
+    installHint: downgraded ? modelProbe.install : null,
+  };
+}
+
+/** 给失败结果补一个字段，不改变 ok 语义。 */
+function this_or(res, extra) {
+  return { ...res, ...extra };
+}
+
+/**
+ * 可逆性验证（V4 §门禁）：把分轨按**划分**相加与原版比较，写 studio/roundtrip.json。
+ *
+ * 为什么这是 ④ 修音 的前置：深度路径的全部前提是「多轨复合优于单轨直出」，
+ * 而那是**假设不是事实**。可逆性是唯一可测的代理——分解再复合必须回到原版。
+ * 但**它不证明分轨质量**（任何可逆分解都能通过），所以产物里同时带着控制组读数
+ * （轨1=原版、轨2=静音 同样通过），防止 passed 被读成「分轨已验证」。
+ */
+async function checkRoundtrip(caseDir) {
+  const src = resolveCaseSource(caseDir);
+  if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+  const stemsDir = path.join(caseDir, 'stems');
+  if (!fs.existsSync(stemsDir)) {
+    return { ok: false, reason: 'NO_STEMS', detail: '还没有分轨，无法验证可逆性。' };
+  }
+  const rt = requireRuntimeExe(() => resolveRuntime('audio').python);
+  if (!rt.ok) return rt;
+  const out = path.join(caseDir, 'studio', 'roundtrip.json');
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  const res = await runLong('roundtrip', rt.exe, [
+    path.join(TOOLS_ROOT, 'roundtrip.py'), '--stems', stemsDir,
+    '--original', src, '--out', out,
+  ]);
+  if (!res.ok) return { ...res, reason: res.reason || 'ROUNDTRIP_FAILED' };
+  const artifact = pipeline.readJsonSafe(out);
+  return {
+    ok: true,
+    artifact,
+    passed: Boolean(artifact && artifact.passed === true),
+    path: out,
+    nullDepthDb: artifact && artifact.measurement ? artifact.measurement.null_depth_db : null,
+  };
+}
+
+/**
+ * ④ 结构（机器部分）：音频 → MIDI（必需）+ 结构事实（速度 / 拍点 / 段落边界）。
+ *
+ * 顺序有讲究：MIDI 是阶段门禁（`structured` 由 midi/*.mid 推导），所以在最前面；
+ * 结构事实是方案的可解释依据，失败不阻断（它提供上下文，不是门禁）。
+ * 曲谱是派生解读，同样不阻断。
+ */
+async function structureAnalysis(caseDir) {
+  const src = resolveCaseSource(caseDir);
+  if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
+  const rt = requireRuntimeExe(() => resolveRuntime('audio').python);
+  if (!rt.ok) return rt;
+  const out = path.join(caseDir, 'studio', 'structure.json');
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  const res = await runLong('structure', rt.exe, [
+    path.join(TOOLS_ROOT, 'structure.py'), src, '--out', out,
+  ]);
+  if (!res.ok) return res;
+  return { ok: true, structure: pipeline.readJsonSafe(out), path: out };
+}
+
+/** 逆向分解的入口：分轨 + 可逆性，两件事一起做（会话里这一步是原子的）。 */
+async function sessionSeparate(dir) {
+  const res = await separateStems(dir, readStemEnginePref());
+  if (!res.ok) return res;
+  const rt = await checkRoundtrip(dir);
+  // 可逆性验证失败**不**回滚分轨：分轨是真实产物，验证结果也是真实事实。
+  // 但这一步的 ok 必须反映门禁是否通过，否则会话会以为可以进 ④。
+  return {
+    ok: true,
+    engine: res.engine,
+    downgraded: res.downgraded || false,
+    downgradeReason: res.downgradeReason || null,
+    roundtrip: rt.ok ? { passed: rt.passed, nullDepthDb: rt.nullDepthDb, path: rt.path } : null,
+    roundtripError: rt.ok ? null : (rt.reason || 'ROUNDTRIP_FAILED'),
+  };
 }
 
 /**
@@ -1586,18 +1751,28 @@ async function sessionAnalyze(dir) {
   };
 }
 
-/** ③ 结构：音频 → MIDI（必需）→ 曲谱（派生解读，失败不阻断）。 */
+/**
+ * ④ 结构：MIDI（必需，阶段门禁）+ 结构事实（速度/拍点/段落，失败不阻断）+ 曲谱（派生解读）。
+ *
+ * 为什么结构事实不阻断：它给方案提供可解释依据（「副歌在第 60 秒」），
+ * 但不是 `STRUCTURED` 阶段的判定条件（判定条件只有一个：`midi/*.mid` 非空）。
+ * 把非门禁的东西做成阻断，只会让用户在无关的地方卡住。
+ */
 async function sessionStructure(dir) {
   const src = resolveCaseSource(dir);
   if (!src) return { ok: false, reason: '未找到源音频（source_path.json 缺失或文件不存在）' };
   const midi = await transcribeMidi(dir, src);
   if (!midi.ok) return midi;
   if (!midi.midi) return { ok: false, reason: '未生成 MIDI 文件' };
+  // 结构事实（机器部分）：失败不阻断，但如实回报失败原因
+  const structure = await structureAnalysis(dir);
   // 曲谱是派生解读，转不出来不阻断主流程（MIDI 才是机器可读结构）
   const score = await convertScore(dir, midi.midi);
   return {
     ok: true,
     midi: midi.midi,
+    structure: structure.ok ? structure.path : null,
+    structureError: structure.ok ? null : (structure.reason || '结构分析失败'),
     score: score.ok ? score.musicxml : null,
     scoreSkipped: score.ok ? null : (score.reason || '曲谱转换失败'),
   };
@@ -1643,7 +1818,7 @@ async function sessionRecheck(dir) {
 // 相位 → 真实步骤。键与 session.PHASES[].run 一一对应（测试会钉住这一点）。
 const SESSION_STEPS = Object.freeze({
   analyze: sessionAnalyze,
-  separate: separateStems,
+  separate: sessionSeparate,
   structure: sessionStructure,
   tune: sessionTune,
   recheck: sessionRecheck,

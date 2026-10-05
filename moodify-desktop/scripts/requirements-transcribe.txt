@@ -1,0 +1,24 @@
+# Moodify Studio — 转写运行时（.venv-basic-pitch）
+#
+# 用途：`midi:run`（音频 → MIDI，Basic Pitch ONNX）与 `score:run`（MIDI → MusicXML，music21）。
+#
+# 上游
+#   Basic Pitch  https://github.com/spotify/basic-pitch   (Apache-2.0)
+#   music21      https://github.com/cuthbertLab/music21   (BSD-3-Clause)
+#
+# 这两个能力在 V3/V4 流程契约里早已被声明（`pipeline.js` 的 CAPABILITIES、
+# `main.js` 的注释、`runtime.js` 的 RUNTIMES），但**运行时从未被安装过**——
+# 于是 ④ 结构 阶段在真实机器上从未可达。本文件把那个声明补成事实。
+#
+# 安装：python -m venv .venv-basic-pitch
+#       .venv-basic-pitch/Scripts/python -m pip install -r moodify-desktop/scripts/requirements-transcribe.txt
+
+basic-pitch>=0.4.0
+music21>=9.1
+soundfile>=0.12,<1
+numpy>=1.26,<3
+# ONNX 序列化后端。main.js 的 midi:run 走 `--model-serialization onnx`
+# （比 TF SavedModel 启动快、体积小）。**必须显式安装**：basic-pitch 的
+# `[onnx]` extra 不会随基础安装带入，缺了它 CLI 会在参数解析后直接报缺后端。
+# 这个依赖漏装过一次，症状是「MIDI 阶段报一个和音频无关的 onnxruntime 错误」。
+onnxruntime>=1.16

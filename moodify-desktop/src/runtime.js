@@ -26,18 +26,41 @@ const CODE_DEPENDENCY_MISSING = 'DEPENDENCY_MISSING';
 // 专用运行时清单。dir 是打包/开发布局下的默认位置；envVar 允许显式覆盖。
 // 注意：envVar 指向的是**同一个专用 venv**，不是「随便一个 python」——
 // 覆盖是显式的、要校验的，与「静默回退」是两件事。
+//
+// 安装：见 moodify-desktop/scripts/requirements-*.txt 每个文件顶部的说明。
+// 缺任何一个运行时都会返回 DEPENDENCY_MISSING，并说清**缺哪个**；
+// 不安装也能启动应用，只是对应阶段被如实阻断。
 const RUNTIMES = {
+  // 音频工具：numpy + scipy + soundfile，**不含** librosa/sklearn/pandas。
+  // 逆向分解（快速）与结构分析走这里。刻意轻量，见 requirements-audio.txt。
+  audio: {
+    label: '音频工具（快速分离 / 结构分析）',
+    envVar: 'MOODIFY_VENV_AUDIO',
+    dir: path.join(__dirname, '..', '..', '.venv-audio'),
+    python: path.join('Scripts', 'python.exe'),
+    tools: {},
+  },
+  // 模型分离：torch + demucs。母带级四轨，CPU RTF ≈ 2–4×。
+  demucs: {
+    label: 'Demucs（模型分离，母带级四轨）',
+    envVar: 'MOODIFY_VENV_DEMUCS',
+    dir: path.join(__dirname, '..', '..', '.venv-demucs'),
+    python: path.join('Scripts', 'python.exe'),
+    tools: {},
+  },
+  // 转写：basic-pitch（音频→MIDI）+ music21（MIDI→MusicXML）。
   'basic-pitch': {
-    label: 'Basic Pitch（快速分离 / MIDI）',
+    label: 'Basic Pitch / music21（音频→MIDI→曲谱）',
     envVar: 'MOODIFY_VENV_BASIC_PITCH',
     dir: path.join(__dirname, '..', '..', '.venv-basic-pitch'),
     python: path.join('Scripts', 'python.exe'),
     tools: { 'basic-pitch': path.join('Scripts', 'basic-pitch.exe') },
   },
+  // 历史遗留：`score` 曾单独存在。保留别名以免旧配置失效，实际复用转写运行时。
   score: {
     label: 'music21（MIDI → 曲谱）',
     envVar: 'MOODIFY_VENV_SCORE',
-    dir: path.join(__dirname, '..', '..', '.venv-score'),
+    dir: path.join(__dirname, '..', '..', '.venv-basic-pitch'),
     python: path.join('Scripts', 'python.exe'),
     tools: {},
   },
@@ -128,6 +151,47 @@ function tryResolve(fn) {
   }
 }
 
+/**
+ * 只探测、不抛：给 UI 报告「哪些运行时可用」。
+ *
+ * 存在的理由：用户看不到 venv，只看到某个按钮点了没反应。把可用性做成
+ * 可查询的事实，UI 才能说「模型分离不可用（缺 .venv-demucs）」而不是
+ * 让用户自己猜。这里**不返回回退解释器**，与 resolveRuntime 的口径一致。
+ */
+function probeRuntime(name) {
+  try {
+    const resolved = resolveRuntime(name);
+    return { name, available: true, label: RUNTIMES[name].label, dir: resolved.dir };
+  } catch (err) {
+    if (err instanceof RuntimeMissingError) {
+      return { name, available: false, label: RUNTIMES[name].label,
+               reason: err.message, candidates: err.candidates,
+               install: installHint(name) };
+    }
+    throw err;
+  }
+}
+
+/** 该运行时该怎么装。UI 直接展示这句话，不让用户去翻文档。 */
+function installHint(name) {
+  const spec = RUNTIMES[name];
+  const requirements = {
+    audio: 'requirements-audio.txt',
+    demucs: 'requirements-demucs.txt',
+    'basic-pitch': 'requirements-transcribe.txt',
+    score: 'requirements-transcribe.txt',
+  }[name];
+  if (!requirements) return null;
+  const venv = path.basename(spec.dir);
+  return `python -m venv ${venv} && ${venv}/Scripts/python -m pip install -r `
+    + `moodify-desktop/scripts/${requirements}`;
+}
+
+/** 列出全部运行时的可用性（不抛异常）。UI 的「能力体检」用这个。 */
+function probeAllRuntimes() {
+  return Object.keys(RUNTIMES).map((name) => probeRuntime(name));
+}
+
 module.exports = {
   CODE_DEPENDENCY_MISSING,
   RUNTIMES,
@@ -137,4 +201,7 @@ module.exports = {
   resolveRuntimeTool,
   runtimeCandidates,
   tryResolve,
+  probeRuntime,
+  probeAllRuntimes,
+  installHint,
 };

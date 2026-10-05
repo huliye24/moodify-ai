@@ -1,0 +1,22 @@
+# Moodify Studio — 音频工具运行时（.venv-audio）
+#
+# 用途：`dsp_separate.py`（快速分离）与 `structure.py`（结构分析）。
+#
+# 为什么刻意保持极小
+#   这两个脚本**不需要**任何机器学习库：分离是 DSP（中置估计 + HPSS 中值滤波），
+#   结构分析是节拍/段落/频谱统计。把它们挂在轻量运行时上，等于让
+#   「③ 逆向分解」和「④ 结构」不依赖 torch/sklearn/pandas 这条易碎的链。
+#
+# 历史教训（DEEP-PROCESSING-GAP-SCAN-001）
+#   dsp_separate.py 曾经 import librosa.decompose，导入链是
+#       librosa → sklearn → pandas → numpy C-ABI
+#   只要 pandas 是按旧 numpy 编译的，numpy 2.x 下导入即抛
+#       ValueError: numpy.dtype size changed
+#   于是快速分离在真实机器上必然崩溃。HPSS 只需要中值滤波，scipy 就够——
+#   本文件就是那条结论的落地：**不引入 sklearn / pandas / librosa**。
+#
+# 安装：python -m venv .venv-audio && .venv-audio/Scripts/python -m pip install -r moodify-desktop/scripts/requirements-audio.txt
+
+numpy>=1.26,<3
+scipy>=1.11,<2
+soundfile>=0.12,<1

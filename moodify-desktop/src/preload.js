@@ -47,9 +47,19 @@ contextBridge.exposeInMainWorld('moodify', {
   permissionGet: () => ipcRenderer.invoke('codex:permission:get'),
   permissionSet: (value) => ipcRenderer.invoke('codex:permission:set', value),
 
-  // 分离 / MIDI / 曲谱：显式动作，产物落世界目录
+  // 逆向分解 / 结构 / 可逆性：显式动作，产物落世界目录
   listCaseFiles: (caseDir, subdir, exts) => ipcRenderer.invoke('casefiles:list', caseDir, subdir, exts),
-  stemsRun: (caseDir) => ipcRenderer.invoke('stems:run', caseDir),
+  // mode: 'auto'（默认，模型优先）| 'model'（Demucs 母带级）| 'dsp'（快速，秒级预览级）
+  stemsRun: (caseDir, mode) => ipcRenderer.invoke('stems:run', caseDir, mode),
+  // 可逆性验证：分轨相加回原版 → studio/roundtrip.json（④ 修音 的门禁）
+  stemsRoundtrip: (caseDir) => ipcRenderer.invoke('stems:roundtrip', caseDir),
+  // 分离引擎偏好；缺模型运行时时不会被替用户改选，只如实报缺
+  stemsEngineGet: () => ipcRenderer.invoke('stems:engine:get'),
+  stemsEngineSet: (engine) => ipcRenderer.invoke('stems:engine:set', engine),
+  // 结构事实：速度 / 拍点 / 段落边界 → studio/structure.json
+  structureAnalyze: (caseDir) => ipcRenderer.invoke('structure:analyze', caseDir),
+  // 能力体检：哪些外部运行时可用、缺哪个、怎么装。UI 据此说明「为什么这一步走不通」。
+  capabilitiesProbe: () => ipcRenderer.invoke('capabilities:probe'),
   midiRun: (caseDir, audioPath) => ipcRenderer.invoke('midi:run', caseDir, audioPath),
   scoreRun: (caseDir, midiPath) => ipcRenderer.invoke('score:run', caseDir, midiPath),
   readText: (caseDir, filePath) => ipcRenderer.invoke('text:read', caseDir, filePath),

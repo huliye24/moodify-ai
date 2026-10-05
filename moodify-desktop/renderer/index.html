@@ -378,12 +378,20 @@
           </div>
         </section>
 
-        <!-- 分离工作台：引擎 A=DSP 快速分离（本壳自带）；模型精分离后续接入 -->
+        <!-- 逆向分解工作台：两档真实引擎 —— 模型（Demucs，母带级四轨）与快速（DSP，秒级预览级）。
+             可逆性验证是 ④ 修音 的门禁：分轨按划分相加必须回到原版。 -->
         <section id="view-stems" class="workspace-view" hidden>
           <div id="stems-head">
-            <button id="stems-run" class="primary">快速分离</button>
-            <span class="muted stems-engine">引擎：DSP 中置估计 + HPSS（非模型）</span>
+            <button id="stems-run" class="primary">开始逆向分解</button>
+            <select id="stems-engine" title="分离引擎">
+              <option value="auto">引擎：自动（模型优先）</option>
+              <option value="model">引擎：Demucs 模型（母带级四轨）</option>
+              <option value="dsp">引擎：DSP 快速（秒级，预览级）</option>
+            </select>
+            <button id="stems-roundtrip" class="ghost" title="把分轨相加与原版比较">验证可逆性</button>
+            <span id="stems-engine-note" class="muted stems-engine"></span>
           </div>
+          <div id="stems-roundtrip-note" class="tool-progress" hidden></div>
           <div id="stems-progress" class="tool-progress" hidden></div>
           <div class="bench-tracks" id="stems-tracks"></div>
         </section>

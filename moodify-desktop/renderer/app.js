@@ -367,14 +367,26 @@ function openBench() {
   requestAnimationFrame(applyZoom); // 从隐藏态回来，宽度恢复后重画
 }
 
-// ——— 分离工作台（图标栏第 4 位）：引擎 A=DSP 快速分离；模型精分离后续接入 ———
+// ——— 逆向分解工作台（图标栏第 4 位）———
+//
+// 两档真实引擎，不是「快/慢」的措辞差异：
+//   model = Demucs htdemucs（MIT）神经网络四轨 drums/bass/other/vocals，母带级
+//   dsp   = scipy 中置估计 + HPSS，秒级，产物自带 PREVIEW_NOT_MASTERING_GRADE
+// 没装模型运行时时默认走快速并**明确标注这是降级**——用户必须知道手上是哪一档。
+// 可逆性验证是 ④ 修音 的门禁：分轨按划分相加必须回到原版（null 深度）。
 
 const STEM_LABELS = {
-  vocals: '人声（中置估计）',
+  vocals: '人声（模型分离 / 中置估计）',
   instrumental: '伴奏（源 − 中置）',
   harmonic: '谐波（持续音）',
   percussive: '打击（瞬态）',
+  drums: '鼓（模型分离）',
+  bass: '贝斯（模型分离）',
+  other: '其他乐器（模型分离）',
 };
+
+/** Demucs 的轨名也要认得出来，否则四轨会显示成文件名。 */
+const STEM_BASE_RE = /__(vocals|instrumental|harmonic|percussive|drums|bass|other)\.wav$/i;
 const stemWS = []; // 分离轨 WaveSurfer 实例（与 #stems-tracks 子行同序）
 
 function destroyStemWaves() {
@@ -446,7 +458,7 @@ async function openStems() {
 }
 
 function stemBase(name) {
-  const m = name.match(/__(vocals|instrumental|harmonic|percussive)\.wav$/i);
+  const m = name.match(STEM_BASE_RE);
   return m ? m[1].toLowerCase() : name;
 }
 
@@ -461,18 +473,88 @@ function stopStemWaves() {
 async function runStems() {
   if (!state.caseDir) return;
   const btn = $('stems-run');
+  const engineSel = $('stems-engine');
+  const mode = (engineSel && engineSel.value) || 'auto';
   btn.disabled = true;
-  showToolProgress('stems', '分离中…');
+  showToolProgress('stems', mode === 'dsp' ? '快速分离中…' : '分离中…（模型分离按 2–4× 实时长，请耐心）');
   try {
-    const res = await window.moodify.stemsRun(state.caseDir);
-    if (!res.ok) showToolProgress('stems', `分离失败（code ${res.code ?? '?'} ${res.reason || ''}）`);
-    else showToolProgress('stems', '完成。');
+    const res = await window.moodify.stemsRun(state.caseDir, mode);
+    if (!res.ok) {
+      // 缺运行时是**可操作**的失败：把怎么装一起说出来，不给一个光秃秃的错误码
+      const hint = res.install ? `；安装：${res.install}` : '';
+      showToolProgress('stems', `分离失败（${res.code || res.reason || '?'} ${res.detail || ''}）${hint}`);
+    } else if (res.downgraded) {
+      showToolProgress('stems',
+        `已用快速分离（预览级）。${res.downgradeReason || ''}${res.installHint ? ` 安装模型引擎：${res.installHint}` : ''}`);
+    } else {
+      showToolProgress('stems', `完成（引擎：${res.engine === 'model' ? 'Demucs 模型' : 'DSP 快速'}）。`);
+    }
     await openStems(); // 重扫产物入列
   } catch (err) {
     showToolProgress('stems', `分离失败：${err.message || err}`);
   } finally {
     btn.disabled = false;
   }
+}
+
+/**
+ * 可逆性验证（④ 修音 的门禁）。
+ *
+ * UI 的两条纪律：
+ *   · 通过时必须把 null 深度一起显示 —— 只显示「通过」会被读成「分轨已验证」；
+ *   · 必须同时说明它**不**证明分轨质量（任何可逆分解都能通过，包括「轨1=原版、轨2=静音」）。
+ */
+async function runRoundtrip() {
+  if (!state.caseDir) return;
+  const btn = $('stems-roundtrip');
+  const note = $('stems-roundtrip-note');
+  btn.disabled = true;
+  note.hidden = false;
+  note.textContent = '正在把分轨相加与原版比较…';
+  try {
+    const res = await window.moodify.stemsRoundtrip(state.caseDir);
+    if (!res.ok) {
+      note.textContent = `可逆性验证未完成（${res.code || res.reason || '?'}）。`
+        + '这不代表分轨有问题——只代表这一步没跑完。';
+    } else {
+      const db = res.nullDepthDb;
+      note.textContent = res.passed
+        ? `可逆性通过：null 深度 ${db} dB（分轨按划分相加能回到原版）。`
+          + '注意：这**不**说明分轨分得好——任何可逆分解都能通过。'
+        : `可逆性未通过：null 深度 ${db} dB。分解与复合之间存在真实漂移，`
+          + '④ 修音保持锁定。';
+    }
+    await refreshPipeline();
+  } catch (err) {
+    note.textContent = `可逆性验证失败：${err.message || err}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/** 引擎下拉：缺模型运行时时如实标注，并保留用户的选择权（不替他改）。 */
+async function initStemEngineSelect() {
+  const sel = $('stems-engine');
+  const note = $('stems-engine-note');
+  if (!sel || !note) return;
+  try {
+    const res = await window.moodify.stemsEngineGet();
+    if (res && res.ok) {
+      sel.value = res.engine || 'auto';
+      const model = res.model || {};
+      if (model.available) {
+        note.textContent = '模型引擎可用（Demucs）。';
+      } else {
+        sel.querySelector('option[value="model"]').disabled = true;
+        note.textContent = '模型引擎未安装：自动模式会走快速分离（预览级）。'
+          + (model.install ? ` 安装：${model.install}` : '');
+      }
+    }
+  } catch { /* 探测失败不阻断工作台 */ }
+  sel.addEventListener('change', async () => {
+    try { await window.moodify.stemsEngineSet(sel.value); } catch { /* 记录失败不影响本次运行 */ }
+    await refreshPipeline();
+  });
 }
 
 // ——— 曲谱工作台（图标栏第 5 位）：音频 → MIDI → MusicXML → 壳内渲染 ———
@@ -2287,6 +2369,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('rp-prepare').addEventListener('click', prepareComparison);
   $('rp-record').addEventListener('click', recordJudgment);
   $('stems-run').addEventListener('click', runStems);
+  $('stems-roundtrip').addEventListener('click', runRoundtrip);
+  initStemEngineSelect();
   $('score-convert').addEventListener('click', convertChain);
   $('score-product').addEventListener('change', () => {
     const p = scoreProducts[Number($('score-product').value)];

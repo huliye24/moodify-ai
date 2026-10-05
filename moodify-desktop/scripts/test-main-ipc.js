@@ -1399,6 +1399,12 @@ function addCompletePair(dir, { tuned = true, composed = true, recheck = true } 
     for (const f of failures) console.log('  - ' + f);
     process.exit(1);
   }
+  // 这个脚本 require 了真实的 main.js，而 main.js 会留下活着的句柄
+  // （codex stdio 客户端、长任务单飞锁、可能还有 node-pty 的 shell）。
+  // 断言全部跑完后必须显式退出：否则进程永远不退出，`npm test` 就变成一个
+  // 「测试全过、但命令永不返回」的挂起——比失败更难诊断，而且会攒下孤儿进程。
+  // 这是测试夹具的收尾，不是被测代码的行为。
+  process.exit(0);
 })().catch((err) => {
   console.error('TEST HARNESS ERROR:', err);
   process.exit(1);

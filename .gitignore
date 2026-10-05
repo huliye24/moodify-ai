@@ -50,8 +50,19 @@ _github_moodify_ai/
 *.docx
 
 # Local virtualenvs and scratch state (never committed; regenerate locally)
+#
+# 为什么这里用通配 `/.venv-*/` 而不是逐条列举：
+# `.venv-basic-pitch/` 早已在第 221 行单独列过，但 `.venv-audio/` 与 `.venv-demucs/`
+# （2026-10-05 新增的运行时的默认位置）**不在任何规则里**——`git status` 直接把它们
+# 报成未跟踪，`git add -A` 会一次提交 231 MB 的解释器。
+# 仓库已经因为「逐条列举跟不上新增目录」栽过四次（*.png 吞品牌资产那类），
+# 所以这里一次性覆盖整个 `.venv-*` 命名空间，新增运行时不必再改 .gitignore。
+/.venv-*/
 /.venv-core/
 /.venv-score/
+/.venv-basic-pitch/
+/.venv-audio/
+/.venv-demucs/
 /.tmp/
 
 # Moodify Studio private media library (user recordings — never committed)

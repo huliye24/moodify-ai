@@ -510,8 +510,26 @@ function recordStage(caseDir) {
 const CAPABILITIES = Object.freeze([
   { id: 'analysis-report', kind: 'analysis', detail: '测量 + 报告三件套',
     core_command: 'moodify analyze <audio> | moodify report <case>', stage: 'ANALYZE' },
-  { id: 'fast-separation', kind: 'separation', detail: 'DSP 中置估计 + HPSS（快速/预览，非母带级）',
+  { id: 'fast-separation', kind: 'separation',
+    detail: 'DSP 中置估计 + HPSS（scipy 中值滤波；快速/预览，非母带级）',
     core_command: 'moodify-desktop/scripts/dsp_separate.py', stage: 'SEPARATE' },
+  // 模型分离：Demucs htdemucs（MIT）。母带级四轨（drums/bass/other/vocals）。
+  // 与快速分离是**两档**，不是替代关系：快速用于秒级观察，模型用于真正要复合的场合。
+  { id: 'model-separation', kind: 'separation',
+    detail: 'Demucs htdemucs 神经网络四轨分离（母带级；CPU RTF ≈ 2–4×）',
+    core_command: 'moodify-desktop/scripts/model_separate.py', stage: 'SEPARATE' },
+  // 可逆性验证（**壳侧**实现）。放在这里而不是 PLANNED 里，是因为它真的能跑；
+  // 同时 PLANNED 里保留了**Core 侧**的同名能力，两者不冲突也更不能混为一谈：
+  //   - 壳侧（本项）：分轨相加与原版比较，写 studio/roundtrip.json，给门禁一个真实依据
+  //   - Core 侧（PLANNED）：Core 自己产出可逆性证据
+  // 名称带 `shell-` 前缀就是为了让这两件事在代码里无法被认错。
+  { id: 'shell-reversibility-check', kind: 'verification',
+    detail: '可逆性验证：按划分把分轨相加与原版比较（null 深度），写 studio/roundtrip.json',
+    core_command: 'moodify-desktop/scripts/roundtrip.py --stems <dir> --original <wav>',
+    stage: 'SEPARATE' },
+  { id: 'structure-analysis', kind: 'structure',
+    detail: '速度 / 拍点 / 段落边界 / 能量曲线（numpy+scipy；段落是位置编号，不是主歌副歌判断）',
+    core_command: 'moodify-desktop/scripts/structure.py', stage: 'STRUCTURE' },
   { id: 'audio-to-midi', kind: 'structure', detail: 'Basic Pitch 音频转 MIDI',
     core_command: 'basic-pitch --save-midi <dir> <audio>', stage: 'STRUCTURE' },
   { id: 'midi-to-score', kind: 'structure', detail: 'music21 转 MusicXML',
@@ -528,15 +546,22 @@ const CAPABILITIES = Object.freeze([
 ]);
 
 /**
- * Capabilities the V4 flow needs but Core does not have yet.
+ * Capabilities the V4 flow needs but **Core** does not have yet.
  *
  * Listed, marked unavailable, with a reason — never mapped onto something similar. The V3
  * `streaming_ready` target was handled the same way: the button must not promise what the
  * engine cannot do. The three presets that used to live here retired on 2026-10-04.
+ *
+ * `reversibility-check` stays here on purpose even though the shell can now perform a
+ * reversibility check (`shell-reversibility-check`, above). The two are different claims:
+ * the shell compares a stem sum against the original; Core owning the evidence is what
+ * this entry is about. Collapsing them would let a shell-side null test be read as Core
+ * verification — exactly the kind of upgrade-by-renaming this repository keeps removing.
  */
 const PLANNED_CAPABILITIES = Object.freeze([
   { id: 'reversibility-check', stage: 'SEPARATE',
-    reason: '分解→复合 的可逆性验证（studio/roundtrip.json）需 Core 实现；未产出前 ④ 修音保持锁定' },
+    reason: '由 Core 自己产出可逆性证据（studio/roundtrip.json）；壳侧实现见 '
+      + 'shell-reversibility-check，两者不得互相顶替' },
   { id: 'stem-tuning', stage: 'TUNE',
     reason: '逐轨音准·节奏修正以 MIDI 为参考，Core 无此能力；见 MIP-0002' },
   { id: 'multi-stem-compose', stage: 'COMPOSE',
@@ -560,7 +585,8 @@ const FAST_PAIR_AVAILABLE = AVAILABLE_CAPABILITY_IDS.has(FAST_PAIR_CAPABILITY_ID
  */
 function buildContext(caseDir) {
   const info = inspect(caseDir);
-  const fromCase = (p) => path.relative(path.join(caseDir, 'studio'), p).split(path.sep).join('/');
+  const studioDir = path.join(caseDir, 'studio');
+  const fromCase = (p) => path.relative(studioDir, p).split(path.sep).join('/');
 
   const ctx = {
     schema: 'moodify.studio.context/0.2',
@@ -569,6 +595,9 @@ function buildContext(caseDir) {
     source: null,
     analysis: {},
     stems: null,
+    // 结构事实（速度/拍点/段落边界）由 scripts/structure.py 产出；缺失时为 null。
+    // 段落只有位置编号，没有主歌/副歌标签——语义不是测量结果。
+    structure: null,
     midi: [],
     score: [],
     // 该保护什么 —— ④ 修音 的输入侧，由人填写（2026-10-04 裁定：从 ②问题 迁来）
@@ -591,14 +620,42 @@ function buildContext(caseDir) {
 
   if (info.hasStems || info.stemsManifest) {
     const m = info.stemsManifest || {};
+    // grade 必须**来自 manifest**，不能在这里写死。写死的话，接入模型分离之后
+    // （engine_grade = MODEL_SEPARATION_NOT_VERIFIED_AGAINST_ORIGINAL_STEMS）
+    // 每个下游仍会读到「预览级」，等于把升级过的产物降级描述——比没写更糟。
+    const grade = m.engine_grade
+      || (m.engine === 'demucs' ? 'MODEL_SEPARATION_NOT_VERIFIED_AGAINST_ORIGINAL_STEMS'
+        : 'PREVIEW_NOT_MASTERING_GRADE');
     ctx.stems = {
       manifest: info.stemsManifest ? fromCase(info.stemsManifestPath) : null,
       files: info.stemWavs.map((p) => fromCase(p)),
       engine: m.engine || null,
+      engine_model: m.engine_model || null,
       engine_note: m.engine_note || null,
-      grade: 'PREVIEW_NOT_MASTERING_GRADE',
+      grade,
+      // 划分：一套分轨里哪些轨**相加等于原版**。缺了它，可逆性验证只能靠搜索猜。
+      partition: m.partition || null,
     };
-    ctx.notes.push('分轨为快速/预览级（DSP 中置估计 + HPSS），不可作为母带级分轨使用。');
+    if (grade === 'PREVIEW_NOT_MASTERING_GRADE') {
+      ctx.notes.push('分轨为快速/预览级（DSP 中置估计 + HPSS），不可作为母带级分轨使用。');
+    } else {
+      ctx.notes.push('分轨来自模型引擎（Demucs）；原分轨不可知，'
+        + '因此『分离得对不对』无法回答，只能以可逆性作为代理。');
+    }
+  }
+
+  const structurePath = path.join(studioDir, 'structure.json');
+  const structure = readJsonSafe(structurePath);
+  if (structure) {
+    ctx.structure = {
+      path: 'structure.json',
+      bpm: structure.tempo ? structure.tempo.bpm : null,
+      tempo_confidence: structure.tempo ? structure.tempo.confidence : null,
+      beats: structure.beat_count ?? null,
+      sections: Array.isArray(structure.sections) ? structure.sections.length : 0,
+      section_labels: null, // 段落语义不是测量结果——**没有**标签，只有位置编号
+      judgment_boundary: structure.judgment_boundary || null,
+    };
   }
 
   ctx.midi = info.midiFiles.map((p) => fromCase(p));
@@ -616,8 +673,17 @@ function buildContext(caseDir) {
     finish_mode: snap.gates.mode,
     finish_mode_label: snap.gates.modeLabel,
     reversibility: info.roundtrip
-      ? { passed: info.roundtrip.passed === true, path: 'roundtrip.json' }
-      : { passed: false, path: null },
+      ? {
+        passed: info.roundtrip.passed === true,
+        path: 'roundtrip.json',
+        // 把「这个数说明什么 / 不说明什么」一起带上：只有 passed 一个布尔值，
+        // 下游一定会把它读成「分轨已验证」。null 深度与控制组读数必须同行。
+        null_depth_db: info.roundtrip.measurement
+          ? info.roundtrip.measurement.null_depth_db : null,
+        partition: info.roundtrip.stems ? Object.keys(info.roundtrip.stems) : null,
+        interpretation: info.roundtrip.interpretation || null,
+      }
+      : { passed: false, path: null, null_depth_db: null, partition: null, interpretation: null },
     facts: snap.gates.facts,
   };
 
