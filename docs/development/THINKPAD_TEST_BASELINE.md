@@ -53,3 +53,15 @@ Project Model 0.1、Capability Registry、Provider Router 等测试
 测试期间本机同时发生了少量短时 CLI 作业（PROCESS/分析验证，见
 `THINKPAD_PROCESS_PIPELINE.md`）——即便如此 0 失败。全套测试为本机
 **单线程串行**运行，非 xdist 并行；总时长含全部音频处理测试。
+
+## 优化 001 后的回归复跑（同日同会话）
+
+改动：`auditory/decode.py` + `auditory/spectrogram.py`（ffmpeg 发现/版本探测
+memoize，见 `THINKPAD_PROCESS_PERFORMANCE.md` §3）。
+
+```text
+命令同 canonical；结果: 1403 passed, 6 skipped, 14 warnings in 256.04s (0:04:16)
+exit 0 —— passed/skipped 与基线完全一致，零回归。
+```
+
+256s vs 基线 519s 的差异来自热缓存（与优化无关，冷热差效应见性能文档 §1.2）。

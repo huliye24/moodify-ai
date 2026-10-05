@@ -12,7 +12,9 @@ Measures wall time and peak memory per stage of the public PROCESS path:
 No stage is re-implemented and no private API is imported: every stage is a
 subprocess call to the same CLI the desktop shell invokes
 (`python -m moodify.release_cli ...`). Timings are wall-clock; peak memory is
-sampled from the child process (Windows only, no new dependencies).
+sampled from the child's **process tree** (Windows only, no new dependencies):
+a venv `python.exe` is a redirector whose real workload runs in a descendant,
+and ffmpeg children appear there too.
 
 Usage:
     python scripts/benchmark_process.py --input local_audio_assets/inputs/test_A_10s.wav --label A
@@ -59,21 +61,36 @@ class _PROCESS_MEMORY_COUNTERS(ctypes.Structure):
     ]
 
 
-def _sample_peak_ws(pid: int) -> int | None:
-    """Peak working set (bytes) of a live process; None if unavailable."""
+def _sample_peak_ws(pid: int) -> tuple[int, int] | None:
+    """(peak, current) working set in bytes for one live process; None if unavailable.
+
+    NOTE (measured on this node): a venv `python.exe` on Windows is a redirector
+    that spawns the base interpreter as its child, so the *real* workload lives in
+    a descendant process. Sampling only the spawned pid measures the redirector
+    (~4 MB). Callers must walk the process tree — see `_tree_pids`.
+    """
     if not IS_WINDOWS:
         return None
     try:
         k32 = ctypes.windll.kernel32
         psapi = ctypes.windll.psapi
-        h = k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        # 64-bit HANDLEs must not be truncated to a default c_int: declare types.
+        k32.OpenProcess.restype = ctypes.c_void_p
+        k32.OpenProcess.argtypes = [wt.DWORD, wt.BOOL, wt.DWORD]
+        k32.CloseHandle.argtypes = [ctypes.c_void_p]
+        psapi.GetProcessMemoryInfo.argtypes = [
+            ctypes.c_void_p, ctypes.POINTER(_PROCESS_MEMORY_COUNTERS), wt.DWORD,
+        ]
+        psapi.GetProcessMemoryInfo.restype = wt.BOOL
+        access = PROCESS_QUERY_LIMITED_INFORMATION | 0x0400 | 0x0010  # QLI | QUERY | VM_READ
+        h = k32.OpenProcess(access, False, pid)
         if not h:
             return None
         try:
             pmc = _PROCESS_MEMORY_COUNTERS()
             pmc.cb = ctypes.sizeof(pmc)
             if psapi.GetProcessMemoryInfo(h, ctypes.byref(pmc), pmc.cb):
-                return int(pmc.PeakWorkingSetSize)
+                return int(pmc.PeakWorkingSetSize), int(pmc.WorkingSetSize)
             return None
         finally:
             k32.CloseHandle(h)
@@ -81,9 +98,64 @@ def _sample_peak_ws(pid: int) -> int | None:
         return None
 
 
+# ── process-tree walking (Toolhelp32) ────────────────────────────────────────
+
+TH32CS_SNAPPROCESS = 0x00000002
+INVALID_HANDLE_VALUE = ctypes.c_void_p(-1).value
+
+
+class _PROCESSENTRY32(ctypes.Structure):
+    _fields_ = [
+        ("dwSize", wt.DWORD),
+        ("cntUsage", wt.DWORD),
+        ("th32ProcessID", wt.DWORD),
+        ("th32DefaultHeapID", ctypes.POINTER(ctypes.c_ulong)),
+        ("th32ModuleID", wt.DWORD),
+        ("cntThreads", wt.DWORD),
+        ("th32ParentProcessID", wt.DWORD),
+        ("pcPriClassBase", ctypes.c_long),
+        ("dwFlags", wt.DWORD),
+        ("szExeFile", ctypes.c_char * 260),
+    ]
+
+
+def _tree_pids(root_pid: int) -> list[int]:
+    """root pid + all its descendants (snapshot at call time)."""
+    if not IS_WINDOWS:
+        return [root_pid]
+    try:
+        k32 = ctypes.windll.kernel32
+        k32.CreateToolhelp32Snapshot.restype = ctypes.c_void_p
+        k32.CreateToolhelp32Snapshot.argtypes = [wt.DWORD, wt.DWORD]
+        snap = k32.CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+        if not snap or snap == INVALID_HANDLE_VALUE:
+            return [root_pid]
+        try:
+            entry = _PROCESSENTRY32()
+            entry.dwSize = ctypes.sizeof(entry)
+            children: dict[int, list[int]] = {}
+            ok = k32.Process32First(snap, ctypes.byref(entry))
+            while ok:
+                children.setdefault(int(entry.th32ParentProcessID), []).append(
+                    int(entry.th32ProcessID))
+                ok = k32.Process32Next(snap, ctypes.byref(entry))
+        finally:
+            k32.CloseHandle(snap)
+        out, stack = [root_pid], [root_pid]
+        while stack:
+            for child in children.get(stack.pop(), []):
+                if child not in out:
+                    out.append(child)
+                    stack.append(child)
+        return out
+    except Exception:
+        return [root_pid]
+
+
 def run_stage(cmd: list[str], cwd: Path, env: dict[str, str]) -> dict:
     """Run one official CLI stage; return timing + peak memory + result."""
-    peak = 0
+    peak_single = 0   # max over time of the largest single process in the tree
+    peak_tree = 0     # max over time of the summed working set of the tree
     stop = threading.Event()
 
     proc = subprocess.Popen(
@@ -91,12 +163,20 @@ def run_stage(cmd: list[str], cwd: Path, env: dict[str, str]) -> dict:
     )
 
     def sampler() -> None:
-        nonlocal peak
+        nonlocal peak_single, peak_tree
         while not stop.is_set():
-            b = _sample_peak_ws(proc.pid)
-            if b:
-                peak = max(peak, b)
-            stop.wait(0.03)
+            tree_peak, tree_cur = 0, 0
+            for pid in _tree_pids(proc.pid):
+                s = _sample_peak_ws(pid)
+                if s:
+                    p, cur = s
+                    tree_peak = max(tree_peak, p)
+                    tree_cur += cur
+            if tree_peak:
+                peak_single = max(peak_single, tree_peak)
+            if tree_cur:
+                peak_tree = max(peak_tree, tree_cur)
+            stop.wait(0.05)
 
     th = threading.Thread(target=sampler, daemon=True)
     t0 = time.perf_counter()
@@ -106,9 +186,11 @@ def run_stage(cmd: list[str], cwd: Path, env: dict[str, str]) -> dict:
     stop.set()
     th.join(timeout=1.0)
 
+    mb = 1024 * 1024
     result: dict = {
         "elapsed_s": round(elapsed, 3),
-        "peak_mem_mb": round(peak / (1024 * 1024), 1) if peak else None,
+        "peak_mem_mb": round(peak_single / mb, 1) if peak_single else None,
+        "peak_tree_mb": round(peak_tree / mb, 1) if peak_tree else None,
         "exit_code": proc.returncode,
         "status": "ok" if proc.returncode == 0 else "failed",
     }

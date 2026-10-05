@@ -120,8 +120,11 @@ def main() -> int:
         cli = stages["process"].get("cli_result") or {}
         out_wav = Path(cli["output"]) if isinstance(cli.get("output"), str) else None
         if out_wav and out_wav.is_file() and out_wav.stat().st_size > 0:
-            actual = "sha256:" + sha256_file(out_wav)
-            rec["output_matches_hash"] = (actual == cli.get("output_sha256"))
+            # The CLI records raw hex (no "sha256:" prefix); tolerate both forms.
+            cli_hash = str(cli.get("output_sha256") or "").removeprefix("sha256:")
+            rec["output_matches_hash"] = (
+                (sha256_file(out_wav) == cli_hash) if cli_hash else None
+            )
         elif rec["status"] == "ok":
             rec["status"] = "no_output"
 
