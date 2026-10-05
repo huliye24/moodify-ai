@@ -60,3 +60,16 @@ jobs:
       - name: Headless processing chain
         working-directory: moodify-desktop
         run: node scripts/test-studio.js
+
+      - name: Deep-chain scripts (separation / reversibility / structure)
+        # 这条链曾经在真实机器上完全不可达而没有任何测试发现：脚本 import 了
+        # librosa→sklearn→pandas→numpy 这条会崩的链，外部运行时也从未安装。
+        # 这个测试真的跑脚本，因此需要 .venv-audio（numpy+scipy+soundfile，很轻）。
+        # 缺运行时它**如实跳过**（不是假装通过）。
+        working-directory: moodify-desktop
+        run: node scripts/test-deep-chain.js
+
+      - name: Release guard (trust chain)
+        # 发布是唯一不可撤回的动作，所以守卫本身必须被测到会挡住坏产物集。
+        working-directory: moodify-desktop
+        run: node scripts/test-release-guard.js

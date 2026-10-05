@@ -1,4 +1,4 @@
-﻿name: Desktop Sign & Attest
+name: Desktop Sign & Attest
 
 # 桌面产物的**信任链**工作流。与 `desktop-release.yml` 的分工是刻意的：
 #
@@ -218,19 +218,57 @@ jobs:
           Write-Host "::notice title=Unsigned build::$msg"
 
       - name: Stage the artifacts that will be attested
+        # ── 这一段是整条链的**发布守卫核心**，改动前请读完 ──────────────────────
+        #
+        # 它决定「最终被证明与发布的字节是哪一个」。规则只有一条：
+        #
+        #     签名已启用 ⇒ final **只能**来自 SignPath 的输出目录；
+        #                  拿不到签名产物就整个失败，绝不回退到未签名字节。
+        #
+        # 为什么必须这样：早先的写法是「signed 目录为空就 copy unsigned」——
+        # 那意味着 SignPath 挂掉、超时、或 artifact-configuration 配错时，
+        # 流水线会**静默地把未签名产物当成最终产物**继续走下去，
+        # 一路通过证明与校验和，最后被发出去。这正是
+        # 「Build A → Sign A → Publish B」那条被明令禁止的路径，
+        # 只不过它伪装成了「签名服务暂时不可用」。
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path final | Out-Null
+          $signingEnabled = "${{ vars.SIGNPATH_ENABLED }}" -eq "true"
+          $signed = @()
           if (Test-Path signed) {
-            Get-ChildItem -Path signed -Recurse -File |
-              Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') } |
-              Copy-Item -Destination final -Force
+            $signed = @(Get-ChildItem -Path signed -Recurse -File |
+              Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') })
           }
-          if (-not (Get-ChildItem -Path final -File -ErrorAction SilentlyContinue)) {
+
+          if ($signingEnabled) {
+            if ($signed.Count -eq 0) {
+              throw ("SIGNING_ENABLED but no signed artifacts were produced. " +
+                     "Refusing to fall back to the unsigned build: publishing unsigned bytes " +
+                     "as the official release is exactly the failure this gate exists to prevent.")
+            }
+            $signed | Copy-Item -Destination final -Force
+            Write-Host "final = SIGNED artifacts from SignPath ($($signed.Count) file(s))"
+          } else {
             Copy-Item -Path unsigned/* -Destination final -Force
-            Write-Host "final = unsigned artifacts (no signing was performed)"
+            Write-Host ("final = unsigned artifacts. VAR SIGNPATH_ENABLED is not 'true', " +
+                        "so NO signature exists and none is claimed. See " +
+                        "docs/releases/WINDOWS_CODE_SIGNING.md.")
           }
-          Get-ChildItem final | Select-Object Name, Length | Format-Table -AutoSize
+
+          # 无论走哪条路：final 里必须恰好是本次构建的那批可执行文件，一个不多一个不少。
+          # 数量对不上说明有东西被漏掉或多出来——两种都不该发布。
+          $unsignedExes = @(Get-ChildItem -Path unsigned -File |
+            Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') })
+          $finalExes = @(Get-ChildItem -Path final -File |
+            Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') })
+          if ($finalExes.Count -eq 0) { throw "no executable artifacts were staged" }
+          if ($finalExes.Count -ne $unsignedExes.Count) {
+            throw ("artifact set changed across the signing stage: built $($unsignedExes.Count) " +
+                   "executable(s), staged $($finalExes.Count). The released set must be exactly " +
+                   "the built set, signed or not.")
+          }
+          $finalExes | Select-Object Name, Length | Format-Table -AutoSize
 
       - name: Verify signatures and write signature facts
         id: facts
@@ -288,16 +326,27 @@ jobs:
           $manifest | ConvertTo-Json -Depth 6 |
             Set-Content -LiteralPath final/RELEASE_MANIFEST.json -Encoding utf8
 
-      - name: Checksums
+      - name: Checksums (over the final bytes only)
+        # 校验和**只覆盖被发布的字节**（最终 exe/msix/msi）。
+        #
+        # 为什么不把 SIGNATURE_FACTS.json / RELEASE_MANIFEST.json 也算进去：
+        #   SHA256SUMS.txt 的语义是「这些二进制的指纹」。把描述性 JSON 混进来，
+        #   用户就得自己判断哪一行才是安装包；而 `sha256sum -c` 也会因为多出来的
+        #   条目而变得难以使用。事实与清单是**佐证**，不是被校验的对象。
+        #   而且这些执行文件此刻已经是签名后的字节——顺序是 Sign → SHA256，
+        #   不是 SHA256 → Sign。
         shell: pwsh
         run: |
-          $paths = (Get-ChildItem final -File | Where-Object { $_.Name -ne 'SHA256SUMS.txt' }).FullName
-          $paths += (Join-Path $PWD 'final/SIGNATURE_FACTS.json')
-          $lines = $paths | Sort-Object -Unique | ForEach-Object {
-            "$((Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant())  $(Split-Path $_ -Leaf)"
+          $exes = @(Get-ChildItem -Path final -File |
+            Where-Object { $_.Extension -in @('.exe', '.msix', '.msi') } |
+            Sort-Object Name)
+          if ($exes.Count -eq 0) { throw "nothing to checksum: no executables in final/" }
+          $lines = $exes | ForEach-Object {
+            "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)"
           }
           $lines | Set-Content -LiteralPath final/SHA256SUMS.txt -Encoding ascii
           $lines | ForEach-Object { Write-Host $_ }
+          Write-Host "checksums cover $($exes.Count) final artifact(s)"
 
       - name: Attest build provenance
         # 来源证明证明「这个字节序列由这次 commit、这个 workflow 产出」。

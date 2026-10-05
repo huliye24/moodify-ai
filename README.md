@@ -71,6 +71,49 @@ and [`docs/canon/PRODUCT_DEFINITION_V3.md`](docs/canon/PRODUCT_DEFINITION_V3.md)
 
 ---
 
+## Windows downloads
+
+Official Windows builds are published through
+[GitHub Releases](https://github.com/huliye24/moodify-ai/releases).
+
+Moodify is open-source software licensed under GPL-3.0.
+
+Official Windows binaries are:
+
+- built with GitHub Actions
+- code-signed through [SignPath Foundation](https://signpath.org/)
+- accompanied by SHA256 checksums (`SHA256SUMS.txt`)
+- accompanied by GitHub artifact attestations
+
+```bash
+# integrity — the checksum must match the file you downloaded
+sha256sum -c SHA256SUMS.txt
+
+# provenance — this binary was built by this repository's CI, from a specific commit
+gh attestation verify Moodify_Studio_*_Setup_x64.exe --repo huliye24/moodify-ai
+```
+
+### What those guarantees do and do not cover
+
+The Windows Authenticode publisher is **SignPath Foundation**, not Moodify. That is the
+current, deliberate trade-off for a zero-cost release chain; a future release may move to a
+project-owned certificate. See
+[`docs/releases/WINDOWS_CODE_SIGNING.md`](docs/releases/WINDOWS_CODE_SIGNING.md).
+
+Code signing and artifact attestation answer different questions. Signing says **who published
+the bytes**; attestation says **which commit and workflow produced them**. Neither is a claim
+that the software is free of defects, and neither should be read as "safe", "fully trusted" or
+"Microsoft certified" — those claims cannot be proven and are not made.
+
+A valid signature also does not by itself remove the Windows SmartScreen prompt: publisher
+reputation accumulates over downloads. Before signing is enabled, `RELEASE_MANIFEST.json`
+reports `code_signed: false`, measured from the artifact rather than assumed.
+
+Full detail: [`docs/releases/`](docs/releases/) — trust audit, signing, provenance, and the
+MSIX/Microsoft Store compatibility spike.
+
+---
+
 ## Quick start
 
 Two interfaces share the Core. **CLI** is the Creator side — the action is `PROCESS`.

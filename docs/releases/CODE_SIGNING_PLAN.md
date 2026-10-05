@@ -1,5 +1,19 @@
 # 代码签名方案 — CODE-SIGNING-PLAN-001
 
+> **2026-10-05 更新（`MOODIFY_DESKTOP_TRUST_CHAIN_001`）：**
+> 本文 §6 的三条 `HUMAN_DECISION_REQUIRED` 中，**第 1 条已拍板**——
+> 接受 `SignPath Foundation` 作为 Windows Authenticode Publisher
+> （`Decision A`，不再标记为待决）。第 2、3 条（是否进入 Store、macOS 渠道）
+> 仍然待决。
+>
+> 可操作的执行文档现在是：
+> - [`WINDOWS_CODE_SIGNING.md`](WINDOWS_CODE_SIGNING.md) — 策略、验证手册、接线状态
+> - [`DESKTOP_RELEASE_TRUST_AUDIT.md`](DESKTOP_RELEASE_TRUST_AUDIT.md) — 发布链审计
+> - [`ARTIFACT_PROVENANCE.md`](ARTIFACT_PROVENANCE.md) — 四层证据与边界
+> - [`MSIX_COMPATIBILITY.md`](MSIX_COMPATIBILITY.md) — Store 渠道的可行性 spike
+>
+> 本文保留为**方案论证与代价对比**的原始记录。
+
 **Date:** 2026-10-05
 **Status:** 方案（DEFINED）。**当前没有任何签名证书**——本文描述的是怎么拿到，不是已经拿到。
 **Authority:** 本文件是实施方案，不是 Canon；产品对外身份相关部分标 `HUMAN_DECISION_REQUIRED`。
@@ -169,10 +183,16 @@ Azure Trusted Signing。先核实个人开发者资格与是否需要额外 Entr
 
 ## 6. HUMAN_DECISION_REQUIRED
 
-1. **是否接受代码签名的发布者显示为 `SignPath Foundation` 而不是 `Moodify`？**
-   （免费档的固有条件；要显示自己的名字就需要 Azure Trusted Signing 或购买证书）
-2. **是否进入 Microsoft Store？** 若是，需先回答 §4 第 2 步的第 2 问——
-   Store 版是否允许「只播放、不完成」，或接受为 Store 版单独维护一份受限能力。
+1. ~~**是否接受代码签名的发布者显示为 `SignPath Foundation` 而不是 `Moodify`？**~~
+   **已拍板（2026-10-05，Decision A）：接受。** Windows 属性面板显示
+   `SignPath Foundation` 是当前阶段主动接受的取舍；现阶段不购买 OV/EV/商业证书，
+   未来有稳定现金流后再迁移到自有证书（迁移路径见
+   [`WINDOWS_CODE_SIGNING.md`](WINDOWS_CODE_SIGNING.md) §5）。**不再作为待决事项。**
+2. **是否进入 Microsoft Store？** 在
+   [`MSIX_COMPATIBILITY.md`](MSIX_COMPATIBILITY.md) 的十二项测试得出
+   `FULL` 或 `PLAY_ONLY` 结论之前不启动。若为 `PLAY_ONLY`，
+   Store 版是 Player Edition，GitHub 版是完整 Studio，且**必须在 UI / README /
+   Store Description 三处说明能力区别**。
 3. **是否需要 Windows 之外的分发渠道？** macOS 的公证（notarization）是另一套
    （Apple Developer Program 年费），本方案未覆盖。
 
