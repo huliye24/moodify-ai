@@ -1,4 +1,4 @@
-name: Desktop Release
+﻿name: Desktop Release
 
 # 发布链 = 复用 `desktop-sign.yml`（构建 → 签名 → 来源证明），再发布。
 #
@@ -55,10 +55,10 @@ jobs:
       contents: write
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download signed + attested artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: desktop-signed
           path: release
@@ -69,7 +69,7 @@ jobs:
           ls -la release/
 
       - name: Publish GitHub prerelease
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: Moodify Studio ${{ github.ref_name }}
           prerelease: true

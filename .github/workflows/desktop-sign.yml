@@ -1,4 +1,4 @@
-name: Desktop Sign & Attest
+﻿name: Desktop Sign & Attest
 
 # 桌面产物的**信任链**工作流。与 `desktop-release.yml` 的分工是刻意的：
 #
@@ -64,10 +64,10 @@ jobs:
         working-directory: moodify-desktop
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: npm
@@ -121,7 +121,7 @@ jobs:
           Write-Host "packaged scripts verified: $($required -join ', ')"
 
       - name: Upload unsigned artifacts for the signing stage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: desktop-unsigned
           if-no-files-found: error
@@ -150,12 +150,7 @@ jobs:
       )
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+        uses: actions/checkout@v7
 
       - name: Assert helper scripts survived checkout intact
         # `verify-signature.ps1` 含中文注释，**必须**带 UTF-8 BOM：
@@ -173,7 +168,7 @@ jobs:
           Write-Host "$f has its UTF-8 BOM"
 
       - name: Download unsigned artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: desktop-unsigned
           path: unsigned
@@ -309,12 +304,12 @@ jobs:
         # 关键边界：它**不**让 Windows 信任这个二进制——那是代码签名的事。
         # 两者互补，不能互相替代。
         id: attest
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: final/*.exe
 
       - name: Upload signed + attested artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: desktop-signed
           if-no-files-found: error
