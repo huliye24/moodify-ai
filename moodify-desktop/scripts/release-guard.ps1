@@ -48,6 +48,33 @@ function Fail([string]$Message) {
     exit 1
 }
 
+<#
+.SYNOPSIS
+    计算文件的 SHA-256 十六进制摘要。
+
+.DESCRIPTION
+    刻意**不**使用 `Get-FileHash`。它在这个环境的 Windows PowerShell 下会抛
+    `CommandNotFoundException`（CI 实测），而这是一个发布守卫——它依赖的每个东西
+    都必须是这条流水线上真实可用的。.NET 的 SHA256 是 API 而不是 cmdlet，
+    不受执行策略 / 语言模式 / 模块自动加载的影响。
+
+    这不是理论顾虑：CI 上守卫正是因为 Get-FileHash 而整段失败。
+#>
+function Get-Sha256Hex([string]$Path) {
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $stream = [System.IO.File]::OpenRead($Path)
+        try {
+            $bytes = $sha.ComputeHash($stream)
+        } finally {
+            $stream.Dispose()
+        }
+    } finally {
+        $sha.Dispose()
+    }
+    return ([System.BitConverter]::ToString($bytes) -replace '-', '').ToLowerInvariant()
+}
+
 if (-not (Test-Path -LiteralPath $ReleaseDir)) {
     Fail "release directory not found: $ReleaseDir"
 }
@@ -80,7 +107,7 @@ foreach ($line in $lines) {
     if (-not (Test-Path -LiteralPath $file)) {
         Fail "SHA256SUMS.txt references a file that is not present: $name"
     }
-    $got = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
+    $got = Get-Sha256Hex $file
     if ($got -ne $want) {
         Fail "sha256 mismatch for $name`n  listed: $want`n  actual: $got"
     }

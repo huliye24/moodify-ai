@@ -141,13 +141,16 @@ function expectRan(res) {
   if (res.status === null) {
     throw new Error(`guard produced no exit status (signal=${res.signal})\n${res.stdout || ''}`);
   }
-  // 把 PowerShell 自己的「找不到脚本 / 解析失败」和「守卫判定了」分开。
-  // 前者也会给出非 0 退出码，若不区分就会被读成「守卫正确地挡住了」——
-  // 一个假通过。CI 上正是这样暴露了 -File 收到相对路径的问题。
-  const out = `${res.stdout || ''}\n${res.stderr || ''}`;
-  if (/CommandNotFoundException|Cannot find (path|the file)|ParserError|is not recognized/.test(out)) {
-    throw new Error(`PowerShell could not run the guard (this is a test-harness error, `
-      + `not a guard verdict):\n${out}`);
+  // 把「PowerShell 根本没把脚本启动起来」和「守卫运行后做出了判断」分开。
+  // 只看 **stderr**，而且只匹配最窄的「找不到可执行/脚本」形态。
+  // 早先这一条写得过宽（把 "Cannot find path" 也算进去，且两边都扫），
+  // 结果把守卫**内部**的失败也标成"测试脚手架问题"，等于把真实缺陷藏了起来。
+  // 现在：只有 PowerShell 明确说它找不到那个 .ps1 文件时才算脚手架问题。
+  const err = res.stderr || '';
+  if (/CommandNotFoundException[\s\S]{0,200}release-guard\.ps1/.test(err)
+      || /(Cannot find|The term).{0,120}release-guard\.ps1/.test(err)) {
+    throw new Error('PowerShell could not launch the guard script at all '
+      + '(test-harness error, not a guard verdict):\n' + err);
   }
   return res.status;
 }
