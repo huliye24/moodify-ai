@@ -54,14 +54,41 @@ function tmp(prefix) {
   return dir;
 }
 
-/** 解析 .venv-audio；缺了就让整组测试如实跳过（不假装通过）。 */
-function audioPython() {
+/**
+ * 找出一个能跑这些脚本的解释器。
+ *
+ * 顺序刻意如此：
+ *   1. `runtime.js` 解析出的专用运行时（`.venv-audio`）——**这是产品的真实路径**，
+ *      应用就是这么找解释器的，所以优先测它。
+ *   2. 退回到系统 python，**仅当它真的装了 numpy+scipy+soundfile**。
+ *
+ * 为什么允许第 2 步：CI 里没有 `.venv-audio`（虚拟环境不进仓库），
+ * 但流水线会显式安装 `requirements-audio.txt`。若只认 `.venv-audio`，
+ * CI 里这条测试会**永远如实跳过**——而「永远跳过的测试」正是这条链当初
+ * 全绿却完全不可达的原因。退回系统 python 不违反产品纪律：
+ * 产品代码仍然只走 runtime.js，这里退的只是**测试的解释器**，
+ * 而且必须先验证依赖真的存在（rc !== 0 就不退）。
+ */
+function findAudioPython() {
+  const candidates = [];
   try {
-    return rt.resolveRuntime('audio').python;
-  } catch {
-    return null;
+    candidates.push({ exe: rt.resolveRuntime('audio').python, how: 'dedicated runtime (.venv-audio)' });
+  } catch { /* 没装专用运行时，试系统 python */ }
+  candidates.push({ exe: process.env.MOODIFY_PYTHON || 'python', how: 'system python (CI)' });
+
+  for (const c of candidates) {
+    const probe = spawnSync(c.exe, ['-c', 'import numpy, scipy, soundfile'],
+      { encoding: 'utf8', env: { ...process.env, PYTHONUTF8: '1' } });
+    if (!probe.error && probe.status === 0) return c;
   }
+  return null;
 }
+
+console.log('moodify-desktop deep chain (separate → reversibility → structure)');
+
+const audio = findAudioPython();
+const PY = audio ? audio.exe : null;
+if (PY) console.log(`  using: ${PY}  (${audio.how})\n`);
 
 /**
  * 合成一段「居中人声 + 偏侧伴奏」的立体声测试音频。
@@ -115,10 +142,6 @@ function lastJson(text) {
   }
   return null;
 }
-
-console.log('moodify-desktop deep chain (separate → reversibility → structure)');
-
-const PY = audioPython();
 
 // ── 1. 运行时清单 ───────────────────────────────────────────────────────────────
 console.log('\n1. 运行时清单：新引擎各有一个可解析的运行时');
