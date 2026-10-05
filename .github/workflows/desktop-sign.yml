@@ -147,6 +147,13 @@ jobs:
     name: Sign (SignPath, optional)
     needs: [build]
     runs-on: windows-latest
+    # GitHub's provenance action exchanges an OIDC token and writes an
+    # attestation. Declare these at the job that actually performs the action;
+    # caller-level grants are only an upper bound for reusable workflows.
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     # 供 desktop-release.yml 读取：产物是否真的有效签名。
     # 用 verification 的实测结果，而不是「signpath 步骤跑过了」这种代理事实。
     outputs:
