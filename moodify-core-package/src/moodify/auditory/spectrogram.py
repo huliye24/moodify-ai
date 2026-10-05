@@ -12,7 +12,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from moodify.auditory.errors import FfmpegNotFound, SpectrogramGenerationFailed
+from moodify.auditory.decode import _which_ffmpeg, ffmpeg_version
+from moodify.auditory.errors import SpectrogramGenerationFailed
 from moodify.auditory.profiles import ScanProfile
 
 
@@ -33,35 +34,18 @@ class SpectrogramRun:
 
 
 def _ffmpeg() -> str:
-    import os
-    import shutil
-    exe = shutil.which("ffmpeg")
-    if exe is None:
-        # Windows 常见安装位（winget links / scoop shims / Program Files），
-        # 不在 PATH 时兜底查找，避免环境缺口导致扫描不可用。
-        for probe in (
-            os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\WinGet\Links\ffmpeg.exe"),
-            os.path.expanduser(r"~\scoop\shims\ffmpeg.exe"),
-            r"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
-        ):
-            if os.path.isfile(probe):
-                return probe
-    if exe is None:
-        raise FfmpegNotFound("ffmpeg not found on PATH")
-    return exe
+    """Resolved ffmpeg path — single discovery per process (memoized in decode).
+
+    The probe order (PATH, then winget links / scoop shims / Program Files) and
+    the FfmpegNotFound failure live in `moodify.auditory.decode`; this module
+    previously carried a second, identical copy.
+    """
+    return _which_ffmpeg()
 
 
 def _ffmpeg_version() -> str:
-    import shutil
-    try:
-        out = subprocess.run(
-            [shutil.which("ffmpeg") or "ffmpeg", "-version"],
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
-            timeout=15,
-        ).stdout
-        return out.splitlines()[0] if out else "unknown"
-    except Exception:
-        return "unknown"
+    """ffmpeg version string — single probe per process (memoized in decode)."""
+    return ffmpeg_version()
 
 
 def _valid_png(path: Path, min_width: int, min_height: int) -> bool:
