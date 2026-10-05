@@ -49,6 +49,13 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
 
+      - name: Install the audio runtime (deep chain)
+        # `.venv-audio` 的等价物：numpy + scipy + soundfile，没有 sklearn/pandas。
+        # 装它是为了让 test-deep-chain 在 CI 里**真的跑**那条链，而不是如实跳过——
+        # 这条链曾经在真实机器上完全不可达而全量测试全绿，原因正是「没有一个测试跑过它」。
+        # 刻意不装 librosa/sklearn/pandas：修复的一部分就是让快速分离不再依赖那条会崩的链。
+        run: python -m pip install -r moodify-desktop/scripts/requirements-audio.txt
+
       - name: Static contract check
         working-directory: moodify-desktop
         run: node scripts/check-contracts.js

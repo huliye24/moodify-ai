@@ -84,8 +84,20 @@ jobs:
             throw "Desktop tag version '$tagVersion' does not match package version '$packageVersion'."
           }
 
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Install the audio runtime (deep chain)
+        # 让 `npm test` 里的 test-deep-chain 真的跑起来，而不是因为缺 .venv-audio 跳过。
+        # 只需 numpy+scipy+soundfile；打包出去的应用仍走 runtime.js 解析的专用运行时，
+        # 两者不冲突。注意本 job 的 working-directory 是 moodify-desktop，
+        # 所以这里是 `scripts/...` 而不是 `moodify-desktop/scripts/...`。
+        run: python -m pip install -r scripts/requirements-audio.txt
 
       - name: Run desktop tests
         run: npm test
