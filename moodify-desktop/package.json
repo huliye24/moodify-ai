@@ -1,6 +1,6 @@
 {
   "name": "moodify-desktop",
-  "version": "1.0.1-rc.3",
+  "version": "1.0.1-rc.4",
   "description": "Moodify — company desktop shell: pick a song, detect, read data & charts, get the repair/mixing plan. The core stays in moodify-core-package (pip); this shell orchestrates it.",
   "main": "src/main.js",
   "scripts": {
