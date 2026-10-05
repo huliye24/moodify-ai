@@ -70,8 +70,11 @@ jobs:
         # （见 scripts/test-release-guard.js），证明它真的会挡住那些情况。
         shell: pwsh
         run: |
-          $flag = if ("${{ vars.SIGNPATH_ENABLED }}" -eq "true") { '-SigningEnabled' } else { '' }
-          & ./moodify-desktop/scripts/release-guard.ps1 -ReleaseDir release $flag
+          if ("${{ vars.SIGNPATH_ENABLED }}" -eq "true") {
+            & ./moodify-desktop/scripts/release-guard.ps1 -ReleaseDir release -SigningEnabled
+          } else {
+            & ./moodify-desktop/scripts/release-guard.ps1 -ReleaseDir release
+          }
           if ($LASTEXITCODE -ne 0) { throw "release guard rejected the artifact set" }
 
       - name: Publish GitHub prerelease
