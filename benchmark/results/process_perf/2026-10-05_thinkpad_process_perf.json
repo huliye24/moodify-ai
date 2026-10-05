@@ -1,0 +1,52 @@
+{
+  "machine": "ThinkPad (LENOVO 21SJ, Core Ultra 5 135H, 16GB, NVMe)",
+  "node_role": "Moodify Heavy Development Lane",
+  "date": "2026-10-05",
+  "pipeline": "process",
+  "backend": "cpu",
+  "tool": "scripts/benchmark_process.py",
+  "note": "cold = first runs of the session; warm = steady state, medians over n>=2 runs. Peak memory = process tree (venv python redirector + real interpreter + ffmpeg children).",
+  "baseline": {
+    "cold": {
+      "A_10s": {"validate_s": 0.82, "analyze_s": 5.88, "process_s": 2.13, "verify_s": 2.66, "total_s": 11.61},
+      "B_60s": {"validate_s": 0.87, "analyze_s": 8.87, "process_s": 2.63, "verify_s": 3.20, "total_s": 15.70},
+      "C_180s": {"validate_s": 0.84, "analyze_s": 15.82, "process_s": 4.23, "verify_s": 4.51, "total_s": 25.52}
+    },
+    "warm": {
+      "A_10s": {"validate_s": 0.59, "analyze_s": 3.54, "process_s": 1.42, "verify_s": 1.72, "total_s": 7.30, "analyze_peak_mem_mb": 126.2, "process_peak_mem_mb": 91.1, "verify_peak_mem_mb": 114.9},
+      "B_60s": {"validate_s": 0.56, "analyze_s": 5.36, "process_s": 1.86, "verify_s": 2.18, "total_s": 10.00, "analyze_peak_mem_mb": 280.9, "process_peak_mem_mb": 175.4, "verify_peak_mem_mb": 206.1},
+      "C_180s": {"validate_s": 0.55, "analyze_s": 10.09, "process_s": 2.96, "verify_s": 3.06, "total_s": 16.74, "analyze_peak_mem_mb": 654.5, "process_peak_mem_mb": 377.1, "verify_peak_mem_mb": 428.4}
+    },
+    "cost_model_warm": {
+      "analyze": "~3.2s fixed + ~0.038 s per audio second",
+      "process": "~1.3s fixed + ~0.009 s per audio second",
+      "verify": "~1.7s fixed + ~0.008 s per audio second",
+      "validate": "~0.57s fixed"
+    }
+  },
+  "optimization_001": {
+    "name": "ffmpeg discovery/version memoization",
+    "code": ["moodify-core-package/src/moodify/auditory/decode.py", "moodify-core-package/src/moodify/auditory/spectrogram.py"],
+    "mechanism": "analyze spawned `ffmpeg -version` 3x per run for identical metadata (2x spectrogram.py, 1x decode.py) plus duplicate PATH discovery; now one memoized probe per process.",
+    "measured_warm_spawn_cost_s": 0.167,
+    "analyze_before_after_median": {
+      "A_10s": {"before_s": 3.736, "after_s": 3.539, "delta_s": -0.197, "delta_pct": -5.3},
+      "B_60s": {"before_s": 5.825, "after_s": 5.364, "delta_s": -0.461, "delta_pct": -7.9}
+    },
+    "unaffected_stages": "process/verify unchanged within noise (change confined to the analyze path)",
+    "behavior_verification": "spectrum_linear.png / spectrum_log.png sha256 byte-identical before vs after; 199 focused tests + full 1403-test suite pass (0 regressions)",
+    "caveat": "observed delta straddles machine warm-up drift (later runs slightly faster); effect stated as -0.2 to -0.46s, direction consistent with the 0.33s mechanism prediction"
+  },
+  "soak": {
+    "jobs": 15,
+    "jobs_ok": 15,
+    "process_s_range": [1.291, 1.579],
+    "peak_mem_mb_first_last": [91.1, 91.1],
+    "hash_mismatches": 0,
+    "stray_decoder_processes_after": 0,
+    "leftover_files": [],
+    "output_determinism": "byte-identical output wav sha256 across independent runs",
+    "status": "pass"
+  },
+  "status": "pass"
+}
