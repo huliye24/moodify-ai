@@ -25,7 +25,10 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const GUARD = path.join(__dirname, 'release-guard.ps1');
+// 必须是**绝对路径**：PowerShell 的 `-File` 拿到相对路径时会把它当成命令名，
+// 报 `CommandNotFoundException: release-guard.ps1` —— 而 spawnSync 的退出码非 0
+// 看起来又像「守卫拒绝了」，于是每一格的失败原因都会被误读。
+const GUARD = path.resolve(__dirname, 'release-guard.ps1');
 const tmpDirs = [];
 let failures = 0;
 
@@ -95,7 +98,7 @@ function makeRelease(dir, opts = {}) {
 
 function runGuard(dir, signingEnabled) {
   const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', GUARD,
-    '-ReleaseDir', dir];
+    '-ReleaseDir', path.resolve(dir)];
   if (signingEnabled) args.push('-SigningEnabled');
   return spawnSync(POWERSHELL, args, { encoding: 'utf8' });
 }
@@ -137,6 +140,14 @@ function expectRan(res) {
   if (res.error) throw new Error(`guard could not be executed: ${res.error.message}`);
   if (res.status === null) {
     throw new Error(`guard produced no exit status (signal=${res.signal})\n${res.stdout || ''}`);
+  }
+  // 把 PowerShell 自己的「找不到脚本 / 解析失败」和「守卫判定了」分开。
+  // 前者也会给出非 0 退出码，若不区分就会被读成「守卫正确地挡住了」——
+  // 一个假通过。CI 上正是这样暴露了 -File 收到相对路径的问题。
+  const out = `${res.stdout || ''}\n${res.stderr || ''}`;
+  if (/CommandNotFoundException|Cannot find (path|the file)|ParserError|is not recognized/.test(out)) {
+    throw new Error(`PowerShell could not run the guard (this is a test-harness error, `
+      + `not a guard verdict):\n${out}`);
   }
   return res.status;
 }
