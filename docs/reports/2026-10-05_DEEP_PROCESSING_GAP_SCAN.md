@@ -244,6 +244,50 @@ $ git check-ignore -v .venv-probe-test  → .gitignore:60:/.venv-*/   ✓
 `AGENTS.md` 已经要求「新增任何非 `.py` 文件前先 `git check-ignore -v`」，
 本次是这个要求的第一次真正生效。
 
+### 4.6 同一类故障的第二处：结构审计也逐条列举 venv
+
+`tools/temporal_texture/temporal_texture_audit.py` 的 `exclude_dirs` 里写的是
+`.venv`、`.venv-basic-pitch`，**没有** `.venv-audio` / `.venv-demucs`。于是本地审计把
+两个 site-packages 当成项目代码扫描：
+
+```text
+修复前：files_scanned 3455，findings 14816（top_paths 全是 .venv-*/Lib/site-packages/...）
+修复后：files_scanned  696，findings  1553
+```
+
+已改为**前缀规则** `is_virtualenv_dir()`（任何以 `.venv` 开头的目录），一次覆盖整个
+命名空间，新增运行时不必再改配置。修复后本地守卫输出与 CI **完全一致**
+（`{"new": 323, "new_errors": 24, ...}`），这本身就是修复正确的证据。
+
+### 4.7 `temporal-texture` 守卫当前是红的——原因不是本次改动
+
+修复 §4.6 后，守卫在本机与 CI 报出同一组数字：
+
+```text
+{"new": 323, "new_errors": 24, "new_warnings": 115, "resolved": 192}
+```
+
+溯源到具体文件后结论明确：**这 323 条来自 V4 分支自身的文件**，不是本次科学层改动。
+
+```text
+moodify-core-package/src/moodify/tuning.py        v4=True   main=False   ← V4 新增
+moodify-desktop/src/history-sync/queue.js         v4=True   main=False   ← V4 新增
+moodify-desktop/scripts/test-orchestrator.js      v4=True   main=False   ← V4 新增
+```
+
+本次新增文件（`roundtrip.py` / `structure.py` / `model_separate.py` /
+`test-deep-chain.js` / `verify-signature.ps1`）合计 20 条，其中：
+
+- **2 条 error**：`model_separate.py:main` 126 行、`roundtrip.py:main` 223 行且复杂度 33。
+  这两条是**真实**的可维护性问题，已登记为后续重构（不是阻断项）。
+- **13 条 info 是工具误报**：`TT-DEBT-MARKER` 把 `TEMP` 当债务标记做**子串**匹配，
+  于是 `tempfile`（Python 3.12+ 的 `tempfile` 属性）、`template` 之类的普通代码
+  全部命中。这是 `temporal_texture_audit.py` 的匹配缺陷，修它属于另一个任务；
+  **不**为了让扫描器变绿去改写正常代码。
+
+守卫对 `1.0` 权威路径的判据基线是 mainline。V4 已在 2026-10-04 被人类采纳为基线，
+因此这批债务是「采纳 V4 的代价」，需要一次专门的技术债清偿，而不是在签名 PR 里顺手处理。
+
 ---
 
 ## 5. 未完成 / 需人类裁决

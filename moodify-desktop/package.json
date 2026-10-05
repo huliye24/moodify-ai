@@ -34,26 +34,24 @@
     "files": [
       "src/**/*",
       "renderer/**/*",
-      "scripts/dsp_separate.py",
-      "scripts/midi_to_musicxml.py",
+      "scripts/*.py",
+      "scripts/*.js",
+      "scripts/*.txt",
+      "!scripts/test-*.js",
       "package.json"
     ],
     "win": {
       "icon": "moodify_icon.ico",
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "signtoolOptions": {
+        "publisherName": "Moodify",
+        "signingHashAlgorithms": ["sha256"],
+        "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      },
+      "signAndEditExecutable": true
     },
     "nsis": {
       "artifactName": "Moodify_Studio_${version}_Setup_${arch}.${ext}",

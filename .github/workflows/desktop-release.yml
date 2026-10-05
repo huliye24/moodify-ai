@@ -1,10 +1,22 @@
 name: Desktop Release
 
+# 发布链 = 复用 `desktop-sign.yml`（构建 → 签名 → 来源证明），再发布。
+#
+# 为什么改成复用而不是各建一次：
+#   原实现自己跑一遍 `npm run dist:win` 并直接发布**未签名**产物。一旦引入签名，
+#   两条构建路径就会产生两个不同的字节序列——而发布的那一条可能是没签名的那条。
+#   现在只有一份构建实现，发布动作只能拿到它产出的、已证明来源的产物。
+#
+# 职责分工：
+#   desktop-sign.yml     构建 + 测试 + （可选）签名 + 来源证明 + 验签  ← 唯一构建入口
+#   desktop-release.yml   取产物 → 发布 GitHub Release（不重新构建）
+
 on:
   pull_request:
     paths:
       - "moodify-desktop/**"
       - ".github/workflows/desktop-release.yml"
+      - ".github/workflows/desktop-sign.yml"
       - "docs/releases/**"
   workflow_dispatch:
   push:
@@ -12,120 +24,59 @@ on:
       - "desktop-v*"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  windows-x64:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: pwsh
-        working-directory: moodify-desktop
+  # PR 与 tag 都走这一条：PR 上它验证构建与测试，tag 上它额外签名与证明。
+  #
+  # 权限必须在这里给全：可复用 workflow 的权限**不能超过**调用方授予的上限
+  # （GitHub 的行为），所以 `id-token: write` + `attestations: write` 若不在此声明，
+  # 被调用 workflow 里的来源证明步骤会直接失败。
+  #
+  # 代价要说清楚：这两个权限因此覆盖整条链，**包括跑 `npm ci` 的构建 job**，
+  # 而不再是只覆盖「只碰字节」的签名 job。这是复用带来的真实让步，
+  # 不是无意之举——换来的是「只有一份构建实现」，即不可能出现
+  # 「未签名的那一份被发出去」。若日后要收回这个让步，做法是在
+  # desktop-sign.yml 内部把证明步骤拆成独立 workflow 并以
+  # `workflow_run` 触发（只对已完成的 artifact 操作），而不是放弃单一构建入口。
+  build:
+    uses: ./.github/workflows/desktop-sign.yml
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
 
+  publish:
+    name: Publish GitHub Release
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/desktop-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
+      - name: Download signed + attested artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: moodify-desktop/package-lock.json
+          name: desktop-signed
+          path: release
 
-      - name: Verify tag matches package version
-        if: startsWith(github.ref, 'refs/tags/desktop-v')
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
+      - name: Show what will be published, and whether it is signed
         run: |
-          $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
-          $tagVersion = $env:RELEASE_TAG -replace '^desktop-v', ''
-          if ($tagVersion -ne $packageVersion) {
-            throw "Desktop tag version '$tagVersion' does not match package version '$packageVersion'."
-          }
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run desktop tests
-        run: npm test
-
-      - name: Build Windows installer and portable executable
-        run: npm run dist:win
-
-      - name: Generate release manifest and checksums
-        env:
-          RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
-          RELEASE_COMMIT: ${{ github.sha }}
-        run: |
-          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
-          $setupName = "Moodify_Studio_${version}_Setup_x64.exe"
-          $portableName = "Moodify_Studio_${version}_Portable_x64.exe"
-          $releaseDir = Join-Path $PWD "dist-electron"
-          $setupPath = Join-Path $releaseDir $setupName
-          $portablePath = Join-Path $releaseDir $portableName
-
-          foreach ($path in @($setupPath, $portablePath)) {
-            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-              throw "Expected release artifact is missing: $path"
-            }
-            if ((Get-Item -LiteralPath $path).Length -le 0) {
-              throw "Release artifact is empty: $path"
-            }
-          }
-
-          $artifacts = @($setupPath, $portablePath) | ForEach-Object {
-            $item = Get-Item -LiteralPath $_
-            [ordered]@{
-              name = $item.Name
-              bytes = $item.Length
-              sha256 = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant()
-            }
-          }
-
-          $manifest = [ordered]@{
-            product = "Moodify Studio"
-            version = $version
-            tag = $env:RELEASE_TAG
-            commit = $env:RELEASE_COMMIT
-            platform = "windows"
-            arch = "x64"
-            channel = "rc"
-            code_signed = $false
-            runtime_mode = "external"
-            artifacts = $artifacts
-          }
-          $manifestPath = Join-Path $releaseDir "RELEASE_MANIFEST.json"
-          $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $manifestPath -Encoding utf8
-
-          $checksumPaths = @($setupPath, $portablePath, $manifestPath)
-          $checksumLines = $checksumPaths | ForEach-Object {
-            $item = Get-Item -LiteralPath $_
-            $hash = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant()
-            "$hash  $($item.Name)"
-          }
-          $checksumLines | Set-Content -LiteralPath (Join-Path $releaseDir "SHA256SUMS.txt") -Encoding ascii
-
-      - name: Upload Windows release artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: moodify-studio-${{ github.sha }}-windows-x64
-          if-no-files-found: error
-          path: |
-            moodify-desktop/dist-electron/Moodify_Studio_*_Setup_x64.exe
-            moodify-desktop/dist-electron/Moodify_Studio_*_Portable_x64.exe
-            moodify-desktop/dist-electron/SHA256SUMS.txt
-            moodify-desktop/dist-electron/RELEASE_MANIFEST.json
+          echo "code_signed (measured in the build job) = ${{ needs.build.outputs.code_signed }}"
+          ls -la release/
 
       - name: Publish GitHub prerelease
-        if: startsWith(github.ref, 'refs/tags/desktop-v')
         uses: softprops/action-gh-release@v2
         with:
-          name: Moodify Studio 1.0.0-rc.1
+          name: Moodify Studio ${{ github.ref_name }}
           prerelease: true
           body_path: docs/releases/MOODIFY_STUDIO_1_0_RC1.md
           files: |
-            moodify-desktop/dist-electron/Moodify_Studio_*_Setup_x64.exe
-            moodify-desktop/dist-electron/Moodify_Studio_*_Portable_x64.exe
-            moodify-desktop/dist-electron/SHA256SUMS.txt
-            moodify-desktop/dist-electron/RELEASE_MANIFEST.json
+            release/*.exe
+            release/RELEASE_MANIFEST.json
+            release/SIGNATURE_FACTS.json
+            release/SHA256SUMS.txt
+          fail_on_unmatched_files: true
