@@ -71,6 +71,36 @@ and [`docs/canon/PRODUCT_DEFINITION_V3.md`](docs/canon/PRODUCT_DEFINITION_V3.md)
 
 ---
 
+## Clone
+
+For normal development, use a shallow clone:
+
+```bash
+git clone --depth 1 https://github.com/huliye24/moodify-ai.git
+cd moodify-ai
+```
+
+The active source tree is lightweight; the project has a comparatively large
+historical object store. Most contributors do not need the entire history to build,
+test, and open a pull request.
+
+A shallow clone supports the normal loop — edit, commit, push, PR, tests, and both
+repository guards — but `git log` shows only the current commit.
+
+If you need more history, note that `--deepen` is **not** a gradual cost here: `main`
+contains 31 merge commits, so a small deepen pulls whole merged branch histories with
+it (measured: `--deepen=5` took a 27 MB clone to 70 MB; `--deepen=25` to 240 MB).
+Prefer a predictable complete fetch:
+
+```bash
+git fetch --unshallow
+```
+
+Background and measurements:
+[`docs/repository/REPOSITORY_SIZE_AUDIT.md`](docs/repository/REPOSITORY_SIZE_AUDIT.md).
+
+---
+
 ## Quick start
 
 Two interfaces share the Core. **CLI** is the Creator side — the action is `PROCESS`.

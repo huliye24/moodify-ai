@@ -28,3 +28,12 @@ jobs:
 
       - name: Run structure guard
         run: python scripts/check_repo_structure.py
+
+      - name: Run repository size guard
+        # 防止大型二进制再次进入源码仓库（MOODIFY_REPOSITORY_SLIM_001）。
+        #
+        # 为什么和结构守卫分两步而不是一个脚本：两者失败的含义不同，分开能让
+        # 「结构违规」与「体积违规」在 CI 上各自可读，不必从一段混合输出里猜。
+        #
+        # 它只读 `git ls-tree HEAD`，因此不需要完整历史——浅克隆检出即可运行。
+        run: python scripts/check_repository_size.py

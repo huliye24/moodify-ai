@@ -37,6 +37,40 @@ Fork → Branch → Focused commit → Pull request → Review and CI
 5. In the pull request, describe measurements, evidence, verification, failure behavior,
    and any user-visible or Canon implications.
 
+### Clone
+
+Use a shallow clone. The active source tree is lightweight; the project has a
+comparatively large historical object store, and the normal contribution loop does not
+need the entire history.
+
+```bash
+git clone --depth 1 https://github.com/huliye24/moodify-ai.git
+cd moodify-ai
+```
+
+A shallow clone supports everything in the workflow above — branch, commit, push, PR,
+tests, and both repository guards (`check_repo_structure.py` and
+`check_repository_size.py`) — but `git log` shows only the current commit.
+
+You only need more history for deep `git blame`, old-tag investigation, long-range
+`bisect`, or reconstructing an old release. Note that `--deepen` is **not** a gradual
+cost here: `main` contains 31 merge commits, so a small deepen pulls whole merged
+branch histories with it (measured: `--deepen=5` took a 27 MB clone to 70 MB;
+`--deepen=25` to 240 MB). Prefer a predictable complete fetch:
+
+```bash
+git fetch --unshallow
+```
+
+### Large files
+
+Do not commit large binaries — installers, archives, model weights, build outputs,
+audio or video exports. Publish them through GitHub Releases or Actions artifacts
+instead. A tracked file above 10 MiB fails CI
+(`scripts/check_repository_size.py`). The measurements behind that limit, and why the
+exceptions file should stay empty, are in
+[`docs/repository/REPOSITORY_SIZE_AUDIT.md`](docs/repository/REPOSITORY_SIZE_AUDIT.md).
+
 ## Proposing a change to the protocol
 
 A change to the protocol, a schema, a Core behavior contract, governance, the evidence

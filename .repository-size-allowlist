@@ -1,0 +1,30 @@
+# Repository size guard — allowlist
+#
+# 格式：
+#   <path>              ← 必须与 `git ls-tree -r HEAD` 里的路径完全一致
+#   # 理由（写在 path 上方的注释里，会被读作该项的理由）
+#
+# 规则由 scripts/check_repository_size.py 执行：任何 >10 MiB 的**已跟踪**文件
+# 都会让 CI 失败，除非它出现在这个文件里。
+#
+# ── 这个文件是「例外」，不是「方便之门」 ──────────────────────────────────
+#
+# 加一项之前必须能回答：
+#   1. 这个文件为什么必须进 Git，而不能放 GitHub Releases / Actions artifacts /
+#      运行时下载 / 本地缓存？
+#   2. 它是否可以被确定性再生成？如果可以，应该生成而不是提交。
+#   3. 它是否真的会被普通贡献者的测试路径用到？如果只有少数人需要，
+#      应该是可选的下载，而不是每个人的克隆成本。
+#
+# 如果三条都答不上来，正确做法是不要提交这个文件，而不是把它加到这里。
+#
+# ── 当前状态：空 ────────────────────────────────────────────────────────
+#
+# 当前 HEAD 最大的已跟踪文件是 8.24 MiB
+# （moodify-core-package/tests/baseline/test_audio/vocal_folk.wav），
+# 低于 10 MiB 上限，因此**不需要任何例外**。
+#
+# 三个 baseline WAV 合计 21 MiB，是真实的、带 provenance 的校准音频
+# （CAD-MFY-002 / CAD-MFY-006, Suno v4），被 CI 测试与校准流程引用。
+# 它们的用途与处理决定见 docs/repository/REPOSITORY_SIZE_AUDIT.md §4。
+# 它们各自都在 10 MiB 以下，所以不构成本文件的条目。

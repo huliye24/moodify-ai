@@ -9,8 +9,12 @@
 
 ## Setup
 
+Clone with `--depth 1`. The active source tree is lightweight; the project has a
+comparatively large historical object store, and most contributors do not need the
+full history to build and test.
+
 ```bash
-git clone https://github.com/huliye24/moodify-ai.git
+git clone --depth 1 https://github.com/huliye24/moodify-ai.git
 cd moodify-ai/moodify-core-package
 python -m venv .venv
 # PowerShell: .\.venv\Scripts\Activate.ps1
@@ -18,6 +22,21 @@ python -m venv .venv
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
+
+A shallow clone supports the normal loop — edit, commit, push, open a PR, run tests,
+and run both repository guards — but `git log` shows only the current commit.
+
+If you need more history, be aware that `--deepen` is **not** a gradual cost here:
+`main` contains 31 merge commits, so even a small deepen pulls whole merged branch
+histories with it (measured: `--deepen=5` took a 27 MB clone to 70 MB, and
+`--deepen=25` to 240 MB). Prefer a predictable full fetch:
+
+```bash
+git fetch --unshallow      # fetch the complete history
+```
+
+Background, measurements and the per-file size limit are in
+[`docs/repository/REPOSITORY_SIZE_AUDIT.md`](docs/repository/REPOSITORY_SIZE_AUDIT.md).
 
 ## Run Tests and Checks
 

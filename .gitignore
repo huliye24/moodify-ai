@@ -7,7 +7,16 @@ __pycache__
 *.pyc
 *.egg-info/
 .env
+# 虚拟环境。`.venv` 单独一行只匹配名为 `.venv` 的目录，
+# **不匹配** `.venv-audio` / `.venv-demucs` / `.venv-basic-pitch` 这类按用途命名的运行时——
+# 而后者正是本仓库实际使用的命名（见 docs/repository/REPOSITORY_SIZE_AUDIT.md §5）。
+# 实测 `.venv-audio/lib.py` 在补这条规则前是「未忽略」的，一次 `git add -A`
+# 就会把上百 MB 的解释器提交进去。用前缀 + 两种常见命名一次覆盖整个命名空间。
 .venv
+.venv-*/
+venv/
+env/
+ENV/
 .playwright-mcp
 backend/moodify-server.exe
 backend/moodify-server.exe~
@@ -35,6 +44,11 @@ _github_moodify_ai/
 *.tar.gz
 *.tgz
 *.apk
+# Git bundle：单个文件就是一份完整历史副本。
+# 历史里曾有一个 `moodify-mainline-codex.bundle`（84.4 MB，远端可达），
+# 是仓库体积的主要来源之一。它当时**不在**忽略规则里，所以补上。
+# 完整清单与体积分析见 docs/repository/REPOSITORY_SIZE_AUDIT.md §2.1。
+*.bundle
 *.ckpt
 *.safetensors
 *.onnx
