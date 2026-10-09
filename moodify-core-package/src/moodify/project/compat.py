@@ -318,16 +318,15 @@ def _add_artifact(
                     "corrupt")
 
 
-def _recorded_artifact(
+def _recorded_scan_artifact(
     acc: _Acc,
     root: Path,
-    section: str,
     scan_dir: Path,
     name: str,
     record: Any,
     kind: str,
 ) -> None:
-    """Reference an artifact described by a scan manifest entry.
+    """Reference a scan artifact; scan artifacts land in the ``analysis`` section.
 
     The recorded ``path`` is untrusted input (the committed golden case even
     records a path from another machine). Only its **basename** is used, joined
@@ -343,7 +342,7 @@ def _recorded_artifact(
                     "incomplete")
         return
     recorded_sha = record.get("sha256") if isinstance(record, dict) else None
-    _add_artifact(acc, root, section, scan_dir / basename, kind, recorded_sha)
+    _add_artifact(acc, root, "analysis", scan_dir / basename, kind, recorded_sha)
 
 
 def _note_schema(acc: _Acc, logical_path: str, schema: Any) -> None:
@@ -372,8 +371,8 @@ def _verify_scan_dir(acc: _Acc, root: Path, scan_dir: Path) -> None:
     artifacts = manifest.get("artifacts")
     if isinstance(artifacts, dict):
         for name in sorted(artifacts):
-            _recorded_artifact(acc, root, "analysis", scan_dir, name,
-                               artifacts[name], "analysis.scan_artifact")
+            _recorded_scan_artifact(acc, root, scan_dir, name,
+                                    artifacts[name], "analysis.scan_artifact")
 
 
 # ── layout detection ──────────────────────────────────────────────────────────
@@ -530,127 +529,176 @@ def _inspect_project(root: Path) -> CaseInspection:
 
 # ── L2/L3: Core case bundle ± Studio subtree ──────────────────────────────────
 
-def _inspect_case_bundle(root: Path, layout: str) -> CaseInspection:
-    acc = _Acc()
-    is_studio = layout == LAYOUT_STUDIO_CASE
+@dataclass
+class _BundleState:
+    """Identity accumulated across a bundle's records while reading it."""
 
-    # -- case.json (the ProductionCase record) --
+    case_id: str | None = None
+    recorded_source: str | None = None
+    lifecycle: str | None = None
+
+
+def _read_case_record(acc: _Acc, root: Path, state: _BundleState) -> None:
+    """Read case.json — the ProductionCase record."""
     case_json_path = root / "case.json"
     case_record = _read_json(case_json_path) if case_json_path.is_file() else None
     if case_json_path.is_file() and case_record is None:
         acc.problem("CASE_RECORD_UNREADABLE", "case.json exists but does not parse",
                     "corrupt")
-    case_id: str | None = None
-    recorded_source: str | None = None
-    lifecycle: str | None = None
-    if isinstance(case_record, dict):
-        acc.reference("case.json")
-        if isinstance(case_record.get("case_id"), str):
-            case_id = case_record["case_id"]
-        recorded_source = _norm_sha(case_record.get("source_id"))
-        if recorded_source is None:
-            acc.problem("SOURCE_RECORD_MALFORMED",
-                        "case.json source_id is not a well-formed sha256 digest",
-                        "corrupt")
-        if isinstance(case_record.get("lifecycle_state"), str):
-            lifecycle = case_record["lifecycle_state"]
-        schema_version = case_record.get("schema_version")
-        if schema_version is not None and schema_version != _CASE_SCHEMA_VERSION:
-            acc.unknown(
-                f"case.json declares schema_version {schema_version!r} (recognised: "
-                f"{_CASE_SCHEMA_VERSION!r}); fields are recorded as-is, not interpreted"
-            )
+    if not isinstance(case_record, dict):
+        return
+    acc.reference("case.json")
+    if isinstance(case_record.get("case_id"), str):
+        state.case_id = case_record["case_id"]
+    state.recorded_source = _norm_sha(case_record.get("source_id"))
+    if state.recorded_source is None:
+        acc.problem("SOURCE_RECORD_MALFORMED",
+                    "case.json source_id is not a well-formed sha256 digest",
+                    "corrupt")
+    if isinstance(case_record.get("lifecycle_state"), str):
+        state.lifecycle = case_record["lifecycle_state"]
+    schema_version = case_record.get("schema_version")
+    if schema_version is not None and schema_version != _CASE_SCHEMA_VERSION:
+        acc.unknown(
+            f"case.json declares schema_version {schema_version!r} (recognised: "
+            f"{_CASE_SCHEMA_VERSION!r}); fields are recorded as-is, not interpreted"
+        )
 
-    # -- report.json (the analysis authority) --
+
+def _read_analysis_report(acc: _Acc, root: Path, state: _BundleState) -> Any:
+    """Read report.json — the analysis authority — and merge its identity."""
     report_path = root / "report.json"
-    report = None
-    if report_path.is_file():
-        report = _read_json(report_path)
-        if report is None:
-            acc.problem("ANALYSIS_REPORT_UNREADABLE",
-                        "report.json exists but does not parse", "corrupt")
-        else:
-            _add_artifact(acc, root, "analysis", report_path, "analysis.report")
-            if isinstance(report, dict):
-                _note_schema(acc, "report.json", report.get("protocol"))
-                report_case = report.get("case") if isinstance(report.get("case"), dict) else {}
-                report_id = report_case.get("case_id")
-                if isinstance(report_id, str):
-                    if case_id is not None and report_id != case_id:
-                        acc.problem("CASE_ID_CONFLICT",
-                                    f"case.json says {case_id!r} but report.json says "
-                                    f"{report_id!r}", "corrupt")
-                    case_id = case_id or report_id
-                report_source = (report.get("source")
-                                 if isinstance(report.get("source"), dict) else {})
-                report_sha = _norm_sha(report_source.get("sha256"))
-                if recorded_source and report_sha and report_sha != recorded_source:
-                    acc.problem("SOURCE_HASH_CONFLICT",
-                                "case.json source_id and report.json source.sha256 "
-                                "disagree", "corrupt")
-                recorded_source = recorded_source or report_sha
-    else:
-        code = ("ANALYSIS_NOT_COMPLETED" if lifecycle == "ACTIVE"
+    if not report_path.is_file():
+        code = ("ANALYSIS_NOT_COMPLETED" if state.lifecycle == "ACTIVE"
                 else "ANALYSIS_REPORT_MISSING")
         acc.problem(code, "no report.json — the analysis stage has no result on disk",
                     "incomplete")
+        return None
+    report = _read_json(report_path)
+    if report is None:
+        acc.problem("ANALYSIS_REPORT_UNREADABLE",
+                    "report.json exists but does not parse", "corrupt")
+        return None
+    _add_artifact(acc, root, "analysis", report_path, "analysis.report")
+    if isinstance(report, dict):
+        _note_schema(acc, "report.json", report.get("protocol"))
+        _merge_report_identity(acc, state, report)
+    return report
 
-    # -- scan/ (artifact hashes live in scan_manifest.json) --
+
+def _merge_report_identity(acc: _Acc, state: _BundleState, report: dict[str, Any]) -> None:
+    """Cross-check the report's case id and source digest against case.json."""
+    report_case = report.get("case") if isinstance(report.get("case"), dict) else {}
+    report_id = report_case.get("case_id")
+    if isinstance(report_id, str):
+        if state.case_id is not None and report_id != state.case_id:
+            acc.problem("CASE_ID_CONFLICT",
+                        f"case.json says {state.case_id!r} but report.json says "
+                        f"{report_id!r}", "corrupt")
+        state.case_id = state.case_id or report_id
+    report_source = (report.get("source")
+                     if isinstance(report.get("source"), dict) else {})
+    report_sha = _norm_sha(report_source.get("sha256"))
+    if state.recorded_source and report_sha and report_sha != state.recorded_source:
+        acc.problem("SOURCE_HASH_CONFLICT",
+                    "case.json source_id and report.json source.sha256 "
+                    "disagree", "corrupt")
+    state.recorded_source = state.recorded_source or report_sha
+
+
+def _read_scan_subtree(acc: _Acc, root: Path, state: _BundleState) -> None:
+    """Read scan/ — the artifact hashes live in its scan_manifest.json."""
     scan_dir = root / "scan"
-    if scan_dir.is_dir():
-        scan_manifest = _read_json(scan_dir / "scan_manifest.json") \
-            if (scan_dir / "scan_manifest.json").is_file() else None
-        if isinstance(scan_manifest, dict):
-            manifest_input = _norm_sha(scan_manifest.get("input_sha256"))
-            if recorded_source and manifest_input and manifest_input != recorded_source:
-                acc.problem("SOURCE_HASH_CONFLICT",
-                            "scan_manifest.json input_sha256 disagrees with the case "
-                            "source digest", "corrupt")
-            recorded_source = recorded_source or manifest_input
-            input_path = scan_manifest.get("input_path")
-            if isinstance(input_path, str) and not Path(input_path).is_file():
-                acc.unknown(
-                    "scan_manifest.json input_path is an absolute path from scan "
-                    "time and does not resolve here; the source is located by "
-                    "digest, not by that path"
-                )
-        _verify_scan_dir(acc, root, scan_dir)
-        for path in _list_files(scan_dir):
-            rel = _rel(root, path)
-            if rel in acc.referenced:
-                continue
-            kind = ("analysis.scan_manifest" if path.name == "scan_manifest.json"
-                    else "analysis.scan_file")
-            _add_artifact(acc, root, "analysis", path, kind)
+    if not scan_dir.is_dir():
+        return
+    manifest_path = scan_dir / "scan_manifest.json"
+    scan_manifest = _read_json(manifest_path) if manifest_path.is_file() else None
+    if isinstance(scan_manifest, dict):
+        manifest_input = _norm_sha(scan_manifest.get("input_sha256"))
+        if state.recorded_source and manifest_input and manifest_input != state.recorded_source:
+            acc.problem("SOURCE_HASH_CONFLICT",
+                        "scan_manifest.json input_sha256 disagrees with the case "
+                        "source digest", "corrupt")
+        state.recorded_source = state.recorded_source or manifest_input
+        input_path = scan_manifest.get("input_path")
+        if isinstance(input_path, str) and not Path(input_path).is_file():
+            acc.unknown(
+                "scan_manifest.json input_path is an absolute path from scan "
+                "time and does not resolve here; the source is located by "
+                "digest, not by that path"
+            )
+    _verify_scan_dir(acc, root, scan_dir)
+    _collect_scan_files(acc, root, scan_dir)
 
-    # -- the rest of the Core bundle --
-    for name, kind in (("report.md", "analysis.report_markdown"),
-                       ("report.html", "analysis.report_html"),
-                       ("measurements.json", "analysis.measurements"),
-                       ("evidence.json", "analysis.evidence"),
-                       ("judgment_rules.json", "analysis.judgment_rules"),
-                       ("auditory_report.json", "analysis.auditory_report")):
+
+def _collect_scan_files(acc: _Acc, root: Path, scan_dir: Path) -> None:
+    """Reference scan/ files the manifest did not already cover."""
+    for path in _list_files(scan_dir):
+        rel = _rel(root, path)
+        if rel in acc.referenced:
+            continue
+        kind = ("analysis.scan_manifest" if path.name == "scan_manifest.json"
+                else "analysis.scan_file")
+        _add_artifact(acc, root, "analysis", path, kind)
+
+
+#: Optional sibling files of the Core bundle (derived renders and record copies).
+_BUNDLE_EXTRAS = (
+    ("report.md", "analysis.report_markdown"),
+    ("report.html", "analysis.report_html"),
+    ("measurements.json", "analysis.measurements"),
+    ("evidence.json", "analysis.evidence"),
+    ("judgment_rules.json", "analysis.judgment_rules"),
+    ("auditory_report.json", "analysis.auditory_report"),
+)
+
+
+def _read_bundle_extras(acc: _Acc, root: Path) -> None:
+    for name, kind in _BUNDLE_EXTRAS:
         path = root / name
         if path.is_file():
             _add_artifact(acc, root, "analysis", path, kind)
 
-    # -- Studio subtree (L3) --
-    if is_studio:
-        _inspect_studio(acc, root, case_id, recorded_source)
 
-    # -- source resolution --
-    source = _resolve_case_source(acc, root, recorded_source)
-
-    name = None
+def _case_display_name(report: Any, source: SourceRef | None) -> str | None:
+    """The best display name the bundle itself carries (never invented)."""
     if isinstance(report, dict):
         report_source = report.get("source") if isinstance(report.get("source"), dict) else {}
         if isinstance(report_source.get("name"), str):
-            name = report_source["name"]
-    if name is None and source is not None:
-        name = source.original_name or source.logical_path
+            return report_source["name"]
+    if source is not None:
+        return source.original_name or source.logical_path
+    return None
 
-    return _finish(root, layout=layout, case_id=case_id, name=name,
-                   source=source, acc=acc)
+
+def _inspect_case_bundle(root: Path, layout: str) -> CaseInspection:
+    acc = _Acc()
+    state = _BundleState()
+    _read_case_record(acc, root, state)
+    report = _read_analysis_report(acc, root, state)
+    _read_scan_subtree(acc, root, state)
+    _read_bundle_extras(acc, root)
+    if layout == LAYOUT_STUDIO_CASE:
+        _inspect_studio(acc, root, state.case_id, state.recorded_source)
+    source = _resolve_case_source(acc, root, state.recorded_source)
+    return _finish(root, layout=layout, case_id=state.case_id,
+                   name=_case_display_name(report, source), source=source, acc=acc)
+
+
+def _read_source_pointer(acc: _Acc, root: Path) -> str | None:
+    """Read the desktop-written source_path.json pointer, when usable."""
+    sp_path = root / "source_path.json"
+    if not sp_path.is_file():
+        return None
+    sp = _read_json(sp_path)
+    if sp is None:
+        acc.problem("SOURCE_PATH_UNREADABLE",
+                    "source_path.json exists but does not parse", "incomplete")
+        return None
+    acc.reference("source_path.json")
+    if isinstance(sp, dict) and isinstance(sp.get("path"), str) and sp["path"].strip():
+        return sp["path"].strip()
+    return None
 
 
 def _resolve_case_source(
@@ -659,21 +707,10 @@ def _resolve_case_source(
     recorded_source: str | None,
 ) -> SourceRef | None:
     """SourceRef for a case bundle: recorded digest + optional external path."""
-    sp_path = root / "source_path.json"
-    sp: Any = None
-    if sp_path.is_file():
-        sp = _read_json(sp_path)
-        if sp is None:
-            acc.problem("SOURCE_PATH_UNREADABLE",
-                        "source_path.json exists but does not parse", "incomplete")
-        else:
-            acc.reference("source_path.json")
-
+    recorded_path = _read_source_pointer(acc, root)
     external: Path | None = None
     original_name: str | None = None
-    recorded_path: str | None = None
-    if isinstance(sp, dict) and isinstance(sp.get("path"), str) and sp["path"].strip():
-        recorded_path = sp["path"].strip()
+    if recorded_path is not None:
         candidate = Path(recorded_path)
         original_name = candidate.name
         if candidate.is_file():
@@ -709,21 +746,49 @@ def _resolve_case_source(
     )
 
 
-def _inspect_studio(acc: _Acc, root: Path, case_id: str | None,
-                    recorded_source: str | None) -> None:
-    """Read the Studio subtree. Every file stays a reference; nothing moves."""
-    studio = root / "studio"
+#: Typed studio records: file name → artifact kind.
+_STUDIO_RECORDS = (
+    ("meta.json", "session.meta"),
+    ("diagnosis.json", "session.diagnosis"),
+    ("context.json", "session.context"),
+    ("finish_mode.json", "session.finish_mode"),
+    ("pipeline.json", "session.pipeline_record"),
+    ("selection.json", "session.selection"),
+)
 
-    # -- typed studio records: parse, check schema, check case binding --
-    typed = (
-        ("meta.json", "session.meta"),
-        ("diagnosis.json", "session.diagnosis"),
-        ("context.json", "session.context"),
-        ("finish_mode.json", "session.finish_mode"),
-        ("pipeline.json", "session.pipeline_record"),
-        ("selection.json", "session.selection"),
-    )
-    for name, kind in typed:
+#: Derived records and human decisions worth a note, said once when present.
+_STUDIO_RECORD_NOTES = (
+    ("pipeline.json",
+     "studio/pipeline.json is a derived record, not an authority; the "
+     "stage is re-derived from artifacts by its producer and is not "
+     "normalized here"),
+    ("finish_mode.json",
+     "studio/finish_mode.json records an explicit human opt-in "
+     "(QUICK_STEREO_ONLY); it is preserved as a human decision, not "
+     "re-derived"),
+    ("selection.json",
+     "studio/selection.json records the human's chosen version; it is "
+     "preserved as a decision and never auto-selected here"),
+)
+
+
+def _check_case_binding(acc: _Acc, case_id: str | None, logical_path: str,
+                        data: Any) -> None:
+    """Note the schema, and refuse a record bound to a different case."""
+    if not isinstance(data, dict):
+        return
+    _note_schema(acc, logical_path, data.get("schema"))
+    bound = data.get("case_id")
+    if isinstance(bound, str) and case_id is not None and bound != case_id:
+        acc.problem("CASE_ID_CONFLICT",
+                    f"{logical_path} says case {bound!r} but the case is "
+                    f"{case_id!r}", "corrupt")
+
+
+def _read_studio_records(acc: _Acc, root: Path, case_id: str | None) -> None:
+    """Typed studio records, then the decisions/derived state they carry."""
+    studio = root / "studio"
+    for name, kind in _STUDIO_RECORDS:
         path = studio / name
         if not path.is_file():
             continue
@@ -731,98 +796,78 @@ def _inspect_studio(acc: _Acc, root: Path, case_id: str | None,
         if data is None:
             acc.problem("STUDIO_FILE_UNREADABLE",
                         f"studio/{name} exists but does not parse", "corrupt")
-            _add_artifact(acc, root, "session", path, kind)
-            continue
-        if isinstance(data, dict):
-            _note_schema(acc, f"studio/{name}", data.get("schema"))
-            bound = data.get("case_id")
-            if isinstance(bound, str) and case_id is not None and bound != case_id:
-                acc.problem("CASE_ID_CONFLICT",
-                            f"studio/{name} says case {bound!r} but the case is "
-                            f"{case_id!r}", "corrupt")
+        else:
+            _check_case_binding(acc, case_id, f"studio/{name}", data)
         _add_artifact(acc, root, "session", path, kind)
+    for name, note in _STUDIO_RECORD_NOTES:
+        if (studio / name).is_file():
+            acc.unknown(note)
 
-    # Derived records and human decisions: say what they are, once, when present.
-    if (studio / "pipeline.json").is_file():
-        acc.unknown(
-            "studio/pipeline.json is a derived record, not an authority; the "
-            "stage is re-derived from artifacts by its producer and is not "
-            "normalized here"
-        )
-    if (studio / "finish_mode.json").is_file():
-        acc.unknown(
-            "studio/finish_mode.json records an explicit human opt-in "
-            "(QUICK_STEREO_ONLY); it is preserved as a human decision, not "
-            "re-derived"
-        )
-    if (studio / "selection.json").is_file():
-        acc.unknown(
-            "studio/selection.json records the human's chosen version; it is "
-            "preserved as a decision and never auto-selected here"
-        )
 
-    # -- plans --
-    for path in _list_files(studio / "plans", (".json",)):
+def _read_studio_plans(acc: _Acc, root: Path, case_id: str | None) -> None:
+    for path in _list_files(root / "studio" / "plans", (".json",)):
         plan = _read_json(path)
         if plan is None:
             acc.problem("STUDIO_FILE_UNREADABLE",
                         f"{_rel(root, path)} exists but does not parse", "corrupt")
-        elif isinstance(plan, dict):
-            _note_schema(acc, _rel(root, path), plan.get("schema"))
-            bound = plan.get("case_id")
-            if isinstance(bound, str) and case_id is not None and bound != case_id:
-                acc.problem("CASE_ID_CONFLICT",
-                            f"{_rel(root, path)} says case {bound!r} but the case "
-                            f"is {case_id!r}", "corrupt")
+        else:
+            _check_case_binding(acc, case_id, _rel(root, path), plan)
         _add_artifact(acc, root, "session", path, "session.plan")
 
-    # -- versions (renders): ai_*/out/*, job.json, evidence.json --
-    for attempt in _list_dirs(studio / "versions"):
-        if not attempt.name.startswith("ai_"):
+
+def _read_studio_versions(acc: _Acc, root: Path) -> None:
+    """One directory per render version: ``studio/versions/ai_*/``."""
+    for version_dir in _list_dirs(root / "studio" / "versions"):
+        if not version_dir.name.startswith("ai_"):
             continue
-        for audio in _list_files(attempt / "out", _AUDIO_SUFFIXES):
-            _add_artifact(acc, root, "renders", audio, "renders.attempt_audio")
-        evidence = attempt / "evidence.json"
+        for audio in _list_files(version_dir / "out", _AUDIO_SUFFIXES):
+            _add_artifact(acc, root, "renders", audio, "renders.version_audio")
+        evidence = version_dir / "evidence.json"
         if evidence.is_file():
             if _read_json(evidence) is None:
                 acc.problem("STUDIO_FILE_UNREADABLE",
                             f"{_rel(root, evidence)} exists but does not parse",
                             "corrupt")
-            _add_artifact(acc, root, "renders", evidence, "renders.attempt_evidence")
-        job = attempt / "job.json"
+            _add_artifact(acc, root, "renders", evidence, "renders.version_evidence")
+        job = version_dir / "job.json"
         if job.is_file():
-            _add_artifact(acc, root, "renders", job, "renders.attempt_job")
+            _add_artifact(acc, root, "renders", job, "renders.version_job")
 
-    # -- verification / exports --
-    for path in _list_files(studio / "verification", (".json",)):
+
+def _read_studio_outputs(acc: _Acc, root: Path) -> None:
+    for path in _list_files(root / "studio" / "verification", (".json",)):
         _add_artifact(acc, root, "verification", path, "verification.record")
-    for path in _list_files(studio / "export"):
+    for path in _list_files(root / "studio" / "export"):
         _add_artifact(acc, root, "exports", path, "exports.file")
 
-    # -- stems / midi / score --
+
+def _read_stems(acc: _Acc, root: Path, recorded_source: str | None) -> None:
     for path in _list_files(root / "stems", _AUDIO_SUFFIXES):
         _add_artifact(acc, root, "stems", path, "stems.audio")
-    stems_manifest_path = root / "stems" / "manifest.json"
-    if stems_manifest_path.is_file():
-        stems_manifest = _read_json(stems_manifest_path)
-        if stems_manifest is None:
-            acc.problem("STUDIO_FILE_UNREADABLE",
-                        "stems/manifest.json exists but does not parse", "corrupt")
-        elif isinstance(stems_manifest, dict):
-            manifest_sha = _norm_sha(stems_manifest.get("source_sha256"))
-            if recorded_source and manifest_sha and manifest_sha != recorded_source:
-                acc.problem("SOURCE_HASH_CONFLICT",
-                            "stems/manifest.json source_sha256 disagrees with the "
-                            "case source digest", "corrupt")
-            if isinstance(stems_manifest.get("engine_note"), str) and \
-                    stems_manifest["engine_note"]:
-                acc.unknown(
-                    "stems/manifest.json declares its own grade boundary; the "
-                    "separator's statement travels with the data and is not "
-                    "upgraded here"
-                )
-        _add_artifact(acc, root, "stems", stems_manifest_path, "stems.manifest")
+    manifest_path = root / "stems" / "manifest.json"
+    if not manifest_path.is_file():
+        return
+    manifest = _read_json(manifest_path)
+    if manifest is None:
+        acc.problem("STUDIO_FILE_UNREADABLE",
+                    "stems/manifest.json exists but does not parse", "corrupt")
+    elif isinstance(manifest, dict):
+        manifest_sha = _norm_sha(manifest.get("source_sha256"))
+        if recorded_source and manifest_sha and manifest_sha != recorded_source:
+            acc.problem("SOURCE_HASH_CONFLICT",
+                        "stems/manifest.json source_sha256 disagrees with the "
+                        "case source digest", "corrupt")
+        engine_note = manifest.get("engine_note")
+        if isinstance(engine_note, str) and engine_note:
+            acc.unknown(
+                "stems/manifest.json declares its own grade boundary; the "
+                "separator's statement travels with the data and is not "
+                "upgraded here"
+            )
+    _add_artifact(acc, root, "stems", manifest_path, "stems.manifest")
 
+
+def _read_transcription(acc: _Acc, root: Path) -> None:
     for path in _list_files(root / "midi", (".mid", ".midi")):
         _add_artifact(acc, root, "transcription", path, "transcription.midi")
     for path in _list_files(root / "midi", (".csv",)):
@@ -830,7 +875,9 @@ def _inspect_studio(acc: _Acc, root: Path, case_id: str | None,
     for path in _list_files(root / "score", (".musicxml", ".xml")):
         _add_artifact(acc, root, "score", path, "score.musicxml")
 
-    # -- finishing (mix graph artifacts) --
+
+def _read_finishing(acc: _Acc, root: Path) -> None:
+    """Preset mix-graph artifacts: graph.json + audio + *.evidence.json."""
     for path in _list_files(root / "finishing"):
         if path.suffix.lower() in AUDIO_EXTENSIONS:
             _add_artifact(acc, root, "renders", path, "renders.mix_graph_audio")
@@ -839,34 +886,55 @@ def _inspect_studio(acc: _Acc, root: Path, case_id: str | None,
         elif path.suffix.lower() == ".json":
             _add_artifact(acc, root, "renders", path, "renders.mix_graph")
 
-    # -- compare/ (A/B evidence and the human choice ledger) --
+
+def _count_ledger_decisions(choices: Path) -> int | None:
+    """Human A/B decisions in the ledger, or None when a line does not parse."""
+    decisions = 0
+    try:
+        for line in choices.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            json.loads(line)
+            decisions += 1
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    return decisions
+
+
+def _read_compare(acc: _Acc, root: Path) -> None:
+    """A/B evidence and the human choice ledger."""
     compare_dir = root / "compare"
     artifact = compare_dir / "ab_comparison.json"
     if artifact.is_file():
         _add_artifact(acc, root, "verification", artifact, "verification.ab_comparison")
     choices = compare_dir / "ab_choices.jsonl"
-    if choices.is_file():
-        _add_artifact(acc, root, "session", choices, "session.ab_choices")
-        decisions = 0
-        unreadable = False
-        try:
-            for line in choices.read_text(encoding="utf-8").splitlines():
-                if not line.strip():
-                    continue
-                json.loads(line)
-                decisions += 1
-        except (OSError, json.JSONDecodeError, UnicodeDecodeError):
-            unreadable = True
-        if unreadable:
-            acc.problem("LEDGER_UNREADABLE",
-                        "compare/ab_choices.jsonl contains a line that does not "
-                        "parse", "corrupt")
-        else:
-            acc.unknown(
-                f"compare/ab_choices.jsonl records {decisions} human A/B "
-                f"decision(s); the decisions are preserved as a ledger, not "
-                f"re-interpreted"
-            )
+    if not choices.is_file():
+        return
+    _add_artifact(acc, root, "session", choices, "session.ab_choices")
+    decisions = _count_ledger_decisions(choices)
+    if decisions is None:
+        acc.problem("LEDGER_UNREADABLE",
+                    "compare/ab_choices.jsonl contains a line that does not "
+                    "parse", "corrupt")
+    else:
+        acc.unknown(
+            f"compare/ab_choices.jsonl records {decisions} human A/B "
+            f"decision(s); the decisions are preserved as a ledger, not "
+            f"re-interpreted"
+        )
+
+
+def _inspect_studio(acc: _Acc, root: Path, case_id: str | None,
+                    recorded_source: str | None) -> None:
+    """Read the Studio subtree. Every file stays a reference; nothing moves."""
+    _read_studio_records(acc, root, case_id)
+    _read_studio_plans(acc, root, case_id)
+    _read_studio_versions(acc, root)
+    _read_studio_outputs(acc, root)
+    _read_stems(acc, root, recorded_source)
+    _read_transcription(acc, root)
+    _read_finishing(acc, root)
+    _read_compare(acc, root)
 
 
 # ── L4: legacy numbered WSE case ──────────────────────────────────────────────
@@ -881,63 +949,71 @@ _LEGACY_SECTIONS = (
 )
 
 
-def _inspect_legacy(root: Path) -> CaseInspection:
-    acc = _Acc()
-
-    # -- case records: production_case.json is the ProductionCase contract;
-    #    case_manifest.json is this layout's own provenance manifest. --
+def _read_production_case_record(
+    acc: _Acc, root: Path
+) -> tuple[str | None, list[tuple[str, str]]]:
+    """production_case.json — the ProductionCase contract record."""
     case_id: str | None = None
-    recorded_source: str | None = None
     source_claims: list[tuple[str, str]] = []
+    path = root / "production_case.json"
+    if not path.is_file():
+        return case_id, source_claims
+    data = _read_json(path)
+    if data is None:
+        acc.problem("CASE_RECORD_UNREADABLE",
+                    "production_case.json exists but does not parse", "corrupt")
+        return case_id, source_claims
+    if not isinstance(data, dict):
+        return case_id, source_claims
+    acc.reference("production_case.json")
+    if isinstance(data.get("case_id"), str):
+        case_id = data["case_id"]
+    claim = _norm_sha(data.get("source_id"))
+    if claim:
+        source_claims.append(("production_case.json", claim))
+    schema_version = data.get("schema_version")
+    if schema_version is not None and schema_version != _CASE_SCHEMA_VERSION:
+        acc.unknown(
+            f"production_case.json declares schema_version "
+            f"{schema_version!r} (recognised: {_CASE_SCHEMA_VERSION!r}); "
+            f"fields are recorded as-is, not interpreted"
+        )
+    return case_id, source_claims
 
-    production_case_path = root / "production_case.json"
-    if production_case_path.is_file():
-        data = _read_json(production_case_path)
-        if data is None:
-            acc.problem("CASE_RECORD_UNREADABLE",
-                        "production_case.json exists but does not parse", "corrupt")
-        elif isinstance(data, dict):
-            acc.reference("production_case.json")
-            if isinstance(data.get("case_id"), str):
-                case_id = data["case_id"]
-            claim = _norm_sha(data.get("source_id"))
-            if claim:
-                source_claims.append(("production_case.json", claim))
-            schema_version = data.get("schema_version")
-            if schema_version is not None and schema_version != _CASE_SCHEMA_VERSION:
-                acc.unknown(
-                    f"production_case.json declares schema_version "
-                    f"{schema_version!r} (recognised: {_CASE_SCHEMA_VERSION!r}); "
-                    f"fields are recorded as-is, not interpreted"
-                )
 
-    case_manifest_path = root / "case_manifest.json"
-    case_manifest: Any = None
-    if case_manifest_path.is_file():
-        case_manifest = _read_json(case_manifest_path)
-        if case_manifest is None:
-            acc.problem("CASE_RECORD_UNREADABLE",
-                        "case_manifest.json exists but does not parse", "corrupt")
-        else:
-            acc.reference("case_manifest.json")
-    if isinstance(case_manifest, dict):
-        manifest_case_id = case_manifest.get("case_id")
-        if isinstance(manifest_case_id, str):
-            if case_id is not None and manifest_case_id != case_id:
-                acc.problem("CASE_ID_CONFLICT",
-                            f"production_case.json says {case_id!r} but "
-                            f"case_manifest.json says {manifest_case_id!r}", "corrupt")
-            case_id = case_id or manifest_case_id
-        claim = _norm_sha(case_manifest.get("source_sha256"))
-        if claim:
-            source_claims.append(("case_manifest.json", claim))
+def _read_case_manifest_record(
+    acc: _Acc, root: Path, case_id: str | None, source_claims: list[tuple[str, str]]
+) -> tuple[str | None, Any]:
+    """case_manifest.json — this layout's own provenance manifest."""
+    path = root / "case_manifest.json"
+    if not path.is_file():
+        return case_id, None
+    case_manifest = _read_json(path)
+    if case_manifest is None:
+        acc.problem("CASE_RECORD_UNREADABLE",
+                    "case_manifest.json exists but does not parse", "corrupt")
+        return case_id, None
+    acc.reference("case_manifest.json")
+    if not isinstance(case_manifest, dict):
+        return case_id, case_manifest
+    manifest_case_id = case_manifest.get("case_id")
+    if isinstance(manifest_case_id, str):
+        if case_id is not None and manifest_case_id != case_id:
+            acc.problem("CASE_ID_CONFLICT",
+                        f"production_case.json says {case_id!r} but "
+                        f"case_manifest.json says {manifest_case_id!r}", "corrupt")
+        case_id = case_id or manifest_case_id
+    claim = _norm_sha(case_manifest.get("source_sha256"))
+    if claim:
+        source_claims.append(("case_manifest.json", claim))
+    return case_id, case_manifest
 
-    # -- source: the file inside 00_source/, verified against recorded digests --
-    source_dir = root / "00_source"
-    source_files = _list_files(source_dir, _AUDIO_SUFFIXES)
 
-    scan_manifest = _read_json(root / "01_source_scan" / "scan_manifest.json") \
-        if (root / "01_source_scan" / "scan_manifest.json").is_file() else None
+def _collect_legacy_claims(acc: _Acc, root: Path,
+                           source_claims: list[tuple[str, str]]) -> None:
+    """Add the 01_source_scan claim (or the 02_plans fallback) as a claim."""
+    scan_manifest_path = root / "01_source_scan" / "scan_manifest.json"
+    scan_manifest = _read_json(scan_manifest_path) if scan_manifest_path.is_file() else None
     if isinstance(scan_manifest, dict):
         claim = _norm_sha(scan_manifest.get("input_sha256"))
         if claim:
@@ -949,65 +1025,79 @@ def _inspect_legacy(root: Path) -> CaseInspection:
                 "machine that produced it and does not resolve here; the source "
                 "is verified by digest instead"
             )
-    if not source_claims:
-        # Fallback: plans recorded the source digest they were planned against.
-        for plan in _list_files(root / "02_plans", (".json",)):
-            data = _read_json(plan)
-            if isinstance(data, dict):
-                claim = _norm_sha(data.get("source_sha256"))
-                if claim:
-                    source_claims.append((_rel(root, plan), claim))
-                    break
+    if source_claims:
+        return
+    # Fallback: plans recorded the source digest they were planned against.
+    for plan in _list_files(root / "02_plans", (".json",)):
+        data = _read_json(plan)
+        if isinstance(data, dict):
+            claim = _norm_sha(data.get("source_sha256"))
+            if claim:
+                source_claims.append((_rel(root, plan), claim))
+                break
 
-    # Every record that names the source digest must agree — a disagreement
-    # means one of them is wrong and neither may be trusted silently.
+
+def _check_claim_conflicts(acc: _Acc, source_claims: list[tuple[str, str]]) -> str | None:
+    """Every record that names the source digest must agree.
+
+    A disagreement means one of them is wrong and neither may be trusted
+    silently.
+    """
     recorded_source = source_claims[0][1] if source_claims else None
     for where, claim in source_claims[1:]:
         if claim != recorded_source:
             acc.problem("SOURCE_HASH_CONFLICT",
                         f"{where} records source digest {claim!r} but "
                         f"{source_claims[0][0]} records {recorded_source!r}", "corrupt")
+    return recorded_source
 
-    source: SourceRef | None = None
-    if source_files:
-        primary = source_files[0]
-        if len(source_files) > 1:
-            acc.unknown(
-                f"00_source/ contains {len(source_files)} audio files; the first "
-                f"in sorted order is treated as the source and the rest are left "
-                f"unreferenced"
-            )
-        verified: bool | None = None
-        if recorded_source is not None:
-            verified = sha256_file(primary) == recorded_source
-            if not verified:
-                acc.problem("SOURCE_HASH_MISMATCH",
-                            "00_source file does not match the recorded source "
-                            "digest records", "corrupt")
-        acc.reference(_rel(root, primary))
-        source = SourceRef(
-            origin="in_case",
-            logical_path=_rel(root, primary),
-            path=str(primary.resolve()),
-            original_name=primary.name,
-            size_bytes=primary.stat().st_size,
-            recorded_sha256=recorded_source,
-            verified=verified,
-        )
-    else:
+
+def _resolve_legacy_source(acc: _Acc, root: Path,
+                           recorded_source: str | None) -> SourceRef | None:
+    """The file inside 00_source/, verified against the recorded digests."""
+    source_files = _list_files(root / "00_source", _AUDIO_SUFFIXES)
+    if not source_files:
         acc.problem("SOURCE_FILE_MISSING", "00_source/ contains no audio file",
                     "incomplete")
+        return None
+    primary = source_files[0]
+    if len(source_files) > 1:
+        acc.unknown(
+            f"00_source/ contains {len(source_files)} audio files; the first "
+            f"in sorted order is treated as the source and the rest are left "
+            f"unreferenced"
+        )
+    verified: bool | None = None
+    if recorded_source is not None:
+        verified = sha256_file(primary) == recorded_source
+        if not verified:
+            acc.problem("SOURCE_HASH_MISMATCH",
+                        "00_source file does not match the recorded source "
+                        "digest records", "corrupt")
+    acc.reference(_rel(root, primary))
+    return SourceRef(
+        origin="in_case",
+        logical_path=_rel(root, primary),
+        path=str(primary.resolve()),
+        original_name=primary.name,
+        size_bytes=primary.stat().st_size,
+        recorded_sha256=recorded_source,
+        verified=verified,
+    )
 
-    # -- recorded scan artifacts (01 source scan + per-candidate 04 scans) --
+
+def _verify_legacy_scan_dirs(acc: _Acc, root: Path) -> None:
+    """Recorded scan artifacts: the 01 source scan + per-candidate 04 scans."""
     _verify_scan_dir(acc, root, root / "01_source_scan")
     for candidate_scan in _list_dirs(root / "04_after_scan"):
         _verify_scan_dir(acc, root, candidate_scan)
 
-    # -- candidate digests: candidate_*.json records and the manifest map must
-    #    agree, and the audio files must hash to whatever they agree on. --
-    candidates_dir = root / "03_candidates"
+
+def _candidate_claims(root: Path,
+                      case_manifest: Any) -> tuple[dict[str, str], dict[str, str]]:
+    """Candidate digests from the record files and from the case manifest map."""
     records: dict[str, str] = {}
-    for record_path in _list_files(candidates_dir, (".json",)):
+    for record_path in _list_files(root / "03_candidates", (".json",)):
         data = _read_json(record_path)
         if isinstance(data, dict):
             claim = _norm_sha(data.get("candidate_sha256"))
@@ -1021,6 +1111,13 @@ def _inspect_legacy(root: Path) -> CaseInspection:
             if claim:
                 name = key if key.startswith("candidate_") else f"candidate_{key}"
                 manifest_map[name] = claim
+    return records, manifest_map
+
+
+def _read_legacy_candidates(acc: _Acc, root: Path, case_manifest: Any) -> None:
+    """Candidate records, the manifest map and the audio files must agree."""
+    candidates_dir = root / "03_candidates"
+    records, manifest_map = _candidate_claims(root, case_manifest)
     for name in sorted(set(records) & set(manifest_map)):
         if records[name] != manifest_map[name]:
             acc.problem("CANDIDATE_HASH_CONFLICT",
@@ -1034,7 +1131,9 @@ def _inspect_legacy(root: Path) -> CaseInspection:
         elif path.suffix.lower() == ".json":
             _add_artifact(acc, root, "renders", path, "renders.candidate_record")
 
-    # -- numbered stage directories --
+
+def _collect_legacy_stage_files(acc: _Acc, root: Path) -> None:
+    """The numbered stage directories, by the roles their positions imply."""
     for dirname, section, kind in _LEGACY_SECTIONS:
         stage_dir = root / dirname
         if not stage_dir.is_dir():
@@ -1050,7 +1149,9 @@ def _inspect_legacy(root: Path) -> CaseInspection:
                 stage_kind = f"{kind}.scan_manifest"
             _add_artifact(acc, root, section, path, stage_kind)
 
-    # -- case-level documentation and the reopen/verify tool --
+
+def _collect_legacy_docs(acc: _Acc, root: Path) -> None:
+    """Case-level documentation and the reopen/verify tool."""
     readme = root / "README.md"
     if readme.is_file():
         _add_artifact(acc, root, "provenance", readme, "provenance.readme")
@@ -1058,12 +1159,23 @@ def _inspect_legacy(root: Path) -> CaseInspection:
     if reopen_tool.is_file():
         _add_artifact(acc, root, "verification", reopen_tool, "verification.reopen_tool")
 
+
+def _inspect_legacy(root: Path) -> CaseInspection:
+    acc = _Acc()
+    case_id, source_claims = _read_production_case_record(acc, root)
+    case_id, case_manifest = _read_case_manifest_record(acc, root, case_id, source_claims)
+    _collect_legacy_claims(acc, root, source_claims)
+    recorded_source = _check_claim_conflicts(acc, source_claims)
+    source = _resolve_legacy_source(acc, root, recorded_source)
+    _verify_legacy_scan_dirs(acc, root)
+    _read_legacy_candidates(acc, root, case_manifest)
+    _collect_legacy_stage_files(acc, root)
+    _collect_legacy_docs(acc, root)
     acc.unknown(
         "artifact roles in the numbered WSE layout come from directory positions; "
         "every JSON payload beyond the recorded digests is preserved as a file "
         "reference, not interpreted"
     )
-
     name = source.original_name if source is not None else None
     return _finish(root, layout=LAYOUT_LEGACY_WSE, case_id=case_id, name=name,
                    source=source, acc=acc)
