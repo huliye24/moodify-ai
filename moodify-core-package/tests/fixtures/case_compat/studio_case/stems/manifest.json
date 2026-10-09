@@ -1,0 +1,9 @@
+{
+  "engine": "dsp_center_hpss",
+  "engine_note": "非模型快速分离：fixture note",
+  "source_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "sample_rate": 44100,
+  "channels": 2,
+  "duration_s": 1.0,
+  "stems": {"vocals": "stems/vocals.m4a", "instrumental": "stems/instrumental.m4a"}
+}

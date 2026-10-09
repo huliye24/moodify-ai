@@ -1,0 +1,9 @@
+{
+  "schema": "moodify.studio.pipeline/0.1",
+  "case_id": "case_22222222222222222222222222222222",
+  "stage": "RENDERED",
+  "facts": {"analyzed": true, "diagnosed": true},
+  "history": [],
+  "updated_at": "2026-01-02T00:10:00.000Z",
+  "note": "记录用，不是权威来源"
+}

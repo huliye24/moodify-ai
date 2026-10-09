@@ -1,0 +1,17 @@
+{
+  "case": {"case_id": "case_22222222222222222222222222222222"},
+  "findings": [],
+  "generated_at": "2026-01-02T00:00:00Z",
+  "judgment_boundary": {"layer1_measurement": "EXECUTED"},
+  "plan": {"status": "DRAFT_PLAN_NOT_EXECUTED", "nodes": [], "notes": [], "next_actions": []},
+  "protocol": "moodify.msp_report/0.2",
+  "report_schema_version": "0.2",
+  "source": {
+    "name": "studio_fixture.m4a",
+    "sha256": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "duration_s": 1.0,
+    "channels": 2,
+    "sample_rate": 44100
+  },
+  "technical_state": {"workflow_decision": "NO_TECHNICAL_BLOCKERS"}
+}

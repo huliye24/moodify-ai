@@ -1,0 +1,5 @@
+# Case-compat fixtures record byte-exact sha256 digests for their own files
+# (e.g. scan/scan_manifest.json hashes scan/metrics.json). A checkout that
+# rewrites line endings would turn the recorded "verified" into a false
+# "tampered", so these files must be stored and checked out byte-for-byte.
+moodify-core-package/tests/fixtures/case_compat/** -text

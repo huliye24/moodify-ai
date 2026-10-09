@@ -1,0 +1,10 @@
+{
+  "schema": "moodify.studio.diagnosis/0.1",
+  "case_id": "case_22222222222222222222222222222222",
+  "generated_at": "2026-01-02T00:00:00.000Z",
+  "source_report": "report.json",
+  "issues": [],
+  "draft_plan": {"status": "DRAFT_PLAN_NOT_EXECUTED", "nodes": [], "notes": [], "next_actions": []},
+  "preserve": [],
+  "human_notes": []
+}
