@@ -129,6 +129,18 @@ def main(argv: list[str] | None = None) -> int:
                              help="pair id recorded in pair.json (default: the output directory name)")
     finishing_export.add_argument("--audio", required=True)
     finishing_export.add_argument("--output-dir", default="outputs")
+    project_cmd = commands.add_parser(
+        "project", help="Song Project tools (moodify.project/0.1)")
+    project_sub = project_cmd.add_subparsers(dest="project_action", required=True)
+    project_inspect = project_sub.add_parser(
+        "inspect-legacy",
+        help="read-only inspection of an existing case/project directory "
+             "(Song Project / Core case / Studio case / legacy WSE); "
+             "never writes")
+    project_inspect.add_argument("target", help="case or project directory")
+    project_inspect.add_argument(
+        "--json", action="store_true",
+        help="suppress the human digest on stderr; stdout is one JSON object either way")
     args = parser.parse_args(argv)
     if args.command == "analyze":
         result = analyze_to_case(Path(args.audio), Path(args.cases_root))
@@ -272,6 +284,20 @@ def main(argv: list[str] | None = None) -> int:
             print(_summarize_compare(args.compare_action, result), file=sys.stderr)
         print(json.dumps(result, ensure_ascii=False, sort_keys=True))
         return exit_code
+    elif args.command == "project":
+        from moodify.project import ProjectError, inspect_case
+
+        try:
+            inspection = inspect_case(Path(args.target))
+        except ProjectError as exc:
+            print(json.dumps({"status": "error", "error": str(exc)},
+                             ensure_ascii=False), file=sys.stderr)
+            return 2
+        if not args.json:
+            print(_summarize_inspection(inspection.to_dict()), file=sys.stderr)
+        print(json.dumps(inspection.to_dict(), ensure_ascii=False, sort_keys=True))
+        # RECOGNIZED / INCOMPLETE are answers; CORRUPT / UNSUPPORTED are refusals.
+        return 0 if inspection.status in ("RECOGNIZED", "INCOMPLETE") else 2
     elif args.command == "doctor":
         result = _doctor_report()
     elif args.command == "demo":
@@ -462,6 +488,35 @@ def _summarize_compare(action: str, result: dict) -> str:
         lines.append(f"  [{reason.get('code')}] {reason.get('message')}")
     if result.get("status") == "READY":
         lines.append("下一步: moodify compare choose <case-dir> --keep A|B --role creator|listener|pro")
+    return "\n".join(lines)
+
+
+def _summarize_inspection(result: dict) -> str:
+    """Short human digest (stderr only) for `moodify project inspect-legacy`.
+
+    stdout stays exactly one JSON object whether or not ``--json`` is given;
+    this is the human convenience the flag suppresses — same discipline as
+    `moodify compare`.
+    """
+    lines = [f"project inspect-legacy — {result['status']}（{result['layout']}）"]
+    if result.get("case_id"):
+        lines.append(f"case: {result['case_id']}"
+                     + (f" · {result['name']}" if result.get("name") else ""))
+    source = result.get("source")
+    if source:
+        recorded = source.get("recorded_sha256")
+        lines.append(
+            f"source: {source.get('origin')} · "
+            f"记录哈希 {(recorded or '无')[:19]} · 验证 {source.get('verified')}")
+    filled = {k: len(v) for k, v in result["sections"].items() if v}
+    if filled:
+        lines.append("sections: " + "  ".join(f"{k}={n}" for k, n in filled.items()))
+    for problem in result["problems"]:
+        lines.append(f"  [{problem['severity']}] {problem['code']} — {problem['message']}")
+    for unknown in result["unknowns"]:
+        lines.append(f"  [unknown] {unknown}")
+    if result["ignored_file_count"]:
+        lines.append(f"额外未归类文件: {result['ignored_file_count']} 个（不影响识别）")
     return "\n".join(lines)
 
 
