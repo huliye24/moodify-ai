@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from ..contracts.hashing import sha256_file
@@ -318,6 +318,25 @@ def _add_artifact(
                     "corrupt")
 
 
+def _recorded_basename(recorded_path: Any) -> str:
+    """Last component of a recorded path, split on either platform's separator.
+
+    A recorded path is untrusted input and may come from another machine or
+    another OS (the committed golden case stores Windows paths). Splitting on
+    both ``/`` and ``\\`` regardless of the host keeps the component honest —
+    ``Path(...).name`` alone would treat ``a\\b.m4a`` as one filename on POSIX —
+    and a recorded path can never direct a read outside the case.
+    """
+    if not isinstance(recorded_path, str):
+        return ""
+    name = PurePosixPath(recorded_path.replace("\\", "/")).name
+    if name in (".", ".."):
+        return ""
+    if len(name) == 2 and name.endswith(":"):  # a bare drive designator ("C:")
+        return ""
+    return name
+
+
 def _recorded_scan_artifact(
     acc: _Acc,
     root: Path,
@@ -335,7 +354,7 @@ def _recorded_scan_artifact(
     that is actually there.
     """
     recorded_path = record.get("path") if isinstance(record, dict) else None
-    basename = Path(str(recorded_path)).name if recorded_path else ""
+    basename = _recorded_basename(recorded_path)
     if not basename:
         acc.problem("ARTIFACT_RECORD_MALFORMED",
                     f"scan manifest entry '{name}' records no usable file name",

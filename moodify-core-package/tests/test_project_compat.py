@@ -34,7 +34,10 @@ from moodify.project import (
     detect_layout,
     inspect_case,
 )
-from moodify.project.compat import _norm_sha  # exercised directly below
+from moodify.project.compat import (  # exercised directly below
+    _norm_sha,
+    _recorded_basename,
+)
 from moodify.project.errors import ProjectValidationError
 
 FIXTURES = Path(__file__).parent / "fixtures" / "case_compat"
@@ -345,7 +348,10 @@ def test_recorded_artifact_path_cannot_escape_the_case(tmp_path):
     for logical in _all_logical_paths(inspection):
         assert ".." not in logical.split("/")
         assert not Path(logical).is_absolute()
-    assert "ARTIFACT_MISSING" in _problem_codes(inspection)  # scan/sneaky.m4a absent
+    # the backslash path resolves to its last component on every platform
+    assert any(a.logical_path == "scan/outside.m4a"
+               for a in inspection.sections["analysis"])
+    assert "ARTIFACT_MISSING" in _problem_codes(inspection)  # scan/outside.m4a absent
 
 
 # ── G. read-only and deterministic ────────────────────────────────────────────
@@ -435,6 +441,25 @@ def test_norm_sha_normalizes_both_recorded_formats():
     assert _norm_sha(prefixed) == "sha256:" + "a" * 64
     assert _norm_sha("not-a-digest") is None
     assert _norm_sha(None) is None
+
+
+def test_recorded_basename_splits_both_platform_separators():
+    """A recorded path may come from any OS; its last component is the file.
+
+    Regression guard: ``Path(...).name`` alone treats ``a\\b.m4a`` as a single
+    filename on POSIX, which made every Windows-recorded artifact resolve to a
+    non-existent path on Linux CI.
+    """
+    assert _recorded_basename("D:\\somewhere\\scan\\metrics.json") == "metrics.json"
+    assert _recorded_basename("/var/scan/metrics.json") == "metrics.json"
+    assert _recorded_basename("..\\..\\outside.m4a") == "outside.m4a"
+    assert _recorded_basename("../../outside.m4a") == "outside.m4a"
+    assert _recorded_basename("mixed\\dir/lead.mid") == "lead.mid"
+    assert _recorded_basename("..") == ""
+    assert _recorded_basename("C:\\") == ""
+    assert _recorded_basename("") == ""
+    assert _recorded_basename(None) == ""
+    assert _recorded_basename(17) == ""
 
 
 # ── I. the real historical golden case ────────────────────────────────────────
