@@ -17,8 +17,10 @@ from __future__ import annotations
 
 import sys
 import time
-from datetime import datetime, timezone
 from collections.abc import Mapping
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from ..capabilities.models import Provider
@@ -217,27 +219,9 @@ def _venv_unverified_checks(check: VenvCheck, environment: str,
     return checks
 
 
-def _check_venv(check: VenvCheck) -> tuple[list[RequirementCheck], str | None, dict[str, Any]]:
-    """Probe one external venv once; map the single child's answer to checks."""
-    candidates = adapters.venv_candidates(check.venv_name, check.env_var)
-    venv_dir = next((candidate for candidate in candidates
-                     if adapters.venv_python(candidate) is not None), None)
-    if venv_dir is None:
-        return _venv_missing_checks(check, candidates), None, {"candidates": [str(c) for c in candidates]}
-
-    packages = tuple((package.module, package.distribution) for package in check.packages)
-    fact = adapters.venv_fact(venv_dir, packages)
-
-    if fact.timed_out:
-        detail = (f"venv probe timed out after {adapters.VENV_TIMEOUT_S:.0f}s "
-                  f"(importing {', '.join(p.module for p in check.packages)})")
-        checks = _venv_unverified_checks(check, str(venv_dir), detail)
-        return checks, str(venv_dir), {"venv": str(venv_dir), "output_ok": False}
-    if fact.error or fact.python_version is None:
-        detail = f"venv probe failed: {fact.error or 'no interpreter version reported'}"
-        checks = _venv_unverified_checks(check, str(venv_dir), detail)
-        return checks, str(venv_dir), {"venv": str(venv_dir), "output_ok": False}
-
+def _venv_answered_checks(check: VenvCheck, venv_dir: Path,
+                          fact: adapters.VenvFact) -> list[RequirementCheck]:
+    """The checks for a venv whose child ran and answered."""
     checks: list[RequirementCheck] = []
     if adapters.version_at_least(fact.python_version, check.minimum_python):
         checks.append(RequirementCheck(
@@ -272,13 +256,38 @@ def _check_venv(check: VenvCheck) -> tuple[list[RequirementCheck], str | None, d
         status=RequirementStatus.SATISFIED,
         detail=f"interpreter ran at {venv_dir}",
     ))
+    return checks
+
+
+def _check_venv(check: VenvCheck) -> tuple[list[RequirementCheck], str | None, dict[str, Any]]:
+    """Probe one external venv once; map the single child's answer to checks."""
+    candidates = adapters.venv_candidates(check.venv_name, check.env_var)
+    venv_dir = next((candidate for candidate in candidates
+                     if adapters.venv_python(candidate) is not None), None)
+    if venv_dir is None:
+        return (_venv_missing_checks(check, candidates), None,
+                {"candidates": [str(c) for c in candidates]})
+
+    packages = tuple((package.module, package.distribution) for package in check.packages)
+    fact = adapters.venv_fact(venv_dir, packages)
+
+    if fact.timed_out:
+        detail = (f"venv probe timed out after {adapters.VENV_TIMEOUT_S:.0f}s "
+                  f"(importing {', '.join(p.module for p in check.packages)})")
+        return (_venv_unverified_checks(check, str(venv_dir), detail), str(venv_dir),
+                {"venv": str(venv_dir), "output_ok": False})
+    if fact.error or fact.python_version is None:
+        detail = f"venv probe failed: {fact.error or 'no interpreter version reported'}"
+        return (_venv_unverified_checks(check, str(venv_dir), detail), str(venv_dir),
+                {"venv": str(venv_dir), "output_ok": False})
+
     evidence = {
         "venv": str(venv_dir),
         "python": fact.python_version,
         "packages": fact.packages,
         "output_ok": True,
     }
-    return checks, str(venv_dir), evidence
+    return _venv_answered_checks(check, venv_dir, fact), str(venv_dir), evidence
 
 
 def _check_unsupported(check: UnsupportedCheck) -> RequirementCheck:
@@ -318,60 +327,86 @@ def probe_provider(
             evidence={"reason": "no_probe_spec"},
         )
 
-    resolvers = resolvers if resolvers is not None else _resolvers()
+    acc = _ProbeAcc(resolvers if resolvers is not None else _resolvers())
     started = time.perf_counter()
-    checks: list[RequirementCheck] = []
-    warnings: list[str] = []
-    environment: str | None = None
-    version: str | None = None
-    evidence: dict[str, Any] = {}
-
     for check in spec.checks:
-        if isinstance(check, PythonVersionCheck):
-            result = _check_python_version(check)
-            environment = environment or sys.executable
-            version = version or adapters.platform_version()
-        elif isinstance(check, ImportCheck):
-            result = _check_import(check)
-            evidence.setdefault("packages", {})
-            evidence["packages"][check.module] = result.status.value
-        elif isinstance(check, ExecutableCheck):
-            result, fact, extra_warnings = _check_executable(check, resolvers)
-            warnings.extend(extra_warnings)
-            if fact.path:
-                environment = environment or fact.path
-                evidence.setdefault("executables", {})
-                evidence["executables"][check.resolver] = fact.path
-            version = version or fact.version
-        elif isinstance(check, VenvCheck):
-            results, venv_path, venv_evidence = _check_venv(check)
-            checks.extend(results)
-            environment = environment or venv_path
-            evidence.update(venv_evidence)
-            venv_python_version = venv_evidence.get("python")
-            version = version or (venv_python_version if isinstance(venv_python_version, str) else None)
-            continue
-        else:  # UnsupportedCheck — the union is closed
-            result = _check_unsupported(check)
-        checks.append(result)
+        _apply_check(check, acc)
 
-    checks_tuple = tuple(checks)
+    checks_tuple = tuple(acc.checks)
     missing = tuple(c.requirement for c in checks_tuple
                     if c.status is RequirementStatus.MISSING)
-    evidence["probe_duration_s"] = round(time.perf_counter() - started, 3)
+    acc.evidence["probe_duration_s"] = round(time.perf_counter() - started, 3)
     return ProviderProbe(
         provider_id=provider.provider_id,
         capability_ids=provider.capability_ids,
         probe_status=probe_status_for(checks_tuple),
         checked_at=checked_at,
         runtime_kind=spec.runtime_kind,
-        executable_or_environment=environment,
-        version=version,
+        executable_or_environment=acc.environment,
+        version=acc.version,
         requirements_checked=checks_tuple,
         missing_requirements=missing,
-        warnings=tuple(warnings),
-        evidence=evidence,
+        warnings=tuple(acc.warnings),
+        evidence=acc.evidence,
     )
+
+
+@dataclass
+class _ProbeAcc:
+    """Collects everything one provider's probe learns, in check order."""
+
+    resolvers: dict[str, Any]
+    checks: list[RequirementCheck] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    environment: str | None = None
+    version: str | None = None
+    evidence: dict[str, Any] = field(default_factory=dict)
+
+
+def _apply_python_version(check: PythonVersionCheck, acc: _ProbeAcc) -> None:
+    acc.checks.append(_check_python_version(check))
+    acc.environment = acc.environment or sys.executable
+    acc.version = acc.version or adapters.platform_version()
+
+
+def _apply_import(check: ImportCheck, acc: _ProbeAcc) -> None:
+    result = _check_import(check)
+    acc.checks.append(result)
+    acc.evidence.setdefault("packages", {})[check.module] = result.status.value
+
+
+def _apply_executable(check: ExecutableCheck, acc: _ProbeAcc) -> None:
+    result, fact, extra_warnings = _check_executable(check, acc.resolvers)
+    acc.checks.append(result)
+    acc.warnings.extend(extra_warnings)
+    if fact.path:
+        acc.environment = acc.environment or fact.path
+        acc.evidence.setdefault("executables", {})[check.resolver] = fact.path
+    acc.version = acc.version or fact.version
+
+
+def _apply_venv(check: VenvCheck, acc: _ProbeAcc) -> None:
+    results, venv_path, venv_evidence = _check_venv(check)
+    acc.checks.extend(results)
+    acc.environment = acc.environment or venv_path
+    acc.evidence.update(venv_evidence)
+    venv_python_version = venv_evidence.get("python")
+    if isinstance(venv_python_version, str):
+        acc.version = acc.version or venv_python_version
+
+
+def _apply_check(check, acc: _ProbeAcc) -> None:
+    """Dispatch one spec check to its adapter. The union is closed."""
+    if isinstance(check, PythonVersionCheck):
+        _apply_python_version(check, acc)
+    elif isinstance(check, ImportCheck):
+        _apply_import(check, acc)
+    elif isinstance(check, ExecutableCheck):
+        _apply_executable(check, acc)
+    elif isinstance(check, VenvCheck):
+        _apply_venv(check, acc)
+    else:
+        acc.checks.append(_check_unsupported(check))
 
 
 # ── whole registry ────────────────────────────────────────────────────────────

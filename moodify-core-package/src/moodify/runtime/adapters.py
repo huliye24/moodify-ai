@@ -54,7 +54,7 @@ _MAX_VERSION_CHARS = 120
 
 @dataclass(frozen=True)
 class ExecutableFact:
-    """What one attempted executable probe learned."""
+    """What one executable probe learned."""
 
     path: str | None = None
     version: str | None = None
@@ -66,7 +66,7 @@ class ExecutableFact:
 
 @dataclass(frozen=True)
 class VenvFact:
-    """What one attempted external-venv probe learned.
+    """What one external-venv probe learned.
 
     ``python_version`` is the *venv interpreter's* version — the requirements
     of a venv-backed provider are satisfied by that interpreter, not by the
@@ -122,7 +122,12 @@ def import_fact(module: str, distribution: str | None,
     try:
         importlib.import_module(module)
         fact["ok"] = True
-    except Exception as exc:  # a broken native dep can raise anything
+    except Exception as exc:
+        # Boundary: a broken native package can raise anything of its own at
+        # import (the ABI-mismatch failure mode this repo has been bitten
+        # by). Converting any failure into a fact is this adapter's whole
+        # job; letting it crash the diagnostic would hide the very state
+        # the probe exists to report.
         fact["error"] = _short(f"{type(exc).__name__}: {exc}")
         return fact
     if distribution:
@@ -130,7 +135,7 @@ def import_fact(module: str, distribution: str | None,
             fact["version"] = importlib.metadata.version(distribution)
         except importlib.metadata.PackageNotFoundError:
             fact["version"] = None
-        except Exception as exc:  # metadata corruption, not absence
+        except Exception as exc:  # boundary: corrupt metadata is not absence
             fact["version"] = None
             fact["error"] = _short(f"metadata: {type(exc).__name__}: {exc}")
     if pin is not None and fact["version"] is not None:
@@ -150,7 +155,9 @@ def executable_fact(resolver, *, timeout_s: float = EXECUTABLE_TIMEOUT_S) -> Exe
     """
     try:
         path = resolver()
-    except Exception as exc:  # resolver contract: raise when absent
+    except Exception as exc:
+        # Boundary: the resolver is pluggable and reports absence by raising
+        # (FfmpegNotFound, OSError, …); any raise means "not resolvable here".
         return ExecutableFact(found=False, error=_short(f"{type(exc).__name__}: {exc}"))
     try:
         proc = subprocess.run(
