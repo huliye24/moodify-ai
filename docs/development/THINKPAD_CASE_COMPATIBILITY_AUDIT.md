@@ -87,20 +87,32 @@
 ## 5. L4 — Legacy WSE 案卷（仓库样本：`examples/golden_case/`，49 文件）
 
 ```text
+production_case.json                                 ProductionCase 记录（与 L2 case.json 同合同）：
+                                                     case_id=case_0000…01 / source_id / lifecycle=COMPLETED / authority=ALGORITHM
+case_manifest.json                                   MFY-DATA-PROTOCOL-001 清单：source_path(相对) /
+                                                     source_sha256 / candidate_sha256{A,B,C} / versions{scan_profile,plan_gen,…}
+README.md / reopen_golden.py                         案卷文档；重开+校验工具（data_factory.dataset_builder）
 00_source/source.wav                                 被处理源（**在案卷内**）
 01_source_scan/{scan_manifest.json, metrics.json, timeline_metrics.jsonl, analysis_data.npz}
+                                                     （*scan_manifest 记录 5 个 artifact 含 spectrum_{linear,log}，磁盘缺失——见下*）
 02_plans/plan_{A,B,C}.json                           plan_id/params/rationale/source_sha256
 03_candidates/candidate_{A,B,C}.{json,wav}           candidate_sha256/parent_source_sha256/processing_*
 04_after_scan/{A,B,C}/…                              候选项复扫（同 01 结构）
-05_comparison/source_vs_A/{auditory_report.json, comparison_manifest.json, comparison_report.json, judgment_rules.json}
+05_comparison/source_vs_{A,B,C}/                     每个 5 文件：auditory_report / comparison_manifest /
+                                                     comparison_report / judgment_rules / metrics_delta
 06_human_review/{review.json, algorithmic_scores.json}
 07_learning/{pairwise_preferences.jsonl, training_record.json}
 ```
 
-**实测哈希验证（2026-10-05）**: `00_source/source.wav` 的 sha256 == `01_source_scan/scan_manifest.json:input_sha256` == `e8e61fea…` **MATCH**。
-**陈旧证据（重要）**: `scan_manifest.input_path` 指向另一台机器/旧路径 `E:\moodify\…\case_0000…01\00_source\source.wav` —— **input_path 不可信，input_sha256 可信**（本机已实测）。reader 以“哈希对案卷内实际文件”验证，不按 input_path 寻找。
-**候选/复扫哈希**: `candidate_*.json.candidate_sha256`、`04_after_scan/*/scan_manifest.artifacts.*.sha256` 均记录可验证哈希。
-**可安全归一化**: 编号目录的角色（结构性事实）、源/候选哈希、计划/复审/学习的**存在性与文件引用**。
+**实测哈希验证（2026-10-05）**:
+- `00_source/source.wav` == `production_case.json:source_id` == `case_manifest.json:source_sha256` == `scan_manifest:input_sha256` == `e8e61fea…` —— **四处一致 + 实际文件 MATCH**；
+- 三个候选 WAV 对 `candidate_sha256`（record 文件与 manifest map 双向一致）—— **全部 MATCH**。
+
+**陈旧/缺失证据（重要，reader 实测行为）**:
+- `scan_manifest.input_path` 指向另一台机器/旧路径 `E:\moodify\…\00_source\source.wav` —— **input_path 不可信，摘要可信**；reader 以“哈希对案卷内实际文件”验证，不按 input_path 寻找。
+- **8 个 spectrum PNG 记录在案但磁盘缺失**（01 的 linear/log + 04 的 A/B/C 各 2 个；历史 `.gitignore` 吞掉所致）。reader 如实报 `ARTIFACT_MISSING` ×8 → `INCOMPLETE` —— 这是“missing ≠ success”的实机演示，不是误报。
+
+**可安全归一化**: case_id、编号目录的角色（结构性事实）、源/候选哈希（已挂到 artifact 引用上）、计划/复审/学习的**存在性与文件引用**、README/reopen 工具的引用。
 **必须保持 UNKNOWN**: 02–07 各 JSON 的完整语义（`params` 具体含义、`judgment_decision` 的裁决语义、learning 记录的用途）——只记录 observed role，不解释。
 
 ## 6. 支持边界（本任务交付的 reader 遵守）
@@ -109,8 +121,9 @@
 识别:     L1 / L2 / L3 / L4（按 §1 优先级；L4 也可被显式指定——命令行直接指向 00_source 的父目录）
 不识别:   非案卷输出目录、未知布局 → UNSUPPORTED + 原因（绝不猜测升级）
 读操作:   纯读取；同一案卷读两次磁盘零字节变化（测试断言整个目录树哈希不变）
-哈希:     源（L1: 对副本; L2/L3: 对 source_path 指向的实际文件 vs case 记录; L4: 00_source vs scan 记录）
-          与 scan_manifest.artifacts（存在则验证）；记录哈希而不复制文件
+哈希:     源（L1: 对副本; L2/L3: 对 source_path 指向的实际文件 vs case 记录; L4: 00_source vs
+          多份记录——production_case / case_manifest / scan 先互相冲突检查，再对实际文件）
+          与 scan_manifest.artifacts、候选 WAV（存在则验证）；记录哈希而不复制文件
 缺失:     「记录里有的文件不在」= 问题 + INCOMPLETE；「记录里没有的东西缺失」= 正常
 篡改:     哈希不匹配 = 问题 + CORRUPT（响亮，不修复、不重哈希）
 未知:     未识别的 schema 字符串 → unknowns 记录 + 不解释其内容（不静默接受）
