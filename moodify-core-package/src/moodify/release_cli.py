@@ -39,7 +39,9 @@ def main(argv: list[str] | None = None) -> int:
     report_cmd.add_argument("target", help="case_id (resolved under --cases-root) or path to report.json")
     report_cmd.add_argument("--cases-root", default="outputs/moodify_cases")
     commands.add_parser(
-        "doctor", help="environment probe: python/core/dependencies/ffmpeg (stdout JSON)")
+        "doctor",
+        help="environment probe: python/core/dependencies/ffmpeg/provider runtimes "
+             "(stdout JSON, bounded read-only runtime probe included)")
     demo = commands.add_parser(
         "demo",
         help="one-shot core moment: analyze audio, render the 0.2 report "
@@ -384,6 +386,12 @@ def _doctor_report() -> dict:
     stdout-JSON discipline: the diagnostic itself always succeeds (exit 0);
     whether the environment is usable is carried by ``ready`` so agents can
     branch on data instead of parsing exit codes.
+
+    Since Runtime Capability Probe 0.1 the report also carries
+    ``runtime_probe``: per declared provider, whether its runtime requirements
+    are actually usable on this machine (``moodify.runtime``), joined with
+    router eligibility. The probe is read-only and bounded; it never installs,
+    downloads or touches the network.
     """
     import importlib
     import importlib.metadata
@@ -391,6 +399,7 @@ def _doctor_report() -> dict:
 
     from moodify.auditory.decode import FfmpegNotFound, _which_ffmpeg, ffmpeg_version
     from moodify.auditory.judgment import JUDGMENT_RULES_VERSION
+    from moodify.runtime import runtime_report
 
     packages: dict[str, dict] = {}
     for name in _DOCTOR_PACKAGES:
@@ -424,6 +433,7 @@ def _doctor_report() -> dict:
         "judgment_rules_version": JUDGMENT_RULES_VERSION,
         "ffmpeg": ffmpeg_report,
         "packages": packages,
+        "runtime_probe": runtime_report().model_dump(mode="json"),
         **({} if ready else {"hint": "install ffmpeg and ensure it is on PATH; "
                                      "re-run `moodify doctor` to verify"}),
     }

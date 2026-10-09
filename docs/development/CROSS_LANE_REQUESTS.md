@@ -30,3 +30,48 @@ status:   NON_BLOCKING
 suggest:  mainline rewrites it as the dev-entry index; the heavy-lane docs added here
           (THINKPAD_*) are self-contained.
 ```
+
+## CLR-003 — `preview_separation` declaration names the wrong venv (and a stale lib)
+
+```text
+file:     moodify-core-package/src/moodify/capabilities/builtin.py
+          (moodify.preview_separation runtime_requirements)
+need:     align the declaration with the desktop's current runtime layout.
+reason:   the declaration says "external venv .venv-basic-pitch" + "librosa", but the
+          desktop shell now launches dsp_separate.py on resolveRuntime('audio')
+          = .venv-audio (moodify-desktop/src/main.js:1187; requirements-audio.txt
+          exists for exactly this runtime). dsp_separate.py imports
+          numpy/soundfile/scipy only — requirements-audio.txt drops librosa
+          deliberately (librosa→sklearn→pandas C-ABI chain), so the declared
+          "librosa" is stale too. Measured on the ThinkPad 2026-10-09:
+          .venv-audio does not exist, so the shell's quick-separation path would
+          raise DEPENDENCY_MISSING, while the probe (declaration-faithful,
+          .venv-basic-pitch) reports all requirements SATISFIED. Found by
+          THINKPAD 003.
+status:   NON_BLOCKING (probe is declaration-faithful; drift is documentation truth)
+suggest:  either update the declaration to "external venv .venv-audio" +
+          "numpy"/"soundfile"/"scipy", or change runtime.js back; a mainline call
+          between Core declarations and desktop runtime layout. Do not auto-fix.
+```
+
+## CLR-004 — `music21.local` declares `.venv-score`, desktop resolves `.venv-basic-pitch`
+
+```text
+file:     moodify-core-package/src/moodify/capabilities/builtin.py
+          (music21.local runtime_requirements) and/or moodify-desktop/src/runtime.js
+need:     one canonical location for music21, declared and implemented alike.
+reason:   builtin.py declares "external venv .venv-score"; runtime.js aliases the
+          score runtime to .venv-basic-pitch (dir: '.venv-basic-pitch') and
+          requirements-transcribe.txt installs music21 into .venv-basic-pitch.
+          Measured ThinkPad 2026-10-09: .venv-basic-pitch has NO music21
+          (ModuleNotFoundError) while .venv-score has music21 9.9.2.
+          Probe demonstration (THINKPAD 003 evidence doc): music21.local probed
+          against the declared .venv-score = AVAILABLE; probed against the
+          desktop-resolved .venv-basic-pitch = UNAVAILABLE (import fails) — i.e.
+          the shell's score:run fails on this machine today.
+status:   NON_BLOCKING for the probe (declaration-faithful), BLOCKING-equivalent
+          for the desktop score path on this machine.
+suggest:  decide the canonical venv (likely: install music21 into .venv-basic-pitch
+          per requirements-transcribe.txt and update the builtin.py declaration),
+          then machine venvs are rebuilt to match. Product-adjacent call — mainline.
+```
