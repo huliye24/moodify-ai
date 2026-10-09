@@ -75,3 +75,21 @@ suggest:  decide the canonical venv (likely: install music21 into .venv-basic-pi
           per requirements-transcribe.txt and update the builtin.py declaration),
           then machine venvs are rebuilt to match. Product-adjacent call — mainline.
 ```
+
+## CLR-005 — AGENTS.md §6 still describes the V3 pipeline (②⑤ exist there, V4 deleted them)
+
+```text
+file:     AGENTS.md (§6 生产流程段落; authority file — mainline-owned)
+need:     sync the pipeline wording with STUDIO_PRODUCTION_PIPELINE_V4.md.
+reason:   AGENTS.md §6 still says the Creator flow is 检测 → 问题 → 分轨 → 结构 → 方案 → 成品,
+          with "⑤ 方案在 分轨 + MIDI 齐备前保持锁定" and a finish-mode rule that unlocks ⑤.
+          V4 (2026-10-04, implemented in moodify-desktop/src/pipeline.js:60) deleted ②问题
+          and ⑤方案 outright: stages are IMPORTED/ANALYZED/SEPARATED/STRUCTURED/TUNED/
+          COMPOSED/RECHECKED/CHOSEN/EXPORTED, findings live inside ①, and quick mode never
+          unlocks any plan stage. Found while characterizing the pipeline for THINKPAD 004
+          (docs/development/THINKPAD_PRODUCTION_GRAPH_PARITY.md §10.4).
+status:   NON_BLOCKING for THINKPAD 004 (code is V4; the graph ports code semantics), but a
+          reader following AGENTS.md alone would build the V3 model.
+suggest:  mainline updates AGENTS.md §6 to the V4 vocabulary (and its "参见 V3" pointer),
+          keeping whatever product principles remain true (Understand first / no black box /
+          quick is explicit-only).
