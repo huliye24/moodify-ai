@@ -1,0 +1,10 @@
+{
+  "schema": "moodify.studio.plan/0.1",
+  "case_id": "case_22222222222222222222222222222222",
+  "generated_at": "2026-01-02T00:06:00.000Z",
+  "status": "DRAFT_PLAN_NOT_EXECUTED",
+  "context": "../context.json",
+  "diagnosis": "../diagnosis.json",
+  "finish_mode": "FAST_STEREO_ONLY",
+  "draft_plan": {"status": "DRAFT_PLAN_NOT_EXECUTED", "nodes": [], "notes": [], "next_actions": []}
+}

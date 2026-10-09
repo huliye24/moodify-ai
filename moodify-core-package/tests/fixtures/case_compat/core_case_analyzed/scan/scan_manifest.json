@@ -1,0 +1,18 @@
+{
+  "artifacts": {
+    "metrics": {
+      "path": "D:\\somewhere\\scan\\metrics.json",
+      "sha256": "f51f066e0f7837801cd6885e1eaf286c3b3ca7e7fa690419c0bf94d74c9b826a",
+      "size_bytes": 104
+    }
+  },
+  "case_id": "case_11111111111111111111111111111111",
+  "commands": [],
+  "environment": {"note": "fixture"},
+  "generated_at": "2026-01-01T00:00:00Z",
+  "input_path": "D:\\somewhere\\source.m4a",
+  "input_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "scan_profile_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+  "scan_profile_id": "MFY-WSE-SCAN-PROFILE-001",
+  "stage": "source"
+}
