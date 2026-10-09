@@ -112,6 +112,10 @@ README.md / reopen_golden.py                         案卷文档；重开+校�
 - `scan_manifest.input_path` 指向另一台机器/旧路径 `E:\moodify\…\00_source\source.wav` —— **input_path 不可信，摘要可信**；reader 以“哈希对案卷内实际文件”验证，不按 input_path 寻找。
 - **8 个 spectrum PNG 记录在案但磁盘缺失**（01 的 linear/log + 04 的 A/B/C 各 2 个；历史 `.gitignore` 吞掉所致）。reader 如实报 `ARTIFACT_MISSING` ×8 → `INCOMPLETE` —— 这是“missing ≠ success”的实机演示，不是误报。
 
+**跨平台字节陷阱（2026-10-09 由 Linux CI 实测，reader 行为正确）**:
+- `01_source_scan/` 与 `04_after_scan/{A,B,C}/` 的 `metrics.json`、`timeline_metrics.jsonl` 共 8 个文本文件，其记录摘要来自产出机器上的 **CRLF** 字节；仓库此前按 LF 规范化存储，导致非 Windows checkout 上摘要永不匹配，reader 如实报 `ARTIFACT_TAMPERED` → `CORRUPT`。这是 **checkout 运输损坏**，不是案例被篡改——reader 的响亮失败正是设计行为。
+- 修复在仓库层：`.gitattributes` 以 `-text` 固定这 8 个文件的字节（与 `case_compat` fixtures 同一策略），使记录摘要**在任一平台都可验证**且 checkout 可复现（实测：checkout 后字节 == 记录摘要）。8 个缺失 PNG 不受影响，仍报 `INCOMPLETE`。
+
 **可安全归一化**: case_id、编号目录的角色（结构性事实）、源/候选哈希（已挂到 artifact 引用上）、计划/复审/学习的**存在性与文件引用**、README/reopen 工具的引用。
 **必须保持 UNKNOWN**: 02–07 各 JSON 的完整语义（`params` 具体含义、`judgment_decision` 的裁决语义、learning 记录的用途）——只记录 observed role，不解释。
 

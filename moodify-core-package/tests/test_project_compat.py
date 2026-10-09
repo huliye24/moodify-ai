@@ -42,6 +42,9 @@ from moodify.project.errors import ProjectValidationError
 
 FIXTURES = Path(__file__).parent / "fixtures" / "case_compat"
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# ``.gitattributes`` pins the golden case's recorded text artifacts as ``-text``:
+# their digests cover the CRLF bytes the producing machine wrote, so a
+# normalizing checkout would otherwise report them as tampered off-Windows.
 GOLDEN_CASE = REPO_ROOT / "examples" / "golden_case"
 
 

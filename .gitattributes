@@ -3,3 +3,11 @@
 # rewrites line endings would turn the recorded "verified" into a false
 # "tampered", so these files must be stored and checked out byte-for-byte.
 moodify-core-package/tests/fixtures/case_compat/** -text
+
+# The legacy WSE golden case is provenance evidence: its scan manifests record
+# byte-exact sha256 digests of the files below as the producing machine wrote
+# them (CRLF included). Stored LF-normalized they can never verify off-Windows
+# — a normalizing checkout turns recorded evidence into a false tamper report
+# (caught by Linux CI 2026-10-09). Keep these bytes exactly as recorded.
+examples/golden_case/**/metrics.json -text
+examples/golden_case/**/timeline_metrics.jsonl -text
