@@ -2,7 +2,35 @@
   "$id": "moodify.cpu-result/0.1",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Moodify CPU job result",
-  "description": "S3 队列 jobs/done/<job_id>.json 或 jobs/failed/<job_id>.json 的唯一权威结果契约（moodify.cpu-result/0.1）。任何无法对齐的指标写字符串 \"not_alignable\"，不得补算、不得估填。",
+  "description": "S3 队列 jobs/done/<job_id>.json 或 jobs/failed/<job_id>.json 的唯一权威结果契约（moodify.cpu-result/0.1）。任何无法对齐的指标写字符串 \"not_alignable\"，不得补算、不得估填。状态与错误码**不是同一层**：状态是小写生命周期词，错误码是稳定的大写机器码。",
+  "$defs": {
+    "lifecycle_state": {
+      "description": "任务生命周期，统一小写。pending / claimed 是队列位置，永远不出现在结果里。",
+      "enum": ["pending", "claimed", "done", "failed", "inconclusive", "human_required"]
+    },
+    "terminal_state": {
+      "description": "结果 JSON 允许的四个终态。inconclusive / human_required 不是失败，是诚实结论。",
+      "enum": ["done", "failed", "inconclusive", "human_required"]
+    },
+    "error_code": {
+      "description": "稳定的大写机器码。Studio 据以决定重试、停止或要求人工——所以它必须比「异常类」细。分成六组：\n  契约/输入  SCHEMA_INVALID · UNKNOWN_JOB_TYPE · INPUT_NOT_FOUND · INPUT_HASH_MISMATCH · INPUT_TOO_LARGE\n  传输      OUTPUT_UPLOAD_FAILED\n  外部工具  TIMEOUT · TOOL_FAILED\n  Core      CORE_NOT_AVAILABLE（未安装/不可导入，环境问题，可重试）· TUNABLE_CORE_NOT_AVAILABLE（Core 装了但没有这个能力，能力缺口，不可重试）· CORE_JOB_FAILED（Core 跑了并确定性拒绝，不可重试）\n  队列      RETRY_EXHAUSTED（回收/重试把尝试次数用满）\n  兜底      INTERNAL_ERROR",
+      "enum": [
+        "SCHEMA_INVALID",
+        "UNKNOWN_JOB_TYPE",
+        "INPUT_NOT_FOUND",
+        "INPUT_HASH_MISMATCH",
+        "INPUT_TOO_LARGE",
+        "OUTPUT_UPLOAD_FAILED",
+        "TIMEOUT",
+        "TOOL_FAILED",
+        "CORE_NOT_AVAILABLE",
+        "TUNABLE_CORE_NOT_AVAILABLE",
+        "CORE_JOB_FAILED",
+        "RETRY_EXHAUSTED",
+        "INTERNAL_ERROR"
+      ]
+    }
+  },
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -27,8 +55,7 @@
       "const": "moodify.cpu-result/0.1"
     },
     "status": {
-      "description": "DONE=完成；FAILED=出错；INCONCLUSIVE=跑了但证据不足；HUMAN_REQUIRED=必须人类裁决。后两者不是失败，是诚实结论。",
-      "enum": ["DONE", "FAILED", "INCONCLUSIVE", "HUMAN_REQUIRED"]
+      "$ref": "#/$defs/terminal_state"
     },
     "job_id": {
       "type": "string",
@@ -40,12 +67,12 @@
     },
     "job_type": {
       "enum": [
-        "probe",
+        "smoke",
+        "media_probe",
         "transcode",
         "analyze",
         "judge_before",
-        "manifest",
-        "smoke"
+        "manifest"
       ]
     },
     "worker_id": {
@@ -53,7 +80,7 @@
       "minLength": 1
     },
     "attempt": {
-      "description": "第几次尝试（1 起）。重试上限 2 次（§5）。",
+      "description": "第几次尝试（1 起）。回收与重试都必须推进它，用满即终止（§5：最多 2 次重试）。",
       "type": "integer",
       "minimum": 1
     },
@@ -154,8 +181,20 @@
       "description": "该失败是否值得重投。由错误码决定，不由调用方随意填写。",
       "type": "boolean"
     },
+    "outcome": {
+      "description": "本次投递的处置结果。EXECUTED = 真的跑了；ALREADY_COMPLETED = 命中既有权威结果，**未重复执行**（此时内容与既有结果一致，见 deduplicated_from）。生产者据此区分「刚跑完」与「早跑过」。",
+      "enum": ["EXECUTED", "ALREADY_COMPLETED"],
+      "default": "EXECUTED"
+    },
+    "deduplicated_from": {
+      "description": "非 null 表示本对象是一份别名：request_id 已产出过权威结果，worker 未重复执行，而是把权威结果复制到本 job_id 的键下，让生产者仍能在自己的 job_id 上查到答案。字段值即原始 job_id。",
+      "anyOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ]
+    },
     "error": {
-      "description": "status=FAILED 时为对象；其余状态为 null。",
+      "description": "status=failed 时为对象；其余状态为 null。",
       "anyOf": [
         {"type": "null"},
         {
@@ -163,19 +202,7 @@
           "additionalProperties": false,
           "required": ["code", "message", "retryable"],
           "properties": {
-            "code": {"type": "string", "enum": [
-              "SCHEMA_INVALID",
-              "UNKNOWN_JOB_TYPE",
-              "INPUT_NOT_FOUND",
-              "INPUT_HASH_MISMATCH",
-              "INPUT_TOO_LARGE",
-              "OUTPUT_UPLOAD_FAILED",
-              "TIMEOUT",
-              "TUNABLE_CORE_NOT_AVAILABLE",
-              "CORE_UNAVAILABLE",
-              "STALE_CLAIM_RECLAIMED",
-              "INTERNAL_ERROR"
-            ]},
+            "code": {"$ref": "#/$defs/error_code"},
             "message": {"type": "string"},
             "detail": {"type": "string"},
             "retryable": {"type": "boolean"}

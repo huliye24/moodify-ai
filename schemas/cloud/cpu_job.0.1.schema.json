@@ -2,7 +2,17 @@
   "$id": "moodify.cpu-job/0.1",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Moodify CPU job",
-  "description": "S3 队列 jobs/pending/<job_id>.json 的唯一权威任务契约（moodify.cpu-job/0.1）。生产者：Moodify Studio。消费者：ops/cloud_worker。本文件是契约的单一权威，两侧（JS / Python）都对本文件校验，任一实现都不是第二权威。",
+  "description": "S3 队列 jobs/pending/<job_id>.json 的唯一权威任务契约（moodify.cpu-job/0.1）。生产者：Moodify Studio。消费者：ops/cloud_worker。**本文件是契约的唯一权威**：Python 侧（contract.py 的常量与校验器）、结果契约、Studio 侧 JSON、测试样本都必须从它派生，或被针对它的契约测试约束；CI 必须检测 Schema 与 Python 常量的漂移。",
+  "$defs": {
+    "lifecycle_state": {
+      "description": "任务生命周期。跨 Studio / S3 / Python / JSON 的协议值，**统一小写**，与既有 S3 路径一致。前两个是**队列位置**，不是结果状态，因此永远不出现在结果 JSON 里。",
+      "enum": ["pending", "claimed", "done", "failed", "inconclusive", "human_required"]
+    },
+    "terminal_state": {
+      "description": "结果 JSON 允许的状态：四个终态。队列位置（pending / claimed）不在此列。",
+      "enum": ["done", "failed", "inconclusive", "human_required"]
+    }
+  },
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -19,7 +29,7 @@
       "const": "moodify.cpu-job/0.1"
     },
     "job_id": {
-      "description": "任务唯一 id，同时用作 S3 键名。用 UUID。",
+      "description": "任务唯一 id，同时用作 S3 键名。用 UUID。唯一性由 request_id 保证幂等，job_id 不是幂等键。",
       "type": "string",
       "minLength": 1,
       "maxLength": 128,
@@ -32,14 +42,14 @@
       "maxLength": 200
     },
     "job_type": {
-      "description": "probe/transcode/analyze/judge_before/manifest/smoke —— 每个类型映射到一个已有 Core/CLI 能力；无 Core 实现者返回 TUNABLE_CORE_NOT_AVAILABLE。",
+      "description": "**能力边界就在这一行**。media_probe 只提取媒体事实（容器/编码/时长/采样率/声道）；它直接用 ffprobe，不是声音分析、DSP 或 Judge，因此不违反 One Core。analyze 与 judge_before **必须**调用唯一 Moodify Core；Core 未安装时返回 CORE_NOT_AVAILABLE，**不得制造分析产物**。manifest 无 Core 权威，返回 TUNABLE_CORE_NOT_AVAILABLE。",
       "enum": [
-        "probe",
+        "smoke",
+        "media_probe",
         "transcode",
         "analyze",
         "judge_before",
-        "manifest",
-        "smoke"
+        "manifest"
       ]
     },
     "input": {
@@ -79,7 +89,7 @@
       "default": "resolved-at-runtime"
     },
     "params": {
-      "description": "任务类型专属参数（如转码目标码率）。开放对象，语义由各 adapter 定义；未知键必须被 adapter 显式拒绝，不得静默忽略。",
+      "description": "任务类型专属参数（如 transcode 的目标码率）。开放对象，语义由各 adapter 定义；未知键必须被 adapter 显式拒绝，不得静默忽略。",
       "type": "object",
       "default": {}
     },

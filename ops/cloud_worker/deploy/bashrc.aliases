@@ -1,0 +1,33 @@
+# Moodify 宁夏节点 — 常用别名与环境变量
+# 部署位置: /home/ubuntu/.moodify_aliases  （由 ~/.bashrc 末尾 source）
+
+export MOODIFY_WORKER_DIR=/home/ubuntu/moodify-worker
+export MOODIFY_VENV=/home/ubuntu/moodify-lab/.venv
+export AWS_DEFAULT_REGION=cn-northwest-1
+export PATH="$MOODIFY_WORKER_DIR:$PATH"
+
+# 状态快照（--json 便于脚本解析）
+alias mstatus="$MOODIFY_VENV/bin/python $MOODIFY_WORKER_DIR/node_info.py"
+alias mstatusj="$MOODIFY_VENV/bin/python $MOODIFY_WORKER_DIR/node_info.py --json"
+
+# 自检：身份 / S3 权限 / 契约 / adapter / 工具 / Core / 工作目录
+alias mcheck="$MOODIFY_VENV/bin/python $MOODIFY_WORKER_DIR/worker.py --check"
+
+# 只扫一轮队列就退出（调试用）
+alias monce="$MOODIFY_VENV/bin/python $MOODIFY_WORKER_DIR/worker.py --once"
+
+# 最多处理 10 个任务后退出（冒烟用）
+alias mdrain="$MOODIFY_VENV/bin/python $MOODIFY_WORKER_DIR/worker.py --drain 10"
+
+# 常驻 worker 的日志
+alias mlogs="tail -f $MOODIFY_WORKER_DIR/logs/worker.log"
+alias merr="tail -50 $MOODIFY_WORKER_DIR/logs/worker.err.log"
+
+# systemd 快捷方式（注意：service 默认未 enable）
+alias mstart="sudo systemctl start moodify-worker"
+alias mstop="sudo systemctl stop moodify-worker"
+alias mrestart="sudo systemctl restart moodify-worker"
+alias mstat="systemctl status moodify-worker --no-pager"
+
+# 进入 venv
+alias mvenv="source $MOODIFY_VENV/bin/activate"

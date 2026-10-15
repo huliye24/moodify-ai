@@ -1,0 +1,16 @@
+# logrotate — Moodify worker 日志
+# 部署位置: /etc/logrotate.d/moodify-worker
+# 说明: worker 用 systemd 的 append: 直写文件，logrotate 负责切割。
+#       copytruncate 配合 append 模式最稳（不依赖 worker 重新打开 fd）。
+
+/home/ubuntu/moodify-worker/logs/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    su ubuntu ubuntu
+    create 0644 ubuntu ubuntu
+}

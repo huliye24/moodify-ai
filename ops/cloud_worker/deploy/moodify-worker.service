@@ -1,0 +1,56 @@
+# systemd unit — Moodify 宁夏 CPU 节点 worker
+# 部署位置: /etc/systemd/system/moodify-worker.service
+#
+# ⚠️ 本 unit 安装后不会自动 enable/start（deploy.sh 只 install）。
+#    只有方案 W3 的 10 个冒烟任务通过后才允许：
+#       sudo systemctl enable --now moodify-worker
+#
+# 资源参数按方案 §5：MemoryMax=24G / CPUQuota=700% / Nice=5。
+# 相对首版的 diff（8G→24G、400%→700%、新增 Nice、poll 15→10）记录在
+# docs/cloud/ 的 W3 报告里，改前有 unit 备份。
+
+[Unit]
+Description=Moodify S3 job worker (Ningxia CPU node)
+Documentation=file:///home/ubuntu/moodify-worker/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/moodify-worker
+
+# 用 venv 的 python：里面既有 boto3，也装了唯一 Moodify Core
+ExecStart=/home/ubuntu/moodify-lab/.venv/bin/python /home/ubuntu/moodify-worker/worker.py
+
+# 崩溃后等 30s 再重启；1 分钟内失败 5 次就彻底放弃，避免把 S3 打爆
+Restart=on-failure
+RestartSec=30
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+# 日志
+StandardOutput=append:/home/ubuntu/moodify-worker/logs/worker.log
+StandardError=append:/home/ubuntu/moodify-worker/logs/worker.err.log
+
+# 资源上限（方案 §5）：8 vCPU / 30G 内存的机器上，单 worker 留出维护空间
+MemoryMax=24G
+CPUQuota=700%
+Nice=5
+TasksMax=256
+
+# 安全加固
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=false
+ReadWritePaths=/home/ubuntu/moodify-worker
+
+Environment=PYTHONUNBUFFERED=1
+Environment=AWS_DEFAULT_REGION=cn-northwest-1
+Environment=MOODIFY_WORK_ROOT=/home/ubuntu/moodify-worker/work
+Environment=MOODIFY_POLL_INTERVAL=10
+
+[Install]
+WantedBy=multi-user.target

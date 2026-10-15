@@ -1,0 +1,46 @@
+{
+  "$id": "moodify.cpu-reject/0.1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify CPU job rejection slip",
+  "description": "当 jobs/pending/ 里的对象**根本不是一份合法任务**时，worker 写进 jobs/failed/<job_id>.json 的退件单。它不是结果契约（结果契约要求 job_type/input 等字段可解析），因此单列一份最小契约——目的是让「这份东西不是任务」这件事有据可查，而不是伪造一份看起来像结果的对象。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "error", "detected_at", "worker_id"],
+  "properties": {
+    "schema_version": {
+      "const": "moodify.cpu-reject/0.1"
+    },
+    "status": {
+      "const": "REJECTED"
+    },
+    "job_id": {
+      "description": "从对象键推断出的任务 id（不是从内容读的，内容可能根本读不出来）。",
+      "type": "string"
+    },
+    "worker_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": {
+          "enum": ["SCHEMA_INVALID", "UNKNOWN_JOB_TYPE", "INTERNAL_ERROR"]
+        },
+        "message": {"type": "string"},
+        "detail": {"type": "string"},
+        "retryable": {"type": "boolean"}
+      }
+    },
+    "raw_job": {
+      "description": "尽力保留的原始内容，便于生产者定位。读不出来就是 null。",
+      "anyOf": [{"type": "object"}, {"type": "array"}, {"type": "null"}]
+    }
+  }
+}

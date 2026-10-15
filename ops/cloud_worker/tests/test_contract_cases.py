@@ -25,7 +25,7 @@ def _valid_job(**overrides):
         "schema_version": contract.JOB_SCHEMA_VERSION,
         "job_id": "b3f1c2d4-0000-4000-8000-000000000001",
         "request_id": "req-smoke-0001",
-        "job_type": "probe",
+        "job_type": "media_probe",
         "input": {
             "bucket": "moodify-dataset",
             "key": "raw/non-ai/fixtures/sine_1s.wav",
