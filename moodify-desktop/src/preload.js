@@ -20,6 +20,23 @@ contextBridge.exposeInMainWorld('moodify', {
     try { return webUtils.getPathForFile(file); } catch { return file && file.path ? file.path : null; }
   },
   listArchive: () => ipcRenderer.invoke('archive:list'),
+  projectsSnapshot: () => ipcRenderer.invoke('projects:snapshot'),
+  projectsCreate: (input) => ipcRenderer.invoke('projects:create', input),
+  projectsCreateCue: (projectId, input) => ipcRenderer.invoke('projects:createCue', projectId, input),
+  projectsLinkCandidate: (projectId, cueId, caseDir) =>
+    ipcRenderer.invoke('projects:linkCandidate', projectId, cueId, caseDir),
+  librarySnapshot: () => ipcRenderer.invoke('library:snapshot'),
+  libraryPick: (kind) => ipcRenderer.invoke('library:pick', kind),
+  libraryCreate: (input) => ipcRenderer.invoke('library:create', input),
+  libraryCreateMany: (audioPaths) => ipcRenderer.invoke('library:createMany', audioPaths),
+  libraryPickMany: () => ipcRenderer.invoke('library:pickMany'),
+  libraryCropCover: (sourcePath, positionY) => ipcRenderer.invoke('library:cropCover', sourcePath, positionY),
+  libraryPublish: (workId) => ipcRenderer.invoke('library:publish', workId),
+  onPublishProgress: (cb) => ipcRenderer.on('publish:progress', (_e, payload) => cb(payload)),
+  libraryUpdate: (workId, patch) => ipcRenderer.invoke('library:update', workId, patch),
+  libraryReadLyrics: (workId) => ipcRenderer.invoke('library:readLyrics', workId),
+  libraryHide: (workId) => ipcRenderer.invoke('library:hide', workId),
+  libraryDelete: (workId) => ipcRenderer.invoke('library:delete', workId),
   runAnalysis: (audioPath) => ipcRenderer.invoke('analysis:run', audioPath),
   readReport: (reportPath) => ipcRenderer.invoke('report:read', reportPath),
   renderCharts: (reportPath) => ipcRenderer.invoke('charts:render', reportPath),
@@ -117,4 +134,14 @@ contextBridge.exposeInMainWorld('moodify', {
   pipelineReadContext: (caseDir) => ipcRenderer.invoke('pipeline:readContext', caseDir),
   // 显式选择快速完成（仅立体声）。深度路径需要 分轨 + MIDI + 可逆性通过，跳过必须由人主动选。
   pipelineSetFinishMode: (caseDir, mode) => ipcRenderer.invoke('pipeline:setFinishMode', caseDir, mode),
+
+  // 波场通道（实验，默认关闭）：Wave Field Local v0。
+  // 开关由主进程读 MOODIFY_WAVEFIELD_V0 决定（env 里回传），渲染层只在开启时才显示入口。
+  // 这里只转发：渲染、听测、账本都在 Core；壳不含任何音频算法。
+  wavefieldStatus: (caseDir) => ipcRenderer.invoke('wavefield:status', caseDir),
+  wavefieldCreate: (caseDir, sourcePath) => ipcRenderer.invoke('wavefield:create', caseDir, sourcePath),
+  wavefieldChoose: (caseDir, kept, role, requestId) =>
+    ipcRenderer.invoke('wavefield:choose', caseDir, kept, role, requestId),
+  wavefieldExport: (caseDir, kept) => ipcRenderer.invoke('wavefield:export', caseDir, kept),
+  wavefieldAudio: (caseDir, candidateId) => ipcRenderer.invoke('wavefield:audio', caseDir, candidateId),
 });

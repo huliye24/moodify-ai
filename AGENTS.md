@@ -4,11 +4,70 @@ This file defines the canonical context for AI coding agents working in this rep
 
 ## Product Identity
 
-**External product:** Moodify Sound Protocol — AI / Agent 可通过 CLI 调用的声音处理协议；一个共享 Core，CLI 为首要执行接口，App 为播放/审听接口。协议 v0.1 的实际边界见 `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`。
+**Phase-one business definition (2026-10-08 human decision, CANON_CHANGE = YES):** Moodify 是
+荣景文川内部的 AI 商用音乐生产系统。当前外部网剧等 B2B 客户购买音乐与制作服务，不直接使用
+Moodify；不以通用 C 端、外部 Studio SaaS、UGC、社交或 Marketplace 为当前产品目标。Studio 以
+Project / Cue 组织内部生产；Play 只展示荣景文川控制的作品，并承载显式创建的私有客户审片。
+Cloud-first、Judge 核心、Wavefield、One Core、Protocol 与 `Generated is not finished` 均保持不变。
+详细边界见 `docs/canon/COMMERCIAL_MUSIC_OPERATING_MODEL.md`。
+
+**Phase-one operator and website boundary (2026-10-08 human correction, CANON_CHANGE = YES):**
+当前官网主要是内部观察、研究出版、实验图像、作品与能力状态入口，不承担接单转化；获客与交易发生在
+小红书、抖音、淘宝等外部渠道。不得因 B2B 业务方向把官网重写成销售落地页或删除研究/实验结构。
+Moodify Studio 的当前用户是内部受训操作员，因此允许专业复杂度与细分功能；设计目标从“降低首次学习
+成本”调整为“提高生产吞吐、控制精度、批量能力、可归因、可复现与交付可靠性”。复杂度必须服务真实
+工序，不得形成第二套 Core、状态机或判断权威。
+
+**External product (2026-10-05 human decision):** **Moodify Cloud — Audio Intelligence, powered by GPU computing.** Cloud 是载体，Audio Intelligence 是产品能力层，API / Agent / Desktop / App 是入口。Sound Protocol、Core、Studio 与 App 继续作为同一 Moodify 产品的协议、能力与接口，不得拆成第二个公开产品身份。协议 v0.1 的实际边界见 `docs/protocol/MOODIFY_SOUND_PROTOCOL_0_1.md`。
 
 **产品命题（Product thesis）：Generated is not finished.（生成 ≠ 完成。）**
 
-**公共项目原则（Public project principle）：Fork the code. Join the process.（代码可以复制，过程需要参与。）** Moodify 采用开源 + 免费 + 公共协作路线，不把「别人看不到我们的代码」当作壁垒。代码可以被复制，产品可以被逆向；真正需要保护的是 continuity、standards、review quality、release trust、history、network density。目标不是「只有我们能更新 Moodify」，而是「任何人都可以改进 Moodify，且改进能够重新进入公共演化过程」。
+**核心技术方向（2026-10-06 human decision，CANON_CHANGE = YES）：从波形到波场。** 数字音频是
+触发声音发生的条件，不是声音发生本身。Moodify 的 HEAR / JUDGE / ACT 必须逐步从只观察和修改
+waveform，迁移为构建、观测、选择和验证 wavefield；权威边界见
+`docs/canon/WAVEFIELD_CORE_PRINCIPLE.md`。Judge 仍是核心模型，Wavefield 是核心技术对象与处理范式。
+单个立体声文件不得被表述为真实三维声压场；真实空间结论必须来自校准的播放与采集链。
+
+**首要使用动作（2026-10-06 human decision，CANON_CHANGE = YES）：** Moodify 的核心能力链为
+`HEAR → JUDGE → ACT`。当前 Web Studio 首先完成两个用户动作：**上传音乐**，随后由 Moodify
+执行 **HEAR + JUDGE**；`ACT` 暂不开放，不得用未实现的处理能力占位。底部对话框是连接模型的
+Moodify AI 对话入口，不是上传或“检测”按钮。旧的多阶段侧栏不得继续充当当前首屏信息架构。
+
+**核心模型原则（2026-10-06 human decision，CANON_CHANGE = YES）：**
+
+> **Moodify Judge = Moodify 的核心模型。**
+>
+> **We don't need to own every audio model. We need to own the judgment.**
+
+Moodify 必须拥有处理前与处理后的两次 Judge：先判断声音发生了什么、是否需要处理、什么必须保护；
+再判断处理结果是否真正改善、是否应接受、重试、调整或保留原版。分离、降噪、修音、混音、母带、
+生成模型与 foundation encoder 均可先采用第三方/开源/可替换 Provider；Provider 是 Hands，Judge 是
+Ear + Brain。`Moodify Auditory Intelligence` 是长期核心资产总称，第一代目标模型名为 `Judge-1`。
+Judge 仍属于唯一 Moodify Core，不构成第二个公开产品身份。完整边界见
+`docs/canon/JUDGE_CORE_PRINCIPLE.md`。
+
+**生产参数原则（2026-10-11 human decision，CANON_CHANGE = YES）：固定流程，不固定参数。**
+每首歌、每次迭代都必须重新 `HEAR → JUDGE → ACT → VERIFY → BLIND COMPARE`。调音、降噪、混音、
+母带参数由该次输入、分轨、时间段、问题证据、作品意图与 `preserve` 约束生成；固定参数、预设和历史
+工艺卡只能作为安全边界、未校准初始化值或搜索起点，不能作为“更好”的答案。每轮只生成一个新的
+**挑战者**，与当前基准在统一编码和严格响度匹配后随机匿名为 A/B；A/B 是盲测槽位，不再表示同时
+生成的保守/激进两套参数。Judge 输出必须定位改善与损害、置信度和下一动作；无法证明净收益时保留
+当前基准。默认采用**最小可归因干预**：一轮只修一个有证据的问题或一个边界清楚的局部范围；该轮
+挑战者通过复检与盲比后才晋升为新的当前基准，否则撤回或局部重试，不把未验证改动继续叠加。
+所有输入状态、判断、Mix Graph、参数、局部变化、验证、匿名选择和失败原因进入可治理的
+Treatment Record，作为未来 Judge 校准的数据资产。详见 `docs/canon/JUDGE_CORE_PRINCIPLE.md` 与
+`docs/canon/STUDIO_PRODUCTION_PIPELINE_V4.md` 的 2026-10-11 修订。
+
+**人声身份保护原则（2026-10-12 human decision，CANON_CHANGE = YES）：Voice is identity;
+accompaniment is adaptable.** 对 AI 音乐生产，Moodify 默认把人声视为更高身份密度、更难无损重建的
+资产；音色、咬字、气息、滑音、颤音、微时值与情绪动态进入 `preserve`。这不是“永不修改人声”的
+绝对规则：有明确生成缺陷时仍可局部修复，但修改人声的证据门槛高于修改伴奏。当人声本身正常而在
+混合中被遮蔽时，优先让伴奏通过电平、编配、动态 EQ 或空间关系让位，而不是先抬高、压缩、增亮或
+重写人声。`V−A` 等相对比值只能定位关系变化，必须拆分人声侧与伴奏侧贡献后才能触发处理动作；
+比值异常不得直接等同于人声异常。详见 `docs/canon/JUDGE_CORE_PRINCIPLE.md` 与
+`docs/canon/STUDIO_PRODUCTION_PIPELINE_V4.md`。
+
+**公共项目原则（Public project principle）：Fork the code. Join the process.（代码可以复制，过程需要参与。）** Moodify 采用开源 + 免费 + 公共协作路线，不把「别人看不到我们的代码」当作壁垒。**代码开源，理论同样开源**：公开问题、假设、定义、公式、方法、证据边界、失败条件与修订历史；理论文档与代码共同进入公共演化过程。代码和理论都可以被复制，产品可以被逆向；真正需要保护的是 continuity、standards、review quality、release trust、history、network density。目标不是「只有我们能更新 Moodify」，而是「任何人都可以改进 Moodify，且改进能够重新进入公共演化过程」。
 
 ```text
              Moodify
@@ -98,8 +157,8 @@ Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop �
    - **可逆性门禁**：分解 → 复合（不处理）必须回到原版（`<case>/studio/roundtrip.json`，仅
      `passed === true` 才算通过）。**门禁不通过，④修音不开**，也不得自行推断一个通过。
      这是分解质量的唯一可测代理——原分轨不可知（AI 音乐无原轨客体），"还原得对不对"无法回答。
-   - **第三出口**：选定为 `A / B / 保留原版`（`kept ∈ A|B|ORIGINAL`）。净增益为负时系统应主动
-     推荐保留原版；缺了这一出口，「最小变换」就是空话。
+   - **基准出口**：每轮在“当前基准 / 单个新挑战者”之间选择；净增益为负、证据不足或结论不确定时
+     保留当前基准。第一轮的当前基准通常是原版，后续也可以是已接受版本。
    **②「问题」不是独立阶段**（2026-10-04 裁定）：Core `report.json` 的 `findings` 仍在 ①检测 里可见，
    但不得单设阶段或页面；`issues: []` 只能说「当前规则未发现技术问题」，**不得**说「这首歌没问题」——
    这条诚实要求由 ①检测 承接，不随 ② 的退场而消失。
@@ -108,22 +167,23 @@ Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop �
    **三个预设（`clean_master`/`warm_vocal`/`wide_space`）已退场**（2026-10-04 裁定），
    不得作为产品面、流程起点或「成品」工具重新引入。
    阶段由磁盘产物推导（`moodify-desktop/src/pipeline.js`），未满足前置的阶段不得进入；
-   成就判定**用聚合**（任一成对的修音对达到即可），开一对新实验不得让阶段倒退。
+   成就判定**用聚合**，开启新迭代不得让已经完成的历史迭代倒退。
    **分解先于修音：④ 修音在 分轨 + MIDI + 可逆性通过 齐备前保持锁定**（曲谱/MusicXML 不能替代 MIDI）。
-   **修音必须成对**：一次产出保守 / 激进两个**完整方案**（系统出两档参数，人只负责听与选）；
-   **A、B 必须成对**——只有一侧时 `TUNED` 不成立，⑤ ⑥ 一律锁定。
-   **⑥ 复检**：对 A、B 各重跑一次完整检测，与原版逐指标对齐；缺项只能进 `not_alignable`，**不得补算**，
+   **每轮只生成一个挑战者**：先由 Judge Before 判断问题与保护目标，再由 Planner/AI 生成该曲、该轮
+   专属参数；不得固定产出“保守 / 激进”两套预设。挑战者必须完整包含本轮涉及的逐轨产物与复合结果。
+   **⑥ 复检**：对挑战者重跑完整检测，与当前基准逐指标对齐；缺项只能进 `not_alignable`，**不得补算**，
    **不得发明测量事实**。**绝不** `AI 处理 → 自动完成`；`Generated is not finished.` 不变。
-   **⑦ 选定**由人做，逐步落账 `<case>/studio/tuning/decisions.jsonl`
-   （只追加、不可修改、带 request_id 幂等）；任何一档都不得被自动称为「完成」。
+   **盲测**：当前基准与挑战者先统一编码、严格响度匹配，再随机匿名为 A/B；Judge 不得接收来源身份、
+   插件或参数提示。**⑦ 选定**将“接受挑战者 / 保留当前基准 / 局部重试”逐步落账
+   `<case>/studio/tuning/decisions.jsonl`（只追加、不可修改、带 request_id 幂等）。
    **跳过分解的「快速完成（仅立体声）」必须由人显式选择**
    （记为 `<case>/studio/finish_mode.json`，带 `chosen_at`），**绝不自动解锁**——否则捷径会变成默认路径；
-   其处理引擎是**对整轨的两档处理**（无 MIDI → 只做混音处理，不做音准·节奏修正），
+   其处理引擎是**对整轨生成一个挑战者**（无 MIDI → 只做混音处理，不做音准·节奏修正），
    **不得**打开需要分轨的 ④ 修音；但它**仍然必须走 ⑤复合 → ⑥复检 → ⑦选定 才能导出**
    （跳过的是分解，不是验证）。模式徽章必须显示 `深度完成` / `快速（仅立体声）`。
    `preserve`（该保护什么）是听觉判断，挂在 ④ 修音 的输入侧，默认留空由人填。
-   **两档参数是人类听觉判断**：产物必须携带 `calibration_status`，未校准时为
-   `UNCALIBRATED_ENGINEERING_DEFAULT`，不得被读成「更好的设置」。
+   **参数不是标准答案**：产物必须记录 Judge/Planner 版本、完整参数、证据与 `calibration_status`；
+   未校准时为 `UNCALIBRATED_ENGINEERING_DEFAULT`，不得被读成“更好的设置”。
    Core 的逐轨修音 / 复合 / 可逆性验证能力未就绪时，壳必须显式拒绝（`TUNABLE_CORE_NOT_AVAILABLE`），
    **不得留假产物**。
    参见 `docs/canon/STUDIO_PRODUCTION_PIPELINE_V4.md`。
@@ -158,6 +218,8 @@ Network  个人音乐节点之间的连接  →  未实现；V1 仅指 Desktop �
 - 依赖方向严格单向：`moodify-core → moodify-cli / moodify-app`。
 - 禁止 GUI-only core capability：任何真正影响声音结果的 App 能力，必须能通过 Core API 被其他 interface 调用。
 - 跨端一致性：同一版本 Core + 同一输入 + 同一 profile，CLI 与 App 结果需有一致性保证；分三级 `bit-exact / numerical-equivalent / perceptual-equivalent`，不盲目承诺 bit-perfect（以 runtime 实测为准）。
+- **Judge authority 单一：** 处理前 Judge 与处理后 Judge 的任务定义、契约、证据、版本、校准与
+  人类升级规则只能有一套权威实现。Provider 可替换，但不得各自携带一套互相冲突的“质量判断”。
 
 ## Governance Principle — Human Direction / Machine Execution
 

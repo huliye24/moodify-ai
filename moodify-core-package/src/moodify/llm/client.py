@@ -191,6 +191,47 @@ class DeepSeekClient:
 """
         return self._call(system, prompt)
 
+    def chat(self, message: str, context: dict | None = None) -> str | None:
+        """Bounded Moodify AI conversation, optionally grounded in HEAR evidence."""
+        key = os.getenv("DEEPSEEK_API_KEY")
+        if not key:
+            return None
+        system = """你是 Moodify AI，服务于 Moodify Cloud 的音乐完成工作流。
+当前产品能力链是 HEAR → JUDGE → ACT；ACT 尚未开放。
+你可以解释 HEAR 的测量证据与当前规则式 Judge 结论，但必须区分测量事实、模型推断、价值判断和建议。
+Judge-1 尚未实现；不得声称歌曲一定好听或没问题，不得虚构未提供的指标。
+证据不足时明确说 INCONCLUSIVE 或需要人工听审。回答简洁、专业，默认使用中文。"""
+        payload = {
+            "model": self._model,
+            "messages": [
+                {"role": "system", "content": system},
+                {
+                    "role": "user",
+                    "content": (
+                        "HEAR/JUDGE context:\n"
+                        + json.dumps(context or {}, ensure_ascii=False)
+                        + f"\n\nUser:\n{message}"
+                    ),
+                },
+            ],
+            "temperature": 0.2,
+        }
+        try:
+            import httpx
+
+            response = httpx.post(
+                os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/")
+                + "/chat/completions",
+                headers={"Authorization": f"Bearer {key}"},
+                json=payload,
+                timeout=30.0,
+            )
+            response.raise_for_status()
+            content = response.json()["choices"][0]["message"]["content"]
+            return str(content).strip() or None
+        except Exception:
+            return None
+
     # ── 内部 ────────────────────────────────────
 
     def _call(self, system_prompt: str, user_content: str) -> dict | None:

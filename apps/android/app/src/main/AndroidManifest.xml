@@ -7,10 +7,10 @@
     <application
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/app_icon_soft_white_1024"
         android:label="Moodify"
         android:localeConfig="@xml/locales_config"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/app_icon_soft_white_1024"
         android:supportsRtl="true"
         android:theme="@style/Theme.Moodify">
         <activity

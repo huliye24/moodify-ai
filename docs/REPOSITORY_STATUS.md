@@ -1,5 +1,18 @@
 # Repository Status
 
+> **2026-10-08 internal commercial-production update:** Phase one now serves Rongjing WenChuan's
+> internal web-series music production. The additive Project / Cue / Candidate / Rights /
+> Judge / Approval contracts are **IMPLEMENTED (EXPERIMENTAL, MIP-0004 DRAFT)** with contract tests.
+> Studio Project/Cue UI, persistence, delivery packages, private client review, first-party Play
+> catalogue filtering and a real order run are **NOT_IMPLEMENTED**. Existing consumer/app code is
+> retained but is no longer the active phase-one product target.
+
+> **2026-10-05 positioning update:** 对外首要定位为 **Moodify Cloud — Audio Intelligence, powered by GPU computing.** `GPU Computing → Moodify Cloud → Audio Intelligence → API / Agent / Desktop / App` 是人类批准的产品层级；本文后续状态表仍是“什么已实现”的事实边界，不得由新定位推导未实现能力已上线。
+
+> **2026-10-06 Wavefield direction:** 人类裁定核心技术方向为“从波形到波场”。当前仓库已有 WSE、
+> 频谱/相位/立体声测量、playback profiles、DSP、evidence 与 Judge 基础，但 Wavefield schema、
+> 物理录音棚接入、校准采集、Wavefield Profile 和条件化 render contract 均 **NOT_IMPLEMENTED**。
+
 **Status:** 当前 Canon 与事实状态入口（Canon v3.0 / Personal Music Node，2026-10-03 更新）。
 **Authority:** 本文件是状态入口，不是独立权威；权威见 root `AGENTS.md` 与 `docs/canon/*`（[AUTHORITY_ORDER](canon/AUTHORITY_ORDER.md)）。
 
@@ -10,6 +23,10 @@
 - **公共项目原则：** **Fork the code. Join the process.**（代码可以复制，过程需要参与。）Moodify 采用开源 + 免费 + 公共协作路线；`Moodify Moat = Process × History × Network`，不是 Code。三层叙事：**Protocol（规则层）/ Core（能力层）/ Network（过程）**——见 `GOVERNANCE.md`、`docs/governance/NETWORK.md`、`protocol/`。
 - **对外产品面：** Listener Side = App/Player，兼 Preview / A-B / Review / Delivery；Creator Side = CLI（生产端完成流）+ Studio（`moodify-desktop/` 人类工作台）。
 - **内部系统：** Moodify Ear / Auditory Intelligence（听觉、判断、验证与研究）、Cloud Production System（Intake→…→Render→Delivery）、Classic Reconstruction（内部生产哲学，宪法 v1.0）。
+- **核心模型方向（2026-10-06）：** `Moodify Judge` 是长期自有核心；处理前诊断 Judge + 处理后验收 Judge
+  构成不可省略的双 Judge。处理模型可通过 Provider 替换。当前仓库已有规则式技术 judgment、证据、
+  comparison 与人工升级，但成熟学习型 `Judge-1` **尚未实现**；16 条生产阈值仍全部
+  `DEFAULT_UNCALIBRATED`，L3–L5 judgment 仍为 `NOT_PROMISED`。
 - **治理与证据层（2026-10-03 新增）：** `GOVERNANCE.md`、`MAINTAINERS.md`、`docs/governance/NETWORK.md`、`docs/governance/constraints/`（ME-001…ME-003）、`protocol/mips/`（MIP 流程）、`docs/evidence/`（W01-P00 Evidence Index 等）、`docs/ARCHIVE_INDEX.md`。**NO TOKEN / NO DAO / NO AIRDROP / NO TREASURY GOVERNANCE。**
 - **历史身份说明：** 旧表述「The Ear of AI — an Auditory Intelligence System」作为**公开产品身份已失效**（被 W01-P01 Canon 覆盖）；Ear 保留为内部系统资产。完整裁决见 W01-P01 Decision Register CD-001/CD-002。
 - **已移出主线的项目线（2026-10-03）：** MOOD Protocol Web3 线（EVM/BSC 主网 BEP-20 代币，已部署合约）**移出主线但磁盘保留**：`mood-web3-protocol/`（原 `protocol/`）、`apps/web`、`e2e/staging`、`web 3.0/`。该线与 Moodify Network 是两件事；历史记录见 `docs/ARCHIVE_INDEX.md`，不静默改写。
@@ -38,6 +55,7 @@ Studio → Publish to My Library → Phone → Play
 | Moodify Core | **IMPLEMENTED** | `moodify-core-package/`（679 文件，v1.0.0-rc.1） |
 | Moodify Protocol 0.1 / 0.2 | **IMPLEMENTED**（预设作业 + 报告；可编辑 Mix Graph 仍为目标态） | `moodify protocol validate\|process`；`docs/protocol/` |
 | Moodify Studio（Electron 壳） | **IMPLEMENTED（壳）** — 只编排 Core，自身无 DSP；启动脚本仅 `electron .` | `moodify-desktop/`（v1.0.0-rc.1，Electron ^33） |
+| Moodify Web Studio | **IMPLEMENTED（检测入口）** — 无需安装，主动选择音频后调用现有 Cloud `/api/v1/auditory/analyze`；分轨 / 结构 / 修音 / 复合 / 复检仍锁定 | `ops/web_origin/site/rongjingmusic/studio.html`；2026-10-05 真实无声 WAV 冒烟返回 `COMPLETED` + `HUMAN_REQUIRED` |
 | Android 客户端 | **IMPLEMENTED（两条并存线，未裁决）** | `apps/android`（com.moodify.app v2.0.0）、`apps/music-android`（com.moodify.music v2.0.1） |
 | **Studio → My Library 发布动作** | **TARGET — 不存在** | 全仓库无实现 |
 | **Track package / `manifest.json`** | **TARGET — 不存在** | 全仓库无实现 |

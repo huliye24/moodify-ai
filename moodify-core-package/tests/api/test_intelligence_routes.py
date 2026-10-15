@@ -13,6 +13,22 @@ def test_intelligence_routes_are_registered():
     assert "/api/v1/intelligence/process" in paths
 
 
+def test_health_exposes_current_identity_without_claiming_judge_one_exists():
+    payload = TestClient(app).get("/api/v1/health").json()
+
+    assert payload["identity"] == "Moodify Cloud — Audio Intelligence"
+    assert payload["judge"]["model"] == "Judge-1"
+    assert payload["judge"]["status"] == "NOT_IMPLEMENTED"
+
+
+def test_ai_chat_fails_explicitly_when_model_is_unavailable(monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    response = TestClient(app).post("/api/v1/ai/chat", json={"message": "这首歌发生了什么？"})
+
+    assert response.status_code == 503
+    assert response.json()["detail"]["code"] == "MODEL_UNAVAILABLE"
+
+
 def test_process_route_is_explicitly_reserved():
     response = TestClient(app).post(
         "/api/v1/intelligence/process",

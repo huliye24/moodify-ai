@@ -12,8 +12,8 @@ android {
         applicationId = "com.moodify.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 20
-        versionName = "2.0.0" // Moodify Play 2.0, 2026-08-15
+        versionCode = 39
+        versionName = "3.4.5" // Direct-to-player launch, 2026-10-15
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -61,6 +61,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")

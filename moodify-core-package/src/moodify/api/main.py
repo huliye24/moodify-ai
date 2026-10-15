@@ -1,4 +1,4 @@
-"""Canonical Moodify 1.0 API — The Ear of AI."""
+"""Canonical Moodify Cloud API backed by the shared Moodify Core."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from pydantic import BaseModel, Field
 
 from moodify.auditory.errors import AuditoryError
 from moodify.release import PRODUCT_VERSION, analyze_to_case, reopen_case
@@ -20,14 +21,20 @@ from moodify.api.routes.process import router as intelligence_process_router
 from moodify.api.routes.reviews import router as reviews_router
 from moodify.api.routes.stems import router as stems_router
 from moodify.reconstruction_job.routes_reconstruction import router as reconstruction_router
+from moodify.llm.client import DeepSeekClient
 
 MAX_SIZE = int(os.environ.get("MOODIFY_MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
 ALLOWED_SUFFIXES = {".wav", ".mp3", ".flac", ".m4a", ".ogg", ".aac"}
 
+
+class ChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4000)
+    context: dict = Field(default_factory=dict)
+
 app = FastAPI(
-    title="Moodify — The Ear of AI",
+    title="Moodify Cloud — Audio Intelligence",
     version=PRODUCT_VERSION,
-    description="Can machines learn to hear? Evidence-backed auditory intelligence.",
+    description="Evidence-backed audio analysis and production services from Moodify Core.",
 )
 
 
@@ -77,7 +84,13 @@ async def health() -> dict:
         "status": "ok",
         "product": "Moodify",
         "version": PRODUCT_VERSION,
-        "identity": "The Ear of AI",
+        "identity": "Moodify Cloud — Audio Intelligence",
+        "judge": {
+            "core_principle": "Moodify owns the judgment; providers remain replaceable.",
+            "model": "Judge-1",
+            "status": "NOT_IMPLEMENTED",
+            "current_authority": "RULE_BASED_TECHNICAL_JUDGMENT_WITH_HUMAN_ESCALATION",
+        },
         "queue": counts,
     }
 
@@ -117,6 +130,28 @@ async def analyze(audio: UploadFile = File(...)) -> dict:
     finally:
         if tmp_path is not None:
             tmp_path.unlink(missing_ok=True)
+
+
+@app.post("/api/v1/ai/chat")
+async def ai_chat(request: ChatRequest) -> dict:
+    """Talk to Moodify AI; HEAR evidence is context, never hidden authority."""
+    import asyncio
+
+    safe_context = {
+        key: request.context[key]
+        for key in (
+            "source_name", "overall_status", "summary", "sections", "findings", "authority_state",
+        )
+        if key in request.context
+    }
+    answer = await asyncio.to_thread(DeepSeekClient().chat, request.message.strip(), safe_context)
+    if answer is None:
+        raise HTTPException(status_code=503, detail={"code": "MODEL_UNAVAILABLE"})
+    return {
+        "answer": answer,
+        "authority": "ASSISTIVE_CONVERSATION_ONLY",
+        "act_status": "NOT_AVAILABLE",
+    }
 
 
 @app.post("/api/v1/auditory/jobs", status_code=202)

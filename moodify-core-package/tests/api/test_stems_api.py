@@ -26,6 +26,7 @@ class FakeLalal:
         self.upload_paths: list[Path] = []
         self.split_calls: list[dict] = []
         self.check_calls: list[list[str]] = []
+        self.minutes_left_calls = 0
 
     def upload(self, path, filename):
         self.upload_calls += 1
@@ -66,6 +67,10 @@ class FakeLalal:
                     "presets": {"stem": "vocals", "extraction_level": "deep_extraction", "splitter": "auto"},
                 }
         return result
+
+    def minutes_left(self):
+        self.minutes_left_calls += 1
+        return 250.25
 
 
 @pytest.fixture(autouse=True)
@@ -403,3 +408,28 @@ def test_list_and_usage(api_env):
     assert usage["total_tasks"] == 2
     assert usage["succeeded"] == 1
     assert len(usage["recent"]) == 2
+
+
+def test_provider_status_checks_balance_without_exposing_license(api_env):
+    client, fake, _ = api_env
+    response = client.get("/api/v1/stems/provider/status")
+    assert response.status_code == 200
+    body = response.json()
+    assert body == {
+        "provider": "lalal.ai",
+        "configured": True,
+        "connection": "AVAILABLE",
+        "processing_location": "LALAL_AI_CLOUD",
+        "minutes_left": 250.25,
+    }
+    assert fake.minutes_left_calls == 1
+    assert "license" not in str(body).lower()
+
+
+def test_provider_status_not_configured_does_not_call_upstream(api_env, monkeypatch):
+    client, fake, _ = api_env
+    monkeypatch.setenv("LALAL_LICENSE_KEY", "")
+    response = client.get("/api/v1/stems/provider/status")
+    assert response.status_code == 200
+    assert response.json()["connection"] == "NOT_CONFIGURED"
+    assert fake.minutes_left_calls == 0

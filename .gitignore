@@ -139,7 +139,9 @@ artifacts/production_cases/
 !apps/android/app/src/main/res/drawable/ic_launcher_foreground.png
 !apps/android/app/src/main/res/drawable/moodify_logo_symbol.png
 !apps/android/app/src/main/res/drawable/moodify_lockscreen_artwork.png
+!apps/android/app/src/main/res/drawable-nodpi/app_icon_soft_white_1024.png
 !ops/web_origin/site/rongjingmusic/assets/moodify-android-2.0-download-qr.png
+!ops/web_origin/site/rongjingmusic/assets/moodify-wavefield-illustration.png
 
 # Ear workbench pages are canonical app source (MFY_RELEASE_CANDIDATE_INTEGRITY_001)
 !apps/ear-workbench/*.html

@@ -75,12 +75,33 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .hero {
+  position: relative;
   min-height: calc(100svh - 80px);
   padding-block: clamp(110px, 16vh, 180px) clamp(90px, 13vh, 150px);
   display: flex;
   align-items: center;
 }
 .hero-copy { width: 100%; position: relative; z-index: 1; }
+.first-screen-illustration {
+  width: min(56vw, 920px);
+  height: auto;
+  margin-left: clamp(0px, 4vw, 64px);
+  object-fit: contain;
+  filter: saturate(.86);
+}
+.hero-mark {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: clamp(8px, 5vw, 72px);
+  width: clamp(220px, 27vw, 410px);
+  height: auto;
+  opacity: .08;
+  transform: translateY(-48%) scale(2.4);
+  transform-origin: center;
+  pointer-events: none;
+  user-select: none;
+}
 .eyebrow {
   margin: 0 0 26px;
   color: var(--muted);
@@ -100,6 +121,22 @@ h1 {
 }
 h1 span { display: block; }
 h1 span:last-child { margin-left: clamp(0px, 7vw, 108px); color: #3f51e8; }
+.hero-positioning {
+  max-width: 980px;
+  margin: clamp(28px, 4vh, 46px) 0 12px;
+  font-size: clamp(30px, 4.4vw, 66px);
+  font-weight: 500;
+  letter-spacing: -.045em;
+  line-height: 1.02;
+}
+.hero-tagline { margin-bottom: 0; color: var(--muted); font-size: clamp(17px, 1.7vw, 22px); }
+.infrastructure-credit {
+  margin: clamp(34px, 5vh, 54px) 0 0;
+  color: var(--muted);
+  font-size: clamp(13px, 1.2vw, 16px);
+  letter-spacing: .01em;
+}
+.infrastructure-credit strong { color: var(--fg); font-weight: 650; }
 h2 {
   margin-bottom: 30px;
   font-size: clamp(40px, 6vw, 76px);
@@ -230,10 +267,13 @@ h3 { font-size: 23px; font-weight: 560; line-height: 1.2; }
   .brand { gap: 7px; font-size: 12px; }
   .brand img { width: 39px; height: 26px; }
   .hero { min-height: calc(100svh - 72px); padding-block: 86px 96px; }
+  .first-screen-illustration { width: min(92vw, 680px); margin-inline: auto; }
+  .hero-mark { display: none; }
   h1 { font-size: clamp(52px, 14vw, 72px); line-height: .94; }
   h1 span:last-child { margin: 10px 0 0; }
   .hero-lower { margin-top: 64px; grid-template-columns: 1fr; align-items: start; }
   .hero-cn { font-size: clamp(25px, 8vw, 34px); }
+  .infrastructure-credit { max-width: 320px; line-height: 1.8; }
   h1 { width: 100%; max-width: 100%; font-size: clamp(38px, 11vw, 44px); line-height: .98; overflow-wrap: normal; }
   .split, .download-layout, .download-products, .footer-grid { grid-template-columns: 1fr; }
   .evidence-grid { grid-template-columns: 1fr; }

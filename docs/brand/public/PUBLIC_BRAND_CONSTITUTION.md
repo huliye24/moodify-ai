@@ -1,5 +1,7 @@
 # Moodify Public Brand Constitution v0.1
 
+> **2026-10-05 human-authority amendment:** 公开首要定位更新为 **Moodify Cloud — Audio Intelligence, powered by GPU computing.** 本修订覆盖本文中将 AI Audio Player / Play 作为 Moodify 唯一第一定义的旧条款。`Play` 保留为 Listener 接口，`Download` 保留；品牌信念 **Every voice deserves to be heard.** 不变。页面不得把未经验证的 Cloud / API / Agent 能力写成已全面上线。
+
 **状态：** Public Form 阶段工作权威
 
 **日期：** 2026-08-19

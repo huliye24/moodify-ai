@@ -8,12 +8,57 @@
 **Human decision:** 2026-10-04，共六项裁定 + 一项方向采纳，见 §1.1 / §1.2
 **Related:** [PRODUCT_DEFINITION_V3.md](PRODUCT_DEFINITION_V3.md) · [TECHNOLOGY_PRINCIPLES.md](TECHNOLOGY_PRINCIPLES.md) · [../plan/2026-10-04_TUNING_LOOP_PLAN_V01.md](../plan/2026-10-04_TUNING_LOOP_PLAN_V01.md) · [../../protocol/mips/MIP-0002-stem-tuning-loop.md](../../protocol/mips/MIP-0002-stem-tuning-loop.md)
 
+> **2026-10-11 authoritative amendment (CANON_CHANGE = YES):** V4 中“每次同时产出保守 A / 激进 B”及
+> “固定两档参数”的语义退出 Canon。新规则为：固定流程、不固定参数；每轮由 Judge Before 和作品证据
+> 生成一个完整挑战者，与当前基准统一编码、严格响度匹配、随机匿名为 A/B 后比较。A/B 现在是盲测
+> 槽位，不是处理强度名称。接受挑战者、保留当前基准、局部重试是三个结果。下文涉及 `{A,B}`、
+> `conservative/full`、pair completeness 的内容仅描述 2026-10-04 已实现 runtime 和迁移来源，不能再
+> 解释为目标产品规则。runtime/schema/state contract 的迁移需要 MIP，在迁移完成前必须显式标记
+> `LEGACY_PAIR_RUNTIME`，不得谎称已实现单挑战者权威流程。
+
 ---
 
 ## 0. 核心原则
 
 > **Understand first. Decompose second. Tune third. Compose fourth. Verify fifth.**
 > 先理解，再分解，再修音，再复合，最后复检。
+
+> **固定流程，不固定参数。每首歌重新听、重新判断、重新干预、重新验证。**
+
+每次迭代只增加一个挑战者：
+
+```text
+Current Baseline
+  → HEAR + Judge Before
+  → song-specific Plan / Mix Graph
+  → one Challenger
+  → VERIFY
+  → format-normalized + loudness-matched + identity-blind A/B
+  → ACCEPT_CHALLENGER | KEEP_BASELINE | LOCAL_RETRY
+```
+
+参数不是作品质量标准。标准由流程完整性、证据、门禁、盲测、校准与可回退性组成；参数只是当前案例
+中可复现的动作。任何固定参数只可作为安全界限、初始化值或搜索起点。
+
+### 0.1 最小可归因干预与逐步晋升
+
+默认每轮只处理**一个有证据的问题**或**一个边界清楚的局部范围**，例如一处齿音、一句主唱电平、
+一个接缝或一种可隔离的遮蔽关系。若问题必须联动多个参数才能解决，这些参数应作为同一个有边界的
+Mix Graph 变更单元记录，而不是拆成无法独立工作的假步骤。
+
+挑战者只有在下列条件全部满足后，才可晋升为下一轮 `Current Baseline`：
+
+1. 本轮作用对象、时间范围、参数和保护目标完整记录；
+2. 技术复检没有引入阻断性退化；
+3. 与当前基准完成统一编码、严格响度匹配和身份盲化比较；
+4. 已校准 Judge 在授权范围内判定净收益为正，或人类审听明确接受；
+5. 局部改善没有以不可接受的全局损害为代价。
+
+若证据不足、不可稳定分辨、出现副作用或净收益不明确，则 `KEEP_BASELINE`；若问题定位仍成立但处理
+方案不成立，则 `LOCAL_RETRY`。被拒绝的改动不得进入后续基准，也不得与下一项未验证处理叠加。
+
+停止条件不是“所有指标达到最大”，而是：当前规则未发现新的高置信问题、候选无法证明净收益、达到
+预先声明的实验预算，或需要升级为人工判断。最终交付前仍需对累积后的当前基准执行整曲复检。
 
 V3 的原则是 `Understand → Decompose → Plan → Process`：处理放在最后一步，作用对象是**整轨母带**，
 三预设是它的工具。2026-10-04 的裁定与方向采纳拆掉了这条路径的三个支点：
@@ -270,6 +315,20 @@ UI 与产物不得把它读成「更好的设置」。
 
 听觉判断，默认留空由人填。它是修音必须遵守的约束 —— 与「最小变换」一致。
 修音不得在未记录 `preserve` 的情况下宣称"保护了音色"。
+
+对 AI 音乐，人声默认进入高保护等级：音色身份、咬字、气息、滑音、颤音、微时值和情绪动态应显式
+列入 `preserve`。这不是禁止修复明确的人声生成缺陷，而是规定人声动作必须有来自人声分轨自身的证据，
+且作用范围应尽可能局部。
+
+### 5.3.1 人声内部诊断与混合关系诊断必须分开
+
+- **人声内部诊断**只回答人声轨自身是否存在掉音、断裂、伪影、异常电平、音高或节奏问题；
+- **混合关系诊断**回答人声放回伴奏后是否被遮蔽、比例是否合适、空间是否冲突。
+
+`V−A` 等比值异常不得直接生成“修改人声”的计划。系统必须先分别计算人声侧与伴奏侧证据并记录
+`driver_attribution`。当人声侧正常而伴奏侧驱动异常时，默认先修改伴奏；只有 `VOCAL` 或有充分证据的
+`BOTH` 才能进入人声处理候选。处理人声后必须先做人声轨 A/B，再放回伴奏做整曲 A/B，两层均通过
+才能晋升挑战者。
 
 ### 5.4 MIDI 不是真值，也不是单轨的还原物
 

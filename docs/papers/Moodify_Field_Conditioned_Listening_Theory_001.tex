@@ -1,0 +1,146 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[UTF8,fontset=windows]{ctex}
+\usepackage{amsmath,amssymb,booktabs,array,xcolor,geometry,fancyhdr,hyperref,microtype,enumitem}
+\geometry{top=22mm,bottom=23mm,left=22mm,right=22mm}
+\definecolor{MoodInk}{HTML}{121318}
+\definecolor{MoodViolet}{HTML}{5947F5}
+\definecolor{MoodGray}{HTML}{747985}
+\definecolor{MoodPale}{HTML}{F1F3F7}
+\hypersetup{colorlinks=true,linkcolor=MoodViolet,urlcolor=MoodViolet,pdfauthor={},pdftitle={Field-Conditioned Listening: A Foundational Proposition for Moodify}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist[itemize]{leftmargin=1.5em,itemsep=.25em,topsep=.3em}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\color{MoodGray}MOODIFY OPEN THEORY · MFY-FT-001}
+\fancyhead[R]{\footnotesize\color{MoodGray}RESEARCH DRAFT · 2026-10-06}
+\fancyfoot[C]{\footnotesize\color{MoodGray}\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\newcommand{\term}[1]{\textbf{#1}}
+\begin{document}
+
+\begin{center}
+{\small\bfseries\color{MoodViolet} FOUNDATIONAL THEORY PROPOSITION}\par
+\vspace{1.1cm}
+{\fontsize{28}{31}\selectfont\bfseries 场条件听觉论}\par
+\vspace{0.3cm}
+{\Large Field-Conditioned Listening}\par
+\vspace{0.55cm}
+{\large 从波形到听觉经验的基础命题}\par
+\vspace{1cm}
+\colorbox{MoodPale}{\parbox{0.82\linewidth}{\centering\vspace{0.45cm}
+{\Large\displaystyle E=H(W,F,L)}
+\vspace{0.45cm}}}
+\vspace{1cm}
+
+{\small MOODIFY OPEN THEORY · MFY-FT-001}\par
+{\small Research Draft · Open Access · Version 0.1}\par
+\end{center}
+
+\vspace{1cm}
+\textbf{摘要}\quad 本文提出 Moodify 的第一条基础理论命题：数字声音不是一条孤立波形，听觉结果是波形进入某个场，并在具体听者与监听条件下发生作用的结果。本文以 $E=H(W,F,L)$ 表示波形、场、听者条件与听觉经验之间的关系，论证 \emph{Waveform $\neq$ Sound Experience}，并由此把音频系统的核心问题从“如何修改文件”转向“声音应当存在于怎样的场中”。本文进一步给出同波形异场、场不可省略、听者条件不可隐去三项推论，界定文件域波场投影与真实三维声压场的证据边界，并说明该命题对 Moodify HEAR、JUDGE、ACT 架构的影响。本文是一篇理论命题论文，不声称已完成感知实验验证。
+
+\textbf{关键词}\quad 波形；波场；听觉经验；监听条件；声学空间；Moodify Judge
+
+\vspace{0.5cm}
+\textbf{Abstract}\quad This paper states a foundational proposition for Moodify: digital sound is not an isolated waveform. Auditory experience emerges when a waveform is realized in a field and encountered under a listener-specific listening condition. The relation is expressed as $E=H(W,F,L)$. The formulation separates the encoded source from its acoustic realization and from the conditions of reception. It reframes the central problem of audio processing from modifying a file to selecting, constructing, observing, and validating the field in which a sound should exist. The paper derives three immediate corollaries, defines the boundary between file-domain wavefield projections and measured three-dimensional sound-pressure fields, and maps the proposition to Moodify's HEAR, JUDGE, and ACT architecture. This is a theoretical research draft, not a report of completed perceptual validation.
+
+\textbf{Keywords}\quad waveform; wavefield; auditory experience; listening condition; acoustic space; judgment
+
+\section{问题的转移}
+数字音频工程通常把可编辑对象视为波形 $W$：振幅随时间变化的离散表示。均衡、动态、降噪、修音、混音和母带处理都可以作用于这一对象。然而，人实际听到的并不是文件本身。文件必须经由解码、数模转换、放大、换能、空间传播与人体感知，才能成为一次听觉事件。
+
+因此，波形是声音发生的\term{触发条件与编码载体}，却不是完整的听觉结果。把波形等同于声音经验，会把传播环境、播放系统、听者位置和监听状态压缩成未被说明的常数。Moodify 的理论起点，是把这些被隐去的条件重新写回模型。
+
+\section{基础命题}
+设
+\begin{equation}
+E=H(W,F,L),
+\end{equation}
+其中：
+\begin{itemize}
+\item $W$（Waveform）表示声源的数字编码、时间结构与频谱结构；
+\item $F$（Field）表示声音发生与传播的场，包括物理空间、播放系统及其可观测声学响应；
+\item $L$（Listener / Listening Condition）表示听者位置、姿态、听觉状态、设备耦合与具体监听条件；
+\item $E$（Experience）表示最终形成的听觉经验；
+\item $H$ 表示从编码声音到听觉经验的整体实现关系，而非单一滤波器。
+\end{itemize}
+
+由此得到本文的核心断言：
+\begin{equation}
+\boxed{\text{Waveform}\neq\text{Sound Experience}}.
+\end{equation}
+
+两者并非无关。$W$ 对 $E$ 施加强约束，但 $W$ 不能单独决定 $E$。场与监听条件不是附加装饰，而是声音成为可听经验的组成变量。
+
+\section{三项直接推论}
+\subsection{同波形异场}
+给定同一波形 $W$，当它进入不同的场 $F_1,F_2,F_3$，且其他条件保持在可比较范围内时，通常有
+\begin{equation}
+H(W,F_1,L)=E_1,\quad H(W,F_2,L)=E_2,\quad H(W,F_3,L)=E_3,
+\end{equation}
+并且不应预设 $E_1=E_2=E_3$。房间模态、混响时间、扬声器指向性、声压级、早期反射与听音位置都会改变听觉结果。
+
+\subsection{场不可省略}
+若把 $F$ 从模型中删除，所得 $E=H(W,L)$ 只能描述一个把传播链默认为固定条件的局部模型。它在特定设备或耳机条件下可能有工程用途，但不能被推广为声音经验的一般理论。
+
+\subsection{听者条件不可隐去}
+即使 $W$ 与 $F$ 相同，听者位置、声压暴露、听觉敏感度、注意状态与设备耦合发生变化，也可能得到不同的 $E$。因此，“最佳波场”不是脱离监听条件的绝对对象，而应附带适用范围与校准条件。
+
+\section{从文件优化到场优化}
+传统问题常被表述为：如何修改这一条 WAV？场条件听觉论把问题改写为：\term{这条声音应当存在于怎样的场中？}
+
+令 $\mathcal{F}$ 为允许搜索的波场集合，$\operatorname{Render}(W,F,L)$ 为在指定监听条件下把波形实现于场中的过程，$J$ 为具有证据边界的 Moodify Judge，则候选最优场可写为
+\begin{equation}
+F^{*}=\arg\max_{F\in\mathcal{F}}J\!\left(\operatorname{Render}(W,F,L)\right).
+\end{equation}
+
+该式不是“自动变好听”的保证。它要求至少明确：搜索空间、渲染链、Judge 的目标、必须保护的声音身份、比较条件、置信范围，以及在证据不足时返回 HUMAN\_REQUIRED 或 INCONCLUSIVE 的机制。
+
+\section{可观测性与证据边界}
+单个单声道或立体声文件可以严格计算波形、频谱、相位、响度、声道相关性和时间-频率结构，也可以构造文件域的\term{波场投影}。但这些量不能自动恢复录音发生时或播放空间中的真实三维声压场。
+
+真实空间结论至少需要经过校准的播放与采集链，包括麦克风阵列或多点采样、空间坐标、设备响应、声压基准与环境记录。因此，Moodify 必须区分：
+\begin{itemize}
+\item \textbf{文件域证据}：由上传音频本身严格计算；
+\item \textbf{渲染域证据}：由已知播放器、扬声器与空间模型计算或测量；
+\item \textbf{真实场证据}：由校准的物理空间播放与多点采集获得；
+\item \textbf{听觉判断}：由人类评审或经验证的 Judge 在明确条件下给出。
+\end{itemize}
+
+任何层级都不得冒充比自身更高的证据层级。
+
+\section{对 Moodify 架构的含义}
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[HEAR] 不只读取波形特征，还要建立 $W$、候选 $F$ 与 $L$ 的可观察表示，记录哪些量来自文件、模拟或真实测量。
+\item[JUDGE] 比较不同场中的渲染结果，判断发生了什么、什么必须保护、改善是否成立，并在越出校准范围时升级给人类。
+\item[ACT] 在开放后执行可回退的场选择、空间渲染或播放配置；输出必须携带参数、证据、版本与恢复路径。
+\end{description}
+
+因此，波场不是新增的视觉效果或功能模块，而是 Moodify 的核心技术对象；Judge 仍是对候选场作出有边界判断的核心模型。
+
+\section{可证伪条件与研究计划}
+该命题必须允许被检验，而不能停留在品牌语言。后续研究至少需要回答：
+\begin{enumerate}[leftmargin=1.6em,itemsep=.35em]
+\item 在控制 $W$ 与 $L$ 后，不同 $F$ 是否产生可重复、可辨识的听觉差异？
+\item 哪些场参数对经验差异贡献最大，哪些只是冗余描述？
+\item 文件域投影对真实场测量具有多大预测力，误差在哪里失控？
+\item Judge 的评价与盲听结果在何种范围内一致，何时必须升级给人类？
+\item 一个在空间 $A$ 中得到的 $F^{*}$，能否迁移到空间 $B$，迁移需要哪些校准？
+\end{enumerate}
+
+若在充分控制条件下，$F$ 的变化不能产生稳定差异，或所提出的场表示不能提高预测、选择或验证能力，则相应模型必须被修订或拒绝。
+
+\section{结论}
+场条件听觉论把声音从孤立文件重新放回发生条件之中。它不否认波形处理的价值，而是限制其理论地位：波形是必要变量，但不是听觉经验的充分描述。Moodify 因此从“修改一条 WAV”转向“观测、寻找、构建并验证声音应当存在的场”。这一区分使波场从界面图形变成研究对象，也使 HEAR、JUDGE、ACT 获得统一的理论起点。
+
+\section*{出版与开放声明}
+本文为 Moodify Open Theory 基础理论命题草案，不列个人作者。问题、定义、公式、方法、证据边界、失败条件与后续修订均公开。本文不报告人体实验或真实空间测量结果，不构成已验证的普适听觉定律。
+
+\textbf{Data availability}\quad 本文未生成或使用实验数据。\\
+\textbf{Ethics declaration}\quad 本文不涉及人体受试者、私人数据或临床判断。\\
+\textbf{Conflict of interest}\quad 无。\\
+\textbf{Funding}\quad 未声明外部资助。\\
+\textbf{AI-use disclosure}\quad 文稿由 Moodify 项目的人机协作写作流程形成，理论方向与核心命题由人类提出并裁定；AI 参与结构化、语言表达、排版与一致性检查。
+
+\end{document}

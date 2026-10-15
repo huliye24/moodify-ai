@@ -2,6 +2,186 @@
 
 > 所有产品身份、authority order、内部/外部边界变化必须记录于此（R7）。
 
+## 2026-10-15 — Owner-controlled Studio library and Desktop → App loop（CANON_CHANGE = YES）
+
+- **Why:** 人类明确 Studio 的当前主动作是在电脑端批量管理歌名、封面、音频和歌词，发布到
+  自己的云端后由自己的 App 播放；后处理只是 Studio 的一部分。
+- **Decision:** Studio 默认首屏转为作品管理，Project/Cue 与后处理保留为独立工作区；App 保持
+  Listener Side / PLAY，不加入导入和管理功能。
+- **Data authority:** 每件作品必须绑定 owner；原始资产、元数据、歌词、版本、发布记录和处理
+  证据可导出、可删除、可追溯、可撤回。云端是 owner-controlled data 的托管与同步层，不取得作品
+  权威。
+- **Web3 boundary:** 采用数据可携带、所有者隔离、来源与版本可验证的原则；不新增 token、DAO、
+  airdrop、treasury governance 或链上作品权判定。
+- **Affected authority:** `CURRENT_CANON.md`, `PRODUCT_BOUNDARY.md`, 本 changelog；实现位于
+  `moodify-desktop/`，不新增第二套 Core/Judge/state machine。
+- **Migration:** 先建立本地 `owner_id=local-owner` 作品库和云端状态字段；同账号身份、RLS、对象存储、
+  云端处理和 App 同步逐项以真实凭据验证后开放。
+- **Rollback:** 可将默认首屏切回 Project/Cue；本地作品资产与 `library.json` 保留，不随 UI 回滚删除。
+- **Current reality:** 本地 owner 作品库与单用户 Desktop → LA Cloud → App 已实跑通：原始 WAV
+  可分段播放、封面可读、App 目录缓存已出现真实新作品。该通道是当前唯一操作者的 SSH owner bridge；
+  多用户同账号身份、RLS、对象存储仍为 `DEPLOYMENT_BLOCKED`，不得伪装成通用账号系统。
+- **MIP_REQUIRED:** YES — 云端 owner schema、RLS、发布事件、删除/撤回契约进入生产前需 MIP。
+
+## 2026-10-12 — Vocal identity preservation and accompaniment adaptation（CANON_CHANGE = YES）
+
+- **Why:** 人类确认 AI 音乐中人声比多数乐器更难可信重建，承载更高密度的身份与表演信息；真实案例
+  S011 同时暴露 `V−A` 比值的归因缺陷：排名最高的所谓人声候选实际主要由伴奏变化驱动，若直接处理
+  人声会修错对象。
+- **Decision:** 默认采用 `Voice is identity; accompaniment is adaptable.`。修改人声的证据门槛高于
+  修改伴奏；人声自身正常但在混合中被遮蔽时，优先让伴奏让位。该原则不是人声禁改令，明确的人声
+  生成缺陷仍可在 `preserve` 约束下局部修复。
+- **Evidence rule:** `V−A`、遮蔽率等相对指标不得直接触发人声处理。Judge Before 必须拆分两侧证据并
+  记录 `driver_attribution = VOCAL | ACCOMPANIMENT | BOTH | AMBIGUOUS`；歧义进入试听或人工升级。
+- **Affected authority:** `AGENTS.md`, `CURRENT_CANON.md`, `JUDGE_CORE_PRINCIPLE.md`,
+  `STUDIO_PRODUCTION_PIPELINE_V4.md`, 本 changelog。
+- **Migration:** 后续在 Judge/Treatment Record schema 中增加人声保护字段、两侧独立证据与
+  `driver_attribution`；当前 S011 仍为实验代码，不得宣称生产运行时已具备该判断能力。
+- **Rollback:** 可回退默认优先级与 schema 计划，但保留 S011 实验证据和“相对比值不能单独完成驱动
+  归因”的方法学记录。
+- **Current reality:** Canon 已确定，生产 Judge 与 Studio 尚未实现完整 driver attribution；当前必须
+  输出 `HUMAN_REQUIRED / INCONCLUSIVE`，不得用旧比值分数自动处理人声。
+- **MIP_REQUIRED:** YES — 进入生产 schema、Core behavior contract 与 evidence format 前需提交 MIP。
+
+## 2026-10-11 — Fixed process, song-specific parameters, single challenger（CANON_CHANGE = YES）
+
+- **Why:** 人类纠正此前“用固定参数或每轮固定生成保守/激进两档即可提高质量”的假设。歌曲、分轨、
+  时间段、问题、意图和保护目标每次不同，参数必须由当次 HEAR/JUDGE 证据生成；行业资产应积累判断与
+  结果数据，而不是积累万能预设。
+- **Decision:** 固定 `HEAR → JUDGE → ACT → VERIFY → BLIND COMPARE`，不固定调音、降噪、混音和
+  母带参数。每轮只生成一个完整挑战者，与当前基准统一编码、严格响度匹配并随机匿名为 A/B。
+  `A/B` 改为盲测槽位，不再表示同时生成的 conservative/full 两档。结果为接受挑战者、保留当前基准
+  或局部重试；无法证明净收益时保留基准。默认每轮只修一个有证据的问题或边界清楚的局部范围；
+  挑战者通过复检与盲比后才晋升为下一轮基准，未验证改动不得叠加。
+- **Data authority:** Treatment Record 必须保存输入状态、时间段问题、Judge Before、保护目标、
+  Mix Graph、完整参数、Provider trace、处理前后验证、匿名选择、置信度与失败原因。历史参数只作为
+  先验或搜索起点，不自动成为下一首歌的答案。被拒绝或无结论的局部处理同样保留为失败证据，但不能
+  进入当前基准。
+- **Evidence:** 真实案例《自己的神话3》的 LALAL 分轨单挑战者实验显示：技术门禁通过、响度严格匹配，
+  但微小全局处理没有校准证据证明审美净收益，系统正确输出 `INCONCLUSIVE_KEEP_CURRENT_BASELINE`。
+  该结果支持“每轮必须重新判断”，不证明任何具体参数普遍有效。
+- **Affected authority:** `AGENTS.md`, `CURRENT_CANON.md`, `JUDGE_CORE_PRINCIPLE.md`,
+  `STUDIO_PRODUCTION_PIPELINE_V4.md`, 本 changelog。
+- **Migration:** 先将旧 A/B pair runtime 标为 `LEGACY_PAIR_RUNTIME`；另起 MIP 修订 tuning/recheck/
+  decision schema、阶段推导和 UI，迁移为 baseline/challenger iteration。历史 A/B 产物只读保留，不重写、
+  不删除；旧 A/B 可分别解释为两个历史实验，但不得自动伪造成一轮新式盲测。
+- **Rollback:** 可回退本次文档修订并恢复固定双候选目标，但不得删除本次 Treatment Record 或改写实验
+  证据。运行时代码当前尚未迁移，因此无需数据回滚。
+- **Current reality:** Canon 已变更；现有 Desktop/Core 仍实现 2026-10-04 pair contract。单挑战者
+  runtime 尚未完成，必须如实标记，不能仅凭文档宣称已上线。
+- **MIP_REQUIRED:** YES — 后续将改变 schema、Core behavior contract、state derivation 与 evidence
+  format；本次只冻结人类裁决与迁移边界。
+
+## 2026-10-08 — Operator-first Studio and research website correction (CANON_CHANGE = YES)
+
+- **Human correction:** 官网主要给内部查看，保留研究文档、实验图片、作品和原有习惯；不在官网接单，
+  当前获客/交易渠道是小红书、抖音、淘宝。
+- **Rollback evidence:** `rongjingmusic.com` 回滚到 `20261006T-hear-judge-v1`；
+  `rongjingwenchuan.com` 回滚到 `20260822T123755Z-brand-nav`；旧 Play 路由恢复。错误的 B2B 落地页
+  release `20261007T231918Z-business-showcase` 保留作可审计历史，但不再 active。
+- **Studio decision:** 内部受训操作员优先；允许高密度、多面板、细工序、批量队列、显式参数、快捷键
+  与专业证据视图。评价标准是生产吞吐、控制精度、可归因、可复现、失败恢复与交付质量，不是首次
+  使用是否零学习成本。
+- **Boundary:** 专业复杂度不能变成功能堆砌，所有功能必须对应真实 Core capability、artifact、evidence
+  或 human decision；One Core、单一 Judge/Job/state authority 不变。
+- **Affected authority:** `AGENTS.md`, `CURRENT_CANON.md`,
+  `COMMERCIAL_MUSIC_OPERATING_MODEL.md`, 本 changelog。
+- **MIP_REQUIRED:** NO for this product/UI correction; future contract or state changes still require MIP.
+
+## 2026-10-08 — Internal commercial-music phase (CANON_CHANGE = YES)
+
+- **Why:** 人类明确第一阶段没有通用 C 端用户，也不把 Moodify 软件销售给外部 B 端；公司当前业务是
+  为网剧公司生产和交付商用音乐。
+- **Decision:** Moodify 第一阶段定义为荣景文川内部 AI 商用音乐生产系统；Studio 从单曲入口转向
+  Project / Cue 生产上下文；Play 收缩为自有作品展示与私有客户审片。
+- **Unchanged:** Moodify Cloud 对外身份、Judge 核心模型、Wavefield 技术方向、One Core、Protocol、
+  `Generated is not finished`、人工权威与证据边界均保留。MATLAB 继续作为实验室，不成为第二权威。
+- **Rights boundary:** 技术 commercial-ready 与法律 commercially usable 分开。处理不能创造授权；
+  Rights Gate 必须有人类归属与证据。
+- **Affected authority/files:** `AGENTS.md`, `CURRENT_CANON.md`, `PRODUCT_BOUNDARY.md`,
+  `COMMERCIAL_MUSIC_OPERATING_MODEL.md`, MIP-0004 and additive Core contracts.
+- **Migration:** 既有 case 可显式关联 Candidate，不自动重解释；C 端/社交/市场代码不批量删除，只退出
+  当前主路径。先跑通一个真实网剧订单，再决定 Cloud 持久化和开放接口。
+- **Rollback:** 移除新消费者与入口，保留 JSON 证据为惰性记录；现有 MSP、Core 与 Studio case 不迁移。
+- **Current evidence:** 仅契约测试；真实订单闭环尚未完成，不得写成生产能力。
+- **MIP_REQUIRED:** YES — 新增商业生产记录族，见 `protocol/mips/MIP-0004-commercial-music-production.md`。
+
+## 2026-10-06 — Open code and open theory (CANON_CHANGE = YES)
+
+- **Human decision:** Moodify 不仅代码开源，理论也完全开放。
+- **Public form:** 官网 Technology 成为版本化的 Open Technology Notes，而非营销概览；每篇公开
+  Question / Thesis / Definitions / Formula / Method / Evidence / Boundary / Failure / Revision log。
+- **Governance:** 理论可以被引用、批评、复现和修订；未验证假设必须保留状态标签，开放发布不得成为
+  夸大实现状态的理由。
+- **Affected authority:** `AGENTS.md`、`CURRENT_CANON.md`、本 changelog、公开 Technology 页面。
+- **Migration / rollback:** 旧的封闭技术概览退出；保留页面历史。如开放笔记格式失败，可更换呈现方式，
+  但不得恢复“理论与算法原则默认不公开”的旧边界。
+
+## 2026-10-06 — From Waveform to Wavefield (CANON_CHANGE = YES)
+
+- **Human decision:** Moodify 的核心技术方向是“从波形到波场”。数字文件只是触发条件；Core 要把
+  声音置入可描述、可重放、可观测、可验证的波场，并由 Judge 选择目标条件下的佳波场。
+- **Core formula:** \(F^\*=\arg\max_F J(\operatorname{Render}(Audio,F))\)。工程实现采用受约束的
+  鲁棒优化形式，保留身份保护、目标条件、证据、不确定性、人工权威和 `KEEP_ORIGINAL`；不得用未
+  校准的单一分数替代“什么叫更好听”的人类裁决。
+- **Authority reconciliation:** Judge 仍是核心模型和判断权威；Wavefield 是核心技术对象与处理范式。
+- **Physical boundary:** mono/stereo 只能支持空间投影；真实三维场结论需要校准的扬声器、房间与多点/
+  双耳/阵列采集。保存对象是 Wavefield Profile + 条件化 renders + evidence，不承诺一个 wav 在任意
+  环境中重现同一物理场。
+- **Affected authority:** `AGENTS.md`、`CURRENT_CANON.md`、`PRODUCT_BOUNDARY.md`、
+  `WAVEFIELD_CORE_PRINCIPLE.md`、`REPOSITORY_STATUS.md`。
+- **Migration:** 保留并提升 WSE、analysis、phase/coherence、playback profiles、Judge、evidence 和
+  Mix Graph；将 DSP/空间/母带重构为 field operators；停止扩展无目标空间和处理后验证的黑箱处理。
+  下一步 schema / protocol / Core contract 变更必须走 MIP。
+- **Evidence:** 当前只有文件域与 stereo projection 能力；真实 studio-in-the-loop 尚无校准实验，
+  不得写成已实现。
+- **Rollback:** 若受控实验不能证明稳定净收益，将 Wavefield 降回 Research，保留当前 Core 与历史。
+
+## 2026-10-06 — HEAR → JUDGE → ACT as primary interaction (CANON_CHANGE = YES)
+
+- **Human decision:** Moodify 的核心能力链统一表达为 `HEAR → JUDGE → ACT`。
+- **Current scope:** Web Studio 先完成“上传音乐 → AI HEAR → AI JUDGE”；`ACT` 明确未开放。
+- **UI migration:** 旧多阶段左侧栏退出首屏；上传是独立动作；底部输入框连接 Moodify AI 模型。
+- **Authority unchanged:** Judge-1 仍未实现；当前为规则式技术判断并在证据不足时升级人类。
+- **Affected authority:** `AGENTS.md`、`CURRENT_CANON.md`、本 changelog、Web Studio、Cloud API identity。
+- **Rollback:** 可回滚界面，但不得恢复旧公开身份或把对话框再次当作检测按钮。
+
+## 2026-10-06 — Moodify Judge as the permanent core model (CANON_CHANGE = YES)
+
+- **CANON_CHANGE = YES。** 触发项：核心资产边界、内部能力边界、judgment authority 与 data authority。
+- **Human decision：** `Moodify Judge = Moodify 的核心模型`；Moodify 不需要拥有所有音频处理模型，
+  但必须拥有判断。每个处理闭环包含 Judge Before（听见/诊断/处理必要性/保护目标）和 Judge After
+  （改善/退化/接受/重试/调整/保留原版）。
+- **Boundary：** separation / denoise / tuning / mix / mastering / generation / foundation encoder 可采用
+  第三方、开源或可替换 Provider；Judge 的契约、证据、版本、校准、Treatment Records 与人类升级
+  规则归唯一 Moodify Core。Planner 受 Judge 约束，不得发明事实或绕过处理后验收。Judge 不成为
+  第二个公开产品身份。
+- **Evidence / current reality：** 仓库已有 `moodify.auditory.judgment`、comparison、evidence、scoped
+  authority 与人类升级机制；但当前主要是规则式技术判断，16 条阈值均为
+  `DEFAULT_UNCALIBRATED`，L3–L5 为 `NOT_PROMISED`，学习型 `Judge-1` 尚未实现。
+- **Affected authority files：** `AGENTS.md`、`docs/canon/CURRENT_CANON.md`、
+  `PRODUCT_BOUNDARY.md`、`INTERNAL_SYSTEMS.md`、`JUDGE_CORE_PRINCIPLE.md`、
+  `docs/REPOSITORY_STATUS.md`。
+- **Migration：** 本次只冻结产品/R&D 原则，不删除现有 DSP、Studio、协议、App 或 Provider，不改变现有
+  runtime/schema。后续顺序为 Judge taxonomy/contract → governed Treatment Records → baseline/calibration/
+  blind evaluation → `Judge-1` → Planner/Provider 接线。任何 protocol/schema/core behavior contract 变更
+  仍需 MIP。
+- **Rollback：** 回退上述文档条款即可恢复此前“Core 能力并列、Judge 非最高研发优先级”的状态；当前
+  运行时代码与数据无需迁移。
+- **MIP_REQUIRED：NO（本次纯 Canon 文档裁决）；** 后续若改变协议、schema 或 Core behavior contract，
+  `MIP_REQUIRED：YES`。
+
+## 2026-10-05 — Moodify Cloud cloud-first public identity (CANON_CHANGE = YES)
+
+- **CANON_CHANGE = YES.** 人类明确裁定官网与对外定位从 “AI Audio Player” / 播放器为主，切换为 **Moodify Cloud — Audio Intelligence, powered by GPU computing.**
+- **Why / evidence：** 2026-10-05 人类直接产品指令，用于统一 NVIDIA 初创加速申请与官网的产品层级表达。批准层级：`GPU Computing → Moodify Cloud → Audio Intelligence → API / Agent / Desktop / App`。
+- **Boundary：** Cloud 为载体，Audio Intelligence 为能力层，Desktop / App / API / Agent 为接口；Play 和 Download 保留。One Core / Multiple Interfaces、Generated is not finished、证据与人工审听边界不变。未验证的云端能力仅可写为 platform direction 或 capability-specific availability。
+- **Public infrastructure acknowledgement：** 2026-10-05 人类进一步确认 NVIDIA 与 Amazon Web Services 为主要赞助/基础设施支持方；官网首屏以 `Infrastructure supported by` 明示 NVIDIA = GPU computing、Amazon Web Services = Cloud infrastructure。该表达不扩大为独家合作、产品背书或已验证能力声明。
+- **Primary web interfaces：** 2026-10-05 人类裁定 Web 上同时保留 `Studio` 与 `Play`：Play 仍是播放端，Studio 是截图所示桌面 Studio 的免安装网页形态，不是旧 `/studio` 创作者发布页。首批 Web Studio 复用现有 Cloud `/api/v1/auditory/analyze` 和唯一 Core，只对已接通的“检测”开放；分轨 / 结构 / 修音 / 复合 / 复检未接通时必须锁定。音频仅在用户选择文件并主动点击检测后上传。
+- **Affected authority files：** `AGENTS.md`、`docs/canon/CURRENT_CANON.md`、`docs/canon/PRODUCT_BOUNDARY.md`、`docs/brand/public/PUBLIC_BRAND_CONSTITUTION.md`、`docs/REPOSITORY_STATUS.md`、本文件。运行表面：`ops/web_origin/site/rongjingmusic/index.html` 与官网样式表。
+- **Migration：** 官网保留导航、Play、Download、响应式结构与全部实有下载；只更新首屏、精简架构表达、接口角色和 SEO/OG/structured data。
+- **Rollback：** 将官网 `current` 软链接切回发布前 release，并回退上述权威文件中的 2026-10-05 amendment 与本条；Play / Download 资产无需迁移。
+
 ## 2026-10-04 — Identity / Account / Personal History（Phase 3A，CANON_CHANGE = YES）
 
 - **CANON_CHANGE = YES。** 触发的 Canon 控制项：**内部/外部能力边界** + **data authority** +

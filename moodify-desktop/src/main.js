@@ -11,7 +11,7 @@
  * product-killing bug on Chinese Windows.
  */
 
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, nativeImage, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -28,9 +28,21 @@ const pipeline = require('./pipeline');
 const session = require('./session');
 // 调度循环本体（与 Electron 无关，步骤函数由本文件注入）—— 这样它能被 headless 测到。
 const { createOrchestrator } = require('./orchestrator');
+// 发布链路的纯逻辑：资产键布局、内容指纹、幂等判断、manifest 乐观锁脚本。
+// 与上面几个模块同一原则——不碰 Electron，能被 `node scripts/test-publish.js` 直接验证。
+const publish = require('./publish');
+// 波场通道（实验、默认关闭）：**只有定位 / 调 runner / 校验产物**，不含任何音频算法。
+const wavefield = require('./wavefield');
+// Project/Cue 是工业生产的上层组织；它只链接既有 case，不复制 HEAR/JUDGE 或流程权威。
+const projectWorkspace = require('./project-workspace');
+const musicLibrary = require('./music-library');
 
 const CASES_ROOT = process.env.MOODIFY_CASES_ROOT
   || path.join(os.homedir(), '.moodify', 'cases');
+const PROJECTS_ROOT = process.env.MOODIFY_PROJECTS_ROOT
+  || path.join(os.homedir(), '.moodify', 'projects');
+const LIBRARY_ROOT = process.env.MOODIFY_LIBRARY_ROOT
+  || path.join(os.homedir(), '.moodify', 'library');
 // 研究侧账本（T1）：暂存区，人类晋升动作才进文川院权威证据库
 const RESEARCH_ROOT = path.join(os.homedir(), '.moodify', 'research');
 const RESEARCH_PREFS = path.join(RESEARCH_ROOT, 'prefs.json');
@@ -45,6 +57,316 @@ const AUDIO_FILTERS = [
   { name: '音频', extensions: ['flac', 'wav', 'mp3', 'm4a', 'aac', 'ogg', 'aiff', 'aif'] },
   { name: '所有文件', extensions: ['*'] },
 ];
+
+function runExternal(exe, args, timeoutMs = 180000) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(exe, args, { windowsHide: true });
+    let stdout = ''; let stderr = '';
+    const timer = setTimeout(() => { child.kill(); reject(new Error(`${exe.toUpperCase()}_TIMEOUT`)); }, timeoutMs);
+    child.stdout.on('data', (data) => { stdout += data.toString('utf8'); });
+    child.stderr.on('data', (data) => { stderr += data.toString('utf8'); });
+    child.on('error', (err) => { clearTimeout(timer); reject(err); });
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      if (code === 0) resolve(stdout);
+      else {
+        // 退出码必须透出：manifest 的 compare-and-swap 用退出码 3 表示「版本冲突」，
+        // 调用方要据此决定是否重试。只看 stderr 文本会丢失这个判据。
+        const err = new Error((stderr || stdout || `${exe} exited ${code}`).trim().slice(-1000));
+        err.exitCode = code;
+        reject(err);
+      }
+    });
+  });
+}
+
+// ——— 发布：进度广播与重入保护 ——————————————————————————————————————————————
+//
+// 发布是分钟级操作（78MB 音频跨境上传）。两段保护都是必需的：
+//  1. 重入保护：同一作品不能并发发布（第二次直接拒绝，而不是覆盖第一次的结果）
+//  2. 进度广播：把阶段推给界面，用户知道卡在哪一步
+
+function publishProgress(workId, stage, fraction, detail) {
+  const stageMeta = publish.PUBLISH_STAGES.find((s) => s.id === stage);
+  const payload = {
+    workId,
+    stage,
+    label: stageMeta ? stageMeta.label : stage,
+    percent: publish.stagePercent(stage, fraction),
+    detail: detail || '',
+    at: new Date().toISOString(),
+  };
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) win.webContents.send('publish:progress', payload);
+  }
+  return payload;
+}
+
+const publishLocks = new Set();
+function acquirePublish(workId) {
+  if (publishLocks.has(workId)) return false;
+  publishLocks.add(workId);
+  return true;
+}
+function releasePublish(workId) { publishLocks.delete(workId); }
+
+/** 本地 ffprobe。发布前就能拿到时长，省掉「传完再远程问一遍」的往返。 */
+function ffprobePath() {
+  if (BUNDLED_RUNTIME) return path.join(BUNDLED_RUNTIME, 'ffmpeg', 'ffprobe.exe');
+  return path.join(__dirname, '..', 'build', 'runtime', 'ffmpeg', 'ffprobe.exe');
+}
+
+async function probeDurationMs(audioPath) {
+  try {
+    const raw = await runExternal(ffprobePath(), [
+      '-v', 'error', '-show_entries', 'format=duration',
+      '-of', 'default=nw=1:nk=1', audioPath,
+    ], 60000);
+    const ms = Math.round(Number.parseFloat(String(raw).trim()) * 1000);
+    return Number.isFinite(ms) && ms > 0 ? ms : null;
+  } catch {
+    // 时长不是发布的前置条件：拿不到就写 null，不因此中断整条链路。
+    return null;
+  }
+}
+
+/**
+ * 用 compare-and-swap 写入远端 manifest。
+ *
+ * 为什么不能「读回 → 本地改 → 传回去」：这三步之间另一个发布者完全可以插入，
+ * 后写的静默覆盖先写的。CAS 把比较与写入放进远程同一个进程，冲突时以退出码 3 拒绝，
+ * 调用方重读再重试——这才是真正的并发保护。
+ *
+ * @returns {Promise<number>} 写入后的 revision
+ */
+async function casWriteCatalogue(remoteManifest, buildNext, maxRetries = 3) {
+  let lastErr = null;
+  for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+    let current;
+    try {
+      current = JSON.parse(await runExternal('ssh', ['dev', `cat '${remoteManifest}'`]));
+    } catch {
+      current = { tracks: [], revision: 0 };  // 首次发布时远端还没有清单
+    }
+    const expected = publish.revisionOf(current);
+    const next = buildNext(current);
+
+    const localPayload = path.join(app.getPath('temp'), `catalogue-payload-${Date.now()}.json`);
+    fs.writeFileSync(localPayload, JSON.stringify(next, null, 2), 'utf8');
+    const remotePayload = `${remoteManifest}.payload.json`;
+    try {
+      await runExternal('scp', [localPayload, `dev:${remotePayload}`]);
+      const script = publish.casScript(remoteManifest, next, expected);
+      // 脚本正文走 heredoc；payload 走文件（stdin 已被 heredoc 占用）。
+      const out = await runExternal('ssh', ['dev', `python3 - '${remoteManifest}' '${expected}' '${remotePayload}' <<'PY'\n${script}\nPY`], 120000);
+      return Number.parseInt(String(out).trim(), 10) || expected + 1;
+    } catch (err) {
+      lastErr = err;
+      // 退出码 3 = 版本冲突：重读再试。其它错误不重试（可能是权限、路径等真故障）。
+      if (err && err.exitCode === 3) continue;
+      throw err;
+    } finally {
+      try { await runExternal('ssh', ['dev', `rm -f '${remotePayload}'`], 30000); } catch { /* 清理失败不掩盖主错误 */ }
+      fs.rmSync(localPayload, { force: true });
+    }
+  }
+  throw new Error(`CATALOGUE_CONFLICT_UNRESOLVED after ${maxRetries} retries: ${lastErr && lastErr.message || ''}`);
+}
+
+/**
+ * 已发布作品的**元数据**同步（改标题 / 创作者 / 歌词文本）。
+ *
+ * 只改清单条目 + 必要时重传歌词（几 KB），**不重传音频**。
+ * 没有已记录资产键的老作品会退回完整发布——那时确实不知道音频传成了什么名字。
+ */
+async function syncPublishedMetadata(work, opts = {}) {
+  const pa = work.published_assets || {};
+  const keys = {
+    safeId: `owner-${String(work.work_id).toLowerCase()}`,
+    audio: pa.audio_key || null,
+    cover: pa.cover_key || null,
+    lyrics: pa.lyrics_key || null,
+  };
+  if (!keys.audio) return publishSingleOwnerWork(work.work_id, opts);
+
+  const remoteDir = '/opt/moodify/music-media/audio-opt/zh-cn';
+  publishProgress(work.work_id, 'lyrics', 0, '同步歌词');
+
+  let lyricsFp = pa.lyrics || null;
+  if (keys.lyrics && work.lyrics_text) {
+    const tempLyrics = path.join(app.getPath('temp'), `${keys.safeId}-lyrics.txt`);
+    fs.writeFileSync(tempLyrics, work.lyrics_text, 'utf8');
+    const fp = publish.fingerprintFile(tempLyrics);
+    const need = publish.uploadNeeded(pa, 'lyrics', fp);
+    if (need.needed) {
+      await runExternal('scp', [tempLyrics, `dev:${remoteDir}/${path.basename(keys.lyrics)}`]);
+      lyricsFp = fp;
+    }
+    fs.rmSync(tempLyrics, { force: true });
+  } else if (keys.lyrics && work.lyrics_path && fs.existsSync(work.lyrics_path)) {
+    const fp = publish.fingerprintFile(work.lyrics_path);
+    if (publish.uploadNeeded(pa, 'lyrics', fp).needed) {
+      await runExternal('scp', [work.lyrics_path, `dev:${remoteDir}/${path.basename(keys.lyrics)}`]);
+      lyricsFp = fp;
+    }
+  }
+
+  publishProgress(work.work_id, 'catalogue', 0, '更新清单');
+  const remoteManifest = '/opt/moodify/music/current/dist/client/internal-catalogue.json';
+  const durationMs = await probeDurationMs(work.audio_path);
+  const track = publish.buildTrack(work, keys, durationMs);
+  await casWriteCatalogue(remoteManifest, (current) => publish.applyTrack(current, track));
+
+  musicLibrary.recordPublishedAssets(LIBRARY_ROOT, work.work_id, {
+    audio: pa.audio || null, cover: pa.cover || null, lyrics: lyricsFp,
+  }, { audio_key: keys.audio, cover_key: keys.cover, lyrics_key: keys.lyrics });
+
+  const refresh = opts.refresh || 'restart';
+  if (refresh === 'restart') {
+    publishProgress(work.work_id, 'refresh', 0, '刷新线上服务');
+    await runExternal('ssh', ['dev', 'systemctl restart moodify-music.service'], 120000);
+  }
+  publishProgress(work.work_id, 'refresh', 1, '完成');
+  return musicLibrary.markPublishing(LIBRARY_ROOT, work.work_id, 'PUBLISHED', `https://play.rongjingmusic.com/audio/${keys.audio}`);
+}
+
+/**
+ * 发布一首作品。
+ *
+ * 与旧实现的关键差别：
+ *  - 音频/封面/歌词**按内容指纹幂等**：没变就不重传（改个标题不再传 78MB）
+ *  - manifest 走 CAS：并发发布不再互相覆盖
+ *  - 时长本地 probe：省一次跨境往返
+ *  - 全程进度广播
+ */
+async function publishSingleOwnerWork(workId, opts = {}) {
+  if (!acquirePublish(workId)) throw new Error('PUBLISH_ALREADY_RUNNING');
+  try {
+    return await runPublish(workId, opts);
+  } finally {
+    releasePublish(workId);
+  }
+}
+
+async function runPublish(workId, opts) {
+  const value = musicLibrary.snapshot(LIBRARY_ROOT);
+  const work = value.works.find((item) => item.work_id === workId);
+  if (!work) throw new Error('WORK_NOT_FOUND');
+  if (!work.audio_path || !fs.existsSync(work.audio_path)) throw new Error('AUDIO_FILE_NOT_FOUND');
+  musicLibrary.markPublishing(LIBRARY_ROOT, workId, 'UPLOADING', '正在发布到 App。');
+  publishProgress(workId, 'prepare', 0, '准备发布');
+
+  // 封面带资产版本号以破坏 CDN/浏览器缓存；已发布过的作品沿用旧版本号，
+  // 这样「封面没换」时 URL 也不变，App 侧缓存能命中。
+  const prevCoverKey = work.published_assets && work.published_assets.cover_key;
+  const assetVersion = opts.forceNewCover || !prevCoverKey ? Date.now() : null;
+  const keys = publish.buildAssetKeys(work, assetVersion ? { assetVersion } : {});
+  if (prevCoverKey && !opts.forceNewCover) keys.cover = prevCoverKey;
+
+  // Nginx 的 /audio/ 当前指向 audio-opt；发布必须写入实际对外目录。
+  const remoteDir = '/opt/moodify/music-media/audio-opt/zh-cn';
+  const remoteAudio = `${remoteDir}/${path.basename(keys.audio)}`;
+
+  publishProgress(workId, 'probe', 0, '读取时长');
+  const durationMs = await probeDurationMs(work.audio_path);
+
+  // ——— 音频（幂等） ———
+  const audioFp = publish.fingerprintFile(work.audio_path);
+  const needAudio = publish.uploadNeeded(work.published_assets, 'audio', audioFp);
+  if (needAudio.needed) {
+    publishProgress(workId, 'audio', 0, `上传音频（${needAudio.reason}）`);
+    await runExternal('scp', [work.audio_path, `dev:${remoteAudio}`], 15 * 60 * 1000);
+    publishProgress(workId, 'audio', 1, '音频上传完成');
+  } else {
+    publishProgress(workId, 'audio', 1, `音频未变化，跳过上传（${needAudio.reason}）`);
+  }
+
+  // ——— 封面（幂等） ———
+  let coverFp = null;
+  if (keys.cover && work.cover_path && fs.existsSync(work.cover_path)) {
+    coverFp = publish.fingerprintFile(work.cover_path);
+    const need = publish.uploadNeeded(work.published_assets, 'cover', coverFp);
+    if (need.needed) {
+      publishProgress(workId, 'cover', 0, `上传封面（${need.reason}）`);
+      await runExternal('scp', [work.cover_path, `dev:${remoteDir}/${path.basename(keys.cover)}`]);
+    } else {
+      publishProgress(workId, 'cover', 1, '封面未变化，跳过');
+    }
+  } else {
+    publishProgress(workId, 'cover', 1, '无封面');
+  }
+
+  // ——— 歌词（幂等） ———
+  let lyricsFp = null;
+  if (keys.lyrics) {
+    let localLyrics = work.lyrics_path;
+    let tempLyrics = null;
+    if (!localLyrics || !fs.existsSync(localLyrics)) {
+      if (work.lyrics_text) {
+        tempLyrics = path.join(app.getPath('temp'), `${keys.safeId}-lyrics.txt`);
+        fs.writeFileSync(tempLyrics, work.lyrics_text, 'utf8');
+        localLyrics = tempLyrics;
+      }
+    }
+    if (localLyrics) {
+      lyricsFp = publish.fingerprintFile(localLyrics);
+      const need = publish.uploadNeeded(work.published_assets, 'lyrics', lyricsFp);
+      if (need.needed) {
+        publishProgress(workId, 'lyrics', 0, `上传歌词（${need.reason}）`);
+        await runExternal('scp', [localLyrics, `dev:${remoteDir}/${path.basename(keys.lyrics)}`]);
+      } else {
+        publishProgress(workId, 'lyrics', 1, '歌词未变化，跳过');
+      }
+    }
+    if (tempLyrics) fs.rmSync(tempLyrics, { force: true });
+  } else {
+    publishProgress(workId, 'lyrics', 1, '无歌词');
+  }
+
+  // ——— 清单（CAS 写入） ———
+  publishProgress(workId, 'catalogue', 0, '写入清单');
+  const remoteManifest = '/opt/moodify/music/current/dist/client/internal-catalogue.json';
+  const track = publish.buildTrack(work, keys, durationMs);
+  await casWriteCatalogue(remoteManifest, (current) => publish.applyTrack(current, track));
+  // public 是源资产目录，保持同步便于下次部署带出。
+  try {
+    await runExternal('ssh', ['dev', `cp -f '${remoteManifest}' '/opt/moodify/music/current/public/internal-catalogue.json'`], 60000);
+  } catch { /* public 同步失败不影响线上读取路径，不阻断发布 */ }
+
+  // ——— 刷新线上 ———
+  //
+  // 实测（2026-10-15）：在 dist/client 下新建文件后 HTTP GET 返回 404，
+  // 说明 vinext 启动时索引静态资产，新增资产不重启确实不可见。
+  // 因此默认仍然重启；`refresh: 'none'` 供将来改为 nginx 直服清单后关闭。
+  const refresh = opts.refresh || 'restart';
+  if (refresh === 'restart') {
+    publishProgress(workId, 'refresh', 0, '刷新线上服务');
+    await runExternal('ssh', ['dev', 'systemctl restart moodify-music.service'], 120000);
+  } else {
+    publishProgress(workId, 'refresh', 1, '跳过刷新（清单由 nginx 直服）');
+  }
+
+  // 记下这次传上去的内容指纹，作为下次「是否需要重传」的依据。
+  musicLibrary.recordPublishedAssets(LIBRARY_ROOT, workId, {
+    audio: audioFp, cover: coverFp, lyrics: lyricsFp,
+    cover_key: keys.cover, audio_key: keys.audio, lyrics_key: keys.lyrics,
+  });
+  publishProgress(workId, 'refresh', 1, '完成');
+  return musicLibrary.markPublishing(LIBRARY_ROOT, workId, 'PUBLISHED', `https://play.rongjingmusic.com/audio/${keys.audio}`);
+}
+
+async function removeFromSingleOwnerCatalogue(workId, deleteAssets = false) {
+  const safeId = `owner-${String(workId).toLowerCase()}`;
+  if (!/^owner-[0-9a-f-]{36}$/.test(safeId)) throw new Error('INVALID_WORK_ID');
+  const manifest = '/opt/moodify/music/current/dist/client/internal-catalogue.json';
+  // 同样走 CAS：下架与发布并发时，不能让「读-改-写」把另一方的条目吞掉。
+  await casWriteCatalogue(manifest, (current) => publish.removeTrack(current, safeId));
+  await runExternal('ssh', ['dev', `cp -f '${manifest}' '/opt/moodify/music/current/public/internal-catalogue.json'`], 60000);
+  if (deleteAssets) {
+    await runExternal('ssh', ['dev', `find '/opt/moodify/music-media/audio-opt/zh-cn' -maxdepth 1 -type f -name '${safeId}*' -delete`], 60000);
+  }
+  await runExternal('ssh', ['dev', 'systemctl restart moodify-music.service'], 120000);
+}
 
 // ——— Application updates: user chooses; Studio never replaces itself silently. ———
 
@@ -186,7 +508,7 @@ function pythonEnv() {
   return env;
 }
 
-function runPython(args, timeoutMs = 30 * 60 * 1000) {
+function runPython(args, timeoutMs = 30 * 60 * 1000, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(PYTHON, args, { env: pythonEnv() });
     let stdout = '';
@@ -196,6 +518,12 @@ function runPython(args, timeoutMs = 30 * 60 * 1000) {
     child.stderr.on('data', (d) => { stderr += d.toString('utf8'); });
     child.on('error', (err) => { clearTimeout(timer); reject(err); });
     child.on('close', (code) => { clearTimeout(timer); resolve({ code, stdout, stderr }); });
+    // 只有显式给了 input 才碰 stdin：既有调用者一个字节都不受影响。
+    // 需要 stdin 的是 wavefield runner（JSON stdin/stdout 协议）。
+    if (options.input !== undefined && options.input !== null) {
+      try { child.stdin.end(String(options.input), 'utf8'); }
+      catch (err) { clearTimeout(timer); reject(err); }
+    }
   });
 }
 
@@ -590,12 +918,19 @@ function registerIpc() {
   registerKeepsakeIpc();
   registerSessionIpc();
   registerPipelineIpc();
+  registerWaveFieldIpc();
+  registerProjectWorkspaceIpc();
+  registerMusicLibraryIpc();
   ipcMain.handle('env', async () => {
     const probe = await runPython(['-c', 'import moodify'], 60 * 1000).catch(() => null);
     return {
       casesRoot: CASES_ROOT,
+      projectsRoot: PROJECTS_ROOT,
+      libraryRoot: LIBRARY_ROOT,
       python: PYTHON,
       coreReady: Boolean(probe && probe.code === 0),
+      // 波场通道默认关闭：未开启时已发布 Studio 的行为必须一字不变。
+      wavefieldV0: wavefield.enabled(),
     };
   });
   ipcMain.handle('pick-audio', async (event) => {
@@ -628,6 +963,114 @@ function registerIpc() {
   });
 
   registerStudioToolIpc();
+}
+
+function registerMusicLibraryIpc() {
+  const call = (fn) => {
+    try { return { ok: true, ...fn() }; }
+    catch (err) { return { ok: false, reason: err && err.message || String(err) }; }
+  };
+  ipcMain.handle('library:snapshot', async () => call(() => ({ snapshot: musicLibrary.snapshot(LIBRARY_ROOT) })));
+  ipcMain.handle('library:create', async (_event, input) => call(() => ({ work: musicLibrary.create(LIBRARY_ROOT, input || {}) })));
+  ipcMain.handle('library:createMany', async (_event, audioPaths) => call(() => ({
+    works: (Array.isArray(audioPaths) ? audioPaths : []).map((audioPath) => musicLibrary.create(LIBRARY_ROOT, {
+      title: path.basename(audioPath, path.extname(audioPath)), audio_path: audioPath, creator: '',
+    })),
+  })));
+  ipcMain.handle('library:pick', async (event, kind) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const filters = kind === 'cover'
+      ? [{ name: '封面', extensions: ['png', 'jpg', 'jpeg', 'webp'] }]
+      : kind === 'lyrics'
+        ? [{ name: '歌词', extensions: ['lrc', 'txt', 'json'] }]
+        : AUDIO_FILTERS;
+    const picked = await dialog.showOpenDialog(win, { title: `选择${kind === 'cover' ? '封面' : kind === 'lyrics' ? '歌词' : '音频'}`, properties: ['openFile'], filters });
+    return picked.canceled ? null : picked.filePaths[0];
+  });
+  ipcMain.handle('library:pickMany', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const picked = await dialog.showOpenDialog(win, {
+      title: '批量选择音频', properties: ['openFile', 'multiSelections'], filters: AUDIO_FILTERS,
+    });
+    return picked.canceled ? [] : picked.filePaths;
+  });
+  ipcMain.handle('library:cropCover', async (_event, sourcePath, positionY) => {
+    try {
+      if (!sourcePath || !fs.existsSync(sourcePath)) throw new Error('COVER_FILE_NOT_FOUND');
+      const image = nativeImage.createFromPath(sourcePath);
+      const size = image.getSize();
+      if (!size.width || !size.height) throw new Error('COVER_DECODE_FAILED');
+      const side = Math.min(size.width, size.height);
+      const x = Math.max(0, Math.round((size.width - side) / 2));
+      const ratio = Math.max(0, Math.min(100, Number(positionY) || 50)) / 100;
+      const y = Math.max(0, Math.round((size.height - side) * ratio));
+      const outputDir = path.join(LIBRARY_ROOT, 'drafts');
+      fs.mkdirSync(outputDir, { recursive: true });
+      const outputPath = path.join(outputDir, `cover-${Date.now()}.png`);
+      fs.writeFileSync(outputPath, image.crop({ x, y, width: side, height: side }).toPNG());
+      return { ok: true, path: outputPath };
+    } catch (err) { return { ok: false, reason: err && err.message || String(err) }; }
+  });
+  ipcMain.handle('library:publish', async (_event, workId) => {
+    try { return { ok: true, work: await publishSingleOwnerWork(workId) }; }
+    catch (err) {
+      try { musicLibrary.markPublishing(LIBRARY_ROOT, workId, 'FAILED', err && err.message || String(err)); } catch { /* preserve original error */ }
+      return { ok: false, reason: err && err.message || String(err) };
+    }
+  });
+  ipcMain.handle('library:update', async (_event, workId, patch) => {
+    try {
+      const before = musicLibrary.snapshot(LIBRARY_ROOT).works.find((item) => item.work_id === workId);
+      const work = musicLibrary.update(LIBRARY_ROOT, workId, patch || {});
+      if (before && before.cloud_status === 'PUBLISHED') {
+        // 只改清单条目，不重传资产。
+        //
+        // 旧实现在这里整条重跑 publishSingleOwnerWork：改一个标题要重传 78MB 音频、
+        // 再重启一次生产服务。标题/创作者/歌词文本都在 manifest 里，
+        // 没有理由为此再传一遍字节流。
+        await syncPublishedMetadata(work);
+      }
+      return { ok: true, work };
+    } catch (err) { return { ok: false, reason: err && err.message || String(err) }; }
+  });
+  // 作品试音：歌词文本。只收 work_id，文件位置由作品库从快照解析，不接受任意路径。
+  ipcMain.handle('library:readLyrics', async (_event, workId) => call(() => ({ lyrics: musicLibrary.readLyrics(LIBRARY_ROOT, workId) })));
+  ipcMain.handle('library:hide', async (_event, workId) => {
+    try {
+      await removeFromSingleOwnerCatalogue(workId, false);
+      return { ok: true, work: musicLibrary.markPublishing(LIBRARY_ROOT, workId, 'HIDDEN', '已从 App 下架，原始资产仍保留。') };
+    } catch (err) { return { ok: false, reason: err && err.message || String(err) }; }
+  });
+  ipcMain.handle('library:delete', async (_event, workId) => {
+    try {
+      const work = musicLibrary.snapshot(LIBRARY_ROOT).works.find((item) => item.work_id === workId);
+      if (!work) throw new Error('WORK_NOT_FOUND');
+      if (['PUBLISHED', 'HIDDEN', 'FAILED', 'UPLOADING'].includes(work.cloud_status)) {
+        await removeFromSingleOwnerCatalogue(workId, true);
+      }
+      const workDir = path.join(LIBRARY_ROOT, 'works', workId);
+      if (fs.existsSync(workDir)) await shell.trashItem(workDir);
+      musicLibrary.remove(LIBRARY_ROOT, workId);
+      return { ok: true };
+    } catch (err) { return { ok: false, reason: err && err.message || String(err) }; }
+  });
+}
+
+function registerProjectWorkspaceIpc() {
+  const call = (fn) => {
+    try { return { ok: true, ...fn() }; }
+    catch (err) { return { ok: false, reason: err && err.message || String(err) }; }
+  };
+  ipcMain.handle('projects:snapshot', async () =>
+    call(() => ({ snapshot: projectWorkspace.snapshot(PROJECTS_ROOT, CASES_ROOT) })));
+  ipcMain.handle('projects:create', async (_e, input) =>
+    call(() => ({ project: projectWorkspace.createProject(PROJECTS_ROOT, input || {}) })));
+  ipcMain.handle('projects:createCue', async (_e, projectId, input) =>
+    call(() => ({ cue: projectWorkspace.createCue(PROJECTS_ROOT, projectId, input || {}) })));
+  ipcMain.handle('projects:linkCandidate', async (_e, projectId, cueId, caseDir) =>
+    call(() => ({ candidate: projectWorkspace.linkCandidate(
+      PROJECTS_ROOT, CASES_ROOT, projectId, cueId, caseDir,
+    ) })));
 }
 
 // ——— 分离 / MIDI / 曲谱：显式动作，产物落 case 目录（世界产物）———
@@ -1862,6 +2305,140 @@ function completionState(dir) {
       title: caseTitle(dir), selected, completedAt, inscription: stored.inscription, tierLabel,
     }),
   };
+}
+
+// ——— 波场通道（实验，默认关闭）· Wave Field Local v0 ————————————————
+//
+// 产品句：**Moodify 把声音放进一个场，听它的结果，并搜索更好的场。**
+//
+// 这一段的边界非常窄：**壳不做任何音频算法**。渲染、听测、账本全在
+// moodify-core-package/src/moodify/wavefield/，由 scripts/wavefield_runner.py
+// 以 JSON stdin/stdout 暴露；这里只做三件事——守卫 case、转发、按产物提供音频字节。
+//
+// 关闭时（MOODIFY_WAVEFIELD_V0 != 1）每个入口都返回 DISABLED，且不写任何文件：
+// 未完成的实验流程绝不静默进入发布路径。
+
+const WAVEFIELD_RUNNER = wavefield.DEFAULT_RUNNER;
+
+/** runner 调用通道：请求 JSON 走 stdin，回应 JSON 从 stdout 回来。 */
+function wavefieldRun(args, input) {
+  return runPython(args, 30 * 60 * 1000, { input });
+}
+
+const wavefieldClient = wavefield.createClient({ run: wavefieldRun });
+
+/** 未启用时的统一回应。 */
+function wavefieldDisabled() {
+  return {
+    ok: false,
+    reason: 'DISABLED',
+    detail: '波场通道默认关闭（设置 MOODIFY_WAVEFIELD_V0=1 后重启 Studio）。',
+  };
+}
+
+/**
+ * 试听字节的来源。只认两处：case 内已渲染的候选，与 session.json 记录的源音频。
+ * 渲染层递什么路径都读不到别的文件——这里不接受来自渲染层的路径。
+ */
+function wavefieldAudioSource(dir, candidateId) {
+  if (candidateId === 'ORIGINAL') {
+    const session = wavefield.readJsonSafe(wavefield.sessionPath(dir));
+    const src = session && session.source_path;
+    return src && fs.existsSync(src) ? src : null;
+  }
+  const file = wavefield.candidateAudioPath(dir, candidateId);
+  return file && fs.existsSync(file) ? file : null;
+}
+
+function registerWaveFieldIpc() {
+  // 只读状态：全部从磁盘推导，壳不缓存、不发明进度。
+  ipcMain.handle('wavefield:status', async (_e, caseDir) => {
+    if (!wavefield.enabled()) return wavefieldDisabled();
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    return { ok: true, state: wavefield.readState(dir) };
+  });
+
+  // 建立波场：一次动作 = 渲染 A/B/C + 四个版本各做一次听测。编排在 runner，算法在 Core。
+  ipcMain.handle('wavefield:create', async (_e, caseDir, sourcePath) => {
+    if (!wavefield.enabled()) return wavefieldDisabled();
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    const source = sourcePath || resolveCaseSource(dir);
+    if (!source) {
+      return { ok: false, reason: 'SOURCE_NOT_FOUND',
+               detail: '这个世界没有记录源音频（缺 source_path.json）。' };
+    }
+    return wavefieldClient.createSession(dir, source);
+  });
+
+  // 人的选择：A / B / C / 保留原版。入账后不可修改（账本只追加）。
+  ipcMain.handle('wavefield:choose', async (_e, caseDir, kept, role, requestId) => {
+    if (!wavefield.enabled()) return wavefieldDisabled();
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+    return wavefieldClient.choose(dir, kept, role, requestId);
+  });
+
+  // 导出：先在 case 内落 export/（含 manifest 与当场重渲染验证），再让用户选保存路径。
+  ipcMain.handle('wavefield:export', async (event, caseDir, kept) => {
+    if (!wavefield.enabled()) return wavefieldDisabled();
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) return { ok: false, reason: 'INVALID_CASE_DIR' };
+
+    const res = await wavefieldClient.exportChosen(dir, kept || null);
+    if (!res.ok) return { ok: false, reason: res.reason, detail: res.detail, code: res.code };
+
+    const manifest = res.payload.manifest;
+    const inCase = manifest.export_mode === 'RENDERED_FIELD'
+      ? manifest.chosen_audio
+      : manifest.source_path;
+    if (!inCase || !fs.existsSync(inCase)) {
+      return { ok: false, reason: 'EXPORT_NOT_FOUND', detail: '导出成功但未找到产物。' };
+    }
+
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const picked = await dialog.showSaveDialog(win, {
+      title: '导出所选波场',
+      defaultPath: path.basename(inCase),
+      filters: [{ name: 'WAV 音频', extensions: ['wav'] }],
+    });
+    if (picked.canceled || !picked.filePath) {
+      // 用户取消：case 内的导出产物保留（它本身就是记录），但不写到用户路径
+      return { ok: false, canceled: true, reason: '已取消导出', manifest };
+    }
+    try { fs.copyFileSync(inCase, picked.filePath); }
+    catch (err) { return { ok: false, reason: '写入目标路径失败：' + err.message }; }
+
+    // 导出回执：写明导出的是哪个出口、哪一次决定，以及复现验证是否通过。
+    const receipt = {
+      schema: 'moodify.wavefield.export.receipt/0.1',
+      kept: manifest.kept,
+      export_mode: manifest.export_mode,
+      decided_at: manifest.decided_at,
+      case_output: inCase,
+      user_path: picked.filePath,
+      output_sha256: manifest.chosen_audio_sha256 || manifest.source_sha256,
+      reproducible: Boolean(res.payload.reproduced && res.payload.reproduced.ok),
+      exported_at: new Date().toISOString(),
+    };
+    try {
+      fs.writeFileSync(path.join(wavefield.exportDir(dir), 'export_record.json'),
+        JSON.stringify(receipt, null, 2), 'utf8');
+    } catch { /* 回执尽力而为；音频已经写出去了 */ }
+
+    return { ok: true, path: picked.filePath, manifest, receipt, reproduced: res.payload.reproduced };
+  });
+
+  // 试听字节：一条走带权威由渲染层负责，这里只给字节。
+  ipcMain.handle('wavefield:audio', async (_e, caseDir, candidateId) => {
+    if (!wavefield.enabled()) throw new Error('WAVEFIELD_DISABLED');
+    const dir = resolveGuardedCase(caseDir);
+    if (!dir) throw new Error('INVALID_CASE_DIR');
+    const file = wavefieldAudioSource(dir, candidateId);
+    if (!file) throw new Error('AUDIO_NOT_AVAILABLE');
+    return fs.promises.readFile(file);
+  });
 }
 
 function registerKeepsakeIpc() {

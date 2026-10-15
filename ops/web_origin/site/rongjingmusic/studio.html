@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moodify — Hear. Judge.</title>
+  <meta name="description" content="Upload music. Moodify Hear builds evidence. Moodify Judge explains what matters.">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="stylesheet" href="/assets/studio-web.css?v=20261006e">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Moodify home"><img src="/assets/moodify-logo.png" alt="" width="42" height="28"><span>Moodify</span></a>
+    <div class="top-actions"><span class="cloud-state"><i></i>Moodify Cloud</span><a href="https://play.rongjingmusic.com">Play ↗</a></div>
+  </header>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">AUDIO INTELLIGENCE</p>
+      <h1>Upload. Hear. Judge.</h1>
+    </section>
+    <section id="upload-panel" class="upload-panel">
+      <input id="audio-file" name="audio" type="file" accept=".wav,.mp3,.flac,.m4a,.ogg,.aac,audio/*" hidden>
+      <button id="choose-file" class="upload-target" type="button">
+        <span class="upload-mark">＋</span><strong id="file-label">上传音乐</strong>
+        <small>WAV · MP3 · FLAC · M4A · OGG · AAC · 最大 50 MB</small>
+      </button>
+      <button id="hear-button" class="primary-action" type="button" disabled>开始 HEAR</button>
+    </section>
+    <section id="result-view" class="result-view" hidden>
+      <div class="result-head"><div><p class="eyebrow">HEARING STATE</p><h2 id="result-title">声音证据</h2></div><span id="result-status" class="status-pill">分析中</span></div>
+      <section class="acoustic-lab" aria-label="Acoustic imaging">
+        <figure class="plot plot-wide primary-field"><figcaption><strong>WAVE–SPECTRAL EVOLUTION</strong><span>STFT · dBFS · logarithmic frequency · measured</span></figcaption><canvas id="spectrogram-plot"></canvas></figure>
+        <figure class="plot"><figcaption><strong>WAVEFORM</strong><span>amplitude / time</span></figcaption><canvas id="waveform-plot"></canvas></figure>
+        <figure class="plot"><figcaption><strong>SPECTRAL ENERGY</strong><span>magnitude / Hz</span></figcaption><canvas id="spectrum-plot"></canvas></figure>
+        <figure class="plot"><figcaption><strong>DYNAMIC ENVELOPE</strong><span>RMS · dBFS / time</span></figcaption><canvas id="dynamics-plot"></canvas></figure>
+        <figure class="plot"><figcaption><strong>WAVE–FIELD PROJECTION</strong><span>stereo amplitude-density · measured</span></figcaption><canvas id="phase-plot"></canvas></figure>
+        <figure class="plot emotion-plot"><figcaption><strong>AFFECTIVE ACOUSTIC FIELD</strong><span>activation / brightness · inferred proxy</span></figcaption><canvas id="emotion-plot"></canvas></figure>
+      </section>
+      <div id="metric-strip" class="metric-strip"></div>
+      <div id="hearing-map" class="hearing-map" aria-label="Evidence state"></div>
+      <article class="judge-card">
+        <div><span>JUDGE BEFORE</span><strong id="judge-decision">INCONCLUSIVE</strong></div>
+        <p id="judge-summary">等待 HEAR 证据。</p>
+      </article>
+      <details><summary>完整证据</summary><pre id="result-json"></pre></details>
+    </section>
+  </main>
+  <section class="ai-dock" aria-label="Moodify AI conversation">
+    <div id="conversation" class="conversation" aria-live="polite"></div>
+    <form id="chat-form" class="chat-form">
+      <input id="chat-input" maxlength="4000" autocomplete="off" placeholder="问 Moodify AI：这首歌发生了什么？" aria-label="与 Moodify AI 对话">
+      <button id="chat-button" type="submit">发送</button>
+    </form>
+  </section>
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+  <script src="/assets/studio-web.js?v=20261006e" defer></script>
+</body>
+</html>

@@ -8,7 +8,9 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +24,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -47,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -62,23 +68,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moodify.app.data.CatalogueClient
+import com.moodify.app.data.Catalogue
 import com.moodify.app.data.CatalogueTrack
 import com.moodify.app.data.PlaybackManager
 import com.moodify.app.data.PlaybackState
 import com.moodify.app.data.QueueItem
 import com.moodify.app.ui.components.MoodifyMark
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import kotlin.math.min
 
-private const val AUDIO_BASE = "https://rongjinwenchuan.xyz/audio/"
+private const val AUDIO_BASE = "https://play.rongjingmusic.com/audio/"
 private val Night = Color(0xFF000106)
 private val Ink = Color(0xFFF8F7FB)
 private val Muted = Color(0xFF9798C4)
 private val Purple = Color(0xFF8139FF)
 private val Blue = Color(0xFF22BCFF)
+private val Paper = Color(0xFFFAF9F5)
+private val PaperInk = Color(0xFF17151A)
+private val PaperMuted = Color(0xFFB7B3B5)
 
 @Composable
 fun HomeScreen(
@@ -86,7 +97,7 @@ fun HomeScreen(
     onFavourite: (QueueItem) -> Unit = {},
     onAddToPlaylist: (QueueItem) -> Unit = {},
 ) {
-    var tracks by remember { mutableStateOf<List<CatalogueTrack>?>(null) }
+    var tracks by remember { mutableStateOf<List<CatalogueTrack>?>(CatalogueClient.internalTestCatalogue().tracks) }
     var loadFailed by remember { mutableStateOf(false) }
     val playback by PlaybackManager.state.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -98,21 +109,27 @@ fun HomeScreen(
         }
     }
     LaunchedEffect(Unit) {
-        CatalogueClient.cached(context)?.let { cached ->
-            tracks = cached.tracks
-            if (playback.queue.isEmpty()) PlaybackManager.loadQueue(cached.tracks.toQueue())
-        }
-        val result = withContext(Dispatchers.IO) { runCatching { CatalogueClient().playableCatalogue() } }
-        result.onSuccess { catalogue ->
-            tracks = catalogue.tracks
-            CatalogueClient.cache(context, catalogue)
-            val refreshedQueue = catalogue.tracks.toQueue()
-            if (refreshedQueue.isNotEmpty() && PlaybackManager.state.value.queue != refreshedQueue) {
-                val currentTitle = PlaybackManager.state.value.current?.title
-                val refreshedIndex = refreshedQueue.indexOfFirst { it.title == currentTitle }.coerceAtLeast(0)
-                PlaybackManager.playQueue(refreshedQueue, refreshedIndex, autoPlay = PlaybackManager.state.value.playWhenReady)
+        val seed = CatalogueClient.internalTestCatalogue()
+        if (PlaybackManager.state.value.queue.isEmpty()) PlaybackManager.loadQueue(seed.tracks.toQueue())
+        while (true) {
+            val result = withContext(Dispatchers.IO) { runCatching { CatalogueClient().playableCatalogue() } }
+            result.onSuccess { catalogue ->
+                val merged = (seed.tracks + catalogue.tracks).distinctBy { it.id }
+                tracks = merged
+                CatalogueClient.cache(context, Catalogue(merged))
+                val refreshedQueue = merged.toQueue()
+                if (refreshedQueue.isNotEmpty() && PlaybackManager.state.value.queue != refreshedQueue) {
+                    val currentPath = PlaybackManager.state.value.current?.path
+                    val refreshedIndex = refreshedQueue.indexOfFirst { it.path == currentPath }.coerceAtLeast(0)
+                    PlaybackManager.playQueue(refreshedQueue, refreshedIndex, autoPlay = PlaybackManager.state.value.playWhenReady)
+                }
+                loadFailed = false
+            }.onFailure {
+                if (tracks.isNullOrEmpty()) tracks = CatalogueClient.cached(context)?.tracks ?: seed.tracks
+                loadFailed = false
             }
-        }.onFailure { if (tracks == null) loadFailed = true }
+            delay(10_000)
+        }
     }
 
     Box(Modifier.fillMaxSize().background(Night)) {
@@ -120,9 +137,176 @@ fun HomeScreen(
             tracks == null && !loadFailed -> LoadingSurface()
             loadFailed -> MessageSurface("暂时无法连接曲库")
             tracks.isNullOrEmpty() -> MessageSurface("曲库中还没有可播放作品")
-            else -> PlayerPager(tracks.orEmpty(), playback, favouritePaths, onFavourite, onAddToPlaylist)
+            else -> ArtworkPlayer(tracks.orEmpty(), playback)
         }
     }
+}
+
+@Composable
+private fun ArtworkPlayer(
+    tracks: List<CatalogueTrack>,
+    playback: PlaybackState,
+) {
+    var libraryOpen by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val queue = tracks.toQueue()
+    val index = playback.queueIndex.coerceAtLeast(0).coerceAtMost(tracks.lastIndex)
+    val track = tracks[index]
+    val cover = artworkFor(track)
+    val lyricIndex = galaxyLyrics.indexOfLast { playback.positionMs >= it.first * 1000L }
+    val visibleLyrics = if (index == 0) {
+        val start = (lyricIndex - 2).coerceAtLeast(0)
+        galaxyLyrics.drop(start).take(5)
+    } else emptyList()
+
+    Box(
+        Modifier.fillMaxSize().background(Paper)
+            .pointerInput(index) {
+                var drag = 0f
+                detectHorizontalDragGestures(
+                    onHorizontalDrag = { _, amount -> drag += amount },
+                    onDragEnd = {
+                        if (drag > 110f) PlaybackManager.previous()
+                        if (drag < -110f) PlaybackManager.next()
+                    },
+                )
+            },
+    ) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 24.dp).padding(bottom = 112.dp)) {
+            Row(Modifier.fillMaxWidth().padding(top = 38.dp), verticalAlignment = Alignment.CenterVertically) {
+                MoodifyMark(Modifier.size(42.dp, 28.dp))
+                Box(
+                    Modifier.weight(1f).padding(start = 18.dp).height(48.dp).clip(RoundedCornerShape(26.dp))
+                        .background(Color.White.copy(alpha = .76f)).border(1.dp, Color(0xFFE4E0DC), RoundedCornerShape(26.dp)),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    BasicTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it; libraryOpen = it.isNotBlank() },
+                        singleLine = true,
+                        textStyle = androidx.compose.ui.text.TextStyle(color = PaperInk, fontSize = 15.sp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp),
+                        decorationBox = { inner ->
+                            if (searchQuery.isBlank()) Text("⌕   搜索作品", color = Color(0xFF99949B), fontSize = 15.sp)
+                            inner()
+                        },
+                    )
+                }
+            }
+
+            AsyncImage(
+                model = cover,
+                contentDescription = "${track.title} 封面",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 48.dp).size(286.dp)
+                    .clip(RoundedCornerShape(18.dp)).background(Color(0xFFF0EEE9)),
+            )
+            Text(
+                track.title,
+                color = PaperInk,
+                fontSize = if (track.title.length > 18) 27.sp else 37.sp,
+                lineHeight = 44.sp,
+                fontFamily = FontFamily.Serif,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 28.dp),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (visibleLyrics.isNotEmpty()) {
+                Column(Modifier.fillMaxWidth().padding(top = 25.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    visibleLyrics.forEach { line ->
+                        val active = line.first == galaxyLyrics.getOrNull(lyricIndex)?.first
+                        Text(
+                            line.second,
+                            color = if (active) Color(0xFF242137) else PaperMuted,
+                            fontSize = if (active) 18.sp else 15.sp,
+                            fontFamily = FontFamily.Serif,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().clickable { PlaybackManager.seekTo(line.first * 1000L) }
+                                .padding(vertical = 8.dp),
+                        )
+                    }
+                }
+            }
+        }
+
+        if (libraryOpen && searchQuery.isNotBlank()) {
+            val matches = tracks.filter { it.title.contains(searchQuery.trim(), ignoreCase = true) }.take(5)
+            Column(
+                Modifier.fillMaxWidth().align(Alignment.TopCenter).padding(top = 96.dp, start = 24.dp, end = 24.dp)
+                    .clip(RoundedCornerShape(20.dp)).background(Color.White).border(1.dp, Color(0xFFE6E1DC), RoundedCornerShape(20.dp))
+                    .padding(vertical = 8.dp),
+            ) {
+                if (matches.isEmpty()) Text("没有匹配作品", color = PaperMuted, modifier = Modifier.padding(20.dp))
+                matches.forEach { item ->
+                    val trackIndex = tracks.indexOfFirst { it.id == item.id }
+                    Text(
+                        item.title,
+                        color = PaperInk,
+                        fontSize = 15.sp,
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            PlaybackManager.playQueue(queue, trackIndex)
+                            libraryOpen = false
+                            searchQuery = ""
+                        }.padding(horizontal = 20.dp, vertical = 14.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+
+        Row(
+            Modifier.align(Alignment.BottomCenter).padding(bottom = 104.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            tracks.forEachIndexed { dotIndex, _ ->
+                Box(
+                    Modifier.size(if (dotIndex == index) 18.dp else 6.dp, 6.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(if (dotIndex == index) Color(0xFF25212B) else Color(0xFFD8D3CE))
+                        .clickable { PlaybackManager.playQueue(queue, dotIndex) },
+                )
+            }
+        }
+
+        Row(
+            Modifier.fillMaxWidth().height(96.dp).align(Alignment.BottomCenter).background(Color(0xFFFDFCF9))
+                .border(1.dp, Color(0xFFE8E4DF)).padding(horizontal = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AsyncImage(model = cover, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFF0EEE9)))
+            Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
+                Text(track.title, color = PaperInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text("${index + 1} / ${tracks.size}", color = Color(0xFFAAA5A2), fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
+            }
+            Text("‹", color = PaperInk, fontSize = 28.sp, modifier = Modifier.clickable { PlaybackManager.previous() }.padding(horizontal = 8.dp, vertical = 12.dp))
+            Box(
+                Modifier.size(54.dp).clip(CircleShape).border(1.dp, Color(0xFFD8D2C9), CircleShape).clickable { PlaybackManager.toggle() },
+                contentAlignment = Alignment.Center,
+            ) { Text(if (playback.playWhenReady) "Ⅱ" else "▶", color = PaperInk, fontSize = 17.sp) }
+            Text("›", color = PaperInk, fontSize = 28.sp, modifier = Modifier.clickable { PlaybackManager.next() }.padding(horizontal = 8.dp, vertical = 12.dp))
+        }
+    }
+}
+
+private val galaxyLyrics = listOf(
+    6 to "我曾遥望银河星光", 12 to "期待着自己闪耀的模样", 18 to "历经风雨沧桑，终究渡劫成光",
+    28 to "沉迷于旧时光亮", 34 to "只会停止向上生长", 40 to "如今亲手清空过往", 46 to "却在原地，失了方向",
+    54 to "怕笔端再无惊涛浪", 60 to "怕再也写不出旧时锋芒", 66 to "满心执念成了枷锁", 72 to "困住了想飞翔的渴望",
+    81 to "这沉默从不是荒凉", 87 to "是旧羽脱落，新翼生长", 93 to "是灵感在心底悄悄酝酿",
+    102 to "不必逼自己即刻绽放", 108 to "不必怕不如从前模样", 114 to "放下执念，心便敞亮",
+    120 to "给梦想腾出安放的空间", 126 to "给自己力量，长出新生的翅膀", 136 to "待到清风起",
+    140 to "你自会乘风破浪", 144 to "带着更温柔的光", 148 to "飞向更辽阔的诗和远方",
+    152 to "自成光芒不再是梦想", 156 to "而是用自己的力量", 160 to "为夜空点亮更多更美的星光",
+)
+
+private fun artworkFor(track: CatalogueTrack): String = when {
+    track.coverAssetKey != null -> AUDIO_BASE + track.coverAssetKey
+    track.id.contains("wo-ceng-yaowang") -> "$AUDIO_BASE/zh-cn/wo-ceng-yaowang-yinhe-xingguang-cover.png"
+    track.id.contains("bao-yu-ye") -> "$AUDIO_BASE/zh-cn/moodify-double-fish-bauhaus-20261008.png"
+    else -> "https://play.rongjingmusic.com/moodify-logo.png"
 }
 
 @Composable

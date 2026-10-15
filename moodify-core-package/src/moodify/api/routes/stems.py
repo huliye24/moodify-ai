@@ -192,3 +192,12 @@ def download_stem(job_id: str, stem: str) -> Response:
 @router.get("/usage")
 def stem_usage() -> dict:
     return service._store().usage()
+
+
+@router.get("/provider/status")
+def stem_provider_status() -> dict:
+    """Check LALAL.AI configuration and balance without uploading user audio."""
+    try:
+        return service.provider_status()
+    except StemError as exc:
+        raise _map_upstream_error(exc) from exc

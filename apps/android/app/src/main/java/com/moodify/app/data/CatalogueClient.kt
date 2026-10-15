@@ -17,6 +17,7 @@ data class CatalogueTrack(
     val durationMs: Long?,
     val publishedAt: String?,
     val audioAssetKey: String?,
+    val coverAssetKey: String?,
 ) {
     companion object {
         fun from(json: JSONObject): CatalogueTrack {
@@ -31,6 +32,7 @@ data class CatalogueTrack(
                 durationMs = if (json.has("duration_ms") && !json.isNull("duration_ms")) json.optLong("duration_ms") else null,
                 publishedAt = json.optString("published_at", "").ifEmpty { null },
                 audioAssetKey = version?.optString("audio_asset_key", "")?.ifEmpty { null },
+                coverAssetKey = version?.optString("cover_asset_key", "")?.ifEmpty { null },
             )
         }
     }
@@ -52,11 +54,41 @@ data class Catalogue(val tracks: List<CatalogueTrack>, val nextCursor: String? =
  * Public Music BFF client — anonymous /api/v1/music only.
  * Never talks to PolarDB; never holds internal service keys.
  */
-class CatalogueClient(private val baseUrl: String = "https://rongjinwenchuan.xyz/api/v1/music") {
+class CatalogueClient(private val baseUrl: String = "https://play.rongjingmusic.com/api/v1/music") {
 
     companion object {
         private const val CACHE = "moodify_music_catalogue"
         private const val CACHE_TRACKS = "playable_tracks"
+
+        /**
+         * First-party works used by the internal listening bench when the
+         * catalogue service is unavailable. This is a UI fallback, not a
+         * second catalogue authority; a healthy BFF response is merged in.
+         */
+        fun internalTestCatalogue(): Catalogue = Catalogue(
+            listOf(
+                testTrack("wo-ceng-yaowang-yinhe-xingguang", "我曾遥望银河星光", 164_000),
+                testTrack("bao-yu-ye", "暴雨夜", 249_000),
+                testTrack("iron-banner-at-dawn", "Iron Banner at Dawn", 124_000),
+                testTrack("clash-above-the-crimson-plain", "Clash Above the Crimson Plain", 192_000),
+                testTrack("midnight-rooftops-in-the-rain", "Midnight Rooftops in the Rain", 164_000),
+                testTrack("rain-over-old-roof-tiles", "Rain Over Old Roof Tiles", 181_000),
+                testTrack("tea-steam-in-slow-motion", "Tea Steam In Slow Motion", 169_000),
+            )
+        )
+
+        private fun testTrack(slug: String, title: String, durationMs: Long) = CatalogueTrack(
+            id = "internal-$slug",
+            title = title,
+            creatorId = "rongjingwenchuan",
+            creatorHandle = "荣景文川",
+            status = "published",
+            primaryLanguage = if (title.firstOrNull()?.code?.let { it > 127 } == true) "zh-CN" else "en",
+            durationMs = durationMs,
+            publishedAt = null,
+            audioAssetKey = "zh-cn/$slug.mp3",
+            coverAssetKey = null,
+        )
 
         fun cached(context: Context): Catalogue? = runCatching {
             val raw = context.getSharedPreferences(CACHE, Context.MODE_PRIVATE)
@@ -79,7 +111,10 @@ class CatalogueClient(private val baseUrl: String = "https://rongjinwenchuan.xyz
                     put("primary_language", track.primaryLanguage)
                     put("duration_ms", track.durationMs)
                     put("published_at", track.publishedAt)
-                    put("version", JSONObject().put("audio_asset_key", track.audioAssetKey))
+                    put("version", JSONObject().apply {
+                        put("audio_asset_key", track.audioAssetKey)
+                        put("cover_asset_key", track.coverAssetKey)
+                    })
                 })
             }
             context.getSharedPreferences(CACHE, Context.MODE_PRIVATE)
@@ -108,17 +143,31 @@ class CatalogueClient(private val baseUrl: String = "https://rongjinwenchuan.xyz
      * track through its canonical detail endpoint before presenting it as
      * playable; this avoids inventing fallback media in the client.
      */
-    fun playableCatalogue(): Catalogue = Catalogue(
-        catalogue().tracks.mapNotNull { summary ->
-            if (summary.audioAssetKey != null) summary
-            else runCatching { track(summary.id) }.getOrNull()?.takeIf { it.audioAssetKey != null }
-        }
-    )
+    fun playableCatalogue(): Catalogue {
+        // Studio currently publishes owner-controlled works to this manifest.
+        // Read it even when the older BFF is healthy: a successful but stale
+        // BFF response must not hide a newly published owner work.
+        val ownerTracks = runCatching {
+            Catalogue.from(getAbsoluteJson("https://play.rongjingmusic.com/internal-catalogue.json?v=${System.currentTimeMillis()}"))
+                .tracks.filter { it.audioAssetKey != null }
+        }.getOrDefault(emptyList())
+        val bffTracks = runCatching {
+            catalogue().tracks.mapNotNull { summary ->
+                if (summary.audioAssetKey != null) summary
+                else runCatching { track(summary.id) }.getOrNull()?.takeIf { it.audioAssetKey != null }
+            }
+        }.getOrDefault(emptyList())
+        val merged = (ownerTracks + bffTracks).distinctBy { it.id }
+        if (merged.isEmpty()) throw ConnectionError.NotFound("catalogue unavailable")
+        return Catalogue(merged)
+    }
 
     fun track(id: String): CatalogueTrack = CatalogueTrack.from(getJson("/tracks/$id"))
 
-    private fun getJson(path: String): JSONObject {
-        val conn = URL("$baseUrl$path").openConnection() as HttpURLConnection
+    private fun getJson(path: String): JSONObject = getAbsoluteJson("$baseUrl$path")
+
+    private fun getAbsoluteJson(url: String): JSONObject {
+        val conn = URL(url).openConnection() as HttpURLConnection
         conn.requestMethod = "GET"
         conn.connectTimeout = 10_000
         conn.readTimeout = 15_000

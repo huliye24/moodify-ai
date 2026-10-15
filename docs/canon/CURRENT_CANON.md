@@ -1,5 +1,63 @@
 # CURRENT CANON — Moodify
 
+> **2026-10-15 owner-controlled music library amendment (CANON_CHANGE = YES):** Studio 新增
+> 作品管理主界面，用于在电脑端管理歌名、封面、音频、歌词与发布状态；后处理保留为
+> 独立生产模块，App 仍是播放端。“数据属于用户”的工程含义是作品按 owner 隔离、原始资产
+> 可导出、可删除、发布可追溯与可撤回；不引入 token、DAO、空投或链上作品权威。当前已实现
+> 本地 owner 作品库；单用户的 Desktop → LA Cloud → App 发布链已实跑通。多用户同账号
+> 身份、RLS 与对象存储仍为 `DEPLOYMENT_BLOCKED`，不得把单用户 SSH owner bridge 写成通用账号系统。
+
+> **2026-10-12 vocal identity preservation amendment (CANON_CHANGE = YES):** 对 AI 音乐生产，Moodify
+> 默认采用 `Voice is identity; accompaniment is adaptable.`：人声承载高密度身份与表演信息，修改
+> 人声的证据门槛高于修改伴奏。人声自身正常但在混合中被遮蔽时，优先让伴奏让位。相对比值异常必须
+> 拆分人声侧与伴奏侧贡献，不能直接触发人声修音。该规则是默认干预优先级，不是“人声永不修改”或
+> “乐器可无限替换”的绝对事实；明确的人声生成缺陷仍可在保护约束下局部修复。
+
+> **2026-10-11 song-specific parameters and single-challenger amendment (CANON_CHANGE = YES):**
+> Moodify 固定的是生产流程、证据契约、门禁与裁决规则，不是每首歌的调音参数。每轮执行
+> `HEAR → JUDGE → ACT → VERIFY → BLIND COMPARE`，参数必须由该曲、该分轨、具体时间段、问题证据、
+> 作品意图与保护目标重新生成。固定预设只能作为安全边界或搜索起点。每轮只生成一个新挑战者，
+> 与当前基准统一编码、严格响度匹配并随机匿名为 A/B；A/B 是盲测槽位，不再是两套处理强度。
+> 无校准证据、净收益不明确或出现局部损害时保留当前基准。Treatment Records 积累判断、动作、参数、
+> 验证、盲测与失败证据，构成未来 Judge 的数据资产，而不是积累“万能参数”。默认采用最小可归因
+> 干预：每轮只修一个有证据的问题或边界清楚的局部范围；只有通过复检与盲比的挑战者才能成为下一轮
+> 基准，未验证改动不得继续叠加。
+
+> **2026-10-08 operator-first correction (CANON_CHANGE = YES):** 第一阶段唯一真实用户是内部受训
+> 制作团队，因此 Studio 不再以 C 端学习成本为主要约束，可以发展为高密度、细工序、批量化的工业
+> 生产软件；复杂度必须换来吞吐、精度、证据、复现与可靠交付。官网不承担接单，保留研究文档、实验
+> 图像、作品与既有浏览习惯；小红书、抖音、淘宝是当前获客/交易渠道。该修订不授权第二套 Core、
+> Judge、Job 或 state machine。
+
+> **2026-10-08 internal commercial-music phase amendment (CANON_CHANGE = YES):** Moodify 第一阶段
+> 是荣景文川内部的 AI 商用音乐生产系统。外部网剧等 B2B 客户购买音乐与制作服务，不操作 Moodify；
+> 当前不建设通用 C 端、外部 B 端 SaaS 或创作者平台。Studio 以 Project / Cue 为工作入口，Play 只承载
+> 自有作品目录与私有客户审片。Cloud、Judge、Wavefield、One Core 和 `Generated is not finished`
+> 不变。权威边界见 [COMMERCIAL_MUSIC_OPERATING_MODEL.md](COMMERCIAL_MUSIC_OPERATING_MODEL.md)。
+
+> **2026-10-06 Waveform → Wavefield amendment (CANON_CHANGE = YES):** Moodify 的核心技术方向是
+> **从波形到波场**。数字文件是声音发生的触发条件；Moodify 将其置入可描述、可重放、可观测、
+> 可验证的 Wavefield，再由 Judge 选择目标条件下的佳场。Judge 仍是核心模型，Wavefield 是核心技术
+> 对象与处理范式。输出不只是 wav，而是 Wavefield Profile + 条件化 renders + evidence + rollback。
+> 单个 mono/stereo 文件只能产生空间投影，不得冒充真实三维声压场。详见
+> [WAVEFIELD_CORE_PRINCIPLE.md](WAVEFIELD_CORE_PRINCIPLE.md)。
+> 北极星公式为 \(F^\*=\arg\max_F J(\operatorname{Render}(Audio,F))\)；生产实现必须加入身份保护、
+> 目标播放条件、跨环境鲁棒性、证据、不确定性、人工权威与 `KEEP_ORIGINAL`，不得把未校准 Judge
+> 压成一个可被优化器投机的绝对分数。
+
+> **2026-10-06 Open-theory amendment (CANON_CHANGE = YES):** Moodify 不仅开放代码，也开放理论。
+> Technology Notes 公开问题、假设、术语、公式、方法、证据、不确定性、失败条件、版本与修订历史；
+> 理论和实现共同接受公共实验、引用、批评与演化。公开不等于把未验证方向写成事实。
+
+> **2026-10-06 HEAR/JUDGE/ACT interaction amendment (CANON_CHANGE = YES):** Moodify 的核心能力链为
+> `HEAR → JUDGE → ACT`。当前 Web Studio 的首要体验收敛为“上传音乐 → AI HEAR → AI JUDGE”；
+> `ACT` 尚未开放。页面底部是 Moodify AI 模型对话入口，不承担上传或检测动作。该裁决改变公开
+> 交互与流程表达，但不改变 One Core、双 Judge、人工升级和 `KEEP_ORIGINAL` 权威边界。
+
+> **2026-10-05 Cloud-first amendment (CANON_CHANGE = YES):** 人类权威将对外首要定位更新为 **Moodify Cloud — Audio Intelligence, powered by GPU computing.** 产品层级为 `GPU Computing → Moodify Cloud → Audio Intelligence → API / Agent / Desktop / App`。本修订覆盖下文中“Sound Protocol 为对外首要身份”的旧表述；Sound Protocol 仍是重要契约层，Core 仍是唯一声音权威，Desktop / App / API / Agent 均是接口。未经运行时验证的云端能力、API、Agent 和第三方集成必须标为方向或逐步可用，不得冒充生产事实。
+
+> **2026-10-06 Judge-core amendment (CANON_CHANGE = YES):** `Moodify Judge` 是 Moodify 的核心模型与长期自有判断权威。每个处理闭环必须包含处理前 Judge（发生了什么、是否需要处理、保护什么）与处理后 Judge（是否改善、接受/重试/调整/保留原版）。分离、降噪、修音、混音、母带、生成模型和 foundation encoder 可以采用可替换 Provider；Moodify 必须拥有 Judge 契约、证据、校准、Treatment Records 与人类升级机制。详见 [JUDGE_CORE_PRINCIPLE.md](JUDGE_CORE_PRINCIPLE.md)。
+
 **Version:** 2.1（Sound Protocol；延续 v2.0 Professional Finishing 与 One Core / Two Interfaces）
 **Date:** 2026-09-23
 **Authority:** root `AGENTS.md` → `docs/canon/*`
@@ -53,6 +111,10 @@ Moodify Ear / Auditory Intelligence 是**内部听觉、判断、验证与研究
 - Evidence
 - Uncertainty
 - Learn
+
+其中 **Judge 是永久核心**：Provider 可以替换，处理前与处理后的 Judge authority 不可外包。
+`Moodify Auditory Intelligence` 是能力总称，第一代目标模型为 `Judge-1`；它不是第二个公开产品。
+当前实现仍以未充分校准的规则式技术判断为主，不得将目标模型写成已经训练或生产可用。
 - Verify
 - Controlled Intervention
 
@@ -71,7 +133,17 @@ Moodify Ear / Auditory Intelligence 是**内部听觉、判断、验证与研究
 7. **一个站点一个角色**：`rongjingmusic.com` = Product Home；`rongjingwenchuan.com` = Company Home；`.xyz` = 过渡 Player / 历史入口，目标优先评估 `play.rongjingmusic.com`。
 8. **One Core, Multiple Interfaces**：禁止两套声音逻辑；一切声音能力来自 Core（见 AGENTS Technical Constitution）。
 9. **Generated is not finished**：对外的处理能力是有决策、可编辑、带证据、可回退的专业完成层；禁止以黑箱一键母带 / 不透明 wav 作为对外产品形态。
-10. **Mix Graph 为生产中间表示（目标态）**：完成会话的权威表示是可序列化、可重放、可旁路的 Mix Graph + evidence；实现落地前不虚构其运行状态（R6/R10）。
+10. **Two-Judge invariant**：任何 Provider 产出都不能自证完成；处理前诊断 Judge 与处理后验收 Judge
+    均必须存在，并保留 `KEEP_ORIGINAL / HUMAN_REQUIRED / INCONCLUSIVE` 等诚实出口。
+11. **Waveform → Wavefield**：Core 的处理对象从孤立 waveform 扩展为 waveform + field target +
+    reproduction chain + observations。佳波场必须相对于作品意图、目标条件和人工权威定义。
+12. **Mix Graph 为生产中间表示（目标态）**：完成会话的权威表示是可序列化、可重放、可旁路的 Mix Graph + evidence；实现落地前不虚构其运行状态（R6/R10）。
+13. **固定流程，不固定参数**：所有处理参数必须具备本轮 Judge 证据、保护目标与作用时间范围；历史参数
+    只提供先验，不自动继承为答案。每轮单挑战者与当前基准盲比，不能证明改善就不替换基准；默认一次
+    只改变一个可归因问题或局部范围，避免多个未验证处理同时进入作品。
+14. **人声身份优先保护**：AI 音乐中默认将人声视为高身份密度资产；修改人声需要人声轨自身证据，
+    不能由 `V−A`、遮蔽或其他相对比值单独触发。若异常由伴奏侧驱动，先处理伴奏；明确的人声缺陷
+    才进入局部人声修复，并保留音色、咬字、气息、滑音、颤音、微时值与情绪动态。
 
 ## 4. Canon Change Rule
 

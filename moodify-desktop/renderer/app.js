@@ -21,9 +21,14 @@ const state = {
   streamOpen: false,    // 对话区是否展开
   streamUnread: false,  // 抽屉收起时有新内容待读
   convStarted: false,   // 本会话是否已开始 AI 对话（决定抽屉把手是否出现）
+  projectSnapshot: { projects: [] },
+  projectId: null,
+  cueId: null,
+  library: { works: [] },
+  libraryDraft: { audio_path: null, cover_path: null, lyrics_path: null },
 };
 
-const VIEWS = ['empty', 'tuning', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score'];
+const VIEWS = ['library', 'projects', 'empty', 'tuning', 'data', 'spectrum', 'charts', 'bench', 'stems', 'score', 'wavefield', 'player'];
 /** Which pipeline stage each view belongs to (① 检测 spans the three observation tabs). */
 const VIEW_STAGE = {
   data: 'analyze', spectrum: 'analyze', charts: 'analyze',
@@ -204,6 +209,7 @@ async function runAnalysisPath(audioPath) {
     setStatus(''); // 检测完成直接出结果，不留状态文字
     await refreshArchive();
     await openReport(result.reports.json);
+    return result;
   } catch (err) {
     clearInterval(state.elapsedTimer);
     setStatus('检测失败');
@@ -233,12 +239,17 @@ let currentView = 'empty';
 
 function selectView(name) {
   currentView = name;
+  document.body.dataset.view = name; // 供 CSS 按视图调整外壳（顶栏），不承载业务逻辑
+  // 试音是唯一会自己发声的视图：离开它就停掉走带，绝不留下一条在响的音轨。
+  if (name !== 'player') destroyPlayerTransport();
   for (const v of VIEWS) $(`view-${v}`).hidden = v !== name;
-  $('tabs').hidden = name === 'empty' || name === 'bench' || name === 'stems' || name === 'score'
-    || name === 'tuning';
+  // 反向枚举要隐藏谁，每加一个新视图就得记得来登记一次——player 就漏过一次，
+  // 结果试音时标签栏还挂在头上。改成正向枚举：只有这三个观察视图才需要它。
+  $('tabs').hidden = !(name === 'data' || name === 'spectrum' || name === 'charts');
   // 技术阶段条（pipeline.js 的内部 8 阶段）不再裸露在主界面上——它属于「制作详情」层。
   // 主界面的进度由完成会话的 6 相位条承担，而那一条是不可点的状态投影。
-  $('pipeline-bar').hidden = name === 'empty' || name === 'tuning';
+  // 试音是纯粹的听，不挂制作阶段条。
+  $('pipeline-bar').hidden = name === 'library' || name === 'projects' || name === 'empty' || name === 'tuning' || name === 'wavefield' || name === 'player';
   for (const [view, tabId] of Object.entries(VIEW_TAB)) {
     $(tabId).classList.toggle('active', view === name);
   }
@@ -246,6 +257,9 @@ function selectView(name) {
   $('rail-bench').classList.toggle('active', name === 'bench');
   $('rail-stems').classList.toggle('active', name === 'stems');
   $('rail-score').classList.toggle('active', name === 'score');
+  $('rail-wavefield').classList.toggle('active', name === 'wavefield');
+  $('rail-projects').classList.toggle('active', name === 'projects');
+  $('rail-library').classList.toggle('active', name === 'library');
   // 波形在隐藏态宽度为 0：进入审听视图后重新应用缩放，别留一条画不出来的空轨。
   if (name === 'tuning') {
     requestAnimationFrame(() => { try { applyReviewZoom(); } catch { /* not mounted yet */ } });
@@ -273,6 +287,7 @@ async function openReport(reportPath) {
   resetTuningWorld(); // 换世界：修音/复合视图复位（修音对留在旧世界目录）
   resetSession();     // 换世界：完成会话复位（一次启动的状态不跨世界）
   resetPipeline();    // 换世界：流程状态复位（阶段由新 case 的产物重新推导）
+  resetWaveField();   // 换世界：波场通道复位（走带、缓冲、表格全部丢弃）
 
   $('source-name').textContent = (report.source || {}).name || '?';
   $('case-title').hidden = false;
@@ -2319,6 +2334,490 @@ function initCompilerSetup() {
   });
 }
 
+// ——— Project / Cue production control ———
+
+function activeProject() {
+  return state.projectSnapshot.projects.find((project) => project.project_id === state.projectId) || null;
+}
+
+function activeCue() {
+  const project = activeProject();
+  return project && project.cues.find((cue) => cue.cue_id === state.cueId) || null;
+}
+
+function emptyList(text) {
+  const el = document.createElement('div');
+  el.className = 'project-empty-list';
+  el.textContent = text;
+  return el;
+}
+
+function renderProjectWorkspace() {
+  const projects = state.projectSnapshot.projects || [];
+  if (!projects.some((item) => item.project_id === state.projectId)) state.projectId = projects[0] && projects[0].project_id;
+  const project = activeProject();
+  if (!project || !project.cues.some((item) => item.cue_id === state.cueId)) state.cueId = project && project.cues[0] && project.cues[0].cue_id;
+  const cue = activeCue();
+
+  $('project-count').textContent = projects.length;
+  $('cue-count').textContent = project ? project.cues.length : 0;
+  $('cue-create').disabled = !project;
+  const projectList = $('project-list');
+  projectList.textContent = '';
+  if (!projects.length) projectList.appendChild(emptyList('尚无项目。先建立真实业务项目，再把音乐候选放进具体 Cue。'));
+  for (const item of projects) {
+    const button = document.createElement('button');
+    button.className = `project-item${item.project_id === state.projectId ? ' active' : ''}`;
+    const title = document.createElement('strong');
+    title.textContent = item.title;
+    const meta = document.createElement('span');
+    meta.className = 'project-meta';
+    meta.textContent = `${item.client_name} · ${item.cues.length} Cues`;
+    button.append(title, meta);
+    button.addEventListener('click', () => { state.projectId = item.project_id; state.cueId = null; renderProjectWorkspace(); });
+    projectList.appendChild(button);
+  }
+
+  const cueList = $('cue-list');
+  cueList.textContent = '';
+  if (!project) cueList.appendChild(emptyList('选择 Project。'));
+  else if (!project.cues.length) cueList.appendChild(emptyList('这个项目还没有 Cue。'));
+  for (const item of project ? project.cues : []) {
+    const button = document.createElement('button');
+    button.className = `cue-item${item.cue_id === state.cueId ? ' active' : ''}`;
+    const title = document.createElement('strong');
+    title.textContent = item.title;
+    const meta = document.createElement('span');
+    meta.className = 'project-meta';
+    meta.textContent = `${item.kind} · ${item.target_duration_s}s · ${item.candidates.length} 候选`;
+    button.append(title, meta);
+    button.addEventListener('click', () => { state.cueId = item.cue_id; renderProjectWorkspace(); });
+    cueList.appendChild(button);
+  }
+
+  $('cue-detail-empty').hidden = Boolean(cue);
+  $('cue-detail').hidden = !cue;
+  if (!cue) return;
+  $('cue-kind').textContent = `${cue.kind} · ${project.title}`;
+  $('cue-title').textContent = cue.title;
+  $('cue-scene').textContent = cue.scene;
+  $('cue-intent').textContent = cue.creative_intent;
+  $('cue-duration').textContent = `${cue.target_duration_s} 秒`;
+  $('cue-dialogue').textContent = cue.dialogue_present ? '有' : '无';
+  $('cue-vocal').textContent = cue.vocal_preference;
+  $('candidate-count').textContent = String(cue.candidates.length);
+  const candidateList = $('candidate-list');
+  candidateList.textContent = '';
+  if (!cue.candidates.length) candidateList.appendChild(emptyList('尚无候选。导入后，Core 会先 HEAR，再给出 Judge 结论与人工升级状态。'));
+  for (const candidate of cue.candidates) {
+    const row = document.createElement('div');
+    row.className = 'candidate-row';
+    const name = document.createElement('span'); name.className = 'candidate-name'; name.textContent = candidate.source_name;
+    const hear = document.createElement('span'); hear.className = `candidate-pill${candidate.hear_status === 'HEARD' ? ' heard' : ''}`; hear.textContent = `HEAR · ${candidate.hear_status}`;
+    const judge = document.createElement('span'); judge.className = `candidate-pill${candidate.judge_status === 'HUMAN_REQUIRED' ? ' human' : ''}`; judge.textContent = `JUDGE · ${candidate.judge_status}`;
+    const findings = document.createElement('span'); findings.textContent = `${candidate.finding_count} findings`;
+    const open = document.createElement('button'); open.className = 'ghost'; open.textContent = '打开证据';
+    open.addEventListener('click', () => openReport(candidate.report_path));
+    row.append(name, hear, judge, findings, open);
+    candidateList.appendChild(row);
+  }
+}
+
+async function refreshProjects() {
+  const result = await window.moodify.projectsSnapshot();
+  if (!result.ok) throw new Error(result.reason || 'PROJECT_SNAPSHOT_FAILED');
+  state.projectSnapshot = result.snapshot;
+  renderProjectWorkspace();
+}
+
+function initProjectWorkspace() {
+  $('rail-projects').addEventListener('click', async () => { await refreshProjects(); selectView('projects'); });
+  $('project-create').addEventListener('click', () => $('project-dialog').showModal());
+  $('cue-create').addEventListener('click', () => $('cue-dialog').showModal());
+  $('project-cancel').addEventListener('click', () => $('project-dialog').close());
+  $('cue-cancel').addEventListener('click', () => $('cue-dialog').close());
+  $('project-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      const result = await window.moodify.projectsCreate({
+        title: $('project-title-input').value,
+        client_name: $('project-client-input').value,
+        production_type: $('project-type-input').value,
+        delivery_spec_ref: $('project-spec-input').value,
+      });
+      if (!result.ok) throw new Error(result.reason || 'PROJECT_CREATE_FAILED');
+      state.projectId = result.project.project_id; state.cueId = null;
+      $('project-dialog').close(); $('project-form').reset(); await refreshProjects();
+    } catch (err) { showError(err.message || String(err)); }
+  });
+  $('cue-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      const result = await window.moodify.projectsCreateCue(state.projectId, {
+        title: $('cue-title-input').value, kind: $('cue-kind-input').value,
+        scene: $('cue-scene-input').value, creative_intent: $('cue-intent-input').value,
+        target_duration_s: $('cue-duration-input').value,
+        dialogue_present: $('cue-dialogue-input').checked, vocal_preference: $('cue-vocal-input').value,
+      });
+      if (!result.ok) throw new Error(result.reason || 'CUE_CREATE_FAILED');
+      state.cueId = result.cue.cue_id;
+      $('cue-dialog').close(); $('cue-form').reset(); await refreshProjects();
+    } catch (err) { showError(err.message || String(err)); }
+  });
+  $('candidate-import').addEventListener('click', async () => {
+    const projectId = state.projectId; const cueId = state.cueId;
+    const audioPath = await window.moodify.pickAudio();
+    if (!audioPath) return;
+    const result = await runAnalysisPath(audioPath);
+    if (!result || !state.caseDir) return;
+    try {
+      const linked = await window.moodify.projectsLinkCandidate(projectId, cueId, state.caseDir);
+      if (!linked.ok) throw new Error(linked.reason || 'CANDIDATE_LINK_FAILED');
+      await refreshProjects();
+      selectView('projects');
+    } catch (err) { showError(`候选关联失败：${err.message || err}`); }
+  });
+}
+
+function libraryFilename(filePath, fallback) {
+  return filePath ? String(filePath).split(/[\\/]/).pop() : fallback;
+}
+
+function renderLibrary() {
+  const works = state.library.works || [];
+  $('library-count').textContent = `${works.length} 首`;
+  const list = $('library-list');
+  list.textContent = '';
+  if (!works.length) list.appendChild(emptyList('还没有作品。从左侧加入第一首歌，Studio 会保留原始资产与所有权状态。'));
+  for (const work of works) {
+    const card = document.createElement('article'); card.className = 'library-card';
+    const cover = document.createElement('div'); cover.className = 'library-cover';
+    if (work.cover_path) { const img = document.createElement('img'); img.src = fileUrl(work.cover_path); img.alt = ''; cover.appendChild(img); }
+    else cover.textContent = '♫';
+    const info = document.createElement('div'); info.className = 'library-info';
+    const title = document.createElement('h4'); title.textContent = work.title;
+    const meta = document.createElement('p'); meta.textContent = `${work.creator} · ${libraryFilename(work.audio_path, '音频')}`;
+    const status = document.createElement('span');
+    status.className = `library-status ${['FAILED', 'DEPLOYMENT_BLOCKED'].includes(work.cloud_status) ? 'blocked' : ''} ${work.cloud_status === 'HIDDEN' ? 'hidden' : ''}`;
+    const statusLabels = { NOT_PUBLISHED: '本地草稿', DEPLOYMENT_BLOCKED: '待发布', UPLOADING: '正在上传', PUBLISHED: '已发布到 App', HIDDEN: '已从 App 隐藏', FAILED: '发布失败' };
+    status.textContent = statusLabels[work.cloud_status] || work.cloud_status;
+    info.append(title, meta, status);
+    const actions = document.createElement('div'); actions.className = 'library-actions';
+    const audition = document.createElement('button'); audition.className = 'primary'; audition.type = 'button'; audition.textContent = '试听';
+    audition.addEventListener('click', () => { openPlayer(work); });
+    actions.appendChild(audition);
+    const edit = document.createElement('button'); edit.className = 'ghost'; edit.type = 'button'; edit.textContent = '编辑';
+    edit.addEventListener('click', () => {
+      $('library-edit-id').value = work.work_id;
+      $('library-edit-title').value = work.title || '';
+      $('library-edit-creator').value = work.creator || '';
+      $('library-edit-lyrics').value = work.lyrics_text || '';
+      $('library-edit-status').textContent = work.cloud_status === 'PUBLISHED' ? '保存后会同步更新 App。' : '';
+      $('library-edit-dialog').showModal();
+    });
+    actions.appendChild(edit);
+    if (work.cloud_status === 'PUBLISHED') {
+      const hide = document.createElement('button'); hide.className = 'ghost'; hide.type = 'button'; hide.textContent = '隐藏';
+      hide.addEventListener('click', async () => {
+        hide.disabled = true; hide.textContent = '正在隐藏…';
+        const result = await window.moodify.libraryHide(work.work_id);
+        if (!result.ok) showError(`隐藏失败：${result.reason || '未知错误'}`);
+        await refreshLibrary();
+      });
+      actions.appendChild(hide);
+    }
+    const publish = document.createElement('button'); publish.className = 'ghost'; publish.type = 'button';
+    publish.textContent = work.cloud_status === 'PUBLISHED' ? '重新发布' : work.cloud_status === 'HIDDEN' ? '恢复到 App' : '发布到 App';
+    publish.addEventListener('click', async () => {
+      publish.disabled = true; publish.textContent = '正在发布…';
+      // 进度来自 main 的 publish:progress 广播。发布是分钟级操作，
+      // 让用户知道卡在「上传音频」还是「写入清单」，比一句「正在处理」有用得多。
+      publishButtons.set(work.work_id, publish);
+      let result;
+      try {
+        result = await window.moodify.libraryPublish(work.work_id);
+      } finally {
+        publishButtons.delete(work.work_id);
+      }
+      if (!result.ok) showError(`发布失败：${result.reason || '未知错误'}`);
+      publish.textContent = work.cloud_status === 'PUBLISHED' ? '重新发布' : work.cloud_status === 'HIDDEN' ? '恢复到 App' : '发布到 App';
+      await refreshLibrary();
+    });
+    actions.appendChild(publish);
+    const remove = document.createElement('button'); remove.className = 'danger'; remove.type = 'button'; remove.textContent = '删除';
+    remove.addEventListener('click', () => {
+      $('library-delete-id').value = work.work_id;
+      $('library-delete-title').textContent = work.title;
+      $('library-delete-status').textContent = '';
+      $('library-delete-dialog').showModal();
+    });
+    actions.appendChild(remove);
+    card.append(cover, info, actions); list.appendChild(card);
+  }
+}
+
+async function refreshLibrary() {
+  const result = await window.moodify.librarySnapshot();
+  if (!result.ok) throw new Error(result.reason || 'LIBRARY_SNAPSHOT_FAILED');
+  state.library = result.snapshot; renderLibrary();
+}
+
+// ——— 作品试音（读 LRC，逐行高亮；时间轴不是 Studio 猜的，是创作者自己做的）————
+//
+// 走带规则同波场：**一个视图一条走带，切换必停、离开必销毁**。
+// 音频只能经 IPC 读入再解码——CSP 是 default-src 'self'，<audio src="file://…">
+// 会被直接挡掉。波形用已内置的 WaveSurfer 6.6.4 兼作进度条与定位条。
+
+let playerWS = null;
+let playerLines = [];
+let playerLineEls = [];
+let playerActive = -1;
+let playerTimed = false;
+let playerToken = 0;   // 中途切歌 / 离开视图时，让在飞的载入自行作废
+
+function destroyPlayerTransport() {
+  if (playerWS) { try { playerWS.destroy(); } catch (e) { /* already gone */ } playerWS = null; }
+  playerLines = []; playerLineEls = []; playerActive = -1; playerTimed = false;
+  playerToken += 1;
+}
+
+/** 把歌词文本变成「有轴 / 无轴 / 没有 / 读不了」四种之一，UI 照实显示，不美化。 */
+async function loadPlayerLyrics(workId) {
+  const result = await window.moodify.libraryReadLyrics(workId);
+  if (!result.ok) return { state: 'error', message: `歌词读取失败：${result.reason || '未知错误'}`, lines: [] };
+  const payload = result.lyrics || {};
+  if (payload.reason === 'LYRICS_ENCODING_NOT_UTF8') {
+    return { state: 'error', message: '歌词文件不是 UTF-8 编码。请用记事本打开后「另存为」→ 编码选 UTF-8，再重新导入。', lines: [] };
+  }
+  if (payload.reason === 'LYRICS_ENCODING_UTF16') {
+    return { state: 'error', message: '歌词文件是 UTF-16 编码，暂不支持。请另存为 UTF-8。', lines: [] };
+  }
+  if (payload.reason === 'LYRICS_FILE_UNREADABLE') {
+    return { state: 'error', message: '歌词文件读不出来（可能被移走或占用）。可到「编辑」里改为直接粘贴歌词。', lines: [] };
+  }
+  const parsed = window.MoodifyLyrics.parseLrc(payload.text);
+  if (!parsed.timed) {
+    if (!parsed.lines.length) {
+      return { state: 'none', message: '这首还没有歌词。到「编辑」里粘贴歌词；想跟着音乐滚动，就粘贴带 [mm:ss.xx] 时间戳的 LRC 内容。', lines: [] };
+    }
+    // 编辑对话框只有纯文本输入框（LRC 文件选择器在「添加作品」表单里），
+    // 所以对已有作品，粘贴 LRC 内容是唯一能拿到时间轴的途径——提示必须说清这点。
+    return { state: 'plain', message: '这首的歌词没有时间轴，所以不会滚动。到「编辑」里粘贴带 [mm:ss.xx] 时间戳的 LRC 内容，歌词就能跟着音乐走。', lines: parsed.lines };
+  }
+  return { state: 'timed', message: '', lines: parsed.lines };
+}
+
+function renderPlayerLyrics(state, lines) {
+  const track = $('player-lyrics');
+  track.textContent = '';
+  track.style.transform = 'translateY(0)';
+  playerLineEls = [];
+  playerLines = state.timed ? lines : [];
+  playerTimed = state.timed;
+  $('player-lyrics-note').hidden = !state.message;
+  $('player-lyrics-note').textContent = state.message;
+  for (const line of lines) {
+    const el = document.createElement('p');
+    el.className = 'lyric-line';
+    // 空行是 LRC 里的间奏标记，保留其占位，否则滚动会突然跳一大截。
+    if (!line.text) { el.classList.add('blank'); el.textContent = '·'; }
+    else el.textContent = line.text;
+    playerLineEls.push(el);
+    track.appendChild(el);
+  }
+}
+
+/** 高亮当前行并把轨道平移到「当前行居中」。无轴歌词不参与。 */
+function syncPlayerLyric(time) {
+  if (!playerTimed || !playerLines.length) return;
+  const index = window.MoodifyLyrics.activeLineIndex(playerLines, time);
+  if (index === playerActive) return;
+  playerActive = index;
+  for (let i = 0; i < playerLineEls.length; i += 1) playerLineEls[i].classList.toggle('active', i === index);
+  const el = playerLineEls[index];
+  if (!el) return;
+  const viewport = $('player-lyrics-viewport');
+  const target = viewport.clientHeight / 2 - el.offsetTop - el.offsetHeight / 2;
+  $('player-lyrics').style.transform = `translateY(${Math.round(target)}px)`;
+}
+
+async function openPlayer(work) {
+  destroyPlayerTransport();
+  const token = playerToken;
+  selectView('player');
+
+  $('player-title').textContent = work.title || '未命名';
+  $('player-creator').textContent = work.creator || '创作者未填';
+  if (work.cover_path) {
+    $('player-cover').src = fileUrl(work.cover_path);
+    $('player-cover').hidden = false;
+    $('player-cover-fallback').hidden = true;
+  } else {
+    $('player-cover').hidden = true;
+    $('player-cover').removeAttribute('src');
+    $('player-cover-fallback').hidden = false;
+  }
+  $('player-play').disabled = true;
+  $('player-time').textContent = '0:00.0 / 0:00.0';
+  $('player-note').textContent = '正在载入…';
+
+  const lyricsState = await loadPlayerLyrics(work.work_id);
+  if (token !== playerToken) return;   // 载入途中已经切歌或离开视图
+  renderPlayerLyrics(lyricsState, lyricsState.lines);
+
+  if (!work.audio_path) {
+    $('player-note').textContent = '这首没有音频文件，无法试音。';
+    return;
+  }
+  let buffer;
+  try {
+    const bytes = await window.moodify.readAudio(work.audio_path);
+    const ab = bytes instanceof ArrayBuffer ? bytes
+      : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    buffer = ab;
+  } catch (err) {
+    $('player-note').textContent = `音频读取失败：${err && err.message || err}`;
+    return;
+  }
+  if (token !== playerToken) return;
+
+  playerWS = WaveSurfer.create({
+    container: $('player-wave'),
+    backend: 'WebAudio',
+    height: 64,
+    responsive: true,
+    cursorWidth: 1,
+    waveColor: 'rgba(79, 70, 229, 0.35)',
+    progressColor: 'rgba(79, 70, 229, 0.85)',
+    cursorColor: '#16181d',
+  });
+  playerWS.on('ready', () => {
+    if (token !== playerToken) return;
+    $('player-play').disabled = false;
+    $('player-note').textContent = lyricsState.state === 'timed' ? '' : '已载入。';
+    $('player-time').textContent = `0:00.0 / ${fmtTime(playerWS.getDuration() || 0)}`;
+  });
+  playerWS.on('timeupdate', (t) => {
+    if (token !== playerToken) return;
+    $('player-time').textContent = `${fmtTime(t)} / ${fmtTime(playerWS.getDuration() || 0)}`;
+    syncPlayerLyric(t);
+  });
+  playerWS.on('play', () => { if (token === playerToken) $('player-play').textContent = '⏸'; });
+  playerWS.on('pause', () => { if (token === playerToken) $('player-play').textContent = '▶'; });
+  playerWS.on('finish', () => {
+    if (token !== playerToken) return;
+    $('player-play').textContent = '▶';
+    $('player-time').textContent = `0:00.0 / ${fmtTime(playerWS.getDuration() || 0)}`;
+    playerActive = -1;
+    for (const el of playerLineEls) el.classList.remove('active');
+    $('player-lyrics').style.transform = 'translateY(0)';
+  });
+  // loadArrayBuffer 是回调式的（内部 decodeArrayBuffer → loadDecodedBuffer），
+  // 不返回 Promise：解码失败只会走 error 事件，await 是接不住的。
+  playerWS.on('error', (err) => {
+    if (token !== playerToken) return;
+    $('player-note').textContent = `音频载入失败：${err && err.message || err}`;
+  });
+  playerWS.loadArrayBuffer(buffer);
+}
+
+function togglePlayer() {
+  if (!playerWS) return;
+  try { playerWS.playPause(); } catch (e) { /* 未就绪 */ }
+}
+
+function initPlayer() {
+  $('player-play').addEventListener('click', togglePlayer);
+  $('player-back').addEventListener('click', async () => { destroyPlayerTransport(); await refreshLibrary(); selectView('library'); });
+}
+
+// 发布中的按钮引用：main 推来的进度要落到「被点的那个按钮」上。
+const publishButtons = new Map();
+
+function initPublishProgress() {
+  if (!window.moodify.onPublishProgress) return;
+  window.moodify.onPublishProgress((p) => {
+    const btn = publishButtons.get(p.workId);
+    if (!btn) return;
+    // 阶段名 + 百分比。detail 里带的是「跳过上传」这类原因，只在有信息时附上。
+    btn.textContent = p.percent >= 100
+      ? `${p.label} 完成`
+      : `${p.label} ${p.percent}%`;
+    btn.title = p.detail || '';
+  });
+}
+
+function initLibrary() {
+  initPublishProgress();
+  $('rail-library').addEventListener('click', async () => { await refreshLibrary(); selectView('library'); });
+  $('library-edit-cancel').addEventListener('click', () => $('library-edit-dialog').close());
+  $('library-delete-cancel').addEventListener('click', () => $('library-delete-dialog').close());
+  $('library-edit-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const status = $('library-edit-status'); status.textContent = '正在保存…';
+    const result = await window.moodify.libraryUpdate($('library-edit-id').value, {
+      title: $('library-edit-title').value,
+      creator: $('library-edit-creator').value,
+      lyrics_text: $('library-edit-lyrics').value,
+    });
+    if (!result.ok) { status.textContent = `保存失败：${result.reason || '未知错误'}`; return; }
+    $('library-edit-dialog').close();
+    await refreshLibrary();
+  });
+  $('library-delete-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const status = $('library-delete-status'); status.textContent = '正在删除云端与本机记录…';
+    const result = await window.moodify.libraryDelete($('library-delete-id').value);
+    if (!result.ok) { status.textContent = `删除失败：${result.reason || '未知错误'}`; return; }
+    $('library-delete-dialog').close();
+    await refreshLibrary();
+  });
+  for (const button of document.querySelectorAll('.asset-picker')) button.addEventListener('click', async () => {
+    const kind = button.dataset.kind; const picked = await window.moodify.libraryPick(kind);
+    if (!picked) return;
+    state.libraryDraft[`${kind}_path`] = picked;
+    $(`library-${kind}-name`).textContent = libraryFilename(picked, picked);
+    if (kind === 'audio' && !$('library-title').value.trim()) {
+      const filename = libraryFilename(picked, picked);
+      $('library-title').value = filename.replace(/\.[^.]+$/, '');
+    }
+    if (kind === 'cover') {
+      $('library-crop-image').src = fileUrl(picked);
+      $('library-crop-image').style.objectPosition = `50% ${$('library-crop-y').value}%`;
+      $('library-crop').hidden = false;
+    }
+    button.classList.add('has-file');
+  });
+  $('library-crop-y').addEventListener('input', () => {
+    $('library-crop-image').style.objectPosition = `50% ${$('library-crop-y').value}%`;
+  });
+  $('library-crop-apply').addEventListener('click', async () => {
+    const source = state.libraryDraft.cover_path;
+    if (!source) return;
+    const result = await window.moodify.libraryCropCover(source, $('library-crop-y').value);
+    if (!result.ok) { showError(`封面裁剪失败：${result.reason}`); return; }
+    state.libraryDraft.cover_path = result.path;
+    $('library-cover-name').textContent = '已应用方形裁剪';
+    $('library-crop-image').src = fileUrl(result.path);
+    $('library-crop-image').style.objectFit = 'contain';
+  });
+  $('library-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const status = $('library-form-status'); status.textContent = '正在保存作品资产…';
+    const result = await window.moodify.libraryCreate({
+      title: $('library-title').value, creator: $('library-creator').value,
+      lyrics_text: $('library-lyrics-text').value, ...state.libraryDraft,
+    });
+    if (!result.ok) { status.textContent = result.reason === 'AUDIO_REQUIRED' ? '请先选择音频文件。' : `保存失败：${result.reason}`; return; }
+    $('library-form').reset();
+    state.libraryDraft = { audio_path: null, cover_path: null, lyrics_path: null };
+    $('library-crop').hidden = true; $('library-crop-image').removeAttribute('src'); $('library-crop-image').style.objectFit = '';
+    $('library-audio-name').textContent = '选择 WAV / FLAC'; $('library-cover-name').textContent = '选择图片'; $('library-lyrics-name').textContent = '可选 LRC / TXT';
+    for (const button of document.querySelectorAll('.asset-picker')) button.classList.remove('has-file');
+    status.textContent = '已保存到本机作品库。'; await refreshLibrary();
+  });
+}
+
 // ——— boot ———
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -2396,39 +2895,22 @@ window.addEventListener('DOMContentLoaded', async () => {
   initRollEvents();
   initScoreSplit();
   window.addEventListener('resize', requestRollDraw);
+  initWaveField(env);   // 波场通道：仅当 MOODIFY_WAVEFIELD_V0=1 时出现入口
+  initProjectWorkspace();
+  initLibrary();
+  initPlayer();
   window.moodify.onToolProgress((kind, line) => appendToolProgress(kind, line));
-  initStreamBar();
-  const sendIntent = () => {
-    const text = $('compiler-input').value;
-    $('compiler-input').value = '';
-    $('compiler-input').style.height = '';
-    intentSend(text);
-  };
-  $('compiler-send').addEventListener('click', sendIntent);
-  $('compiler-input').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendIntent();
-    }
-  });
-  $('compiler-input').addEventListener('input', (e) => {
-    const el = e.target;
-    el.style.height = 'auto';
-    el.style.height = `${Math.min(96, el.scrollHeight)}px`;
-  });
-  $('compiler-stop').addEventListener('click', () => window.moodify.codexInterrupt(compiler.threadId));
-  $('compiler-save').addEventListener('click', savePlan);
-  window.moodify.onCodexEvent(handleCodexEvent);
-  window.moodify.onCodexServerRequest(handleCodexServerRequest);
-  initCompilerSetup();
-  initPermToggle();
+  // AI 对话框已从 Studio 产品面移除。历史内核和 IPC 仍保留供旧产物回放，
+  // 但不启动 provider、不打开 thread、不注册对话交互。
   initDrawer();
   initDrop();
   initTuning();
   initSession();
   initPipeline();
-  await ensureCompiler();
   await refreshArchive();
+  await refreshProjects();
+  await refreshLibrary();
+  selectView('library');
 });
 
 // ——— drag & drop audio onto the workspace ———
@@ -4287,7 +4769,10 @@ function openPipelineStage(id) {
   const s = PIPELINE_STAGES.find((x) => x.id === id);
   if (!s) return;
   switch (id) {
-    case 'analyze': selectView('data'); break;
+    // 数据 / 频谱 / 图表已归入「制作详情」层，不再作为独立视图开放：
+    // 它们自身没有返回入口，一旦跳进去只能靠顶部标签栏出来——而标签栏已移除。
+    // ①检测 因此落在完成会话，与其它阶段保持一致。
+    case 'analyze': openTuning(); break;
     case 'separate': openStems(); break;
     case 'structure': openScore(); break;
     case 'tune':
@@ -4318,4 +4803,439 @@ async function enterPipeline() {
   const next = PIPELINE_STAGES.find((s) => stageUnlocked(s.id, snap.gates) && !done[s.id])
     || PIPELINE_STAGES[PIPELINE_STAGES.length - 1];
   openPipelineStage(next.id);
+}
+
+// ============================================================================
+// 波场通道（实验，默认关闭）· Wave Field Local v0
+// ============================================================================
+//
+// 产品句：Moodify 把声音放进一个场，听它的结果，并搜索更好的场。
+//
+// 渲染层的责任边界：
+//   · **不计算任何指标** —— 表格里的每个数字都照抄 Core 的 HearSnapshot；
+//   · **不实现任何音频算法** —— 渲染/听测在 Core，渲染层只递字节；
+//   · **只有一条走带权威** —— 由 window.MoodifyWaveFieldPlayer 保证，
+//     切换候选先停上一个，绝不允许两条同时响。
+//
+// 开关关闭时（env.wavefieldV0 为假）本段只做一件事：把 rail 按钮继续藏着。
+
+const wf = {
+  enabled: false,
+  caseDir: null,
+  state: null,
+  player: null,
+  audioCtx: null,
+  loadToken: 0,
+  tick: null,
+  busy: false,
+};
+
+const WF_ORDER = ['ORIGINAL', 'A', 'B', 'C'];
+const WF_LABEL = { ORIGINAL: '原版', A: 'A · 更近 / 更直接', B: 'B · 中等', C: 'C · 更大 / 更开阔' };
+
+/** 建立（一次）唯一一个 AudioContext —— 「一条走带权威」的物理实现。 */
+function wfAudioBackend() {
+  if (!wf.audioCtx) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    wf.audioCtx = new Ctx();
+  }
+  const ctx = wf.audioCtx;
+  return {
+    decode: async (bytes) => {
+      const ab = bytes instanceof ArrayBuffer
+        ? bytes
+        : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      return ctx.decodeAudioData(ab);
+    },
+    createSource: (buffer) => {
+      const node = ctx.createBufferSource();
+      node.buffer = buffer;
+      node.connect(ctx.destination);
+      return node;
+    },
+    now: () => ctx.currentTime,
+  };
+}
+
+function wfPlayer() {
+  if (!wf.player) {
+    wf.player = window.MoodifyWaveFieldPlayer.createPlayer({
+      audio: wfAudioBackend(),
+      onStateChange: wfRenderTransport,
+    });
+  }
+  return wf.player;
+}
+
+function resetWaveField() {
+  if (wf.tick) { clearInterval(wf.tick); wf.tick = null; }
+  if (wf.player) wf.player.reset();
+  wf.caseDir = null;
+  wf.state = null;
+  wf.loadToken += 1;
+  $('wf-source').textContent = '—';
+  $('wf-body').hidden = true;
+  $('wf-field-body').textContent = '';
+  $('wf-hear-body').textContent = '';
+  $('wf-choices').textContent = '';
+  $('wf-manifest').textContent = '';
+  $('wf-status').textContent = '';
+  $('wf-load').textContent = '';
+  $('wf-playing').textContent = '—';
+}
+
+function wfSetStatus(text) { $('wf-status').textContent = text || ''; }
+
+function wfRenderTransport(state) {
+  const current = state && state.current ? state.current : null;
+  $('wf-playing').textContent = current ? (WF_LABEL[current] || current) : '—';
+  $('wf-play').textContent = state && state.status === 'playing' ? '⏸' : '▶';
+  for (const button of $('wf-sources').querySelectorAll('button')) {
+    button.classList.toggle('is-current', button.dataset.id === current);
+    button.classList.toggle('is-playing', button.dataset.id === current
+      && Boolean(state && state.status === 'playing'));
+  }
+  const duration = wf.player && current ? (wf.player.buffer(current) || {}).duration : 0;
+  $('wf-time').textContent = fmtTime(state ? state.position : 0) + ' / ' + fmtTime(duration || 0);
+  wfTick(Boolean(state && state.status === 'playing'));
+}
+
+/** 播放时每 250 ms 刷新一次读数；停下就清掉计时器（不空转）。 */
+function wfTick(playing) {
+  if (playing && !wf.tick) {
+    wf.tick = setInterval(() => {
+      if (!wf.player) return;
+      const current = wf.player.current();
+      const duration = current ? (wf.player.buffer(current) || {}).duration : 0;
+      $('wf-time').textContent = fmtTime(wf.player.position()) + ' / ' + fmtTime(duration || 0);
+    }, 250);
+  } else if (!playing && wf.tick) {
+    clearInterval(wf.tick);
+    wf.tick = null;
+  }
+}
+
+/** 点亮/熄灭候选按钮，并显示哪一版正在响。 */
+function wfRenderSources(state) {
+  const box = $('wf-sources');
+  box.textContent = '';
+  for (const id of WF_ORDER) {
+    const row = state.candidates[id] || {};
+    const available = id === 'ORIGINAL' ? true : Boolean(row.exists);
+    const button = document.createElement('button');
+    button.className = 'wf-src';
+    button.dataset.id = id;
+    button.disabled = !available;
+    button.title = available ? '试听 ' + (WF_LABEL[id] || id) : id + ' 还没有渲染产物';
+    const dot = document.createElement('span');
+    dot.className = 'wf-src-dot';
+    button.appendChild(dot);
+    button.appendChild(document.createTextNode(WF_LABEL[id] || id));
+    button.addEventListener('click', () => wfPlayCandidate(id));
+    box.appendChild(button);
+  }
+}
+
+/** 试听：切换候选时**先停上一个**（走带模块内部保证），再从头部开始。 */
+async function wfPlayCandidate(id) {
+  if (!wf.caseDir) return;
+  const player = wfPlayer();
+  const token = ++wf.loadToken;
+  $('wf-load').textContent = '正在加载 ' + (WF_LABEL[id] || id) + '…';
+  try {
+    if (player.buffer(id)) {
+      player.stop();   // 显式停掉上一个，再切
+    } else {
+      const bytes = await window.moodify.wavefieldAudio(wf.caseDir, id);
+      if (token !== wf.loadToken) return;
+      const loaded = await player.load(id, bytes);
+      if (!loaded.ok) {
+        $('wf-load').textContent = '加载失败：' + (loaded.detail || loaded.reason || '未知原因');
+        return;
+      }
+    }
+    if (!player.isPlaying()) player.play(id);
+    $('wf-load').textContent = '';
+  } catch (err) {
+    $('wf-load').textContent = '加载失败：' + ((err && err.message) || err);
+  }
+}
+
+function wfCell(value, digits) {
+  if (value === null || value === undefined || Number.isNaN(value)) return '—';
+  if (typeof value === 'number') return String(parseFloat(value.toFixed(digits === undefined ? 2 : digits)));
+  return String(value);
+}
+
+function wfTechText(summary) {
+  const status = summary.technical_status;
+  if (status === 'REFERENCE') return '基准（原版）';
+  if (status === 'BLOCKED') return '阻断：' + ((summary.blocking_flags || []).join('、') || '—');
+  if (status === 'SAFE_TO_LISTEN') return (summary.warnings || []).length ? '可听（有警告）' : '可听';
+  return status || '—';
+}
+
+/** 表格：场参数 + 听测数字。数字全部来自 Core，渲染层不计算任何指标。 */
+function wfRenderTables(state) {
+  const columns = ['ORIGINAL', 'A', 'B', 'C'];
+  const labels = ['原版', 'A', 'B', 'C'];
+
+  const fieldHead = $('wf-field-head');
+  fieldHead.textContent = '';
+  for (const label of ['参数'].concat(labels)) {
+    const th = document.createElement('th');
+    th.textContent = label;
+    fieldHead.appendChild(th);
+  }
+
+  const intents = state.policyCandidates || [];
+  const intentOf = (id) => {
+    const row = intents.find((entry) => entry.candidateId === id);
+    return row ? row.intent : '';
+  };
+
+  const fieldBody = $('wf-field-body');
+  fieldBody.textContent = '';
+  for (const key of ['room_size', 'damping', 'wet', 'width']) {
+    const tr = document.createElement('tr');
+    const th = document.createElement('th');
+    th.textContent = key;
+    tr.appendChild(th);
+    for (const id of columns) {
+      const td = document.createElement('td');
+      const field = id === 'ORIGINAL' ? null : state.fields[id];
+      td.textContent = field ? wfCell(field.parameters[key], 2) : '—';
+      tr.appendChild(td);
+    }
+    fieldBody.appendChild(tr);
+  }
+  const intentRow = document.createElement('tr');
+  const intentTh = document.createElement('th');
+  intentTh.textContent = '意图';
+  intentRow.appendChild(intentTh);
+  for (const id of columns) {
+    const td = document.createElement('td');
+    td.textContent = id === 'ORIGINAL' ? '未施加任何场' : (intentOf(id) || '—');
+    intentRow.appendChild(td);
+  }
+  fieldBody.appendChild(intentRow);
+
+  const hearHead = $('wf-hear-head');
+  hearHead.textContent = '';
+  for (const label of ['指标'].concat(labels)) {
+    const th = document.createElement('th');
+    th.textContent = label;
+    hearHead.appendChild(th);
+  }
+
+  const rows = [
+    ['LUFS（积分响度）', (s) => wfCell(s.integrated_lufs)],
+    ['真峰值 dBFS', (s) => wfCell(s.true_peak_dbfs)],
+    ['波峰因数 dB', (s) => wfCell(s.crest_factor_db)],
+    ['立体声相关性', (s) => wfCell(s.stereo_correlation, 3)],
+    ['宽度代理', (s) => wfCell(s.stereo_width_proxy, 3)],
+    ['中侧比 dB', (s) => wfCell(s.side_to_mid_db)],
+    ['相位风险比', (s) => wfCell(s.phase_risk_ratio, 4)],
+    ['试听响度校正 dB', (s) => wfCell(s.audition_correction_db)],
+    ['技术状态', (s) => wfTechText(s)],
+  ];
+  const hearBody = $('wf-hear-body');
+  hearBody.textContent = '';
+  for (const entry of rows) {
+    const label = entry[0];
+    const read = entry[1];
+    const tr = document.createElement('tr');
+    const th = document.createElement('th');
+    th.textContent = label;
+    tr.appendChild(th);
+    for (const id of columns) {
+      const td = document.createElement('td');
+      const summary = state.summary[id];
+      td.textContent = summary ? read(summary) : '—';
+      if (label === '技术状态' && summary) {
+        td.classList.toggle('wf-blocked', (summary.blocking_flags || []).length > 0);
+      }
+      tr.appendChild(td);
+    }
+    hearBody.appendChild(tr);
+  }
+
+  const judge = state.judgment.A || {};
+  const flags = [].concat(judge.blocking_flags || [], judge.warnings || []).filter(Boolean);
+  $('wf-hear-note').textContent = flags.length
+    ? '技术闸门的提示（只报事实，不给人听感结论）：' + flags.join(' · ')
+    : '技术闸门未报阻断或警告。它只做安全/回归守卫，不判断哪个场更好听。';
+}
+
+function wfRenderChoices(state) {
+  const box = $('wf-choices');
+  box.textContent = '';
+  const chosen = state.chosen ? state.chosen.kept : null;
+  for (const id of WF_ORDER) {
+    const available = id === 'ORIGINAL' ? true : Boolean(state.candidates[id].exists);
+    const button = document.createElement('button');
+    button.className = 'wf-choice';
+    button.textContent = id === 'ORIGINAL' ? '保留原版' : '选定 ' + id;
+    button.disabled = !available || wf.busy;
+    button.classList.toggle('is-chosen', chosen === id);
+    button.addEventListener('click', () => wfChoose(id));
+    box.appendChild(button);
+  }
+  $('wf-export').disabled = !state.chosen || wf.busy;
+
+  if (chosen) {
+    const decided = state.decisions[state.decisions.length - 1];
+    wfSetStatus('已选定 ' + chosen + '（' + ((decided && decided.role) || '?')
+      + '，账本只追加、不修改）');
+  } else {
+    wfSetStatus('还没有选定。听到合适的那个，再选定。');
+  }
+  const manifest = state.export;
+  $('wf-manifest').textContent = manifest
+    ? '已导出：' + manifest.kept + '（' + manifest.export_mode + '）；产物哈希 '
+      + String(manifest.chosen_audio_sha256 || manifest.source_sha256 || '').slice(0, 16)
+      + '…；manifest.json 记录了源哈希、场参数、引擎版本与决定时间。'
+    : '';
+}
+
+function wfRenderState(state) {
+  wf.state = state;
+  $('wf-body').hidden = !state || !state.present;
+  if (!state || !state.present) {
+    wfSetStatus('这个世界还没有波场。点「建立波场」开始。');
+    return;
+  }
+  const sourcePath = (state.session && state.session.source_path) || '—';
+  $('wf-source').textContent = sourcePath.split(/[\\/]/).pop();
+  $('wf-source').title = sourcePath;
+  wfRenderSources(state);
+  wfRenderTables(state);
+  wfRenderChoices(state);
+
+  const missing = (state.blockers || []).filter((b) => b.indexOf('CANDIDATE_MISSING') === 0);
+  if (missing.length) {
+    wfSetStatus('缺少产物：' + missing.join('、') + '（可再点一次「建立波场」重渲染）');
+  }
+  if (state.warnings && state.warnings.length) $('wf-load').textContent = state.warnings.join(' · ');
+}
+
+async function wfRefresh() {
+  if (!wf.enabled || !state.caseDir) return null;
+  wf.caseDir = state.caseDir;
+  const res = await window.moodify.wavefieldStatus(wf.caseDir);
+  if (!res || !res.ok) {
+    wfSetStatus(res && res.detail ? res.detail : '无法读取波场状态。');
+    return null;
+  }
+  wfRenderState(res.state);
+  return res.state;
+}
+
+async function wfCreate() {
+  if (!wf.enabled || !state.caseDir || wf.busy) return;
+  wf.busy = true;
+  $('wf-create').disabled = true;
+  wfSetStatus('正在建立波场：渲染 A / B / C，并对四个版本各做一次听测……');
+  try {
+    const res = await window.moodify.wavefieldCreate(state.caseDir, null);
+    if (!res || !res.ok) {
+      wfSetStatus('建立失败：' + ((res && (res.detail || res.reason)) || '未知原因'));
+      return;
+    }
+    wfRenderState(res.payload.state);
+    wfSetStatus('波场已建立。逐个试听，再选定。');
+  } catch (err) {
+    wfSetStatus('建立失败：' + ((err && err.message) || err));
+  } finally {
+    wf.busy = false;
+    $('wf-create').disabled = false;
+  }
+}
+
+async function wfChoose(kept) {
+  if (!wf.enabled || !wf.caseDir || wf.busy) return;
+  wf.busy = true;
+  if (wf.state) wfRenderChoices(wf.state);
+  try {
+    // 同一个待决选择用同一个 requestId：重试会被账本识别为重复，而不是写第二条。
+    const requestId = 'wf:' + wf.caseDir + ':' + kept + ':' + (wf.state ? wf.state.decisions.length : 0);
+    const res = await window.moodify.wavefieldChoose(wf.caseDir, kept, 'creator', requestId);
+    if (!res || !res.ok) {
+      wfSetStatus('记录失败：' + ((res && (res.detail || res.reason)) || '未知原因'));
+      return;
+    }
+    if (res.payload && res.payload.state) wfRenderState(res.payload.state);
+    wfSetStatus(res.payload && res.payload.created === false
+      ? '这一次选择已经记过账了（' + kept + '），没有写入第二条。'
+      : '已记录：' + kept + '。');
+  } catch (err) {
+    wfSetStatus('记录失败：' + ((err && err.message) || err));
+  } finally {
+    wf.busy = false;
+    if (wf.state) wfRenderChoices(wf.state);
+  }
+}
+
+/** 导出：case 内先落 export/（含 manifest 与当场重渲染验证），再让用户选保存位置。 */
+async function wfExport() {
+  if (!wf.enabled || !wf.caseDir || wf.busy) return;
+  const chosen = wf.state && wf.state.chosen ? wf.state.chosen.kept : null;
+  if (!chosen) { wfSetStatus('还没有选定，不能导出。'); return; }
+  wf.busy = true;
+  $('wf-export').disabled = true;
+  wfSetStatus('正在导出并验证可复现……');
+  try {
+    const res = await window.moodify.wavefieldExport(wf.caseDir, chosen);
+    if (!res || !res.ok) {
+      wfSetStatus(res && res.canceled
+        ? '已取消导出（case 内的产物保留）。'
+        : '导出失败：' + ((res && (res.detail || res.reason)) || '未知原因'));
+      return;
+    }
+    const verified = res.reproduced && res.reproduced.ok;
+    wfSetStatus(verified
+      ? '已导出到 ' + res.path + '，并已重渲染验证哈希一致。'
+      : '已导出到 ' + res.path + '；重渲染哈希不一致——记录如实反映。');
+    await wfRefresh();
+  } catch (err) {
+    wfSetStatus('导出失败：' + ((err && err.message) || err));
+  } finally {
+    wf.busy = false;
+    if (wf.state) wfRenderChoices(wf.state);
+  }
+}
+
+async function openWaveField() {
+  if (!wf.enabled) return;
+  selectView('wavefield');
+  if (!state.caseDir) {
+    wfSetStatus('先打开一首歌（左上第一个按钮），波场挂在它的世界里。');
+    return;
+  }
+  await wfRefresh();
+}
+
+/** 入口装配。关闭时只做一件事：把 rail 按钮继续藏着。 */
+function initWaveField(env) {
+  wf.enabled = Boolean(env && env.wavefieldV0);
+  if (!wf.enabled) return;
+
+  $('rail-wavefield').hidden = false;
+  $('rail-wavefield').addEventListener('click', openWaveField);
+  $('wf-create').addEventListener('click', wfCreate);
+  $('wf-play').addEventListener('click', () => {
+    if (!wf.player || !wf.player.current()) { wfSetStatus('先点一个候选试听。'); return; }
+    wf.player.toggle();
+  });
+  $('wf-export').addEventListener('click', wfExport);
+
+  // 空格 = 播放/暂停（焦点不在输入区时）
+  window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    if ($('view-wavefield').hidden) return;
+    const el = document.activeElement;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+    e.preventDefault();
+    if (wf.player && wf.player.current()) wf.player.toggle();
+  });
 }

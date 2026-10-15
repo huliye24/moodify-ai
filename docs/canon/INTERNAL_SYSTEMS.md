@@ -10,6 +10,12 @@
 
 ## 1. Moodify Ear / Auditory Intelligence
 
+**2026-10-06 human decision:** Moodify Judge 是 Auditory Intelligence 的永久核心。该核心以
+**Judge Before → bounded Planner/Provider → Judge After** 形成闭环：第一次判断发生了什么、是否需要
+处理与保护什么；第二次判断结果是否改善、是否接受/重试/调整/保留原版。分离、降噪、修音、混音、
+母带和生成能力可来自可替换 Provider，但 Judge authority、证据、校准、Treatment Records 与人类升级
+规则必须归 Moodify。完整原则见 [JUDGE_CORE_PRINCIPLE.md](JUDGE_CORE_PRINCIPLE.md)。
+
 内部听觉智力层：listen → represent → judge → evidence → uncertainty → learn → verify → controlled intervention。
 
 - 权威参考：[AUDITORY_INTELLIGENCE_ARCHITECTURE.md](../AUDITORY_INTELLIGENCE_ARCHITECTURE.md)（INTERNAL）

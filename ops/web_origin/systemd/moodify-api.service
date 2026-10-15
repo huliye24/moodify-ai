@@ -8,6 +8,8 @@ Type=simple
 User=moodify
 Group=moodify
 EnvironmentFile=/etc/moodify/node.env
+Environment=MOODIFY_CASES_ROOT=/var/lib/moodify/moodify_cases
+Environment=MOODIFY_REVIEW_DB=/var/lib/moodify/moodify_cases/review.sqlite3
 WorkingDirectory=/opt/moodify/current
 ExecStart=/opt/moodify/venv/bin/uvicorn moodify.api.main:app --host 127.0.0.1 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips=127.0.0.1
 Restart=always

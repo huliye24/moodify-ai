@@ -35,6 +35,25 @@ def _license_present() -> bool:
     return bool(os.environ.get("LALAL_LICENSE_KEY", "").strip())
 
 
+def provider_status() -> dict:
+    """Verify the configured LALAL.AI credential without exposing it."""
+    if not _license_present():
+        return {
+            "provider": "lalal.ai",
+            "configured": False,
+            "connection": "NOT_CONFIGURED",
+            "processing_location": "LALAL_AI_CLOUD",
+        }
+    minutes = _client().minutes_left()
+    return {
+        "provider": "lalal.ai",
+        "configured": True,
+        "connection": "AVAILABLE",
+        "processing_location": "LALAL_AI_CLOUD",
+        "minutes_left": minutes,
+    }
+
+
 def uploads_dir() -> Path:
     from moodify.node.config import NodeConfig
 

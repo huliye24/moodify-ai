@@ -11,20 +11,25 @@
 <body>
   <!-- 顶栏：logo + 当前世界名。无关闭：世界不关闭，只切换。 -->
   <header id="topbar">
-    <img class="logo" src="assets/moodify_logo.png" alt="Moodify">
     <div id="case-title" hidden>
       <h1 id="source-name"></h1>
     </div>
     <div class="top-actions">
       <span id="status-line" class="muted" hidden></span>
-      <button id="update-open" class="ghost" title="检查 Moodify Studio 更新">更新</button>
-      <button id="perm-toggle" class="ghost" title="AI 编译器权限模式">权限：标准</button>
+      <button id="update-open" class="ghost" title="检查 Moodify Studio 更新" hidden>更新</button>
+      <button id="perm-toggle" class="ghost" title="AI 编译器权限模式" hidden>权限：标准</button>
     </div>
   </header>
 
   <div id="main-row">
     <!-- 左图标栏：打开 / 完成流（修音·复合·选定）/ 波形 / 逆向分解 / 结构 / 世界 / 研究账本 -->
     <nav id="rail">
+      <button id="rail-library" title="作品管理（封面 · 音频 · 歌词 · 发布）" aria-label="作品管理">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 16V8l8-1.5v7"/><circle cx="6.5" cy="16.5" r="1.5"/><circle cx="14.5" cy="14" r="1.5"/></svg>
+      </button>
+      <button id="rail-projects" title="生产控制室（Project / Cue / Candidates）" aria-label="生产控制室">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M8 5V3h8v2M3 10h18M8 14h3M8 17h6"/></svg>
+      </button>
       <button id="rail-open" title="打开音频文件（创建/进入世界）" aria-label="打开音频文件">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
       </button>
@@ -45,6 +50,11 @@
       </button>
       <button id="rail-research" title="研究账本（记录人类判断；感知通道）" aria-label="研究账本">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5A3.5 3.5 0 1 1 12.5 8M9 11.5 5 15.5M15 9a4 4 0 1 1-1.5 7.5L11 20.5M15 9l4-4"/></svg>
+      </button>
+      <!-- 波场（实验，默认关闭）：只在 MOODIFY_WAVEFIELD_V0=1 时由 app.js 显示。
+           未开启时这个按钮一直 hidden，已发布 Studio 的界面一字不变。 -->
+      <button id="rail-wavefield" title="波场（实验）：同一段声音放进不同大小的场，听、比较、选定" aria-label="波场" hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><ellipse cx="12" cy="12" rx="9.4" ry="4.2"/><ellipse cx="12" cy="12" rx="4.6" ry="9.2"/></svg>
       </button>
     </nav>
 
@@ -136,6 +146,112 @@
       <div id="views">
         <!-- 产品水印：透明底纹，常驻工作区背景层；结果内容叠加其上，不占布局 -->
         <img id="wm" src="assets/moodify_watermark.png" alt="">
+        <section id="view-library" class="workspace-view library-workspace" hidden>
+          <div class="library-layout">
+            <form id="library-form" class="library-compose">
+              <h3>添加作品</h3>
+              <label>歌名<input id="library-title" required maxlength="120" placeholder="输入歌名"></label>
+              <label>创作者<input id="library-creator" maxlength="120" placeholder="可选"></label>
+              <div class="library-files">
+                <button type="button" class="asset-picker" data-kind="audio"><b>音频</b><span id="library-audio-name">选择 WAV / FLAC</span></button>
+                <button type="button" class="asset-picker" data-kind="cover"><b>封面</b><span id="library-cover-name">选择图片</span></button>
+                <button type="button" class="asset-picker" data-kind="lyrics"><b>歌词文件</b><span id="library-lyrics-name">可选 LRC / TXT</span></button>
+              </div>
+              <div id="library-crop" class="library-crop" hidden>
+                <div class="library-crop-preview"><img id="library-crop-image" alt="封面裁剪预览"></div>
+                <div class="library-crop-tools"><label>上下位置<input id="library-crop-y" type="range" min="0" max="100" value="50"></label><button id="library-crop-apply" type="button" class="ghost">应用方形裁剪</button></div>
+              </div>
+              <label>歌词<textarea id="library-lyrics-text" rows="7" placeholder="也可以直接粘贴歌词"></textarea></label>
+              <button class="primary" type="submit">保存到我的作品库</button>
+              <p id="library-form-status" class="muted"></p>
+            </form>
+            <section class="library-collection"><div class="library-section-head"><h3>我的作品</h3><span id="library-count">0 首</span></div><div id="library-list" class="library-list"></div></section>
+          </div>
+        </section>
+        <!-- 作品试音：打开一首歌，边听边看滚动歌词。
+             歌词是**只读**的：时间轴来自创作者自己做的 LRC，Studio 不猜、不生成。 -->
+        <section id="view-player" class="workspace-view player-workspace" hidden>
+          <header class="player-header">
+            <button id="player-back" class="ghost" type="button">← 返回作品库</button>
+            <div class="player-heading">
+              <p class="project-kicker">MOODIFY AUDITION</p>
+              <h2 id="player-title">—</h2>
+              <p class="muted" id="player-creator"></p>
+            </div>
+          </header>
+
+          <div class="player-body">
+            <aside class="player-side">
+              <div class="player-cover">
+                <img id="player-cover" alt="" hidden>
+                <span id="player-cover-fallback">♫</span>
+              </div>
+              <div class="player-transport">
+                <button id="player-play" class="primary" type="button" disabled>▶</button>
+                <span id="player-time" class="player-time muted">0:00.0 / 0:00.0</span>
+              </div>
+              <!-- 波形兼进度条：点击即定位。用已内置的 WaveSurfer，不新引入播放器。 -->
+              <div id="player-wave" class="player-wave"></div>
+              <p class="muted player-note" id="player-note"></p>
+            </aside>
+
+            <section class="player-lyrics-pane">
+              <div id="player-lyrics-viewport" class="lyrics-viewport">
+                <div id="player-lyrics" class="lyrics-track"></div>
+              </div>
+              <p class="muted lyrics-note" id="player-lyrics-note" hidden></p>
+            </section>
+          </div>
+        </section>
+
+        <section id="view-projects" class="workspace-view project-workspace" hidden>
+          <header class="project-header">
+            <div>
+              <p class="project-kicker">MOODIFY PRODUCTION CONTROL</p>
+              <h2>Project / Cue 工作台</h2>
+              <p class="muted">业务任务进入 Cue；候选音乐统一经过 HEAR + JUDGE。处理工具可以替换，判断证据不能绕过。</p>
+            </div>
+            <div class="project-header-actions">
+              <button id="project-create" class="ghost">新建 Project</button>
+              <button id="cue-create" class="primary" disabled>新建 Cue</button>
+            </div>
+          </header>
+
+          <div class="project-grid">
+            <aside class="project-column">
+              <div class="project-column-head"><span>PROJECTS</span><b id="project-count">0</b></div>
+              <div id="project-list" class="project-list"></div>
+            </aside>
+            <section class="cue-column">
+              <div class="project-column-head"><span>CUES</span><b id="cue-count">0</b></div>
+              <div id="cue-list" class="cue-list"></div>
+            </section>
+            <section class="candidate-column">
+              <div id="cue-detail-empty" class="project-placeholder">选择一个 Cue，进入候选生产与判断。</div>
+              <div id="cue-detail" hidden>
+                <div class="cue-detail-head">
+                  <div>
+                    <p id="cue-kind" class="project-kicker"></p>
+                    <h3 id="cue-title">—</h3>
+                    <p id="cue-scene" class="muted"></p>
+                  </div>
+                  <button id="candidate-import" class="primary">导入候选 · HEAR + JUDGE</button>
+                </div>
+                <dl class="cue-brief">
+                  <div><dt>创作意图</dt><dd id="cue-intent">—</dd></div>
+                  <div><dt>目标时长</dt><dd id="cue-duration">—</dd></div>
+                  <div><dt>对白</dt><dd id="cue-dialogue">—</dd></div>
+                  <div><dt>人声偏好</dt><dd id="cue-vocal">—</dd></div>
+                </dl>
+                <div class="candidate-head">
+                  <span>CANDIDATES</span><span id="candidate-count" class="muted">0</span>
+                </div>
+                <div id="candidate-list" class="candidate-list"></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
         <section id="view-empty" class="workspace-view">
           <!-- 空态：唯一清晰的入口。说清会发生什么（两个完整候选 + 原版出口），
                而不是罗列分轨 / MIDI / DSP 这些内部步骤。 -->
@@ -428,9 +544,113 @@
             <p class="muted">选择上方音频（源或分离轨）→「音频转曲谱」，MIDI 与曲谱一次生成；<br>之后进入本工作台即直接打开，无需重转。</p>
           </div>
         </section>
+
+        <!-- ================= 波场（实验通道，默认关闭）=================
+             产品句：Moodify 把声音放进一个场，听它的结果，并搜索更好的场。
+             这一屏刻意不追求视觉打磨，它要成立的唯一交互是：
+             **同一段声音可以在不同大小的场里被听见，并选出一个。**
+             所有数值都来自 Core 的 HearSnapshot；壳不计算任何指标。
+             算法房间场是感知性的虚拟声场，不是物理精确的传播模拟。 -->
+        <section id="view-wavefield" class="workspace-view" hidden>
+          <div id="wf-head">
+            <h2 class="wf-title">Wave Field</h2>
+            <span class="muted caption">波形 → 波场 → 听 → 判断 → 选择 → 渲染</span>
+          </div>
+          <p class="muted caption wf-note">
+            感知性的虚拟声场（algorithmic room field），<strong>不是</strong>物理精确的传播模拟，也不是真实房间重建。
+            A / B / C 是空间尺度上的工程探针，未经过听感校准。
+          </p>
+
+          <div class="wf-row">
+            <span class="wf-label">源</span>
+            <span id="wf-source" class="muted">—</span>
+            <button id="wf-create" class="primary">建立波场（A / B / C）</button>
+          </div>
+
+          <div id="wf-body" hidden>
+            <div class="wf-audition">
+              <div class="wf-now">
+                <span class="wf-label">正在试听</span>
+                <span id="wf-playing" class="wf-playing">—</span>
+                <span class="muted caption">同一时刻只有一条在响</span>
+              </div>
+              <div id="wf-sources" class="wf-sources"></div>
+              <div class="wf-transport">
+                <button id="wf-play" class="ghost" title="播放 / 暂停当前候选">▶</button>
+                <span id="wf-time" class="bench-time">0:00.0 / 0:00.0</span>
+                <span id="wf-load" class="muted caption"></span>
+              </div>
+            </div>
+
+            <div class="wf-block">
+              <h3 class="wf-h">场（FieldSpec）</h3>
+              <table class="data"><thead><tr id="wf-field-head"></tr></thead><tbody id="wf-field-body"></tbody></table>
+            </div>
+
+            <div class="wf-block">
+              <h3 class="wf-h">听（HearSnapshot · 数值全部来自 Core 的既有度量）</h3>
+              <table class="data"><thead><tr id="wf-hear-head"></tr></thead><tbody id="wf-hear-body"></tbody></table>
+              <p class="muted caption" id="wf-hear-note"></p>
+            </div>
+
+            <div class="wf-block">
+              <span class="wf-label">选定</span>
+              <div id="wf-choices" class="wf-choices"></div>
+              <button id="wf-export" class="ghost" disabled>导出所选</button>
+              <span id="wf-status" class="muted caption"></span>
+            </div>
+
+            <p class="muted caption" id="wf-manifest"></p>
+          </div>
+        </section>
       </div>
     </main>
   </div>
+
+  <dialog id="project-dialog" class="studio-dialog">
+    <form id="project-form" method="dialog">
+      <p class="project-kicker">NEW PROJECT</p><h2>建立制作项目</h2>
+      <label>项目名称<input id="project-title-input" required placeholder="例如：网剧《项目名》第一季"></label>
+      <label>客户 / 委托方<input id="project-client-input" placeholder="内部项目可填 INTERNAL"></label>
+      <label>制作类型<select id="project-type-input"><option value="WEB_SERIES">网剧</option><option value="SHORT_DRAMA">短剧</option><option value="COMMERCIAL">商业广告</option><option value="LIBRARY">曲库建设</option></select></label>
+      <label>交付规范<input id="project-spec-input" placeholder="例如：48kHz / 24-bit WAV；待确认可留空"></label>
+      <div class="dialog-actions"><button type="button" class="ghost" id="project-cancel">取消</button><button class="primary" value="default">创建 Project</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="cue-dialog" class="studio-dialog">
+    <form id="cue-form" method="dialog">
+      <p class="project-kicker">NEW CUE</p><h2>定义音乐任务</h2>
+      <div class="dialog-two"><label>Cue 名称<input id="cue-title-input" required></label><label>类型<select id="cue-kind-input"><option value="SCORE">配乐</option><option value="THEME">主题曲</option><option value="INSERT">插曲</option><option value="TRAILER">预告</option></select></label></div>
+      <label>场景<input id="cue-scene-input" required placeholder="剧情位置、画面或对白上下文"></label>
+      <label>创作意图<textarea id="cue-intent-input" required rows="3" placeholder="情绪、叙事功能、必须保护与必须避免的内容"></textarea></label>
+      <div class="dialog-two"><label>目标时长（秒）<input id="cue-duration-input" type="number" min="1" step="0.1" required></label><label>人声偏好<select id="cue-vocal-input"><option value="EITHER">均可</option><option value="INSTRUMENTAL">纯音乐</option><option value="VOCAL">人声</option></select></label></div>
+      <label class="dialog-check"><input id="cue-dialogue-input" type="checkbox"> 场景含对白（Judge 需关注对白可懂度空间）</label>
+      <div class="dialog-actions"><button type="button" class="ghost" id="cue-cancel">取消</button><button class="primary" value="default">创建 Cue</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="library-edit-dialog" class="studio-dialog">
+    <form id="library-edit-form">
+      <h2>编辑作品</h2>
+      <input id="library-edit-id" type="hidden">
+      <label>歌名<input id="library-edit-title" required maxlength="120"></label>
+      <label>创作者<input id="library-edit-creator" maxlength="120" placeholder="可选"></label>
+      <label>歌词<textarea id="library-edit-lyrics" rows="9" placeholder="可选"></textarea></label>
+      <p id="library-edit-status" class="muted"></p>
+      <div class="dialog-actions"><button type="button" class="ghost" id="library-edit-cancel">取消</button><button class="primary" type="submit">保存修改</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="library-delete-dialog" class="studio-dialog compact-dialog">
+    <form id="library-delete-form">
+      <h2>删除作品？</h2>
+      <input id="library-delete-id" type="hidden">
+      <p>“<strong id="library-delete-title"></strong>”将从 App 曲库和 Studio 中移除。云端副本会删除，本机作品文件夹会移入回收站。</p>
+      <p id="library-delete-status" class="muted"></p>
+      <div class="dialog-actions"><button type="button" class="ghost" id="library-delete-cancel">取消</button><button class="danger" type="submit">确认删除</button></div>
+    </form>
+  </dialog>
 
   <div id="update-dialog" class="update-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="update-title">
     <div class="update-card">
@@ -462,7 +682,7 @@
 
   <!-- 意图命令条 = Mood 编译器之家：写文字 → DeepSeek 回答与操作；唯一 AI 门。
        平时只有一条输入框+发送；开始对话后抽屉对话区出现（可拖动/可收起）。 -->
-  <div id="intent-dock">
+  <div id="intent-dock" hidden aria-hidden="true">
     <div id="stream-bar" hidden title="拖动调高度，双击收起/展开对话">
       <span id="stream-dot" hidden></span>
       <span class="grip">⋯</span>
@@ -507,6 +727,10 @@
   <script src="vendor/wavesurfer.timeline.min.js"></script>
   <!-- OpenSheetMusicDisplay 1.9.4 (BSD-3-Clause) © PhonicScore — 曲谱工作台渲染引擎 -->
   <script src="vendor/opensheetmusicdisplay.min.js"></script>
+  <!-- 波场走带权威（单一播放器，UMD，可在 Node 里被测试）；无算法，只调度一条音源 -->
+  <script src="wavefield-player.js"></script>
+  <!-- LRC 时间轴解析与逐行定位（UMD，无 DOM 依赖，可在 Node 里被测试） -->
+  <script src="lyrics.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

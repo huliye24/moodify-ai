@@ -1,0 +1,156 @@
+/*
+ * Moodify Play — "Saving Beauty" palette
+ *
+ * The listening surface shares the Cloud/Studio visual family: warm paper,
+ * ink, quiet lilac/cyan traces, generous space, and restrained motion.
+ * This file is an operational override for the separately deployed Play app.
+ */
+
+:root {
+  --bg: #f7f6f2;
+  --surface: #fffefa;
+  --surface-subtle: rgba(72, 64, 88, 0.035);
+  --line: rgba(35, 31, 42, 0.11);
+  --text: #17161a;
+  --text-muted: #77727f;
+  --text-faint: #a39daa;
+  --focus: #6254f5;
+  --brand-violet: #6254f5;
+  --brand-cyan: #43bdd7;
+  --on-accent: #ffffff;
+  --on-contrast: #17161a;
+}
+
+html { background: var(--bg); }
+body { background: var(--bg); color: var(--text); }
+
+.sidebar {
+  background: rgba(250, 249, 246, 0.96);
+  border-right-color: var(--line);
+}
+.brand-link,
+.mobile-brand a { color: var(--text); }
+.sidebar nav button,
+.nav-search,
+.nav-group button,
+.nav-link { color: var(--text-muted); }
+.sidebar nav .nav-active {
+  color: var(--text);
+  background: rgba(98, 84, 245, 0.075);
+  box-shadow: inset 2px 0 var(--brand-violet);
+}
+.nav-search input { color: var(--text); }
+.nav-search input::placeholder { color: var(--text-faint); }
+.menu-toggle {
+  color: var(--text-muted);
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.45);
+}
+.menu-toggle:hover { color: var(--text); border-color: rgba(98, 84, 245, 0.32); }
+.profile { border-top-color: var(--line); }
+.avatar { background: var(--brand-violet); color: white; }
+
+.content {
+  background:
+    radial-gradient(circle at 76% 18%, rgba(102, 84, 245, 0.075), transparent 23%),
+    radial-gradient(circle at 94% 40%, rgba(67, 189, 215, 0.065), transparent 24%),
+    var(--bg);
+}
+.history button,
+.round {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--line);
+}
+.hero { border-bottom-color: var(--line); }
+.hero h1 { color: var(--text); font-weight: 400; }
+.hero p,
+.result-note,
+.section-head button { color: var(--text-muted); }
+.eyebrow { color: #77708b; }
+
+.primary {
+  background: var(--brand-violet);
+  color: white;
+  box-shadow: 0 10px 28px rgba(98, 84, 245, 0.14);
+}
+.glass {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.65);
+  border-color: var(--line);
+}
+
+.hero-vinyl .vinyl {
+  box-shadow: 0 25px 55px rgba(35, 31, 42, 0.13), 0 0 0 1px rgba(35, 31, 42, 0.07);
+}
+.vinyl {
+  background: radial-gradient(circle,
+    #f8f7f3 0 10%, #201e24 11% 30%, #39353f 31% 32%,
+    #19171c 33% 48%, #44404a 49% 50%, #18161b 51% 68%,
+    #3e3a43 69% 70%, #151317 71%);
+  box-shadow: 0 7px 18px rgba(35, 31, 42, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+.vinyl:after {
+  background: linear-gradient(115deg, transparent 30%, rgba(200, 230, 237, 0.13) 43%, transparent 55%, rgba(216, 207, 244, 0.12) 69%, transparent 80%);
+}
+.orbit { border-color: rgba(98, 84, 245, 0.13); }
+.orbit-two { border-color: rgba(67, 189, 215, 0.12); }
+.floating-note { color: rgba(98, 84, 245, 0.45); }
+
+.section-head h2,
+.track-info h3 { color: var(--text); }
+.filters button {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.48);
+  border-color: transparent;
+}
+.filters .selected {
+  color: #5043d5;
+  border-color: rgba(98, 84, 245, 0.24);
+  background: rgba(98, 84, 245, 0.065);
+}
+.tracks article:hover,
+.tracks article.playing { background: rgba(255, 255, 255, 0.7); }
+.track-info p,
+.duration,
+.tag { color: var(--text-muted); }
+.like,
+.more { color: #8c8693; }
+.is-liked { color: var(--brand-violet); }
+
+.player {
+  background: rgba(252, 251, 248, 0.94);
+  border-top-color: var(--line);
+  box-shadow: 0 -12px 36px rgba(35, 31, 42, 0.045);
+}
+.now span,
+.timeline,
+.utilities { color: var(--text-muted); }
+.now button { color: var(--brand-violet); }
+.controls button { color: var(--text-muted); }
+.controls .play { background: var(--text); color: white; }
+.timeline input { accent-color: var(--brand-violet); }
+.utility-link { color: var(--text-muted); text-decoration: none; }
+
+.drawer-overlay { background: rgba(31, 28, 36, 0.22); backdrop-filter: blur(2px); }
+.drawer {
+  background: rgba(250, 249, 246, 0.98);
+  border-left-color: var(--line);
+  box-shadow: -20px 0 60px rgba(35, 31, 42, 0.08);
+}
+.drawer-header button { color: var(--text-muted); border-color: var(--line); }
+.drawer-header button:hover { color: var(--text); }
+.drawer-label { color: var(--text-faint); }
+.drawer-item { color: var(--text-muted); }
+.drawer-item:hover { color: var(--text); background: rgba(98, 84, 245, 0.055); }
+.drawer-divider { border-top-color: var(--line); }
+
+.player-error { color: var(--text); }
+
+@media (max-width: 760px) {
+  .content {
+    background:
+      radial-gradient(circle at 105% 42%, rgba(98, 84, 245, 0.08), transparent 30%),
+      var(--bg);
+  }
+}

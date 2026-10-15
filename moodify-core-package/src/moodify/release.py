@@ -137,7 +137,13 @@ def analyze_to_case(source: Path, cases_root: Path, *, display_name: str | None 
             created_at=created.created_at,
         )
         _write_model(case_root / "case.json", completed)
-        return {"case": json.loads(to_canonical_json(completed)), "report": report}
+        return {
+            "case": json.loads(to_canonical_json(completed)),
+            "report": report,
+            # Additive public evidence for scientific visualisation. Values retain
+            # their unit/status wrappers so the interface never invents a measure.
+            "metrics": evidence.metrics,
+        }
     except Exception:
         failed = ProductionCase(
             case_id=case_id, source_id=source_id, objective="auditory analysis",
@@ -154,4 +160,5 @@ def reopen_case(cases_root: Path, case_id: str) -> dict:
     ProductionCase.model_validate_json((cases_root / case_id / "case.json").read_text(encoding="utf-8"))
     case = json.loads((cases_root / case_id / "case.json").read_text(encoding="utf-8"))
     report = json.loads((cases_root / case_id / "auditory_report.json").read_text(encoding="utf-8"))
-    return {"case": case, "report": report}
+    metrics = json.loads((cases_root / case_id / "scan" / "metrics.json").read_text(encoding="utf-8"))
+    return {"case": case, "report": report, "metrics": metrics}

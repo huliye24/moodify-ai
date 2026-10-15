@@ -1,5 +1,25 @@
 # PRODUCT BOUNDARY — Moodify
 
+> **2026-10-15 Studio library boundary:** 人类授权 Studio 建设内部作品库与 Desktop → Cloud
+> → App 发布链。Studio 负责输入与管理封面、音频、歌名、歌词；App 只负责播放。
+> 这是荣景文川内部 operator / owner 工具，不把当前阶段扩张为公共 UGC、社交、Marketplace
+> 或外部 Studio SaaS。“Web3 概念”只采用可验证的数据主权原则，不恢复历史 token/DAO 产品线。
+
+> **2026-10-08 phase-one business boundary:** external B2B clients buy commercial music and
+> production service, not Moodify software. Studio is internal; Play contains only first-party
+> catalogue works and explicitly shared private client review sets. General consumer, UGC,
+> marketplace, social and public Studio SaaS surfaces are paused. See
+> [COMMERCIAL_MUSIC_OPERATING_MODEL.md](COMMERCIAL_MUSIC_OPERATING_MODEL.md).
+
+> **2026-10-06 Wavefield boundary:** Moodify 的核心技术方向由 waveform-only processing 扩展为
+> `waveform → observable wavefield → judged wavefield`。Wavefield Profile、条件化 render、实测/模拟/
+> 推断分层证据属于 Core；真实录音棚、扬声器、麦克风阵列可作为可替换 field-realization Provider，
+> 不形成第二套 Core。未经校准的 stereo projection 不得称为真实三维声场。
+
+> **2026-10-05 Cloud-first override:** 对外首要产品定义为 **Moodify Cloud — Audio Intelligence, powered by GPU computing.** GPU 是计算底座，Cloud 是载体，Audio Intelligence 是产品能力层，API / Agent / Desktop / App 是入口。下文 Sound Protocol / Core / CLI / Studio / App 边界继续有效，但不再各自承担首要公开产品身份。网站可表达平台方向，但未验证能力必须显式限定为 direction / capability-specific availability。
+
+> **2026-10-06 Judge-core boundary:** Moodify 的不可外包核心是处理前与处理后的两次 Judge。处理模型属于可替换 Provider 层；Judge 的契约、证据、校准、数据治理和升级规则属于 Moodify Core。Judge 是技术核心名，不是与 Moodify 并列的新产品品牌。当前成熟 `Judge-1` 尚未实现，不得对外虚构。
+
 **Canon v2.1（Sound Protocol, 2026-09-23；One Core / Two Interfaces 延续）**
 
 ## External Product
@@ -30,6 +50,14 @@ Moodify 提供以 `PLAY` 为核心的消费端聆听体验，同时提供以 `PR
 - cloud production（intake → job → storage → compute → render → delivery）
 
 **Moodify Core** 是跨生产端/消费端的共享资产：analysis / dsp / processing / playback / profiles / verification / contracts 统一来自 Core，interface 不得私藏第二套声音逻辑。
+
+Core 的主要技术对象包含 `Waveform + Wavefield Profile + Reproduction Evidence`。文件域分析、模拟渲染与
+真实空间采集必须共享同一证据契约；录音棚连接是 field-realization / measurement Provider，不拥有独立
+Judge authority。
+
+Core 的**战略中心**是 Moodify Judge；既有 DSP、processing 与 playback 仍属于共享 Core，但不因在
+Core 中实现就自动成为必须自研的模型。第三方/开源 Provider 必须经显式适配层调用，并由同一 Judge
+在调用前给出理由、在调用后验收结果。
 
 ## User-visible complexity rule
 

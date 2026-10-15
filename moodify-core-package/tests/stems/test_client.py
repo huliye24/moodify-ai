@@ -167,3 +167,24 @@ def test_check_missing_task_raises_task_unknown():
     client = _client_with(factory)
     with pytest.raises(StemTaskUnknown):
         client.check(["missing"])
+
+
+def test_minutes_left_uses_license_header_and_parses_balance():
+    seen = {}
+
+    def factory(request):
+        seen["url"] = str(request.url)
+        seen["license"] = request.headers.get("X-License-Key")
+        return httpx.Response(200, json={"minutes_left": 249.75})
+
+    assert _client_with(factory).minutes_left() == 249.75
+    assert seen == {
+        "url": "https://www.lalal.ai/api/v1/limits/minutes_left/",
+        "license": "test-key",
+    }
+
+
+def test_minutes_left_rejects_invalid_payload():
+    client = _client_with(lambda request: httpx.Response(200, json={"unexpected": True}))
+    with pytest.raises(StemUpstreamError, match="limits response is invalid"):
+        client.minutes_left()

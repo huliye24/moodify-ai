@@ -7,21 +7,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.core.os.LocaleListCompat
 import com.moodify.app.data.LocaleKit
-import com.moodify.app.ui.LaunchScreen
 import com.moodify.app.ui.MoodifyApp
 import com.moodify.app.ui.theme.MoodifyTheme
-import kotlinx.coroutines.delay
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -30,23 +19,10 @@ class MainActivity : AppCompatActivity() {
         ensureInitialLocale()
         setContent {
             MoodifyTheme {
-                var launching by remember { mutableStateOf(true) }
-                LaunchedEffect(Unit) {
-                    delay(300)
-                    launching = false
-                    requestNotificationPermissionIfNeeded()
-                }
-                Box {
-                    // Initialize playback and refresh the cloud catalogue behind
-                    // the branded launch layer, avoiding a second loading phase.
-                    MoodifyApp()
-                    AnimatedVisibility(
-                        visible = launching,
-                        exit = fadeOut(tween(140)),
-                    ) { LaunchScreen() }
-                }
+                MoodifyApp()
             }
         }
+        requestNotificationPermissionIfNeeded()
     }
 
     /** Android 13+ requires runtime consent for the media notification. */

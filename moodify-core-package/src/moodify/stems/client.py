@@ -95,6 +95,21 @@ class LalalClient:
                 raise StemTaskUnknown(f"task {task_id} unknown to lalal.ai")
         return result
 
+    def minutes_left(self) -> float:
+        """Return the upstream processing-minute balance without uploading audio."""
+        try:
+            response = self._client.post(
+                self.base_url + "limits/minutes_left/",
+                headers=self._headers(),
+            )
+        except httpx.HTTPError as exc:
+            raise StemUpstreamError(f"limits transport failure: {exc}") from exc
+        self._raise_for_status(response, "limits")
+        try:
+            return float(response.json()["minutes_left"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise StemUpstreamError("lalal.ai limits response is invalid") from exc
+
     def _raise_for_status(self, response: httpx.Response, operation: str) -> None:
         if response.status_code in (401, 403):
             raise StemLicenseInvalid(f"lalal.ai rejected license key ({operation})")
