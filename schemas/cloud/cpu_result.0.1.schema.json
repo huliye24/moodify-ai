@@ -1,0 +1,187 @@
+{
+  "$id": "moodify.cpu-result/0.1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify CPU job result",
+  "description": "S3 队列 jobs/done/<job_id>.json 或 jobs/failed/<job_id>.json 的唯一权威结果契约（moodify.cpu-result/0.1）。任何无法对齐的指标写字符串 \"not_alignable\"，不得补算、不得估填。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "job_id",
+    "request_id",
+    "job_type",
+    "worker_id",
+    "attempt",
+    "input",
+    "input_sha256",
+    "outputs",
+    "started_at",
+    "finished_at",
+    "duration_seconds",
+    "retryable",
+    "error"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "moodify.cpu-result/0.1"
+    },
+    "status": {
+      "description": "DONE=完成；FAILED=出错；INCONCLUSIVE=跑了但证据不足；HUMAN_REQUIRED=必须人类裁决。后两者不是失败，是诚实结论。",
+      "enum": ["DONE", "FAILED", "INCONCLUSIVE", "HUMAN_REQUIRED"]
+    },
+    "job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "job_type": {
+      "enum": [
+        "probe",
+        "transcode",
+        "analyze",
+        "judge_before",
+        "manifest",
+        "smoke"
+      ]
+    },
+    "worker_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt": {
+      "description": "第几次尝试（1 起）。重试上限 2 次（§5）。",
+      "type": "integer",
+      "minimum": 1
+    },
+    "input": {
+      "description": "回显任务声明的输入，便于无需回读任务即可自证。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bucket", "key", "sha256"],
+      "properties": {
+        "bucket": {"type": "string"},
+        "key": {"type": "string"},
+        "sha256": {"type": "string"}
+      }
+    },
+    "input_sha256": {
+      "description": "worker 实测的输入哈希。未取到（如对象不存在）写 not_alignable。",
+      "anyOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {"const": "not_alignable"}
+      ]
+    },
+    "outputs": {
+      "description": "产物清单：S3 键 + 实测 sha256 + 字节数。空数组表示本次没有产物（如失败任务）。",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "sha256", "bytes", "role"],
+        "properties": {
+          "key": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "bytes": {"type": "integer", "minimum": 0},
+          "role": {
+            "description": "产物角色：report / evidence / log / media / manifest / other。",
+            "enum": ["report", "evidence", "log", "media", "manifest", "other"]
+          }
+        }
+      }
+    },
+    "started_at": {"type": "string", "format": "date-time"},
+    "finished_at": {"type": "string", "format": "date-time"},
+    "duration_seconds": {"type": "number", "minimum": 0},
+    "cpu_seconds": {
+      "description": "进程 CPU 时间（user+sys）。测不到写 not_alignable。",
+      "anyOf": [
+        {"type": "number", "minimum": 0},
+        {"const": "not_alignable"}
+      ]
+    },
+    "peak_memory_bytes": {
+      "description": "峰值常驻内存。测不到写 not_alignable。",
+      "anyOf": [
+        {"type": "integer", "minimum": 0},
+        {"const": "not_alignable"}
+      ]
+    },
+    "core_version": {
+      "description": "运行期实际解析到的唯一 Core 版本；Core 未安装时写 not_alignable。",
+      "type": "string"
+    },
+    "tool_versions": {
+      "description": "实际用到的外部工具版本，如 ffmpeg / ffprobe / python。",
+      "type": "object",
+      "default": {},
+      "additionalProperties": {"type": "string"}
+    },
+    "evidence": {
+      "description": "证据路径清单。与 outputs 指向同一批对象，此处给的是「这条结论的证据是什么」的语义索引。",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "role"],
+        "properties": {
+          "key": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "params": {
+      "description": "本次实际生效的参数（含默认值补齐后的结果），供复现。",
+      "type": "object",
+      "default": {}
+    },
+    "limits_applied": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "properties": {
+        "timeout_seconds": {"type": "integer"},
+        "max_input_bytes": {"type": "integer"}
+      }
+    },
+    "retryable": {
+      "description": "该失败是否值得重投。由错误码决定，不由调用方随意填写。",
+      "type": "boolean"
+    },
+    "error": {
+      "description": "status=FAILED 时为对象；其余状态为 null。",
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message", "retryable"],
+          "properties": {
+            "code": {"type": "string", "enum": [
+              "SCHEMA_INVALID",
+              "UNKNOWN_JOB_TYPE",
+              "INPUT_NOT_FOUND",
+              "INPUT_HASH_MISMATCH",
+              "INPUT_TOO_LARGE",
+              "OUTPUT_UPLOAD_FAILED",
+              "TIMEOUT",
+              "TUNABLE_CORE_NOT_AVAILABLE",
+              "CORE_UNAVAILABLE",
+              "STALE_CLAIM_RECLAIMED",
+              "INTERNAL_ERROR"
+            ]},
+            "message": {"type": "string"},
+            "detail": {"type": "string"},
+            "retryable": {"type": "boolean"}
+          }
+        }
+      ]
+    }
+  }
+}

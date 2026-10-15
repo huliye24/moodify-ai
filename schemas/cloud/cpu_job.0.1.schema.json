@@ -1,0 +1,108 @@
+{
+  "$id": "moodify.cpu-job/0.1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Moodify CPU job",
+  "description": "S3 队列 jobs/pending/<job_id>.json 的唯一权威任务契约（moodify.cpu-job/0.1）。生产者：Moodify Studio。消费者：ops/cloud_worker。本文件是契约的单一权威，两侧（JS / Python）都对本文件校验，任一实现都不是第二权威。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "job_id",
+    "request_id",
+    "job_type",
+    "input",
+    "output_prefix",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "moodify.cpu-job/0.1"
+    },
+    "job_id": {
+      "description": "任务唯一 id，同时用作 S3 键名。用 UUID。",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "request_id": {
+      "description": "幂等键。同一 request_id 重复投递只产生一个权威结果，返回既有结果而不重复执行。",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "job_type": {
+      "description": "probe/transcode/analyze/judge_before/manifest/smoke —— 每个类型映射到一个已有 Core/CLI 能力；无 Core 实现者返回 TUNABLE_CORE_NOT_AVAILABLE。",
+      "enum": [
+        "probe",
+        "transcode",
+        "analyze",
+        "judge_before",
+        "manifest",
+        "smoke"
+      ]
+    },
+    "input": {
+      "description": "输入对象。sha256 是生产者声明的期望哈希；worker 下载后必须实测比对，不符即 INPUT_HASH_MISMATCH。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bucket", "key", "sha256"],
+      "properties": {
+        "bucket": {
+          "type": "string",
+          "minLength": 3
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "output_prefix": {
+      "description": "产物前缀。必须落在 results/ 下且以 / 结尾——这是「不覆盖输入、不覆盖当前基准」的结构性保证。",
+      "type": "string",
+      "minLength": 9,
+      "maxLength": 512,
+      "pattern": "^results/(?!.*\\.\\.)[A-Za-z0-9._/-]*/$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "core_version": {
+      "description": "生产者的建议值。worker 以运行期实际解析到的版本为准写入结果，此处不构成约束。",
+      "type": "string",
+      "default": "resolved-at-runtime"
+    },
+    "params": {
+      "description": "任务类型专属参数（如转码目标码率）。开放对象，语义由各 adapter 定义；未知键必须被 adapter 显式拒绝，不得静默忽略。",
+      "type": "object",
+      "default": {}
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "properties": {
+        "timeout_seconds": {
+          "description": "单任务超时。上限 7200s，防止生产者把 worker 的看门狗关掉。",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7200,
+          "default": 1800
+        },
+        "max_input_bytes": {
+          "description": "输入对象字节上限，下载前用 HeadObject 预检。默认 2 GiB。",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10737418240,
+          "default": 2147483648
+        }
+      }
+    }
+  }
+}
