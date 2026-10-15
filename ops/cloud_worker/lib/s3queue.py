@@ -59,6 +59,12 @@ CLAIM_TIMEOUT_SEC = 3600
 #: 重试上限（方案 §5：最多 2 次重试，即最多 3 次尝试）。
 MAX_ATTEMPTS = 3
 
+#: 指数退避基数（方案 §5）。第 n 次失败后等 RETRY_BASE_SEC * 2^(n-1) 秒。
+RETRY_BASE_SEC = 30
+
+#: 条件写入是否可用。探测到后端不支持时置 False 并只告警一次。
+_conditional_write_supported = True
+
 def _default_client():
     """生产路径：凭据由 EC2 instance profile 提供，不落盘。"""
     return boto3.client("s3", region_name=REGION)
@@ -261,17 +267,19 @@ def claim(job_id: str, worker_id: str) -> Optional[Dict[str, Any]]:
 def reclaim_stale(
     worker_id: str, timeout_sec: int = CLAIM_TIMEOUT_SEC, limit: int = 100
 ) -> List[str]:
-    """把超时未完成的 claimed 任务放回 pending。返回被回收的 job_id 列表。
+    """把超时未完成的 claimed 任务放回 pending，**每次回收都推进 attempt**。返回 job_id 列表。
 
     为什么需要：claim 是「先写 claimed、再删 pending」，中间崩溃会让任务卡在 claimed
-    里再也不被任何人看到。回收时把 attempt 加一，超过 :data:`MAX_ATTEMPTS` 的直接判死，
-    避免坏任务 crash loop。
+    里再也不被任何人看到。回收让僵死任务重新可见。
+
+    为什么**不在这里判死**：判死要写一份契约合法的失败结果，那是契约层的事；队列层写一份
+    原始 job 进 failed/ 会得到一份「看着像结果、其实不是」的对象。这里只负责让任务重新
+    可见，用满尝试次数的那些由 worker 在领取时立刻终止（RETRY_EXHAUSTED）。
     """
     now = time.time()
     reclaimed: List[str] = []
 
-    claimed_keys = list_keys(PREFIX_CLAIMED, limit=limit)
-    for key in claimed_keys:
+    for key in list_keys(PREFIX_CLAIMED, limit=limit):
         if not key.endswith(".json"):
             continue
         job_id = key[len(PREFIX_CLAIMED) : -len(".json")]
@@ -282,29 +290,25 @@ def reclaim_stale(
                 continue  # 别人刚完成并清了 claimed
             raise
 
-        claimed_at = job.get("claimed_at") or 0
-        if now - claimed_at < timeout_sec:
-            continue
-
-        attempt = int(job.get("attempt") or 1) + 1
-        if attempt > MAX_ATTEMPTS:
-            job["attempt"] = attempt
-            job["reclaimed_by"] = worker_id
-            write_json_atomic(PREFIX_FAILED + job_id + ".json", job)
-            delete(key)
-            reclaimed.append(job_id)
+        if now - (job.get("claimed_at") or 0) < timeout_sec:
             continue
 
         resumed = dict(job)
-        resumed["attempt"] = attempt
+        resumed["attempt"] = int(job.get("attempt") or 1) + 1
         resumed["reclaimed_by"] = worker_id
         resumed.pop("worker_id", None)
         resumed.pop("claimed_at", None)
+        resumed.pop("not_before", None)  # 回收不是退避，立刻可再领
         write_json(PREFIX_PENDING + job_id + ".json", resumed)
         delete(key)
         reclaimed.append(job_id)
 
     return reclaimed
+
+
+def peek_pending(job_id: str) -> Optional[Dict[str, Any]]:
+    """读一份 pending 但不认领它。用于跳过仍在退避期的任务。"""
+    return read_json_or_none(PREFIX_PENDING + f"{job_id}.json")
 
 
 def mark_done(job: Dict[str, Any], result: Dict[str, Any], worker_id: str) -> str:
@@ -342,11 +346,25 @@ def _clear_claimed(job_id: str) -> None:
         pass  # claimed 已不存在不影响完成语义
 
 
-def _record_idempotency(job: Dict[str, Any], result: Dict[str, Any], result_key: str) -> None:
-    """登记 request_id → 权威结果。失败不阻断：结果本身已落在 done/failed 上。"""
+def _record_idempotency(
+    job: Dict[str, Any], result: Dict[str, Any], result_key: str
+) -> Optional[str]:
+    """登记 request_id → 权威结果。**条件写入：先写者赢。**
+
+    为什么必须条件写：claim 非原子，两个 worker 可能同时跑同一个 request_id。
+    无条件 PUT 会让后写者覆盖先写者，于是「权威结果」退化成「最后一个碰巧先写的人的结果」。
+    ``If-None-Match: *`` 让 S3 自己裁定谁赢 —— 我们需要的性质从来不是「只有一个 worker
+    拿到任务」（那做不到），而是「**只有一个权威结果**」（这个做得到）。
+
+    返回胜出的键；没赢（别人已登记）或后端不支持条件写时返回 None。
+    登记失败不阻断：结果本身已经落在 done/ 或 failed/ 上了。
+    """
+    global _conditional_write_supported
+
     request_id = job.get("request_id")
     if not request_id:
-        return
+        return None
+
     entry = {
         "request_id": request_id,
         "job_id": str(job["job_id"]),
@@ -355,10 +373,34 @@ def _record_idempotency(job: Dict[str, Any], result: Dict[str, Any], result_key:
         "result_key": result_key,
         "recorded_at": time.time(),
     }
+    key = idem_key(request_id)
+    body = json.dumps(entry, ensure_ascii=False, indent=2, sort_keys=True).encode("utf-8")
+
+    def _put():
+        c = _client()
+        kwargs = {"Bucket": QUEUE_BUCKET, "Key": key, "Body": body,
+                  "ContentType": "application/json; charset=utf-8"}
+        if _conditional_write_supported:
+            kwargs["IfNoneMatch"] = "*"
+        c.put_object(**kwargs)
+        return key
+
     try:
-        write_json(idem_key(request_id), entry)
-    except S3Error:
-        pass
+        return _wrap(f"record_idem({request_id})", _put)
+    except S3Error as e:
+        if _conditional_write_supported and e.code in ("PreconditionFailed", "412"):
+            return None  # 别人先登记了 —— 这正是条件写要挡住的情况
+        if _conditional_write_supported and e.code in ("NotImplemented", "501"):
+            # 后端不支持 If-None-Match：降级为无条件写，但**说清楚**，
+            # 不让「只有一个权威结果」这句保证悄悄变成空话。
+            _conditional_write_supported = False
+            print(
+                f"[WARN] S3 后端不支持条件写入（{e.code}），幂等索引降级为无条件 PUT："
+                "并发重投时权威结果由最后写者决定，不再由 S3 裁定。",
+                flush=True,
+            )
+            return _record_idempotency(job, result, result_key)
+        return None
 
 
 def publish_alias(job_id: str, alias_payload: Dict[str, Any]) -> str:
@@ -441,12 +483,24 @@ def should_retry(job: Dict[str, Any], result: Dict[str, Any]) -> bool:
     return attempt_of(job) < MAX_ATTEMPTS
 
 
+def retry_delay_seconds(attempt: int) -> int:
+    """第 ``attempt`` 次尝试失败后的退避时长：RETRY_BASE_SEC * 2^(attempt-1)。"""
+    return RETRY_BASE_SEC * (2 ** max(0, attempt - 1))
+
+
 def requeue_for_retry(job: Dict[str, Any], result: Dict[str, Any]) -> str:
-    """把任务放回 pending 等下一轮（指数退避由 worker 的 poll 节奏承担）。"""
+    """把任务放回 pending 等下一轮，带**指数退避**（方案 §5）。
+
+    退避落在 ``not_before`` 上而不是靠 poll 节奏：轮询间隔是运维参数，不该兼职当退避，
+    否则调快轮询就等于取消退避、调慢就等于惩罚所有正常任务。
+    """
+    attempt = attempt_of(job) + 1
+    delay = retry_delay_seconds(attempt_of(job))
     resumed = {k: v for k, v in job.items() if k not in ("worker_id", "claimed_at")}
-    resumed["attempt"] = attempt_of(job) + 1
+    resumed["attempt"] = attempt
     resumed["retry_of"] = str(job["job_id"])
     resumed["last_error"] = (result.get("error") or {}).get("code")
+    resumed["not_before"] = time.time() + delay
     return write_json(PREFIX_PENDING + str(job["job_id"]) + ".json", resumed)
 
 

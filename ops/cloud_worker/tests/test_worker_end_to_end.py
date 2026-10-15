@@ -397,3 +397,91 @@ CANNED_FFPROBE = {
         }
     ],
 }
+
+
+# ------------------------------------------------------------- 退避与尝试上限
+
+def test_backoff_gated_job_is_not_claimed_yet(ready):
+    """退避期未到的任务不该被领走 —— 否则退避等于没有。"""
+    fake, key, digest = ready
+    job = make_job(key=key, sha256=digest)
+    job["not_before"] = time.time() + 300
+    submit(fake, job)
+
+    assert worker.process_one(WID) is False, "还在退避期，本轮应当什么都不做"
+    assert len(fake.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_PENDING)) == 1
+    assert fake.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_CLAIMED) == []
+
+
+def test_backoff_expired_job_is_claimed(ready):
+    fake, key, digest = ready
+    job = make_job(key=key, sha256=digest)
+    job["not_before"] = time.time() - 1
+    submit(fake, job)
+
+    assert worker.process_one(WID) is True
+    assert _done(fake, job["job_id"])["status"] == "done"
+
+
+def test_retryable_failure_schedules_backoff(ready):
+    fake, key, digest = ready
+    job = make_job(key=key, sha256=digest, params={"mode": "fail", "fail_with": "TIMEOUT"})
+    submit(fake, job)
+    before = time.time()
+
+    worker.process_one(WID)
+
+    pending = read_json(
+        fake, s3queue.QUEUE_BUCKET, f"{s3queue.PREFIX_PENDING}{job['job_id']}.json"
+    )
+    assert pending["not_before"] >= before + s3queue.RETRY_BASE_SEC
+
+
+def test_exhausted_attempts_are_terminated_with_a_contract_result(ready):
+    """尝试次数用满后**判死**，且判死写的是一份契约合法的结果，不是原始 job。
+
+    这条挡的是「能让 worker 崩溃的任务」：那种任务每次都在递增 attempt 之前把进程带走，
+    只有领取时判死才拦得住无限重跑。
+    """
+    fake, key, digest = ready
+    job = make_job(key=key, sha256=digest)
+    job["attempt"] = s3queue.MAX_ATTEMPTS + 1
+    submit(fake, job)
+    fake.calls.clear()
+
+    worker.process_one(WID)
+
+    result = _failed(fake, job["job_id"])
+    contract.validate_result(result)  # 判死也必须产出契约合法的结果，否则它就不是结果
+    assert result["status"] == "failed"
+    assert result["error"]["code"] == "RETRY_EXHAUSTED"
+    assert result["retryable"] is False
+    assert result["outputs"] == []
+    assert not any(c.startswith("download:") for c in fake.calls), "判死不该先下载输入"
+    assert fake.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_PENDING) == [], "不得再放回队列"
+
+
+def test_exhausted_job_does_not_loop_forever(ready):
+    """端到端证明它真的会停：回收推进 attempt，跑满之后终止。"""
+    fake, key, digest = ready
+    job = make_job(key=key, sha256=digest, params={"mode": "fail", "fail_with": "TIMEOUT"})
+    submit(fake, job)
+
+    for _ in range(s3queue.MAX_ATTEMPTS):
+        # 每轮把退避期抹掉，模拟时间流逝
+        peeked = s3queue.peek_pending(job["job_id"])
+        if peeked is not None:
+            peeked.pop("not_before", None)
+            s3queue.write_json(
+                f"{s3queue.PREFIX_PENDING}{job['job_id']}.json", peeked
+            )
+        elif fake.get(
+            s3queue.QUEUE_BUCKET, f"{s3queue.PREFIX_FAILED}{job['job_id']}.json"
+        ):
+            break
+        worker.process_one(WID)
+
+    result = _failed(fake, job["job_id"])
+    assert result["error"]["code"] == "TIMEOUT", "前几次走正常重试路径"
+    assert fake.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_PENDING) == [], "最终必须停下来"
+    assert len(fake.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_IDEM)) == 1

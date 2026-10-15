@@ -5,6 +5,7 @@
 """
 
 import json
+import time
 
 import pytest
 
@@ -120,8 +121,13 @@ def test_reclaim_leaves_fresh_claims_alone(fake_s3):
     assert len(fake_s3.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_CLAIMED)) == 1
 
 
-def test_reclaim_gives_up_after_max_attempts(fake_s3):
-    """用满尝试次数的僵死任务判死，不再放回 pending —— 避免 crash loop。"""
+def test_reclaim_requeues_even_past_max_attempts(fake_s3):
+    """回收**总是**把任务放回 pending 并推进 attempt —— 包括用满次数的那些。
+
+    回归用例：曾有一版回收直接把原始 job 对象写进 failed/。那份东西不是契约结果
+    （没有 status/error 对象/哈希），读起来却像结果 —— 那是伪造。
+    判死要写一份契约合法的失败结果，所以判死属于 worker；队列层只负责让任务重新可见。
+    """
     job = make_job()
     submit(fake_s3, job)
     claimed = s3queue.claim(job["job_id"], "worker-a")
@@ -132,8 +138,30 @@ def test_reclaim_gives_up_after_max_attempts(fake_s3):
     reclaimed = s3queue.reclaim_stale("worker-b", timeout_sec=3600)
 
     assert reclaimed == [job["job_id"]]
-    assert fake_s3.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_PENDING) == []
-    assert len(fake_s3.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_FAILED)) == 1
+    pending = read_json(
+        fake_s3, s3queue.QUEUE_BUCKET, f"{s3queue.PREFIX_PENDING}{job['job_id']}.json"
+    )
+    assert pending["attempt"] == s3queue.MAX_ATTEMPTS + 1
+    assert fake_s3.keys(s3queue.QUEUE_BUCKET, s3queue.PREFIX_FAILED) == [], (
+        "队列层不得往 failed/ 写非契约对象"
+    )
+
+
+def test_reclaim_clears_backoff_so_recovered_work_is_runnable(fake_s3):
+    """回收不是退避：捞回来的任务应当立刻可领，而不是继续等。"""
+    job = make_job()
+    submit(fake_s3, job)
+    claimed = s3queue.claim(job["job_id"], "worker-a")
+    claimed["claimed_at"] -= 7200
+    claimed["not_before"] = time.time() + 9999
+    s3queue.write_json(s3queue.PREFIX_CLAIMED + f"{job['job_id']}.json", claimed)
+
+    s3queue.reclaim_stale("worker-b", timeout_sec=3600)
+
+    pending = read_json(
+        fake_s3, s3queue.QUEUE_BUCKET, f"{s3queue.PREFIX_PENDING}{job['job_id']}.json"
+    )
+    assert "not_before" not in pending
 
 
 # ------------------------------------------------------------ 原子写
@@ -259,6 +287,67 @@ def test_requeue_for_retry_increments_attempt(fake_s3):
     )
     assert requeued["attempt"] == 2
     assert requeued["last_error"] == "TIMEOUT"
+
+
+def test_retry_delay_is_exponential():
+    """退避是任务属性，不是轮询节奏：30s / 60s（方案 §5 的最多 2 次重试）。"""
+    assert s3queue.retry_delay_seconds(1) == s3queue.RETRY_BASE_SEC
+    assert s3queue.retry_delay_seconds(2) == s3queue.RETRY_BASE_SEC * 2
+
+
+def test_requeue_sets_not_before_into_the_future(fake_s3):
+    job = make_job()
+    result = _failed_result(retryable=True, attempt=1, job=job)
+    before = time.time()
+
+    s3queue.requeue_for_retry(job, result)
+
+    requeued = read_json(
+        fake_s3, s3queue.QUEUE_BUCKET, f"{s3queue.PREFIX_PENDING}{job['job_id']}.json"
+    )
+    assert requeued["not_before"] >= before + s3queue.RETRY_BASE_SEC
+
+
+# ------------------------------------------------------------ 幂等索引的条件写入
+
+def test_idempotency_index_keeps_the_first_writer(fake_s3):
+    """并发重投时，权威结果由**先写者**决定，不是由最后写者决定。
+
+    这是「只有一个权威结果」的机制本身：claim 无法保证只有一个 worker 拿到任务，
+    但条件写入（If-None-Match: *）能保证只有一份索引登记。
+    """
+    job_a = make_job(job_id="aaaa", request_id="req-race")
+    job_b = make_job(job_id="bbbb", request_id="req-race")
+    result_a = {"job_id": "aaaa", "status": "done", "request_id": "req-race", "worker": "w-a"}
+    result_b = {"job_id": "bbbb", "status": "done", "request_id": "req-race", "worker": "w-b"}
+
+    assert s3queue._record_idempotency(job_a, result_a, "jobs/done/aaaa.json") is not None
+    assert s3queue._record_idempotency(job_b, result_b, "jobs/done/bbbb.json") is None, (
+        "第二个写者必须输 —— 否则权威结果会被后写者覆盖"
+    )
+
+    entry = read_json(fake_s3, s3queue.QUEUE_BUCKET, s3queue.idem_key("req-race"))
+    assert entry["job_id"] == "aaaa"
+    assert entry["result_key"] == "jobs/done/aaaa.json"
+
+
+def test_idempotency_index_falls_back_loudly_when_conditional_write_unsupported(fake_s3, capsys):
+    """后端不支持条件写时降级，但必须**出声** —— 不能让那句保证悄悄变成空话。"""
+    from botocore.exceptions import ClientError
+
+    fake_s3.fail_on["put_object"] = ClientError(
+        {"Error": {"Code": "NotImplemented", "Message": "no If-None-Match"}}, "PutObject"
+    )
+    s3queue._conditional_write_supported = True
+    job = make_job(request_id="req-fallback")
+    try:
+        s3queue._record_idempotency(job, {"status": "done"}, "jobs/done/x.json")
+    finally:
+        fake_s3.fail_on.pop("put_object", None)
+        s3queue._conditional_write_supported = True
+
+    out = capsys.readouterr().out
+    assert "不支持条件写入" in out
 
 
 def test_mark_attempt_failed_does_not_record_idempotency(fake_s3):

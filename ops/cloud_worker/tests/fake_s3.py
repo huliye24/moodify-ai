@@ -55,6 +55,12 @@ class FakeS3:
     def put_object(self, Bucket: str, Key: str, Body: bytes, **kwargs: Any) -> dict:
         self.calls.append(f"put:{Key}")
         self._maybe_fail("put_object")
+        # If-None-Match: * —— 真正的条件写：键已存在就 412，让 S3（这里是替身）裁定谁赢
+        if kwargs.get("IfNoneMatch") == "*" and (Bucket, Key) in self.objects:
+            raise ClientError(
+                {"Error": {"Code": "PreconditionFailed", "Message": "object exists"}},
+                "PutObject",
+            )
         data = bytes(Body)
         if any(Key.startswith(p) for p in self.corrupt_prefixes):
             data = b'{"corrupted": true}'

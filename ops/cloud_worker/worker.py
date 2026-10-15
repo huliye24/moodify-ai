@@ -233,6 +233,30 @@ def handle(job: Dict[str, Any], raw_job: Any, wid: str) -> None:
             return
 
     attempt = s3queue.attempt_of(job)
+
+    # ---- 3. 尝试次数已用满：立刻终止，不再执行 ----
+    # 这一条挡的是「能让 worker 崩溃的任务」—— 那种任务每次都在递增 attempt 之前就把进程
+    # 带走，只有在这里判死才拦得住无限重跑。判死必须写一份契约合法的失败结果，
+    # 所以它属于契约层（worker），不属于队列层。
+    if attempt > s3queue.MAX_ATTEMPTS:
+        stamp = contract.utc_now()
+        result = contract.build_result(
+            job=job,
+            worker_id=wid,
+            status=contract.STATUS_FAILED,
+            attempt=attempt,
+            started_at=stamp,
+            finished_at=stamp,
+            error=contract.build_error(
+                "RETRY_EXHAUSTED",
+                f"已尝试 {attempt - 1} 次，超过上限 {s3queue.MAX_ATTEMPTS}",
+                "重投同一任务不会有不同结果；请修正输入本身。",
+            ),
+        )
+        s3queue.mark_failed(job, result, wid)
+        log(f"终止 {job_id}：RETRY_EXHAUSTED（attempt={attempt}）")
+        return
+
     work_dir = WORK_ROOT / job_id
     in_dir = work_dir / "input"
     out_dir = work_dir / "out"
@@ -245,7 +269,7 @@ def handle(job: Dict[str, Any], raw_job: Any, wid: str) -> None:
     keep_local = False
 
     try:
-        # ---- 3. 下载前预检：不把注定失败的几 GB 拉下来 ----
+        # ---- 4. 下载前预检：不把注定失败的几 GB 拉下来 ----
         declared = s3queue.head_input(job["input"]["key"], job["input"]["bucket"])
         if declared is None:
             raise AdapterError("INPUT_NOT_FOUND", "输入对象不存在", f"{job['input']['bucket']}/{job['input']['key']}")
@@ -258,13 +282,13 @@ def handle(job: Dict[str, Any], raw_job: Any, wid: str) -> None:
         for d in (in_dir, out_dir, scratch_dir):
             d.mkdir(parents=True, exist_ok=True)
 
-        # ---- 4. 下载并核对哈希 ----
+        # ---- 5. 下载并核对哈希 ----
         local_input = in_dir / Path(job["input"]["key"]).name
         s3queue.download_input(job["input"]["key"], str(local_input), job["input"]["bucket"])
         actual = s3queue.sha256_file(str(local_input))
         contract.check_input_hash(job["input"]["sha256"], actual)
 
-        # ---- 5. 交给 adapter（领域逻辑全在 Core 侧） ----
+        # ---- 6. 交给 adapter（领域逻辑全在 Core 侧） ----
         adapter = get_adapter(job["job_type"])
         ctx = AdapterContext(
             job=job,
@@ -278,7 +302,7 @@ def handle(job: Dict[str, Any], raw_job: Any, wid: str) -> None:
         )
         outcome = adapter(ctx)
 
-        # ---- 6. 先上传，后清理 ----
+        # ---- 7. 先上传，后清理 ----
         outputs, evidence = _upload_artifacts(outcome.artifacts, job["output_prefix"])
 
         result = contract.build_result(
@@ -365,7 +389,7 @@ def _safe_hash_or_not_alignable(in_dir: Path, job: Dict[str, Any]) -> Any:
 def process_one(wid: str) -> bool:
     """取一个任务并处理。返回是否真的处理了任务。"""
     try:
-        pending = s3queue.list_pending(limit=1)
+        pending = s3queue.list_pending(limit=10)
     except s3queue.S3Error as exc:
         if exc.code in ("AccessDenied", "403", "AllAccessDisabled"):
             log(f"FATAL 无 S3 权限（{exc.code}）：instance role 未挂策略，无法轮询任务。")
@@ -377,7 +401,21 @@ def process_one(wid: str) -> bool:
     if not pending:
         return False
 
-    job_id = pending[0]
+    # 跳过仍在退避期的任务（not_before 未到）—— 退避是任务属性，不是轮询节奏
+    now = time.time()
+    job_id = None
+    for candidate in pending:
+        peeked = s3queue.peek_pending(candidate)
+        if peeked is None:
+            continue
+        not_before = peeked.get("not_before")
+        if isinstance(not_before, (int, float)) and not_before > now:
+            continue
+        job_id = candidate
+        break
+    if job_id is None:
+        return False  # 队列里全是还在退避期的任务
+
     job = s3queue.claim(job_id, wid)
     if job is None:
         return False  # 被其它 worker 抢走
